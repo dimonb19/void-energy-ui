@@ -1,18 +1,37 @@
-@use '/src/styles/abstracts/variables' as *;
+@use '../abstracts/variables' as *;
+
+/* ==========================================================================
+   VOID ENERGY ANIMATION LOGIC
+   ==========================================================================
+   
+   PURPOSE:
+   Defines the "Time" aspect of the design system.
+   Contains reusable Keyframes and Transition Mixins.
+
+   CONTENTS:
+   1. Mixins:
+      - entry-transition: Standard "Slide Up + Fade In" for elements.
+   
+   2. Keyframes:
+      - shimmer:        Loading skeleton movement.
+      - cyber-pulse:    Breathing glow for active states.
+      - rotate-laser:   The Gemini Button gradient rotation.
+      - progress-fill:  Simple width animation for bars.
+      - logo-enter:     Holographic materialization effect for logos.
+   ========================================================================== */
 
 // ==========================================================================
-// ANIMATION LOGIC
+// 1. CONTROL MIXINS
 // ==========================================================================
-
-// --- 1. CONTROL MIXINS ---
 
 // Standard Entry Transition (The "Cyber Slide")
+// Usage: @include entry-transition; inside a class (e.g., .fade-in)
 @mixin entry-transition($duration: 0.4s, $delay: 0s) {
   // Use --ease-stabilize for the "Slide In" feel
   transition: 
     opacity $duration var(--ease-stabilize) $delay,
     transform $duration var(--ease-stabilize) $delay,
-    filter $duration ease $delay; // Filter is expensive, keep it simple
+    filter $duration ease $delay; 
   
   opacity: 1;
   transform: translateY(0) scale(1);
@@ -25,21 +44,19 @@
   }
 }
 
-// Materialize (Holographic Entry)
-@mixin animate-materialize($duration: 0.4s, $delay: 0s) {
-  animation: materialize $duration cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
-  animation-delay: $delay;
-}
-
-// --- 2. CORE KEYFRAMES ---
+// ==========================================================================
+// 2. CORE KEYFRAMES
+// ==========================================================================
 
 // A. SHIMMER (Loading/Energy)
+// Used by: .shimmer (Helpers)
 @keyframes shimmer {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 
 // B. CYBER PULSE (Active States)
+// Used by: .cyber-pulse (Helpers)
 @keyframes cyber-pulse {
   0%, 100% {
     opacity: 1;
@@ -51,52 +68,31 @@
   }
 }
 
-// C. MATERIALIZE (Hologram)
-@keyframes materialize {
-  0% {
-    opacity: 0;
-    transform: scale(0.95) translateY(10px);
-    filter: blur(10px);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-    filter: blur(0px);
-  }
-}
-
-// D. VOID BREATHE (Backgrounds)
-@keyframes void-breathe {
-  0%, 100% { transform: scale(1); opacity: 0.4; }
-  50% { transform: scale(1.05); opacity: 0.6; }
-}
-
-// E. ROTATION (Loaders / Laser Border)
-@keyframes rotate-center {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
+// C. ROTATE LASER (Gemini Button)
+// Used by: .btn-cta (Buttons)
 @keyframes rotate-laser {
   from { transform: translate(-50%, -50%) rotate(0deg); }
   to   { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-// F. PROGRESS FILL
+// D. PROGRESS FILL
+// Used by: .progress-bar (Helpers)
 @keyframes progress-fill {
   from { width: 0%; }
   to { width: 100%; }
 }
 
+// E. LOGO ENTRY (Holographic Materialization)
+// Used by: .loading-logo (Helpers)
 @keyframes logo-enter {
   0% {
     opacity: 0;
-    transform: scale(0.5);
-    filter: blur(10px) grayscale(100%);
+    transform: scale(0.8); // Starts slightly smaller
+    filter: blur(12px);    // Starts out of focus (Void Physics)
   }
   100% {
     opacity: 1;
     transform: scale(1);
-    filter: blur(0) grayscale(0%);
+    filter: blur(0);       // Snaps into focus
   }
 }

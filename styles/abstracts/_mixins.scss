@@ -43,21 +43,16 @@
         
         // FIX: Don't use raw variable. Mix it to keep transparency.
         // This results in ~50% opacity color, not 100% solid.
-        border-top-color: color-mix(in srgb, var(--energy-primary), transparent 50%); 
+        border-color: color-mix(in srgb, var(--energy-primary), transparent 50%);
         
         // Glow calculation
         box-shadow: 
           0 12px 40px rgba(0, 0, 0, 0.6), 
           0 0 15px color-mix(in srgb, var(--energy-primary), transparent 80%);
-          
-      } @else {
-        // CASE B: Static (Layout Only)
-        // No movement. No glow.
-        // We just slightly brighten the border to acknowledge the cursor exists,
-        // but not enough to suggest "Click Me".
-        border-top-color: color-mix(in srgb, var(--border-highlight), white 10%);
-        transform: none;
-        box-shadow: var(--void-shadow); // Keep original shadow
+        
+        @at-root [data-atmosphere='paper'] & {
+          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
       }
     }
   }
@@ -101,6 +96,10 @@
 @mixin text-glow($color: var(--energy-primary)) {
   color: $color;
   text-shadow: 0 0 15px color-mix(in srgb, $color, transparent 40%);
+
+  @at-root [data-atmosphere='paper'] & {
+    text-shadow: 0 0 5px color-mix(in srgb, $color, transparent 40%);
+  }
 }
 
 // MIXIN: The "Gemini Laser" Structure
@@ -113,14 +112,14 @@
   color: var(--text-main);
   
   // Important: Border radius must be set on parent to clip the laser
-  border-radius: 4px; 
+  border-radius: 999px; // Pill Shape
 
   // 1. THE ROTATING BEAM (The Gradient)
   &::before {
     content: '';
     position: absolute;
     top: 50%; left: 50%;
-    width: 400%; height: 400%; 
+    width: 500%; height: 500%; 
     border-radius: 50%;
     
     // The "Tail" Effect Gradient
@@ -140,6 +139,29 @@
     animation: rotate-laser 4s linear infinite;
     z-index: -1;
     opacity: 1; 
+
+    // TERMINAL OVERRIDE: The "Segmented" Radar
+    @at-root [data-atmosphere='terminal'] & {
+      background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        transparent 100deg,
+        var(--energy-primary) 100deg, 
+        var(--energy-primary) 115deg, 
+        transparent 115deg,
+        transparent 125deg,
+        var(--energy-primary) 125deg,
+        var(--energy-primary) 150deg,
+        transparent 150deg,
+        transparent 160deg,
+        var(--energy-primary) 160deg,
+        var(--energy-primary) 240deg, 
+        transparent 240deg,
+        transparent 360deg
+      );
+      // Optional: Make it semi-transparent like a CRT ghost
+      opacity: 0.8;
+    }
   }
 
   // 2. THE INNER MASK (The "Solid" Button)
@@ -152,7 +174,7 @@
     background: var(--bg-canvas); 
     
     z-index: -1;
-    border-radius: 2px; 
+    border-radius: 999px; // Pill Shape
   }
   
   // HOVER EFFECT: SURGE (Brightness + Width)

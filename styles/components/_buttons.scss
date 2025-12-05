@@ -1,9 +1,52 @@
 @use '../abstracts/variables' as *;
 @use '../abstracts/mixins' as *;
 
+/* ==========================================================================
+   VOID ENERGY BUTTON SYSTEM
+   ==========================================================================
+   
+   PURPOSE:
+   Defines the interactive elements of the system. In Void Energy, buttons are 
+   not just colored rectangles; they are physical surfaces that react to touch.
+
+   PHILOSOPHY: "Interaction is Energy"
+   - Resting state = Potential Energy (Subtle border/glass).
+   - Hover/Focus = Kinetic Energy (Glow, Rise, Brightness).
+   
+   --------------------------------------------------------------------------
+   CHEAT SHEET & API REFERENCE
+   --------------------------------------------------------------------------
+
+   1. THE BASE CLASS
+      - .btn or <button>  Standard Glass Button. Used for secondary actions.
+                          (Cancel, Back, Open Settings).
+
+   2. THE PRIMARY ACTION (The "Gemini Laser")
+      - .btn-cta          High-visibility button with a rotating gradient border.
+                          Usage: ONE per view (e.g., "Connect Wallet", "Submit").
+
+   3. SEMANTIC VARIANTS (Contextual Energy)
+      - .btn-orb          Premium / Web3 / Value (Gold/Cyan in Terminal).
+      - .btn-signal       Success / Safe Action (Green).
+      - .btn-alert        Destructive / Error (Red).
+      - .btn-system       Configuration / AI (Purple).
+
+   4. UTILITIES
+      - .btn-icon         Forces a perfect circle (44x44px) for SVGs.
+      - .btn-void         "Naked" reset. Strips all styles. Used for text links
+                          or wrapping complex clickable areas.
+
+   --------------------------------------------------------------------------
+   ATMOSPHERE BEHAVIOR
+   --------------------------------------------------------------------------
+   - Void (Default):   Glass surface. Hover emits a Neon Glow.
+   - Paper (Light):    Graphite outline. Hover resembles Ink density (Darker).
+   - Terminal:         Instant state changes (0s latency). High contrast.
+
+   -------------------------------------------------------------------------- */
+
 // ==========================================================================
 // BUTTONS
-// Mantra: "Interaction is Energy."
 // ==========================================================================
 
 // 1. BASE BUTTON & VARIANTS
@@ -117,6 +160,8 @@ button:not(.btn-void),
     min-height: 3rem;
     padding-inline: 1.5rem;
 
+    border-radius: 999px; // Pill Shape
+
     @media (hover: hover) {
       &:hover:not(:disabled) {
         // Reset base button hover effects that clash
@@ -134,6 +179,11 @@ button:not(.btn-void),
           color: var(--energy-primary); 
           text-shadow: none;
           box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        // TERMINAL OVERRIDE: The "Hard Glitch"
+        @at-root [data-atmosphere='terminal'] & {
+          text-shadow: none;
         }
       }
     }

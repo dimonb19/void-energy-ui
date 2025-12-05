@@ -27,24 +27,36 @@
       - Wrapping:   .flex-wrap | .flex-nowrap
       - Sizing:     .full-w (width 100%) | .full-h (height 100%) | .flex-1 (fill space)
 
-   2. SPACING (1 unit = 1px visual reference, mostly REM based)
-      - Gaps:       .gap-8 | .gap-16 | .gap-24 | .gap-32 | .gap-64
-      - Padding:    .pad-16 | .pad-24 | .pad-32 | .pad-inline (24px horizontal)
-      - Margin:     .mar-16 | .mar-auto (Horizontal Center)
+   2. SIZING (Dimensions)
+      - Width:      .w-full (100%) | .w-screen (100vw) | .w-auto
+      - Height:     .h-full (100%) | .h-screen (100vh) | .h-auto
+      - Min-Height: .min-h-screen (Crucial for app wrapper)
+      - Constraints:.max-w-full (Prevent overflow)
 
-   3. PHYSICS & SHAPE (Atmosphere Aware)
+   3. SPACING (1 unit = 1px visual reference, mostly REM based)
+      - Gaps:       .gap-0 | .gap-8 | .gap-16 | .gap-24 | .gap-32 | .gap-64
+      - Padding:    .pad-0 | .pad-16 | .pad-24 | .pad-32 | .pad-inline (24px horizontal)
+      - Margin:     .mar-0 | .mar-16 | .mar-auto (Horizontal Center)
+      - Margin Top: .mar-top-8 | .mar-top-16 | .mar-top-24 | .mar-top-32 | .mar-top-64
+      - Margin Bot: .mar-bot-8 | .mar-bot-16 | .mar-bot-24 | .mar-bot-32 | .mar-bot-64
+      - Margin Y:   .mar-y-16 | .mar-y-24 | .mar-y-32 | .mar-y-64
+
+   4. PHYSICS & SHAPE (Atmosphere Aware)
       - Radius:     .round-8 | .round-12 | .round-16 | .round-24 | .round-full
       - Blur:       .blur (Adapts: 20px in Void, 0px in Paper, 2px in Terminal)
 
-   4. ANIMATION (Time)
+   5. ANIMATION (Time)
       - Entry:      .fade-in (add .delay-1 through .delay-5)
       - Loading:    .shimmer (Adapts color to current atmosphere)
       - Action:     .cyber-pulse (Breathing glow for active states)
       - Progress:   .progress-bar > <span> (Inner span animates fill)
+      - Logo Load:  .loading-logo (Holographic materialization effect)
 
-   5. TEXT (Typography)
+   6. TEXT (Typography)
+      - Alignment:  .text-center (Center text horizontally)
       - Highlight:  .text-highlight (Neon glow using current atmosphere energy)
       - Accessibility: .sr-only (Screen reader only content)
+      - Status Colors: .text-success | .text-error | .text-premium | .text-system
 
    --------------------------------------------------------------------------
    COMMON PATTERNS (Copy-Paste)
@@ -134,28 +146,82 @@
 .full-h       { height: 100%; }
 
 // --------------------------------------------------------------------------
-// 2. SPACING 
+// 2. SIZING & DIMENSIONS
 // --------------------------------------------------------------------------
 
-// Gap
+// Widths
+.w-full       { width: 100%; } // Safest: fits inside parent/scrollbar
+.w-auto       { width: auto; }
+.max-w-full   { max-width: 100%; }
+
+// Viewport Width (Use with caution: can cause horizontal scrollbars on Windows)
+.w-screen     { width: 100vw; } 
+
+// Heights
+.h-full       { height: 100%; }
+.h-auto       { height: auto; }
+
+// Viewport Height (The Fix)
+// 100vh = Fixed (Hidden by address bar on mobile)
+// 100dvh = Dynamic (Updates when address bar shrinks/grows)
+.h-screen     { 
+  height: 100vh; // Fallback
+  height: 100dvh; 
+}
+
+// Minimum Heights (Crucial for App Wrapper)
+.min-h-screen { 
+  min-height: 100vh; // Fallback
+  min-height: 100dvh; 
+}
+
+// --------------------------------------------------------------------------
+// 3. SPACING 
+// --------------------------------------------------------------------------
+
+// A. GAPS (Flex/Grid Parents)
+.gap-0  { gap: 0; }
 .gap-8  { gap: 0.5rem; }
 .gap-16 { gap: 1rem; }
 .gap-24 { gap: 1.5rem; }
 .gap-32 { gap: 2rem; }
 .gap-64 { gap: 4rem; }
 
-// Padding
+// B. PADDING (Internal Space)
+.pad-0  { padding: 0; }
 .pad-16 { padding: 1rem; }
 .pad-24 { padding: 1.5rem; }
 .pad-32 { padding: 2rem; }
 .pad-inline { padding-inline: 1.5rem; }
 
-// Margins
+// C. MARGINS (External Space)
+// Base
+.mar-0  { margin: 0; }
 .mar-16 { margin: 1rem; }
 .mar-auto { margin-inline: auto; }
 
+// Top (Push down)
+.mar-top-8  { margin-top: 0.5rem; }
+.mar-top-16 { margin-top: 1rem; }
+.mar-top-24 { margin-top: 1.5rem; }
+.mar-top-32 { margin-top: 2rem; }
+.mar-top-64 { margin-top: 4rem; }
+
+// Bottom (Push up)
+.mar-bot-8  { margin-bottom: 0.5rem; }
+.mar-bot-16 { margin-bottom: 1rem; }
+.mar-bot-24 { margin-bottom: 1.5rem; }
+.mar-bot-32 { margin-bottom: 2rem; }
+.mar-bot-64 { margin-bottom: 4rem; }
+
+// Vertical Axis (Top & Bottom) - Very useful for sections
+.mar-y-16 { margin-block: 1rem; }
+.mar-y-24 { margin-block: 1.5rem; }
+.mar-y-32 { margin-block: 2rem; }
+.mar-y-64 { margin-block: 4rem; }
+
 // --------------------------------------------------------------------------
-// 3. VISUAL PHYSICS & SHAPE
+// 4. VISUAL PHYSICS & SHAPE
 // --------------------------------------------------------------------------
 
 // Dynamic Blur
@@ -173,7 +239,7 @@
 .round-full { border-radius: 9999px; }   // Circles
 
 // --------------------------------------------------------------------------
-// 4. ANIMATION UTILITIES
+// 5. ANIMATION UTILITIES
 // --------------------------------------------------------------------------
 
 // Entry Animations
@@ -228,9 +294,35 @@
   }
 }
 
+// Logo Loader (Splash Screen)
+// Usage: <img src="/logo.svg" class="loading-logo" />
+.loading-logo {
+  // Sizing (Adjustable via inline styles if needed)
+  width: 8rem; 
+  aspect-ratio: 1/1;
+  
+  // The Animation
+  // 1.2s duration gives it a "Cinematic" feel (not too fast)
+  // var(--ease-snap) makes it settle firmly into place
+  animation: logo-enter 1.2s var(--ease-snap) forwards;
+
+  // OPTIONAL: If the load takes > 2s, you can chain the "Pulse" animation 
+  // to start after the entry finishes.
+  // animation: 
+  //   logo-enter 1.2s var(--ease-snap) forwards,
+  //   cyber-pulse 3s var(--ease-pulse) infinite 1.2s; // Starts after 1.2s delay
+}
+
 // --------------------------------------------------------------------------
-// 5. TEXT UTILITIES
+// 6. TEXT UTILITIES
 // --------------------------------------------------------------------------
+
+.text-center { text-align: center; }
+
+.text-success { color: var(--color-success); }
+.text-error   { color: var(--color-error); }
+.text-premium { color: var(--color-premium); }
+.text-system  { color: var(--color-system); }
 
 // Neon Highlight
 .text-highlight {

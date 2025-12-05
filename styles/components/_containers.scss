@@ -1,12 +1,71 @@
 @use 'sass:map';
 @use '/src/styles/abstracts' as *;
 
+/* ==========================================================================
+   VOID ENERGY CONTAINER & SURFACE SYSTEM
+   ==========================================================================
+   
+   PURPOSE:
+   This file manages the "Frame" (Layout) and the "Skin" (Surfaces) of the UI.
+   It separates width constraints from visual physics to allow maximum flexibility.
+
+   PHILOSOPHY: "Separation of Concerns"
+   1. Containers handle WIDTH and MARGINS.
+   2. Surfaces handle BACKGROUNDS, BLURS, and BORDERS.
+   
+   --------------------------------------------------------------------------
+   CHEAT SHEET & API REFERENCE
+   --------------------------------------------------------------------------
+
+   1. LAYOUT CONTAINERS (Structure Only)
+      - .container        Responsive max-width + padding. Centers content.
+      - .container-fluid  100% width + responsive padding. 
+
+   2. PRESET CARDS (Layout + Visuals)
+      - .card-glass       A standard glass container with vertical spacing.
+      - .card-sunk        A recessed container (sidebar style) with vertical spacing.
+
+   3. ATOMIC SURFACES (Texture Only - No Padding/Layout)
+      Combine these with utility classes from _helpers.scss (.pad-*, .round-*).
+      
+      - .surface-glass        Static glass layer (Background/Blur).
+      - .surface-glass-action Interactive glass (Rises & Glows on hover).
+      - .surface-sunk         Recessed layer (Inner shadow).
+      - .surface-void         Solid canvas color (Opaque masking).
+      - .surface-spotlight    Slightly lighter solid background.
+
+   4. CANVAS-LEVEL INPUTS (The Exception)
+      - .sunk-on-canvas   Use this when an input must sit directly on the --bg-canvas
+
+   --------------------------------------------------------------------------
+   COMMON PATTERNS (Copy-Paste)
+   --------------------------------------------------------------------------
+
+   A. THE STANDARD PAGE LAYOUT
+      <div class="container flex-col gap-24">
+         <h1>Title</h1>
+         <p>Content...</p>
+      </div>
+
+   B. THE COMPOSABLE GLASS CARD (Preferred)
+      <div class="surface-glass round-16 pad-24 flex-col gap-16">
+         <h2>Card Title</h2>
+      </div>
+
+   C. THE CLICKABLE WIDGET
+      <div class="surface-glass-action round-12 pad-16 flex-center">
+         <span>Click Me</span>
+      </div>
+
+   -------------------------------------------------------------------------- */
+
 // ==========================================================================
-// CONTAINER COMPONENT
-// Role: Handles max-widths and margins across breakpoints.
-// Logic: Pure layout. No visuals (blur/glow) by default.
+// 1. LAYOUT CONTAINERS (Structure)
 // ==========================================================================
 
+// STANDARD CONTAINER
+// Role: Handles max-widths and margins across breakpoints.
+// Logic: Pure layout. No visuals (blur/glow) by default.
 .container {
   // 1. Base Mobile Styles (Zero config)
   width: 100%;
@@ -33,32 +92,9 @@
   }
 }
 
-// ==========================================================================
-// OPTIONAL: VISUAL MODIFIERS
-// Usage: <div class="container card-glass">
-// ==========================================================================
-
-.card-glass {
-  @include glass-float;
-  border-radius: 16px;
-  margin-block: 2rem; // Adds vertical breathing room
-  
-  // Ensure the glass container usually needs internal padding
-  // varying by breakpoint (optional, but recommended)
-  padding-block: 2rem;
-}
-
-.card-sunk {
-  @include glass-sunk;
-  border-radius: 16px;
-  margin-block: 2rem;
-  padding-block: 2rem;
-}
-
-// ==========================================================================
-// FULL WIDTH FLUID CONTAINER
-// Usage: Background sections that span viewport edge-to-edge
-// ==========================================================================
+// FLUID CONTAINER
+// Role: Background sections that span viewport edge-to-edge.
+// Logic: 100% width, but respects the grid's side padding.
 .container-fluid {
   width: 100%;
   padding-inline: map.get($container-paddings, 'base');
@@ -74,5 +110,114 @@
         padding-inline: $target-padding;
       }
     }
+  }
+}
+
+// ==========================================================================
+// 2. PRESET CARDS (Layout + Visuals)
+// ==========================================================================
+// Use these when you want a standard "Section" block with spacing included.
+
+// Shared Logic for responsive verticality
+@mixin responsive-vertical-spacing {
+  // Mobile Base: Compact but comfortable
+  margin-block: 2rem; 
+  padding-block: 2rem; 
+
+  // Tablet: Start opening up
+  @media (min-width: 768px) {
+    margin-block: 3rem;
+    padding-block: 2.5rem;
+  }
+
+  // Large Desktop: Luxurious space
+  @media (min-width: 1440px) {
+    margin-block: 4rem; // 64px separation
+    padding-block: 3rem; // 48px internal padding
+  }
+  
+  // 4K / Ultra Wide: Massive void
+  @media (min-width: 1920px) {
+    margin-block: 6rem; // 96px separation
+    padding-block: 4rem;
+  }
+}
+
+.card-glass {
+  @include glass-float();
+  border-radius: 16px;
+  @include responsive-vertical-spacing;
+}
+
+.card-sunk {
+  @include glass-sunk;
+  border-radius: 16px;
+  @include responsive-vertical-spacing;
+}
+
+// ==========================================================================
+// 3. ATOMIC SURFACES (Texture Only)
+// ==========================================================================
+// Purpose: Apply "Void Physics" to any element without enforcing layout/spacing.
+
+// A. FLOATING SURFACES (Positive Z)
+// --------------------------------------------------------------------------
+
+// Static Glass (Decoration / Wrapper)
+// Does not move on hover.
+.surface-glass {
+  @include glass-float($interactive: false);
+  // No padding/margin/radius defined. Combine with _helpers.scss.
+}
+
+// Interactive Glass (Clickable Cards)
+// Rises and glows on hover.
+.surface-glass-action {
+  @include glass-float($interactive: true);
+  cursor: pointer;
+}
+
+// B. SUNK SURFACES (Negative Z)
+// --------------------------------------------------------------------------
+
+// Recessed areas (for groupings, not just inputs)
+.surface-sunk {
+  @include glass-sunk;
+}
+
+// C. SOLID SURFACES (Opaque)
+// --------------------------------------------------------------------------
+
+// Pure Void Background (Useful for masking or solid headers)
+.surface-void {
+  background: var(--bg-canvas);
+  // Optional: add a subtle border to define edges against other void elements
+  border: 1px solid var(--border-shadow); 
+}
+
+// Spotlight Background (Slightly lighter, useful for active sections)
+.surface-spotlight {
+  background: var(--bg-spotlight);
+  border: 1px solid var(--border-shadow);
+}
+
+// 4. CANVAS-LEVEL INPUTS (The Exception)
+// --------------------------------------------------------------------------
+// Use this when an input must sit directly on the --bg-canvas 
+// without a parent Glass Card. It adds a stronger border to define boundaries.
+
+.sunk-on-canvas {
+  @include glass-sunk;
+  
+  // VISIBLE BORDER & ATMOSPHERIC DEPTH
+  // Since we don't have the glass card contrast, we brighten the border,
+  // and darken the current canvas color
+  border-color: var(--border-highlight); // 30% opacity (Brighter)
+  background: color-mix(in srgb, var(--bg-canvas), black 20%);
+  
+  // Paper Mode Override
+  @at-root [data-atmosphere='paper'] & {
+    background: #FFFFFF;
+    border: 1px solid var(--energy-secondary);
   }
 }

@@ -173,7 +173,7 @@
   --text-main: #{$term-amber};
   --text-dim: rgba(245, 197, 24, 0.7);
 
-  --color-premium: #F5C518;
+  --color-premium: #{$void-cyan}; // Amber (Standard) vs Cyan (Premium) creates maximum contrast
   --color-error: #FF3333;
   --color-success: #00FF41;
 

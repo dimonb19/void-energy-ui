@@ -1,0 +1,149 @@
+@use '/src/styles/abstracts' as *;
+
+// ==========================================================================
+// DIALOGS & MODALS
+// Mantra: "Holographic Stabilization."
+// ==========================================================================
+
+dialog {
+  // --- 1. LAYOUT & POSITION ---
+  position: fixed;
+  margin: auto; // Centers native dialogs
+  padding: 0;   // Reset, let inner container handle it
+  inset: 0;     // Ensure full screen centering context
+  
+  width: min(90%, 30rem); 
+  max-height: 85vh;
+  z-index: 100; // Layer: Modal
+
+  // --- 2. VOID STYLING ---
+  border: none;
+  border-radius: 1rem;
+  color: var(--text-main);
+  
+  // Apply Glass Physics (Static: No hover movement)
+  @include glass-float($interactive: false);
+  
+  // Extra Depth: Modals float higher than cards
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+  
+  // --- 3. ANIMATION PHYSICS (The Materialize Effect) ---
+  // Default State (OPEN)
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  filter: blur(0);
+  
+  // We transition properties including display/overlay for exit animations
+  transition: 
+    opacity var(--speed-base) var(--ease-flow),
+    transform var(--speed-base) var(--ease-snap), // The "Pop"
+    filter var(--speed-base) var(--ease-flow),
+    display var(--speed-base) allow-discrete,
+    overlay var(--speed-base) allow-discrete;
+
+  // --- 4. ENTRY STATE (@starting-style) ---
+  // How it looks the millisecond before it opens
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px); // Slightly small, slightly low
+    filter: blur(10px); // Out of focus
+  }
+
+  // --- 5. EXIT STATE ---
+  // When 'open' is removed
+  &:not([open]) {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px); // Drifts away upwards
+    filter: blur(10px);
+  }
+
+  // --- 6. BACKDROP (The Overlay) ---
+  &::backdrop {
+    // Dynamic: Deep Blue in Void, Dark Grey in Paper
+    background: color-mix(in srgb, var(--bg-canvas), transparent 20%);
+    backdrop-filter: blur(4px);
+    opacity: 1;
+    
+    transition: 
+      opacity var(--speed-base) var(--ease-flow),
+      display var(--speed-base) allow-discrete,
+      overlay var(--speed-base) allow-discrete;
+      
+    // Paper Mode Exception: Standard dark overlay
+    @at-root [data-atmosphere='paper'] & {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(2px);
+    }
+  }
+
+  &:not([open])::backdrop {
+    opacity: 0;
+    backdrop-filter: blur(0);
+  }
+
+  // --- 7. INNER CONTENT LAYOUT ---
+  // We target a direct child div to handle padding/scroll
+  & > div {
+    display: flex;
+    flex-flow: column nowrap;
+    padding: 2rem;
+    gap: 1.5rem;
+    
+    // Typography
+    h2, h3 { 
+      color: var(--text-main); 
+      margin: 0; 
+      font-family: var(--font-heading);
+    }
+    
+    p { 
+      color: var(--text-dim); 
+      line-height: 1.6; 
+    }
+  }
+
+  // --- 8. SCROLLBARS (Neon Stream) ---
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--energy-secondary) transparent;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: transparent;
+    margin-block: 0.5rem;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, var(--energy-secondary), var(--energy-primary));
+    border-radius: 10px;
+    
+    &:hover {
+      background: var(--energy-primary);
+      box-shadow: 0 0 10px var(--energy-primary);
+    }
+  }
+
+  // --- 9. PAPER MODE OVERRIDE ---
+  @at-root [data-atmosphere='paper'] & {
+    background: #FFFFFF;
+    border: 1px solid #E0E0E0;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15); // Clean shadow
+    border-radius: 8px;
+    
+    // Crisp entry, no blur
+    @starting-style {
+      opacity: 0;
+      transform: scale(0.95); 
+      filter: none;
+    }
+    
+    &:not([open]) {
+      opacity: 0;
+      transform: scale(0.95);
+      filter: none;
+    }
+  }
+}
