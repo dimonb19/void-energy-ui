@@ -1,5 +1,6 @@
 @use 'sass:map';
 @use '/src/styles/abstracts' as *;
+@use '/src/styles/base/typography';
 
 /* ==========================================================================
    VOID ENERGY CONTAINER & SURFACE SYSTEM
@@ -208,5 +209,62 @@
   @at-root [data-atmosphere='paper'] & {
     background: #FFFFFF;
     border: 1px solid var(--energy-secondary);
+  }
+}
+
+// ==========================================================================
+// 5. SETTINGS GRID (Dashboard Layout)
+// ==========================================================================
+// Usage:
+// <div class="settings-grid">
+//   <div class="settings-label">Label</div>
+//   <div class="settings-content">...inputs...</div>
+// </div>
+
+.settings-grid {
+  display: grid;
+  width: 100%;
+  gap: 1rem;
+  
+  // 1. MOBILE (Stacked)
+  grid-template-columns: 1fr; 
+  align-items: start; // Align to top, not center
+
+  // 2. DESKTOP (Side-by-Side)
+  @include respond-up(small-desktop) {
+    // 10rem is tighter than 14rem, matches your screenshot better
+    grid-template-columns: 10rem 1fr; 
+    gap: 2rem;
+  }
+
+  // 3. INTERNAL PARTS
+  .settings-label {
+    @extend .text-h4; 
+    color: var(--text-dim);
+    margin-block: auto;
+    text-align: left; // Match your old UI (Left aligned)
+
+    @include mobile-only {
+      text-align: center; // Labels stay left-aligned on mobile
+      padding-bottom: 0.75rem; 
+    }
+    
+    // OPTICAL ALIGNMENT
+    // Inputs have padding. Text needs to move down slightly to line up 
+    // with the text *inside* the input.
+    // padding-top: 0.75rem; 
+  }
+
+  .settings-content {
+    display: flex;
+    flex-direction: column; 
+    gap: 1.25rem; // Increased gap between rows slightly
+    width: 100%;
+    margin-block: auto;
+    
+    &.flow-row {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
   }
 }

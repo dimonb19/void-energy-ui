@@ -1,5 +1,6 @@
 @use 'sass:map';
 @use '/src/styles/abstracts/breakpoints' as *;
+@use '/src/styles/components/anchors';
 
 /* =========================================
    1. THE LOGIC (Scales & Weights)
@@ -39,12 +40,10 @@ $font-weights: (
     // -----------------------------
     @if ($level == 'h1' or $level == 'h2' or $level == 'h3' or $level == 'h4' or $level == 'h5') {
       font-family: var(--font-heading);
-      // Use mapped weight, unless overridden
       font-weight: map.get($font-weights, $level);
     } @else {
       font-family: var(--font-body);
       
-      // Special check: Is this an input or just h5-sized text?
       @if $is-input {
         font-weight: map.get($font-weights, 'input');
       } @else {
@@ -52,10 +51,13 @@ $font-weights: (
       }
     }
 
-    // 2. SIZE CALCULATION (With User Scale Multiplier)
+    // 2. SIZE CALCULATION
     // -----------------------------
     $base-clamp: map.get($font-scale, $level);
-    // This math prevents conflicts. The H1 calculates its OWN size based on the multiplier.
+    
+    // We apply the clamp. 
+    // On 4K screens, this naturally stops growing at the max value defined in $font-scale.
+    // e.g., for H1 it stops at 2.5rem (or 3.5rem with the override below).
     font-size: calc(#{$base-clamp} * var(--text-scale));
     line-height: 1.5;
 
@@ -63,35 +65,13 @@ $font-weights: (
     // -----------------------------
     
     // Tablet Override for H1
+    // We bump the max size for H1 specifically on larger screens so it feels "Heroic"
     @if $level == 'h1' {
       @include respond-up(tablet) {
         font-size: calc(clamp(2rem, 5vw, 3.5rem) * var(--text-scale));
       }
     }
-
-    // Quad-HD (4K) Logic
-    @include respond-up(quad-hd) {
-      $vw-size: null;
-      
-      // For Headings: VW scaling is fine (big screens = big titles)
-      @if $level == 'h1' { $vw-size: 1.88vw; }
-      @else if $level == 'h2' { $vw-size: 1.56vw; }
-      @else if $level == 'h3' { $vw-size: 1.25vw; }
-      @else if $level == 'h4' { $vw-size: 0.94vw; }
-      
-      // For Body/Inputs: CAP the size. 
-      // 0.65vw on 4K is 25px (Too big). We cap it at a static max.
-      @else {
-         // No VW scaling for body text on huge screens. 
-         // Just stick to the max clamp value defined in $font-scale.
-         // This is safer for dashboards.
-      }
-
-      @if $vw-size {
-        font-size: calc(#{$vw-size} * var(--text-scale));
-      }
-    }
-
+    
   } @else {
     @warn "Typography level `#{$level}` not found in scale.";
   }

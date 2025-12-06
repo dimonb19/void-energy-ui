@@ -72,6 +72,12 @@
    - .container-fluid  : 100% Width + Side Padding.
                          (Use for full-bleed sections).
 
+   DASHBOARD LAYOUT (Settings Grid)
+      - .settings-grid    : Responsive Grid. Stacks on mobile, Label-Left on Desktop.
+      - .settings-label   : Auto-styled H4 label. Right-aligned on desktop.
+      - .settings-content : Flex wrapper for inputs. 
+                            (Add .flow-row for side-by-side tags).
+
    --------------------------------------------------------------------------
    5. TEXTURE: SURFACES (Backgrounds & Physics)
    --------------------------------------------------------------------------
@@ -141,4 +147,20 @@
    --------------------------------------------------------------------------
    - Inputs:     <input>, <select>, <textarea> (Auto-styled to Sunk Surface)
    - Modals:     <dialog> (Auto-styled Glass + Blur)
+
+  --------------------------------------------------------------------------
+   9. CHIPS (Rich Data Display)
+   --------------------------------------------------------------------------
+   A. SMALL TILES (Tags/Chips)
+      Usage: <div class="tile-small"><h5>Title</h5><p>Subtitle</p></div>
+      
+      - Base:       .tile-small
+      - Labeled:    .tile-labeled (Adds a "Tab" label on top via data-label="...")
+      
+   B. SEMANTIC VARIANTS (Colors)
+      - .tile-system    : Purple (AI/Config)
+      - .tile-premium   : Orange (Web3/Gold)
+      - .tile-success   : Green (Safe/Active)
+      - .tile-error     : Red (Danger/Horror)
+      - .tile-secondary : Secondary Accent
    ========================================================================== */

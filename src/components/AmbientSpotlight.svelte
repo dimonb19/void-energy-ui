@@ -391,6 +391,159 @@
       <div class="loading-tile"></div>
     </div>
   </section>
+
+  <section class="flex-col gap-24 mar-top-24">
+    <h2 class="container">05 // PARAMETERS</h2>
+
+    <div class="container">
+      <div class="card-glass mar-y-0 pad-inline">
+        <div class="settings-grid">
+          <div class="settings-label">Rendering</div>
+          <div class="settings-content flow-row">
+            <div class="flex-col flex-1 gap-8">
+              <label for="visual-fidelity" class="text-small text-center"
+                >Visual Fidelity</label
+              >
+              <select id="visual-fidelity">
+                <option>ULTRA (4K)</option>
+                <option>HIGH (1440p)</option>
+                <option>PERFORMANCE (1080p)</option>
+              </select>
+            </div>
+
+            <div class="flex-col flex-1 gap-8">
+              <label for="frame-rate" class="text-small text-center"
+                >Frame Rate</label
+              >
+              <select id="frame-rate">
+                <option>120 HZ</option>
+                <option>60 HZ</option>
+                <option>30 HZ</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <hr />
+
+        <div class="settings-grid">
+          <div class="settings-label">Active Modules</div>
+          <div class="settings-content">
+            <div
+              class="surface-sunk round-8 pad-16 flex-row gap-8 flex-wrap justify-center"
+            >
+              <button class="tile-small tile-system">
+                <h5>Neural Net</h5>
+                <p class="btn-void">✕</p>
+              </button>
+              <button class="tile-small tile-error">
+                <h5>Firewall</h5>
+                <p class="btn-void">✕</p>
+              </button>
+              <button class="tile-small tile-secondary">
+                <h5>Log v.1</h5>
+                <p class="btn-void">✕</p>
+              </button>
+            </div>
+
+            <div class="flex-row gap-16">
+              <select class="flex-1">
+                <option>Select Module...</option>
+                <option>Physics Engine</option>
+                <option>Audio Synth</option>
+              </select>
+              <button class="btn">Add Module</button>
+            </div>
+          </div>
+        </div>
+
+        <hr />
+
+        <div class="settings-grid">
+          <div class="settings-label">Sync Threshold</div>
+          <div class="settings-content">
+            <div class="flex-row justify-between text-highlight text-small">
+              <span>LATENCY</span>
+              <span>SYNCED</span>
+              <span>INSTANT</span>
+            </div>
+            <input type="range" min="0" max="100" value="75" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="flex-col gap-24 mar-y-24">
+    <h2 class="container">06 // ENTITY TAGS</h2>
+
+    <div class="container flex-col gap-32">
+      <div class="flex-col gap-16">
+        <h5 class="text-dim">Standard Entities</h5>
+        <div class="flex-row flex-wrap gap-16">
+          <button class="tile-small tile-system">
+            <h5>System</h5>
+            <p>v2.4</p>
+          </button>
+
+          <button class="tile-small tile-premium">
+            <h5>Premium</h5>
+            <p>Gold</p>
+          </button>
+
+          <button class="tile-small tile-success">
+            <h5>Status</h5>
+            <p>Online</p>
+          </button>
+
+          <button class="tile-small tile-error">
+            <h5>Threat</h5>
+            <p>Critical</p>
+          </button>
+
+          <button class="tile-small tile-secondary">
+            <h5>Archive</h5>
+            <p>Read-Only</p>
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-col gap-16">
+        <h5 class="text-dim">Labeled Entities (Data-Attribute)</h5>
+        <div class="flex-row flex-wrap gap-16 pad-top-16">
+          <div class="tile-small tile-system tile-labeled" data-label="Config">
+            <h5>AI Model</h5>
+            <p>GPT-4</p>
+          </div>
+
+          <div class="tile-small tile-premium tile-labeled" data-label="Web3">
+            <h5>Wallet</h5>
+            <p>0x...8F</p>
+          </div>
+
+          <div class="tile-small tile-success tile-labeled" data-label="Active">
+            <h5>Connection</h5>
+            <p>Stable</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-col gap-16">
+        <h5 class="text-dim">Interactive States</h5>
+        <div class="flex-row flex-wrap gap-16">
+          <button class="tile-small tile-secondary">
+            <h5>Hover Me</h5>
+            <p>Interactive</p>
+          </button>
+
+          <button class="tile-small tile-secondary" disabled>
+            <h5>Disabled</h5>
+            <p>Offline</p>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <Modal />
