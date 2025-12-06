@@ -50,14 +50,13 @@
   // 1. Base Mobile Styles (Zero config)
   width: 100%;
   margin-inline: auto; // Centers the container
-  
+
   // Use 'base' padding from the map (16px)
   padding-inline: map.get($container-paddings, 'base');
 
   // 2. Responsive Loop
   // We iterate through the breakpoints map defined in _variables.scss
   @each $breakpoint-name, $breakpoint-width in $breakpoints {
-    
     // Check if we have defined values for this specific breakpoint
     $target-width: map.get($container-widths, $breakpoint-name);
     $target-padding: map.get($container-paddings, $breakpoint-name);
@@ -84,7 +83,7 @@
   // Still respect responsive edge padding
   @each $breakpoint-name, $breakpoint-width in $breakpoints {
     $target-padding: map.get($container-paddings, $breakpoint-name);
-    
+
     @if $target-padding {
       @media (min-width: $breakpoint-width) {
         padding-inline: $target-padding;
@@ -101,8 +100,8 @@
 // Shared Logic for responsive verticality
 @mixin responsive-vertical-spacing {
   // Mobile Base: Compact but comfortable
-  margin-block: 2rem; 
-  padding-block: 2rem; 
+  margin-block: 2rem;
+  padding-block: 2rem;
 
   // Tablet: Start opening up
   @media (min-width: 768px) {
@@ -115,7 +114,7 @@
     margin-block: 4rem; // 64px separation
     padding-block: 3rem; // 48px internal padding
   }
-  
+
   // 4K / Ultra Wide: Massive void
   @media (min-width: 1920px) {
     margin-block: 6rem; // 96px separation
@@ -130,7 +129,7 @@
 
   // OPINIONATED DEFAULTS:
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   gap: 1.5rem; // Default gap
 }
 
@@ -141,7 +140,7 @@
 
   // OPINIONATED DEFAULTS:
   display: flex;
-  flex-direction: column; 
+  flex-direction: column;
   gap: 1.5rem; // Default gap
 }
 
@@ -182,7 +181,7 @@
 .surface-void {
   background: var(--bg-canvas);
   // Optional: add a subtle border to define edges against other void elements
-  border: var(--physics-border-width) solid var(--border-shadow); 
+  border: var(--physics-border-width) solid var(--border-shadow);
 }
 
 // Spotlight Background (Slightly lighter, useful for active sections)
@@ -193,21 +192,21 @@
 
 // 4. CANVAS-LEVEL INPUTS (The Exception)
 // --------------------------------------------------------------------------
-// Use this when an input must sit directly on the --bg-canvas 
+// Use this when an input must sit directly on the --bg-canvas
 // without a parent Glass Card. It adds a stronger border to define boundaries.
 
 .sunk-on-canvas {
   @include glass-sunk;
-  
+
   // VISIBLE BORDER & ATMOSPHERIC DEPTH
   // Since we don't have the glass card contrast, we brighten the border,
   // and darken the current canvas color
   border-color: var(--border-highlight); // 30% opacity (Brighter)
   background: shade(var(--bg-canvas), 20%);
-  
+
   // Paper Mode Override
   @at-root [data-atmosphere='paper'] & {
-    background: #FFFFFF;
+    background: #ffffff;
     border: var(--physics-border-width) solid var(--energy-secondary);
   }
 }
@@ -225,43 +224,43 @@
   display: grid;
   width: 100%;
   gap: 1rem;
-  
+
   // 1. MOBILE (Stacked)
-  grid-template-columns: 1fr; 
+  grid-template-columns: 1fr;
   align-items: start; // Align to top, not center
 
   // 2. DESKTOP (Side-by-Side)
   @include respond-up(small-desktop) {
     // 10rem is tighter than 14rem, matches your screenshot better
-    grid-template-columns: 10rem 1fr; 
+    grid-template-columns: 10rem 1fr;
     gap: 2rem;
   }
 
   // 3. INTERNAL PARTS
   .settings-label {
-    @extend .text-h4; 
+    @extend .text-h4;
     color: var(--text-dim);
     margin-block: auto;
     text-align: left; // Match your old UI (Left aligned)
 
     @include mobile-only {
       text-align: center; // Labels stay left-aligned on mobile
-      padding-bottom: 0.75rem; 
+      padding-bottom: 0.75rem;
     }
-    
+
     // OPTICAL ALIGNMENT
-    // Inputs have padding. Text needs to move down slightly to line up 
+    // Inputs have padding. Text needs to move down slightly to line up
     // with the text *inside* the input.
-    // padding-top: 0.75rem; 
+    // padding-top: 0.75rem;
   }
 
   .settings-content {
     display: flex;
-    flex-direction: column; 
+    flex-direction: column;
     gap: 1.25rem; // Increased gap between rows slightly
     width: 100%;
     margin-block: auto;
-    
+
     &.flow-row {
       flex-direction: row;
       flex-wrap: wrap;

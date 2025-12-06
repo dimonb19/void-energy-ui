@@ -11,7 +11,7 @@
   padding: 0;
   box-sizing: border-box;
   // Font inherit ensures inputs/buttons match the atmosphere's font stack
-  font-family: inherit; 
+  font-family: inherit;
 }
 
 /* =========================================
@@ -30,14 +30,14 @@ html {
 
   // --- TYPOGRAPHY INITIALIZATION ---
   // Sets Font Family + Base Size (calculated by scale)
-  @include typography('body'); 
-  
+  @include typography('body');
+
   // Text Luminance: Layer 2 (Dimmed) is default for reading
-  color: var(--text-dim); 
+  color: var(--text-dim);
   transition:
-    background-color var(--speed-base) var(--ease-flow), 
+    background-color var(--speed-base) var(--ease-flow),
     color var(--speed-base) var(--ease-flow);
-  
+
   // Rendering & Spacing
   -webkit-font-smoothing: antialiased; // Critical for "Neon" legibility
   text-align: left;
@@ -59,13 +59,13 @@ html {
     border-radius: 3px;
     opacity: 0.5;
   }
-  
+
   &::-webkit-scrollbar-thumb:hover {
     background: var(--energy-primary); // Glows active color
   }
 }
 
-// Ensure body fills the specific height if needed, 
+// Ensure body fills the specific height if needed,
 // otherwise it inherits naturally.
 body {
   min-height: 100vh;
@@ -94,10 +94,10 @@ textarea {
   background: transparent;
   color: inherit;
   font-family: inherit;
-  
+
   // Performance: Only animate composite properties
   transition:
-    color var(--speed-fast) var(--ease-flow), 
+    color var(--speed-fast) var(--ease-flow),
     opacity var(--speed-fast) var(--ease-flow),
     border-color var(--speed-fast) var(--ease-snap),
     box-shadow var(--speed-fast) var(--ease-snap),
@@ -106,8 +106,8 @@ textarea {
   &:focus-visible {
     // Focus states snap to Primary Energy
     outline: var(--physics-border-width) solid var(--energy-primary);
-    box-shadow: 0 0 8px var(--energy-primary); 
-    z-index: z('base'); 
+    box-shadow: 0 0 8px var(--energy-primary);
+    z-index: z('base');
   }
 }
 
@@ -126,26 +126,31 @@ select:disabled,
 textarea:disabled {
   cursor: not-allowed;
   opacity: 0.5;
-  
+
   // Sunk Surfaces for inactive/disabled
-  background-color: var(--bg-sink); 
-  border: var(--physics-border-width) solid var(--border-shadow); 
+  background-color: var(--bg-sink);
+  border: var(--physics-border-width) solid var(--border-shadow);
   color: var(--text-mute);
 }
 
 /* =========================================
    6. MEDIA & LISTS
    ========================================= */
-ul, ol {
+ul,
+ol {
   list-style: none;
 }
 
-img, picture, video, canvas, svg {
+img,
+picture,
+video,
+canvas,
+svg {
   display: block;
   max-width: 100%;
   height: auto;
   // Visual for broken images in void
-  background-color: var(--bg-sink); 
+  background-color: var(--bg-sink);
 }
 
 /* =========================================
@@ -162,17 +167,18 @@ hr {
 }
 
 // Code blocks (Sunk Surfaces)
-code, pre {
+code,
+pre {
   // Use abstract variable or fallback to mono
-  font-family: $font-code; 
-  
+  font-family: $font-code;
+
   // "Inner Sink" shadow logic
-  background: var(--bg-sink); 
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5); 
-  
+  background: var(--bg-sink);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
+
   // "High Energy" Data Flow
-  color: var(--energy-primary); 
-  
+  color: var(--energy-primary);
+
   padding: 0.2em 0.4em;
   border-radius: 4px;
 }
@@ -180,7 +186,7 @@ code, pre {
 pre {
   padding: 1rem;
   overflow-x: auto;
-  
+
   code {
     background: transparent;
     box-shadow: none;
@@ -192,7 +198,7 @@ pre {
 /* =========================================
    8. SEMANTIC TYPOGRAPHY DEFAULTS
    ========================================= */
-// Note: _typography.scss handles the sizes via mixins. 
+// Note: _typography.scss handles the sizes via mixins.
 // These are just browser defaults for semantic tags.
 
 :where(h1, h2, h3, h4, h5) {

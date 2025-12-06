@@ -13,7 +13,7 @@
 // $interactive: boolean - Set to true ONLY if the element is clickable (Link/Button)
 @mixin glass-float($interactive: false) {
   background: var(--bg-surface);
-  
+
   // Physics: Blur
   backdrop-filter: blur(var(--physics-blur));
   -webkit-backdrop-filter: blur(var(--physics-blur));
@@ -21,16 +21,16 @@
   // The Lighting Model
   border-width: var(--physics-border-width);
   border-style: solid;
-  border-top-color: var(--border-highlight);   
-  border-bottom-color: var(--border-shadow);   
-  border-left-color: var(--border-shadow);     
-  border-right-color: var(--border-shadow);    
+  border-top-color: var(--border-highlight);
+  border-bottom-color: var(--border-shadow);
+  border-left-color: var(--border-shadow);
+  border-right-color: var(--border-shadow);
 
   // "Void Shadow"
   box-shadow: var(--void-shadow);
 
-  transition: 
-    transform var(--speed-base) var(--ease-stabilize), 
+  transition:
+    transform var(--speed-base) var(--ease-stabilize),
     border-color var(--speed-base) var(--ease-snap),
     background-color var(--speed-base) var(--ease-flow),
     box-shadow var(--speed-base) var(--ease-snap);
@@ -40,19 +40,18 @@
     &:hover {
       @if $interactive {
         // CASE A: Interactive (It moves and energizes)
-        transform: translateY(-2px); 
-        
-        // FIX: Don't use raw variable. Mix it to keep transparency.
-        // This results in ~50% opacity color, not 100% solid.
+        transform: translateY(-2px);
+
+        // Don't use raw variable. Mix it to keep transparency.
         border-color: fade(var(--energy-primary), 50%);
-        
+
         // Glow calculation
-        box-shadow: 
-          0 12px 40px rgba(0, 0, 0, 0.6), 
+        box-shadow:
+          0 12px 40px rgba(0, 0, 0, 0.6),
           0 0 15px fade(var(--energy-primary), 80%);
-        
+
         @at-root [data-atmosphere='paper'] & {
-          box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
       }
     }
@@ -63,17 +62,17 @@
 // Context: Negative Z-Index. Carved into the void.
 @mixin glass-sunk {
   background: var(--bg-sink);
-  
+
   // Keep blur consistent
   backdrop-filter: blur(var(--physics-blur));
   -webkit-backdrop-filter: blur(var(--physics-blur));
 
   // Faint ambient rim
   border: var(--physics-border-width) solid var(--border-shadow);
-  
+
   // "Inner Sink" shadow
   box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
-  
+
   color: var(--text-main);
   transition:
     border-color var(--speed-fast) var(--ease-snap),
@@ -83,18 +82,18 @@
   &:focus-visible {
     border-color: var(--energy-primary);
     outline: none;
-      box-shadow: 
-        inset 0 2px 8px rgba(0, 0, 0, 0.5),
-        0 0 10px fade(var(--energy-primary), 70%);
+    box-shadow:
+      inset 0 2px 8px rgba(0, 0, 0, 0.5),
+      0 0 10px fade(var(--energy-primary), 70%);
   }
 
   // Paper Mode Override
   @at-root [data-atmosphere='paper'] & {
     box-shadow: inset var(--void-shadow);
 
-    &:focus-visible, 
+    &:focus-visible,
     &:focus-within {
-      box-shadow: 
+      box-shadow:
         inset var(--void-shadow),
         0 0 5px fade(var(--energy-primary), 70%);
     }
@@ -117,12 +116,12 @@
 // MIXIN: The "Gemini Laser" Structure
 @mixin gemini-laser {
   position: relative;
-  background: transparent; 
-  border: none; 
+  background: transparent;
+  border: none;
   overflow: hidden;
   z-index: z('base');
   color: var(--text-main);
-  
+
   // Important: Border radius must be set on parent to clip the laser
   border-radius: 999px; // Pill Shape
 
@@ -130,10 +129,12 @@
   &::before {
     content: '';
     position: absolute;
-    top: 50%; left: 50%;
-    width: 500%; height: 500%; 
+    top: 50%;
+    left: 50%;
+    width: 500%;
+    height: 500%;
     border-radius: 50%;
-    
+
     // The "Tail" Effect Gradient
     background: conic-gradient(
       from 0deg,
@@ -146,11 +147,11 @@
     );
 
     transition: background-color var(--speed-base) var(--ease-flow);
-    
+
     transform: translate(-50%, -50%);
     animation: rotate-laser 4s linear infinite;
     z-index: z('sink');
-    opacity: 1; 
+    opacity: 1;
 
     // TERMINAL OVERRIDE: The "Segmented" Radar
     @at-root [data-atmosphere='terminal'] & {
@@ -158,8 +159,8 @@
         from 0deg,
         transparent 0deg,
         transparent 100deg,
-        var(--energy-primary) 100deg, 
-        var(--energy-primary) 115deg, 
+        var(--energy-primary) 100deg,
+        var(--energy-primary) 115deg,
         transparent 115deg,
         transparent 125deg,
         var(--energy-primary) 125deg,
@@ -167,7 +168,7 @@
         transparent 150deg,
         transparent 160deg,
         var(--energy-primary) 160deg,
-        var(--energy-primary) 240deg, 
+        var(--energy-primary) 240deg,
         transparent 240deg,
         transparent 360deg
       );
@@ -181,14 +182,14 @@
     content: '';
     position: absolute;
     inset: 2px; // The border thickness
-    
+
     // Use Solid Color, NOT Glass.
-    background: var(--bg-canvas); 
-    
+    background: var(--bg-canvas);
+
     z-index: z('sink');
     border-radius: 999px; // Pill Shape
   }
-  
+
   // HOVER EFFECT: SURGE (Brightness + Width)
   @media (hover: hover) {
     &:hover::before {
@@ -206,7 +207,7 @@
 @mixin shimmer {
   // 1. THE DELAY LOGIC (400% Width Trick)
   background-size: 400% 100%;
-  
+
   // 2. THE ANIMATION
   animation: shimmer 3s infinite linear;
 
@@ -238,10 +239,12 @@
     background-image: linear-gradient(
       90deg,
       transparent 0%,
-      transparent 43%, 
-      var(--energy-primary) 43%, // Hard Start
-      var(--energy-primary) 47%, // Hard End (Block width)
-      transparent 47%,           
+      transparent 43%,
+      var(--energy-primary) 43%,
+      // Hard Start
+      var(--energy-primary) 47%,
+      // Hard End (Block width)
+      transparent 47%,
       transparent 100%
     );
   }

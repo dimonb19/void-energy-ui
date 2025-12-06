@@ -25,8 +25,8 @@ $spacing-scale: (
   '16': 1rem,
   '24': 1.5rem,
   '32': 2rem,
-  '48': 3rem, 
-  '64': 4rem
+  '48': 3rem,
+  '64': 4rem,
 );
 
 $spacing-aliases: (
@@ -34,7 +34,7 @@ $spacing-aliases: (
   'sm': '16',
   'md': '24',
   'lg': '32',
-  'xl': '64'
+  'xl': '64',
 );
 
 // ==========================================================================
@@ -44,69 +44,140 @@ $spacing-aliases: (
 // We call this once for base styles, and again for every breakpoint.
 
 @mixin generate-utilities($prefix: '') {
-  
   // --- LAYOUT & DISPLAY ---
-  .#{$prefix}hidden { display: none !important; }
-  .#{$prefix}block  { display: block; }
-  .#{$prefix}inline { display: inline-block; }
-  
-  .#{$prefix}flex { display: flex; }
-  .#{$prefix}flex-col { display: flex; flex-direction: column; }
-  .#{$prefix}flex-row { display: flex; flex-direction: row; }
-  
-  // Alignment Shortcuts
-  .#{$prefix}flex-center { 
-    display: flex; align-items: center; justify-content: center; 
+  .#{$prefix}hidden {
+    display: none !important;
   }
-  .#{$prefix}flex-center-col { 
-    display: flex; flex-direction: column; align-items: center; justify-content: center; 
+  .#{$prefix}block {
+    display: block;
+  }
+  .#{$prefix}inline {
+    display: inline-block;
+  }
+
+  .#{$prefix}flex {
+    display: flex;
+  }
+  .#{$prefix}flex-col {
+    display: flex;
+    flex-direction: column;
+  }
+  .#{$prefix}flex-row {
+    display: flex;
+    flex-direction: row;
+  }
+
+  // Alignment Shortcuts
+  .#{$prefix}flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .#{$prefix}flex-center-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 
   // Flex Modifiers
-  .#{$prefix}items-center { align-items: center; }
-  .#{$prefix}items-start  { align-items: flex-start; }
-  .#{$prefix}items-end    { align-items: flex-end; }
-  .#{$prefix}items-stretch{ align-items: stretch; }
+  .#{$prefix}items-center {
+    align-items: center;
+  }
+  .#{$prefix}items-start {
+    align-items: flex-start;
+  }
+  .#{$prefix}items-end {
+    align-items: flex-end;
+  }
+  .#{$prefix}items-stretch {
+    align-items: stretch;
+  }
 
-  .#{$prefix}justify-center { justify-content: center; }
-  .#{$prefix}justify-between{ justify-content: space-between; }
-  .#{$prefix}justify-start  { justify-content: flex-start; }
-  .#{$prefix}justify-end    { justify-content: flex-end; }
+  .#{$prefix}justify-center {
+    justify-content: center;
+  }
+  .#{$prefix}justify-between {
+    justify-content: space-between;
+  }
+  .#{$prefix}justify-start {
+    justify-content: flex-start;
+  }
+  .#{$prefix}justify-end {
+    justify-content: flex-end;
+  }
 
-  .#{$prefix}flex-wrap    { flex-wrap: wrap; }
-  .#{$prefix}flex-nowrap  { flex-wrap: nowrap; }
-  .#{$prefix}flex-1       { flex: 1; }
+  .#{$prefix}flex-wrap {
+    flex-wrap: wrap;
+  }
+  .#{$prefix}flex-nowrap {
+    flex-wrap: nowrap;
+  }
+  .#{$prefix}flex-1 {
+    flex: 1;
+  }
 
   // --- SIZING ---
-  .#{$prefix}w-full { width: 100%; }
-  .#{$prefix}w-auto { width: auto; }
-  .#{$prefix}h-full { height: 100%; }
-  .#{$prefix}h-auto { height: auto; }
+  .#{$prefix}w-full {
+    width: 100%;
+  }
+  .#{$prefix}w-auto {
+    width: auto;
+  }
+  .#{$prefix}h-full {
+    height: 100%;
+  }
+  .#{$prefix}h-auto {
+    height: auto;
+  }
 
   // --- SPACING LOOP (Gaps, Padding, Margins) ---
   @each $key, $val in $spacing-scale {
-    
     // 1. Pixel Literals (e.g., .gap-16)
-    .#{$prefix}gap-#{$key} { gap: $val; }
-    .#{$prefix}pad-#{$key} { padding: $val; }
-    .#{$prefix}mar-#{$key} { margin: $val; }
-    
-    .#{$prefix}pad-top-#{$key} { padding-top: $val; }
-    .#{$prefix}pad-bot-#{$key} { padding-bottom: $val; }
-    
-    .#{$prefix}mar-top-#{$key} { margin-top: $val; }
-    .#{$prefix}mar-bot-#{$key} { margin-bottom: $val; }
-    .#{$prefix}mar-y-#{$key}   { margin-block: $val; }
+    .#{$prefix}gap-#{$key} {
+      gap: $val;
+    }
+    .#{$prefix}pad-#{$key} {
+      padding: $val;
+    }
+    .#{$prefix}mar-#{$key} {
+      margin: $val;
+    }
+
+    .#{$prefix}pad-top-#{$key} {
+      padding-top: $val;
+    }
+    .#{$prefix}pad-bot-#{$key} {
+      padding-bottom: $val;
+    }
+
+    .#{$prefix}mar-top-#{$key} {
+      margin-top: $val;
+    }
+    .#{$prefix}mar-bot-#{$key} {
+      margin-bottom: $val;
+    }
+    .#{$prefix}mar-y-#{$key} {
+      margin-block: $val;
+    }
   }
 
   // --- SEMANTIC ALIASES (e.g., .gap-md) ---
   @each $alias, $key in $spacing-aliases {
     $val: map.get($spacing-scale, $key);
 
-    .#{$prefix}gap-#{$alias} { gap: $val; }
-    .#{$prefix}pad-#{$alias} { padding: $val; }
-    .#{$prefix}mar-#{$alias} { margin: $val; }
-    .#{$prefix}mar-y-#{$alias} { margin-block: $val; }
+    .#{$prefix}gap-#{$alias} {
+      gap: $val;
+    }
+    .#{$prefix}pad-#{$alias} {
+      padding: $val;
+    }
+    .#{$prefix}mar-#{$alias} {
+      margin: $val;
+    }
+    .#{$prefix}mar-y-#{$alias} {
+      margin-block: $val;
+    }
   }
 }
 
@@ -119,20 +190,32 @@ $spacing-aliases: (
 @include generate-utilities('');
 
 // Special non-responsive base helpers
-.w-screen     { width: 100vw; }
-.h-screen     { height: 100vh; height: 100dvh; }
-.min-h-screen { min-height: 100vh; min-height: 100dvh; }
-.max-w-full   { max-width: 100%; }
-.mar-auto     { margin-inline: auto; }
-.pad-inline   { padding-inline: 1.5rem; }
+.w-screen {
+  width: 100vw;
+}
+.h-screen {
+  height: 100vh;
+  height: 100dvh;
+}
+.min-h-screen {
+  min-height: 100vh;
+  min-height: 100dvh;
+}
+.max-w-full {
+  max-width: 100%;
+}
+.mar-auto {
+  margin-inline: auto;
+}
+.pad-inline {
+  padding-inline: 1.5rem;
+}
 
 // B. RESPONSIVE LOOP
 // Iterates through your global $breakpoints map
 @each $bp-name, $bp-value in $breakpoints {
-  
   // Skip the 'mobile' 0 value, as that is the base above
   @if $bp-value != 0 {
-    
     @media (min-width: $bp-value) {
       // The slash \ is needed to escape the colon in CSS class names
       @include generate-utilities('#{$bp-name}\\:');
@@ -151,32 +234,58 @@ $spacing-aliases: (
 }
 
 // Border Radius
-.round-8    { border-radius: 0.5rem; }
-.round-12   { border-radius: 0.75rem; }
-.round-16   { border-radius: 1rem; }
-.round-24   { border-radius: 1.5rem; }
-.round-full { border-radius: 9999px; }
+.round-8 {
+  border-radius: 0.5rem;
+}
+.round-12 {
+  border-radius: 0.75rem;
+}
+.round-16 {
+  border-radius: 1rem;
+}
+.round-24 {
+  border-radius: 1.5rem;
+}
+.round-full {
+  border-radius: 9999px;
+}
 
 // Entry Animations
-.fade-in { @include entry-transition; }
+.fade-in {
+  @include entry-transition;
+}
 
 // Delays
-.delay-1 { transition-delay: 50ms; }
-.delay-2 { transition-delay: 100ms; }
-.delay-3 { transition-delay: 150ms; }
-.delay-4 { transition-delay: 200ms; }
-.delay-5 { transition-delay: 250ms; }
+.delay-1 {
+  transition-delay: 50ms;
+}
+.delay-2 {
+  transition-delay: 100ms;
+}
+.delay-3 {
+  transition-delay: 150ms;
+}
+.delay-4 {
+  transition-delay: 200ms;
+}
+.delay-5 {
+  transition-delay: 250ms;
+}
 
 // Loading
-.shimmer { @include shimmer; }
+.shimmer {
+  @include shimmer;
+}
 .loading-logo {
-  width: 8rem; 
+  width: 8rem;
   aspect-ratio: 1/1;
   animation: logo-enter 1.2s var(--ease-snap) forwards;
 }
 
 // Interactive
-.cyber-pulse { animation: cyber-pulse 3s var(--ease-pulse) infinite; }
+.cyber-pulse {
+  animation: cyber-pulse 3s var(--ease-pulse) infinite;
+}
 
 // Progress
 .progress-bar {
@@ -189,7 +298,11 @@ $spacing-aliases: (
   span {
     display: block;
     height: 100%;
-    background: linear-gradient(135deg, var(--energy-primary), var(--energy-secondary));
+    background: linear-gradient(
+      135deg,
+      var(--energy-primary),
+      var(--energy-secondary)
+    );
     box-shadow: 0 0 10px fade(var(--energy-primary), 40%);
     border-radius: inherit;
     animation: progress-fill 2s ease-out forwards;
@@ -200,14 +313,28 @@ $spacing-aliases: (
 // 4. TEXT UTILITIES
 // ==========================================================================
 
-.text-center { text-align: center; }
-.text-right  { text-align: right; }
-.text-left   { text-align: left; }
+.text-center {
+  text-align: center;
+}
+.text-right {
+  text-align: right;
+}
+.text-left {
+  text-align: left;
+}
 
-.text-success { color: var(--color-success); }
-.text-error   { color: var(--color-error); }
-.text-premium { color: var(--color-premium); }
-.text-system  { color: var(--color-system); }
+.text-success {
+  color: var(--color-success);
+}
+.text-error {
+  color: var(--color-error);
+}
+.text-premium {
+  color: var(--color-premium);
+}
+.text-system {
+  color: var(--color-system);
+}
 
 .text-highlight {
   @include text-glow;

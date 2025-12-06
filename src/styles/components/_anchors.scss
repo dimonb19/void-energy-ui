@@ -13,7 +13,7 @@ a {
   text-decoration: none;
   color: inherit; // Don't force blue; inherit from parent (Button/Card)
   cursor: pointer;
-  
+
   // Subtle interaction for generic links (like in a navbar)
   transition: color var(--speed-fast) var(--ease-flow);
 
@@ -46,17 +46,17 @@ a {
     left: 0;
     right: 0;
     bottom: -2px; // Distance from text
-    height: 1px;  // Laser thinness
-    
+    height: 1px; // Laser thinness
+
     // The Line Color (Matches Text)
     background-color: var(--energy-primary);
-    
+
     // START STATE: Scaled to 0 (Invisible)
     transform: scaleX(0);
-    
+
     // ORIGIN: Start from the RIGHT (so it exits to the right)
     transform-origin: right;
-    
+
     transition: transform var(--speed-base) var(--ease-snap);
   }
 
@@ -64,7 +64,7 @@ a {
   @media (hover: hover) {
     &:hover {
       opacity: 1; // Ensure full visibility
-      
+
       // Text Glow
       text-shadow: 0 0 8px fade(var(--energy-primary), 60%);
 
@@ -75,21 +75,22 @@ a {
       }
     }
   }
-  
+
   // --- C. Paper Mode Override ---
   @at-root [data-atmosphere='paper'] & {
     color: var(--energy-primary); // Ink Blue
     font-weight: 600;
-    
+
     // In Paper mode, links are traditionally underlined by default.
     // We can keep a faint underline that darkens on hover.
-    border-bottom: var(--physics-border-width) solid fade(var(--energy-primary), 80%);
-    
+    border-bottom: var(--physics-border-width) solid
+      fade(var(--energy-primary), 80%);
+
     &::after {
       height: 2px; // Thicker pen stroke
       bottom: -3px;
     }
-    
+
     &:hover {
       text-shadow: none;
       border-bottom-color: transparent; // Hide base border

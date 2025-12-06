@@ -8,26 +8,39 @@
 
 // Size Logic (Your original clamps, verified safe)
 $font-scale: (
-  'body':    clamp(1rem, 1.5vw, 1.05rem),       // 16px -> 16.8px
-  'small':   clamp(0.875rem, 1.2vw, 1rem),      // 14px -> 16px
-  'caption': clamp(0.75rem, 1vw, 0.875rem),     // 12px -> 14px
-  
-  'h1':      clamp(1.5rem, 3vw, 2.5rem),        // 24px -> 40px (Mobile-friendly)
-  'h2':      clamp(1.75rem, 4vw, 3rem),         // 28px -> 48px
-  'h3':      clamp(1.5rem, 3vw, 2.5rem),        // 24px -> 40px
-  'h4':      clamp(1.25rem, 2.5vw, 1.5rem),     // 20px -> 24px
-  'h5':      clamp(1.125rem, 1.5vw, 1.25rem),   // 18px -> 20px
+  // 16px -> 16.8px
+  'body': clamp(1rem, 1.5vw, 1.05rem),
+  // 14px -> 16px
+  'small': clamp(0.875rem, 1.2vw, 1rem),
+  // 12px -> 14px
+  'caption': clamp(0.75rem, 1vw, 0.875rem),
+  // 24px -> 40px (Mobile-friendly)
+  'h1': clamp(1.5rem, 3vw, 2.5rem),
+  // 28px -> 48px
+  'h2': clamp(1.75rem, 4vw, 3rem),
+  // 24px -> 40px
+  'h3': clamp(1.5rem, 3vw, 2.5rem),
+  // 20px -> 24px
+  'h4': clamp(1.25rem, 2.5vw, 1.5rem),
+  // 18px -> 20px
+  'h5': clamp(1.125rem, 1.5vw, 1.25rem),
 );
 
 // Weight Logic (Graduated hierarchy)
 $font-weights: (
-  'h1': 700, // Structural (Bold)
-  'h2': 700, // Structural (Bold)
-  'h3': 600, // Section (SemiBold)
-  'h4': 600, // Subsection (SemiBold)
-  'h5': 500, // Card Title (Medium)
+  // Structural (Bold)
+  'h1': 700,
+  // Structural (Bold)
+  'h2': 700,
+  // Section (SemiBold)
+  'h3': 600,
+  // Subsection (SemiBold)
+  'h4': 600,
+  // Card Title (Medium)
+  'h5': 500,
   'body': 400,
-  'input': 400 // Input data should be legible (Regular)
+  // Input data should be legible (Regular)
+  'input': 400,
 );
 
 /* =========================================
@@ -35,15 +48,25 @@ $font-weights: (
    ========================================= */
 @mixin typography($level: 'body', $is-input: false) {
   @if map.has-key($font-scale, $level) {
-    
     // 1. FAMILY & WEIGHT ASSIGNMENT
     // -----------------------------
-    @if ($level == 'h1' or $level == 'h2' or $level == 'h3' or $level == 'h4' or $level == 'h5') {
+    @if (
+      $level ==
+        'h1' or
+        $level ==
+        'h2' or
+        $level ==
+        'h3' or
+        $level ==
+        'h4' or
+        $level ==
+        'h5'
+    ) {
       font-family: var(--font-heading);
       font-weight: map.get($font-weights, $level);
     } @else {
       font-family: var(--font-body);
-      
+
       @if $is-input {
         font-weight: map.get($font-weights, 'input');
       } @else {
@@ -54,8 +77,8 @@ $font-weights: (
     // 2. SIZE CALCULATION
     // -----------------------------
     $base-clamp: map.get($font-scale, $level);
-    
-    // We apply the clamp. 
+
+    // We apply the clamp.
     // On 4K screens, this naturally stops growing at the max value defined in $font-scale.
     // e.g., for H1 it stops at 2.5rem (or 3.5rem with the override below).
     font-size: calc(#{$base-clamp} * var(--text-scale));
@@ -63,7 +86,7 @@ $font-weights: (
 
     // 3. RESPONSIVE OVERRIDES
     // -----------------------------
-    
+
     // Tablet Override for H1
     // We bump the max size for H1 specifically on larger screens so it feels "Heroic"
     @if $level == 'h1' {
@@ -71,7 +94,6 @@ $font-weights: (
         font-size: calc(clamp(2rem, 5vw, 3.5rem) * var(--text-scale));
       }
     }
-    
   } @else {
     @warn "Typography level `#{$level}` not found in scale.";
   }
@@ -82,57 +104,100 @@ $font-weights: (
    ========================================= */
 
 body {
-  // This variable automatically switches between Atmosphere Default 
+  // This variable automatically switches between Atmosphere Default
   // and User Override based on the logic above.
   font-family: var(--font-body);
-  
+
   // Applies the scale factor
   font-size: calc(1rem * var(--text-scale));
 }
 
-h1, h2, h3 {
+h1,
+h2,
+h3 {
   // Usually we keep headings locked to the atmosphere for flavor
-  font-family: var(--font-heading); 
+  font-family: var(--font-heading);
 }
 
 /* Layer 1: Headers (100% Opacity) */
-h1 { @include typography('h1'); color: var(--text-main); }
-h2 { @include typography('h2'); color: var(--text-main); }
-h3 { @include typography('h3'); color: var(--text-main); }
+h1 {
+  @include typography('h1');
+  color: var(--text-main);
+}
+h2 {
+  @include typography('h2');
+  color: var(--text-main);
+}
+h3 {
+  @include typography('h3');
+  color: var(--text-main);
+}
 
 /* Layer 2: Subheaders/Body (85% Opacity) */
-h4 { @include typography('h4'); color: var(--text-dim); } // H4 often acts as subheader
-h5 { @include typography('h5'); color: var(--text-dim); }
+h4 {
+  @include typography('h4');
+  color: var(--text-dim);
+} // H4 often acts as subheader
+h5 {
+  @include typography('h5');
+  color: var(--text-dim);
+}
 
-p, ul, ol, li, label, button { 
-  @include typography('body'); 
-  color: var(--text-dim); 
+p,
+ul,
+ol,
+li,
+label,
+button {
+  @include typography('body');
+  color: var(--text-dim);
 }
 
 /* Layer 3: Metadata (60% Opacity) */
-.validation, caption, small { 
-  @include typography('small'); 
-  color: var(--text-mute); 
+.validation,
+caption,
+small {
+  @include typography('small');
+  color: var(--text-mute);
 }
 
 /* INPUTS (Special Case) */
 /* Inputs share H5 size but need 'input' weight (Regular) and bright text for data */
-input, select, textarea {
+input,
+select,
+textarea {
   @include typography('h5', $is-input: true); // Pass flag to force weight: 400
-  color: var(--text-main); // Input data is "Active", so it uses Main color (White)
+  // Input data is "Active", so it uses Main color (White)
+  color: var(--text-main);
 }
 
 /* =========================================
    4. UTILITY CLASSES
    ========================================= */
-.text-caption { @include typography('caption'); }
-.text-small   { @include typography('small'); }
-.text-body    { @include typography('body'); }
-.text-h1      { @include typography('h1'); }
-.text-h2      { @include typography('h2'); }
-.text-h3      { @include typography('h3'); }
-.text-h4      { @include typography('h4'); }
-.text-h5      { @include typography('h5'); }
+.text-caption {
+  @include typography('caption');
+}
+.text-small {
+  @include typography('small');
+}
+.text-body {
+  @include typography('body');
+}
+.text-h1 {
+  @include typography('h1');
+}
+.text-h2 {
+  @include typography('h2');
+}
+.text-h3 {
+  @include typography('h3');
+}
+.text-h4 {
+  @include typography('h4');
+}
+.text-h5 {
+  @include typography('h5');
+}
 
 /* =========================================
    5. LONG-FORM CONTENT (Legal / Docs)
@@ -144,22 +209,36 @@ input, select, textarea {
   color: var(--text-dim); // Ensure readable contrast
 
   // 1. RE-ENABLE STANDARD LISTS
-  ul, ol {
+  ul,
+  ol {
     margin-bottom: 1.5rem;
     padding-left: 1.5rem; // Indent lists
     line-height: 1.6;
   }
 
-  ul { list-style-type: disc; }
-  ol { list-style-type: decimal; }
+  ul {
+    list-style-type: disc;
+  }
+  ol {
+    list-style-type: decimal;
+  }
 
   // Nested Logic
-  ul ul { list-style-type: circle; margin-bottom: 0; }
-  ul ul ul { list-style-type: square; }
+  ul ul {
+    list-style-type: circle;
+    margin-bottom: 0;
+  }
+  ul ul ul {
+    list-style-type: square;
+  }
 
   // 2. UTILITY LIST STYLES
-  ol.uppercase { list-style-type: upper-alpha; }
-  ol.lowercase { list-style-type: lower-alpha; }
+  ol.uppercase {
+    list-style-type: upper-alpha;
+  }
+  ol.lowercase {
+    list-style-type: lower-alpha;
+  }
 
   // 3. LEGAL SUB-ORDERED (1.1, 1.2)
   // Your logic was good, just cleaned up spacing
@@ -172,7 +251,7 @@ input, select, textarea {
       display: table;
       counter-increment: item;
       margin-bottom: 0.5rem;
-      
+
       &:before {
         content: counters(item, '.') '. ';
         display: table-cell;
@@ -182,7 +261,7 @@ input, select, textarea {
         white-space: nowrap;
       }
     }
-    
+
     // Recursive nesting support
     li ol.subordered > li:before {
       content: counters(item, '.') ' ';
@@ -191,11 +270,12 @@ input, select, textarea {
 
   // 4. TYPOGRAPHY FIXES
   // Legal docs need clear distinction between bold/headings
-  strong, b {
+  strong,
+  b {
     color: var(--text-main); // Highlight key terms (e.g., "SECTION 1")
     font-weight: 700;
   }
-  
+
   a {
     @extend .link; // Force your Laser Link style on all anchors
   }

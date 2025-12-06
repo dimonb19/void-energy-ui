@@ -22,31 +22,33 @@
 // 2. TEXT FIELDS (Text, Password, Email, Textarea)
 // --------------------------------------------------------------------------
 // We still apply the "Sunk" look to the box itself, as this is safe styling.
-input:not([type='checkbox']):not([type='radio']):not([type='range']):not([type='file']),
+input:not([type='checkbox']):not([type='radio']):not([type='range']):not(
+    [type='file']
+  ),
 textarea,
 select {
   appearance: none; // Reset default borders
   width: 100%;
-  min-height: 2.75rem; 
+  min-height: 2.75rem;
   padding: 0.75rem 1rem;
-  border-radius: 8px; 
-  
+  border-radius: 8px;
+
   font-family: var(--font-body);
   font-size: 1rem;
-  color: var(--text-main); 
-  
+  color: var(--text-main);
+
   // Use the Sunk Mixin for the container physics
   @include glass-sunk;
 
   // Standard Transitions
-  transition: 
+  transition:
     border-color var(--speed-fast) var(--ease-snap),
     box-shadow var(--speed-fast) var(--ease-snap),
     background-color var(--speed-fast) var(--ease-flow);
 
   &::placeholder {
     color: var(--text-mute);
-    opacity: 0.7; 
+    opacity: 0.7;
   }
 
   // Focus State
@@ -57,7 +59,7 @@ select {
   }
 
   // Error State
-  &.has-error, 
+  &.has-error,
   &:invalid:not(:placeholder-shown) {
     border-color: var(--color-error);
     color: var(--color-error);
@@ -66,8 +68,8 @@ select {
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    box-shadow: none; 
-    background: rgba(255,255,255,0.05);
+    box-shadow: none;
+    background: rgba(255, 255, 255, 0.05);
   }
 }
 
@@ -80,12 +82,12 @@ textarea {
 // --------------------------------------------------------------------------
 select {
   // Restore the native arrow, but keep our box styling.
-  appearance: auto; 
-  
+  appearance: auto;
+
   // Ensure the arrow isn't right up against the text
-  padding-right: 2.5rem; 
+  padding-right: 2.5rem;
   cursor: pointer;
-  
+
   // Background color fix for Chrome/Safari to ensure options are readable
   // (The dropdown menu itself is handled by the OS/Browser)
   background-color: var(--bg-sink);
@@ -93,20 +95,20 @@ select {
 
 // 4. RANGE SLIDERS (Native + Accent)
 // --------------------------------------------------------------------------
-input[type=range] {
+input[type='range'] {
   appearance: auto; // Let the browser draw the track
-  width: 100%; 
+  width: 100%;
   min-height: 2rem;
   padding: 0;
   border: none;
   background: transparent;
   box-shadow: none; // No box shadow on the container
-  
+
   // MAGIC PROPERTY:
   // Paints the thumb and track in our Primary Energy color.
   // Works for Void (Cyan), Terminal (Amber), Paper (Ink).
   accent-color: var(--energy-primary);
-  
+
   cursor: pointer;
 
   &:focus {
@@ -126,30 +128,30 @@ input[type='radio'] {
   appearance: auto;
   width: 1.25rem;
   height: 1.25rem;
-  
+
   // MAGIC PROPERTY:
   accent-color: var(--energy-primary);
-  
+
   cursor: pointer;
   vertical-align: middle;
   margin-right: 0.5rem;
-  
+
   // Slight filter to match the "Glow" vibe in Void mode only
   // (Accent color handles the hue, this adds a slight shine)
   @media (prefers-color-scheme: dark) {
-     filter: drop-shadow(0 0 2px var(--energy-primary));
+    filter: drop-shadow(0 0 2px var(--energy-primary));
   }
-  
+
   // Remove glow in Paper/Terminal
   @at-root [data-atmosphere='paper'] &,
-  [data-atmosphere='terminal'] & {
+    [data-atmosphere='terminal'] & {
     filter: none;
   }
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    filter: none; 
+    filter: none;
   }
 }
 
@@ -162,29 +164,29 @@ input[type='radio'] {
   align-items: center;
   justify-content: center;
   text-align: center;
-  
+
   // Layout
-  padding: 1.5rem; 
+  padding: 1.5rem;
   width: 100%;
   min-height: 10rem; // Give it some vertical breathing room
   border-radius: 1rem;
-  
+
   // Style
   border: 2px dashed fade(var(--energy-secondary), 70%);
-  @include glass-sunk; 
+  @include glass-sunk;
   border-style: dashed; // Override sunk solid border
-  
+
   cursor: pointer;
   transition: all var(--speed-fast) var(--ease-flow);
 
   // --- A. THE REAL INPUT (Invisible Layer) ---
   // We stretch this over the entire parent. It captures all clicks and drops.
-  input[type="file"] {
+  input[type='file'] {
     position: absolute;
-    inset: 0;           // Stretch to corners
+    inset: 0; // Stretch to corners
     width: 100%;
     height: 100%;
-    opacity: 0;         // Invisible but clickable
+    opacity: 0; // Invisible but clickable
     cursor: pointer;
     z-index: z('float'); // Sit on top
   }
@@ -198,22 +200,23 @@ input[type='radio'] {
     gap: 1rem;
     pointer-events: none; // Let clicks pass through to the input
     z-index: z('base'); // Sit above the sunk background
-    
+
     // Icon styling
-    svg, .btn-icon {
+    svg,
+    .btn-icon {
       width: 48px;
       height: 48px;
       font-size: 32px;
       color: var(--text-mute);
       transition: color var(--speed-fast) var(--ease-flow);
     }
-    
+
     // Text styling
     p {
       color: var(--text-mute);
       margin: 0;
     }
-    
+
     .btn-fake {
       // Looks like a button, but isn't one
       @extend .btn; // Inherit your button styles
@@ -224,24 +227,31 @@ input[type='radio'] {
   }
 
   // --- INTERACTION STATES ---
-  
+
   // Hover or Drag Active
-  &:hover, 
+  &:hover,
   &.drag-active,
   &:focus-within {
     border-color: var(--energy-primary);
     background-color: blend(var(--bg-sink), var(--energy-primary), 5%);
-    
+
     // Energize the content
     .dropzone-content {
-      svg, .btn-icon { color: var(--energy-primary); }
-      p { color: var(--text-main); }
+      svg,
+      .btn-icon {
+        color: var(--energy-primary);
+      }
+      p {
+        color: var(--text-main);
+      }
     }
-    
+
     @at-root [data-atmosphere='paper'] & {
-      background-color: #F0F9FF; 
+      background-color: #f0f9ff;
       border-color: var(--energy-primary);
-      .dropzone-content svg { filter: none; }
+      .dropzone-content svg {
+        filter: none;
+      }
     }
   }
 }

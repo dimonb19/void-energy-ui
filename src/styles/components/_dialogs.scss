@@ -9,10 +9,10 @@ dialog {
   // --- 1. LAYOUT & POSITION ---
   position: fixed;
   margin: auto; // Centers native dialogs
-  padding: 0;   // Reset, let inner container handle it
-  inset: 0;     // Ensure full screen centering context
-  
-  width: min(90%, 30rem); 
+  padding: 0; // Reset, let inner container handle it
+  inset: 0; // Ensure full screen centering context
+
+  width: min(90%, 30rem);
   max-height: 85vh;
   z-index: z('modal'); // Layer: Modal
 
@@ -20,23 +20,24 @@ dialog {
   border: none;
   border-radius: 1rem;
   color: var(--text-main);
-  
+
   // Apply Glass Physics (Static: No hover movement)
   @include glass-float($interactive: false);
-  
+
   // Extra Depth: Modals float higher than cards
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-  
+
   // --- 3. ANIMATION PHYSICS (The Materialize Effect) ---
   // Default State (OPEN)
   opacity: 1;
   transform: scale(1) translateY(0);
   filter: blur(0);
-  
+
   // We transition properties including display/overlay for exit animations
-  transition: 
+  transition:
     opacity var(--speed-base) var(--ease-flow),
-    transform var(--speed-base) var(--ease-snap), // The "Pop"
+    transform var(--speed-base) var(--ease-snap),
+    // The "Pop"
     filter var(--speed-base) var(--ease-flow),
     display var(--speed-base) allow-discrete,
     overlay var(--speed-base) allow-discrete;
@@ -63,12 +64,12 @@ dialog {
     background: fade(var(--bg-canvas), 20%);
     backdrop-filter: blur(4px);
     opacity: 1;
-    
-    transition: 
+
+    transition:
       opacity var(--speed-base) var(--ease-flow),
       display var(--speed-base) allow-discrete,
       overlay var(--speed-base) allow-discrete;
-      
+
     // Paper Mode Exception: Standard dark overlay
     @at-root [data-atmosphere='paper'] & {
       background: rgba(0, 0, 0, 0.5);
@@ -88,17 +89,18 @@ dialog {
     flex-flow: column nowrap;
     padding: 2rem;
     gap: 1.5rem;
-    
+
     // Typography
-    h2, h3 { 
-      color: var(--text-main); 
-      margin: 0; 
+    h2,
+    h3 {
+      color: var(--text-main);
+      margin: 0;
       font-family: var(--font-heading);
     }
-    
-    p { 
-      color: var(--text-dim); 
-      line-height: 1.6; 
+
+    p {
+      color: var(--text-dim);
+      line-height: 1.6;
     }
   }
 
@@ -110,16 +112,20 @@ dialog {
   &::-webkit-scrollbar {
     width: 6px;
   }
-  
+
   &::-webkit-scrollbar-track {
     background: transparent;
     margin-block: 0.5rem;
   }
-  
+
   &::-webkit-scrollbar-thumb {
-    background: linear-gradient(to bottom, var(--energy-secondary), var(--energy-primary));
+    background: linear-gradient(
+      to bottom,
+      var(--energy-secondary),
+      var(--energy-primary)
+    );
     border-radius: 10px;
-    
+
     &:hover {
       background: var(--energy-primary);
       box-shadow: 0 0 10px var(--energy-primary);
@@ -128,18 +134,18 @@ dialog {
 
   // --- 9. PAPER MODE OVERRIDE ---
   @at-root [data-atmosphere='paper'] & {
-    background: #FFFFFF;
-    border: var(--physics-border-width) solid #E0E0E0;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15); // Clean shadow
+    background: #ffffff;
+    border: var(--physics-border-width) solid #e0e0e0;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); // Clean shadow
     border-radius: 8px;
-    
+
     // Crisp entry, no blur
     @starting-style {
       opacity: 0;
-      transform: scale(0.95); 
+      transform: scale(0.95);
       filter: none;
     }
-    
+
     &:not([open]) {
       opacity: 0;
       transform: scale(0.95);

@@ -28,19 +28,19 @@
 // Usage: @include entry-transition; inside a class (e.g., .fade-in)
 @mixin entry-transition($duration: 0.4s, $delay: 0s) {
   // Use --ease-stabilize for the "Slide In" feel
-  transition: 
+  transition:
     opacity $duration var(--ease-stabilize) $delay,
     transform $duration var(--ease-stabilize) $delay,
-    filter $duration ease $delay; 
-  
+    filter $duration ease $delay;
+
   opacity: 1;
   transform: translateY(0) scale(1);
   filter: blur(0);
 
   @starting-style {
     opacity: 0;
-    transform: translateY(10px) scale(0.98); 
-    filter: blur(var(--physics-blur)); 
+    transform: translateY(10px) scale(0.98);
+    filter: blur(var(--physics-blur));
   }
 }
 
@@ -51,14 +51,19 @@
 // A. SHIMMER (Loading/Energy)
 // Used by: .shimmer (Helpers)
 @keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
 // B. CYBER PULSE (Active States)
 // Used by: .cyber-pulse (Helpers)
 @keyframes cyber-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     box-shadow: 0 0 10px fade(var(--energy-primary), 60%);
   }
@@ -71,15 +76,23 @@
 // C. ROTATE LASER (Gemini Button)
 // Used by: .btn-cta (Buttons)
 @keyframes rotate-laser {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to   { transform: translate(-50%, -50%) rotate(360deg); }
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
 }
 
 // D. PROGRESS FILL
 // Used by: .progress-bar (Helpers)
 @keyframes progress-fill {
-  from { width: 0%; }
-  to { width: 100%; }
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
 }
 
 // E. LOGO ENTRY (Holographic Materialization)
@@ -88,11 +101,11 @@
   0% {
     opacity: 0;
     transform: scale(0.8); // Starts slightly smaller
-    filter: blur(12px);    // Starts out of focus (Void Physics)
+    filter: blur(12px); // Starts out of focus (Void Physics)
   }
   100% {
     opacity: 1;
     transform: scale(1);
-    filter: blur(0);       // Snaps into focus
+    filter: blur(0); // Snaps into focus
   }
 }

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { onMount, onDestroy } from "svelte";
+  import { onMount, onDestroy } from 'svelte';
 
-  import { theme } from "../stores/theme.svelte";
-  import { showModal } from "../stores/modal.svelte";
-  import Modal from "./Modal.svelte";
+  import { theme } from '../stores/theme.svelte';
+  import { showModal } from '../stores/modal.svelte';
+  import Modal from './Modal.svelte';
 
   let rangeValue = $state(50);
 
@@ -69,13 +69,13 @@
 
   // --- 1. Dynamic Theme Fetching ---
   function updatePalette() {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
 
     const styles = getComputedStyle(document.documentElement);
 
     // Get Raw Hex Strings
-    const rawCanvas = styles.getPropertyValue("--bg-canvas").trim();
-    const rawSpotlight = styles.getPropertyValue("--bg-spotlight").trim();
+    const rawCanvas = styles.getPropertyValue('--bg-canvas').trim();
+    const rawSpotlight = styles.getPropertyValue('--bg-spotlight').trim();
 
     // Parse and set TARGET only. Current will chase it in the render loop.
     if (rawCanvas) targetPalette.canvas = hexToRgb(rawCanvas);
@@ -100,14 +100,14 @@
 
   function handleMove(event: MouseEvent | TouchEvent) {
     let clientX, clientY;
-    if ("touches" in event && event.touches.length > 0) {
+    if ('touches' in event && event.touches.length > 0) {
       clientX = event.touches[0].clientX;
       clientY = event.touches[0].clientY;
-    } else if ("clientX" in event) {
+    } else if ('clientX' in event) {
       clientX = event.clientX;
       clientY = event.clientY;
     }
-    if (typeof clientX === "number" && typeof clientY === "number") {
+    if (typeof clientX === 'number' && typeof clientY === 'number') {
       pointer.x = clientX;
       pointer.y = clientY;
     }
@@ -120,12 +120,12 @@
     currentPalette.canvas = lerpColor(
       currentPalette.canvas,
       targetPalette.canvas,
-      COLOR_LERP
+      COLOR_LERP,
     );
     currentPalette.spotlight = lerpColor(
       currentPalette.spotlight,
       targetPalette.spotlight,
-      COLOR_LERP
+      COLOR_LERP,
     );
 
     // STEP B: Physics (Light Position)
@@ -145,14 +145,14 @@
         0,
         light.x,
         light.y,
-        SPOTLIGHT_RADIUS
+        SPOTLIGHT_RADIUS,
       );
 
       gradient.addColorStop(0, rgbToString(currentPalette.spotlight));
       gradient.addColorStop(1, rgbToString(currentPalette.canvas)); // Fade to floor
 
       ctx.fillStyle = gradient;
-      ctx.globalCompositeOperation = "source-over";
+      ctx.globalCompositeOperation = 'source-over';
       ctx.fillRect(0, 0, width, height);
     }
 
@@ -170,7 +170,7 @@
   });
 
   onMount(() => {
-    ctx = canvas.getContext("2d", { alpha: false })!;
+    ctx = canvas.getContext('2d', { alpha: false })!;
 
     // Initial sync so we don't fade in from black on load
     updatePalette();
@@ -179,18 +179,18 @@
 
     resize();
 
-    window.addEventListener("resize", resize);
-    window.addEventListener("mousemove", handleMove);
-    window.addEventListener("touchmove", handleMove);
+    window.addEventListener('resize', resize);
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('touchmove', handleMove);
 
     frameId = requestAnimationFrame(render);
   });
 
   onDestroy(() => {
-    if (typeof window !== "undefined") {
-      window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", handleMove);
-      window.removeEventListener("touchmove", handleMove);
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('resize', resize);
+      window.removeEventListener('mousemove', handleMove);
+      window.removeEventListener('touchmove', handleMove);
       cancelAnimationFrame(frameId);
     }
   });

@@ -7,7 +7,7 @@
 const KEYS = {
   ATMOSPHERE: 'void_atmosphere',
   FONT: 'void_user_font',
-  SCALE: 'void_text_scale'
+  SCALE: 'void_text_scale',
 };
 
 function createThemeStore() {
@@ -32,7 +32,9 @@ function createThemeStore() {
 
   return {
     // --- 1. ATMOSPHERE ---
-    get atmosphere() { return _atmosphere },
+    get atmosphere() {
+      return _atmosphere;
+    },
     set atmosphere(value: string) {
       _atmosphere = value;
       if (typeof window !== 'undefined') {
@@ -42,7 +44,9 @@ function createThemeStore() {
     },
 
     // --- 2. FONT OVERRIDE ---
-    get font() { return _font },
+    get font() {
+      return _font;
+    },
     set font(value: string) {
       _font = value;
       if (typeof window !== 'undefined') {
@@ -57,14 +61,19 @@ function createThemeStore() {
     },
 
     // --- 3. TEXT SCALE ---
-    get scale() { return _scale },
+    get scale() {
+      return _scale;
+    },
     set scale(value: number) {
       _scale = value;
       if (typeof window !== 'undefined') {
-        document.documentElement.style.setProperty('--text-scale', value.toString());
+        document.documentElement.style.setProperty(
+          '--text-scale',
+          value.toString(),
+        );
         localStorage.setItem(KEYS.SCALE, value.toString());
       }
-    }
+    },
   };
 }
 

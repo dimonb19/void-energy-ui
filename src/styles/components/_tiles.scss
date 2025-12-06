@@ -10,46 +10,50 @@
 // 1. THE COLLECTION (Horizontal Scroll Container)
 // --------------------------------------------------------------------------
 .tiles-collection {
-  width: 100%; 
+  width: 100%;
   min-height: 18rem;
   display: flex;
   flex-flow: row nowrap;
   justify-content: flex-start;
   align-items: center;
   gap: 1.5rem;
-  
+
   // Padding respects the container layout but adds vertical breathing room
   padding: 0.5rem 1.5rem 2rem 1.5rem;
-    
+
   overflow-x: auto;
   overflow-y: hidden;
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
-  
+
   // --- DYNAMIC LASER SCROLLBARS ---
   scrollbar-width: thin;
   scrollbar-color: var(--energy-secondary) transparent;
 
-  &::-webkit-scrollbar { 
-    height: 4px; 
+  &::-webkit-scrollbar {
+    height: 4px;
   }
-  
-  &::-webkit-scrollbar-track { 
-    background: rgba(255, 255, 255, 0.02); 
-    border-radius: 4px; 
-    
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+
     // Paper Override
     @at-root [data-atmosphere='paper'] & {
-      background: rgba(0,0,0,0.05);
+      background: rgba(0, 0, 0, 0.05);
     }
   }
-  
-  &::-webkit-scrollbar-thumb { 
-    background: linear-gradient(90deg, var(--energy-secondary), var(--energy-primary)); 
+
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      90deg,
+      var(--energy-secondary),
+      var(--energy-primary)
+    );
     border-radius: 4px;
-    
-    &:hover { 
-      background: var(--energy-primary); 
+
+    &:hover {
+      background: var(--energy-primary);
       // Glow works in Void, becomes simple color in Paper
       box-shadow: 0 0 10px fade(var(--energy-primary), 40%);
     }
@@ -63,25 +67,25 @@
   flex: none;
   width: 10rem; // Mobile width
   aspect-ratio: 2 / 3;
-    
+
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-    
+
   // --- PHYSICS BASE ---
   // We use the mixin for borders/shadows, but override background/padding
   @include glass-float($interactive: true);
   padding: 0; // Images are full bleed
   background: var(--bg-sink); // Darker than standard cards
-  
+
   text-decoration: none !important;
   overflow: hidden;
   border-radius: 12px; // Fixed visually pleasing radius
   border-width: 2px;
-  
+
   // Explicit transition for hover effects
-  transition: 
-    transform var(--speed-base) var(--ease-stabilize), 
+  transition:
+    transform var(--speed-base) var(--ease-stabilize),
     border-color var(--speed-base) var(--ease-snap),
     box-shadow var(--speed-base) var(--ease-snap);
 
@@ -106,10 +110,11 @@
     background: linear-gradient(
       to bottom,
       transparent 0%,
-      transparent 40%,        // Keep top clear
-      fade(var(--bg-canvas), 60%) 60%, 
-      fade(var(--bg-canvas), 10%) 80%, 
-      var(--bg-canvas) 100%   // Solid Floor
+      transparent 40%,
+      // Keep top clear
+      fade(var(--bg-canvas), 60%) 60%,
+      fade(var(--bg-canvas), 10%) 80%,
+      var(--bg-canvas) 100% // Solid Floor
     );
     z-index: z('base');
     pointer-events: none;
@@ -122,20 +127,20 @@
     z-index: z('decorate');
     margin: 0;
     padding: 0 0.75rem 0.25rem 0.75rem;
-    
+
     font-family: var(--font-heading);
     color: var(--text-main);
     font-weight: 700;
     font-size: 1rem;
     line-height: 1.2;
-    
+
     // Text shadow for legibility over image
-    text-shadow: 0 2px 4px rgba(0,0,0,0.9); 
-    
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+
     @at-root [data-atmosphere='paper'] & {
-       // color: #FFFFFF; // Always white text over image, even in Paper mode
-       // text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-       text-shadow: none;
+      // color: #FFFFFF; // Always white text over image, even in Paper mode
+      // text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+      text-shadow: none;
     }
   }
 
@@ -146,14 +151,15 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    
-    p, span {
+
+    p,
+    span {
       font-size: 0.75rem;
       color: var(--text-mute);
       transition: color 0.3s ease;
-      
+
       @at-root [data-atmosphere='paper'] & {
-         color: rgba(255,255,255,0.7); // Light grey on image
+        color: rgba(255, 255, 255, 0.7); // Light grey on image
       }
     }
   }
@@ -163,37 +169,53 @@
     &:hover:not(.loading-tile),
     &:focus-visible:not(.loading-tile) {
       // Logic handled by mixin, but we add image scale here
-      img { transform: scale(1.05); }
-      
+      img {
+        transform: scale(1.05);
+      }
+
       // Light up metadata
-      .tile-data p { 
-        color: var(--text-main); 
-        @at-root [data-atmosphere='paper'] & { color: #FFFFFF; }
-      } 
+      .tile-data p {
+        color: var(--text-main);
+        @at-root [data-atmosphere='paper'] & {
+          color: #ffffff;
+        }
+      }
 
       @at-root [data-atmosphere='terminal'] & {
-        img { transform: scale(1.01); }
+        img {
+          transform: scale(1.01);
+        }
       }
     }
   }
 
   // --- RESPONSIVE WIDTHS ---
   // Using standard breakpoints logic
-  @media (min-width: 768px) { width: 14rem; }
-  @media (min-width: 1440px) { width: 16rem; }
-  @media (min-width: 1920px) { width: 18rem; } 
+  @media (min-width: 768px) {
+    width: 14rem;
+  }
+  @media (min-width: 1440px) {
+    width: 16rem;
+  }
+  @media (min-width: 1920px) {
+    width: 18rem;
+  }
 }
 
 // 3. LOADING TILE (Skeleton)
 // --------------------------------------------------------------------------
 .loading-tile {
-  @extend .tile; 
+  @extend .tile;
   background: var(--bg-sink);
   pointer-events: none; // Non-interactive
-  
+
   // Clean slate for the skeleton
-  h5, .tile-data, img { opacity: 0; } 
-  
+  h5,
+  .tile-data,
+  img {
+    opacity: 0;
+  }
+
   &::before {
     content: '';
     position: absolute;
@@ -211,24 +233,24 @@
 
 // A. THE MIXIN (Structural DNA)
 @mixin tile-structure {
-  @extend .btn-void; 
-  
+  @extend .btn-void;
+
   // Layout
   display: inline-flex;
   flex-flow: row nowrap;
   align-items: stretch;
   justify-content: space-between;
   gap: 0;
-  
+
   // Sizing
   min-height: 2.25rem;
   padding: 0;
-  
+
   // Typography
   color: var(--text-main);
 
   // Transitions
-  transition: 
+  transition:
     transform var(--speed-base) var(--ease-snap),
     box-shadow var(--speed-base) var(--ease-snap),
     border-color var(--speed-base) var(--ease-snap),
@@ -240,8 +262,12 @@
 
   // 1. LABEL
   .tile-label {
-    display: flex; align-items: center; padding: 0 0.75rem;
-    white-space: nowrap; color: inherit; font-weight: 600;
+    display: flex;
+    align-items: center;
+    padding: 0 0.75rem;
+    white-space: nowrap;
+    color: inherit;
+    font-weight: 600;
   }
 
   // 2. SUNKEN VARIANT
@@ -249,7 +275,9 @@
     background: var(--bg-sink);
     border: 1px solid var(--border-shadow);
     color: var(--text-dim);
-    padding: 0.1rem 0.5rem; margin-block: auto; margin-right: 0.5rem;
+    padding: 0.1rem 0.5rem;
+    margin-block: auto;
+    margin-right: 0.5rem;
     border-radius: 4px;
     @include typography('caption');
   }
@@ -257,15 +285,20 @@
   // 3. REMOVE BUTTON
   .tile-remove {
     @extend .btn-void;
-    display: flex; align-items: center; justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 2.25rem;
-    
+
     // Default Separation (Variant mixin overrides this)
     border-left: var(--physics-border-width) solid fade(white, 10%);
     color: var(--text-mute);
-    
-    border-top-right-radius: 8px; border-bottom-right-radius: 8px;
-    transition: background-color 0.2s ease, color 0.2s ease;
+
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease;
 
     &:hover {
       background: fade(black, 30%);
@@ -280,12 +313,18 @@
     color: shade(var(--text-mute), 20%);
     border-color: shade(var(--text-mute), 50%) !important;
     box-shadow: none !important;
-    opacity: 0.8; transform: none;
+    opacity: 0.8;
+    transform: none;
 
     .tile-remove {
-      cursor: not-allowed; border-left-color: shade(var(--text-mute), 50%);
-      color: shade(var(--text-mute), 20%); background: transparent;
-      &:hover { background: transparent; color: inherit; }
+      cursor: not-allowed;
+      border-left-color: shade(var(--text-mute), 50%);
+      color: shade(var(--text-mute), 20%);
+      background: transparent;
+      &:hover {
+        background: transparent;
+        color: inherit;
+      }
     }
   }
 
@@ -296,17 +335,20 @@
       box-shadow: 0 4px 12px fade(black, 30%);
     }
   }
-  
-  @starting-style { opacity: 0; transform: scale(0.9); }
+
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.9);
+  }
 }
 
 // B. THE VARIANT MIXIN (Color Logic)
 @mixin tile-variant($color) {
   // --- 1. DEFAULT (VOID / GLASS) ---
-  background: fade($color, 20%); 
+  background: fade($color, 20%);
   border-color: tint($color, 20%);
   box-shadow: 0 0 15px fade($color, 80%);
-  color: var(--text-main); 
+  color: var(--text-main);
 
   .tile-remove {
     background: shade($color, 30%);
@@ -335,15 +377,16 @@
     .tile-remove {
       background: transparent;
       border-left: 2px solid $color;
-      border-top-right-radius: 5px; border-bottom-right-radius: 5px;
+      border-top-right-radius: 5px;
+      border-bottom-right-radius: 5px;
       color: $color;
-      
+
       &:hover {
         background: $color; // Invert on hover
         color: black;
       }
     }
-    
+
     &:hover:not(:disabled) {
       box-shadow: 4px 4px 0px fade($color, 50%); // Hard shadow, no blur
     }
@@ -352,18 +395,18 @@
   // --- 3. PAPER OVERRIDE (Ink / Pastel) ---
   @at-root [data-atmosphere='paper'] & {
     // Pastel background
-    background: tint($color, 85%); 
+    background: tint($color, 85%);
     border: 1px solid $color;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     // Darker text for readability on light bg
-    color: shade($color, 60%); 
+    color: shade($color, 60%);
 
     .tile-remove {
       // Slightly darker pastel for the button
-      background: tint($color, 70%); 
+      background: tint($color, 70%);
       border-left: 1px solid $color;
       color: shade($color, 50%);
-      
+
       &:hover {
         background: $color; // Full saturation on hover
         color: white;
@@ -371,7 +414,7 @@
     }
 
     &:hover:not(:disabled) {
-      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
       transform: translateY(-1px);
     }
 
@@ -386,41 +429,59 @@
 // ==========================================================================
 
 // Base Class (Void Blue Default)
-.tile-small { 
-  @include tile-structure; 
-  @include tile-variant(var(--energy-secondary)); 
+.tile-small {
+  @include tile-structure;
+  @include tile-variant(var(--energy-secondary));
 }
 
 // Semantic Variants
-.tile-small-system    { @include tile-structure; @include tile-variant(var(--color-system)); }
-.tile-small-premium   { @include tile-structure; @include tile-variant(var(--color-premium)); }
-.tile-small-success   { @include tile-structure; @include tile-variant(var(--color-success)); }
-.tile-small-error     { @include tile-structure; @include tile-variant(var(--color-error)); }
+.tile-small-system {
+  @include tile-structure;
+  @include tile-variant(var(--color-system));
+}
+.tile-small-premium {
+  @include tile-structure;
+  @include tile-variant(var(--color-premium));
+}
+.tile-small-success {
+  @include tile-structure;
+  @include tile-variant(var(--color-success));
+}
+.tile-small-error {
+  @include tile-structure;
+  @include tile-variant(var(--color-error));
+}
 
 // ==========================================================================
 // 6. THE ADDON (Label on Top)
 // ==========================================================================
 .tile-labeled {
   margin-top: 1rem;
-  border-top-left-radius: 0; 
+  border-top-left-radius: 0;
 
   &::before {
     content: attr(data-label);
     position: absolute;
-    top: -1.5rem; left: -1px;
-    height: 1.5rem; padding: 0 0.5rem;
-    
-    background: inherit;     
-    border: inherit; border-bottom: none;     
-    border-top-left-radius: 8px; border-top-right-radius: 8px;
-    
+    top: -1.5rem;
+    left: -1px;
+    height: 1.5rem;
+    padding: 0 0.5rem;
+
+    background: inherit;
+    border: inherit;
+    border-bottom: none;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+
     text-transform: uppercase;
-    display: flex; align-items: center; z-index: 1;
+    display: flex;
+    align-items: center;
+    z-index: 1;
     @include typography('caption');
 
     // Default Text Color (Glass/Void)
     color: shade(var(--bg-canvas), 50%);
-    text-shadow: none; 
+    text-shadow: none;
     mix-blend-mode: normal;
     // Force readability on glass
     color: var(--text-dim);
@@ -436,8 +497,8 @@
 
     // PAPER LABEL
     @at-root [data-atmosphere='paper'] & {
-       color: inherit; // Dark Ink
-       font-weight: 700;
+      color: inherit; // Dark Ink
+      font-weight: 700;
     }
   }
 }

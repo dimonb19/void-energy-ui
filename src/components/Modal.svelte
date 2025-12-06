@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { showModal } from "../stores/modal.svelte";
+  import { showModal } from '../stores/modal.svelte';
 
   let dialog = $state<HTMLDialogElement | null>(null);
 
