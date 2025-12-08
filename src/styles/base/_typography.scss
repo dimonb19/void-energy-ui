@@ -1,6 +1,6 @@
 @use 'sass:map';
-@use '/src/styles/abstracts/breakpoints' as *;
-@use '/src/styles/components/anchors';
+@use '../abstracts/breakpoints' as *;
+@use '../components/anchors';
 
 /* =========================================
    1. THE LOGIC (Scales & Weights)

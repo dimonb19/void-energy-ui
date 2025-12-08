@@ -1,6 +1,6 @@
 @use 'sass:map';
-@use '/src/styles/abstracts' as *;
-@use '/src/styles/base/typography';
+@use '../abstracts' as *;
+@use '../base/typography';
 
 /* ==========================================================================
    VOID ENERGY CONTAINER & SURFACE SYSTEM
