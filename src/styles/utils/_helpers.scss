@@ -352,3 +352,46 @@ $spacing-aliases: (
   white-space: nowrap;
   border: 0;
 }
+
+// --------------------------------------------------------------------------
+// 7. ICONS & MEDIA
+// --------------------------------------------------------------------------
+
+.icon {
+  // Sizing: scales with text (1.25em = slightly larger than text for balance)
+  width: 1.25em;
+  height: 1.25em;
+  min-width: 1.25em; // Critical: Prevents squishing inside Flex containers
+
+  // Alignment: Centers nicely with text line-height
+  display: inline-block;
+  vertical-align: middle;
+
+  // Color: Inherits from parent (Button/Text)
+  color: inherit;
+
+  // Physics: Prepare for hover transforms
+  transition: transform var(--speed-fast) var(--ease-snap);
+}
+
+// Icon Modifiers
+.icon-sm {
+  width: 1em;
+  height: 1em;
+  min-width: 1em;
+}
+.icon-lg {
+  width: 1.5em;
+  height: 1.5em;
+  min-width: 1.5em;
+}
+.icon-xl {
+  width: 2em;
+  height: 2em;
+  min-width: 2em;
+}
+
+// Spin Utility (for loading icons)
+.icon-spin {
+  animation: rotate-laser 2s linear infinite; // Re-using your existing rotation keyframe
+}
