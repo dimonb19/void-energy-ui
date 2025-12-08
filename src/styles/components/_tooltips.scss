@@ -1,0 +1,136 @@
+@use '/src/styles/abstracts' as *;
+@use '/src/styles/base/typography' as *;
+
+/* ==========================================================================
+   VOID TOOLTIPS (TippyJS Override)
+   ========================================================================== */
+
+// 1. THE BOX (Physics & Skin)
+.tippy-box[data-theme~='void'] {
+  background-color: transparent;
+  color: inherit;
+
+  // High-Legibility Glass
+  // We manually apply glass properties to override Tippy defaults
+  background-color: var(--bg-canvas);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  border: var(--physics-border-width) solid var(--border-highlight);
+  border-radius: 8px;
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+
+  // Typography
+  @include typography('caption');
+  color: var(--text-main);
+  text-align: center;
+  padding: 0.25rem 0.5rem;
+
+  // TERMINAL OVERRIDE (Robotic)
+  @at-root [data-atmosphere='terminal'] & {
+    backdrop-filter: none;
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  // PAPER OVERRIDE (Ink)
+  @at-root [data-atmosphere='paper'] & {
+    background-color: var(--bg-surface);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// 2. THE CONTENT
+.tippy-content {
+  padding: 0.5rem 0.75rem; // Comfort padding
+}
+
+// 3. THE "MATERIALIZE" ANIMATION
+// We replace 'scale.css' with this custom physics engine.
+// Tippy toggles data-state between 'hidden' and 'visible'.
+
+.tippy-box[data-animation='materialize'] {
+  // --- STATE: HIDDEN (Dematerialized) ---
+  &[data-state='hidden'] {
+    opacity: 0;
+    transform: scale(0.95) translateY(4px); // Slight drop
+    filter: blur(8px); // Void Blur
+  }
+
+  // --- STATE: VISIBLE (Stabilized) ---
+  &[data-state='visible'] {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+
+    // The Stabilization Curve
+    transition-property: transform, opacity, filter;
+    transition-duration: var(--speed-fast);
+    transition-timing-function: var(--ease-stabilize);
+  }
+
+  // --- ATMOSPHERE EXCEPTIONS ---
+
+  // Terminal: Instant Snap (0s)
+  @at-root [data-atmosphere='terminal'] & {
+    transition-duration: 0s !important; // Instant
+    &[data-state='hidden'] {
+      filter: none; // No blur in terminal
+    }
+  }
+
+  // Paper: Clean Fade (No Blur)
+  @at-root [data-atmosphere='paper'] & {
+    &[data-state='hidden'] {
+      filter: none; // No blur in paper
+    }
+  }
+}
+
+// 4. ARROW HIDING
+// We hide arrows because glass arrows are visually messy (double borders).
+.tippy-arrow {
+  display: none;
+}
+
+/* ==========================================================================
+   SEMANTIC VARIANTS
+   Usage: use:tooltip={{ content: 'Offline', variant: 'error' }}
+   ========================================================================== */
+
+// ERROR (Red)
+.tippy-box[data-theme~='error'] {
+  border-color: var(--color-error);
+  color: var(--color-error);
+
+  // Add a subtle red glow for danger
+  box-shadow: 0 0 5px fade(var(--color-error), 30%);
+
+  // Background tint (Optional: blends canvas with 10% red)
+  background-color: color-mix(
+    in srgb,
+    var(--bg-canvas),
+    var(--color-error) 10%
+  );
+}
+
+// SUCCESS (Green)
+.tippy-box[data-theme~='success'] {
+  border-color: var(--color-success);
+  color: var(--color-success);
+  box-shadow: 0 0 5px fade(var(--color-success), 30%);
+}
+
+// SYSTEM / INFO (Purple)
+.tippy-box[data-theme~='system'] {
+  border-color: var(--color-system);
+  color: var(--color-system);
+  box-shadow: 0 0 5px fade(var(--color-system), 30%);
+}
+
+// PREMIUM (Gold/Orange)
+.tippy-box[data-theme~='premium'] {
+  border-color: var(--color-premium);
+  color: var(--color-premium);
+  box-shadow: 0 0 5px fade(var(--color-premium), 30%);
+}

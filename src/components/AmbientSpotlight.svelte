@@ -3,6 +3,8 @@
 
   import { theme } from '../stores/theme.svelte';
   import { showModal } from '../stores/modal.svelte';
+  import { tooltip } from '../actions/tooltip';
+
   import Modal from './Modal.svelte';
 
   let rangeValue = $state(50);
@@ -321,9 +323,15 @@
         <div class="flex-row flex-wrap justify-center gap-16">
           <button class="btn-orb">Upgrade Core</button>
           <button class="btn-system">Diagnostics</button>
-          <button class="btn-signal">Secure Channel</button>
-          <button class="btn-alert">Purge Cache</button>
-          <button>Default Action</button>
+          <button class="btn-signal" use:tooltip={'Success Button Styling'}
+            >Secure Channel</button
+          >
+          <button class="btn-alert" use:tooltip={'Error Button Styling'}
+            >Purge Cache</button
+          >
+          <button use:tooltip={'Standard Button Styling'}>
+            Default Action
+          </button>
           <button disabled>Offline</button>
         </div>
       </div>
