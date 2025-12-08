@@ -2,13 +2,6 @@
    🌌 VOID ENERGY UI: GLOBAL ENTRY POINT
    ========================================================================== */
 
-/* 0. VENDOR STYLES */
-// Tippy.js tooltips - https://atomiks.github.io/tippyjs/
-@use 'tippy.js/dist/tippy.css';
-// Use like this:
-// import { tippy } from 'svelte-tippy';
-// use:tippy={{ content: 'Start your story', animation: 'scale' }}
-
 /* 1. ABSTRACTS (Tools, Variables, Mixins) - No Output */
 @use 'abstracts' as *;
 
@@ -20,6 +13,13 @@
 
 /* 4. UTILITIES (Helpers, Animations) */
 @use 'utils';
+
+/* 5. VENDOR STYLES */
+// Tippy.js tooltips - https://atomiks.github.io/tippyjs/
+@import 'tippy.js/dist/tippy.css';
+// Use like this:
+// import { tippy } from 'svelte-tippy';
+// use:tippy={{ content: 'Start your story', animation: 'scale' }}
 
 /* ==========================================================================
    📘 MASTER DEVELOPER CHEAT SHEET (vFinal)
