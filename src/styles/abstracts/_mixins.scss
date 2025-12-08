@@ -116,6 +116,7 @@
 // MIXIN: The "Gemini Laser" Structure
 @mixin gemini-laser {
   position: relative;
+  isolation: isolate; // Force stacking context on the button itself
   background: transparent;
   border: none;
   overflow: hidden;

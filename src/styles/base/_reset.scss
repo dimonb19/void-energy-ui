@@ -65,6 +65,11 @@ html {
   }
 }
 
+// Prevent background scroll when dialog is open
+html:has(dialog[open]) {
+  overflow: hidden;
+}
+
 // Ensure body fills the specific height if needed,
 // otherwise it inherits naturally.
 body {

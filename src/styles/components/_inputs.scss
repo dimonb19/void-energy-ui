@@ -255,3 +255,21 @@ input[type='radio'] {
     }
   }
 }
+
+// 7. AUTOFILL OVERRIDE (Webkit Browsers)
+// --------------------------------------------------------------------------
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill {
+  // Force the background to match sunk surface using an infinite internal shadow
+  -webkit-box-shadow: 0 0 0px 1000px var(--bg-sink) inset !important;
+
+  // Force the text color
+  -webkit-text-fill-color: var(--text-main) !important;
+
+  // Preserve border radius
+  border-radius: 8px;
+
+  transition: background-color 5000s ease-in-out 0s; // Prevent flash
+}

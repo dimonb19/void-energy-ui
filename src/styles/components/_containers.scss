@@ -190,29 +190,8 @@
   border: var(--physics-border-width) solid var(--border-shadow);
 }
 
-// 4. CANVAS-LEVEL INPUTS (The Exception)
-// --------------------------------------------------------------------------
-// Use this when an input must sit directly on the --bg-canvas
-// without a parent Glass Card. It adds a stronger border to define boundaries.
-
-.sunk-on-canvas {
-  @include glass-sunk;
-
-  // VISIBLE BORDER & ATMOSPHERIC DEPTH
-  // Since we don't have the glass card contrast, we brighten the border,
-  // and darken the current canvas color
-  border-color: var(--border-highlight); // 30% opacity (Brighter)
-  background: shade(var(--bg-canvas), 20%);
-
-  // Paper Mode Override
-  @at-root [data-atmosphere='paper'] & {
-    background: #ffffff;
-    border: var(--physics-border-width) solid var(--energy-secondary);
-  }
-}
-
 // ==========================================================================
-// 5. SETTINGS GRID (Dashboard Layout)
+// 4. SETTINGS GRID (Dashboard Layout)
 // ==========================================================================
 // Usage:
 // <div class="settings-grid">

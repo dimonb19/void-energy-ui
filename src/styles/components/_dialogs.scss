@@ -20,6 +20,7 @@ dialog {
   margin: auto; // Centers native dialogs
   padding: 0; // Reset, let inner container handle it
   inset: 0; // Ensure full screen centering context
+  overscroll-behavior: contain; // Prevents scroll chaining to the body
 
   z-index: z('modal'); // Layer: Modal
 
