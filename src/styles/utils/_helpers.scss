@@ -118,9 +118,15 @@ $spacing-aliases: (
   }
 
   // Grid Modifiers
-  .#{$prefix}grid { display: grid; }
-  .#{$prefix}grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-  .#{$prefix}grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .#{$prefix}grid {
+    display: grid;
+  }
+  .#{$prefix}grid-cols-1 {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  .#{$prefix}grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 
   // --- SIZING ---
   .#{$prefix}w-full {

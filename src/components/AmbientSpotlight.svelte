@@ -207,13 +207,17 @@
       <p>System Architecture // Component Library</p>
       <select bind:value={theme.atmosphere}>
         <option value="void">Void Atmosphere</option>
-        <option value="crimson">Crimson Atmosphere</option>
-        <option value="overgrowth">Overgrowth Atmosphere</option>
-        <option value="velvet">Velvet Atmosphere</option>
         <option value="onyx">Onyx Atmosphere</option>
         <option value="terminal">Terminal Atmosphere</option>
-        <option value="paper">Paper Atmosphere</option>
+        <option value="overgrowth">Overgrowth Atmosphere</option>
+        <option value="ember">Ember Atmosphere</option>
+        <option value="glacier">Glacier Atmosphere</option>
+        <option value="nebula">Nebula Atmosphere</option>
+        <option value="crimson">Crimson Atmosphere</option>
+        <option value="velvet">Velvet Atmosphere</option>
         <option value="solar">Solar Atmosphere</option>
+        <option value="paper">Paper Atmosphere</option>
+        <option value="laboratory">Laboratory Atmosphere</option>
       </select>
     </div>
   </header>

@@ -33,7 +33,7 @@
     'ease-snap': $ease-base,
     'ease-flow': $ease-base,
     'speed-base': $speed-base,
-    'speed-fast': $speed-fast
+    'speed-fast': $speed-fast,
   );
 
   $theme-map: map.merge(map.merge($physics-map, $compat-physics), $palette);

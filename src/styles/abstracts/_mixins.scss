@@ -65,12 +65,15 @@
         // Glow calculation
         box-shadow:
           0 12px 40px rgba(0, 0, 0, calc(0.6 * var(--shadow-strength))),
-          0 0 15px color-mix(
-            in srgb,
-            var(--energy-primary)
-              calc(var(--glow-opacity) * var(--glow-strength, 1) * 100%),
-            transparent
-          );
+          0
+            0
+            15px
+            color-mix(
+              in srgb,
+              var(--energy-primary)
+                calc(var(--glow-opacity) * var(--glow-strength, 1) * 100%),
+              transparent
+            );
       }
     }
   }
@@ -103,12 +106,13 @@
     outline: none;
     box-shadow:
       inset 0 2px 8px rgba(0, 0, 0, calc(0.5 * var(--shadow-strength))),
-      0 0 10px color-mix(
-        in srgb,
-        var(--energy-primary)
-          calc(var(--glow-opacity) * var(--glow-strength, 1) * 100%),
-        transparent
-      );
+      0 0 10px
+        color-mix(
+          in srgb,
+          var(--energy-primary)
+            calc(var(--glow-opacity) * var(--glow-strength, 1) * 100%),
+          transparent
+        );
   }
 }
 

@@ -67,7 +67,7 @@ $shared-values: (
   'font-atmos-heading': $font-tech,
   'font-atmos-body': $font-tech,
   'font-heading': var(--user-font-heading, var(--font-atmos-heading)),
-  'font-body': var(--user-font-body, var(--font-atmos-body))
+  'font-body': var(--user-font-body, var(--font-atmos-body)),
 );
 
 $semantic-dark: (
@@ -75,7 +75,7 @@ $semantic-dark: (
   'color-system': $semantic-dark-system,
   'color-success': $semantic-dark-success,
   'color-error': $semantic-dark-error,
-  'gradient-premium': linear-gradient(to right, #ffa528, #ff8c00)
+  'gradient-premium': linear-gradient(to right, #ffa528, #ff8c00),
 );
 
 $semantic-light: (
@@ -83,222 +83,366 @@ $semantic-light: (
   'color-system': $semantic-light-system,
   'color-success': $semantic-light-success,
   'color-error': $semantic-light-error,
-  'gradient-premium': linear-gradient(to right, #f59e0b, #d97706)
+  'gradient-premium': linear-gradient(to right, #f59e0b, #d97706),
 );
 
 // Configuration-driven atmospheres. Add or override entries in this map.
 $themes: (
-  // 1. VOID (Default)
+  // ==========================================================================
+  // The Tech Spectrum (Sci-Fi & Modern)
+  // These are "Void" derivatives, focused on digital narratives.
+  // =========================================================================
+  // 1. VOID (CoNexus Branding)
   'void': (
-    'type': 'dark',
-    'physics': 'glass',
-    'palette': map.merge(
-      $shared-values,
-      map.merge(
-        $semantic-dark,
-        (
-          'bg-canvas': $void-deep,
-          'bg-spotlight': $void-spotlight,
-          'bg-surface': $void-navy,
-          'bg-sink': rgba(0, 2, 41, 0.6),
-          'energy-primary': $void-cyan,
-          'energy-secondary': $void-blue,
-          'border-highlight': rgba(56, 117, 250, 0.3),
-          'border-shadow': rgba(56, 117, 250, 0.1),
-          'text-main': #ffffff,
-          'text-dim': rgba(255, 255, 255, 0.85),
-          'text-mute': rgba(255, 255, 255, 0.6)
-        )
-      )
-    )
-  ),
+      'type': 'dark',
+      'physics': 'glass',
+      'palette': map.merge(
+          $shared-values,
+          map.merge(
+            $semantic-dark,
+            (
+              'bg-canvas': $void-deep,
+              'bg-spotlight': $void-spotlight,
+              'bg-surface': $void-navy,
+              'bg-sink': rgba(0, 2, 41, 0.6),
+              'energy-primary': $void-cyan,
+              'energy-secondary': $void-blue,
+              'border-highlight': rgba(56, 117, 250, 0.3),
+              'border-shadow': rgba(56, 117, 250, 0.1),
+              'text-main': #ffffff,
+              'text-dim': rgba(255, 255, 255, 0.85),
+              'text-mute': rgba(255, 255, 255, 0.6),
+            )
+          )
+        ),
+    ),
 
-  // 2. PAPER (Reading)
-  'paper': (
-    'type': 'light',
-    'physics': 'flat',
-    'palette': map.merge(
-      $shared-values,
-      map.merge(
-        $semantic-light,
-        (
-          'font-atmos-heading': $font-book,
-          'font-atmos-body': $font-book,
-          'bg-canvas': $paper-white,
-          'bg-spotlight': $paper-spotlight,
-          'bg-surface': $paper-sheet,
-          'bg-sink': rgba(0, 0, 0, 0.05),
-          'energy-primary': $paper-ink,
-          'energy-secondary': $paper-pencil,
-          'border-highlight': $paper-pencil,
-          'border-shadow': $paper-pencil,
-          'text-main': #000000,
-          'text-dim': #333333,
-          'text-mute': #666666
-        )
-      )
-    )
-  ),
-
-  // 3. TERMINAL (Hacker)
-  'terminal': (
-    'type': 'dark',
-    'physics': 'retro',
-    'palette': map.merge(
-      $shared-values,
-      map.merge(
-        $semantic-dark,
-        (
-          'font-atmos-heading': $font-code,
-          'font-atmos-body': $font-code,
-          'bg-canvas': $term-deep,
-          'bg-spotlight': $term-spotlight,
-          'bg-surface': rgba(0, 20, 0, 0.9),
-          'bg-sink': #000000,
-          'energy-primary': $term-amber,
-          'energy-secondary': $term-amber,
-          'border-highlight': $term-amber,
-          'border-shadow': $term-amber,
-          'text-main': $term-amber,
-          'text-dim': rgba(245, 197, 24, 0.7),
-          'text-mute': rgba(245, 197, 24, 0.5),
-          'color-premium': $void-cyan,
-          'gradient-premium': linear-gradient(to right, #33e2e6, #00c2ff),
-          'color-success': #00ff41,
-          'color-error': #ff3333
-        )
-      )
-    )
-  ),
-
-  // 4. CRIMSON (Horror)
-  'crimson': (
-    'type': 'dark',
-    'physics': 'glass',
-    'palette': map.merge(
-      $shared-values,
-      map.merge(
-        $semantic-dark,
-        (
-          'font-atmos-heading': $font-horror,
-          'font-atmos-body': $font-horror,
-          'bg-canvas': $crimson-deep,
-          'bg-spotlight': $crimson-spotlight,
-          'bg-surface': $crimson-blood,
-          'bg-sink': rgba(20, 0, 0, 0.8),
-          'energy-primary': $crimson-flare,
-          'energy-secondary': $crimson-dark,
-          'border-highlight': rgba(255, 60, 64, 0.3),
-          'border-shadow': rgba(255, 60, 64, 0.1),
-          'text-main': #ffe5e5,
-          'text-dim': rgba(255, 200, 200, 0.8),
-          'text-mute': rgba(255, 180, 180, 0.65)
-        )
-      )
-    )
-  ),
-
-  // 5. OVERGROWTH (Nature)
-  'overgrowth': (
-    'type': 'dark',
-    'physics': 'glass',
-    'palette': map.merge(
-      $shared-values,
-      map.merge(
-        $semantic-dark,
-        (
-          'font-atmos-heading': $font-nature,
-          'font-atmos-body': $font-nature,
-          'bg-canvas': $nature-deep,
-          'bg-spotlight': $nature-spotlight,
-          'bg-surface': $nature-moss,
-          'bg-sink': rgba(0, 20, 5, 0.8),
-          'energy-primary': $nature-neon,
-          'energy-secondary': $nature-gold,
-          'border-highlight': rgba(0, 224, 85, 0.3),
-          'border-shadow': rgba(0, 224, 85, 0.1),
-          'text-main': #f0fff4,
-          'text-dim': rgba(200, 255, 200, 0.8),
-          'text-mute': rgba(200, 255, 200, 0.6)
-        )
-      )
-    )
-  ),
-
-  // 6. VELVET (Romance)
-  'velvet': (
-    'type': 'dark',
-    'physics': 'glass',
-    'palette': map.merge(
-      $shared-values,
-      map.merge(
-        $semantic-dark,
-        (
-          'font-atmos-heading': $font-hand,
-          'font-atmos-body': $font-hand,
-          'bg-canvas': $velvet-deep,
-          'bg-spotlight': $velvet-spotlight,
-          'bg-surface': $velvet-silk,
-          'bg-sink': rgba(30, 0, 10, 0.8),
-          'energy-primary': $velvet-pink,
-          'energy-secondary': $velvet-rose,
-          'border-highlight': rgba(255, 128, 160, 0.3),
-          'border-shadow': rgba(255, 128, 160, 0.1),
-          'text-main': #fff0f5,
-          'text-dim': rgba(255, 200, 220, 0.8),
-          'text-mute': rgba(255, 180, 200, 0.6)
-        )
-      )
-    )
-  ),
-
-  // 7. ONYX (Carbon / Minimal)
+  // 2. ONYX (Professional / Cinema)
   'onyx': (
-    'type': 'dark',
-    'physics': 'glass',
-    'palette': map.merge(
-      $shared-values,
-      map.merge(
-        $semantic-dark,
-        (
-          'bg-canvas': #05060a,
-          'bg-spotlight': #0b0e16,
-          'bg-surface': rgba(12, 16, 28, 0.55),
-          'bg-sink': rgba(5, 8, 12, 0.7),
-          'energy-primary': #5bf5ff,
-          'energy-secondary': #7d8bff,
-          'border-highlight': rgba(91, 245, 255, 0.35),
-          'border-shadow': rgba(125, 139, 255, 0.15),
-          'text-main': #e8f1ff,
-          'text-dim': rgba(232, 241, 255, 0.8),
-          'text-mute': rgba(232, 241, 255, 0.6)
-        )
-      )
-    )
-  ),
+      'type': 'dark',
+      'physics': 'glass',
+      'palette': map.merge(
+          $shared-values,
+          map.merge(
+            $semantic-dark,
+            (
+              'font-atmos-heading': $font-clean,
+              'font-atmos-body': $font-clean,
+              'bg-canvas': $onyx-deep,
+              'bg-spotlight': $onyx-spotlight,
+              'bg-surface': $onyx-glass,
+              'bg-sink': #000000,
+              'energy-primary': $onyx-white,
+              'energy-secondary': $onyx-silver,
+              'border-highlight': rgba($onyx-white, 0.2),
+              // Subtle white frost
+              'border-shadow': rgba($onyx-white, 0.05),
+              'text-main': $onyx-white,
+              'text-dim': $onyx-silver,
+              'text-mute': rgba($onyx-silver, 0.6),
+            )
+          )
+        ),
+    ),
 
-  // 8. SOLAR (Luminous / Warm Light)
+  // 3. TERMINAL (Hacker / Retro)
+  'terminal': (
+      'type': 'dark',
+      'physics': 'retro',
+      'palette': map.merge(
+          $shared-values,
+          map.merge(
+            $semantic-dark,
+            (
+              'font-atmos-heading': $font-code,
+              'font-atmos-body': $font-code,
+              'bg-canvas': $term-deep,
+              'bg-spotlight': $term-spotlight,
+              'bg-surface': rgba(0, 20, 0, 0.9),
+              'bg-sink': #000000,
+              'energy-primary': $term-amber,
+              'energy-secondary': $term-amber,
+              'border-highlight': $term-amber,
+              'border-shadow': $term-amber,
+              'text-main': $term-amber,
+              'text-dim': rgba(245, 197, 24, 0.7),
+              'text-mute': rgba(245, 197, 24, 0.5),
+              'color-premium': $void-cyan,
+              'gradient-premium': linear-gradient(to right, #33e2e6, #00c2ff),
+              'color-success': #00ff41,
+              'color-error': #ff3333,
+            )
+          )
+        ),
+    ),
+
+  // ==========================================================================
+  // The Organic Spectrum (Nature & Survival)
+  // These ground the user in the physical elements.
+  // ==========================================================================
+  // 4. OVERGROWTH (Nature)
+  'overgrowth': (
+      'type': 'dark',
+      'physics': 'glass',
+      'palette': map.merge(
+          $shared-values,
+          map.merge(
+            $semantic-dark,
+            (
+              'font-atmos-heading': $font-nature,
+              'font-atmos-body': $font-nature,
+              'bg-canvas': $nature-deep,
+              'bg-spotlight': $nature-spotlight,
+              'bg-surface': $nature-moss,
+              'bg-sink': rgba(0, 20, 5, 0.8),
+              'energy-primary': $nature-neon,
+              'energy-secondary': $nature-gold,
+              'border-highlight': rgba(0, 224, 85, 0.3),
+              'border-shadow': rgba(0, 224, 85, 0.1),
+              'text-main': #f0fff4,
+              'text-dim': rgba(200, 255, 200, 0.8),
+              'text-mute': rgba(200, 255, 200, 0.6),
+            )
+          )
+        ),
+    ),
+
+  // 5. EMBER (Survival / Industrial)
+  'ember': (
+      'type': 'dark',
+      'physics': 'glass',
+      'palette': map.merge(
+          $shared-values,
+          map.merge(
+            $semantic-dark,
+            (
+              'font-atmos-heading': $font-industrial,
+              'font-atmos-body': $font-industrial,
+              // Or keep $font-tech for body legibility
+              'bg-canvas': $ember-deep,
+              'bg-spotlight': $ember-spotlight,
+              'bg-surface': $ember-glass,
+              'bg-sink': rgba(20, 10, 5, 0.8),
+              // Dark pit (not pure black)
+              'energy-primary': $ember-burn,
+              'energy-secondary': $ember-rust,
+              'border-highlight': rgba($ember-burn, 0.4),
+              'border-shadow': rgba($ember-burn, 0.1),
+              'text-main': #fff5e6,
+              // Warm, sandy white (not pure white)
+              'text-dim': rgba(255, 230, 200, 0.8),
+              'text-mute': rgba(255, 200, 160, 0.6),
+            )
+          )
+        ),
+    ),
+
+  // 6. GLACIER (Cryogenics / Deep Sea)
+  'glacier': (
+      'type': 'dark',
+      'physics': 'glass',
+      'palette': map.merge(
+          $shared-values,
+          map.merge(
+            $semantic-dark,
+            (
+              'font-atmos-heading': $font-cryo,
+              'font-atmos-body': $font-cryo,
+              'bg-canvas': $glacier-deep,
+              'bg-spotlight': $glacier-spotlight,
+              'bg-surface': $glacier-ice,
+              'bg-sink': rgba(0, 15, 20, 0.8),
+              // Deep trench
+              'energy-primary': $glacier-frost,
+              'energy-secondary': $glacier-chill,
+              'border-highlight': rgba($glacier-frost, 0.3),
+              // Sharp ice edges
+              'border-shadow': rgba($glacier-chill, 0.1),
+              'text-main': #ffffff,
+              'text-dim': rgba(224, 247, 250, 0.9),
+              // Slightly blue-tinted text
+              'text-mute': rgba(224, 247, 250, 0.6),
+            )
+          )
+        ),
+    ),
+
+  // ==========================================================================
+  // The Arcane Spectrum (Fantasy & Emotion)
+  // These focus on magic, mystery, and feeling.
+  // ==========================================================================
+  // 7. NEBULA (Magic / Synthwave)
+  'nebula': (
+      'type': 'dark',
+      'physics': 'glass',
+      'palette': map.merge(
+          $shared-values,
+          map.merge(
+            $semantic-dark,
+            (
+              'font-atmos-heading': $font-arcane,
+              'font-atmos-body': $font-tech,
+              // Keep body readable (Cinzel is hard for long text)
+              'bg-canvas': $nebula-deep,
+              'bg-spotlight': $nebula-spotlight,
+              'bg-surface': $nebula-mist,
+              'bg-sink': rgba(10, 0, 20, 0.6),
+              'energy-primary': $nebula-arcane,
+              'energy-secondary': $nebula-void,
+              'border-highlight': rgba($nebula-arcane, 0.5),
+              // Glowing runes
+              'border-shadow': rgba($nebula-arcane, 0.1),
+              'text-main': #f3e5ff,
+              // Lavender Mist (not pure white)
+              'text-dim': rgba(243, 229, 255, 0.8),
+              'text-mute': rgba(243, 229, 255, 0.5),
+            )
+          )
+        ),
+    ),
+
+  // 8. CRIMSON (Horror)
+  'crimson': (
+      'type': 'dark',
+      'physics': 'glass',
+      'palette': map.merge(
+          $shared-values,
+          map.merge(
+            $semantic-dark,
+            (
+              'font-atmos-heading': $font-horror,
+              'font-atmos-body': $font-horror,
+              'bg-canvas': $crimson-deep,
+              'bg-spotlight': $crimson-spotlight,
+              'bg-surface': $crimson-blood,
+              'bg-sink': rgba(20, 0, 0, 0.8),
+              'energy-primary': $crimson-flare,
+              'energy-secondary': $crimson-dark,
+              'border-highlight': rgba(255, 60, 64, 0.3),
+              'border-shadow': rgba(255, 60, 64, 0.1),
+              'text-main': #ffe5e5,
+              'text-dim': rgba(255, 200, 200, 0.8),
+              'text-mute': rgba(255, 180, 180, 0.65),
+            )
+          )
+        ),
+    ),
+
+  // 9. VELVET (Romance)
+  'velvet': (
+      'type': 'dark',
+      'physics': 'glass',
+      'palette': map.merge(
+          $shared-values,
+          map.merge(
+            $semantic-dark,
+            (
+              'font-atmos-heading': $font-hand,
+              'font-atmos-body': $font-hand,
+              'bg-canvas': $velvet-deep,
+              'bg-spotlight': $velvet-spotlight,
+              'bg-surface': $velvet-silk,
+              'bg-sink': rgba(30, 0, 10, 0.8),
+              'energy-primary': $velvet-pink,
+              'energy-secondary': $velvet-rose,
+              'border-highlight': rgba(255, 128, 160, 0.3),
+              'border-shadow': rgba(255, 128, 160, 0.1),
+              'text-main': #fff0f5,
+              'text-dim': rgba(255, 200, 220, 0.8),
+              'text-mute': rgba(255, 180, 200, 0.6),
+            )
+          )
+        ),
+    ),
+
+  // 10. SOLAR (Divine / Royalty)
   'solar': (
-    'type': 'light',
-    'physics': 'flat',
-    'palette': map.merge(
-      $shared-values,
-      map.merge(
-        $semantic-light,
-        (
-          'bg-canvas': #fff8e6,
-          'bg-spotlight': #fff4d6,
-          'bg-surface': #fff0c2,
-          'bg-sink': rgba(0, 0, 0, 0.06),
-          'energy-primary': #ff9b1a,
-          'energy-secondary': #ff6f61,
-          'border-highlight': rgba(255, 155, 26, 0.45),
-          'border-shadow': rgba(255, 155, 26, 0.2),
-          'text-main': #1f1300,
-          'text-dim': #4d3b1a,
-          'text-mute': #7a6640
-        )
-      )
+      'type': 'dark',
+      'physics': 'glass',
+      'palette': map.merge(
+          $shared-values,
+          map.merge(
+            $semantic-dark,
+            (
+              'font-atmos-heading': $font-royal,
+              'font-atmos-body': $font-book,
+              // Bodoni is hard to read for body text; using Book serif.
+              'bg-canvas': $solar-deep,
+              'bg-spotlight': $solar-spotlight,
+              'bg-surface': $solar-glass,
+              'bg-sink': rgba(20, 15, 0, 0.6),
+              'energy-primary': $solar-gold,
+              'energy-secondary': $solar-bronze,
+              'border-highlight': rgba($solar-gold, 0.4),
+              // Gold leaf edges
+              'border-shadow': rgba($solar-bronze, 0.1),
+              'text-main': #fffae6,
+              // Ivory (Luxury White)
+              'text-dim': rgba(255, 250, 230, 0.8),
+              'text-mute': rgba(255, 250, 230, 0.5),
+            )
+          )
+        ),
+    ),
+
+  // ==========================================================================
+  // The Light Spectrum (Reading & Utility)
+  // These use type: 'light' configuration
+  // ==========================================================================
+  // 11. PAPER (Reading)
+  'paper': (
+      'type': 'light',
+      'physics': 'flat',
+      'palette': map.merge(
+          $shared-values,
+          map.merge(
+            $semantic-light,
+            (
+              'font-atmos-heading': $font-book,
+              'font-atmos-body': $font-book,
+              'bg-canvas': $paper-white,
+              'bg-spotlight': $paper-spotlight,
+              'bg-surface': $paper-sheet,
+              'bg-sink': rgba(0, 0, 0, 0.05),
+              'energy-primary': $paper-ink,
+              'energy-secondary': $paper-pencil,
+              'border-highlight': $paper-pencil,
+              'border-shadow': $paper-pencil,
+              'text-main': #000000,
+              'text-dim': #333333,
+              'text-mute': #666666,
+            )
+          )
+        ),
+    ),
+
+  // 12. LABORATORY (Science / Architecture)
+  'laboratory': (
+      'type': 'light',
+      'physics': 'flat',
+      'palette': map.merge(
+          $shared-values,
+          map.merge(
+            $semantic-light,
+            (
+              'font-atmos-heading': $font-lab,
+              'font-atmos-body': $font-lab,
+              'bg-canvas': $lab-white,
+              'bg-spotlight': #ffffff,
+              'bg-surface': $lab-surface,
+              'bg-sink': rgba(0, 0, 0, 0.05),
+              // Faint grey well
+              'energy-primary': $lab-blue,
+              'energy-secondary': $lab-steel,
+              'border-highlight': rgba($lab-blue, 0.5),
+              // Blueprint lines
+              'border-shadow': rgba($lab-steel, 0.2),
+              'text-main': #0f172a,
+              // Deep Slate (Cold Black)
+              'text-dim': #334155,
+              'text-mute': #94a3b8,
+            )
+          )
+        ),
     )
-  )
 );

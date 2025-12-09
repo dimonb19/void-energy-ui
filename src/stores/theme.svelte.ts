@@ -5,20 +5,25 @@
 // 1. THE CONFIGURATION MAP (The Logic Layer)
 // This maps every Atmosphere Name to its Physics and Mode.
 // In the future, you could import this from a JSON file shared with SCSS.
-const THEME_CONFIG: Record<string, { physics: string; mode: 'light' | 'dark' }> = {
+const THEME_CONFIG: Record<
+  string,
+  { physics: string; mode: 'light' | 'dark' }
+> = {
   // --- CORE THEMES ---
-  'void':       { physics: 'glass', mode: 'dark' },
-  'crimson':    { physics: 'glass', mode: 'dark' },
-  'overgrowth': { physics: 'glass', mode: 'dark' },
-  'velvet':     { physics: 'glass', mode: 'dark' },
-  'onyx':       { physics: 'glass', mode: 'dark' }, // Neutral Dark
+  void: { physics: 'glass', mode: 'dark' },
+  onyx: { physics: 'glass', mode: 'dark' },
+  overgrowth: { physics: 'glass', mode: 'dark' },
+  ember: { physics: 'glass', mode: 'dark' },
+  glacier: { physics: 'glass', mode: 'dark' },
+  nebula: { physics: 'glass', mode: 'dark' },
+  crimson: { physics: 'glass', mode: 'dark' },
+  velvet: { physics: 'glass', mode: 'dark' },
+  solar: { physics: 'glass', mode: 'light' },
 
   // --- EXCEPTIONS ---
-  'terminal':   { physics: 'retro', mode: 'dark' },
-  'paper':      { physics: 'flat',  mode: 'light' },
-  'solar':      { physics: 'flat', mode: 'light' }, // Royal/Gold
-  'notepad':    { physics: 'flat',  mode: 'light' }, // Example of reuse
-  'corporate':  { physics: 'flat',  mode: 'light' }, // Example of reuse
+  terminal: { physics: 'retro', mode: 'dark' },
+  paper: { physics: 'flat', mode: 'light' },
+  laboratory: { physics: 'flat', mode: 'light' },
 };
 
 const KEYS = {
@@ -42,7 +47,7 @@ function createThemeStore() {
 
     // 1. Set Main Atmosphere (Color)
     root.setAttribute('data-atmosphere', atmos);
-    
+
     // 2. Set Physics (Behavior: Glass/Flat/Retro)
     root.setAttribute('data-physics', config.physics);
 
@@ -56,7 +61,7 @@ function createThemeStore() {
     if (storedAtmos) {
       _atmosphere = storedAtmos;
       // Ensure attributes are correct on load (in case they drifted)
-      applyAttributes(_atmosphere); 
+      applyAttributes(_atmosphere);
     }
 
     const storedFont = localStorage.getItem(KEYS.FONT);
@@ -74,9 +79,9 @@ function createThemeStore() {
     set atmosphere(value: string) {
       // Validate input, fallback to void if unknown
       const safeValue = THEME_CONFIG[value] ? value : 'void';
-      
+
       _atmosphere = safeValue;
-      
+
       if (typeof window !== 'undefined') {
         applyAttributes(safeValue);
         localStorage.setItem(KEYS.ATMOSPHERE, safeValue);
@@ -107,15 +112,18 @@ function createThemeStore() {
     set scale(value: number) {
       _scale = value;
       if (typeof window !== 'undefined') {
-        document.documentElement.style.setProperty('--text-scale', value.toString());
+        document.documentElement.style.setProperty(
+          '--text-scale',
+          value.toString(),
+        );
         localStorage.setItem(KEYS.SCALE, value.toString());
       }
     },
-    
+
     // --- 4. UTILITY: Get current config (Useful for UI toggles) ---
     get currentConfig() {
       return THEME_CONFIG[_atmosphere] || THEME_CONFIG['void'];
-    }
+    },
   };
 }
 

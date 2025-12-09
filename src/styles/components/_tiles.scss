@@ -80,8 +80,8 @@
 
   text-decoration: none !important;
   overflow: hidden;
-    border-radius: calc(var(--radius-base) * 1.5);
-    border-width: var(--physics-border-width);
+  border-radius: calc(var(--radius-base) * 1.5);
+  border-width: var(--physics-border-width);
 
   // Explicit transition for hover effects
   transition:

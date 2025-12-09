@@ -20,43 +20,19 @@ $void-cyan: #33e2e6; // Primary Energy: Data, flow, focus.
 $void-blue: #3875fa; // Structure: Borders, dividers, stability.
 
 // --------------------------------------------------------------------------
-// 2. CRIMSON (Horror / Action)
+// 2. ONYX (Professional / Minimal)
 // --------------------------------------------------------------------------
-// Vibe:   Danger, Urgent, "Resident Evil", High Stress
-// Usage:  For users who want an aggressive, high-contrast "Gamified" look.
+// Vibe:   Stealth, Cinematic, "Leica Camera", True Neutral
+// Usage:  For professional dashboards or serious drama. Zero color opinion.
 // --------------------------------------------------------------------------
-$crimson-deep: #1a0505; // The Canvas: Dried blood darkness.
-$crimson-spotlight: #1e0808; // The Light: A faint red glow in the dark.
-$crimson-blood: rgba(60, 0, 0, 0.6); // The Glass: Viscous, thick transparency.
-$crimson-flare: #ff3c40; // Primary Energy: Warning lights, lasers.
-$crimson-dark: #8a0000; // Structure: Dark red steel.
+$onyx-deep: #0a0a0a; // The Canvas: True Neutral Black (Not pitch black).
+$onyx-spotlight: #141414; // The Light: Very subtle soft gray.
+$onyx-glass: rgba(30, 30, 30, 0.6); // The Glass: Smoked gray glass.
+$onyx-white: #ffffff; // Primary Energy: Pure white light.
+$onyx-silver: #a3a3a3; // Structure: Brushed steel/aluminum.
 
 // --------------------------------------------------------------------------
-// 3. OVERGROWTH (Nature / Fantasy)
-// --------------------------------------------------------------------------
-// Vibe:   Calm, Organic, "Zelda", Restoration
-// Usage:  For users seeking a relaxing, less eye-straining dark mode.
-// --------------------------------------------------------------------------
-$nature-deep: #051a0a; // The Canvas: Deep forest night.
-$nature-spotlight: #091e0d; // The Light: Moonlight filtering through leaves.
-$nature-moss: rgba(0, 40, 10, 0.5); // The Glass: Bio-luminescent flora.
-$nature-neon: #00e055; // Primary Energy: Life, growth, toxicity.
-$nature-gold: #ffd700; // Structure: Ancient relics, sun accents.
-
-// --------------------------------------------------------------------------
-// 4. VELVET (Romance / Pop / Kids)
-// --------------------------------------------------------------------------
-// Vibe:   Playful, Soft, "Synthwave", Friendly
-// Usage:  A softer, welcoming dark mode. Great for kids or creative moods.
-// --------------------------------------------------------------------------
-$velvet-deep: #1a0510; // The Canvas: Deep plum/dark velvet.
-$velvet-spotlight: #1f0815; // The Light: A stage spotlight warmth.
-$velvet-silk: rgba(50, 0, 20, 0.5); // The Glass: Tinted rose glass.
-$velvet-pink: #ff80a0; // Primary Energy: Neon pink, bubblegum.
-$velvet-rose: #c71585; // Structure: Magenta, rich fabric.
-
-// --------------------------------------------------------------------------
-// 5. TERMINAL (Hacker / Noir)
+// 3. TERMINAL (Hacker / Noir)
 // --------------------------------------------------------------------------
 // Vibe:   Retro, Monospaced, "Mr. Robot", Industrial
 // Usage:  For developers and power users. High contrast, no distractions.
@@ -72,7 +48,91 @@ $term-screen: rgba(
 $term-amber: #f5c518; // Primary Energy: Old school monochrome phosphor.
 
 // --------------------------------------------------------------------------
-// 6. PAPER (Light Mode / The Exception)
+// 4. OVERGROWTH (Nature / Fantasy)
+// --------------------------------------------------------------------------
+// Vibe:   Calm, Organic, "Zelda", Restoration
+// Usage:  For users seeking a relaxing, less eye-straining dark mode.
+// --------------------------------------------------------------------------
+$nature-deep: #051a0a; // The Canvas: Deep forest night.
+$nature-spotlight: #091e0d; // The Light: Moonlight filtering through leaves.
+$nature-moss: rgba(0, 40, 10, 0.5); // The Glass: Bio-luminescent flora.
+$nature-neon: #39ff14; // Primary Energy: Life, growth, toxicity.
+$nature-gold: #ffd700; // Structure: Ancient relics, sun accents.
+
+// --------------------------------------------------------------------------
+// 5. EMBER (Survival / Industrial)
+// --------------------------------------------------------------------------
+// Vibe:   Mars Colony, Dune, War-torn, Heavy Industry.
+// Usage:  For survival modes, building sims, or dystopian narratives.
+// --------------------------------------------------------------------------
+$ember-deep: #140a05; // The Canvas: Deep Sepia/Mars Night (Brown-Black).
+$ember-spotlight: #26140b; // The Light: Dusty heat haze.
+$ember-glass: rgba(50, 25, 10, 0.6); // The Glass: Dirty/Smoked amber glass.
+$ember-burn: #ff7b00; // Primary Energy: Burning Orange / Molten Slag.
+$ember-rust: #a04020; // Structure: Rusted iron beams.
+
+// --------------------------------------------------------------------------
+// 6. GLACIER (Cryogenics / Isolation)
+// --------------------------------------------------------------------------
+// Vibe:   Arctic, Sub-zero, Deep Sea, Clinical Horror.
+// Usage:  For mountain expeditions, medical bays, or isolation stories.
+// --------------------------------------------------------------------------
+$glacier-deep: #050d14; // The Canvas: Deepest Trench Blue (almost black).
+$glacier-spotlight: #0a1f2e; // The Light: Bioluminescence in the deep.
+$glacier-ice: rgba(10, 30, 40, 0.5); // The Glass: Frosted ice sheet.
+$glacier-frost: #e0f7fa; // Primary Energy: Pale Ice White/Blue.
+$glacier-chill: #00bcd4; // Structure: Frozen Cyan (darker than energy).
+
+// --------------------------------------------------------------------------
+// 7. NEBULA (Arcane / Mystery)
+// --------------------------------------------------------------------------
+// Vibe:   High Fantasy, Occult, Synthwave, Tarot.
+// Usage:  For magic systems, mystic logs, or synth-heavy aesthetics.
+// --------------------------------------------------------------------------
+$nebula-deep: #0d0221; // The Canvas: Deep Cosmic Indigo.
+$nebula-spotlight: #1a0536; // The Light: Faint UV glow.
+$nebula-mist: rgba(45, 10, 80, 0.5); // The Glass: Purple haze.
+$nebula-arcane: #9d00ff; // Primary Energy: Electric Violet / Rune Glow.
+$nebula-void: #4b0082; // Structure: Deep Indigo.
+
+// --------------------------------------------------------------------------
+// 8. CRIMSON (Horror / Action)
+// --------------------------------------------------------------------------
+// Vibe:   Danger, Urgent, "Resident Evil", High Stress
+// Usage:  For users who want an aggressive, high-contrast "Gamified" look.
+// --------------------------------------------------------------------------
+$crimson-deep: #1a0505; // The Canvas: Dried blood darkness.
+$crimson-spotlight: #1e0808; // The Light: A faint red glow in the dark.
+$crimson-blood: rgba(60, 0, 0, 0.6); // The Glass: Viscous, thick transparency.
+$crimson-flare: #ff4500; // Primary Energy: Warning lights, lasers.
+$crimson-dark: #8a0000; // Structure: Dark red steel.
+
+// --------------------------------------------------------------------------
+// 9. VELVET (Romance / Pop / Kids)
+// --------------------------------------------------------------------------
+// Vibe:   Playful, Soft, "Synthwave", Friendly
+// Usage:  A softer, welcoming dark mode. Great for kids or creative moods.
+// --------------------------------------------------------------------------
+$velvet-deep: #1a0510; // The Canvas: Deep plum/dark velvet.
+$velvet-spotlight: #1f0815; // The Light: A stage spotlight warmth.
+$velvet-silk: rgba(50, 0, 20, 0.5); // The Glass: Tinted rose glass.
+$velvet-pink: #ff80a0; // Primary Energy: Neon pink, bubblegum.
+$velvet-rose: #c71585; // Structure: Magenta, rich fabric.
+
+// --------------------------------------------------------------------------
+// 10. SOLAR (Divine / Royalty)
+// --------------------------------------------------------------------------
+// Vibe:   Kingdom, Treasure, Holy, Luxury.
+// Usage:  For religious texts, inventory (gold/loot), or royal interfaces.
+// --------------------------------------------------------------------------
+$solar-deep: #0f0a00; // The Canvas: Deepest Gilded Black.
+$solar-spotlight: #261c05; // The Light: Candlelight/Torch warmth.
+$solar-glass: rgba(50, 40, 10, 0.5); // The Glass: Amber crystal.
+$solar-gold: #ffcc00; // Primary Energy: Pure Gold.
+$solar-bronze: #b8860b; // Structure: Antique Bronze / Dark Goldenrod.
+
+// --------------------------------------------------------------------------
+// 11. PAPER (Light Mode / The Exception)
 // --------------------------------------------------------------------------
 // Vibe:   Traditional, "Newspaper", Corporate, Reading
 // Usage:  The only Light Mode. Breaks "Void" physics for readability.
@@ -83,15 +143,33 @@ $paper-sheet: #ffffff; // The Surface: A sheet of white paper on the desk.
 $paper-ink: #161e5f; // Primary Energy: Navy Blue Ink (Text).
 $paper-pencil: #e0e0e0; // Structure: Graphite grey lines.
 
+// --------------------------------------------------------------------------
+// 12. LABORATORY (Science / Architecture)
+// --------------------------------------------------------------------------
+// Vibe:   Sterile, Clinical, Blueprint, Sketchbook.
+// Usage:  For technical documentation, medical charts, or wireframes.
+// --------------------------------------------------------------------------
+$lab-white: #ffffff; // The Canvas: Pure Sterile White.
+$lab-surface: #f1f5f9; // The Surface: Cool Grey (Slate-50).
+$lab-glass: rgba(255, 255, 255, 0.9); // Almost opaque frosted glass.
+$lab-blue: #007aff; // Primary Energy: Medical / Blueprint Blue.
+$lab-steel: #64748b; // Structure: Surgical Steel / Graphite.
+
 /* =========================================
    2. TYPOGRAPHY STACKS
    ========================================= */
 $font-tech: 'Hanken Grotesk', sans-serif; // Void
-$font-horror: 'Merriweather', serif; // Crimson
-$font-nature: 'Lora', serif; // Overgrowth
-$font-hand: 'Caveat', cursive; // Velvet
+$font-clean: 'Inter', sans-serif; // Onyx [NEW]
 $font-code: 'Courier Prime', monospace; // Terminal
+$font-nature: 'Lora', serif; // Overgrowth
+$font-industrial: 'Oswald', sans-serif; // Ember [NEW]
+$font-cryo: 'Exo 2', sans-serif; // Glacier [NEW]
+$font-arcane: 'Cinzel', serif; // Nebula: [NEW]
+$font-horror: 'Merriweather', serif; // Crimson
+$font-hand: 'Caveat', cursive; // Velvet
+$font-royal: 'Bodoni Moda', serif; // Solar [NEW]
 $font-book: 'PT Serif Caption', serif; // Paper
+$font-lab: 'Open Sans', sans-serif; // Laboratory [NEW]
 
 // ==========================================================================
 // SHARED SEMANTIC CONSTANTS (The Logic Layer)

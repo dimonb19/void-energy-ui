@@ -10,7 +10,7 @@ $physics-presets: (
     'speed-base': 0.3s,
     'ease-base': cubic-bezier(0.16, 1, 0.3, 1),
     'border-opacity': 1,
-    'void-shadow': 0 10px 30px rgba(0, 0, 0, 0.5)
+    'void-shadow': 0 10px 30px rgba(0, 0, 0, 0.5),
   ),
   'flat': (
     'physics-blur': 0px,
@@ -22,7 +22,7 @@ $physics-presets: (
     'speed-base': 0.2s,
     'ease-base': ease-out,
     'border-opacity': 1,
-    'void-shadow': none
+    'void-shadow': none,
   ),
   'retro': (
     'physics-blur': 0px,
@@ -34,6 +34,6 @@ $physics-presets: (
     'speed-base': 0s,
     'ease-base': steps(2),
     'border-opacity': 1,
-    'void-shadow': none
-  )
+    'void-shadow': none,
+  ),
 );
