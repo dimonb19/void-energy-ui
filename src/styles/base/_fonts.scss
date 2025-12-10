@@ -40,47 +40,19 @@
   font-display: swap;
 }
 
-/* --- PT Serif Caption font --- */
+/* --- Inter font --- */
 
 @font-face {
-  font-family: 'PT Serif Caption';
-  src: url('/fonts/PTSerifCaption-Regular.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* --- Lora font --- */
-
-@font-face {
-  font-family: 'Lora';
-  src: url('/fonts/Lora-Bold.woff2') format('woff2');
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Bold.woff2') format('woff2');
   font-weight: bold;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Lora';
-  src: url('/fonts/Lora-Regular.woff2') format('woff2');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* --- Merriweather font --- */
-
-@font-face {
-  font-family: 'Merriweather';
-  src: url('/fonts/Merriweather24pt-Bold.woff2') format('woff2');
-  font-weight: bold;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Merriweather';
-  src: url('/fonts/Merriweather24pt-Regular.woff2') format('woff2');
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Regular.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -104,6 +76,96 @@
   font-display: swap;
 }
 
+/* --- Lora font --- */
+
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Lora';
+  src: url('/fonts/Lora-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- Oswald font --- */
+
+@font-face {
+  font-family: 'Oswald';
+  src: url('/fonts/Oswald-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Oswald';
+  src: url('/fonts/Oswald-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- Exo 2 font --- */
+
+@font-face {
+  font-family: 'Exo 2';
+  src: url('/fonts/Exo2-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Exo 2';
+  src: url('/fonts/Exo2-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- Cinzel font --- */
+
+@font-face {
+  font-family: 'Cinzel';
+  src: url('/fonts/Cinzel-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cinzel';
+  src: url('/fonts/Cinzel-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- Merriweather font --- */
+
+@font-face {
+  font-family: 'Merriweather';
+  src: url('/fonts/Merriweather24pt-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Merriweather';
+  src: url('/fonts/Merriweather24pt-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* --- Caveat font --- */
 
 @font-face {
@@ -117,6 +179,60 @@
 @font-face {
   font-family: 'Caveat';
   src: url('/fonts/Caveat-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- Bodoni Moda font --- */
+
+@font-face {
+  font-family: 'Bodoni Moda';
+  src: url('/fonts/BodoniModa-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Bodoni Moda';
+  src: url('/fonts/BodoniModa-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- PT Serif Caption font --- */
+
+@font-face {
+  font-family: 'PT Serif Caption';
+  src: url('/fonts/PTSerifCaption-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'PT Serif Caption'; 
+  src: url('/fonts/PTSerif-Bold.woff2') format('woff2'); /* <--- Note the file change */
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* --- Open Sans font --- */
+
+@font-face {
+  font-family: 'Open Sans';
+  src: url('/fonts/OpenSans-Bold.woff2') format('woff2');
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  src: url('/fonts/OpenSans-Regular.woff2') format('woff2');
   font-weight: normal;
   font-style: normal;
   font-display: swap;
