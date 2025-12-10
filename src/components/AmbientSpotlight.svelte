@@ -254,6 +254,10 @@
           </div>
         </div>
 
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+
         <div class="flex-col gap-8 flex-1">
           <div class="flex-row justify-between">
             <label class="pad-inline" for="energy-output">Energy Output</label>
@@ -295,21 +299,7 @@
     </section>
 
     <section class="flex-col gap-24 mar-top-24">
-      <h2>02 // DATA UPLOAD</h2>
-
-      <div class="pad-24 round-16 surface-glass">
-        <div class="dropzone">
-          <input type="file" />
-          <div class="dropzone-content">
-            <span class="btn-icon">📂</span>
-            <p>Upload Neural Patterns</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="flex-col gap-24 mar-top-24">
-      <h2>03 // COMMAND DECK</h2>
+      <h2>02 // COMMAND DECK</h2>
 
       <div class="surface-glass round-16 pad-32 flex-col gap-32">
         <div class="flex-col items-center gap-24">
@@ -339,6 +329,20 @@
             Default Action
           </button>
           <button disabled>Offline</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="flex-col gap-24 mar-top-24">
+      <h2>03 // DATA UPLOAD</h2>
+
+      <div class="pad-24 round-16 surface-glass">
+        <div class="dropzone">
+          <input type="file" />
+          <div class="dropzone-content">
+            <span class="btn-icon">📂</span>
+            <p>Upload Neural Patterns</p>
+          </div>
         </div>
       </div>
     </section>

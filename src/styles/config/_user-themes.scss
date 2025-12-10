@@ -135,7 +135,6 @@ $themes: (
               'energy-primary': $onyx-white,
               'energy-secondary': $onyx-silver,
               'border-highlight': rgba($onyx-white, 0.2),
-              // Subtle white frost
               'border-shadow': rgba($onyx-white, 0.05),
               'text-main': $onyx-white,
               'text-dim': $onyx-silver,
@@ -218,18 +217,15 @@ $themes: (
             (
               'font-atmos-heading': $font-industrial,
               'font-atmos-body': $font-industrial,
-              // Or keep $font-tech for body legibility
               'bg-canvas': $ember-deep,
               'bg-spotlight': $ember-spotlight,
               'bg-surface': $ember-glass,
               'bg-sink': rgba(20, 10, 5, 0.8),
-              // Dark pit (not pure black)
               'energy-primary': $ember-burn,
               'energy-secondary': $ember-rust,
               'border-highlight': rgba($ember-burn, 0.4),
               'border-shadow': rgba($ember-burn, 0.1),
               'text-main': #fff5e6,
-              // Warm, sandy white (not pure white)
               'text-dim': rgba(255, 230, 200, 0.8),
               'text-mute': rgba(255, 200, 160, 0.6),
             )
@@ -252,15 +248,12 @@ $themes: (
               'bg-spotlight': $glacier-spotlight,
               'bg-surface': $glacier-ice,
               'bg-sink': rgba(0, 15, 20, 0.8),
-              // Deep trench
               'energy-primary': $glacier-frost,
               'energy-secondary': $glacier-chill,
               'border-highlight': rgba($glacier-frost, 0.3),
-              // Sharp ice edges
               'border-shadow': rgba($glacier-chill, 0.1),
               'text-main': #ffffff,
               'text-dim': rgba(224, 247, 250, 0.9),
-              // Slightly blue-tinted text
               'text-mute': rgba(224, 247, 250, 0.6),
             )
           )
@@ -282,7 +275,6 @@ $themes: (
             (
               'font-atmos-heading': $font-arcane,
               'font-atmos-body': $font-tech,
-              // Keep body readable (Cinzel is hard for long text)
               'bg-canvas': $nebula-deep,
               'bg-spotlight': $nebula-spotlight,
               'bg-surface': $nebula-mist,
@@ -290,10 +282,8 @@ $themes: (
               'energy-primary': $nebula-arcane,
               'energy-secondary': $nebula-void,
               'border-highlight': rgba($nebula-arcane, 0.5),
-              // Glowing runes
               'border-shadow': rgba($nebula-arcane, 0.1),
               'text-main': #f3e5ff,
-              // Lavender Mist (not pure white)
               'text-dim': rgba(243, 229, 255, 0.8),
               'text-mute': rgba(243, 229, 255, 0.5),
             )
@@ -366,7 +356,6 @@ $themes: (
             (
               'font-atmos-heading': $font-royal,
               'font-atmos-body': $font-book,
-              // Bodoni is hard to read for body text; using Book serif.
               'bg-canvas': $solar-deep,
               'bg-spotlight': $solar-spotlight,
               'bg-surface': $solar-glass,
