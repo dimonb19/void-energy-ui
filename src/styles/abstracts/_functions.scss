@@ -1,30 +1,43 @@
 @use 'sass:color';
+@use 'sass:meta';
 
 // ==========================================================================
-// COLOR FUNCTIONS (The "Photoshop" Layer)
+// COLOR FUNCTIONS (Polymorphic)
 // ==========================================================================
 
-// 1. TINT (Make Lighter / Mix with White)
-// Usage: background: tint(var(--energy-primary), 20%);
+// 1. TINT (Mix with White)
 @function tint($color, $percentage) {
-  @return color-mix(in srgb, $color, white $percentage);
+  @if meta.type-of($color) == 'color' {
+    @return color.mix(white, $color, $percentage);
+  } @else {
+    @return color-mix(in srgb, $color, white $percentage);
+  }
 }
 
-// 2. SHADE (Make Darker / Mix with Black)
-// Usage: background: shade(var(--energy-primary), 20%);
+// 2. SHADE (Mix with Black)
 @function shade($color, $percentage) {
-  @return color-mix(in srgb, $color, black $percentage);
+  @if meta.type-of($color) == 'color' {
+    @return color.mix(black, $color, $percentage);
+  } @else {
+    @return color-mix(in srgb, $color, black $percentage);
+  }
 }
 
 // 3. FADE (Make Transparent)
-// Usage: background: fade(var(--energy-primary), 50%);
-// Note: This mixes with transparent, effectively lowering alpha visually
+// Usage: fade(red, 20%) -> 20% Transparent (80% Opacity)
 @function fade($color, $percentage) {
-  @return color-mix(in srgb, $color, transparent $percentage);
+  @if meta.type-of($color) == 'color' {
+    @return color.change($color, $alpha: $percentage);
+  } @else {
+    @return color-mix(in srgb, $color, transparent $percentage);
+  }
 }
 
 // 4. BLEND (Mix Two Colors)
-// Usage: background: blend(var(--bg-sink), var(--energy-primary), 5%);
 @function blend($color, $other, $other-percentage) {
-  @return color-mix(in srgb, $color, $other $other-percentage);
+  @if meta.type-of($color) == 'color' and meta.type-of($other) == 'color' {
+    @return color.mix($other, $color, $other-percentage);
+  } @else {
+    @return color-mix(in srgb, $color, $other $other-percentage);
+  }
 }

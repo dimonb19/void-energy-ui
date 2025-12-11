@@ -466,14 +466,18 @@
   &::before {
     content: attr(data-label);
     position: absolute;
-    top: -1.5rem;
-    left: -1px;
+    
+    // Dynamic positioning based on border width
+    // This ensures it sits exactly on the line, whether it's 1px (Glass) or 2px (Retro)
+    top: -1.5rem; 
+    left: calc(var(--physics-border-width) * -1); 
+    
     height: 1.5rem;
     padding: 0 0.5rem;
 
     background: inherit;
     border: inherit;
-    border-bottom: none;
+    border-bottom: none; // Remove bottom line to merge with parent
     border-top-left-radius: var(--radius-base);
     border-top-right-radius: var(--radius-base);
 
@@ -484,24 +488,22 @@
     @include typography('caption');
 
     // Default Text Color (Glass/Void)
-    color: shade(var(--bg-canvas), 50%);
+    color: inherit;
     text-shadow: none;
     mix-blend-mode: normal;
-    // Force readability on glass
-    color: var(--text-dim);
+
 
     // TERMINAL LABEL
     @at-root [data-physics='retro'] & {
-      left: -2px;
-      background: black;
-      border: var(--physics-border-width) solid currentColor;
-      border-bottom: none;
-      color: inherit; // Amber/Green
+      background: black; // Opaque background to hide the parent border behind it
+      
+      // When parent hovers and color changes, this updates automatically.
+      border: inherit; 
+      border-bottom: none; 
     }
 
     // PAPER LABEL
     @at-root [data-mode='light'] & {
-      color: inherit; // Dark Ink
       font-weight: 700;
     }
   }

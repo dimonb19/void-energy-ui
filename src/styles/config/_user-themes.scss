@@ -3,6 +3,38 @@
 
 /* ==========================================================================
    VOID ENERGY THEME CONFIGURATION
+   ==========================================================================
+   
+   MANUAL: HOW TO ADD OR MODIFY THEMES
+   --------------------------------------------------------------------------
+   This file defines the "Soul" (Colors) of the themes.
+   However, the "Brain" (Physics logic) lives in Svelte.
+
+   👉 TO ADD A NEW THEME, YOU MUST EDIT TWO FILES:
+   
+   STEP 1: DEFINE COLORS (In this file)
+      - Copy an existing block below (e.g., 'void') into `$themes`.
+      - Rename the key (e.g., 'my-new-theme').
+      - Adjust the palette colors.
+      
+   STEP 2: REGISTER LOGIC (In `src/stores/theme.svelte.ts`)
+      - Add your new key to the `THEME_CONFIG` object.
+      - Map it to its physics and mode:
+        my-new-theme: { physics: 'glass', mode: 'dark' }
+   
+   --------------------------------------------------------------------------
+   TECHNICAL DETAILS
+   --------------------------------------------------------------------------
+   The JS engine (`theme.svelte.ts`) will apply these 3 attributes automatically:
+   <html data-atmosphere="name" data-physics="glass" data-mode="dark">
+
+   - data-atmosphere : Triggers the color variables from this file.
+   - data-physics    : Triggers the motion/texture variables from `_physics-presets.scss`.
+   - data-mode       : Triggers the light/dark inversion logic.
+
+   CRITICAL: If you do not register the theme in JS, the store will reject
+   the switch and fallback to 'void'.
+
    ========================================================================== */
 
 $shared-values: (
@@ -30,7 +62,12 @@ $semantic-light: (
 );
 
 $themes: (
-  // --- TECH SPECTRUM ---
+  // ==========================================================================
+  // I. THE TECH SPECTRUM (Sci-Fi & Modern)
+  // Focused on digital narratives.
+  // ==========================================================================
+  
+  // 1. VOID (Default / CoNexus Branding)
   'void': (
       'type': 'dark',
       'physics': 'glass',
@@ -55,6 +92,7 @@ $themes: (
         ),
     ),
 
+  // 2. ONYX (Professional / Cinema)
   'onyx': (
     'type': 'dark',
     'physics': 'glass',
@@ -81,6 +119,7 @@ $themes: (
       ),
   ),
 
+  // 3. TERMINAL (Hacker / Retro)
   'terminal': (
     'type': 'dark',
     'physics': 'retro',
@@ -116,7 +155,12 @@ $themes: (
       ),
   ),
 
-  // --- ORGANIC SPECTRUM ---
+  // ==========================================================================
+  // II. THE ORGANIC SPECTRUM (Nature & Survival)
+  // Grounding elements: Flora, Fire, Ice.
+  // ==========================================================================
+  
+  // 4. OVERGROWTH (Nature)
   'overgrowth': (
       'type': 'dark',
       'physics': 'glass',
@@ -143,6 +187,7 @@ $themes: (
         ),
     ),
 
+  // 5. EMBER (Survival / Industrial)
   'ember': (
     'type': 'dark',
     'physics': 'glass',
@@ -169,6 +214,7 @@ $themes: (
       ),
   ),
 
+  // 6. GLACIER (Cryogenics / Deep Sea)
   'glacier': (
     'type': 'dark',
     'physics': 'glass',
@@ -195,7 +241,12 @@ $themes: (
       ),
   ),
 
-  // --- ARCANE SPECTRUM ---
+  // ==========================================================================
+  // III. THE ARCANE SPECTRUM (Fantasy & Emotion)
+  // Magic, Mystery, and Feeling.
+  // ==========================================================================
+  
+  // 7. NEBULA (Magic / Synthwave)
   'nebula': (
       'type': 'dark',
       'physics': 'glass',
@@ -222,6 +273,7 @@ $themes: (
         ),
     ),
 
+  // 8. CRIMSON (Horror)
   'crimson': (
     'type': 'dark',
     'physics': 'glass',
@@ -248,6 +300,7 @@ $themes: (
       ),
   ),
 
+  // 9. VELVET (Romance)
   'velvet': (
     'type': 'dark',
     'physics': 'glass',
@@ -274,6 +327,7 @@ $themes: (
       ),
   ),
 
+  // 10. SOLAR (Divine / Royalty)
   'solar': (
     'type': 'dark',
     'physics': 'glass',
@@ -300,7 +354,12 @@ $themes: (
       ),
   ),
 
-  // --- LIGHT SPECTRUM ---
+  // ==========================================================================
+  // IV. THE LIGHT SPECTRUM (Reading & Utility)
+  // Optimized for high-contrast reading.
+  // ==========================================================================
+  
+  // 11. PAPER (Reading / Classic)
   'paper': (
       'type': 'light',
       'physics': 'flat',
@@ -327,6 +386,7 @@ $themes: (
         ),
     ),
 
+  // 12. LABORATORY (Science / Architecture)
   'laboratory': (
     'type': 'light',
     'physics': 'flat',

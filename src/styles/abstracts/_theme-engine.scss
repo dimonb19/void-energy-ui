@@ -7,6 +7,7 @@
   $physics-name: map.get($config, 'physics');
   $physics-map: map.get(physics-presets.$physics-presets, $physics-name);
 
+  // Fallback check
   @if $physics-map == null {
     @warn "Physics preset `#{$physics-name}` not found for `#{$name}`. Falling back to `glass`.";
     $physics-name: 'glass';
@@ -20,23 +21,19 @@
     $palette: ();
   }
 
-  $ease-base: map.get($physics-map, 'ease-base');
+  // CALCULATED VALUES (Automation)
+  // We still calculate speed-fast automatically based on the preset's speed-base
   $speed-base: map.get($physics-map, 'speed-base');
   $speed-fast: if($speed-base == 0s, 0s, $speed-base * 0.66);
 
-  // Derived variables for current component contracts.
-  $compat-physics: (
-    'ease-base': $ease-base,
-    'ease-stabilize': $ease-base,
-    'ease-dematerialize': $ease-base,
-    'ease-pulse': $ease-base,
-    'ease-snap': $ease-base,
-    'ease-flow': $ease-base,
-    'speed-base': $speed-base,
-    'speed-fast': $speed-fast,
+  $calculated-vars: (
+    'speed-fast': $speed-fast
   );
 
-  $theme-map: map.merge(map.merge($physics-map, $compat-physics), $palette);
+  // MERGE: Physics Preset + Calculated Vars + Color Palette
+  // We NO LONGER overwrite ease-snap/stabilize with ease-base. 
+  // We trust the preset.
+  $theme-map: map.merge(map.merge($physics-map, $calculated-vars), $palette);
 
   $selector: if($name == 'default', ':root', "[data-atmosphere='#{$name}']");
   $physics-selector: "#{$selector}[data-physics='#{$physics-name}']";

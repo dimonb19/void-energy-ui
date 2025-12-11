@@ -18,7 +18,7 @@ const THEME_CONFIG: Record<
   nebula: { physics: 'glass', mode: 'dark' },
   crimson: { physics: 'glass', mode: 'dark' },
   velvet: { physics: 'glass', mode: 'dark' },
-  solar: { physics: 'glass', mode: 'light' },
+  solar: { physics: 'glass', mode: 'dark' },
 
   // --- EXCEPTIONS ---
   terminal: { physics: 'retro', mode: 'dark' },
