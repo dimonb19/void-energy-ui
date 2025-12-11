@@ -26,7 +26,19 @@ html {
 
   // --- APPEARANCE ---
   // The absolute floor (Switches to White in Paper mode)
-  background-color: var(--bg-canvas);
+  background-color: var(--bg-canvas); // Fallback for old browsers
+
+  // Radial gradient: Light at top center (over content), fading to bottom
+  background-image: radial-gradient(
+    circle at 50% 0%,
+    var(--bg-spotlight) 0%,
+    var(--bg-canvas) 85%
+  );
+
+  // Fixed background for parallax effect
+  background-attachment: fixed;
+  background-size: cover;
+  background-repeat: no-repeat;
 
   // --- TYPOGRAPHY INITIALIZATION ---
   // Sets Font Family + Base Size (calculated by scale)

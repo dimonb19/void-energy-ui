@@ -7,10 +7,10 @@
       // 1. CONFIGURATION LOOKUP (Minimal)
       // We need this to know if we should render Light Mode or Retro Physics immediately.
       var map = {
-        'terminal':   { p: 'retro', m: 'dark' },
-        'paper':      { p: 'flat',  m: 'light' },
-        'laboratory': { p: 'flat',  m: 'light' },
-        'solar':      { p: 'glass', m: 'light' }
+        terminal: { p: 'retro', m: 'dark' },
+        paper: { p: 'flat', m: 'light' },
+        laboratory: { p: 'flat', m: 'light' },
+        solar: { p: 'glass', m: 'light' },
       };
 
       // 2. RESTORE ATMOSPHERE
@@ -32,7 +32,6 @@
       if (scale) {
         root.style.setProperty('--text-scale', scale);
       }
-
     } catch (e) {
       // Fail silently, defaults in CSS will take over
     }

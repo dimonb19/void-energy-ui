@@ -24,3 +24,7 @@ pnpm-debug.log*
 
 # package lock files
 package-lock.json
+
+# context for AI
+generate_context.py
+void_context.txt
