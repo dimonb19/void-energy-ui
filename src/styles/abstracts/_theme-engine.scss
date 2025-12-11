@@ -27,11 +27,11 @@
   $speed-fast: if($speed-base == 0s, 0s, $speed-base * 0.66);
 
   $calculated-vars: (
-    'speed-fast': $speed-fast
+    'speed-fast': $speed-fast,
   );
 
   // MERGE: Physics Preset + Calculated Vars + Color Palette
-  // We NO LONGER overwrite ease-snap/stabilize with ease-base. 
+  // We NO LONGER overwrite ease-snap/stabilize with ease-base.
   // We trust the preset.
   $theme-map: map.merge(map.merge($physics-map, $calculated-vars), $palette);
 

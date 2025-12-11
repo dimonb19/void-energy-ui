@@ -1,0 +1,30 @@
+<script is:inline>
+  (function () {
+    try {
+      const root = document.documentElement;
+      const store = localStorage;
+
+      // 1. Restore Atmosphere
+      const savedAtmosphere = store.getItem('void_atmosphere');
+      const theme = savedAtmosphere || 'void';
+      root.setAttribute('data-atmosphere', theme);
+
+      // NOTE: If you notice "Terminal" theme flashing with rounded corners
+      // before loading, you may need to restore data-physics here too.
+
+      // 2. Restore Font Override
+      const savedFont = store.getItem('void_user_font');
+      if (savedFont && savedFont !== 'default') {
+        root.style.setProperty('--user-font-body', savedFont);
+      }
+
+      // 3. Restore Text Scale
+      const savedScale = store.getItem('void_text_scale');
+      if (savedScale) {
+        root.style.setProperty('--text-scale', savedScale);
+      }
+    } catch (e) {
+      console.warn('Void Energy: Hydration failed', e);
+    }
+  })();
+</script>

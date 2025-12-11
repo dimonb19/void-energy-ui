@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { theme } from '../stores/theme.svelte';
+  import { theme } from '../adapters/themes.svelte';
   import { showModal } from '../stores/modal.svelte';
   import { tooltip } from '../actions/tooltip';
 

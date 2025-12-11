@@ -47,77 +47,78 @@ $physics-presets: (
   // Behavior: Fluid, Heavy, Translucent.
   // Logic: "Light comes from above" (Directional borders).
   'glass': (
-    'physics-blur': 20px,
-    'physics-border-width': 1px,
-    'radius-base': var(--radius-md),
-    
-    // Lighting
-    'glow-opacity': 0.6,
-    'glow-strength': 1,
-    'shadow-strength': 1,
-    'border-opacity': 1,
-    'border-mode': 'directional', // Top border catches light, bottom casts shadow
-    'void-shadow': 0 10px 30px rgba(0, 0, 0, 0.5),
-
-    // TIME & MOTION (The Triad of Movement)
-    'speed-base': 0.3s,
-    // 1. Stabilize: Starts fast, overshoot slightly, settles gently (Entry)
-    'ease-stabilize': cubic-bezier(0.16, 1, 0.3, 1),
-    // 2. Snap: Very snappy, almost instant start, quick stop (Hover/Border)
-    'ease-snap': cubic-bezier(0.22, 1, 0.36, 1),
-    // 3. Flow: Smooth, near-linear for gradients and ambient motion
-    'ease-flow': linear, 
-    // Fallback base
-    'ease-base': cubic-bezier(0.16, 1, 0.3, 1),
-  ),
+      'physics-blur': 20px,
+      'physics-border-width': 1px,
+      'radius-base': var(--radius-md),
+      // Lighting
+      'glow-opacity': 0.6,
+      'glow-strength': 1,
+      'shadow-strength': 1,
+      'border-opacity': 1,
+      'border-mode': 'directional',
+      // Top border catches light, bottom casts shadow
+      'void-shadow': 0 10px 30px rgba(0, 0, 0, 0.5),
+      // TIME & MOTION (The Triad of Movement)
+      'speed-base': 0.3s,
+      // 1. Stabilize: Starts fast, overshoot slightly, settles gently (Entry)
+      'ease-stabilize': cubic-bezier(0.16, 1, 0.3, 1),
+      // 2. Snap: Very snappy, almost instant start, quick stop (Hover/Border)
+      'ease-snap': cubic-bezier(0.22, 1, 0.36, 1),
+      // 3. Flow: Smooth, near-linear for gradients and ambient motion
+      'ease-flow': linear,
+      // Fallback base
+      'ease-base': cubic-bezier(0.16, 1, 0.3, 1),
+    ),
 
   // 2. FLAT PHYSICS (Paper / Laboratory)
   // Behavior: Lightweight, Solid, Printable.
   // Logic: "Ink on Paper" (Uniform borders).
   'flat': (
-    'physics-blur': 0px,
-    'physics-border-width': 1px,
-    'radius-base': var(--radius-sm),
-    
-    // Lighting
-    'glow-opacity': 0,
-    'glow-strength': 0,
-    'shadow-strength': 1, // Minimal shadow to separate paper from desk
-    'border-opacity': 1,
-    'border-mode': 'uniform', // Simple solid line (Pencil/Ink)
-    'void-shadow': 0 2px 8px rgba(0, 0, 0, 0.08),
-
-    // TIME & MOTION (Standard Browser Feel)
-    'speed-base': 0.2s,
-    // Standard eases are more appropriate for "Paper"
-    'ease-stabilize': ease-out,
-    'ease-snap': ease-out, 
-    'ease-flow': ease-in-out,
-    'ease-base': ease-out,
-  ),
+      'physics-blur': 0px,
+      'physics-border-width': 1px,
+      'radius-base': var(--radius-sm),
+      // Lighting
+      'glow-opacity': 0,
+      'glow-strength': 0,
+      'shadow-strength': 1,
+      // Minimal shadow to separate paper from desk
+      'border-opacity': 1,
+      'border-mode': 'uniform',
+      // Simple solid line (Pencil/Ink)
+      'void-shadow': 0 2px 8px rgba(0, 0, 0, 0.08),
+      // TIME & MOTION (Standard Browser Feel)
+      'speed-base': 0.2s,
+      // Standard eases are more appropriate for "Paper"
+      'ease-stabilize': ease-out,
+      'ease-snap': ease-out,
+      'ease-flow': ease-in-out,
+      'ease-base': ease-out,
+    ),
 
   // 3. RETRO PHYSICS (Terminal / CLI)
   // Behavior: Digital, Instant, Hard.
   // Logic: "Phosphor Emission" (Self-illuminated, Uniform borders).
   'retro': (
-    'physics-blur': 0px,
-    'physics-border-width': 2px,
-    'radius-base': 0px, // Hard corners
-    
-    // Lighting
-    'glow-opacity': 0,
-    'glow-strength': 0,
-    'shadow-strength': 1,
-    'border-opacity': 1,
-    'border-mode': 'uniform', // Thick solid beam
-    'void-shadow': none,
+      'physics-blur': 0px,
+      'physics-border-width': 2px,
+      'radius-base': 0px,
 
-    // TIME & MOTION (Instant / Stepped)
-    'speed-base': 0s,
-    // Everything is steps or instant
-    'ease-stabilize': steps(2),
-    'ease-snap': steps(2),
-    'ease-flow': steps(4),
-    'ease-base': steps(2),
-  ),
+      // Hard corners
+      // Lighting
+      'glow-opacity': 0,
+      'glow-strength': 0,
+      'shadow-strength': 1,
+      'border-opacity': 1,
+      'border-mode': 'uniform',
+      // Thick solid beam
+      'void-shadow': none,
+
+      // TIME & MOTION (Instant / Stepped)
+      'speed-base': 0s,
+      // Everything is steps or instant
+      'ease-stabilize': steps(2),
+      'ease-snap': steps(2),
+      'ease-flow': steps(4),
+      'ease-base': steps(2),
+    )
 );

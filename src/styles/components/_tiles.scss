@@ -466,12 +466,12 @@
   &::before {
     content: attr(data-label);
     position: absolute;
-    
+
     // Dynamic positioning based on border width
     // This ensures it sits exactly on the line, whether it's 1px (Glass) or 2px (Retro)
-    top: -1.5rem; 
-    left: calc(var(--physics-border-width) * -1); 
-    
+    top: -1.5rem;
+    left: calc(var(--physics-border-width) * -1);
+
     height: 1.5rem;
     padding: 0 0.5rem;
 
@@ -492,14 +492,13 @@
     text-shadow: none;
     mix-blend-mode: normal;
 
-
     // TERMINAL LABEL
     @at-root [data-physics='retro'] & {
       background: black; // Opaque background to hide the parent border behind it
-      
+
       // When parent hovers and color changes, this updates automatically.
-      border: inherit; 
-      border-bottom: none; 
+      border: inherit;
+      border-bottom: none;
     }
 
     // PAPER LABEL

@@ -27,14 +27,14 @@
   border-color: var(--border-highlight);
 
   // 2. Directional Logic (Glass Effect Borders)
-  @at-root [data-physics="glass"] & {
+  @at-root [data-physics='glass'] & {
     // Calculate the fade amount based on the opacity variable
     // 100% - (Opacity * 100%) = Transparency Amount
     $fade-amt: calc(100% - (var(--border-opacity, 1) * 100%));
 
     // Top is Light (Highlight)
     border-top-color: fade(var(--border-highlight), $fade-amt);
-    
+
     // Bottom/Sides are Shadow (Shadow)
     border-bottom-color: fade(var(--border-shadow), $fade-amt);
     border-left-color: fade(var(--border-shadow), $fade-amt);
@@ -94,7 +94,8 @@
   box-shadow: inset var(--void-shadow);
 
   @at-root [data-physics='glass'] & {
-    box-shadow: inset 0 2px 8px rgba(0, 0, 0, calc(0.5 * var(--shadow-strength)));
+    box-shadow: inset 0 2px 8px
+      rgba(0, 0, 0, calc(0.5 * var(--shadow-strength)));
   }
 
   color: var(--text-main);
