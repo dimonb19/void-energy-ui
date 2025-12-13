@@ -25,6 +25,7 @@
         <option value="solar">Solar Atmosphere</option>
         <option value="paper">Paper Atmosphere</option>
         <option value="laboratory">Laboratory Atmosphere</option>
+        <option value="new">New Atmosphere</option>
       </select>
     </div>
   </header>

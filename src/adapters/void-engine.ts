@@ -6,6 +6,12 @@
 export type VoidPhysics = 'glass' | 'flat' | 'retro';
 export type VoidMode = 'light' | 'dark';
 
+type ErrorHandler = (error: Error) => void;
+
+interface EngineOptions {
+  onError?: ErrorHandler;
+}
+
 interface ThemeConfig {
   physics: VoidPhysics;
   mode: VoidMode;
@@ -37,10 +43,12 @@ type Listener = (atmosphere: string) => void;
 export class VoidEngine {
   public atmosphere: string;
   private observers: Listener[];
+  private onError?: ErrorHandler;
 
-  constructor() {
+  constructor(options?: EngineOptions) {
     this.atmosphere = 'void';
     this.observers = [];
+    this.onError = options?.onError; // Capture the callback
 
     // Auto-init only in browser environments
     if (typeof window !== 'undefined') {
@@ -58,6 +66,11 @@ export class VoidEngine {
     }
   }
 
+  // Validation Helper
+  public hasTheme(name: string): boolean {
+    return !!THEME_CONFIG[name];
+  }
+
   /**
    * Switches the active atmosphere and updates the DOM attributes.
    * This is the "Triad Engine" logic: Atmosphere -> Physics + Mode.
@@ -65,8 +78,17 @@ export class VoidEngine {
   public setAtmosphere(name: string): void {
     // 1. Validation
     if (!THEME_CONFIG[name]) {
-      console.warn(
-        `Void Engine: Atmosphere "${name}" not found. Falling back to 'void'.`,
+      const errorMsg = `Void Engine: Atmosphere "${name}" is not registered in THEME_CONFIG.`;
+
+      // If a custom handler exists, let the app handle it (e.g., Toast notification)
+      if (this.onError) {
+        this.onError(new Error(errorMsg));
+        return; // Stop execution, do not fallback silently
+      }
+
+      // Default behavior: Descriptive Error + Fallback
+      console.error(
+        `${errorMsg} Falling back to 'void'. Available themes: ${Object.keys(THEME_CONFIG).join(', ')}`,
       );
       name = 'void';
     }
