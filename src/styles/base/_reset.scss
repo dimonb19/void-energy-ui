@@ -282,3 +282,51 @@ small {
     background-color: var(--bg-sink);
   }
 }
+
+// High-contrast compliance: solidify surfaces, flatten blur/glow, and align text colors.
+@media (prefers-contrast: more) {
+  :root {
+    // Text tiers converge for stronger legibility.
+    --text-dim: var(--text-main) !important;
+    --text-mute: var(--text-main) !important;
+
+    // Reduce translucency/blur to keep edges crisp.
+    --bg-surface: var(--bg-spotlight) !important;
+    --bg-sink: var(--bg-canvas) !important;
+    --physics-blur: 0px !important;
+    --glow-strength: 0 !important;
+
+    // Sharper borders/shadows for outlines.
+    --border-highlight: color-mix(in srgb, var(--border-highlight) 70%, var(--text-main) 30%) !important;
+    --border-shadow: color-mix(in srgb, var(--border-shadow) 70%, var(--text-main) 30%) !important;
+    --void-shadow: 0 0 0 1px var(--text-main) !important;
+  }
+}
+
+// Forced-colors (Windows High Contrast): defer to system palette and disable ornamental effects.
+@media (forced-colors: active) {
+  :root {
+    color-scheme: light dark;
+    forced-color-adjust: auto;
+
+    // Map core tokens to system colors.
+    --bg-canvas: Canvas !important;
+    --bg-spotlight: Canvas !important;
+    --bg-surface: Canvas !important;
+    --bg-sink: Canvas !important;
+
+    --text-main: CanvasText !important;
+    --text-dim: CanvasText !important;
+    --text-mute: GrayText !important;
+
+    --energy-primary: LinkText !important;
+    --energy-secondary: ButtonText !important;
+    --border-highlight: CanvasText !important;
+    --border-shadow: CanvasText !important;
+
+    // Remove glass/blur/glow that can clash with forced colors.
+    --physics-blur: 0px !important;
+    --glow-strength: 0 !important;
+    --void-shadow: none !important;
+  }
+}
