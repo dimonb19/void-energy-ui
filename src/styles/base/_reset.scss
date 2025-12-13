@@ -229,3 +229,51 @@ p {
 small {
   color: var(--text-mute);
 }
+
+@include mobile-only {
+  @at-root [data-physics='glass'] {
+    // Force a lower blur
+    --physics-blur: 8px !important;
+  }
+}
+
+// REDUCED MOTION (Vestibular Safety)
+// This overrides ALL animations and transitions if the user requests it.
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    // 1. Kill Timers
+    --speed-base: 0s !important;
+    --speed-fast: 0s !important;
+
+    // 2. Kill Physics (Swap to Flat/Solid)
+    --physics-blur: 0px !important;
+    --glow-strength: 0 !important; // Stop pulsing glows
+  }
+
+  // 3. Global Reset
+  *,
+  *::before,
+  *::after {
+    // Snap everything instantly
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+
+    // Stop specific continuous animations
+    animation-play-state: paused !important;
+  }
+
+  // 4. Force Static Fallbacks for specific complex animations
+  .btn-cta::before {
+    // Stop the rotating laser, default to a solid border look
+    background: var(--energy-primary) !important;
+    opacity: 0.2;
+  }
+
+  .shimmer {
+    // Replace moving gradient with static pulses or solid color
+    background-image: none !important;
+    background-color: var(--bg-sink);
+  }
+}

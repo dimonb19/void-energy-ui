@@ -12,16 +12,19 @@
 // Context: Positive Z-Index. Floats above the void.
 // $interactive: boolean - Set to true ONLY if the element is clickable (Link/Button)
 @mixin glass-float($interactive: false) {
-  background: var(--bg-surface);
-  border-radius: var(--radius-base);
+  // We use a slightly more opaque background if blur isn't supported
+  background: blend(var(--bg-surface), var(--bg-canvas), 80%);
 
-  // Physics: Blur
-  backdrop-filter: blur(var(--physics-blur));
-  -webkit-backdrop-filter: blur(var(--physics-blur));
+  @supports (backdrop-filter: blur(1px)) {
+    background: var(--bg-surface); // Return to translucent
+    backdrop-filter: blur(var(--physics-blur));
+    -webkit-backdrop-filter: blur(var(--physics-blur));
+  }
 
   // The Lighting Model
   border-width: var(--physics-border-width);
   border-style: solid;
+  border-radius: var(--radius-base);
 
   // Default Mode: "Uniform" (Used by Flat & Retro)
   border-color: var(--border-highlight);
@@ -80,15 +83,17 @@
 // MIXIN: Sunk Surface (Inputs, Sidebars)
 // Context: Negative Z-Index. Carved into the void.
 @mixin glass-sunk {
-  background: var(--bg-sink);
-  border-radius: var(--radius-base);
+  background: blend(var(--bg-sink), var(--bg-canvas), 90%);
 
-  // Keep blur consistent
-  backdrop-filter: blur(var(--physics-blur));
-  -webkit-backdrop-filter: blur(var(--physics-blur));
+  @supports (backdrop-filter: blur(1px)) {
+    background: var(--bg-sink);
+    backdrop-filter: blur(var(--physics-blur));
+    -webkit-backdrop-filter: blur(var(--physics-blur));
+  }
 
   // Faint ambient rim
   border: var(--physics-border-width) solid var(--border-shadow);
+  border-radius: var(--radius-base);
 
   // "Inner Sink" shadow
   box-shadow: inset var(--void-shadow);

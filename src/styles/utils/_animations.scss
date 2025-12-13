@@ -44,6 +44,20 @@
     transform: translateY(10px) scale(0.98);
     filter: blur(var(--physics-blur));
   }
+
+  // Motion Opt-Out (Direct Override)
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+    transform: none;
+    filter: none;
+    opacity: 1;
+
+    @starting-style {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+  }
 }
 
 // ==========================================================================
