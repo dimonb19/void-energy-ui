@@ -20,8 +20,13 @@
   // Fallback opacity keeps the surface legible when blur is unsupported.
   background: blend(var(--bg-surface), var(--bg-canvas), 80%);
 
+  background: linear-gradient(
+    to bottom,
+    blend(var(--bg-spotlight), var(--energy-secondary), 10%) 0%,
+    var(--bg-surface) 100%
+  );
+
   @supports (backdrop-filter: blur(1px)) {
-    background: var(--bg-surface); // Return to translucent
     backdrop-filter: blur(var(--physics-blur));
     -webkit-backdrop-filter: blur(var(--physics-blur));
   }
@@ -34,7 +39,16 @@
   // Uniform borders for Flat/Retro physics.
   border-color: var(--border-highlight);
 
-  // 2. Directional Logic (Glass Effect Borders)
+  // Uniform Logic (Flat/Retro)
+  box-shadow: var(--void-shadow);
+
+  transition:
+    transform var(--speed-base) var(--ease-stabilize),
+    border-color var(--speed-base) var(--ease-snap),
+    background-color var(--speed-base) var(--ease-flow),
+    box-shadow var(--speed-base) var(--ease-snap);
+
+  // Directional Logic (Glass Effect Borders)
   @at-root [data-physics='glass'] & {
     // Calculate the fade amount based on the opacity variable
     // 100% - (Opacity * 100%) = Transparency Amount
@@ -49,14 +63,13 @@
     border-right-color: fade(var(--border-shadow), $fade-amt);
   }
 
-  // Uniform Logic (Flat/Retro)
-  box-shadow: var(--void-shadow);
-
-  transition:
-    transform var(--speed-base) var(--ease-stabilize),
-    border-color var(--speed-base) var(--ease-snap),
-    background-color var(--speed-base) var(--ease-flow),
-    box-shadow var(--speed-base) var(--ease-snap);
+  // FLAT / RETRO FALLBACKS
+  @at-root [data-physics='flat'] &,
+    [data-physics='retro'] & {
+    background: var(--bg-surface); // Flat colors don't need gradients
+    border-color: var(--border-highlight);
+    box-shadow: var(--void-shadow);
+  }
 
   // --- INTERACTION LOGIC ---
   @media (hover: hover) {
