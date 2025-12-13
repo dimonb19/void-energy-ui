@@ -82,9 +82,9 @@ button:not(.btn-void),
       // Default (Void) Behavior
       color: #ffffff;
       box-shadow:
-        0 0 10px fade(var(--energy-primary), 60%),
-        inset 0 0 5px fade(var(--energy-primary), 80%);
-      text-shadow: 0 0 8px fade(var(--energy-primary), 40%);
+        0 0 10px alpha(var(--energy-primary), 40%),
+        inset 0 0 5px alpha(var(--energy-primary), 20%);
+      text-shadow: 0 0 8px alpha(var(--energy-primary), 60%);
 
       // Light Mode Override
       @at-root [data-mode='light'] & {
@@ -137,7 +137,7 @@ button:not(.btn-void),
         color: #ffffff;
 
         // The Glow (Halo around the box)
-        box-shadow: 0 0 30px fade(var(--energy-primary), 50%);
+        box-shadow: 0 0 30px alpha(var(--energy-primary), 50%);
         text-shadow: 0 0 10px var(--energy-primary);
 
         // CTA Light Mode
@@ -162,24 +162,24 @@ button:not(.btn-void),
 
   // Mixin for clean overrides
   @mixin btn-variant($color-var) {
-    border-color: fade($color-var, 50%);
-    background: fade($color-var, 90%);
+    border-color: alpha($color-var, 50%);
+    background: alpha($color-var, 10%);
     color: $color-var;
 
     @media (hover: hover) {
       &:hover:not(:disabled) {
         border-color: $color-var;
-        background: fade($color-var, 85%);
+        background: alpha($color-var, 15%);
         color: #ffffff;
 
         box-shadow:
-          0 0 10px fade($color-var, 60%),
-          inset 0 0 5px fade($color-var, 80%);
-        text-shadow: 0 0 8px fade($color-var, 40%);
+          0 0 10px alpha($color-var, 40%),
+          inset 0 0 5px alpha($color-var, 20%);
+        text-shadow: 0 0 8px alpha($color-var, 60%);
 
         @at-root [data-mode='light'] & {
           color: $color-var;
-          background: fade($color-var, 90%);
+          background: alpha($color-var, 10%);
           box-shadow: none;
           text-shadow: none;
         }

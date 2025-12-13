@@ -60,7 +60,7 @@
     &:hover {
       background: var(--energy-primary);
       // Glow works in Void, becomes simple color in Paper
-      box-shadow: 0 0 10px fade(var(--energy-primary), 40%);
+      box-shadow: 0 0 10px alpha(var(--energy-primary), 60%);
     }
   }
 }
@@ -121,8 +121,8 @@
       transparent 0%,
       transparent 40%,
       // Keep top clear
-      fade(var(--bg-canvas), 60%) 60%,
-      fade(var(--bg-canvas), 10%) 80%,
+      alpha(var(--bg-canvas), 40%) 60%,
+      alpha(var(--bg-canvas), 90%) 80%,
       var(--bg-canvas) 100% // Solid Floor
     );
     z-index: z('base');
@@ -190,7 +190,7 @@
 
       @at-root [data-physics='retro'] & {
         border-color: var(--energy-primary);
-        box-shadow: 4px 4px 0px fade(var(--energy-primary), 75%); // Hard shadow, no blur
+        box-shadow: 4px 4px 0px alpha(var(--energy-primary), 25%); // Hard shadow, no blur
 
         img {
           transform: scale(1.01);
@@ -301,7 +301,7 @@
     width: 2.25rem;
 
     // Default Separation (Variant mixin overrides this)
-    border-left: var(--physics-border-width) solid fade(white, 10%);
+    border-left: var(--physics-border-width) solid alpha(white, 10%);
     color: var(--text-mute);
 
     border-top-right-radius: var(--radius-base);
@@ -311,7 +311,7 @@
       color var(--speed-fast) var(--ease-snap);
 
     &:hover {
-      background: fade(black, 30%);
+      background: alpha(black, 30%);
       color: var(--text-main);
     }
   }
@@ -338,7 +338,7 @@
   @media (hover: hover) {
     &:hover:not(:disabled) {
       transform: translateY(-2px);
-      box-shadow: 0 4px 12px fade(black, 30%);
+      box-shadow: 0 4px 12px alpha(black, 30%);
     }
   }
 
@@ -351,9 +351,9 @@
 // B. THE VARIANT MIXIN (Color Logic)
 @mixin tile-variant($color) {
   // --- 1. DEFAULT (VOID / GLASS) ---
-  background: fade($color, 20%);
+  background: alpha($color, 80%);
   border-color: tint($color, 20%);
-  box-shadow: 0 0 15px fade($color, 80%);
+  box-shadow: 0 0 15px alpha($color, 20%);
   color: var(--text-main);
 
   .tile-remove {
@@ -370,7 +370,7 @@
   @media (hover: hover) {
     &:hover:not(:disabled) {
       border-color: tint($color, 50%);
-      box-shadow: 0 0 20px fade($color, 60%);
+      box-shadow: 0 0 20px alpha($color, 40%);
     }
   }
 
@@ -395,7 +395,7 @@
     }
 
     &:hover:not(:disabled) {
-      box-shadow: 4px 4px 0px fade($color, 50%); // Hard shadow, no blur
+      box-shadow: 4px 4px 0px alpha($color, 50%); // Hard shadow, no blur
     }
   }
 
@@ -426,7 +426,7 @@
     }
 
     &:disabled {
-      border-color: fade(shade($color, 60%), 90%) !important;
+      border-color: alpha(shade($color, 60%), 10%) !important;
     }
   }
 }

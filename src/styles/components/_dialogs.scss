@@ -100,7 +100,7 @@ dialog {
   // --- 6. BACKDROP (The Overlay) ---
   &::backdrop {
     // Dynamic: Deep Blue in Void, Dark Grey in Paper
-    background: fade(var(--bg-canvas), 20%);
+    background: alpha(var(--bg-canvas), 80%);
     opacity: 1;
 
     // Light Mode Exception: Standard dark overlay

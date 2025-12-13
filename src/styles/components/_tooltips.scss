@@ -17,7 +17,7 @@
 
   // High-Legibility Glass
   // We manually apply glass properties to override Tippy defaults
-  background-color: fade(var(--bg-canvas), 90%);
+  background-color: alpha(var(--bg-canvas), 10%);
   backdrop-filter: blur(var(--physics-blur));
   -webkit-backdrop-filter: blur(var(--physics-blur));
 

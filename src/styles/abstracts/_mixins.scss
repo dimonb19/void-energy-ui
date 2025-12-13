@@ -50,17 +50,16 @@
 
   // Directional Logic (Glass Effect Borders)
   @at-root [data-physics='glass'] & {
-    // Calculate the fade amount based on the opacity variable
-    // 100% - (Opacity * 100%) = Transparency Amount
-    $fade-amt: calc(100% - (var(--border-opacity, 1) * 100%));
+    // Calculate the opacity amount based on the border opacity variable
+    $border-opacity: calc(var(--border-opacity, 1) * 100%);
 
     // Top is Light (Highlight)
-    border-top-color: fade(var(--border-highlight), $fade-amt);
+    border-top-color: alpha(var(--border-highlight), $border-opacity);
 
     // Bottom/Sides are Shadow (Shadow)
-    border-bottom-color: fade(var(--border-shadow), $fade-amt);
-    border-left-color: fade(var(--border-shadow), $fade-amt);
-    border-right-color: fade(var(--border-shadow), $fade-amt);
+    border-bottom-color: alpha(var(--border-shadow), $border-opacity);
+    border-left-color: alpha(var(--border-shadow), $border-opacity);
+    border-right-color: alpha(var(--border-shadow), $border-opacity);
   }
 
   // FLAT / RETRO FALLBACKS
@@ -79,7 +78,7 @@
         transform: translateY(-2px);
 
         // Blend the energy color to preserve transparency.
-        border-color: fade(var(--energy-primary), 50%);
+        border-color: alpha(var(--energy-primary), 50%);
 
         // Glow reinforced by structural shadow.
         box-shadow:
@@ -148,10 +147,10 @@
 // MIXIN: Neon Text Glow
 @mixin text-glow($color: var(--energy-primary)) {
   color: $color;
-  text-shadow: 0 0 15px fade($color, 40%);
+  text-shadow: 0 0 15px alpha($color, 60%);
 
   @at-root [data-mode='light'] & {
-    text-shadow: 0 0 1px fade($color, 60%);
+    text-shadow: 0 0 1px alpha($color, 40%);
   }
 }
 
@@ -260,7 +259,7 @@
     90deg,
     transparent 0%,
     transparent 30%,
-    fade(var(--energy-primary), 85%) 50%,
+    alpha(var(--energy-primary), 15%) 50%,
     transparent 70%,
     transparent 100%
   );

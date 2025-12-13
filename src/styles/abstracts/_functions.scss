@@ -5,6 +5,7 @@
 
 @use 'sass:color';
 @use 'sass:meta';
+@use 'sass:math';
 
 // ==========================================================================
 // COLOR FUNCTIONS (Polymorphic)
@@ -28,14 +29,52 @@
   }
 }
 
-// 3. FADE (Make Transparent)
-// Usage: fade(red, 20%) -> 20% Transparent (80% Opacity)
-@function fade($color, $percentage) {
-  @if meta.type-of($color) == 'color' {
-    @return color.change($color, $alpha: $percentage);
-  } @else {
-    @return color-mix(in srgb, $color, transparent $percentage);
+// Internal: normalize opacity input to a percentage value.
+@function _normalize-opacity($value) {
+  @if meta.type-of($value) == 'number' {
+    $percent: if(math.is-unitless($value), $value * 100%, $value);
+    // Clamp numeric inputs to 0–100%
+    @return math.clamp(0%, 100%, $percent);
   }
+
+  // Non-numeric (e.g., var()/calc()) passthrough for CSS mixing
+  @return $value;
+}
+
+// Internal: compute the complementary transparency term.
+@function _opacity-complement($percent) {
+  @if meta.type-of($percent) == 'number' {
+    @return 100% - $percent;
+  }
+  @return calc(100% - #{$percent});
+}
+
+// 3. ALPHA (Set explicit opacity)
+// Usage: alpha(red, 20%) -> 20% opacity (80% transparent)
+@function alpha($color, $opacity) {
+  $percent: _normalize-opacity($opacity);
+
+  @if meta.type-of($color) == 'color' {
+    // Numeric inputs: direct alpha change for Sass colors
+    @if meta.type-of($percent) == 'number' {
+      $alpha-number: math.div($percent, 100%);
+      @return color.change($color, $alpha: $alpha-number);
+    }
+
+    // Non-numeric opacity: fall back to color-mix for consistency
+    @return color-mix(
+      in srgb,
+      $color $percent,
+      transparent _opacity-complement($percent)
+    );
+  }
+
+  // CSS variables: mix with transparent using the opacity percentage
+  @return color-mix(
+    in srgb,
+    $color $percent,
+    transparent _opacity-complement($percent)
+  );
 }
 
 // 4. BLEND (Mix Two Colors)

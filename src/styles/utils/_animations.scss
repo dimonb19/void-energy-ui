@@ -72,11 +72,11 @@
   0%,
   100% {
     opacity: 1;
-    box-shadow: 0 0 10px fade(var(--energy-primary), 60%);
+    box-shadow: 0 0 10px alpha(var(--energy-primary), 40%);
   }
   50% {
     opacity: 0.9;
-    box-shadow: 0 0 20px fade(var(--energy-primary), 20%);
+    box-shadow: 0 0 20px alpha(var(--energy-primary), 80%);
   }
 }
 

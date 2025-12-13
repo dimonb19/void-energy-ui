@@ -68,7 +68,7 @@ a {
       opacity: 1; // Ensure full visibility
 
       // Text Glow
-      text-shadow: 0 0 8px fade(var(--energy-primary), 60%);
+      text-shadow: 0 0 8px alpha(var(--energy-primary), 40%);
 
       // Line Animation: Expand
       &::after {
@@ -95,7 +95,7 @@ a {
 
     // Paper prefers a faint baseline underline that darkens on hover.
     border-bottom: var(--physics-border-width) solid
-      fade(var(--energy-primary), 80%);
+      alpha(var(--energy-primary), 20%);
 
     &::after {
       height: 2px; // Thicker pen stroke

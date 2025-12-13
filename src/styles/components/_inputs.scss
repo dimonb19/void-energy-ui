@@ -176,7 +176,7 @@ input[type='radio'] {
   border-radius: calc(var(--radius-base) * 2);
 
   // Style
-  border: 2px dashed fade(var(--energy-secondary), 70%);
+  border: 2px dashed alpha(var(--energy-secondary), 30%);
   @include glass-sunk;
   border-style: dashed; // Override sunk solid border
 

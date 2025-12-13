@@ -276,7 +276,7 @@
       var(--energy-primary),
       var(--energy-secondary)
     );
-    box-shadow: 0 0 10px fade(var(--energy-primary), 40%);
+    box-shadow: 0 0 10px alpha(var(--energy-primary), 60%);
     border-radius: inherit;
     animation: progress-fill 2s ease-out forwards;
   }
