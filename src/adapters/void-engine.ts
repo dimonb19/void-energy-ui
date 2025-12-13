@@ -1,6 +1,28 @@
 /* ==========================================================================
    VOID ENERGY UI ENGINE (Vanilla TypeScript)
    The framework-agnostic logic controller.
+   ========================================================================== 
+
+   PURPOSE:
+   This class serves as the Single Source of Truth for the UI's state.
+   It decouples the "Active Theme" from any specific framework (Svelte, React, etc.),
+   allowing the design system to run on the metal of the browser.
+
+   THE TRIAD ARCHITECTURE:
+   In this system, users select an "Atmosphere" (e.g., 'terminal'), but the
+   Engine automatically derives the Physics and Mode from that choice.
+   
+   Selection: "terminal"
+      │
+      └─> 1. Atmosphere: "terminal" (Sets Colors/Fonts via SCSS)
+      └─> 2. Physics:    "retro"    (Sets Motion/Borders via Variables)
+      └─> 3. Mode:       "dark"     (Sets Contrast/Inversion)
+
+   USAGE:
+   1. Initialize: The engine auto-starts in the browser and reads localStorage.
+   2. Subscribe: Frameworks (Svelte stores, React hooks) subscribe to changes.
+   3. Switch: Call `Void.setAtmosphere('name')` to trigger a global update.
+
    ========================================================================== */
 
 export type VoidPhysics = 'glass' | 'flat' | 'retro';

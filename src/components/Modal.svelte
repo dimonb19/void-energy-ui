@@ -1,6 +1,5 @@
 <script lang="ts">
   import { showModal } from '../stores/modal.svelte';
-  import { tooltip } from '../actions/tooltip';
 
   let dialog = $state<HTMLDialogElement | null>(null);
 
