@@ -8,12 +8,14 @@
   // 1. Initialize State
   let atmosphere = $state(engine.atmosphere);
   let currentScale = $state(engine.userConfig.scale);
+  let currentDensity = $state(engine.userConfig.density);
 
   // 2. Handle the Engine Instance
   $effect.root(() => {
     return engine.subscribe((eng) => {
       atmosphere = eng.atmosphere;
       currentScale = eng.userConfig.scale;
+      currentDensity = eng.userConfig.density;
     });
   });
 
@@ -24,7 +26,6 @@
     }
   });
 
-  // Available fonts
   const fontOptions = [
     { label: 'System Default (Atmosphere)', value: null },
     { label: 'Hanken Grotesk (Tech)', value: "'Hanken Grotesk', sans-serif" },
@@ -55,6 +56,14 @@
     theme.setScale(value);
     currentScale = value;
   }
+
+  const densityOptions = [
+    { value: 'high', label: 'Compact', icon: '🥓' }, 
+    { value: 'standard', label: 'Standard', icon: '🍔' },
+    { value: 'low', label: 'Relaxed', icon: '🥗' }
+  ];
+
+  const setDensity = (d: 'high'|'standard'|'low') => theme.setDensity(d);
 </script>
 
 <main class="w-full min-h-screen">
@@ -122,6 +131,26 @@
               onclick={() => setScale(level.value)}
             >
               {level.label}
+            </button>
+          {/each}
+        </div>
+      </div>
+
+      <div class="hidden tablet:flex flex-col gap-xs pt-sm">
+        <div class="flex flex-row justify-between items-end">
+          <label for="density">Spacing Density</label>
+          <span>
+            ({currentDensity})
+          </span>
+        </div>
+        
+        <div class="surface-sunk p-xs rounded-md flex flex-row gap-xs justify-between">
+          {#each densityOptions as opt}
+            <button 
+              class:active={currentDensity === opt.value}
+              onclick={() => setDensity(opt.value as 'high'|'standard'|'low')}
+            >
+              {opt.label}
             </button>
           {/each}
         </div>

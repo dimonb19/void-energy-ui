@@ -52,6 +52,10 @@ export const theme = {
     engine.setPreferences({ scale });
   },
 
+  setDensity(density: 'high' | 'standard' | 'low') {
+    engine.setPreferences({ density });
+  },
+
   // Expose raw engine for advanced use cases
   raw: engine,
 };

@@ -27,6 +27,7 @@
 
 export type VoidPhysics = 'glass' | 'flat' | 'retro';
 export type VoidMode = 'light' | 'dark';
+export type VoidDensity = 'high' | 'standard' | 'low';
 
 type ErrorHandler = (error: Error) => void;
 
@@ -58,7 +59,28 @@ const THEME_CONFIG: Record<string, ThemeConfig> = {
   laboratory: { physics: 'flat', mode: 'light' },
 };
 
-// CHANGE 1: Listener now receives the whole engine instance,
+// DENSITY MAPS (matches src/styles/config/_user-themes.scss)
+const DENSITY_MAPS = {
+  high: {
+    'space-xs': '0.25rem',  // 4px
+    'space-sm': '0.5rem',   // 8px
+    'space-md': '1rem',     // 16px
+    'space-lg': '1.5rem',   // 24px
+    'space-xl': '2rem',     // 32px
+    'space-2xl': '3rem',    // 48px
+  },
+  low: {
+    'space-xs': '0.75rem',  // 12px
+    'space-sm': '1.25rem',  // 20px
+    'space-md': '2rem',     // 32px
+    'space-lg': '2.5rem',   // 40px
+    'space-xl': '4rem',     // 64px
+    'space-2xl': '5rem',    // 80px
+  }
+  // Standard is handled by removing overrides (CSS fallback)
+};
+
+// Listener now receives the whole engine instance,
 // allowing access to both Atmosphere AND UserConfig.
 type Listener = (engine: VoidEngine) => void;
 
@@ -67,6 +89,7 @@ interface UserConfig {
   fontHeading?: string | null; // null = reset to atmosphere default
   fontBody?: string | null;
   scale: number; // 0.85 to 1.50
+  density: VoidDensity; // 'high' | 'standard' | 'low'
 }
 
 // Define Storage Keys
@@ -89,6 +112,7 @@ export class VoidEngine {
       fontHeading: null,
       fontBody: null,
       scale: 1,
+      density: 'standard'
     };
 
     // Auto-init only in browser environments
@@ -208,9 +232,6 @@ export class VoidEngine {
     const root = document.documentElement;
 
     // A. Font Scaling
-    // CHANGE 4: Aligned constraints with UI (0.85 - 1.5)
-    // We allow a slightly wider buffer (0.75 - 2.0) for safety/future-proofing,
-    // but default behavior logic remains.
     const safeScale = Math.min(Math.max(this.userConfig.scale, 0.75), 2);
     root.style.setProperty('--text-scale', safeScale.toString());
 
@@ -228,6 +249,19 @@ export class VoidEngine {
       root.style.setProperty('--user-font-body', this.userConfig.fontBody);
     } else {
       root.style.removeProperty('--user-font-body');
+    }
+
+    // C. Density Maps
+    const density = this.userConfig.density;
+    if (density === 'standard') {
+      // CLEANUP: Remove inline styles so SCSS defaults apply
+      Object.keys(DENSITY_MAPS.high).forEach(key => root.style.removeProperty(`--${key}`));
+    } else {
+      // INJECT: Apply the specific map (High or Low)
+      const map = DENSITY_MAPS[density];
+      Object.entries(map).forEach(([key, value]) => {
+        root.style.setProperty(`--${key}`, value);
+      });
     }
   }
 
