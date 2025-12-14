@@ -199,6 +199,40 @@ button:not(.btn-void),
   &.btn-alert:not(:disabled) {
     @include btn-variant(var(--color-error));
   }
+
+  // ========================================================================
+  // ACTIVE STATE (Toggle / Selected)
+  // Usage: class="btn active" or class="btn" aria-pressed="true"
+  // ========================================================================
+  &.active,
+  &[aria-pressed='true'] {
+    // 1. Solid Fill (The "Lit" Look)
+    background: alpha(var(--energy-primary), 15%);
+    border-color: var(--energy-primary);
+
+    // 2. Contrast Text
+    color: var(--text-main);
+
+    // 3. Glow Effect
+    box-shadow:
+      0 0 15px alpha(var(--energy-primary), 30%),
+      inset 0 0 10px alpha(var(--energy-primary), 10%);
+
+    // --- MODE EXCEPTIONS ---
+    @at-root [data-mode='light'] & {
+      background: alpha(var(--energy-primary), 10%);
+      border-color: var(--energy-primary);
+      color: var(--energy-primary);
+      box-shadow: none;
+    }
+
+    @at-root [data-physics='retro'] & {
+      background: transparent;
+      border: 2px solid var(--energy-primary);
+      color: var(--energy-primary);
+      box-shadow: 3px 3px 0 var(--energy-primary);
+    }
+  }
 }
 
 // 4. UTILITIES

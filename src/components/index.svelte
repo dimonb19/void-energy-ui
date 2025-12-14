@@ -118,7 +118,7 @@
         >
           {#each scaleLevels as level}
             <button
-              class:btn-signal={activeScaleStep.value === level.value}
+              class:active={activeScaleStep.value === level.value}
               onclick={() => setScale(level.value)}
             >
               {level.label}
