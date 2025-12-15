@@ -42,21 +42,21 @@ interface ThemeConfig {
 
 // Triad lookup mapping atmospheres to Physics and Mode semantics.
 const THEME_CONFIG: Record<string, ThemeConfig> = {
-  // Glass Physics defaults
+  // System
   void: { physics: 'glass', mode: 'dark' },
   onyx: { physics: 'glass', mode: 'dark' },
-  overgrowth: { physics: 'glass', mode: 'dark' },
-  ember: { physics: 'glass', mode: 'dark' },
-  glacier: { physics: 'glass', mode: 'dark' },
-  nebula: { physics: 'glass', mode: 'dark' },
-  crimson: { physics: 'glass', mode: 'dark' },
-  velvet: { physics: 'glass', mode: 'dark' },
-  solar: { physics: 'glass', mode: 'dark' },
-
-  // Alternate physics/mode pairings
   terminal: { physics: 'retro', mode: 'dark' },
+  // Narrative
+  crimson: { physics: 'glass', mode: 'dark' },
+  overgrowth: { physics: 'glass', mode: 'dark' },
+  velvet: { physics: 'glass', mode: 'dark' },
+  solar: { physics: 'flat', mode: 'dark' },
+  nebula: { physics: 'glass', mode: 'dark' },
   paper: { physics: 'flat', mode: 'light' },
+  // Utility
   laboratory: { physics: 'flat', mode: 'light' },
+  playground: { physics: 'flat', mode: 'light' },
+  focus: { physics: 'flat', mode: 'light' },
 };
 
 // DENSITY MAPS (matches src/styles/config/_user-themes.scss)

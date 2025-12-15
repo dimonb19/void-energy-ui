@@ -227,6 +227,9 @@ $size-map: (
 .text-dim {
   color: var(--text-dim);
 }
+.text-muted {
+  color: var(--text-muted);
+}
 .text-highlight {
   @include text-glow;
   font-weight: 600;

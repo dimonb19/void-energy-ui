@@ -10,129 +10,104 @@
    Defines raw palette primitives per Atmosphere. Components consume the emitted CSS variables, not these raw constants.
    ========================================= */
 
-// --------------------------------------------------------------------------
-// 1. VOID (Default)
-// --------------------------------------------------------------------------
+// 1. VOID (Default - Brand Identity)
 $void-canvas: #010020; // Canvas: Deepest Navy edge
 $void-spotlight: #0a0c2b; // Light:  Blue center glow
 $void-glass: rgba(22, 30, 95, 0.4); // Glass:  Floating card base
 $void-primary: #33e2e6; // Energy: Data flow & focus
 $void-structure: #3875fa; // Struct: Borders & stability
 
-// --------------------------------------------------------------------------
-// 2. ONYX (Minimal)
-// --------------------------------------------------------------------------
+// 2. ONYX (Minimal - OLED Dark)
 $onyx-canvas: #0a0a0a; // Canvas: Near black neutral
 $onyx-spotlight: #1c1c1c; // Light:  Soft studio grey
 $onyx-glass: rgba(30, 30, 30, 0.6); // Glass:  Smoked dark glass
 $onyx-primary: #ffffff; // Energy: Pure white light
 $onyx-structure: #a3a3a3; // Struct: Brushed steel/alum
 
-// --------------------------------------------------------------------------
-// 3. TERMINAL (Retro)
-// --------------------------------------------------------------------------
+// 3. TERMINAL (Retro - Hacker/Dev)
 $term-canvas: #050505; // Canvas: Vantablack/Off
 $term-spotlight: #141414; // Light:  CRT phosphor burn
 $term-glass: rgba(0, 20, 0, 0.9); // Glass:  Heavy opaque window
 $term-primary: #f5c518; // Energy: Monochrome amber
 $term-structure: #f5c518; // Struct: Same as energy
 
-// --------------------------------------------------------------------------
-// 4. OVERGROWTH (Nature)
-// --------------------------------------------------------------------------
+// 4. CRIMSON (Horror - Dark Red)
+$crimson-canvas: #180808; // Canvas: Dried blood dark
+$crimson-spotlight: #2b0f0f; // Light:  Emergency red
+$crimson-glass: rgba(60, 0, 0, 0.6); // Glass:  Viscous red liquid
+$crimson-primary: #ff6b6b; // Energy: Laser/Warning
+$crimson-structure: #8a0000; // Struct: Dark red steel
+
+// 5. OVERGROWTH (Nature - Toxic Green)
 $nature-canvas: #051a0a; // Canvas: Deep forest night
 $nature-spotlight: #0e2e14; // Light:  Moonlight on leaves
 $nature-glass: rgba(0, 40, 10, 0.5); // Glass:  Bioluminescent moss
 $nature-primary: #39ff14; // Energy: Toxic/Life neon
 $nature-structure: #ffd700; // Struct: Ancient gold relics
 
-// --------------------------------------------------------------------------
-// 5. EMBER (Industrial)
-// --------------------------------------------------------------------------
-$ember-canvas: #140a05; // Canvas: Cold Mars night
-$ember-spotlight: #331a0d; // Light:  Warm fire haze
-$ember-glass: rgba(50, 25, 10, 0.6); // Glass:  Dirty amber glass
-$ember-primary: #ff7b00; // Energy: Molten slag/fire
-$ember-structure: #a04020; // Struct: Rusted iron beams
-
-// --------------------------------------------------------------------------
-// 6. GLACIER (Cryo)
-// --------------------------------------------------------------------------
-$glacier-canvas: #050d14; // Canvas: Abyssal trench
-$glacier-spotlight: #0e2433; // Light:  Deep sea teal
-$glacier-glass: rgba(10, 30, 40, 0.5); // Glass:  Frosted ice sheet
-$glacier-primary: #e0f7fa; // Energy: Pale frost white
-$glacier-structure: #00bcd4; // Struct: Frozen cyan ice
-
-// --------------------------------------------------------------------------
-// 7. NEBULA (Arcane)
-// --------------------------------------------------------------------------
-$nebula-canvas: #0d0221; // Canvas: Cosmic indigo
-$nebula-spotlight: #240a45; // Light:  Violet nebula cloud
-$nebula-glass: rgba(45, 10, 80, 0.5); // Glass:  Purple mystic haze
-$nebula-primary: #d48aff; // Energy: Rune glow/magic
-$nebula-structure: #4b0082; // Struct: Deep solid indigo
-
-// --------------------------------------------------------------------------
-// 8. CRIMSON (Horror)
-// --------------------------------------------------------------------------
-$crimson-canvas: #1a0505; // Canvas: Dried blood dark
-$crimson-spotlight: #300a0a; // Light:  Emergency red
-$crimson-glass: rgba(60, 0, 0, 0.6); // Glass:  Viscous red liquid
-$crimson-primary: #ff6b6b; // Energy: Laser/Warning
-$crimson-structure: #8a0000; // Struct: Dark red steel
-
-// --------------------------------------------------------------------------
-// 9. VELVET (Romance)
-// --------------------------------------------------------------------------
+// 6. VELVET (Romance - Dark Pink)
 $velvet-canvas: #1a0510; // Canvas: Dark plum velvet
 $velvet-spotlight: #2e0b1d; // Light:  Warm stage spot
 $velvet-glass: rgba(50, 0, 20, 0.5); // Glass:  Rose tinted lens
-$velvet-primary: #ff80a0; // Energy: Bubblegum neon
+$velvet-primary: #ff80a0; // Energy: Bubblegum/Rose neon
 $velvet-structure: #c71585; // Struct: Rich magenta
 
-// --------------------------------------------------------------------------
-// 10. SOLAR (Royal)
-// --------------------------------------------------------------------------
-$solar-canvas: #0f0a00; // Canvas: Gilded black
-$solar-spotlight: #332505; // Light:  Torchlight gold
-$solar-glass: rgba(50, 40, 10, 0.5); // Glass:  Amber crystal
-$solar-primary: #ffcc00; // Energy: Pure divine gold
-$solar-structure: #b8860b; // Struct: Antique bronze
+// 7. SOLAR (Fantasy - Divine/Gold)
+$solar-canvas: #120a00; // Canvas: Deep Bronze/Black
+$solar-spotlight: #2b1d00; // Light:  Torchlight
+$solar-glass: rgba(20, 10, 0, 0.6); // Glass:  Amber Crystal
+$solar-primary: #ffaa00; // Energy: Burning Gold
+$solar-structure: #b8860b; // Struct: Dark Goldenrod
 
-// --------------------------------------------------------------------------
-// 11. PAPER (Light)
-// --------------------------------------------------------------------------
-$paper-canvas: #f9f9f6; // Canvas: Creamy off-white
-$paper-spotlight: #ffffff; // Light:  Pure white sun
-$paper-glass: #ffffff; // Glass:  Solid paper sheet
-$paper-primary: #161e5f; // Energy: Navy blue ink
-$paper-structure: #e0e0e0; // Struct: Graphite pencil
+// 8. NEBULA (Arcane - Magic/Synth)
+$nebula-canvas: #0a0014; // Canvas: Void Purple
+$nebula-spotlight: #240046; // Light:  Indigo
+$nebula-glass: rgba(20, 0, 40, 0.6); // Glass:  Dark Amethyst
+$nebula-primary: #d946ef; // Energy: Fuchsia Neon
+$nebula-structure: #8b5cf6; // Struct: Violet
 
-// --------------------------------------------------------------------------
-// 12. LABORATORY (Clinical)
-// --------------------------------------------------------------------------
+// 9. PAPER (Readability - Warm/Ink)
+$paper-canvas: #faeed1; // Canvas: Warm Parchment
+$paper-spotlight: #fff8e1; // Light:  Sunlit page
+$paper-glass: #fdf6e3; // Glass:  Solid paper card
+$paper-primary: #2c3e50; // Energy: Deep Ink Blue
+$paper-structure: #8d6e63; // Struct: Leather binding/Sepia
+
+// 10. LABORATORY (Clinical - Standard Light)
 $lab-canvas: #f1f5f9; // Canvas: Slate-100 grey
 $lab-spotlight: #ffffff; // Light:  Sterile white
 $lab-glass: #ffffff; // Glass:  Clean surface
 $lab-primary: #005bb5; // Energy: Blueprint blue
 $lab-structure: #64748b; // Struct: Surgical steel
 
+// 11. PLAYGROUND (Kids - Fun/Pastel)
+$play-canvas: #e0f7fa; // Canvas: Pastel Cyan
+$play-spotlight: #ffffff; // Light:  Bright White
+$play-glass: #ffffff; // Glass:  Clean white card
+$play-primary: #ff4081; // Energy: Hot Pink
+$play-structure: #00bcd4; // Struct: Cyan crayon
+
+// 12. FOCUS (Seniors - High Contrast)
+$focus-canvas: #ffffff; // Canvas: Pure White
+$focus-spotlight: #f5f5f5; // Light:  Light Grey
+$focus-glass: #ffffff; // Glass:  Solid White
+$focus-primary: #000000; // Energy: Pure Black
+$focus-structure: #000000; // Struct: Pure Black Borders
+
 /* =========================================
    2. TYPOGRAPHY STACKS
    ========================================= */
 $font-tech: 'Hanken Grotesk', sans-serif; // Void
-$font-clean: 'Inter', sans-serif; // Onyx
+$font-clean: 'Inter', sans-serif; // Onyx / Focus
 $font-code: 'Courier Prime', monospace; // Terminal
-$font-nature: 'Lora', serif; // Overgrowth
-$font-industrial: 'Oswald', sans-serif; // Ember
-$font-cryo: 'Exo 2', sans-serif; // Glacier
-$font-arcane: 'Cinzel', serif; // Nebula
 $font-horror: 'Merriweather', serif; // Crimson
+$font-nature: 'Lora', serif; // Overgrowth
 $font-hand: 'Caveat', cursive; // Velvet
-$font-royal: 'Bodoni Moda', serif; // Solar
 $font-book: 'PT Serif Caption', serif; // Paper
+$font-arcane: 'Cinzel', serif; // Solar
+$font-mystic: 'Exo 2', sans-serif; // Nebula
 $font-lab: 'Open Sans', sans-serif; // Laboratory
+$font-fun: 'Comic Neue', sans-serif; // Playground
 
 // ==========================================================================
 // SHARED SEMANTIC CONSTANTS (The Logic Layer)
