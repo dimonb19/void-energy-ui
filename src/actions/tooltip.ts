@@ -1,45 +1,30 @@
 /*
  * ROLE: Tooltip action for Svelte.
- * RESPONSIBILITY: Normalizes tooltip configuration and binds Tippy.js to the Void Energy skin so overlays inherit active Physics and dialog stacking.
+ * RESPONSIBILITY: Bridges Svelte DOM lifecycle to the VoidTooltip logic core.
  */
 
-import tippy, { type Props, type Instance } from 'tippy.js';
+import { VoidTooltip, type VoidTooltipOptions } from '../lib/void-tooltip';
 
-interface TooltipParams {
-  content: string;
-  placement?: Props['placement'];
-}
-
-export function tooltip(node: HTMLElement, params: string | TooltipParams) {
-  // Normalize input to a consistent shape so updates remain stable.
-  let config: TooltipParams =
+export function tooltip(
+  node: HTMLElement,
+  params: string | VoidTooltipOptions,
+) {
+  // Normalize input
+  let config: VoidTooltipOptions =
     typeof params === 'string' ? { content: params } : params;
 
-  const tip: Instance = tippy(node, {
-    content: config.content,
-    theme: 'void', // Uses the Void tooltip skin in components/_tooltips.scss
-    animation: 'materialize', // Aligns with Glass Physics entry timing
-    placement: config.placement || 'top',
-    arrow: false, // Preserves the seamless glass edge
-    offset: [0, 8], // Keeps glow separated from the trigger
-    maxWidth: 250,
-    interactive: false, // Avoids extra event listeners on dense UIs
-    // Anchor to the nearest dialog to respect native stacking contexts.
-    appendTo: () => node.closest('dialog') || document.body,
-  });
+  // Initialize Logic Core
+  const tooltipInstance = new VoidTooltip(node, config);
 
   return {
-    update(newParams: string | TooltipParams) {
+    update(newParams: string | VoidTooltipOptions) {
       const newConfig =
         typeof newParams === 'string' ? { content: newParams } : newParams;
 
-      tip.setProps({
-        content: newConfig.content,
-        placement: newConfig.placement || 'top',
-      });
+      tooltipInstance.update(newConfig);
     },
     destroy() {
-      tip.destroy();
+      tooltipInstance.destroy();
     },
   };
 }

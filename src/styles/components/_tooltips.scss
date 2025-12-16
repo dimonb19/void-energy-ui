@@ -1,100 +1,64 @@
 /*
- * ROLE: Tooltip skin overrides.
- * RESPONSIBILITY: Aligns Tippy.js surfaces with Glass Physics, Retro fallbacks, and light-mode variants.
+ * ROLE: Void Tooltip Surface (Headless)
+ * RESPONSIBILITY: Defines the Glass/Retro/Flat physics for Floating UI elements.
  */
 
 @use '../abstracts' as *;
 @use '../base/typography' as *;
 
-/* ==========================================================================
-   VOID TOOLTIPS (TippyJS Override)
-   ========================================================================== */
+.void-tooltip {
+  // 1. BASE GEOMETRY
+  // Depth Logic: Tooltips are "Ephemeral Alerts", so they reside
+  // on the Toast layer (200) to float above Modals (100).
+  z-index: z('toast');
+  pointer-events: none; // Allow clicking through the tooltip
+  width: max-content;
+  max-width: 250px;
 
-// 1. THE BOX (Physics & Skin)
-.tippy-box[data-theme~='void'] {
-  background-color: transparent;
-  color: inherit;
+  // 2. PHYSICS INHERITANCE
+  // Applies border, background, and shadow logic based on current Theme
+  @include glass-float($interactive: false);
 
-  // High-Legibility Glass
-  // We manually apply glass properties to override Tippy defaults
-  background-color: alpha(var(--bg-canvas), 10%);
-  backdrop-filter: blur(var(--physics-blur));
-  -webkit-backdrop-filter: blur(var(--physics-blur));
-
-  border: var(--physics-border-width) solid var(--border-highlight);
-  border-radius: var(--radius-base);
-  box-shadow: var(--void-shadow, 0 10px 40px -10px rgba(0, 0, 0, 0.5));
-
-  // Typography
+  // 3. TYPOGRAPHY
   @include typography('caption');
-  color: var(--text-main);
+  padding: var(--space-xs) var(--space-sm);
   text-align: center;
-  padding: 0.25rem 0.5rem;
+  color: var(--text-main);
 
-  // RETRO PHYSICS OVERRIDE (Robotic)
-  @at-root [data-physics='retro'] & {
-    background-color: var(--bg-canvas);
-    backdrop-filter: none;
-    border-radius: 0;
-    box-shadow: none;
+  // 4. ANIMATION STATE (The Materialize Effect)
+  // Default State: Dematerialized (Closed)
+  opacity: 0;
+  transform: translateY(4px) scale(0.95);
+  filter: blur(calc(var(--physics-blur) / 2));
+
+  // We explicitly transition specific properties to avoid layout thrashing
+  transition:
+    opacity var(--speed-base) var(--ease-stabilize),
+    transform var(--speed-base) var(--ease-stabilize),
+    filter var(--speed-base) var(--ease-stabilize);
+
+  // Active State: Materialized (Open)
+  &[data-state='open'] {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
   }
 
-  // LIGHT MODE OVERRIDE (Ink)
+  // 5. PHYSICS OVERRIDES
+
+  // RETRO: Robotic/Instant (Terminal Theme)
+  @at-root [data-physics='retro'] & {
+    border-radius: 0;
+    transition: none; // Law: Instant motion
+    filter: none; // Law: No blur
+    background: var(--bg-canvas); // Opaque
+    box-shadow: 4px 4px 0 var(--border-shadow); // Hard shadow
+  }
+
+  // FLAT: Clean Paper (Light Mode)
   @at-root [data-mode='light'] & {
-    background-color: var(--bg-surface);
+    background: var(--bg-surface);
+    filter: none;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
-}
-
-// 2. THE CONTENT
-.tippy-content {
-  padding: 0.5rem 0.75rem; // Comfort padding
-}
-
-// 3. THE "MATERIALIZE" ANIMATION
-// We replace 'scale.css' with this custom physics engine.
-// Tippy toggles data-state between 'hidden' and 'visible'.
-
-.tippy-box[data-animation='materialize'] {
-  // --- STATE: HIDDEN (Dematerialized) ---
-  &[data-state='hidden'] {
-    opacity: 0;
-    transform: scale(0.95) translateY(4px); // Slight drop
-    filter: blur(calc(var(--physics-blur) / 4)); // Void Blur
-  }
-
-  // --- STATE: VISIBLE (Stabilized) ---
-  &[data-state='visible'] {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-    filter: blur(0);
-
-    // The Stabilization Curve
-    transition-property: transform, opacity, filter;
-    transition-duration: var(--speed-fast);
-    transition-timing-function: var(--ease-stabilize);
-  }
-
-  // --- MODE / PHYSICS EXCEPTIONS ---
-
-  // Retro physics: Instant Snap (0s)
-  @at-root [data-physics='retro'] & {
-    transition-duration: 0s !important; // Instant
-    &[data-state='hidden'] {
-      filter: none; // No blur in terminal
-    }
-  }
-
-  // Light mode: Clean Fade (No Blur)
-  @at-root [data-mode='light'] & {
-    &[data-state='hidden'] {
-      filter: none; // No blur in paper
-    }
-  }
-}
-
-// 4. ARROW HIDING
-// We hide arrows because glass arrows are visually messy (double borders).
-.tippy-arrow {
-  display: none;
 }
