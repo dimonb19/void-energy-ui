@@ -204,8 +204,8 @@ button:not(.btn-void),
   // ACTIVE STATE (Toggle / Selected)
   // Usage: class="btn active" or class="btn" aria-pressed="true"
   // ========================================================================
-  &.active,
-  &[aria-pressed='true'] {
+  &[aria-pressed='true'],
+  &[data-state='active'] {
     // 1. Solid Fill (The "Lit" Look)
     background: alpha(var(--energy-primary), 15%);
     border-color: var(--energy-primary);

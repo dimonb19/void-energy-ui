@@ -127,7 +127,7 @@
         >
           {#each scaleLevels as level}
             <button
-              class:active={activeScaleStep.value === level.value}
+              aria-pressed={activeScaleStep.value === level.value}
               onclick={() => setScale(level.value)}
             >
               {level.label}
@@ -149,7 +149,7 @@
         >
           {#each densityOptions as opt}
             <button
-              class:active={currentDensity === opt.value}
+              aria-pressed={currentDensity === opt.value}
               onclick={() =>
                 setDensity(opt.value as 'high' | 'standard' | 'low')}
             >
