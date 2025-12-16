@@ -17,14 +17,8 @@
 // Context: Positive Z-Index. Floats above the void.
 // $interactive: boolean - Set to true ONLY if the element is clickable (Link/Button)
 @mixin glass-float($interactive: false) {
-  // Fallback opacity keeps the surface legible when blur is unsupported.
-  background: blend(var(--bg-surface), var(--bg-canvas), 80%);
-
-  background: linear-gradient(
-    to bottom,
-    blend(var(--bg-spotlight), var(--energy-secondary), 10%) 0%,
-    var(--bg-surface) 100%
-  );
+  // Fallback opacity keeps the surface legible
+  background: var(--bg-surface);
 
   @supports (backdrop-filter: blur(1px)) {
     backdrop-filter: blur(var(--physics-blur));
@@ -50,6 +44,12 @@
 
   // Directional Logic (Glass Effect Borders)
   @at-root [data-physics='glass'] & {
+    background: linear-gradient(
+      to bottom,
+      blend(var(--bg-surface), var(--energy-secondary), 10%) 0%,
+      var(--bg-surface) 100%
+    );
+
     // Calculate the opacity amount based on the border opacity variable
     $border-opacity: calc(var(--border-opacity, 1) * 100%);
 
@@ -65,7 +65,6 @@
   // FLAT / RETRO FALLBACKS
   @at-root [data-physics='flat'] &,
     [data-physics='retro'] & {
-    background: var(--bg-surface); // Flat colors don't need gradients
     border-color: var(--border-highlight);
     box-shadow: var(--void-shadow);
   }
@@ -81,17 +80,22 @@
         border-color: alpha(var(--energy-primary), 50%);
 
         // Glow reinforced by structural shadow.
-        box-shadow:
-          0 12px 40px rgba(0, 0, 0, calc(0.6 * var(--shadow-strength))),
-          0
-            0
-            15px
-            color-mix(
-              in srgb,
-              var(--energy-primary)
-                calc(var(--glow-opacity) * var(--glow-strength, 1) * 100%),
-              transparent
-            );
+        box-shadow: 0
+          4px
+          16px
+          rgba(0, 0, 0, calc(0.5 * var(--shadow-strength)));
+
+        @at-root [data-physics='glass'] & {
+          box-shadow:
+            0 8px 32px rgba(0, 0, 0, calc(0.5 * var(--shadow-strength))),
+            0 0 15px
+              color-mix(
+                in srgb,
+                var(--energy-primary)
+                  calc(var(--glow-opacity) * var(--glow-strength, 1) * 100%),
+                transparent
+              );
+        }
       }
     }
   }
@@ -112,23 +116,19 @@
   border: var(--physics-border-width) solid var(--border-shadow);
   border-radius: var(--radius-base);
 
-  // "Inner Sink" shadow
-  box-shadow: inset var(--void-shadow);
-
   @at-root [data-physics='glass'] & {
-    box-shadow: inset 0 2px 8px
-      rgba(0, 0, 0, calc(0.5 * var(--shadow-strength)));
+    box-shadow: inset var(--void-shadow);
   }
 
   color: var(--text-main);
   transition:
     border-color var(--speed-fast) var(--ease-snap),
-    box-shadow var(--speed-fast) var(--ease-snap);
+    box-shadow var(--speed-fast) var(--ease-snap),
+    outline var(--speed-fast) var(--ease-snap);
 
   // Focus State
   &:focus-visible {
     border-color: var(--energy-primary);
-    outline: none;
     box-shadow:
       inset 0 2px 8px rgba(0, 0, 0, calc(0.5 * var(--shadow-strength))),
       0 0 10px
@@ -138,6 +138,16 @@
             calc(var(--glow-opacity) * var(--glow-strength, 1) * 100%),
           transparent
         );
+
+    @at-root [data-physics='flat'] & {
+      box-shadow: inset var(--void-shadow);
+      outline: var(--physics-border-width) solid var(--border-shadow);
+    }
+
+    @at-root [data-physics='retro'] & {
+      box-shadow: none;
+      outline: var(--physics-border-width) solid var(--border-shadow);
+    }
   }
 }
 
