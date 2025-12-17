@@ -2,6 +2,7 @@
   import { theme } from '../adapters/themes.svelte';
   import { showModal } from '../stores/modal.svelte';
   import { tooltip } from '../actions/tooltip';
+  import { toast } from '../stores/toast.svelte';
 
   const engine = theme.raw;
 
@@ -253,15 +254,46 @@
         </div>
 
         <div class="flex flex-row flex-wrap justify-center gap-sm">
-          <button class="btn-orb">Upgrade Core</button>
-          <button class="btn-system">Diagnostics</button>
-          <button class="btn-signal" use:tooltip={'Success Button Styling'}
-            >Secure Channel</button
+          <button
+            class="btn-orb"
+            onclick={() => {
+              toast.show('No permission to upgrade core', 'warning');
+            }}
           >
-          <button class="btn-alert" use:tooltip={'Error Button Styling'}
-            >Purge Cache</button
+            Upgrade Core
+          </button>
+          <button
+            class="btn-system"
+            onclick={() => {
+              toast.show('Running system diagnostics...', 'loading');
+            }}
           >
-          <button use:tooltip={'Standard Button Styling'}>
+            Diagnostics
+          </button>
+          <button
+            class="btn-signal"
+            use:tooltip={'Success Button Styling'}
+            onclick={() => {
+              toast.show('Connection Established Successfully!', 'success');
+            }}
+          >
+            Secure Channel
+          </button>
+          <button
+            class="btn-alert"
+            use:tooltip={'Error Button Styling'}
+            onclick={() => {
+              toast.show('Cache Purge Failed!', 'error');
+            }}
+          >
+            Purge Cache
+          </button>
+          <button
+            use:tooltip={'Standard Button Styling'}
+            onclick={() => {
+              toast.show('Default action executed.', 'info');
+            }}
+          >
             Default Action
           </button>
           <button disabled>Offline</button>

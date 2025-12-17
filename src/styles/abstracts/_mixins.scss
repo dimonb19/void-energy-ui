@@ -227,6 +227,8 @@
       );
       // Slight transparency echoes CRT phosphor.
       opacity: 0.8;
+      // Sharp stepping for retro feel.
+      animation-timing-function: steps(64);
     }
   }
 

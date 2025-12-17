@@ -1,0 +1,185 @@
+/*
+ * ROLE: Toast Notification Physics
+ * RESPONSIBILITY: Minimalist Text Capsules with Micro-Indicators
+ */
+
+@use '../abstracts' as *;
+@use '../utils/animations';
+@use 'buttons';
+
+// ==========================================================================
+// 1. REGION & LAYOUT
+// ==========================================================================
+.toast-region {
+  position: fixed;
+  z-index: z('toast');
+  top: var(--space-md);
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  flex-direction: column-reverse; // Newest at bottom visually
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: none;
+
+  width: auto;
+  max-width: calc(100vw - var(--space-lg));
+}
+
+// ==========================================================================
+// 2. THE CAPSULE (Surface)
+// ==========================================================================
+.toast-message {
+  @extend .btn-void; // Base button reset
+
+  // --- A. Physics (Glass Capsule) ---
+  @include glass-float;
+  pointer-events: auto;
+
+  // Layout
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem; // separation between icon and text
+
+  // Padding: Slightly less on the left because the icon adds visual weight
+  padding: 0.5rem 1.1rem 0.5rem 0.9rem;
+
+  // Shape: Full Pill
+  border-radius: 999px;
+
+  // --- B. Semantic Mapping ---
+  // Maps notification types to system colors
+  --toast-accent: var(--color-system);
+  &[data-type='success'] {
+    --toast-accent: var(--color-success);
+  }
+  &[data-type='error'] {
+    --toast-accent: var(--color-error);
+  }
+  &[data-type='warning'] {
+    --toast-accent: var(--color-premium);
+  }
+  &[data-type='loading'] {
+    --toast-accent: var(--text-mute);
+  }
+
+  // --- C. The Holographic Glow ---
+  // Subtle border and ambient glow based on the accent color
+  border: 1px solid alpha(var(--toast-accent), 25%) !important;
+  box-shadow:
+    0 4px 15px -5px rgba(0, 0, 0, 0.5),
+    // Depth
+    0 0 10px -4px alpha(var(--toast-accent), 40%); // Signal
+
+  // Motion
+  transition: all var(--speed-fast) var(--ease-snap);
+
+  // Hover Effect: Lift & Brighten
+  &:hover {
+    border-color: alpha(var(--toast-accent), 50%) !important;
+    box-shadow:
+      0 6px 20px -5px rgba(0, 0, 0, 0.6),
+      0 0 15px -4px alpha(var(--toast-accent), 60%);
+  }
+
+  // --- D. PHYSICS OVERRIDES ---
+
+  // 1. RETRO (Terminal)
+  @at-root [data-physics='retro'] & {
+    &[data-type='loading'] {
+      --toast-accent: var(--text-main);
+    }
+
+    border-radius: 0;
+    background: blend(var(--bg-canvas), var(--toast-accent), 10%);
+    border: 2px solid var(--toast-accent) !important;
+    box-shadow: 4px 4px 0 var(--bg-sink); // Hard shadow
+
+    &:hover {
+      background: blend(var(--bg-canvas), var(--toast-accent), 15%);
+    }
+  }
+
+  // 2. FLAT (Paper/Light)
+  @at-root [data-mode='light'] & {
+    background: blend(var(--bg-surface), var(--toast-accent), 5%);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    color: var(--text-main);
+
+    &:hover {
+      background: blend(var(--bg-surface), var(--toast-accent), 10%);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  // 3. GLASS (Default)
+  @at-root [data-physics='glass'] & {
+    // Tint the glass slightly with the accent color
+    background: blend(var(--bg-surface), var(--toast-accent), 15%);
+  }
+}
+
+// ==========================================================================
+// 3. ICONS & LOADER (Micro-Indicators)
+// ==========================================================================
+
+.toast-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1em; // Emojis look better slightly larger
+  line-height: 1;
+  width: 1.2em;
+  height: 1.2em;
+
+  // Ensure icons don't shrink if text is long
+  flex-shrink: 0;
+}
+
+// The Quantum Spin Loader (Tiny & Precise)
+.spin-loader {
+  width: 1em;
+  height: 1em;
+  animation: rotate 1s linear infinite;
+  background-color: unset;
+
+  .track {
+    fill: none;
+    stroke: var(--text-mute);
+    stroke-width: 2px;
+    opacity: 0.2;
+  }
+
+  .car {
+    fill: none;
+    stroke: var(--text-main);
+    stroke-width: 2px;
+    stroke-dasharray: 10 20;
+    stroke-linecap: round;
+  }
+
+  // Retro Loader Override
+  @at-root [data-physics='retro'] & {
+    animation-timing-function: steps(8);
+  }
+}
+
+// ==========================================================================
+// 4. CONTENT
+// ==========================================================================
+.toast-text {
+  position: relative;
+  z-index: 1;
+
+  color: var(--text-main);
+
+  // Retro Font Override
+  @at-root [data-physics='retro'] & {
+    font-family: var(--font-code);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
