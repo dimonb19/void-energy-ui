@@ -25,6 +25,8 @@
 
    ========================================================================== */
 
+import THEME_REGISTRY from '../config/void-registry.json';
+
 export type VoidPhysics = 'glass' | 'flat' | 'retro';
 export type VoidMode = 'light' | 'dark';
 export type VoidDensity = 'high' | 'standard' | 'low';
@@ -35,29 +37,15 @@ interface EngineOptions {
   onError?: ErrorHandler;
 }
 
-interface ThemeConfig {
+// --- FIX: Restored Interface ---
+export interface ThemeConfig {
   physics: VoidPhysics;
   mode: VoidMode;
 }
 
-// Triad lookup mapping atmospheres to Physics and Mode semantics.
-const THEME_CONFIG: Record<string, ThemeConfig> = {
-  // System
-  void: { physics: 'glass', mode: 'dark' },
-  onyx: { physics: 'glass', mode: 'dark' },
-  terminal: { physics: 'retro', mode: 'dark' },
-  // Narrative
-  crimson: { physics: 'glass', mode: 'dark' },
-  overgrowth: { physics: 'glass', mode: 'dark' },
-  velvet: { physics: 'glass', mode: 'dark' },
-  solar: { physics: 'flat', mode: 'dark' },
-  nebula: { physics: 'glass', mode: 'dark' },
-  paper: { physics: 'flat', mode: 'light' },
-  // Utility
-  laboratory: { physics: 'flat', mode: 'light' },
-  playground: { physics: 'flat', mode: 'light' },
-  focus: { physics: 'flat', mode: 'light' },
-};
+// Type the registry using the interface
+type Registry = Record<string, ThemeConfig>;
+const REGISTRY = THEME_REGISTRY as Registry;
 
 // DENSITY MAPS (matches src/styles/config/_user-themes.scss)
 const DENSITY_MAPS = {
@@ -123,7 +111,7 @@ export class VoidEngine {
 
   private init(): void {
     const stored = localStorage.getItem(KEYS.ATMOSPHERE);
-    if (stored && THEME_CONFIG[stored]) {
+    if (stored && REGISTRY[stored]) {
       this.setAtmosphere(stored);
     } else {
       // Set attributes even when falling back to the default atmosphere.
@@ -144,7 +132,7 @@ export class VoidEngine {
 
   // Validation helper used by adapters before attempting a switch.
   public hasTheme(name: string): boolean {
-    return !!THEME_CONFIG[name];
+    return !!REGISTRY[name];
   }
 
   /**
@@ -153,8 +141,8 @@ export class VoidEngine {
    */
   public setAtmosphere(name: string): void {
     // Guard against unknown atmospheres before mutating state.
-    if (!THEME_CONFIG[name]) {
-      const errorMsg = `Void Engine: Atmosphere "${name}" is not registered in THEME_CONFIG.`;
+    if (!REGISTRY[name]) {
+      const errorMsg = `Void Engine: Atmosphere "${name}" is not registered in REGISTRY.`;
 
       // Surface to host application if it provided telemetry hooks.
       if (this.onError) {
@@ -164,14 +152,14 @@ export class VoidEngine {
 
       // Default behavior: Descriptive error + controlled fallback.
       console.error(
-        `${errorMsg} Falling back to 'void'. Available themes: ${Object.keys(THEME_CONFIG).join(', ')}`,
+        `${errorMsg} Falling back to 'void'. Available themes: ${Object.keys(REGISTRY).join(', ')}`,
       );
       name = 'void';
     }
 
     // State update
     this.atmosphere = name;
-    const config = THEME_CONFIG[name];
+    const config = REGISTRY[name];
 
     // DOM Updates (The Triad)
     if (typeof document !== 'undefined') {
@@ -215,7 +203,8 @@ export class VoidEngine {
    */
   public getConfig(name?: string): ThemeConfig {
     const target = name || this.atmosphere;
-    return THEME_CONFIG[target] || THEME_CONFIG['void'];
+    // Returns the explicit config or the void default
+    return REGISTRY[target] || REGISTRY['void'];
   }
 
   // Update User Preferences

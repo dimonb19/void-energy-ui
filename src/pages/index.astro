@@ -4,6 +4,8 @@ import '../styles/global.scss';
 import VoidEnergyUI from '../components/index.svelte';
 import Modal from '../components/Modal.svelte';
 import Toast from '../components/Toast.svelte';
+
+import themeRegistry from '../config/void-registry.json';
 ---
 
 <!doctype html>
@@ -13,7 +15,7 @@ import Toast from '../components/Toast.svelte';
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Void Energy UI</title>
 
-    <script is:inline>
+    <script is:inline define:vars={{ THEMES: themeRegistry }}>
       (function () {
         try {
           const root = document.documentElement;
@@ -22,22 +24,20 @@ import Toast from '../components/Toast.svelte';
           // ----------------------------------------------------------------
           // 1. RESTORE ATMOSPHERE & PHYSICS (The Triad)
           // ----------------------------------------------------------------
+          // Get the saved name (e.g., 'playground'), default to 'void'
           const savedAtmosphere = store.getItem('void_atmosphere') || 'void';
-          root.setAttribute('data-atmosphere', savedAtmosphere);
 
-          // Manually derive physics/mode here because the TS Engine hasn't loaded yet.
-          let physics = 'glass';
-          let mode = 'dark';
+          // Check the injected THEMES object directly.
+          // If 'playground' exists in JSON, we use it. If not, fallback to 'void'.
+          const activeTheme = THEMES[savedAtmosphere]
+            ? savedAtmosphere
+            : 'void';
+          const config = THEMES[activeTheme];
 
-          if (savedAtmosphere === 'terminal') {
-            physics = 'retro';
-          } else if (['paper', 'laboratory'].includes(savedAtmosphere)) {
-            physics = 'flat';
-            mode = 'light';
-          }
-
-          root.setAttribute('data-physics', physics);
-          root.setAttribute('data-mode', mode);
+          // Apply the Triad attributes immediately
+          root.setAttribute('data-atmosphere', activeTheme);
+          root.setAttribute('data-physics', config.physics);
+          root.setAttribute('data-mode', config.mode);
 
           // ----------------------------------------------------------------
           // 2. RESTORE USER CONFIG (Fonts & Scale)
@@ -45,35 +45,45 @@ import Toast from '../components/Toast.svelte';
           const rawConfig = store.getItem('void_user_config');
 
           if (rawConfig) {
-            const config = JSON.parse(rawConfig);
+            const userPrefs = JSON.parse(rawConfig);
 
-            // Restore Scale
-            if (config.scale) {
-              // Clamp to safe limits just in case
-              const safeScale = Math.min(Math.max(config.scale, 0.75), 2);
+            // Restore Scale (Clamped for safety)
+            if (userPrefs.scale) {
+              const safeScale = Math.min(Math.max(userPrefs.scale, 0.75), 2);
               root.style.setProperty('--text-scale', safeScale);
             }
 
-            // Restore Body Font
-            if (config.fontBody) {
-              root.style.setProperty('--user-font-body', config.fontBody);
+            // Restore Custom Fonts
+            if (userPrefs.fontBody) {
+              root.style.setProperty('--user-font-body', userPrefs.fontBody);
+            }
+            if (userPrefs.fontHeading) {
+              root.style.setProperty(
+                '--user-font-heading',
+                userPrefs.fontHeading
+              );
             }
 
-            // Restore Heading Font
-            if (config.fontHeading) {
-              root.style.setProperty('--user-font-heading', config.fontHeading);
+            // Restore Density (Optional, prevents layout shift on high/low density)
+            if (userPrefs.density && userPrefs.density !== 'standard') {
+              // If you have DENSITY_MAPS available here, apply them.
+              // Otherwise, the engine will catch up in a split second.
+              // Usually, scale is the most important visual factor to restore instantly.
             }
           }
         } catch (e) {
-          // If JSON parse fails or storage is blocked, we fail silently.
-          // The CSS default variables will take over.
-          console.warn('Void Energy hydration script failed:', e);
+          // Fail Safe: If JSON fails, force the default Void theme
+          console.warn('Void Energy hydration failed:', e);
+          document.documentElement.setAttribute('data-atmosphere', 'void');
+          document.documentElement.setAttribute('data-physics', 'glass');
+          document.documentElement.setAttribute('data-mode', 'dark');
         }
       })();
     </script>
   </head>
   <body>
     <VoidEnergyUI client:load />
+
     <Modal client:load />
     <Toast client:load />
   </body>
