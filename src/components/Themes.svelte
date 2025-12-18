@@ -22,11 +22,11 @@
       class="theme-option w-full flex items-center gap-sm p-xs rounded-sm text-dim text-left"
       role="option"
       aria-selected={theme.atmosphere === atm.id}
+      data-atmosphere={atm.id}
       onclick={() => selectTheme(atm.id)}
     >
       <div
         class="theme-orb relative flex items-center justify-center"
-        data-atmosphere={atm.id}
         aria-hidden="true"
       >
         <div class="orb-planet absolute inset-0 rounded-full"></div>
@@ -50,34 +50,33 @@
 
     .theme-option {
       position: relative;
-    }
-  }
 
-  // 3. ORB PHYSICS (Must be SCSS to access scoped variables)
-  .theme-orb {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    // Isolate the orb's "space" from the list item background
-    background: var(--bg-sink);
-    overflow: hidden;
+      .theme-orb {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        // Isolate the orb's "space" from the list item background
+        background: var(--bg-sink);
+        overflow: hidden;
 
-    .orb-planet {
-      width: 100%;
-      height: 100%;
-      // Scoped: Reads the atmosphere's canvas color
-      background: var(--bg-canvas);
-      border: var(--physics-border-width) solid var(--border-highlight);
-    }
+        .orb-planet {
+          width: 100%;
+          height: 100%;
+          // Scoped: Reads the atmosphere's canvas color
+          background: var(--bg-canvas);
+          border: var(--physics-border-width) solid var(--border-highlight);
+        }
 
-    .orb-core {
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      // Scoped: Reads the atmosphere's primary energy
-      background: var(--energy-primary);
-      box-shadow: 0 0 6px var(--energy-primary);
-      z-index: 1;
+        .orb-core {
+          position: absolute;
+          width: 12px;
+          height: 12px;
+          // Scoped: Reads the atmosphere's primary energy
+          background: var(--energy-primary);
+          box-shadow: 0 0 6px var(--energy-primary);
+          z-index: 1;
+        }
+      }
     }
   }
 </style>
