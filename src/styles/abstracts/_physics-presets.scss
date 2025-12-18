@@ -57,7 +57,7 @@ $physics-presets: (
       'border-opacity': 1,
       'border-mode': 'directional',
       // Top border catches light, bottom casts shadow
-      'void-shadow': 0 10px 30px rgba(0, 0, 0, 0.5),
+      'void-shadow': 0 4px 16px rgba(0, 0, 0, 0.5),
       // TIME & MOTION (The Triad of Movement)
       'speed-base': 0.3s,
       // 1. Stabilize: Starts fast, overshoot slightly, settles gently (Entry)

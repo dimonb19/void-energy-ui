@@ -253,7 +253,7 @@
 
         <div class="flex flex-row flex-wrap justify-center gap-sm">
           <button
-            class="btn-orb"
+            class="btn-premium"
             onclick={() => {
               toast.show('No permission to upgrade core', 'warning');
             }}
@@ -526,7 +526,7 @@
     <h2 class="container">05 // RECENT ANOMALIES</h2>
 
     <div class="tiles-collection">
-      <a href="/" class="tile">
+      <a href="/" class="tile" onclick={(e) => e.preventDefault()}>
         <img
           src="https://media.dgrslabs.ink/conexus-sections/dischordiansaga.avif"
           alt="Cyber"
@@ -539,7 +539,7 @@
         </div>
       </a>
 
-      <a href="/" class="tile">
+      <a href="/" class="tile" onclick={(e) => e.preventDefault()}>
         <img
           src="https://media.dgrslabs.ink/conexus-sections/communitypicks.avif"
           alt="Fluid"
@@ -550,7 +550,7 @@
         </div>
       </a>
 
-      <a href="/" class="tile">
+      <a href="/" class="tile" onclick={(e) => e.preventDefault()}>
         <img
           src="https://media.dgrslabs.ink/conexus-sections/collabs.avif"
           alt="Fluid"
@@ -560,7 +560,7 @@
         </div>
       </a>
 
-      <a href="/" class="tile">
+      <a href="/" class="tile" onclick={(e) => e.preventDefault()}>
         <img
           src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop"
           alt="Abstract"
