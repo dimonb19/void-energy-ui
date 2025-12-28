@@ -48,29 +48,51 @@
 
 import { flip } from 'svelte/animate';
 import { cubicOut, cubicIn } from 'svelte/easing';
+import { theme } from '../adapters/themes.svelte';
+import THEME_REGISTRY from '../config/void-registry.json';
 
-/* --- HELPER: Read the Physics Engine --- */
-function getSystemConfig(node: Element) {
-  const style = getComputedStyle(node);
-  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Type definition for Registry to ensure strict lookup
+type Registry = Record<string, { physics: string; mode: string }>;
+const REGISTRY = THEME_REGISTRY as Registry;
 
-  // 1. READ SEMANTIC TOKENS
-  const speedVal = style.getPropertyValue('--speed-base').trim();
-  const speedBase = speedVal ? parseFloat(speedVal) * 1000 : 300; // [cite: 176]
+// --------------------------------------------------------------------------
+// PHYSICS CONSTANTS (Mirrors src/styles/abstracts/_physics-presets.scss)
+// --------------------------------------------------------------------------
+// We mirror the SCSS tokens here to avoid `getComputedStyle` layout thrashing.
+const PHYSICS_SPECS: Record<string, { speedBase: number; speedFast: number; blur: number }> = {
+  glass: { speedBase: 300, speedFast: 200, blur: 20 },
+  flat:  { speedBase: 200, speedFast: 133, blur: 0 },  // flat is ~0.66x of base
+  retro: { speedBase: 0,   speedFast: 0,   blur: 0 }
+};
 
-  const speedFastVal = style.getPropertyValue('--speed-fast').trim();
-  const speedFast = speedFastVal ? parseFloat(speedFastVal) * 1000 : 200; // [cite: 177]
+/* --- HELPER: Read the Physics Engine (Zero-Reflow) --- */
+function getSystemConfig() {
+  // 1. READ ENVIRONMENT
+  const reducedMotion = typeof matchMedia !== 'undefined' 
+    ? matchMedia('(prefers-reduced-motion: reduce)').matches 
+    : false;
 
-  // 2. READ PHYSICS STATE
-  const blurVal = style.getPropertyValue('--physics-blur') || '0px';
-  const blurInt = parseInt(blurVal) || 0; // [cite: 178]
+  // 2. READ GLOBAL STATE (The Triad)
+  // We use the theme adapter to get the current atmosphere explicitly.
+  const currentAtmosphere = theme.atmosphere || 'void';
+  const themeConfig = REGISTRY[currentAtmosphere] || REGISTRY['void'];
+  
+  // 3. DERIVE PHYSICS
+  // Default to 'glass' if configuration is missing
+  const physicsMode = themeConfig.physics || 'glass';
+  const specs = PHYSICS_SPECS[physicsMode] || PHYSICS_SPECS['glass'];
 
-  // 3. DETERMINE REALITY
-  const physicsMode = document.documentElement.getAttribute('data-physics'); // [cite: 179]
   const isRetro = physicsMode === 'retro';
-  const isFlat = physicsMode === 'flat'; // Distinct check for Flat
+  const isFlat = physicsMode === 'flat';
 
-  return { speedBase, speedFast, blurInt, isRetro, isFlat, reducedMotion };
+  return { 
+    speedBase: specs.speedBase, 
+    speedFast: specs.speedFast, 
+    blurInt: specs.blur, 
+    isRetro, 
+    isFlat, 
+    reducedMotion 
+  };
 }
 
 /**
@@ -84,17 +106,17 @@ export function live(
   { from, to }: { from: DOMRect; to: DOMRect },
   params: any = {},
 ) {
-  const { isRetro } = getSystemConfig(node);
+  const { isRetro } = getSystemConfig();
 
   // RETRO: Robotic Quantization
-  const steppedEasing = (t: number) => Math.floor(t * 4) / 4; // [cite: 184]
+  const steppedEasing = (t: number) => Math.floor(t * 4) / 4;
 
   return flip(
     node,
     { from, to },
     {
       duration: params.duration ?? 300,
-      easing: isRetro ? steppedEasing : cubicOut, // Default to Smooth Cubic for both Glass & Flat
+      easing: isRetro ? steppedEasing : cubicOut,
       ...params,
     },
   );
@@ -110,33 +132,29 @@ export function materialize(
   node: HTMLElement,
   { delay = 0, duration = null, y = 15 } = {},
 ) {
-  const { speedBase, blurInt, isRetro, isFlat, reducedMotion } =
-    getSystemConfig(node);
+  const { speedBase, blurInt, isRetro, isFlat, reducedMotion } = getSystemConfig();
 
   // A. RETRO / REDUCED (Instant)
   if (reducedMotion || isRetro) {
     return {
       delay,
       duration: isRetro ? 0 : 300,
-      css: (t: number) => `opacity: ${t};`, // [cite: 190]
+      css: (t: number) => `opacity: ${t};`,
     };
   }
 
   // B. SMOOTH PHYSICS (Glass & Flat)
-  // We use the same 'fluid' scale logic for both to ensure smoothness.
-  // The difference is strictly in the FILTER (Blur vs No Blur).
   return {
     delay,
-    duration: duration ?? speedBase, // [cite: 192]
-    easing: cubicOut, // The "Smooth" Standard
+    duration: duration ?? speedBase,
+    easing: cubicOut,
     css: (t: number, u: number) => {
       // Logic: Glass gets blur. Flat gets 0px blur.
-      // We calculate blur dynamically. If isFlat, blurInt is usually 0 anyway from CSS,
-      // but we force it here to be safe.
-      const activeBlur = isFlat ? 0 : Math.max(0, blurInt * (u * 2 - 1)); // [cite: 193]
+      // We calculate blur dynamically based on the u (inverse time)
+      const activeBlur = isFlat ? 0 : Math.max(0, blurInt * (u * 2 - 1));
 
       return `
-        transform: translateY(${u * y}px) scale(${0.96 + 0.04 * t}); 
+        transform: translateY(${u * y}px) scale(${0.96 + 0.04 * t});
         opacity: ${t};
         filter: blur(${activeBlur}px);
       `;
@@ -154,38 +172,34 @@ export function singularity(
   node: HTMLElement,
   { delay = 0, duration = null } = {},
 ) {
-  const { speedFast, blurInt, isRetro, isFlat, reducedMotion } =
-    getSystemConfig(node);
+  const { speedFast, blurInt, isRetro, isFlat, reducedMotion } = getSystemConfig();
 
   if (reducedMotion || isRetro) {
-    return { duration: 0, css: () => 'opacity: 0;' }; // [cite: 198]
+    return { duration: 0, css: () => 'opacity: 0;' };
   }
 
   // B. FLAT PHYSICS (Clean Wipe)
-  // Flat exits shouldn't "Implode" (flash white), they should just recede.
   if (isFlat) {
     return {
       delay,
       duration: duration ?? speedFast,
       easing: cubicIn,
-      css: (t: number, u: number) => `
-        transform: scale(${0.98 + 0.02 * t}); // Subtle shrink for smoothness
+      css: (t: number) => `
+        transform: scale(${0.98 + 0.02 * t});
         opacity: ${t};
       `,
     };
   }
 
   // C. GLASS PHYSICS (Implosion)
-  // Keeps the "Flash" and heavy blur.
   return {
     delay,
     duration: duration ?? speedFast,
     easing: cubicIn,
     css: (t: number, u: number) => {
-      const scale = 0.9 + 0.1 * t; // [cite: 200]
-      const brightness = 1 + u * 2; // Flash effect [cite: 201]
+      const scale = 0.9 + 0.1 * t;
+      const brightness = 1 + u * 2; // Flash effect
       const blur = blurInt * u;
-
       return `
         transform: scale(${scale});
         opacity: ${t};
@@ -197,11 +211,12 @@ export function singularity(
 
 /**
  * ==========================================================================
- * 3. GLITCH (Unchanged)
+ * 3. GLITCH (Effect)
  * ==========================================================================
  */
 export function glitch(node: HTMLElement, { delay = 0, duration = null } = {}) {
-  const { speedFast, isRetro, reducedMotion } = getSystemConfig(node);
+  const { speedFast, isRetro, reducedMotion } = getSystemConfig();
+
   if (reducedMotion) return { duration: 0, css: () => '' };
 
   return {
@@ -213,7 +228,7 @@ export function glitch(node: HTMLElement, { delay = 0, duration = null } = {}) {
         return `
            clip-path: polygon(0 0, 100% 0, 100% ${clipVal}%, 0 ${clipVal}%);
            opacity: ${Math.random() > 0.5 ? 1 : 0.5};
-         `; // [cite: 209]
+         `;
       }
       const activeSkew = 1 - t > 0.2 ? (t * 20) % 5 : 0;
       const clipHeight = t * 100;
@@ -221,7 +236,7 @@ export function glitch(node: HTMLElement, { delay = 0, duration = null } = {}) {
         clip-path: polygon(0 0, 100% 0, 100% ${clipHeight}%, 0 ${clipHeight}%);
         transform: skewX(${activeSkew}deg);
         opacity: ${t};
-      `; // [cite: 212]
+      `;
     },
   };
 }
@@ -235,12 +250,11 @@ export function dematerialize(
   node: HTMLElement,
   { delay = 0, duration = null, y = -20 } = {},
 ) {
-  const { speedBase, blurInt, isRetro, isFlat, reducedMotion } =
-    getSystemConfig(node);
+  const { speedBase, blurInt, isRetro, isFlat, reducedMotion } = getSystemConfig();
 
   if (reducedMotion) return { duration: 0, css: () => 'opacity: 0;' };
 
-  // A. RETRO: Data Dissolve (Unchanged)
+  // A. RETRO: Data Dissolve
   if (isRetro) {
     return {
       delay,
@@ -261,17 +275,11 @@ export function dematerialize(
   return {
     delay,
     duration: duration ?? speedBase,
-    easing: cubicIn, // Accelerate out
+    easing: cubicIn,
     css: (t: number, u: number) => {
       const currentBlur = isFlat ? 0 : blurInt * u;
-
-      // FIX 1: Linear Opacity
-      // We removed Math.pow(t, 0.5). Now it fades perfectly in sync with the movement.
-      const opacity = t;
-
-      // FIX 2: CSS Safety
-      // We add 'transition: none' to ensure global CSS styles (like on .btn)
-      // don't fight the Svelte animation frame updates.
+      const opacity = t; // Linear opacity
+      
       return `
         transition: none;
         transform: translateY(${u * y}px) scale(${1 - u * 0.05});
@@ -282,17 +290,23 @@ export function dematerialize(
   };
 }
 
-// Implode remains largely the same, focusing on layout collapsing
+/**
+ * ==========================================================================
+ * 5. IMPLODE (Layout Collapse)
+ * NOTE: This relies on Computed Styles for geometry, but runs ONCE at start.
+ * ==========================================================================
+ */
 export function implode(
   node: HTMLElement,
   { delay = 0, duration = null } = {},
 ) {
+  // We use the non-DOM config for timing/physics.
   const style = getComputedStyle(node);
   const width = parseFloat(style.width);
   const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
-  const padding =
-    parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
-  const { speedFast, isRetro, reducedMotion } = getSystemConfig(node);
+  const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
+  
+  const { speedFast, isRetro, reducedMotion } = getSystemConfig();
 
   if (reducedMotion) return { duration: 0, css: () => 'opacity: 0; width: 0;' };
 
