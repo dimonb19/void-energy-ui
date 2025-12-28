@@ -1,10 +1,36 @@
 /*
  * ROLE: Global reset and canvas conditioning.
- * RESPONSIBILITY: Primes the Void canvas, typography, and interaction defaults so Triad attributes render consistently across browsers.
+ * RESPONSIBILITY: Primes the Void canvas and spacing engine.
  */
 
 @use '../abstracts' as *;
 @use 'typography' as *;
+
+// =========================================
+// 0. THE DENSITY ENGINE (Bulletproofed)
+// =========================================
+:root {
+  // The Base Unit (4px)
+  --unit: 0.25rem;
+
+  // The Calculated Scale
+  // We use var(--density, 1) to prevent "Invalid Property" errors if the variable is unset.
+  --space-xs: calc(2 * var(--unit) * var(--density, 1)); // 8px
+  --space-sm: calc(4 * var(--unit) * var(--density, 1)); // 16px
+  --space-md: calc(6 * var(--unit) * var(--density, 1)); // 24px
+  --space-lg: calc(8 * var(--unit) * var(--density, 1)); // 32px
+  --space-xl: calc(12 * var(--unit) * var(--density, 1)); // 48px
+  --space-2xl: calc(16 * var(--unit) * var(--density, 1)); // 64px
+
+  // Radius Defaults
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  --text-scale: 1;
+}
 
 /* =========================================
    1. BOX SIZING & DEFAULTS
@@ -15,92 +41,74 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  // Inherit atmosphere typography so native controls stay aligned with Semantic Tokens.
   font-family: inherit;
 }
 
 /* =========================================
-   2. THE VOID CANVAS (HTML/BODY)
+   2. THE VOID CANVAS
    ========================================= */
 html {
-  // --- LAYOUT & SCROLL ---
   scroll-behavior: smooth;
-  overscroll-behavior-y: none; // Interaction guard to block mobile pull-to-refresh
+  overscroll-behavior-y: none;
   padding-block: 0;
-  overflow-x: hidden; // Glow halos should not introduce lateral scroll
+  overflow-x: hidden;
 
-  // --- APPEARANCE ---
-  // Canvas fallback for browsers without gradient support.
   background-color: var(--bg-canvas);
-
-  // Radial gradient simulates overhead light to anchor the Atmosphere context.
   background-image: radial-gradient(
     circle at 50% 0%,
     var(--bg-spotlight) 0%,
     var(--bg-canvas) 85%
   );
-
-  // Fix the background to support parallax-style motion without jitter.
   background-attachment: fixed;
   background-size: cover;
   background-repeat: no-repeat;
 
-  // --- TYPOGRAPHY INITIALIZATION ---
-  // Initialize semantic typography before component-level overrides.
-  @include typography('body');
+  @media (pointer: coarse) {
+    background-attachment: scroll; // Disables parallax on mobile to fix jitter
+  }
 
-  // Text luminance defaults to Layer 2 for comfortable reading.
+  @include typography('body');
   color: var(--text-dim);
+
   transition:
     background-color var(--speed-base) var(--ease-flow),
     color var(--speed-base) var(--ease-flow);
 
-  // Rendering & Spacing
-  -webkit-font-smoothing: antialiased; // Keeps neon edges crisp
+  -webkit-font-smoothing: antialiased;
   text-align: left;
   letter-spacing: 0.015rem;
   word-spacing: 0.05em;
 
-  // --- ELECTRIC SCROLLBAR ---
   &::-webkit-scrollbar {
-    width: 6px; // Intentional, minimal rail
+    width: 6px;
     height: 6px;
   }
-
   &::-webkit-scrollbar-track {
-    background: var(--bg-sink); // Sunk track matches recessed surfaces
+    background: var(--bg-sink);
   }
-
   &::-webkit-scrollbar-thumb {
-    background: var(
-      --energy-secondary
-    ); // Structural color to show motion lanes
+    background: var(--energy-secondary);
     border-radius: 3px;
     opacity: 0.5;
   }
-
   &::-webkit-scrollbar-thumb:hover {
-    background: var(--energy-primary); // Energized interaction cue
+    background: var(--energy-primary);
   }
 }
 
-// Maintain full-height layout when no other containers enforce it.
 body {
   min-height: 100vh;
 }
 
 /* =========================================
-   3. GLOBAL SELECTION STATE
+   3. GLOBAL INTERACTION
    ========================================= */
 ::selection {
-  background: var(--energy-primary); // Selection reflects active energy channel
-  color: var(--bg-canvas); // Preserve contrast against energized background
+  background: var(--energy-primary);
+  color: var(--bg-canvas);
   text-shadow: none;
 }
 
-/* =========================================
-   4. INTERACTIVE ELEMENTS
-   ========================================= */
 a,
 button,
 [role='button'],
@@ -112,17 +120,9 @@ textarea {
   background: transparent;
   color: inherit;
   font-family: inherit;
-
-  // Restrict transitions to composite-friendly properties to avoid layout thrash.
-  transition:
-    color var(--speed-fast) var(--ease-flow),
-    opacity var(--speed-fast) var(--ease-flow),
-    border-color var(--speed-fast) var(--ease-snap),
-    box-shadow var(--speed-fast) var(--ease-snap),
-    transform var(--speed-fast) var(--ease-stabilize);
+  transition: all var(--speed-fast) var(--ease-flow);
 
   &:focus-visible {
-    // Focus states snap to Primary Energy to reveal interaction focus.
     outline: var(--physics-border-width) solid var(--energy-primary);
     box-shadow: 0 0 8px var(--energy-primary);
     z-index: z('base');
@@ -135,30 +135,19 @@ button,
   cursor: pointer;
 }
 
-/* =========================================
-   5. DISABLED STATES (Void Logic)
-   ========================================= */
+// Disabled Logic
 button:disabled,
 input:disabled,
 select:disabled,
 textarea:disabled {
   cursor: not-allowed;
   opacity: 0.5;
-
-  // Disabled surfaces sink into the canvas to telegraph inactive depth.
   background-color: var(--bg-sink);
   border: var(--physics-border-width) solid var(--border-shadow);
   color: var(--text-mute);
 }
 
-/* =========================================
-   6. MEDIA & LISTS
-   ========================================= */
-ul,
-ol {
-  list-style: none;
-}
-
+// Media
 img,
 picture,
 video,
@@ -167,13 +156,13 @@ svg {
   display: block;
   max-width: 100%;
   height: auto;
-  // Provide a stable backdrop if media fails to load.
   background-color: var(--bg-sink);
 }
 
-/* =========================================
-   7. VOID SPECIFIC ELEMENTS
-   ========================================= */
+ul,
+ol {
+  list-style: none;
+}
 
 // Dividers
 hr {
@@ -184,167 +173,9 @@ hr {
   margin: 1.5rem 0;
 }
 
-// Code blocks (Sunk Surfaces)
-code,
-pre {
-  // Use abstract variable or fallback to mono
-  font-family: $font-code;
-
-  // "Inner Sink" shadow logic
-  background: var(--bg-sink);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.5);
-
-  // "High Energy" Data Flow
-  color: var(--energy-primary);
-
-  padding: 0.2em 0.4em;
-  border-radius: 4px;
-}
-
-pre {
-  padding: 1rem;
-  overflow-x: auto;
-
-  code {
-    background: transparent;
-    box-shadow: none;
-    padding: 0;
-    color: inherit;
-  }
-}
-
-/* =========================================
-   8. SEMANTIC TYPOGRAPHY DEFAULTS
-   ========================================= */
-// Note: _typography.scss handles the sizes via mixins.
-// These are just browser defaults for semantic tags.
-
-:where(h1, h2, h3, h4, h5) {
-  // Headers are Layer 1 (Active/White)
-  color: var(--text-main);
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-p {
-  // Paragraphs are Layer 2
-  color: var(--text-dim);
-  line-height: 1.6;
-}
-
-small {
-  color: var(--text-mute);
-}
-
-@include mobile-only {
-  @at-root [data-physics='glass'] {
-    // Reduce blur on mobile hardware to avoid overdraw.
-    --physics-blur: 8px !important;
-  }
-}
-
-// Reduced motion compliance: collapse physics and timers when requested.
-@media (prefers-reduced-motion: reduce) {
-  :root {
-    // Disable timing variables so transitions resolve instantly.
-    --speed-base: 0s !important;
-    --speed-fast: 0s !important;
-
-    // Flatten physics to avoid blur-induced discomfort.
-    --physics-blur: 0px !important;
-    --glow-strength: 0 !important; // Stop pulsing glows
-  }
-
-  // Force system-wide animation halt.
-  *,
-  *::before,
-  *::after {
-    // Snap everything instantly
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-
-    // Stop specific continuous animations
-    animation-play-state: paused !important;
-  }
-
-  // Provide static fallbacks for complex animations.
-  .btn-cta::before {
-    // Freeze the rotating laser and default to a solid border.
-    background: var(--energy-primary) !important;
-    opacity: 0.2;
-  }
-
-  .shimmer {
-    // Replace moving gradient with static fill.
-    background-image: none !important;
-    background-color: var(--bg-sink);
-  }
-}
-
-// High-contrast compliance: solidify surfaces, flatten blur/glow, and align text colors.
-@media (prefers-contrast: more) {
-  :root {
-    // Text tiers converge for stronger legibility.
-    --text-dim: var(--text-main) !important;
-    --text-mute: var(--text-main) !important;
-
-    // Reduce translucency/blur to keep edges crisp.
-    --bg-surface: var(--bg-spotlight) !important;
-    --bg-sink: var(--bg-canvas) !important;
-    --physics-blur: 0px !important;
-    --glow-strength: 0 !important;
-
-    // Sharper borders/shadows for outlines.
-    --border-highlight: color-mix(
-      in srgb,
-      var(--border-highlight) 70%,
-      var(--text-main) 30%
-    ) !important;
-    --border-shadow: color-mix(
-      in srgb,
-      var(--border-shadow) 70%,
-      var(--text-main) 30%
-    ) !important;
-    --void-shadow: 0 0 0 1px var(--text-main) !important;
-  }
-}
-
-// Forced-colors (Windows High Contrast): defer to system palette and disable ornamental effects.
-@media (forced-colors: active) {
-  :root {
-    color-scheme: light dark;
-    forced-color-adjust: auto;
-
-    // Map core tokens to system colors.
-    --bg-canvas: Canvas !important;
-    --bg-spotlight: Canvas !important;
-    --bg-surface: Canvas !important;
-    --bg-sink: Canvas !important;
-
-    --text-main: CanvasText !important;
-    --text-dim: CanvasText !important;
-    --text-mute: GrayText !important;
-
-    --energy-primary: LinkText !important;
-    --energy-secondary: ButtonText !important;
-    --border-highlight: CanvasText !important;
-    --border-shadow: CanvasText !important;
-
-    // Remove glass/blur/glow that can clash with forced colors.
-    --physics-blur: 0px !important;
-    --glow-strength: 0 !important;
-    --void-shadow: none !important;
-  }
-}
-
-// =========================================
-// MOBILE SAFEGUARDS
-// =========================================
+// Mobile Reset
 @include mobile-only {
   :root {
-    // FORCE reset scale on mobile to prevent layout breakage.
     --text-scale: 1 !important;
   }
 }

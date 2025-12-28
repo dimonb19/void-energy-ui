@@ -3,7 +3,8 @@
   "type": "module",
   "version": "0.0.1",
   "scripts": {
-    "dev": "astro dev",
+    "build:tokens": "tsx scripts/generate-tokens.ts",
+    "dev": "npm run build:tokens && astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
@@ -24,6 +25,7 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "sass-embedded": "^1.93.3"
+    "sass-embedded": "^1.93.3",
+    "tsx": "^4.21.0"
   }
 }

@@ -1,6 +1,6 @@
 /*
- * ROLE: Theme emitter.
- * RESPONSIBILITY: Merge palette maps with Physics presets to produce CSS variables for each atmosphere selector.
+ * ROLE: Theme emitter (Fix for Math Spacing).
+ * RESPONSIBILITY: Merge palette maps with Physics presets to produce CSS variables.
  */
 
 @use 'sass:map';
@@ -20,22 +20,12 @@
   }
 
   $palette: map.get($config, 'palette');
-
   @if $palette == null {
     @warn "No palette provided for theme `#{$name}`. Only physics variables will be set.";
     $palette: ();
   }
 
-  // Check if the theme explicitly defines a custom density map.
-  $theme-density: map.get($config, 'density');
-
-  // If no custom density is provided, use the global default from _variables.scss
-  @if $theme-density == null {
-    $theme-density: $spacing-scale;
-  }
-
   // CALCULATED VALUES (Automation)
-  // We still calculate speed-fast automatically based on the preset's speed-base
   $speed-base: map.get($physics-map, 'speed-base');
   $speed-fast: if($speed-base == 0s, 0s, $speed-base * 0.66);
 
@@ -44,8 +34,6 @@
   );
 
   // MERGE: Physics Preset + Calculated Vars + Color Palette
-  // We NO LONGER overwrite ease-snap/stabilize with ease-base.
-  // We trust the preset.
   $theme-map: map.merge(map.merge($physics-map, $calculated-vars), $palette);
 
   $selector: if($name == 'default', ':root', "[data-atmosphere='#{$name}']");
@@ -55,12 +43,9 @@
   #{$physics-selector} {
     color-scheme: if(map.get($config, 'type') == 'light', light, dark);
 
+    // Output Colors & Physics
     @each $key, $value in $theme-map {
       --#{$key}: #{$value};
-    }
-
-    @each $key, $value in $theme-density {
-      --space-#{$key}: #{$value};
     }
   }
 }

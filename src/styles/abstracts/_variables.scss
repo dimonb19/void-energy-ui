@@ -1,189 +1,14 @@
 /*
  * ROLE: Semantic token definitions.
- * RESPONSIBILITY: Defines palette primitives, typography stacks, depth constants, and responsive scales for the Triad Engine.
+ * RESPONSIBILITY: Defines Sass Maps only. CSS output moved to base/_reset.scss.
  */
 
 @use 'sass:map';
 
-/* =========================================
-   1. VOID ENERGY PALETTE SYSTEM
-   Defines raw palette primitives per Atmosphere. Components consume the emitted CSS variables, not these raw constants.
-   ========================================= */
+// =========================================
+// SASS MAPS (For Loops/Mixins)
+// =========================================
 
-// 1. VOID (Default - Brand Identity)
-$void-canvas: #010020; // Canvas: Deepest Navy edge
-$void-spotlight: #0a0c2b; // Light:  Blue center glow
-$void-glass: rgba(22, 30, 95, 0.4); // Glass:  Floating card base
-$void-primary: #33e2e6; // Energy: Data flow & focus
-$void-structure: #3875fa; // Struct: Borders & stability
-
-// 2. ONYX (Minimal - OLED Dark)
-$onyx-canvas: #0a0a0a; // Canvas: Near black neutral
-$onyx-spotlight: #1c1c1c; // Light:  Soft studio grey
-$onyx-glass: rgba(30, 30, 30, 0.6); // Glass:  Smoked dark glass
-$onyx-primary: #ffffff; // Energy: Pure white light
-$onyx-structure: #a3a3a3; // Struct: Brushed steel/alum
-
-// 3. TERMINAL (Retro - Hacker/Dev)
-$term-canvas: #050505; // Canvas: Vantablack/Off
-$term-spotlight: #141414; // Light:  CRT phosphor burn
-$term-glass: rgba(0, 20, 0, 0.9); // Glass:  Heavy opaque window
-$term-primary: #f5c518; // Energy: Monochrome amber
-$term-structure: #f5c518; // Struct: Same as energy
-
-// 4. CRIMSON (Horror - Dark Red)
-$crimson-canvas: #180808; // Canvas: Dried blood dark
-$crimson-spotlight: #2b0f0f; // Light:  Emergency red
-$crimson-glass: rgba(60, 0, 0, 0.6); // Glass:  Viscous red liquid
-$crimson-primary: #ff6b6b; // Energy: Laser/Warning
-$crimson-structure: #8a0000; // Struct: Dark red steel
-
-// 5. OVERGROWTH (Nature - Toxic Green)
-$nature-canvas: #051a0a; // Canvas: Deep forest night
-$nature-spotlight: #0e2e14; // Light:  Moonlight on leaves
-$nature-glass: rgba(0, 40, 10, 0.5); // Glass:  Bioluminescent moss
-$nature-primary: #39ff14; // Energy: Toxic/Life neon
-$nature-structure: #ffd700; // Struct: Ancient gold relics
-
-// 6. VELVET (Romance - Dark Pink)
-$velvet-canvas: #1a0510; // Canvas: Dark plum velvet
-$velvet-spotlight: #2e0b1d; // Light:  Warm stage spot
-$velvet-glass: rgba(50, 0, 20, 0.5); // Glass:  Rose tinted lens
-$velvet-primary: #ff80a0; // Energy: Bubblegum/Rose neon
-$velvet-structure: #c71585; // Struct: Rich magenta
-
-// 7. SOLAR (Fantasy - Divine/Gold)
-$solar-canvas: #120a00; // Canvas: Deep Bronze/Black
-$solar-spotlight: #2b1d00; // Light:  Torchlight
-$solar-glass: rgba(20, 10, 0, 0.6); // Glass:  Amber Crystal
-$solar-primary: #ffaa00; // Energy: Burning Gold
-$solar-structure: #b8860b; // Struct: Dark Goldenrod
-
-// 8. NEBULA (Arcane - Magic/Synth)
-$nebula-canvas: #0a0014; // Canvas: Void Purple
-$nebula-spotlight: #240046; // Light:  Indigo
-$nebula-glass: rgba(20, 0, 40, 0.6); // Glass:  Dark Amethyst
-$nebula-primary: #d946ef; // Energy: Fuchsia Neon
-$nebula-structure: #8b5cf6; // Struct: Violet
-
-// 9. PAPER (Readability - Warm/Ink)
-$paper-canvas: #faeed1; // Canvas: Warm Parchment
-$paper-spotlight: #fff8e1; // Light:  Sunlit page
-$paper-glass: #fdf6e3; // Glass:  Solid paper card
-$paper-primary: #2c3e50; // Energy: Deep Ink Blue
-$paper-structure: #8d6e63; // Struct: Leather binding/Sepia
-
-// 10. LABORATORY (Clinical - Standard Light)
-$lab-canvas: #f1f5f9; // Canvas: Slate-100 grey
-$lab-spotlight: #ffffff; // Light:  Sterile white
-$lab-glass: #ffffff; // Glass:  Clean surface
-$lab-primary: #005bb5; // Energy: Blueprint blue
-$lab-structure: #64748b; // Struct: Surgical steel
-
-// 11. PLAYGROUND (Kids - Fun/Pastel)
-$play-canvas: #e0f7fa; // Canvas: Pastel Cyan
-$play-spotlight: #ffffff; // Light:  Bright White
-$play-glass: #ffffff; // Glass:  Clean white card
-$play-primary: #ff4081; // Energy: Hot Pink
-$play-structure: #00bcd4; // Struct: Cyan crayon
-
-// 12. FOCUS (Seniors - High Contrast)
-$focus-canvas: #ffffff; // Canvas: Pure White
-$focus-spotlight: #f5f5f5; // Light:  Light Grey
-$focus-glass: #ffffff; // Glass:  Solid White
-$focus-primary: #000000; // Energy: Pure Black
-$focus-structure: #000000; // Struct: Pure Black Borders
-
-/* =========================================
-   2. TYPOGRAPHY STACKS
-   ========================================= */
-$font-tech: 'Hanken Grotesk', sans-serif; // Void
-$font-clean: 'Inter', sans-serif; // Onyx / Focus
-$font-code: 'Courier Prime', monospace; // Terminal
-$font-horror: 'Merriweather', serif; // Crimson
-$font-nature: 'Lora', serif; // Overgrowth
-$font-hand: 'Caveat', cursive; // Velvet
-$font-book: 'PT Serif Caption', serif; // Paper
-$font-arcane: 'Cinzel', serif; // Solar
-$font-mystic: 'Exo 2', sans-serif; // Nebula
-$font-lab: 'Open Sans', sans-serif; // Laboratory
-$font-fun: 'Comic Neue', sans-serif; // Playground
-
-// ==========================================================================
-// SHARED SEMANTIC CONSTANTS (The Logic Layer)
-// ==========================================================================
-
-// 1. DARK MODE SEMANTICS (High Energy / Neon)
-// Used in Void, Crimson, Overgrowth, Velvet, Terminal
-$semantic-dark-premium: #ff8c00; // Orb Orange
-$semantic-dark-system: #a078ff; // Deep Purple
-$semantic-dark-success: #00e055; // Signal Green
-$semantic-dark-error: #ff3c40; // Alert Red
-
-// 2. LIGHT MODE SEMANTICS (High Contrast / Ink)
-// Used EXCLUSIVELY in Paper theme
-$semantic-light-premium: #b45309; // Ochre Ink
-$semantic-light-system: #6d28d9; // Royal Purple Ink
-$semantic-light-success: #15803d; // Emerald Stamp
-$semantic-light-error: #dc2626; // Red Pen Correction
-
-/* =========================================
-   3. DEPTH LOGIC (Z-Index)
-   ========================================= */
-// Based on "Depth is Logic"
-$z-layers: (
-  // Inputs, Sidebars (Carved into void)
-  'sink': -1,
-  // Background Canvas
-  'floor': 0,
-  // Standard content (Text, Images) inside a stacking context
-  'base': 1,
-  // Visual flourishes (Lasers, Borders) sitting on base
-  'decorate': 2,
-  // Cards, Panels (The standard UI layer)
-  'float': 10,
-  // Section Headers that stick
-  'sticky': 20,
-  // Global Navbar
-  'header': 40,
-  // Select menus / Tooltips
-  'dropdown': 50,
-  // The darkened backdrop for modals
-  'overlay': 90,
-  // Holographic Overlays
-  'modal': 100,
-  // System Alerts
-  'toast': 200
-);
-
-// The Accessor Function
-@function z($layer) {
-  @if not map.has-key($z-layers, $layer) {
-    @warn "No layer found for `#{$layer}` in $z-layers map. Property omitted.";
-  }
-  @return map.get($z-layers, $layer);
-}
-
-/* =========================================
-   4. SPACING & LAYOUT
-   ========================================= */
-
-// Semantic spacing scale (T-shirt sizes)
-$spacing-scale: (
-  'xs': 0.5rem,
-  // 8px
-  'sm': 1rem,
-  // 16px
-  'md': 1.5rem,
-  // 24px
-  'lg': 2rem,
-  // 32px
-  'xl': 3rem,
-  // 48px
-  '2xl': 4rem, // 64px
-);
-
-// Semantic radius scale (T-shirt sizes)
 $radius-scale: (
   'sm': 4px,
   'md': 8px,
@@ -192,40 +17,42 @@ $radius-scale: (
   'full': 9999px,
 );
 
-// Responsive styling up to 2k resolution
+$z-layers: (
+  'sink': -1,
+  'floor': 0,
+  'base': 1,
+  'decorate': 2,
+  'float': 10,
+  'sticky': 20,
+  'header': 40,
+  'dropdown': 50,
+  'overlay': 90,
+  'modal': 100,
+  'toast': 200,
+);
+
 $breakpoints: (
   'mobile': 0,
   'tablet': 768px,
   'small-desktop': 1024px,
   'large-desktop': 1440px,
   'full-hd': 1920px,
-  'quad-hd': 2560px, // 'ultra-hd': 3840px,
+  'quad-hd': 2560px,
 );
 
 $container-widths: (
   'tablet': 720px,
   'small-desktop': 960px,
-  // 1440 screen - 1320 content = nice gaps
   'large-desktop': 1320px,
-  // 1920 screen - 1600 content = wide margins
   'full-hd': 1600px,
-  // 4k screen - 1920 content = centered look
   'quad-hd': 1920px,
 );
 
 $container-paddings: (
-  // Mobile
   'base': 16px,
   'tablet': 24px,
   'small-desktop': 32px,
   'large-desktop': 40px,
   'full-hd': 48px,
-  'quad-hd': 64px
+  'quad-hd': 64px,
 );
-
-:root {
-  // Export radius tokens
-  @each $key, $value in $radius-scale {
-    --radius-#{$key}: #{$value};
-  }
-}

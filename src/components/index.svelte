@@ -40,11 +40,12 @@
   ];
 
   const scaleLevels = [
-    { label: 'XS', value: 0.85, name: 'Compact' },
-    { label: 'S', value: 1.0, name: 'Standard' },
-    { label: 'M', value: 1.15, name: 'Comfort' },
-    { label: 'L', value: 1.3, name: 'Large' },
+    { label: 'XS', value: 0.75, name: 'Minimal' }, // Matches Engine Min
+    { label: 'S', value: 0.85, name: 'Compact' },
+    { label: 'M', value: 1.0, name: 'Standard' }, // Default
+    { label: 'L', value: 1.25, name: 'Large' },
     { label: 'XL', value: 1.5, name: 'Extra' },
+    { label: 'MAX', value: 2.0, name: 'Maximum' }, // Matches Engine Max
   ];
 
   let activeScaleStep = $derived(

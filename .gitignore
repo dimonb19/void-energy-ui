@@ -32,3 +32,6 @@ void_context.txt
 # css map files
 global.css
 global.css.map
+
+# prettier
+.prettierignore

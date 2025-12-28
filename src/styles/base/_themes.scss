@@ -5,7 +5,7 @@
 
 @use 'sass:map';
 @use '../abstracts/theme-engine' as engine;
-@use '../config/user-themes' as config;
+@use '../config/generated-themes' as config;
 
 // Seed :root with the Void configuration for non-attributed contexts.
 @include engine.generate-theme('default', map.get(config.$themes, 'void'));

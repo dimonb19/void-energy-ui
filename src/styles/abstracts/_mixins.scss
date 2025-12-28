@@ -18,85 +18,54 @@
 // Context: Positive Z-Index. Floats above the void.
 // $interactive: boolean - Set to true ONLY if the element is clickable (Link/Button)
 @mixin glass-float($interactive: false) {
-  // Fallback opacity keeps the surface legible
-  background: var(--bg-surface);
+  // 1. TEXTURE & GEOMETRY
+  // Now uses the variable injected by the preset
+  background: var(--surface-bg);
+  border-radius: var(--radius-base);
+  border-style: solid;
+  border-width: var(--physics-border-width);
 
+  // 2. LIGHTING (Directional vs Uniform is now handled by these vars)
+  border-top-color: var(--surface-border-top);
+  border-bottom-color: var(--surface-border-side);
+  border-left-color: var(--surface-border-side);
+  border-right-color: var(--surface-border-side);
+
+  box-shadow: var(--surface-shadow);
+
+  // 3. BLUR
   @supports (backdrop-filter: blur(1px)) {
     backdrop-filter: blur(var(--physics-blur));
     -webkit-backdrop-filter: blur(var(--physics-blur));
   }
 
-  // The Lighting Model
-  border-width: var(--physics-border-width);
-  border-style: solid;
-  border-radius: var(--radius-base);
-
-  // Uniform borders for Flat/Retro physics.
-  border-color: var(--border-highlight);
-
-  // Uniform Logic (Flat/Retro)
-  box-shadow: var(--void-shadow);
-
+  // 4. MOTION
   transition:
     transform var(--speed-base) var(--ease-stabilize),
     border-color var(--speed-base) var(--ease-snap),
     background-color var(--speed-base) var(--ease-flow),
     box-shadow var(--speed-base) var(--ease-snap);
 
-  // Directional Logic (Glass Effect Borders)
-  @at-root :where([data-physics='glass']) & {
-    background: linear-gradient(
-      to bottom,
-      blend(var(--bg-surface), var(--energy-secondary), 10%) 0%,
-      var(--bg-surface) 100%
-    );
-
-    // Calculate the opacity amount based on the border opacity variable
-    $border-opacity: calc(var(--border-opacity, 1) * 100%);
-
-    // Top is Light (Highlight)
-    border-top-color: alpha(var(--border-highlight), $border-opacity);
-
-    // Bottom/Sides are Shadow (Shadow)
-    border-bottom-color: alpha(var(--border-shadow), $border-opacity);
-    border-left-color: alpha(var(--border-shadow), $border-opacity);
-    border-right-color: alpha(var(--border-shadow), $border-opacity);
-  }
-
-  // FLAT / RETRO FALLBACKS
-  @at-root :where([data-physics='flat']) &,
-    :where([data-physics='retro']) & {
-    border-color: var(--border-highlight);
-    box-shadow: var(--void-shadow);
-  }
-
-  // --- INTERACTION LOGIC ---
+  // 5. INTERACTION
   @media (hover: hover) {
     &:hover {
       @if $interactive {
-        // Interactive surfaces lift and energize on hover.
-        transform: translateY(-2px);
-
-        // Blend the energy color to preserve transparency.
+        // Variable-driven motion (Retro = none, Glass = -2px)
+        transform: var(--hover-transform);
         border-color: alpha(var(--energy-primary), 50%);
 
-        // Glow reinforced by structural shadow.
-        box-shadow: 0
-          4px
-          16px
-          rgba(0, 0, 0, calc(0.5 * var(--shadow-strength)));
-
-        @at-root :where([data-physics='glass']) & {
-          box-shadow:
-            0 8px 32px rgba(0, 0, 0, calc(0.5 * var(--shadow-strength))),
-            0 0 15px
-              color-mix(
-                in srgb,
-                var(--energy-primary)
-                  calc(var(--glow-opacity) * var(--glow-strength, 1) * 100%),
-                transparent
-              );
-        }
+        // Shadow mixing
+        box-shadow:
+          var(--hover-shadow),
+          0
+            0
+            15px
+            color-mix(
+              in srgb,
+              var(--energy-primary)
+                calc(var(--glow-opacity) * var(--glow-strength, 1) * 100%),
+              transparent
+            );
       }
     }
   }
@@ -105,21 +74,19 @@
 // MIXIN: Sunk Surface (Inputs, Sidebars)
 // Context: Negative Z-Index. Carved into the void.
 @mixin glass-sunk {
-  background: blend(var(--bg-sink), var(--bg-canvas), 90%);
+  background: var(--bg-sink);
 
   @supports (backdrop-filter: blur(1px)) {
-    background: var(--bg-sink);
     backdrop-filter: blur(var(--physics-blur));
     -webkit-backdrop-filter: blur(var(--physics-blur));
   }
 
-  // Faint ambient rim
+  // Uniform borders for sunk items
   border: var(--physics-border-width) solid var(--border-shadow);
   border-radius: var(--radius-base);
 
-  @at-root :where([data-physics='glass']) & {
-    box-shadow: inset var(--void-shadow);
-  }
+  // Use inset shadow variable if we want to vary it, or keep standard sunk look
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
 
   color: var(--text-main);
   transition:
@@ -127,9 +94,9 @@
     box-shadow var(--speed-fast) var(--ease-snap),
     outline var(--speed-fast) var(--ease-snap);
 
-  // Focus State
   &:focus-visible {
     border-color: var(--energy-primary);
+    outline: var(--physics-border-width) solid var(--border-shadow);
     box-shadow:
       inset 0 2px 8px rgba(0, 0, 0, calc(0.5 * var(--shadow-strength))),
       0 0 10px
@@ -139,16 +106,6 @@
             calc(var(--glow-opacity) * var(--glow-strength, 1) * 100%),
           transparent
         );
-
-    @at-root :where([data-physics='flat']) & {
-      box-shadow: inset var(--void-shadow);
-      outline: var(--physics-border-width) solid var(--border-shadow);
-    }
-
-    @at-root :where([data-physics='retro']) & {
-      box-shadow: none;
-      outline: var(--physics-border-width) solid var(--border-shadow);
-    }
   }
 }
 

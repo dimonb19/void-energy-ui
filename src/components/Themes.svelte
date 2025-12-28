@@ -20,8 +20,9 @@
   {#each atmospheres as atm (atm.id)}
     <button
       class="theme-option w-full flex items-center gap-sm p-xs rounded-sm text-dim text-left"
-      role="option"
-      aria-selected={theme.atmosphere === atm.id}
+      role="radio"
+      aria-checked={theme.atmosphere === atm.id}
+      tabindex={theme.atmosphere === atm.id ? 0 : -1}
       data-atmosphere={atm.id}
       onclick={() => selectTheme(atm.id)}
     >

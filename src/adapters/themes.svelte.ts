@@ -5,31 +5,45 @@
 
 import { VoidEngine } from './void-engine';
 
-// 1. Initialize the Engine (Singleton)
-const engine =
-  typeof window !== 'undefined' && window.Void ? window.Void : new VoidEngine();
+// --- STRICT SINGLETON PATTERN ---
+// 1. If we are in the browser, check if a global instance exists.
+if (typeof window !== 'undefined') {
+  if (!window.Void) {
+    window.Void = new VoidEngine();
+  }
+}
 
-// 2. Create Global Reactive State
-// We use a single state object to hold both Atmosphere and User Config.
-// This prevents memory leaks from creating multiple subscriptions.
+// 2. Use the global instance if available, otherwise create a temporary one (SSR)
+const engine = typeof window !== 'undefined' ? window.Void : new VoidEngine();
+
+// We split the state so specific listeners only trigger on relevant changes.
+let atmosphere = $state(engine.atmosphere);
+let config = $state(engine.userConfig);
+
+engine.subscribe((updatedEngine) => {
+  atmosphere = updatedEngine.atmosphere;
+  // We spread the object to ensure Svelte detects the value change
+  config = { ...updatedEngine.userConfig };
+});
+
+// 3. Create Global Reactive State
 const voidState = $state({
   atmosphere: engine.atmosphere,
   config: engine.userConfig,
 });
 
-// 3. One-Way Binding: Engine -> Svelte
-// We subscribe ONCE. When the engine notifies us, we update the local Runes.
+// 4. One-Way Binding: Engine -> Svelte
+// Note: engine.subscribe() now calls engine.render(), ensuring
+// the DOM is repainted if Svelte Hydration wiped the styles.
 engine.subscribe((updatedEngine) => {
   voidState.atmosphere = updatedEngine.atmosphere;
-  // We replace the whole object to trigger deep reactivity if needed,
-  // or spread it if you prefer granular updates.
   voidState.config = { ...updatedEngine.userConfig };
 });
 
 export const theme = {
   // GETTER: Returns the reactive atmosphere
   get atmosphere() {
-    return voidState.atmosphere;
+    return atmosphere;
   },
 
   // SETTER: Pushes changes back to the Engine
@@ -38,9 +52,9 @@ export const theme = {
   },
 
   // GETTER: Returns the reactive user config
-  // Now safe to use because it references the stable 'voidState'
+  // Note: We keep the object structure for API compatibility with components
   get config() {
-    return voidState.config;
+    return config;
   },
 
   // Actions

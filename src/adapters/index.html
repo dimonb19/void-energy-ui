@@ -19,44 +19,94 @@
   ========================================================================== -->
 
 <script is:inline>
+  // ⚠️ DATA DEPENDENCIES:
+  // This script expects 'THEMES' and 'DENSITY_MAPS' to be available globally
+  // or injected by any build tool (e.g., Vite/Webpack DefinePlugin).
+  //
   // import THEMES from '../config/void-registry.json';
+  // import { VOID_TOKENS } from '../config/design-tokens'; const DENSITY_MAPS = VOID_TOKENS.density;
 
   (function () {
     try {
       const root = document.documentElement;
       const store = localStorage;
+      const SPACE_KEYS = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'];
+
+      const getDensityFactor = (density) => {
+        const standard = DENSITY_MAPS?.standard;
+        const target = DENSITY_MAPS?.[density];
+        if (!standard || !target) return 1;
+
+        const sum = (map) =>
+          SPACE_KEYS.reduce((total, key) => {
+            const value = parseFloat(String(map[key]));
+            return Number.isFinite(value) ? total + value : total;
+          }, 0);
+
+        const base = sum(standard);
+        const targetSum = sum(target);
+        if (!base || !targetSum) return 1;
+        return targetSum / base;
+      };
+
+      const applyDensity = (density) => {
+        const factor = getDensityFactor(density);
+        root.style.setProperty('--density', String(factor));
+
+        const targetMap = DENSITY_MAPS?.[density];
+        if (!targetMap) return;
+
+        if (density === 'standard') {
+          SPACE_KEYS.forEach((token) => {
+            root.style.removeProperty(`--space-${token}`);
+          });
+          return;
+        }
+
+        SPACE_KEYS.forEach((token) => {
+          const value = targetMap[token];
+          if (value) {
+            root.style.setProperty('--space-' + token, value);
+          }
+        });
+      };
 
       // ----------------------------------------------------------------
       // 1. RESTORE ATMOSPHERE & PHYSICS (The Triad)
       // ----------------------------------------------------------------
-      // Get the saved name (e.g., 'playground'), default to 'void'
       const savedAtmosphere = store.getItem('void_atmosphere') || 'void';
 
-      // Check the injected THEMES object directly.
-      // If 'playground' exists in JSON, we use it. If not, fallback to 'void'.
-      const activeTheme = THEMES[savedAtmosphere] ? savedAtmosphere : 'void';
-      const config = THEMES[activeTheme];
+      // Validate against the Registry
+      // Ensure THEMES is defined before accessing
+      const registry = typeof THEMES !== 'undefined' ? THEMES : {};
+      const activeTheme = registry[savedAtmosphere] ? savedAtmosphere : 'void';
 
-      // Apply the Triad attributes immediately
+      // Fallback config if registry is missing
+      const config = registry[activeTheme] || {
+        physics: 'glass',
+        mode: 'dark',
+      };
+
+      // Apply Triad attributes
       root.setAttribute('data-atmosphere', activeTheme);
       root.setAttribute('data-physics', config.physics);
       root.setAttribute('data-mode', config.mode);
 
       // ----------------------------------------------------------------
-      // 2. RESTORE USER CONFIG (Fonts & Scale)
+      // 2. RESTORE USER CONFIG (Fonts, Scale & Density)
       // ----------------------------------------------------------------
       const rawConfig = store.getItem('void_user_config');
 
       if (rawConfig) {
         const userPrefs = JSON.parse(rawConfig);
 
-        // Restore Scale (Clamped for safety)
+        // A. Restore Scale
         if (userPrefs.scale) {
           const safeScale = Math.min(Math.max(userPrefs.scale, 0.75), 2);
           root.style.setProperty('--text-scale', safeScale);
         }
 
-        // Restore Custom Fonts
+        // B. Restore Custom Fonts
         if (userPrefs.fontBody) {
           root.style.setProperty('--user-font-body', userPrefs.fontBody);
         }
@@ -64,15 +114,11 @@
           root.style.setProperty('--user-font-heading', userPrefs.fontHeading);
         }
 
-        // Restore Density (Optional, prevents layout shift on high/low density)
-        if (userPrefs.density && userPrefs.density !== 'standard') {
-          // If you have DENSITY_MAPS available here, apply them.
-          // Otherwise, the engine will catch up in a split second.
-          // Usually, scale is the most important visual factor to restore instantly.
-        }
+        // C. Restore Density (Prevent Layout Shift)
+        applyDensity(userPrefs.density || 'standard');
       }
     } catch (e) {
-      // Fail Safe: If JSON fails, force the default Void theme
+      // Fail Safe
       console.warn('Void Energy hydration failed:', e);
       document.documentElement.setAttribute('data-atmosphere', 'void');
       document.documentElement.setAttribute('data-physics', 'glass');
