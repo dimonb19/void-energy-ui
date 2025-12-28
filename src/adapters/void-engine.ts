@@ -109,8 +109,28 @@ export class VoidEngine {
     }
   }
 
+  private safeGet(key: string): string | null {
+    try {
+      if (typeof localStorage === 'undefined') return null;
+      return localStorage.getItem(key);
+    } catch (e) {
+      console.warn('Void Engine: Storage access denied.', e);
+      return null;
+    }
+  }
+
+  private safeSet(key: string, value: string): void {
+    try {
+      if (typeof localStorage === 'undefined') return;
+      localStorage.setItem(key, value);
+    } catch (e) {
+      // Quota exceeded or access denied - silently fail or log telemetry
+      console.warn('Void Engine: Storage write failed.', e);
+    }
+  }
+
   private init(): void {
-    const stored = localStorage.getItem(KEYS.ATMOSPHERE);
+    const stored = this.safeGet(KEYS.ATMOSPHERE);
     if (stored && REGISTRY[stored]) {
       this.setAtmosphere(stored);
     } else {
@@ -119,7 +139,7 @@ export class VoidEngine {
     }
 
     // Load User Config
-    const storedConfig = localStorage.getItem(KEYS.USER_CONFIG);
+    const storedConfig = this.safeGet(KEYS.USER_CONFIG);
     if (storedConfig) {
       try {
         this.userConfig = { ...this.userConfig, ...JSON.parse(storedConfig) };
@@ -169,10 +189,7 @@ export class VoidEngine {
       root.setAttribute('data-mode', config.mode);
     }
 
-    // Persistence for subsequent reloads.
-    if (typeof localStorage !== 'undefined') {
-      localStorage.setItem(KEYS.ATMOSPHERE, name);
-    }
+    this.safeSet(KEYS.ATMOSPHERE, name);
 
     // Notify adapters
     this.notify();
@@ -257,9 +274,8 @@ export class VoidEngine {
   }
 
   private persist(): void {
-    if (typeof localStorage === 'undefined') return;
-    localStorage.setItem(KEYS.ATMOSPHERE, this.atmosphere);
-    localStorage.setItem(KEYS.USER_CONFIG, JSON.stringify(this.userConfig));
+    this.safeSet(KEYS.ATMOSPHERE, this.atmosphere);
+    this.safeSet(KEYS.USER_CONFIG, JSON.stringify(this.userConfig));
   }
 }
 
