@@ -35,3 +35,7 @@ global.css.map
 
 # prettier
 .prettierignore
+
+# config
+/src/config/void-registry.json
+/src/styles/config/_generated-themes.scss

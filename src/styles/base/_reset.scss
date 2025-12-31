@@ -120,7 +120,14 @@ textarea {
   background: transparent;
   color: inherit;
   font-family: inherit;
-  transition: all var(--speed-fast) var(--ease-flow);
+
+  // Constrained Transition List
+  transition-property:
+    color, background-color, border-color, text-decoration-color, fill, stroke,
+    opacity, box-shadow, transform, filter, backdrop-filter;
+
+  transition-duration: var(--speed-fast);
+  transition-timing-function: var(--ease-flow);
 
   &:focus-visible {
     outline: var(--physics-border-width) solid var(--energy-primary);

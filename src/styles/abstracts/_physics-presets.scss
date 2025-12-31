@@ -42,103 +42,104 @@
    $ease-base            : The math of movement. Linear, Ease-Out, or Steps.
    ========================================================================== */
 
+@use 'sass:map';
 @use 'functions' as *;
 
+// 1. THE DEFINITIONS (Data Layer)
 $physics-presets: (
-  // 1. GLASS PHYSICS (Default)
   'glass': (
-      'physics-blur': 20px,
-      'physics-border-width': 1px,
-      'radius-base': var(--radius-md),
-      // Lighting Logic (Moved from Mixins to Variables)
-      'glow-opacity': 0.6,
-      'glow-strength': 1,
-      'shadow-strength': 1,
-      'border-opacity': 1,
+    'physics-blur': 20px,
+    'physics-border-width': 1px,
+    'radius-base': var(--radius-md),
+    'glow-opacity': 0.6,
+    'glow-strength': 1,
+    'shadow-strength': 1,
+    'border-opacity': 1,
+    // Surfaces
+    'surface-bg': linear-gradient(
+        to bottom,
+        color-mix(in srgb, var(--bg-surface), var(--energy-secondary) 10%) 0%,
+        var(--bg-surface) 100%
+      ),
+    'surface-border-top': color-mix(
+        in srgb,
+        var(--border-highlight),
+        transparent 0%
+      ),
+    'surface-border-side': color-mix(
+        in srgb,
+        var(--border-shadow),
+        transparent 0%
+      ),
+    'surface-shadow': 0 4px 16px rgba(0, 0, 0, 0.5),
+    // Interaction
+    'hover-transform': translateY(-2px),
+    'hover-shadow': 0 8px 32px rgba(0, 0, 0, 0.5),
+    // Time
+    'speed-base': 0.3s,
+    'ease-stabilize': cubic-bezier(0.16, 1, 0.3, 1),
+    'ease-snap': cubic-bezier(0.22, 1, 0.36, 1),
+    'ease-flow': linear,
+    'ease-base': cubic-bezier(0.16, 1, 0.3, 1),
+  ),
 
-      // The "Directional" Look: Top is lighter, body has a gradient
-      'surface-bg': linear-gradient(
-          to bottom,
-          color-mix(in srgb, var(--bg-surface), var(--energy-secondary) 10%) 0%,
-          var(--bg-surface) 100%
-        ),
-      'surface-border-top': color-mix(
-          in srgb,
-          var(--border-highlight),
-          transparent 0%
-        ),
-      // 100% opacity
-      'surface-border-side': color-mix(
-          in srgb,
-          var(--border-shadow),
-          transparent 0%
-        ),
-      // 100% opacity
-      'surface-shadow': 0 4px 16px rgba(0, 0, 0, 0.5),
-      // Interaction Logic
-      'hover-transform': translateY(-2px),
-      'hover-shadow': 0 8px 32px rgba(0, 0, 0, 0.5),
-      // Time
-      'speed-base': 0.3s,
-      'ease-stabilize': cubic-bezier(0.16, 1, 0.3, 1),
-      'ease-snap': cubic-bezier(0.22, 1, 0.36, 1),
-      'ease-flow': linear,
-      'ease-base': cubic-bezier(0.16, 1, 0.3, 1),
-    ),
-
-  // 2. FLAT PHYSICS (Paper)
   'flat': (
-      'physics-blur': 0px,
-      'physics-border-width': 1px,
-      'radius-base': var(--radius-sm),
-      // Lighting
-      'glow-opacity': 0,
-      'glow-strength': 0,
-      'shadow-strength': 1,
-      'border-opacity': 1,
+    'physics-blur': 0px,
+    'physics-border-width': 1px,
+    'radius-base': var(--radius-sm),
+    'glow-opacity': 0,
+    'glow-strength': 0,
+    'shadow-strength': 1,
+    'border-opacity': 1,
+    'surface-bg': var(--bg-surface),
+    'surface-border-top': var(--border-highlight),
+    'surface-border-side': var(--border-highlight),
+    'surface-shadow': 0 2px 8px rgba(0, 0, 0, 0.08),
+    'hover-transform': translateY(-1px),
+    'hover-shadow': 0 4px 12px rgba(0, 0, 0, 0.12),
+    'speed-base': 0.2s,
+    'ease-stabilize': ease-out,
+    'ease-snap': ease-out,
+    'ease-flow': ease-in-out,
+    'ease-base': ease-out,
+  ),
 
-      // The "Uniform" Look: Solid bg, uniform borders
-      'surface-bg': var(--bg-surface),
-      'surface-border-top': var(--border-highlight),
-      'surface-border-side': var(--border-highlight),
-      'surface-shadow': 0 2px 8px rgba(0, 0, 0, 0.08),
-      // Interaction
-      'hover-transform': translateY(-1px),
-      'hover-shadow': 0 4px 12px rgba(0, 0, 0, 0.12),
-      // Time
-      'speed-base': 0.2s,
-      'ease-stabilize': ease-out,
-      'ease-snap': ease-out,
-      'ease-flow': ease-in-out,
-      'ease-base': ease-out,
-    ),
-
-  // 3. RETRO PHYSICS (Terminal)
   'retro': (
-      'physics-blur': 0px,
-      'physics-border-width': 2px,
-      'radius-base': 0px,
-
-      // Lighting
-      'glow-opacity': 0,
-      'glow-strength': 0,
-      'shadow-strength': 1,
-      'border-opacity': 1,
-
-      // The "Robotic" Look: Solid, Thick borders, No Shadow
-      'surface-bg': var(--bg-surface),
-      'surface-border-top': var(--border-highlight),
-      'surface-border-side': var(--border-highlight),
-      'surface-shadow': none,
-
-      // Interaction
-      'hover-transform': none,
-      'hover-shadow': 4px 4px 0px alpha(var(--energy-primary), 25%),
-      // Time
-      'speed-base': 0s,
-      'ease-stabilize': steps(2),
-      'ease-snap': steps(2),
-      'ease-flow': steps(4),
-      'ease-base': steps(2),
-    )
+    'physics-blur': 0px,
+    'physics-border-width': 2px,
+    'radius-base': 0px,
+    'glow-opacity': 0,
+    'glow-strength': 0,
+    'shadow-strength': 1,
+    'border-opacity': 1,
+    'surface-bg': var(--bg-surface),
+    'surface-border-top': var(--border-highlight),
+    'surface-border-side': var(--border-highlight),
+    'surface-shadow': none,
+    'hover-transform': none,
+    'hover-shadow': 4px 4px 0px alpha(var(--energy-primary), 25%),
+    'speed-base': 0s,
+    'ease-stabilize': steps(2),
+    'ease-snap': steps(2),
+    'ease-flow': steps(4),
+    'ease-base': steps(2),
+  ),
 );
+
+// 2. THE EMITTER (Logic Layer)
+@mixin emit-physics {
+  @each $name, $map in $physics-presets {
+    [data-physics='#{$name}'] {
+      // A. Emit Static Props
+      @each $key, $val in $map {
+        --#{$key}: #{$val};
+      }
+
+      // B. Calculate Derived Motion
+      // We do this here to avoid runtime CSS calc() overhead for static relationships
+      $speed-base: map.get($map, 'speed-base');
+      $speed-fast: if($speed-base == 0s, 0s, $speed-base * 0.66);
+      --speed-fast: #{$speed-fast};
+    }
+  }
+}

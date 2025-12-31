@@ -1,50 +1,26 @@
 /*
- * ROLE: Theme emitter (Fix for Math Spacing).
- * RESPONSIBILITY: Merge palette maps with Physics presets to produce CSS variables.
+ * ROLE: Atmosphere Emitter
+ * RESPONSIBILITY: Output Color Palettes and Mode settings (Light/Dark).
  */
 
 @use 'sass:map';
-@use './variables' as *;
-@use './physics-presets';
 
-// Combines palette + physics into a single theme and emits CSS variables.
-@mixin generate-theme($name, $config) {
-  $physics-name: map.get($config, 'physics');
-  $physics-map: map.get(physics-presets.$physics-presets, $physics-name);
-
-  // Fallback check
-  @if $physics-map == null {
-    @warn "Physics preset `#{$physics-name}` not found for `#{$name}`. Falling back to `glass`.";
-    $physics-name: 'glass';
-    $physics-map: map.get(physics-presets.$physics-presets, 'glass');
-  }
-
+// Generates strictly the "Soul" (Color/Font) of the theme.
+@mixin generate-atmosphere($name, $config) {
   $palette: map.get($config, 'palette');
+  $mode: map.get($config, 'type'); // 'light' or 'dark'
+
   @if $palette == null {
-    @warn "No palette provided for theme `#{$name}`. Only physics variables will be set.";
+    @warn "No palette provided for atmosphere `#{$name}`.";
     $palette: ();
   }
 
-  // CALCULATED VALUES (Automation)
-  $speed-base: map.get($physics-map, 'speed-base');
-  $speed-fast: if($speed-base == 0s, 0s, $speed-base * 0.66);
+  // Selector: [data-atmosphere="void"]
+  [data-atmosphere='#{$name}'] {
+    color-scheme: if($mode == 'light', light, dark);
 
-  $calculated-vars: (
-    'speed-fast': $speed-fast,
-  );
-
-  // MERGE: Physics Preset + Calculated Vars + Color Palette
-  $theme-map: map.merge(map.merge($physics-map, $calculated-vars), $palette);
-
-  $selector: if($name == 'default', ':root', "[data-atmosphere='#{$name}']");
-  $physics-selector: "#{$selector}[data-physics='#{$physics-name}']";
-
-  #{$selector},
-  #{$physics-selector} {
-    color-scheme: if(map.get($config, 'type') == 'light', light, dark);
-
-    // Output Colors & Physics
-    @each $key, $value in $theme-map {
+    // Output Palette Variables
+    @each $key, $value in $palette {
       --#{$key}: #{$value};
     }
   }

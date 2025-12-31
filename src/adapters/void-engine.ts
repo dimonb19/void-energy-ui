@@ -1,13 +1,14 @@
 /* ==========================================================================
    VOID ENERGY UI ENGINE (Vanilla TypeScript)
+   DOM-First Architecture / Deterministic Hydration
    ========================================================================== */
+
 import THEME_REGISTRY from '../config/void-registry.json';
 import { VOID_TOKENS } from '../config/design-tokens';
 
 export type VoidPhysics = 'glass' | 'flat' | 'retro';
 export type VoidMode = 'light' | 'dark';
 export type VoidDensity = 'high' | 'standard' | 'low';
-
 type ErrorHandler = (error: Error) => void;
 
 interface EngineOptions {
@@ -22,60 +23,16 @@ export interface ThemeConfig {
 type Registry = Record<string, ThemeConfig>;
 const REGISTRY = THEME_REGISTRY as Registry;
 
-const DENSITY_MAPS = VOID_TOKENS.density;
-
-const SPACE_KEYS: Array<keyof (typeof DENSITY_MAPS)['standard']> = [
-  'xs',
-  'sm',
-  'md',
-  'lg',
-  'xl',
-  '2xl',
-];
-
-function getDensityFactor(density: VoidDensity): number {
-  const standard = DENSITY_MAPS?.standard;
-  const target = DENSITY_MAPS?.[density];
-
-  if (!standard || !target) return 1;
-
-  const totalStandard = SPACE_KEYS.reduce((sum, key) => {
-    const value = parseFloat(String(standard[key]));
-    return Number.isFinite(value) ? sum + value : sum;
-  }, 0);
-
-  const totalTarget = SPACE_KEYS.reduce((sum, key) => {
-    const value = parseFloat(String(target[key]));
-    return Number.isFinite(value) ? sum + value : sum;
-  }, 0);
-
-  if (!totalStandard || !totalTarget) return 1;
-
-  return totalTarget / totalStandard;
-}
+const DENSITY_FACTORS = VOID_TOKENS.density.factors;
 
 function applyDensity(root: HTMLElement, density: VoidDensity) {
-  const factor = getDensityFactor(density);
+  const factor = DENSITY_FACTORS[density] ?? 1;
   root.style.setProperty('--density', factor.toString());
 
-  // If the map is missing, rely on the calc-based defaults.
-  const targetMap = DENSITY_MAPS?.[density];
-  const standardMap = DENSITY_MAPS?.standard;
-  if (!targetMap || !standardMap) return;
-
-  // Standard falls back to SCSS defaults to avoid stale inline overrides.
-  if (density === 'standard') {
-    SPACE_KEYS.forEach((token) => {
-      root.style.removeProperty(`--space-${token}`);
-    });
-    return;
-  }
-
+  // Cleanup legacy individual overrides if present
+  const SPACE_KEYS = Object.keys(VOID_TOKENS.density.scale);
   SPACE_KEYS.forEach((token) => {
-    const value = targetMap[token];
-    if (value) {
-      root.style.setProperty(`--space-${token}`, value);
-    }
+    root.style.removeProperty(`--space-${token}`);
   });
 }
 
@@ -103,6 +60,7 @@ export class VoidEngine {
     this.atmosphere = 'void';
     this.observers = [];
     this.onError = options?.onError;
+    // Default safe config
     this.userConfig = {
       fontHeading: null,
       fontBody: null,
@@ -114,6 +72,8 @@ export class VoidEngine {
       this.init();
     }
   }
+
+  // --- STORAGE HELPERS ---
 
   private safeGet(key: string): string | null {
     try {
@@ -134,26 +94,50 @@ export class VoidEngine {
     }
   }
 
+  // --- CORE LIFECYCLE ---
+
   private init(): void {
-    const stored = this.safeGet(KEYS.ATMOSPHERE);
-    if (stored && REGISTRY[stored]) {
-      this.setAtmosphere(stored);
+    if (typeof document === 'undefined') return;
+    const root = document.documentElement;
+
+    // 1. DOM TRUTH (Priority 1)
+    // Check if a blocking script or SSR has already set the atmosphere.
+    const domAtmosphere = root.getAttribute('data-atmosphere');
+
+    // 2. STORAGE TRUTH (Priority 2)
+    const storedAtmosphere = this.safeGet(KEYS.ATMOSPHERE);
+
+    // 3. RESOLVE ATMOSPHERE
+    if (domAtmosphere && this.hasTheme(domAtmosphere)) {
+      // Trust the DOM. The hydration script won the race.
+      this.atmosphere = domAtmosphere;
+    } else if (storedAtmosphere && this.hasTheme(storedAtmosphere)) {
+      // Fallback to storage if DOM is blank
+      this.atmosphere = storedAtmosphere;
+      this.syncAttributes(); // Apply it to DOM
     } else {
-      this.setAtmosphere('void');
+      // Default to Void
+      this.atmosphere = 'void';
+      this.syncAttributes();
     }
 
-    // Load User Config
+    // 4. LOAD USER CONFIG (Typography, Density, Scale)
     const storedConfig = this.safeGet(KEYS.USER_CONFIG);
     if (storedConfig) {
       try {
-        this.userConfig = { ...this.userConfig, ...JSON.parse(storedConfig) };
+        const parsed = JSON.parse(storedConfig);
+        this.userConfig = { ...this.userConfig, ...parsed };
       } catch (e) {
         console.error('Void Engine: Corrupt user config', e);
       }
     }
-    // Apply immediately on boot
+
+    // 5. INITIAL RENDER
+    // Applies the user config (CSS Vars) to match the resolved atmosphere.
     this.render();
   }
+
+  // --- PUBLIC API ---
 
   public hasTheme(name: string): boolean {
     return !!REGISTRY[name];
@@ -171,40 +155,17 @@ export class VoidEngine {
     }
 
     this.atmosphere = name;
-    const config = REGISTRY[name];
 
-    if (typeof document !== 'undefined') {
-      const root = document.documentElement;
-      root.setAttribute('data-atmosphere', name);
-      root.setAttribute('data-physics', config.physics);
-      root.setAttribute('data-mode', config.mode);
-    }
-
+    // Write State
+    this.syncAttributes();
     this.safeSet(KEYS.ATMOSPHERE, name);
     this.notify();
   }
 
-  public subscribe(callback: Listener): () => void {
-    this.observers.push(callback);
-    // Notify immediately so component state syncs
-    callback(this);
-    // FORCE RENDER: Ensures DOM is in sync even if Hydration wiped attributes
-    this.render();
-
-    return () => {
-      this.observers = this.observers.filter((cb) => cb !== callback);
-    };
-  }
-
-  private notify(): void {
-    this.observers.forEach((cb) => cb(this));
-  }
-
-  public getConfig(name?: string): ThemeConfig {
-    const target = name || this.atmosphere;
-    return REGISTRY[target] || REGISTRY['void'];
-  }
-
+  /**
+   * Sets preferences for fonts, scale, and density.
+   * Trigger: User changes settings in UI.
+   */
   public setPreferences(prefs: Partial<UserConfig>): void {
     this.userConfig = { ...this.userConfig, ...prefs };
     this.render();
@@ -212,8 +173,50 @@ export class VoidEngine {
     this.notify();
   }
 
-  // --- RENAMED: applyUserConfig -> render (Public) ---
-  // Publicly exposed so adapters can force a repaint if the DOM is reset
+  public subscribe(callback: Listener): () => void {
+    this.observers.push(callback);
+    // Notify immediately to sync local state
+    callback(this);
+
+    // NOTE: Removed `this.render()`.
+    // Subscription is now pure and does not force DOM repaints.
+
+    return () => {
+      this.observers = this.observers.filter((cb) => cb !== callback);
+    };
+  }
+
+  public getConfig(name?: string): ThemeConfig {
+    const target = name || this.atmosphere;
+    return REGISTRY[target] || REGISTRY['void'];
+  }
+
+  // --- INTERNAL ENGINE ---
+
+  private notify(): void {
+    this.observers.forEach((cb) => cb(this));
+  }
+
+  /**
+   * Syncs the "Structural" attributes (Atmosphere, Physics, Mode) to the HTML tag.
+   */
+  private syncAttributes(): void {
+    if (typeof document === 'undefined') return;
+
+    const config = REGISTRY[this.atmosphere];
+    const root = document.documentElement;
+
+    // Use setAttribute to ensure CSS selectors [data-atmosphere="..."] match
+    root.setAttribute('data-atmosphere', this.atmosphere);
+    root.setAttribute('data-physics', config.physics);
+    root.setAttribute('data-mode', config.mode);
+  }
+
+  /**
+   * Renders "User Preference" CSS Variables (Scale, Fonts, Density).
+   * This is separated from syncAttributes() because it deals with
+   * quantitative customization, not qualitative themes.
+   */
   public render(): void {
     if (typeof document === 'undefined') return;
     const root = document.documentElement;
@@ -243,6 +246,7 @@ export class VoidEngine {
   }
 
   private persist(): void {
+    // We persist both, though atmosphere is usually instant-saved in setAtmosphere
     this.safeSet(KEYS.ATMOSPHERE, this.atmosphere);
     this.safeSet(KEYS.USER_CONFIG, JSON.stringify(this.userConfig));
   }

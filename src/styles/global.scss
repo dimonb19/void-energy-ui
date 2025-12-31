@@ -3,17 +3,19 @@
  * RESPONSIBILITY: Imports layers and provides the master architectural reference.
  */
 
-/* 1. ABSTRACTS (Tools, Variables, Mixins) - No Output */
+/* 1. ABSTRACTS (Tools, Variables, Mixins) */
 @use 'abstracts' as *;
 
-/* 2. BASE (Resets, Typography, Themes) - Output Styles */
+/* 2. BASE (Resets, Typography, Themes) */
 @use 'base';
 
 /* 3. COMPONENTS (The Objects) */
 @use 'components';
 
-/* 4. UTILITIES (The "Fake Tailwind" Engine) */
-@use 'utils';
+/* 4. TAILWIND ENTRY (The Engine) */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* ==========================================================================
    📘 MASTER DEVELOPER CHEAT SHEET (vFinal - Optimized Architecture)

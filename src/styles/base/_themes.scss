@@ -1,16 +1,41 @@
 /*
- * ROLE: Theme variable emitter.
- * RESPONSIBILITY: Applies Semantic Tokens from the Triad Engine to :root and atmosphere-scoped selectors.
+ * ROLE: Triad Engine Entry Point
+ * RESPONSIBILITY: Initializes Physics and Atmosphere layers independently.
  */
 
 @use 'sass:map';
+@use '../abstracts/physics-presets' as physics;
 @use '../abstracts/theme-engine' as engine;
 @use '../config/generated-themes' as config;
 
-// Seed :root with the Void configuration for non-attributed contexts.
-@include engine.generate-theme('default', map.get(config.$themes, 'void'));
+// 1. GLOBAL FALLBACKS (:root)
+// We inject the default "Void" + "Glass" tokens into :root.
+// This ensures the UI has shape and color before JS hydrates the attributes.
+:root {
+  // A. Default Physics (Glass)
+  $default-physics: map.get(physics.$physics-presets, 'glass');
+  @each $key, $val in $default-physics {
+    --#{$key}: #{$val};
+  }
+  // Calc speed-fast for root manually or map get
+  --speed-fast: #{0.3s * 0.66};
 
-// Emit attribute-scoped tokens for every registered atmosphere.
+  // B. Default Atmosphere (Void)
+  $default-theme: map.get(config.$themes, 'void');
+  $default-palette: map.get($default-theme, 'palette');
+
+  color-scheme: dark;
+  @each $key, $val in $default-palette {
+    --#{$key}: #{$val};
+  }
+}
+
+// 2. EMIT PHYSICS LAYER
+// Generates: [data-physics="glass"], [data-physics="flat"], etc.
+@include physics.emit-physics;
+
+// 3. EMIT ATMOSPHERE LAYER
+// Generates: [data-atmosphere="void"], [data-atmosphere="onyx"], etc.
 @each $name, $theme-config in config.$themes {
-  @include engine.generate-theme($name, $theme-config);
+  @include engine.generate-atmosphere($name, $theme-config);
 }

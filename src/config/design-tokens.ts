@@ -68,30 +68,23 @@ const SEMANTIC_LIGHT = {
 export const VOID_TOKENS = {
   // Global Density Maps (Scales) - Matches your SCSS spacing-scale
   density: {
-    standard: {
-      xs: '0.5rem',
-      sm: '1rem',
-      md: '1.5rem',
-      lg: '2rem',
-      xl: '3rem',
-      '2xl': '4rem',
+    // A. The Reference Scale (1x Standard)
+    // Used by SCSS generator to create base variables
+    scale: {
+      xs: '0.5rem', // 8px
+      sm: '1rem', // 16px
+      md: '1.5rem', // 24px
+      lg: '2rem', // 32px
+      xl: '3rem', // 48px
+      '2xl': '4rem', // 64px
     },
-    high: {
-      xs: '0.25rem',
-      sm: '0.5rem',
-      md: '1rem',
-      lg: '1.5rem',
-      xl: '2rem',
-      '2xl': '3rem',
-    }, //
-    low: {
-      xs: '0.75rem',
-      sm: '1.25rem',
-      md: '2rem',
-      lg: '2.5rem',
-      xl: '4rem',
-      '2xl': '5rem',
-    }, //
+    // B. The Multipliers (The Logic)
+    // Applied to the --density variable at runtime
+    factors: {
+      high: 0.75, // Compact (~30% tighter)
+      standard: 1, // Default
+      low: 1.25, // Relaxed (~25% looser)
+    },
   },
 
   // The Atmospheres

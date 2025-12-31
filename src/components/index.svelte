@@ -84,7 +84,7 @@
 
 <main class="w-full min-h-screen">
   <header class="container flex flex-col items-center gap-md mt-md">
-    <h1 class="text-highlight">VOID ENERGY</h1>
+    <h1>VOID ENERGY</h1>
 
     <div class="flex flex-col p-md gap-sm surface-glass">
       <p>System Architecture // Component Library</p>

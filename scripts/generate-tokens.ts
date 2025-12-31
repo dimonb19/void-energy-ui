@@ -43,18 +43,12 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
 // ==========================================================================
 `;
 
-  // Generate Density Maps
-  Object.entries(tokens.density).forEach(([key, map]) => {
-    scss += `$density-${key}: (\n`;
-    Object.entries(map).forEach(([prop, val]) => {
-      scss += `  '${prop}': "${val}",\n`;
-    });
-    scss += `);\n\n`;
+  // Generate Single Reference Map
+  scss += `$spacing-scale: (\n`;
+  Object.entries(tokens.density.scale).forEach(([prop, val]) => {
+    scss += `  '${prop}': ${val},\n`; // Removed quotes around value for clean numbers/units
   });
-
-  // Generate Global Spacing Scale (Defaulting to Standard)
-  scss += `// Default spacing scale for utility classes\n`;
-  scss += `$spacing-scale: $density-standard;\n\n`;
+  scss += `);\n\n`;
 
   scss += `// ==========================================================================\n`;
   scss += `// 2. THEME DEFINITIONS\n`;
