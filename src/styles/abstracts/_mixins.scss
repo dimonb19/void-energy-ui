@@ -31,7 +31,13 @@
   border-left-color: var(--surface-border-side);
   border-right-color: var(--surface-border-side);
 
-  box-shadow: var(--surface-shadow);
+  // SHADOW: Scaled by --optics-shadow-mult
+  box-shadow: 0 4px 16px
+    color-mix(
+      in srgb,
+      black calc(0.5 * var(--optics-shadow-mult) * 100%),
+      transparent
+    );
 
   // 3. BLUR
   @supports (backdrop-filter: blur(1px)) {
@@ -52,19 +58,25 @@
       @if $interactive {
         // Variable-driven motion (Retro = none, Glass = -2px)
         transform: var(--hover-transform);
-        border-color: alpha(var(--energy-primary), 50%);
+        border-color: optics-alpha(
+          var(--energy-primary),
+          var(--base-glow-opacity),
+          // <--- CONNECTED HERE
+          '--optics-glow-mult'
+        );
 
-        // Shadow mixing
+        // HOVER SHADOW & GLOW
+        // If mode=light, the colored glow (2nd part) vanishes because mult is 0.
         box-shadow:
           var(--hover-shadow),
           0
             0
             15px
-            color-mix(
-              in srgb,
-              var(--energy-primary)
-                calc(var(--glow-opacity) * var(--glow-strength, 1) * 100%),
-              transparent
+            optics-alpha(
+              var(--energy-primary),
+              calc(var(--base-glow-opacity) * 0.8),
+              // Scale relative to base
+              '--optics-glow-mult'
             );
       }
     }
@@ -85,10 +97,18 @@
   border: var(--physics-border-width) solid var(--border-shadow);
   border-radius: var(--radius-base);
 
-  // Use inset shadow variable if we want to vary it, or keep standard sunk look
-  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
-
+  // Inset shadow is subtle, keep it simple but scale it
+  box-shadow: inset 0 2px 8px
+    color-mix(
+      in srgb,
+      black
+        calc(
+          var(--base-shadow-opacity) * 0.4 * var(--optics-shadow-mult) * 100%
+        ),
+      transparent
+    );
   color: var(--text-main);
+
   transition:
     border-color var(--speed-fast) var(--ease-snap),
     box-shadow var(--speed-fast) var(--ease-snap),
@@ -96,16 +116,15 @@
 
   &:focus-visible {
     border-color: var(--energy-primary);
-    outline: var(--physics-border-width) solid var(--border-shadow);
+    // Focus glow - obedient to optics
     box-shadow:
-      inset 0 2px 8px rgba(0, 0, 0, calc(0.5 * var(--shadow-strength))),
-      0 0 10px
+      inset 0 2px 8px
         color-mix(
           in srgb,
-          var(--energy-primary)
-            calc(var(--glow-opacity) * var(--glow-strength, 1) * 100%),
+          black calc(0.5 * var(--optics-shadow-mult) * 100%),
           transparent
-        );
+        ),
+      0 0 10px optics-alpha(var(--energy-primary), 0.6, '--optics-glow-mult');
   }
 }
 
@@ -116,11 +135,8 @@
 // MIXIN: Neon Text Glow
 @mixin text-glow($color: var(--energy-primary)) {
   color: $color;
-  text-shadow: 0 0 15px alpha($color, 60%);
-
-  @at-root :where([data-mode='light']) & {
-    text-shadow: 0 0 1px alpha($color, 40%);
-  }
+  // If optics-text-glow is 0 (Light Mode), shadow becomes transparent.
+  text-shadow: 0 0 15px optics-alpha($color, 0.6, '--optics-text-glow');
 }
 
 // MIXIN: The "Gemini Laser" Structure
@@ -293,4 +309,67 @@
   &[data-status='loading'] {
     @content;
   }
+}
+
+// ==========================================================================
+// 4. STATE MANAGEMENT MIXINS (Strict Protocol)
+// ==========================================================================
+
+// 1. ACTIVE STATE (Interactive)
+// Use for: Toggles, Tabs, Selections.
+// ⛔️ DO NOT USE: .active class
+@mixin state-active {
+  &[aria-pressed='true'],
+  &[aria-selected='true'],
+  &[aria-checked='true'],
+  &[data-state='active'] {
+    @content;
+  }
+}
+
+// 2. OPEN STATE (Visibility)
+// Use for: Dropdowns, Tooltips, Dialogs, Accordions.
+// ⛔️ DO NOT USE: .show, .open classes
+@mixin state-open {
+  &[data-state='open'],
+  &[open] {
+    @content;
+  }
+}
+
+// 3. LOADING STATE (Process)
+// Use for: Buttons, Cards, inputs waiting for network.
+// ⛔️ DO NOT USE: .loading class
+@mixin state-loading {
+  &[aria-busy='true'],
+  &[data-status='loading'] {
+    @content;
+  }
+}
+
+// ==========================================================================
+// 5. UTILITIES
+// ==========================================================================
+
+// HELPER: Dynamic Optical Alpha
+// Calculates a color's opacity based on the Global Optical Multiplier.
+// $base-opacity: 0.5 (50%)
+@function optics-alpha($color, $base-opacity, $mult-var: '--optics-glow-mult') {
+  // Logic: If Multiplier is 0, we want 100% transparent.
+  // We approximate this using CSS calc in the color-mix percentage.
+  // Note: Standard Sass cannot compile CSS calc() inside color functions easily,
+  // so we rely on native CSS variables for the multiplier interaction.
+
+  // SIMPLIFIED STRATEGY for robust CSS:
+  // We return a color-mix where the transparent amount is controlled by the variable.
+  // Since we can't easily do calc() inside the percentage of color-mix in all browsers yet properly with vars,
+  // we will use the `rgba` or `opacity` property at the component level where possible,
+  // OR use a simpler approach:
+
+  // We will define the shadow color as a variable that changes.
+  @return color-mix(
+    in srgb,
+    $color calc(#{$base-opacity} * var(#{$mult-var}) * 100%),
+    transparent
+  );
 }

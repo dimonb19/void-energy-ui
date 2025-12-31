@@ -1,18 +1,18 @@
 ---
 import '../styles/global.scss';
 
+// Components
 import VoidEnergyUI from '../components/index.svelte';
 import Modal from '../components/Modal.svelte';
 import Toast from '../components/Toast.svelte';
 
-// We use the Registry for Theme Logic (Light vs Dark / Physics)
+// Configuration (SSOT)
 import themeRegistry from '../config/void-registry.json';
-// We use the Tokens for raw values (Density Maps) to prevent FOUC
 import { VOID_TOKENS } from '../config/design-tokens';
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="no-js">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -22,23 +22,30 @@ import { VOID_TOKENS } from '../config/design-tokens';
       is:inline
       define:vars={{
         THEMES: themeRegistry,
-        DENSITY_MAPS: VOID_TOKENS.density,
+        // We only need the factors (0.75, 1, 1.25) to drive the CSS calc() logic
+        DENSITY_FACTORS: VOID_TOKENS.density.factors,
       }}
     >
       (function () {
         try {
           const root = document.documentElement;
+          // 0. JS Ready Flag (Optional hooks for CSS)
+          root.classList.remove('no-js');
+          root.classList.add('js-active');
+
           const store = localStorage;
 
           // ================================================================
-          // 1. RESTORE ATMOSPHERE & PHYSICS (The Triad)
+          // 1. RESTORE ATMOSPHERE (The Soul)
           // ================================================================
-          const savedAtmosphere = store.getItem('void_atmosphere') || 'void';
+          const savedAtmosphere = store.getItem('void_atmosphere');
 
-          // Validate against the Registry. Fallback to 'void' if invalid.
-          const activeTheme = THEMES[savedAtmosphere]
-            ? savedAtmosphere
-            : 'void';
+          // Validate: If saved theme exists in registry, use it. Else default to 'void'.
+          const activeTheme =
+            savedAtmosphere && THEMES[savedAtmosphere]
+              ? savedAtmosphere
+              : 'void';
+
           const config = THEMES[activeTheme];
 
           // Apply Triad Attributes (Instant Visual Sync)
@@ -46,78 +53,43 @@ import { VOID_TOKENS } from '../config/design-tokens';
           root.setAttribute('data-physics', config.physics);
           root.setAttribute('data-mode', config.mode);
 
-          const SPACE_KEYS = ['xs', 'sm', 'md', 'lg', 'xl', '2xl'];
-
-          const getDensityFactor = (density) => {
-            const standard = DENSITY_MAPS?.standard;
-            const target = DENSITY_MAPS?.[density];
-            if (!standard || !target) return 1;
-
-            const sum = (map) =>
-              SPACE_KEYS.reduce((total, key) => {
-                const value = parseFloat(String(map[key]));
-                return Number.isFinite(value) ? total + value : total;
-              }, 0);
-
-            const base = sum(standard);
-            const targetSum = sum(target);
-            if (!base || !targetSum) return 1;
-            return targetSum / base;
-          };
-
-          const applyDensity = (density) => {
-            const factor = getDensityFactor(density);
-            root.style.setProperty('--density', String(factor));
-
-            const targetMap = DENSITY_MAPS?.[density];
-            if (!targetMap) return;
-
-            if (density === 'standard') {
-              SPACE_KEYS.forEach((token) => {
-                root.style.removeProperty(`--space-${token}`);
-              });
-              return;
-            }
-
-            SPACE_KEYS.forEach((token) => {
-              const value = targetMap[token];
-              if (value) {
-                root.style.setProperty(`--space-${token}`, value);
-              }
-            });
-          };
-
           // ================================================================
-          // 2. RESTORE USER CONFIG (Preferences)
+          // 2. RESTORE USER CONFIG (The Body)
           // ================================================================
           const rawConfig = store.getItem('void_user_config');
+          let userPrefs = {};
 
           if (rawConfig) {
-            const userPrefs = JSON.parse(rawConfig);
-
-            // A. Restore Text Scale (Clamped 0.75x - 2.0x)
-            if (userPrefs.scale) {
-              const safeScale = Math.min(Math.max(userPrefs.scale, 0.75), 2);
-              root.style.setProperty('--text-scale', safeScale.toString());
-            }
-
-            // B. Restore Custom Fonts
-            if (userPrefs.fontBody) {
-              root.style.setProperty('--user-font-body', userPrefs.fontBody);
-            }
-            if (userPrefs.fontHeading) {
-              root.style.setProperty(
-                '--user-font-heading',
-                userPrefs.fontHeading
-              );
-            }
-
-            // C. Restore Density (PREVENTS SPACING JUMP)
-            applyDensity(userPrefs.density || 'standard');
+            try {
+              userPrefs = JSON.parse(rawConfig);
+            } catch (e) {}
           }
+
+          // A. Text Scale (Default: 1)
+          const scale = userPrefs.scale || 1;
+          // Clamp for safety (0.75 - 2.0) matching engine limits
+          const safeScale = Math.min(Math.max(scale, 0.75), 2);
+          root.style.setProperty('--text-scale', String(safeScale));
+
+          // B. Custom Fonts
+          if (userPrefs.fontBody) {
+            root.style.setProperty('--user-font-body', userPrefs.fontBody);
+          }
+          if (userPrefs.fontHeading) {
+            root.style.setProperty(
+              '--user-font-heading',
+              userPrefs.fontHeading
+            );
+          }
+
+          // C. Density (The Math)
+          // We apply the factor (e.g., 0.75) which CSS uses to calc() spacing
+          const density = userPrefs.density || 'standard';
+          const factor = DENSITY_FACTORS[density] || 1;
+          root.style.setProperty('--density', String(factor));
         } catch (e) {
-          // Fail Safe: If anything explodes, default to Void/Glass/Dark
           console.warn('Void Engine: Hydration Failure', e);
+          // Fail Safe: Default to Void/Glass/Dark
           document.documentElement.setAttribute('data-atmosphere', 'void');
           document.documentElement.setAttribute('data-physics', 'glass');
           document.documentElement.setAttribute('data-mode', 'dark');

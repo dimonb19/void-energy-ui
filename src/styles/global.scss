@@ -3,16 +3,14 @@
  * RESPONSIBILITY: Imports layers and provides the master architectural reference.
  */
 
-/* 1. ABSTRACTS (Tools, Variables, Mixins) */
+/* 1. CONFIGURATION & LAYERS (Must be first for Sass Compiler) */
 @use 'abstracts' as *;
+@use 'base'; /* "The Laws of Physics" (Resets, Typography, Themes) */
+@use 'components'; /* "The Materials" (Buttons, Cards, etc.) */
 
-/* 2. BASE (Resets, Typography, Themes) */
-@use 'base';
-
-/* 3. COMPONENTS (The Objects) */
-@use 'components';
-
-/* 4. TAILWIND ENTRY (The Engine) */
+/* 2. TAILWIND LAYERS (The Overrides) */
+/* We load these AFTER our layers so Tailwind utilities (e.g. p-0, hidden) 
+   can successfully override component styles when needed. */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -190,15 +188,26 @@
    11. STATE PROTOCOL (Attribute-Driven UI)
    --------------------------------------------------------------------------
    PHILOSOPHY: "State is DOM, not Memory."
-   We do not use classes like `.active` or `.show`. We use semantic attributes.
-   This ensures Accessibility (A11y) and CSS Specificity are always aligned.
+   We STRICTLY do not use classes like `.active`, `.show`, or `.loading`.
+   We use semantic attributes that describe the CURRENT TRUTH of the component.
+   
+   Why?
+   1. Accessibility is free (Screen readers read attributes, not classes).
+   2. Specificity is consistent (Attributes are equal; classes vary).
+   3. JS Logic is decoupled from CSS styling.
 
-   CONTEXT          | ATTRIBUTE       | VALUES              | EXAMPLE
-   ---------------- | --------------- | ------------------- | --------------------------------
-   Toggle Button    | aria-pressed    | true / false        | <button aria-pressed={isOn}>
-   Tabs / Selection | aria-selected   | true / false        | <button role="tab" aria-selected={isActive}>
-   Dropdowns        | data-state      | open / closed       | <div data-state={isOpen ? 'open' : 'closed'}>
-   Generic Logic    | data-state      | active / inactive   | <div class="tile" data-state={isActive ? 'active' : 'inactive'}>
-   Loading/Process  | data-status     | loading / idle      | <button data-status={isLoading ? 'loading' : 'idle'}>
+   UNIFIED STATE MAP (Strict Protocol)
+   --------------------------------------------------------------------------
+   CONTEXT          | ATTRIBUTE            | VALUES              | USAGE EXAMPLE
+   ---------------- | -------------------- | ------------------- | -------------------------
+   Toggle Button    | aria-pressed         | true / false        | <button aria-pressed="true">
+   Tabs / Radios    | aria-selected        | true / false        | <button role="tab" aria-selected="true">
+   Checkboxes       | aria-checked         | true / false        | <div role="checkbox" aria-checked="true">
+   ---------------- | -------------------- | ------------------- | -------------------------
+   Visibility       | data-state           | open / closed       | <div data-state="open">
+   Generic Active   | data-state           | active / inactive   | <div class="dropzone" data-state="active">
+   ---------------- | -------------------- | ------------------- | -------------------------
+   Process          | data-status          | loading / idle      | <button data-status="loading">
+   Validation       | aria-invalid         | true / false        | <input aria-invalid="true">
    
    ========================================================================== */

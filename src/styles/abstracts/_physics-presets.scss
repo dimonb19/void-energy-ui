@@ -40,10 +40,30 @@
    --- TIME (MOTION) ---
    $speed-base           : Duration of transitions. 0s = Instant/Robotic.
    $ease-base            : The math of movement. Linear, Ease-Out, or Steps.
+   
+   ==========================================================================
+   ⚠️ SYSTEM ARCHITECTURE WARNING
+   --------------------------------------------------------------------------
+   The variables defined here are TIER 2 (System Controlled).
+   They are calculated based on the 'physics' mode ('glass', 'flat', 'retro').
+
+   ❌ DO NOT OVERRIDE THESE MANUALLY IN THEMES.
+   ❌ DO NOT USE THESE FOR COLOR (Use --energy-* or --bg-* instead).
+
+   ✅ READ-ONLY API:
+   - var(--physics-blur)
+   - var(--physics-border-width)
+   - var(--speed-base) / var(--speed-fast)
+   - var(--ease-snap) / var(--ease-flow)
    ========================================================================== */
 
 @use 'sass:map';
 @use 'functions' as *;
+
+// 'glow-opacity': 0.6,
+// 'glow-strength': 1,
+// 'shadow-strength': 1,
+// 'border-opacity': 1,
 
 // 1. THE DEFINITIONS (Data Layer)
 $physics-presets: (
@@ -51,10 +71,9 @@ $physics-presets: (
     'physics-blur': 20px,
     'physics-border-width': 1px,
     'radius-base': var(--radius-md),
-    'glow-opacity': 0.6,
-    'glow-strength': 1,
-    'shadow-strength': 1,
-    'border-opacity': 1,
+    // Base Values (Before Multipliers)
+    'base-glow-opacity': 0.6,
+    'base-shadow-opacity': 0.5,
     // Surfaces
     'surface-bg': linear-gradient(
         to bottom,
@@ -87,10 +106,10 @@ $physics-presets: (
     'physics-blur': 0px,
     'physics-border-width': 1px,
     'radius-base': var(--radius-sm),
-    'glow-opacity': 0,
-    'glow-strength': 0,
-    'shadow-strength': 1,
-    'border-opacity': 1,
+    'base-glow-opacity': 0,
+    // Flat never glows, even in dark mode
+    'base-shadow-opacity': 0.1,
+    // Much lighter shadows
     'surface-bg': var(--bg-surface),
     'surface-border-top': var(--border-highlight),
     'surface-border-side': var(--border-highlight),
@@ -108,10 +127,9 @@ $physics-presets: (
     'physics-blur': 0px,
     'physics-border-width': 2px,
     'radius-base': 0px,
-    'glow-opacity': 0,
-    'glow-strength': 0,
-    'shadow-strength': 1,
-    'border-opacity': 1,
+    'base-glow-opacity': 0,
+    'base-shadow-opacity': 1,
+    // Hard shadows
     'surface-bg': var(--bg-surface),
     'surface-border-top': var(--border-highlight),
     'surface-border-side': var(--border-highlight),
@@ -128,18 +146,34 @@ $physics-presets: (
 
 // 2. THE EMITTER (Logic Layer)
 @mixin emit-physics {
+  // A. Emit Physics Presets (Geometry/Time)
   @each $name, $map in $physics-presets {
     [data-physics='#{$name}'] {
-      // A. Emit Static Props
       @each $key, $val in $map {
         --#{$key}: #{$val};
       }
 
-      // B. Calculate Derived Motion
-      // We do this here to avoid runtime CSS calc() overhead for static relationships
+      // Calculate derived speed
       $speed-base: map.get($map, 'speed-base');
       $speed-fast: if($speed-base == 0s, 0s, $speed-base * 0.66);
       --speed-fast: #{$speed-fast};
     }
+  }
+
+  // B. Emit Optics (The Dimmer Switch)
+  // This controls the INTENSITY of the physics based on Light/Dark mode.
+
+  // DARK MODE (High Energy)
+  [data-mode='dark'] {
+    --optics-glow-mult: 1; // Enable neon glows
+    --optics-shadow-mult: 1; // Standard depth
+    --optics-text-glow: 1; // Enable text shadows
+  }
+
+  // LIGHT MODE (Clean / Ink)
+  [data-mode='light'] {
+    --optics-glow-mult: 0; // KILL all neon glows globally
+    --optics-shadow-mult: 0.5; // Reduce shadow intensity by 50%
+    --optics-text-glow: 0; // Kill text shadows for crisp reading
   }
 }

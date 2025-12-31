@@ -37,14 +37,14 @@
   aria-modal="true"
 >
   <div onclick={stopPropagation} role="dialog" tabindex="-1">
-    <h2 class="text-highlight">CONFIRM INITIATION?</h2>
+    <h2>CONFIRM INITIATION?</h2>
     <p>
       You are about to deploy the production build. This action cannot be undone
       by standard protocols.
     </p>
 
     <div class="surface-sunk rounded-md p-md flex flex-row gap-md items-center">
-      <span class="text-highlight">⚠</span>
+      <span>⚠</span>
       <span>This action will consume 500 Credits.</span>
     </div>
 

@@ -15,34 +15,30 @@ interface EngineOptions {
   onError?: ErrorHandler;
 }
 
+// The shape of a theme in the registry (logic only)
 export interface ThemeConfig {
   physics: VoidPhysics;
   mode: VoidMode;
 }
 
+// The shape of a FULL theme definition (for injection)
+export interface RuntimeThemeDefinition extends ThemeConfig {
+  palette: Record<string, string>; // The colors (e.g., 'energy-primary': '#f00')
+}
+
+// Mutable Registry
 type Registry = Record<string, ThemeConfig>;
-const REGISTRY = THEME_REGISTRY as Registry;
 
 const DENSITY_FACTORS = VOID_TOKENS.density.factors;
 
 function applyDensity(root: HTMLElement, density: VoidDensity) {
   const factor = DENSITY_FACTORS[density] ?? 1;
   root.style.setProperty('--density', factor.toString());
-
   // Cleanup legacy individual overrides if present
   const SPACE_KEYS = Object.keys(VOID_TOKENS.density.scale);
   SPACE_KEYS.forEach((token) => {
     root.style.removeProperty(`--space-${token}`);
   });
-}
-
-type Listener = (engine: VoidEngine) => void;
-
-interface UserConfig {
-  fontHeading?: string | null;
-  fontBody?: string | null;
-  scale: number;
-  density: VoidDensity;
 }
 
 const KEYS = {
@@ -52,15 +48,26 @@ const KEYS = {
 
 export class VoidEngine {
   public atmosphere: string;
-  private observers: Listener[];
+  private observers: Function[]; // Loosened type for easier interop
   private onError?: ErrorHandler;
-  public userConfig: UserConfig;
+  public userConfig: {
+    fontHeading?: string | null;
+    fontBody?: string | null;
+    scale: number;
+    density: VoidDensity;
+  };
+
+  // 1. The Master Registry (Starts with Static, grows with Dynamic)
+  private registry: Registry;
 
   constructor(options?: EngineOptions) {
     this.atmosphere = 'void';
     this.observers = [];
     this.onError = options?.onError;
-    // Default safe config
+
+    // Load the static build-time registry
+    this.registry = { ...(THEME_REGISTRY as Registry) };
+
     this.userConfig = {
       fontHeading: null,
       fontBody: null,
@@ -73,6 +80,51 @@ export class VoidEngine {
     }
   }
 
+  // --- RUNTIME INJECTION (The Collaborator Feature) ---
+
+  /**
+   * Injects a new theme into the engine at runtime.
+   * Useful for loading themes from a Backend API or User Upload.
+   */
+  public injectTheme(name: string, definition: RuntimeThemeDefinition): void {
+    if (this.registry[name]) {
+      console.warn(`Void Engine: Overwriting existing theme "${name}"`);
+    }
+
+    // A. Update Logic Registry
+    this.registry[name] = {
+      physics: definition.physics,
+      mode: definition.mode,
+    };
+
+    // B. Generate CSS Variables
+    // We map the palette object to CSS Custom Properties
+    const cssVars = Object.entries(definition.palette)
+      .map(([key, value]) => `--${key}: ${value};`)
+      .join('\n');
+
+    const cssRule = `
+      [data-atmosphere='${name}'] {
+        color-scheme: ${definition.mode};
+        ${cssVars}
+      }
+    `;
+
+    // C. Inject to DOM
+    if (typeof document !== 'undefined') {
+      let styleTag = document.getElementById('void-dynamic-themes');
+      if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'void-dynamic-themes';
+        document.head.appendChild(styleTag);
+      }
+      styleTag.textContent += cssRule;
+    }
+
+    // D. Notify Listeners (UI updates list)
+    this.notify();
+  }
+
   // --- STORAGE HELPERS ---
 
   private safeGet(key: string): string | null {
@@ -80,7 +132,6 @@ export class VoidEngine {
       if (typeof localStorage === 'undefined') return null;
       return localStorage.getItem(key);
     } catch (e) {
-      console.warn('Void Engine: Storage access denied.', e);
       return null;
     }
   }
@@ -89,9 +140,7 @@ export class VoidEngine {
     try {
       if (typeof localStorage === 'undefined') return;
       localStorage.setItem(key, value);
-    } catch (e) {
-      console.warn('Void Engine: Storage write failed.', e);
-    }
+    } catch (e) {}
   }
 
   // --- CORE LIFECYCLE ---
@@ -100,87 +149,66 @@ export class VoidEngine {
     if (typeof document === 'undefined') return;
     const root = document.documentElement;
 
-    // 1. DOM TRUTH (Priority 1)
-    // Check if a blocking script or SSR has already set the atmosphere.
     const domAtmosphere = root.getAttribute('data-atmosphere');
-
-    // 2. STORAGE TRUTH (Priority 2)
     const storedAtmosphere = this.safeGet(KEYS.ATMOSPHERE);
 
-    // 3. RESOLVE ATMOSPHERE
+    // Resolve Atmosphere using the instance registry
     if (domAtmosphere && this.hasTheme(domAtmosphere)) {
-      // Trust the DOM. The hydration script won the race.
       this.atmosphere = domAtmosphere;
     } else if (storedAtmosphere && this.hasTheme(storedAtmosphere)) {
-      // Fallback to storage if DOM is blank
       this.atmosphere = storedAtmosphere;
-      this.syncAttributes(); // Apply it to DOM
+      this.syncAttributes();
     } else {
-      // Default to Void
       this.atmosphere = 'void';
       this.syncAttributes();
     }
 
-    // 4. LOAD USER CONFIG (Typography, Density, Scale)
     const storedConfig = this.safeGet(KEYS.USER_CONFIG);
     if (storedConfig) {
       try {
         const parsed = JSON.parse(storedConfig);
         this.userConfig = { ...this.userConfig, ...parsed };
-      } catch (e) {
-        console.error('Void Engine: Corrupt user config', e);
-      }
+      } catch (e) {}
     }
 
-    // 5. INITIAL RENDER
-    // Applies the user config (CSS Vars) to match the resolved atmosphere.
     this.render();
   }
 
   // --- PUBLIC API ---
 
   public hasTheme(name: string): boolean {
-    return !!REGISTRY[name];
+    return !!this.registry[name];
+  }
+
+  // Returns the list of valid theme keys (Static + Injected)
+  public getAvailableThemes(): string[] {
+    return Object.keys(this.registry);
   }
 
   public setAtmosphere(name: string): void {
-    if (!REGISTRY[name]) {
+    if (!this.registry[name]) {
       const errorMsg = `Void Engine: Atmosphere "${name}" is not registered.`;
-      if (this.onError) {
-        this.onError(new Error(errorMsg));
-        return;
-      }
+      if (this.onError) this.onError(new Error(errorMsg));
       console.error(`${errorMsg} Falling back to 'void'.`);
       name = 'void';
     }
 
     this.atmosphere = name;
-
-    // Write State
     this.syncAttributes();
     this.safeSet(KEYS.ATMOSPHERE, name);
     this.notify();
   }
 
-  /**
-   * Sets preferences for fonts, scale, and density.
-   * Trigger: User changes settings in UI.
-   */
-  public setPreferences(prefs: Partial<UserConfig>): void {
+  public setPreferences(prefs: Partial<typeof this.userConfig>): void {
     this.userConfig = { ...this.userConfig, ...prefs };
     this.render();
     this.persist();
     this.notify();
   }
 
-  public subscribe(callback: Listener): () => void {
+  public subscribe(callback: Function): () => void {
     this.observers.push(callback);
-    // Notify immediately to sync local state
     callback(this);
-
-    // NOTE: Removed `this.render()`.
-    // Subscription is now pure and does not force DOM repaints.
-
     return () => {
       this.observers = this.observers.filter((cb) => cb !== callback);
     };
@@ -188,7 +216,7 @@ export class VoidEngine {
 
   public getConfig(name?: string): ThemeConfig {
     const target = name || this.atmosphere;
-    return REGISTRY[target] || REGISTRY['void'];
+    return this.registry[target] || this.registry['void'];
   }
 
   // --- INTERNAL ENGINE ---
@@ -197,35 +225,22 @@ export class VoidEngine {
     this.observers.forEach((cb) => cb(this));
   }
 
-  /**
-   * Syncs the "Structural" attributes (Atmosphere, Physics, Mode) to the HTML tag.
-   */
   private syncAttributes(): void {
     if (typeof document === 'undefined') return;
-
-    const config = REGISTRY[this.atmosphere];
+    const config = this.registry[this.atmosphere];
     const root = document.documentElement;
-
-    // Use setAttribute to ensure CSS selectors [data-atmosphere="..."] match
     root.setAttribute('data-atmosphere', this.atmosphere);
     root.setAttribute('data-physics', config.physics);
     root.setAttribute('data-mode', config.mode);
   }
 
-  /**
-   * Renders "User Preference" CSS Variables (Scale, Fonts, Density).
-   * This is separated from syncAttributes() because it deals with
-   * quantitative customization, not qualitative themes.
-   */
   public render(): void {
     if (typeof document === 'undefined') return;
     const root = document.documentElement;
 
-    // A. Font Scaling
     const safeScale = Math.min(Math.max(this.userConfig.scale, 0.75), 2);
     root.style.setProperty('--text-scale', safeScale.toString());
 
-    // B. Font Overrides
     if (this.userConfig.fontHeading) {
       root.style.setProperty(
         '--user-font-heading',
@@ -241,19 +256,11 @@ export class VoidEngine {
       root.style.removeProperty('--user-font-body');
     }
 
-    // C. Density Maps
     applyDensity(root, this.userConfig.density);
   }
 
   private persist(): void {
-    // We persist both, though atmosphere is usually instant-saved in setAtmosphere
     this.safeSet(KEYS.ATMOSPHERE, this.atmosphere);
     this.safeSet(KEYS.USER_CONFIG, JSON.stringify(this.userConfig));
-  }
-}
-
-declare global {
-  interface Window {
-    Void: VoidEngine;
   }
 }

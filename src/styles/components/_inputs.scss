@@ -64,6 +64,7 @@ select {
   }
 
   // Error State
+  &[aria-invalid='true'],
   &.has-error,
   &:invalid:not(:placeholder-shown) {
     border-color: var(--color-error);
@@ -236,6 +237,7 @@ input[type='radio'] {
 
   // Hover or Drag Active
   &:hover,
+  &[data-state='active'],
   &.drag-active,
   &:focus-within {
     border-color: var(--energy-primary);

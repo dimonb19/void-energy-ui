@@ -7,6 +7,41 @@
  * This file is the SINGLE SOURCE OF TRUTH. It defines both the "Soul" (Colors)
  * and the "Brain" (Physics/Logic) for the entire application.
  *
+ * --------------------------------------------------------------------------
+ * 🔒 PUBLIC CONTRACT (API v1)
+ * --------------------------------------------------------------------------
+ * Collaborators may create custom themes by providing a "Palette" object.
+ * To ensure the UI Physics engine works, the Palette MUST contain the following keys:
+ *
+ * [GROUP 1: THE CANVAS] - Depth layers
+ * - 'bg-canvas'      : The absolute floor (The Void).
+ * - 'bg-surface'     : Floating elements (Glass/Cards).
+ * - 'bg-sink'        : Recessed elements (Inputs/Wells).
+ * - 'bg-spotlight'   : Top-down ambient light source.
+ *
+ * [GROUP 2: THE ENERGY] - Brand Identity
+ * - 'energy-primary'   : Main action color (Buttons, Active States).
+ * - 'energy-secondary' : Supporting color (Scrollbars, Gradients).
+ * - 'border-highlight' : Top/Left light source (Glass reflection).
+ * - 'border-shadow'    : Bottom/Right shadow (Depth definition).
+ *
+ * [GROUP 3: THE SIGNAL] - Typography & Data
+ * - 'text-main' : High emphasis (Headings, Data).
+ * - 'text-dim'  : Medium emphasis (Body, Labels).
+ * - 'text-mute' : Low emphasis (Captions, Placeholders).
+ *
+ * [GROUP 4: SEMANTIC] - Utility Colors
+ * - 'color-success'
+ * - 'color-error'
+ * - 'color-warning' (Optional)
+ * - 'color-premium' (Optional)
+ *
+ * [GROUP 5: FONTS]
+ * - 'font-atmos-heading'
+ * - 'font-atmos-body'
+ *
+ * --------------------------------------------------------------------------
+ *
  * 👉 TO ADD A NEW THEME:
  * * STEP 1: DEFINE THEME (In this file)
  * 1. Scroll down to `VOID_TOKENS.themes`.

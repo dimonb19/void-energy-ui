@@ -15,7 +15,7 @@
 
   // 2. Handle the Engine Instance
   $effect.root(() => {
-    return engine.subscribe((eng) => {
+    return engine.subscribe((eng: any) => {
       atmosphere = eng.atmosphere;
       currentScale = eng.userConfig.scale;
       currentDensity = eng.userConfig.density;
@@ -535,7 +535,7 @@
         <div class="tile-data">
           <h5>Sector 7G</h5>
           <p>
-            Status: <strong class="text-success">Active</strong>
+            Status: <strong>Active</strong>
           </p>
         </div>
       </a>

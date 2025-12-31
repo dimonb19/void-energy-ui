@@ -3,61 +3,53 @@
  * RESPONSIBILITY: Synchronizes VoidEngine state with Svelte 5 Runes efficiently.
  */
 
-import { VoidEngine } from './void-engine';
+import { VoidEngine, type RuntimeThemeDefinition } from './void-engine';
 
-// --- STRICT SINGLETON PATTERN ---
-// 1. If we are in the browser, check if a global instance exists.
+// Extend the Window interface globally
+declare global {
+  interface Window {
+    Void: VoidEngine;
+  }
+}
+
+// 1. Singleton Initialization
 if (typeof window !== 'undefined') {
   if (!window.Void) {
     window.Void = new VoidEngine();
   }
 }
-
-// 2. Use the global instance if available, otherwise create a temporary one (SSR)
 const engine = typeof window !== 'undefined' ? window.Void : new VoidEngine();
 
-// We split the state so specific listeners only trigger on relevant changes.
+// 2. Reactive State (Runes)
 let atmosphere = $state(engine.atmosphere);
 let config = $state(engine.userConfig);
+// New: Reactive list of themes
+let availableThemes = $state(engine.getAvailableThemes());
 
-engine.subscribe((updatedEngine) => {
+engine.subscribe((updatedEngine: VoidEngine) => {
   atmosphere = updatedEngine.atmosphere;
-  // We spread the object to ensure Svelte detects the value change
   config = { ...updatedEngine.userConfig };
-});
-
-// 3. Create Global Reactive State
-const voidState = $state({
-  atmosphere: engine.atmosphere,
-  config: engine.userConfig,
-});
-
-// 4. One-Way Binding: Engine -> Svelte
-// Note: engine.subscribe() now calls engine.render(), ensuring
-// the DOM is repainted if Svelte Hydration wiped the styles.
-engine.subscribe((updatedEngine) => {
-  voidState.atmosphere = updatedEngine.atmosphere;
-  voidState.config = { ...updatedEngine.userConfig };
+  // Update list whenever engine notifies (e.g. after injection)
+  availableThemes = updatedEngine.getAvailableThemes();
 });
 
 export const theme = {
-  // GETTER: Returns the reactive atmosphere
+  // Getters
   get atmosphere() {
     return atmosphere;
   },
+  get config() {
+    return config;
+  },
+  get availableThemes() {
+    return availableThemes;
+  }, // UI consumes this
 
-  // SETTER: Pushes changes back to the Engine
+  // Setters
   set atmosphere(value: string) {
     engine.setAtmosphere(value);
   },
 
-  // GETTER: Returns the reactive user config
-  // Note: We keep the object structure for API compatibility with components
-  get config() {
-    return config;
-  },
-
-  // Actions
   setFonts(heading: string | null, body: string | null) {
     engine.setPreferences({ fontHeading: heading, fontBody: body });
   },
@@ -70,6 +62,10 @@ export const theme = {
     engine.setPreferences({ density });
   },
 
-  // Expose raw engine for advanced use cases
+  // New: Expose Injection to UI
+  inject(name: string, definition: RuntimeThemeDefinition) {
+    engine.injectTheme(name, definition);
+  },
+
   raw: engine,
 };

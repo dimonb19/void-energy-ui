@@ -78,21 +78,14 @@ button:not(.btn-void),
     &:hover:not(:disabled) {
       border-color: var(--energy-primary);
       transform: translateY(-2px);
-
-      // Default (Void) Behavior
-      color: #ffffff;
+      color: var(--text-main);
       box-shadow:
-        0 0 10px alpha(var(--energy-primary), 40%),
-        inset 0 0 5px alpha(var(--energy-primary), 20%);
-      text-shadow: 0 0 8px alpha(var(--energy-primary), 60%);
+        0 0 10px optics-alpha(var(--energy-primary), 0.4, '--optics-glow-mult'),
+        inset 0 0 5px
+          optics-alpha(var(--energy-primary), 0.2, '--optics-glow-mult');
 
-      // Light Mode Override
-      @at-root [data-mode='light'] & {
-        color: var(--energy-primary);
-        border-color: var(--energy-primary);
-        text-shadow: none;
-        box-shadow: none;
-      }
+      text-shadow: 0 0 8px
+        optics-alpha(var(--energy-primary), 0.6, '--optics-text-glow');
     }
   }
 
@@ -134,23 +127,16 @@ button:not(.btn-void),
         background: transparent;
         border: none;
 
-        color: #ffffff;
-
-        // The Glow (Halo around the box)
-        box-shadow: 0 0 30px alpha(var(--energy-primary), 50%);
-        text-shadow: 0 0 10px var(--energy-primary);
-
-        // CTA Light Mode
-        @at-root [data-mode='light'] & {
-          color: var(--energy-primary);
-          text-shadow: none;
-          box-shadow: none;
-        }
-
-        // TERMINAL OVERRIDE: The "Hard Glitch"
-        @at-root [data-physics='retro'] & {
-          text-shadow: none;
-        }
+        // The Glow
+        box-shadow:
+          var(--hover-shadow),
+          0 0 15px
+            optics-alpha(
+              var(--energy-primary),
+              calc(var(--base-glow-opacity) * 0.8),
+              // Scale relative to base
+              '--optics-glow-mult'
+            );
       }
     }
   }
@@ -169,19 +155,18 @@ button:not(.btn-void),
     @media (hover: hover) {
       &:hover:not(:disabled) {
         border-color: $color-var;
-        background: alpha($color-var, 15%);
+        background: optics-alpha($color-var, 0.15, '--optics-glow-mult');
         color: #ffffff;
 
         box-shadow:
-          0 0 10px alpha($color-var, 40%),
-          inset 0 0 5px alpha($color-var, 20%);
-        text-shadow: 0 0 8px alpha($color-var, 60%);
+          0 0 10px optics-alpha($color-var, 0.4, '--optics-glow-mult'),
+          inset 0 0 5px optics-alpha($color-var, 0.2, '--optics-glow-mult');
 
+        text-shadow: 0 0 8px optics-alpha($color-var, 0.6, '--optics-text-glow');
+
+        // Automatic Light Mode override for text color
         @at-root [data-mode='light'] & {
           color: $color-var;
-          background: alpha($color-var, 10%);
-          box-shadow: none;
-          text-shadow: none;
         }
       }
     }
@@ -202,11 +187,11 @@ button:not(.btn-void),
 
   // ========================================================================
   // ACTIVE STATE (Toggle / Selected)
-  // Usage: class="btn active" or class="btn" aria-pressed="true"
+  // Usage: <button class="btn" aria-pressed="true">
   // ========================================================================
   @include state-active {
     // 1. Solid Fill (The "Lit" Look)
-    background: alpha(var(--energy-primary), 15%);
+    background: optics-alpha(var(--energy-primary), 0.15, '--optics-glow-mult');
     border-color: var(--energy-primary);
 
     // 2. Contrast Text
@@ -214,8 +199,9 @@ button:not(.btn-void),
 
     // 3. Glow Effect
     box-shadow:
-      0 0 15px alpha(var(--energy-primary), 30%),
-      inset 0 0 10px alpha(var(--energy-primary), 10%);
+      0 0 15px optics-alpha(var(--energy-primary), 0.3, '--optics-glow-mult'),
+      inset 0 0 10px
+        optics-alpha(var(--energy-primary), 0.1, '--optics-glow-mult');
 
     // --- MODE EXCEPTIONS ---
     @at-root [data-mode='light'] & {

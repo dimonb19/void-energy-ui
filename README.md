@@ -1,43 +1,70 @@
-# Astro Starter Kit: Minimal
+# 🌌 Void Energy UI
 
-```sh
-npm create astro@latest -- --template minimal
-```
+> "We do not paint pixels; we define materials."
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+The Void Energy UI is a framework-agnostic, physics-based design system for the **CoNexus** storytelling platform. It combines the performance of **Tailwind CSS** (for Layout) with a bespoke **SCSS Physics Engine** (for Materials).
 
-## 🚀 Project Structure
+## 🚀 The Triad Architecture
 
-Inside of your Astro project, you'll see the following folders and files:
+Every pixel on screen is calculated by the intersection of three layers:
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+1.  **Atmosphere (The Soul):** Defines Color (`--energy-primary`) and Fonts.
+2.  **Physics (The Laws):** Defines Texture, Geometry, and Motion (`glass`, `flat`, `retro`).
+3.  **Mode (The Optics):** Handles Light/Dark contrast and Glow intensity.
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## 🛠 Developer Workflow
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+### 1. The Single Source of Truth
+We utilize a **Token-First** architecture. You do **not** edit SCSS theme files manually.
 
-Any static assets, like images, can be placed in the `public/` directory.
+* **Logic Core:** [`src/config/design-tokens.ts`](./src/config/design-tokens.ts)
+* **Command:** `npm run build:tokens`
+
+This command generates:
+* `src/styles/config/_generated-themes.scss` (The Paint)
+* `src/config/void-registry.json` (The Brain)
+
+### 2. Syntax & Usage
+We use a **Hybrid Protocol**:
+
+* **Layout (Tailwind):** Use standard utilities for geometry.
+    * ✅ `p-md`, `gap-lg`, `flex`, `hidden tablet:block`
+    * ❌ `padding: 20px` (Breaks the Density Engine)
+* **Materials (Void SCSS):** Use component classes for physics.
+    * ✅ `.surface-glass`, `.btn-cta`, `.text-highlight`
+    * ❌ `bg-blue-500` (Breaks the Atmosphere Engine)
+
+### 3. The Laws of Physics
+
+| Concept | Rule |
+| :--- | :--- |
+| **Light is Signal** | We do not use shadows for contrast; we use **Glows**. If it glows, it is interactive. |
+| **Depth is Logic** | **Float (+Z):** Cards/Modals (Glass). **Sink (-Z):** Inputs/Wells (Void Depth). |
+| **Atmosphere is Context** | The UI adapts to the story. Switching from `void` to `paper` changes physics instantly. |
 
 ## 🧞 Commands
 
-All commands are run from the root of the project, from a terminal:
+| Command | Action |
+| :--- | :--- |
+| `npm run dev` | Starts local dev server (and auto-builds tokens) |
+| `npm run build:tokens` | Compiles `design-tokens.ts` into SCSS/JSON |
+| `npm run build` | Production build |
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## 📂 Project Structure
 
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+```text
+/
+├── src/
+│   ├── config/
+│   │   ├── design-tokens.ts      <-- 🧠 EDIT THIS (SSOT)
+│   │   └── void-registry.json    <-- 🤖 Generated (Logic)
+│   ├── styles/
+│   │   ├── abstracts/            <-- Functions, Mixins, Variables
+│   │   ├── base/                 <-- Resets, Typography
+│   │   ├── components/           <-- .btn, .card, .input
+│   │   ├── config/
+│   │   │   └── _generated-themes.scss <-- 🤖 Generated (Styles)
+│   │   └── global.scss           <-- The Cascade Entry Point
+│   └── components/               <-- Svelte/Astro Components
+└── scripts/
+    └── generate-tokens.ts        <-- The Compiler
