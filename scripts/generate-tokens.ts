@@ -50,14 +50,7 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
   const timestamp = new Date().toISOString();
   let scss = `// 🤖 AUTO-GENERATED FILE\n// GENERATED AT: ${timestamp}\n\n`;
 
-  // 1. DENSITY
-  scss += `$spacing-scale: (\n`;
-  Object.entries(tokens.density.scale).forEach(([prop, val]) => {
-    scss += `  '${prop}': ${val},\n`;
-  });
-  scss += `);\n\n`;
-
-  // 2. PHYSICS MAPS
+  // 1. PHYSICS MAPS
   scss += `$generated-physics: (\n`;
   
   Object.entries(tokens.physics).forEach(([mode, rawConfig]) => {
@@ -84,7 +77,7 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
   });
   scss += `);\n\n`;
 
-  // 3. THEMES
+  // 2. THEMES
   scss += `$themes: (\n`;
   Object.entries(tokens.themes).forEach(([themeName, config]) => {
     scss += `  '${themeName}': (\n`;

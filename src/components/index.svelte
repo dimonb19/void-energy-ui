@@ -1,6 +1,6 @@
 <script lang="ts">
   import { theme } from '../adapters/themes.svelte';
-  import { showModal } from '../stores/modal.svelte';
+  import { modal } from '../lib/modal-manager.svelte';
   import { tooltip } from '../actions/tooltip';
   import { toast } from '../stores/toast.svelte';
   import { live, singularity } from '../lib/transitions.svelte';
@@ -244,8 +244,23 @@
           >
           <button
             class="btn-cta"
-            onclick={() => {
-              $showModal = true;
+            onclick={async () => {
+              // 1. Trigger the Modal and PAUSE execution here
+              const confirmed = await modal.confirm(
+                'INITIATE SEQUENCE?',
+                'You are about to deploy the production build.<br>This action cannot be undone by standard protocols.',
+                500, // Cost
+              );
+
+              // 2. Only run this if user clicked "Confirm"
+              if (confirmed) {
+                toast.show(
+                  'Sequence Initiated. Void Energy consuming...',
+                  'success',
+                );
+              } else {
+                toast.show('Sequence Aborted.', 'info');
+              }
             }}
           >
             INITIATE SEQUENCE
@@ -345,13 +360,13 @@
                 </p>
               {:else}
                 {#each moduleTiles as btn, i (i)}
-                  <!-- svelte-ignore a11y_click_events_have_key_events -->
-                  <button class="tile-small" animate:live out:singularity>
+                  <div class="tile-small" animate:live out:singularity>
                     <p class="tile-label">{btn}</p>
-                    <span
+
+                    <button
+                      type="button"
                       class="tile-remove"
-                      role="button"
-                      tabindex="0"
+                      aria-label="Remove {btn}"
                       onclick={() => {
                         moduleTiles = moduleTiles.filter(
                           (tile, index) => index !== i,
@@ -359,8 +374,8 @@
                       }}
                     >
                       ✕
-                    </span>
-                  </button>
+                    </button>
+                  </div>
                 {/each}
               {/if}
             </div>
@@ -400,17 +415,12 @@
                 </p>
               {:else}
                 {#each environmentTiles as btn, i (i)}
-                  <!-- svelte-ignore a11y_click_events_have_key_events -->
-                  <button
-                    class="tile-small-system"
-                    animate:live
-                    out:singularity
-                  >
+                  <div class="tile-small-system" animate:live out:singularity>
                     <p class="tile-label">{btn}</p>
-                    <span
+                    <button
+                      type="button"
                       class="tile-remove"
-                      role="button"
-                      tabindex="0"
+                      aria-label="Remove {btn}"
                       onclick={() => {
                         environmentTiles = environmentTiles.filter(
                           (tile, index) => index !== i,
@@ -418,8 +428,8 @@
                       }}
                     >
                       ✕
-                    </span>
-                  </button>
+                    </button>
+                  </div>
                 {/each}
               {/if}
             </div>
@@ -460,17 +470,12 @@
                 </p>
               {:else}
                 {#each premiumTiles as btn, i (i)}
-                  <!-- svelte-ignore a11y_click_events_have_key_events -->
-                  <button
-                    class="tile-small-premium"
-                    animate:live
-                    out:singularity
-                  >
+                  <div class="tile-small-premium" animate:live out:singularity>
                     <p class="tile-label">{btn}</p>
-                    <span
+                    <button
+                      type="button"
                       class="tile-remove"
-                      role="button"
-                      tabindex="0"
+                      aria-label="Remove {btn}"
                       onclick={() => {
                         premiumTiles = premiumTiles.filter(
                           (tile, index) => index !== i,
@@ -478,8 +483,8 @@
                       }}
                     >
                       ✕
-                    </span>
-                  </button>
+                    </button>
+                  </div>
                 {/each}
               {/if}
             </div>
@@ -527,10 +532,10 @@
     <h2 class="container">05 // RECENT ANOMALIES</h2>
 
     <div class="tiles-collection">
-      <a href="/" class="tile" onclick={(e) => e.preventDefault()}>
+      <button type="button" class="btn-void tile">
         <img
           src="https://media.dgrslabs.ink/conexus-sections/dischordiansaga.avif"
-          alt="Cyber"
+          alt="Sector 7G Cover"
         />
         <div class="tile-data">
           <h5>Sector 7G</h5>
@@ -538,39 +543,39 @@
             Status: <strong>Active</strong>
           </p>
         </div>
-      </a>
+      </button>
 
-      <a href="/" class="tile" onclick={(e) => e.preventDefault()}>
+      <button type="button" class="btn-void tile">
         <img
           src="https://media.dgrslabs.ink/conexus-sections/communitypicks.avif"
-          alt="Fluid"
+          alt="Core Dump Cover"
         />
         <div class="tile-data">
           <h5>Core Dump</h5>
           <p>Size: 4.2 TB</p>
         </div>
-      </a>
+      </button>
 
-      <a href="/" class="tile" onclick={(e) => e.preventDefault()}>
+      <button type="button" class="btn-void tile">
         <img
           src="https://media.dgrslabs.ink/conexus-sections/collabs.avif"
-          alt="Fluid"
+          alt="Collaborations Cover"
         />
         <div class="tile-data">
           <h5>Collaborations</h5>
         </div>
-      </a>
+      </button>
 
-      <a href="/" class="tile" onclick={(e) => e.preventDefault()}>
+      <button type="button" class="btn-void tile">
         <img
           src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop"
-          alt="Abstract"
+          alt="Deep Net Cover"
         />
         <div class="tile-data">
           <h5>Deep Net</h5>
           <p>Signal: 98%</p>
         </div>
-      </a>
+      </button>
 
       <div class="loading-tile"></div>
 

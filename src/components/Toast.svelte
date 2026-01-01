@@ -31,7 +31,7 @@
         {/if}
       </span>
 
-      <span class="toast-text">{@html item.message}</span>
+      <span class="toast-text">{item.message}</span>
 
       <div class="toast-glow"></div>
     </button>

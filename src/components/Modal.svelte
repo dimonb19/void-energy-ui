@@ -1,58 +1,110 @@
 <script lang="ts">
-  import { showModal } from '../stores/modal.svelte';
+  import { modal } from '../lib/modal-manager.svelte';
 
   let dialog = $state<HTMLDialogElement | null>(null);
+  let inputValue = $state(''); // Local state for input modal
 
-  const closeDialog = () => {
-    $showModal = false;
-    dialog?.close();
-  };
-
+  // Reset input when modal opens
   $effect(() => {
-    if (!dialog) return;
-    if ($showModal) {
-      dialog.showModal();
-    } else if (dialog.open) {
-      closeDialog();
+    if (modal.activeId === 'input') {
+      inputValue = modal.options.inputValue || '';
     }
   });
 
-  const handleBackdropClick = (event: MouseEvent) => {
-    if (event.target === event.currentTarget) {
-      closeDialog();
+  $effect(() => {
+    if (!dialog) return;
+    if (modal.activeId && !dialog.open) {
+      dialog.showModal();
+    } else if (!modal.activeId && dialog.open) {
+      dialog.close();
     }
+  });
+
+  const handleClose = () => {
+    if (modal.activeId) modal.close(false);
   };
 
-  const stopPropagation = (event: Event) => {
-    event.stopPropagation();
+  const handleBackdropClick = (e: MouseEvent) => {
+    if (e.target === e.currentTarget) modal.close(false);
   };
+
+  // DYNAMIC SIZING LOGIC
+  let sizeClass = $derived.by(() => {
+    const s = modal.options.size ?? 'md'; // Default to medium
+    if (s === 'md') return ''; // Standard dialog (no modifier needed)
+    return `dialog-${s}`; // dialog-sm, dialog-lg, dialog-full
+  });
 </script>
 
-<!-- svelte-ignore a11y_click_events_have_key_events -->
 <dialog
   bind:this={dialog}
-  onclose={closeDialog}
+  onclose={handleClose}
   onclick={handleBackdropClick}
-  aria-label="Modal"
+  class={sizeClass}
+  aria-labelledby="modal-title"
   aria-modal="true"
 >
-  <div onclick={stopPropagation} role="dialog" tabindex="-1">
-    <h2>CONFIRM INITIATION?</h2>
-    <p>
-      You are about to deploy the production build. This action cannot be undone
-      by standard protocols.
-    </p>
+  <div
+    class="flex flex-col gap-lg"
+    onclick={(e) => e.stopPropagation()}
+    role="presentation"
+  >
+    {#if modal.activeId === 'confirm'}
+      <div class="text-center flex flex-col gap-md">
+        <h2 id="modal-title">{modal.options.title ?? 'Confirm Action'}</h2>
+        <p class="text-dim">{@html modal.options.body}</p>
 
-    <div class="surface-sunk rounded-md p-md flex flex-row gap-md items-center">
-      <span>⚠</span>
-      <span>This action will consume 500 Credits.</span>
-    </div>
+        {#if modal.options.cost}
+          <div
+            class="surface-sunk rounded-md p-md flex flex-row gap-md items-center justify-center"
+          >
+            <span class="text-highlight">⚠</span>
+            <span>Consumes <strong>{modal.options.cost} Credits</strong></span>
+          </div>
+        {/if}
+      </div>
 
-    <div class="flex flex-row justify-end gap-md">
-      <button onclick={() => ($showModal = false)}>Abort</button>
-      <button class="btn-signal" onclick={() => ($showModal = false)}
-        >Confirm</button
-      >
-    </div>
+      <div class="flex flex-row justify-end gap-md pt-sm">
+        <button class="btn-alert" onclick={() => modal.close(false)}>
+          {modal.options.cancelText ?? 'Abort'}
+        </button>
+        <button class="btn-signal" onclick={() => modal.close(true)}>
+          {modal.options.confirmText ?? 'Confirm'}
+        </button>
+      </div>
+    {:else if modal.activeId === 'input'}
+      <div class="flex flex-col gap-md">
+        <h2 id="modal-title">{modal.options.title}</h2>
+
+        <div class="flex flex-col gap-xs">
+          <input
+            type="text"
+            bind:value={inputValue}
+            placeholder={modal.options.placeholder}
+            class="w-full"
+            onkeydown={(e) => e.key === 'Enter' && modal.close(inputValue)}
+          />
+        </div>
+      </div>
+
+      <div class="flex flex-row justify-end gap-md pt-sm">
+        <button class="btn-void text-mute" onclick={() => modal.close(null)}>
+          Cancel
+        </button>
+        <button class="btn-cta" onclick={() => modal.close(inputValue)}>
+          {modal.options.confirmText ?? 'Submit'}
+        </button>
+      </div>
+    {:else if modal.activeId === 'alert'}
+      <div class="text-center flex flex-col gap-md">
+        <h2 id="modal-title">{modal.options.title ?? 'System Alert'}</h2>
+        <p>{@html modal.options.body}</p>
+      </div>
+      <div class="flex flex-row justify-center pt-sm">
+        <button class="btn-system" onclick={() => modal.close(true)}>
+          Acknowledge
+        </button>
+      </div>
+    {/if}
   </div>
 </dialog>

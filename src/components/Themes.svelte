@@ -58,7 +58,8 @@
 
 <div
   class="theme-menu surface-sunk p-xs rounded-md flex flex-col gap-xs"
-  role="listbox"
+  role="radiogroup"
+  aria-label="Select Theme"
 >
   {#each atmospheres as atm (atm.id)}
     <button

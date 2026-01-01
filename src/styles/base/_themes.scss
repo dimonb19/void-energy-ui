@@ -14,11 +14,10 @@
 :root {
   // A. Default Physics (Glass)
   $default-physics: map.get(physics.$physics-presets, 'glass');
+
   @each $key, $val in $default-physics {
     --#{$key}: #{$val};
   }
-  // Calc speed-fast for root manually or map get
-  --speed-fast: #{0.3s * 0.66};
 
   // B. Default Atmosphere (Void)
   $default-theme: map.get(config.$themes, 'void');
