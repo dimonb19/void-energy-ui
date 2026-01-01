@@ -1,34 +1,12 @@
 <script lang="ts">
-  import { theme } from '../adapters/themes.svelte';
+  import { voidEngine } from '../adapters/void-engine.svelte';
   import { modal } from '../lib/modal-manager.svelte';
   import { tooltip } from '../actions/tooltip';
   import { toast } from '../stores/toast.svelte';
   import { live, singularity } from '../lib/transitions.svelte';
   import ThemeSelector from './Themes.svelte';
 
-  const engine = theme.raw;
-
-  // 1. Initialize State
-  let atmosphere = $state(engine.atmosphere);
-  let currentScale = $state(engine.userConfig.scale);
-  let currentDensity = $state(engine.userConfig.density);
-
-  // 2. Handle the Engine Instance
-  $effect.root(() => {
-    return engine.subscribe((eng: any) => {
-      atmosphere = eng.atmosphere;
-      currentScale = eng.userConfig.scale;
-      currentDensity = eng.userConfig.density;
-    });
-  });
-
-  // 3. Push Atmosphere changes back
-  $effect(() => {
-    if (atmosphere !== engine.atmosphere) {
-      theme.atmosphere = atmosphere;
-    }
-  });
-
+  // CONSTANTS
   const fontOptions = [
     { label: 'System Default (Atmosphere)', value: null },
     { label: 'Hanken Grotesk (Tech)', value: "'Hanken Grotesk', sans-serif" },
@@ -40,26 +18,13 @@
   ];
 
   const scaleLevels = [
-    { label: 'XS', value: 0.75, name: 'Minimal' }, // Matches Engine Min
+    { label: 'XS', value: 0.75, name: 'Minimal' },
     { label: 'S', value: 0.85, name: 'Compact' },
-    { label: 'M', value: 1.0, name: 'Standard' }, // Default
+    { label: 'M', value: 1.0, name: 'Standard' },
     { label: 'L', value: 1.25, name: 'Large' },
     { label: 'XL', value: 1.5, name: 'Extra' },
-    { label: 'MAX', value: 2.0, name: 'Maximum' }, // Matches Engine Max
+    { label: 'MAX', value: 2.0, name: 'Maximum' },
   ];
-
-  let activeScaleStep = $derived(
-    scaleLevels.reduce((prev, curr) =>
-      Math.abs(curr.value - currentScale) < Math.abs(prev.value - currentScale)
-        ? curr
-        : prev,
-    ),
-  );
-
-  function setScale(value: number) {
-    theme.setScale(value);
-    currentScale = value;
-  }
 
   const densityOptions = [
     { value: 'high', label: 'Compact', icon: '🥓' },
@@ -67,9 +32,26 @@
     { value: 'low', label: 'Relaxed', icon: '🥗' },
   ];
 
-  const setDensity = (d: 'high' | 'standard' | 'low') => theme.setDensity(d);
+  // LOGIC: Derived State from Engine
+  let activeScaleStep = $derived(
+    scaleLevels.reduce((prev, curr) =>
+      Math.abs(curr.value - voidEngine.userConfig.scale) <
+      Math.abs(prev.value - voidEngine.userConfig.scale)
+        ? curr
+        : prev,
+    ),
+  );
 
-  // Sample small tiles for the "Active Modules" section
+  // ACTIONS: Direct Engine Updates
+  function setScale(value: number) {
+    voidEngine.setPreferences({ scale: value });
+  }
+
+  function setDensity(d: 'high' | 'standard' | 'low') {
+    voidEngine.setPreferences({ density: d });
+  }
+
+  // LOCAL STATE (UI Only)
   let moduleTiles = $state(['Neural Net', 'Firewall', 'Log v.1']);
   let newModuleTile = $state(null);
   let environmentTiles = $state([
@@ -94,9 +76,11 @@
       <label for="font-heading" class="text-small">Headings</label>
       <select
         id="font-heading"
-        value={theme.config.fontHeading}
+        value={voidEngine.userConfig.fontHeading}
         onchange={(e) =>
-          theme.setFonts(e.currentTarget.value || null, theme.config.fontBody!)}
+          voidEngine.setPreferences({
+            fontHeading: e.currentTarget.value || null,
+          })}
       >
         {#each fontOptions as font}
           <option value={font.value}>{font.label}</option>
@@ -106,12 +90,11 @@
       <label for="font-body" class="text-small">Body Text</label>
       <select
         id="font-body"
-        value={theme.config.fontBody}
+        value={voidEngine.userConfig.fontBody}
         onchange={(e) =>
-          theme.setFonts(
-            theme.config.fontHeading!,
-            e.currentTarget.value || null,
-          )}
+          voidEngine.setPreferences({
+            fontBody: e.currentTarget.value || null,
+          })}
       >
         {#each fontOptions as font (font.label)}
           <option value={font.value}>{font.label}</option>
@@ -144,7 +127,7 @@
         <div class="flex flex-row justify-between items-end">
           <label for="density">Spacing Density</label>
           <span>
-            ({currentDensity})
+            ({voidEngine.userConfig.density})
           </span>
         </div>
 
@@ -153,7 +136,7 @@
         >
           {#each densityOptions as opt (opt.value)}
             <button
-              aria-pressed={currentDensity === opt.value}
+              aria-pressed={voidEngine.userConfig.density === opt.value}
               onclick={() =>
                 setDensity(opt.value as 'high' | 'standard' | 'low')}
             >

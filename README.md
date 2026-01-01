@@ -12,6 +12,8 @@ Every pixel on screen is calculated by the intersection of three layers:
 2.  **Physics (The Laws):** Defines Texture, Geometry, and Motion (`glass`, `flat`, `retro`).
 3.  **Mode (The Optics):** Handles Light/Dark contrast and Glow intensity.
 
+Note on Customization: While these layers are distinct in code, they are coupled in the user experience. We treat Atmospheres as Strict Presets to ensure visual integrity. See The Law of Immutability below.
+
 ## 🛠 Developer Workflow
 
 ### 1. The Single Source of Truth

@@ -1,39 +1,63 @@
 ---
+/*
+  ROLE: Critical Rendering Path Script
+  RESPONSIBILITY: 
+  1. Blocks painting until the theme is calculated.
+  2. Prevents FOUC (Flash of Unstyled Content).
+  3. syncs with constants.ts to ensure LocalStorage keys match the Engine.
+*/
 import THEME_REGISTRY from '../config/void-registry.json';
+import { STORAGE_KEYS, DOM_ATTRS, DEFAULTS } from '../config/constants';
 ---
 
-<script is:inline define:vars={{ registry: THEME_REGISTRY }}>
+<script
+  is:inline
+  define:vars={{
+    registry: THEME_REGISTRY,
+    keys: STORAGE_KEYS,
+    attrs: DOM_ATTRS,
+    defaults: DEFAULTS,
+  }}
+>
   (function () {
     try {
       var root = document.documentElement;
-      var localAtmosphere = localStorage.getItem('void_atmosphere');
-      var localConfig = localStorage.getItem('void_user_config');
 
-      // 1. Validate Atmosphere against the Registry
-      // If the user has a saved theme that you deleted, this falls back safely.
-      var activeAtmosphere = 'void';
+      // 1. READ STORAGE (Using the shared keys)
+      var localAtmosphere = localStorage.getItem(keys.ATMOSPHERE);
+      var localConfig = localStorage.getItem(keys.USER_CONFIG);
+
+      // 2. VALIDATE ATMOSPHERE
+      // Fallback to default if storage is empty or invalid (e.g. old theme name)
+      var activeAtmosphere = defaults.ATMOSPHERE;
+
       if (localAtmosphere && registry[localAtmosphere]) {
         activeAtmosphere = localAtmosphere;
       }
 
-      // 2. Lookup Physics (The Triad)
+      // 3. LOOKUP PHYSICS
       // This allows "retro" themes to load instant-motion CSS before the body paints.
       var themeData = registry[activeAtmosphere];
 
-      // 3. Inject Attributes
-      root.setAttribute('data-atmosphere', activeAtmosphere);
-      root.setAttribute('data-physics', themeData.physics);
-      root.setAttribute('data-mode', themeData.mode);
+      // 4. INJECT ATTRIBUTES (The Triad)
+      root.setAttribute(attrs.ATMOSPHERE, activeAtmosphere);
+      root.setAttribute(attrs.PHYSICS, themeData.physics);
+      root.setAttribute(attrs.MODE, themeData.mode);
 
-      // 4. Restore User Preferences
+      // 5. RESTORE USER PREFERENCES
       if (localConfig) {
         var config = JSON.parse(localConfig);
+
+        // Scale
         if (config.scale) root.style.setProperty('--text-scale', config.scale);
+
+        // Density (Map locally for speed/simplicity in blocking script)
         if (config.density) {
-          // Re-map density labels to numbers locally for speed
           var densities = { high: 0.75, standard: 1, low: 1.25 };
           root.style.setProperty('--density', densities[config.density] || 1);
         }
+
+        // Fonts
         if (config.fontHeading)
           root.style.setProperty('--user-font-heading', config.fontHeading);
         if (config.fontBody)
@@ -41,6 +65,8 @@ import THEME_REGISTRY from '../config/void-registry.json';
       }
     } catch (e) {
       console.warn('Void Hydration Error:', e);
+      // Fail safely to defaults
+      document.documentElement.setAttribute('data-atmosphere', 'void');
     }
   })();
 </script>

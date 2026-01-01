@@ -1,12 +1,12 @@
 <script lang="ts">
   import { modal } from '../lib/modal-manager.svelte';
+  import { UI_MODALS } from '../config/constants'; // Import constants
 
   let dialog = $state<HTMLDialogElement | null>(null);
-  let inputValue = $state(''); // Local state for input modal
+  let inputValue = $state('');
 
-  // Reset input when modal opens
   $effect(() => {
-    if (modal.activeId === 'input') {
+    if (modal.activeId === UI_MODALS.INPUT) {
       inputValue = modal.options.inputValue || '';
     }
   });
@@ -28,11 +28,10 @@
     if (e.target === e.currentTarget) modal.close(false);
   };
 
-  // DYNAMIC SIZING LOGIC
   let sizeClass = $derived.by(() => {
-    const s = modal.options.size ?? 'md'; // Default to medium
-    if (s === 'md') return ''; // Standard dialog (no modifier needed)
-    return `dialog-${s}`; // dialog-sm, dialog-lg, dialog-full
+    const s = modal.options.size ?? 'md';
+    if (s === 'md') return '';
+    return `dialog-${s}`;
   });
 </script>
 
@@ -49,7 +48,7 @@
     onclick={(e) => e.stopPropagation()}
     role="presentation"
   >
-    {#if modal.activeId === 'confirm'}
+    {#if modal.activeId === UI_MODALS.CONFIRM}
       <div class="text-center flex flex-col gap-md">
         <h2 id="modal-title">{modal.options.title ?? 'Confirm Action'}</h2>
         <p class="text-dim">{@html modal.options.body}</p>
@@ -72,10 +71,9 @@
           {modal.options.confirmText ?? 'Confirm'}
         </button>
       </div>
-    {:else if modal.activeId === 'input'}
+    {:else if modal.activeId === UI_MODALS.INPUT}
       <div class="flex flex-col gap-md">
         <h2 id="modal-title">{modal.options.title}</h2>
-
         <div class="flex flex-col gap-xs">
           <input
             type="text"
@@ -88,22 +86,22 @@
       </div>
 
       <div class="flex flex-row justify-end gap-md pt-sm">
-        <button class="btn-void text-mute" onclick={() => modal.close(null)}>
-          Cancel
-        </button>
+        <button class="btn-void text-mute" onclick={() => modal.close(null)}
+          >Cancel</button
+        >
         <button class="btn-cta" onclick={() => modal.close(inputValue)}>
           {modal.options.confirmText ?? 'Submit'}
         </button>
       </div>
-    {:else if modal.activeId === 'alert'}
+    {:else if modal.activeId === UI_MODALS.ALERT}
       <div class="text-center flex flex-col gap-md">
         <h2 id="modal-title">{modal.options.title ?? 'System Alert'}</h2>
         <p>{@html modal.options.body}</p>
       </div>
       <div class="flex flex-row justify-center pt-sm">
-        <button class="btn-system" onclick={() => modal.close(true)}>
-          Acknowledge
-        </button>
+        <button class="btn-system" onclick={() => modal.close(true)}
+          >Acknowledge</button
+        >
       </div>
     {/if}
   </div>
