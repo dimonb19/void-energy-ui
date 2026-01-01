@@ -24,7 +24,7 @@ export function useVoidTheme() {
   useEffect(() => {
     // Subscribe to Triad changes.
     // The engine now passes itself (the instance) to the callback.
-    const unsubscribe = voidEngine.subscribe((engine) => {
+    const unsubscribe = voidEngine.subscribe((engine: any) => {
       setVoidState({
         atmosphere: engine.atmosphere,
         // Spread the config to ensure React detects the object reference change
@@ -81,7 +81,7 @@ export const ThemeSwitcher = () => {
   } = useVoidTheme();
 
   return (
-    <div className="card-glass pad-md flex-col gap-md">
+    <div className="surface-glass pad-md flex-col gap-md">
       <div>
         <h3>Current: {atmosphere}</h3>
         <p className="text-dim">

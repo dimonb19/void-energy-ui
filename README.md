@@ -68,3 +68,12 @@ We use a **Hybrid Protocol**:
 │   └── components/               <-- Svelte/Astro Components
 └── scripts/
     └── generate-tokens.ts        <-- The Compiler
+```
+
+### 4. The Law of Immutability
+In the Void Energy system, **Atmospheres are strict presets.** * **User Choice:** Users select an **Atmosphere** (e.g., "Void", "Paper", "Terminal").
+* **System Enforced:** The Atmosphere dictates the **Physics** and **Mode**.
+    * *Example:* You cannot have "Void" (Cyberpunk) in "Light Mode".
+    * *Example:* You cannot have "Paper" (Flat) with "Glass" physics.
+
+**Why?** CoNexus is a narrative platform. The visual rendering engine is part of the storytelling. Breaking the physics of a theme breaks the immersion of the story. We provide distinct themes to cover accessibility needs (e.g., "Focus" for high contrast), but we do not allow mixing and matching of Triad layers by the end-user.

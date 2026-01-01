@@ -280,38 +280,6 @@
 }
 
 // ==========================================================================
-// 4. STATE MANAGEMENT MIXINS
-// ==========================================================================
-
-// 1. ACTIVE STATE (Toggle / Selected / Active)
-// Targets: aria-pressed="true", aria-selected="true", data-state="active"
-@mixin state-active {
-  &[aria-pressed='true'],
-  &[aria-selected='true'],
-  &[data-state='active'] {
-    @content;
-  }
-}
-
-// 2. OPEN STATE (Dropdowns / Tooltips / Dialogs)
-// Targets: data-state="open", details[open], dialog[open]
-@mixin state-open {
-  &[data-state='open'],
-  &[open] {
-    @content;
-  }
-}
-
-// 3. LOADING STATE
-// Targets: aria-busy="true", data-status="loading"
-@mixin state-loading {
-  &[aria-busy='true'],
-  &[data-status='loading'] {
-    @content;
-  }
-}
-
-// ==========================================================================
 // 4. STATE MANAGEMENT MIXINS (Strict Protocol)
 // ==========================================================================
 

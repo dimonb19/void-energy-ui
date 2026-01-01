@@ -102,31 +102,6 @@
 // ==========================================================================
 // Use these when you want a standard "Section" block with spacing included.
 
-// Shared Logic for responsive verticality
-@mixin responsive-vertical-spacing {
-  // Mobile Base: Compact but comfortable
-  margin-block: var(--space-lg);
-  padding-block: var(--space-lg);
-
-  // Tablet: Start opening up
-  @include respond-up('tablet') {
-    margin-block: var(--space-xl);
-    padding-block: calc(var(--space-xl) - var(--space-xs));
-  }
-
-  // Large Desktop: Luxurious space
-  @include respond-up('large-desktop') {
-    margin-block: var(--space-2xl); // 64px separation
-    padding-block: var(--space-xl); // 48px internal padding
-  }
-
-  // 4K / Ultra Wide: Massive void
-  @include respond-up('full-hd') {
-    margin-block: calc(var(--space-2xl) + var(--space-lg)); // 96px separation
-    padding-block: var(--space-2xl);
-  }
-}
-
 .card-glass {
   @include glass-float();
   border-radius: var(--radius-lg);
@@ -138,13 +113,6 @@
   @at-root [data-physics='retro'] & {
     border-radius: var(--radius-base);
   }
-
-  @include responsive-vertical-spacing;
-
-  // OPINIONATED DEFAULTS:
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md); // Default gap
 }
 
 .card-sunk {
@@ -158,13 +126,6 @@
   @at-root [data-physics='retro'] & {
     border-radius: var(--radius-base);
   }
-
-  @include responsive-vertical-spacing;
-
-  // OPINIONATED DEFAULTS:
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-md); // Default gap
 }
 
 // ==========================================================================
