@@ -4,10 +4,21 @@
  */
 
 @use 'sass:map';
+@use '../config/generated-themes' as generated;
 
 // =========================================
-// SASS MAPS (For Loops/Mixins)
+// SASS MAPS (Inherited from Design Tokens)
 // =========================================
+
+// Forwarding the maps so other files can use standard syntax
+$z-layers: generated.$z-layers;
+$breakpoints: generated.$breakpoints;
+
+// =========================================
+// LOCAL VARIABLES (Layout Only)
+// =========================================
+// These remain here as they are implementation details of the container system,
+// not global design tokens.
 
 $radius-scale: (
   'sm': 4px,
@@ -15,29 +26,6 @@ $radius-scale: (
   'lg': 16px,
   'xl': 24px,
   'full': 9999px,
-);
-
-$z-layers: (
-  'sink': -1,
-  'floor': 0,
-  'base': 1,
-  'decorate': 2,
-  'float': 10,
-  'sticky': 20,
-  'header': 40,
-  'dropdown': 50,
-  'overlay': 90,
-  'modal': 100,
-  'toast': 200,
-);
-
-$breakpoints: (
-  'mobile': 0,
-  'tablet': 768px,
-  'small-desktop': 1024px,
-  'large-desktop': 1440px,
-  'full-hd': 1920px,
-  'quad-hd': 2560px,
 );
 
 $container-widths: (

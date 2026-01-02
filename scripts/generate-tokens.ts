@@ -16,7 +16,6 @@ const PATHS = {
   scss: path.resolve(__dirname, '../src/styles/config/_generated-themes.scss'),
   registryJson: path.resolve(__dirname, '../src/config/void-registry.json'),
   physicsJson: path.resolve(__dirname, '../src/config/void-physics.json'),
-  tailwindJson: path.resolve(__dirname, '../src/config/void-tailwind-theme.json'), // NEW
 };
 
 /**
@@ -34,74 +33,25 @@ function toCssValue(key: string, value: string | number): string {
   return `${value}`;
 }
 
-/**
- * Generates the JSON object that tailwind.config.mjs will consume
- */
-function generateTailwindConfig(tokens: typeof VOID_TOKENS) {
-    // 1. SPACING (Mapped to --space-*)
-    const spacing: Record<string, string> = { "0": "0", "px": "1px" };
-    Object.keys(tokens.density.scale).forEach(key => {
-        spacing[key] = `var(--space-${key})`;
-    });
-
-    // 2. COLORS (Semantic Mapping)
-    // We map your "Energy" names to cleaner Tailwind classes (e.g., text-primary)
-    const colors = {
-        transparent: 'transparent',
-        current: 'currentColor',
-        inherit: 'inherit',
-        // Canvas
-        canvas: 'var(--bg-canvas)',
-        surface: 'var(--bg-surface)',
-        sink: 'var(--bg-sink)',
-        spotlight: 'var(--bg-spotlight)',
-        // Energy
-        primary: 'var(--energy-primary)',
-        secondary: 'var(--energy-secondary)',
-        highlight: 'var(--border-highlight)',
-        shadow: 'var(--border-shadow)',
-        // Signal
-        main: 'var(--text-main)',
-        dim: 'var(--text-dim)',
-        mute: 'var(--text-mute)',
-        // Semantics
-        premium: 'var(--color-premium)',
-        system: 'var(--color-system)',
-        success: 'var(--color-success)',
-        error: 'var(--color-error)',
-    };
-
-    // 3. RADIUS (Mapped to --radius-*)
-    // Hardcoded map based on your variables.scss logic, but dynamic values
-    const borderRadius = {
-        none: '0',
-        sm: 'var(--radius-sm)',
-        DEFAULT: 'var(--radius-md)',
-        lg: 'var(--radius-lg)',
-        xl: 'var(--radius-xl)',
-        full: 'var(--radius-full)',
-    };
-
-    // 4. TIMING (Mapped to --speed-*)
-    const transitionDuration = {
-        fast: 'var(--speed-fast)',
-        base: 'var(--speed-base)',
-        0: '0ms',
-    };
-    
-    return {
-        spacing,
-        colors,
-        borderRadius,
-        transitionDuration
-    };
-}
-
 function generateSCSS(tokens: typeof VOID_TOKENS) {
   const timestamp = new Date().toISOString();
   let scss = `// 🤖 AUTO-GENERATED FILE\n// GENERATED AT: ${timestamp}\n\n`;
+
+  // 1. Z-LAYERS MAP
+  scss += `$z-layers: (\n`;
+  Object.entries(tokens.layers).forEach(([key, val]) => {
+    scss += `  '${key}': ${val},\n`;
+  });
+  scss += `);\n\n`;
+
+  // 2. BREAKPOINTS MAP
+  scss += `$breakpoints: (\n`;
+  Object.entries(tokens.responsive).forEach(([key, val]) => {
+    scss += `  '${key}': ${val},\n`;
+  });
+  scss += `);\n\n`;
   
-  // 1. PHYSICS MAPS
+  // 3. PHYSICS MAPS
   scss += `$generated-physics: (\n`;
   Object.entries(tokens.physics).forEach(([mode, rawConfig]) => {
     const config = rawConfig as Record<string, string | number>;
@@ -118,7 +68,7 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
   });
   scss += `);\n\n`;
 
-  // 2. THEMES
+  // 4. THEMES
   scss += `$themes: (\n`;
   Object.entries(tokens.themes).forEach(([themeName, config]) => {
     scss += `  '${themeName}': (\n`;
@@ -161,11 +111,6 @@ async function main() {
     // C. Generate Physics (Motion)
     fs.writeFileSync(PATHS.physicsJson, JSON.stringify(VOID_TOKENS.physics, null, 2));
     console.log(`   └─ ⚡  Physics: src/config/void-physics.json`);
-
-    // D. Generate Tailwind Theme (Bridge) -> NEW!
-    const tailwindTheme = generateTailwindConfig(VOID_TOKENS);
-    fs.writeFileSync(PATHS.tailwindJson, JSON.stringify(tailwindTheme, null, 2));
-    console.log(`   └─ 🌊 Tailwind: src/config/void-tailwind-theme.json`);
 
     console.log('✅ Token Pipeline Complete.\n');
   } catch (error) {

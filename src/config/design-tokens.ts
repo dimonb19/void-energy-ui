@@ -110,6 +110,32 @@ export const VOID_TOKENS = {
     },
   },
 
+  // 2. LAYERS
+  layers: {
+    sink: -1,
+    floor: 0,
+    base: 1,
+    decorate: 2,
+    float: 10,
+    sticky: 20,
+    header: 40,
+    dropdown: 50,
+    overlay: 90,
+    modal: 100,
+    toast: 200,
+  },
+
+  // 3. RESPONSIVE
+  // We explicitly define px values here to ensure SCSS and JS match perfectly.
+  responsive: {
+    mobile: '0px',
+    tablet: '768px',
+    'small-desktop': '1024px',
+    'large-desktop': '1440px',
+    'full-hd': '1920px',
+    'quad-hd': '2560px',
+  },
+
   // 2. PHYSICS ENGINE (Time & Matter)
   // Defines how elements move and feel.
   physics: {
