@@ -33,11 +33,7 @@ void_context.txt
 global.css
 global.css.map
 
-# prettier
-.prettierignore
-
 # config
 /src/config/void-registry.json
 /src/config/void-physics.json
-/src/config/void-tailwind-theme.json
 /src/styles/config/_generated-themes.scss

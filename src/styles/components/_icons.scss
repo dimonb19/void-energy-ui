@@ -1,0 +1,102 @@
+/*
+  * ROLE: SVG icons styling.
+  * RESPONSIBILITY: Defines how SVG data reacts to the Void Engine.
+  */
+
+@use '../abstracts' as *;
+
+// ==========================================================================
+// ICON MATERIALS
+// ==========================================================================
+
+// 1. BASE ICON UTILITY
+// Usage: class="icon" or class="icon icon-lg"
+.icon {
+  // A. Layout & Sizing
+  display: inline-block;
+  vertical-align: middle;
+  width: 1em; // Scales with font-size automatically
+  height: 1em;
+
+  // B. Color Inheritance (The most important part!)
+  // This allows the icon to take the color of its parent (text-main, energy-primary, etc)
+  fill: currentColor;
+  stroke: currentColor;
+
+  // C. Physics Transitions
+  // We use global speed variables
+  transform-origin: center center;
+  transition:
+    transform var(--speed-fast) var(--ease-stabilize),
+    opacity var(--speed-fast) var(--ease-flow),
+    filter var(--speed-fast) var(--ease-flow),
+    color var(--speed-fast) var(--ease-flow);
+
+  // --- SIZES ---
+  &.icon-sm {
+    font-size: 0.875rem;
+  } // 14px
+  &.icon-md {
+    font-size: 1.25rem;
+  } // 20px
+  &.icon-lg {
+    font-size: 1.5rem;
+  } // 24px
+  &.icon-xl {
+    font-size: 2rem;
+  } // 32px
+
+  // --- ANIMATIONS ---
+  &.icon-spin {
+    animation: rotate 2s linear infinite;
+    @at-root [data-physics='retro'] & {
+      animation-timing-function: steps(8); // Robotic spin
+    }
+  }
+}
+
+// 2. INTERACTIVE ICONS (Buttons)
+// Usage: Inside <button> or <a>
+.btn-icon,
+.void-btn {
+  // When an icon is inside a button, define interaction physics
+  .icon,
+  svg {
+    transition: transform var(--speed-fast) var(--ease-snap);
+  }
+
+  // HOVER STATE
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      .icon,
+      svg {
+        // Physical Lift
+        transform: scale(1.1);
+
+        // Glow (Glass Mode Only)
+        // Uses your optics-alpha function to handle light/dark mode automatically
+        filter: drop-shadow(
+          0 0 5px optics-alpha(currentColor, 0.6, '--optics-glow-mult')
+        );
+      }
+    }
+  }
+
+  // ACTIVE STATE
+  &:active:not(:disabled) {
+    .icon,
+    svg {
+      transform: scale(0.95); // Press down
+    }
+  }
+
+  // RETRO MODE OVERRIDE
+  @at-root [data-physics='retro'] & {
+    .icon,
+    svg {
+      // No blurring/softness in retro mode
+      shape-rendering: crisp-edges;
+      filter: none !important;
+    }
+  }
+}

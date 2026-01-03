@@ -1,0 +1,40 @@
+# Ignore artifacts:
+build
+
+node_modules
+public
+scripts
+
+dist
+.astro
+.github
+.vscode
+.idea
+.DS_Store
+
+.gitignore
+.gitattributes
+
+Dockerfile
+Makefile
+docker-compose.yml
+
+*.log
+
+.env*
+
+*.sh
+
+bun.lockb
+package-lock.json
+pnpm-lock.yaml
+.pre-commit-config.yaml
+
+# astro.config.mjs
+
+README.md
+
+# config
+/src/config/void-registry.json
+/src/config/void-physics.json
+/src/styles/config/_generated-themes.scss
