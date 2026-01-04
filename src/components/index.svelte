@@ -4,7 +4,9 @@
   import { tooltip } from '../actions/tooltip';
   import { toast } from '../stores/toast.svelte';
   import { live, singularity } from '../lib/transitions.svelte';
-  import ThemeSelector from './Themes.svelte';
+
+  import ThemeSelector from './ui/Themes.svelte';
+  import SettingsRow from './ui/SettingsRow.svelte';
 
   // CONSTANTS
   const fontOptions = [
@@ -301,9 +303,8 @@
       <h2>03 // PARAMETERS</h2>
 
       <div class="surface-glass p-lg flex flex-col gap-lg">
-        <div class="settings-grid">
-          <div class="settings-label">Rendering</div>
-          <div class="settings-content flow-row">
+        <SettingsRow label="Rendering">
+          <div class="flex flex-row flex-wrap gap-md w-full">
             <div class="flex flex-col flex-1 gap-xs">
               <label for="visual-fidelity" class="text-small text-center"
                 >Visual Fidelity</label
@@ -314,7 +315,6 @@
                 <option>PERFORMANCE (1080p)</option>
               </select>
             </div>
-
             <div class="flex flex-col flex-1 gap-xs">
               <label for="frame-rate" class="text-small text-center"
                 >Frame Rate</label
@@ -326,172 +326,148 @@
               </select>
             </div>
           </div>
-        </div>
+        </SettingsRow>
 
         <hr />
 
-        <div class="settings-grid">
-          <div class="settings-label">Active Modules</div>
-          <div class="settings-content">
-            <div
-              class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center"
-            >
-              {#if moduleTiles.length === 0}
-                <p class="text-uppercase text-dim text-caption">
-                  No active modules
-                </p>
-              {:else}
-                {#each moduleTiles as btn, i (i)}
-                  <div class="tile-small" animate:live out:singularity>
-                    <p class="tile-label">{btn}</p>
-
-                    <button
-                      type="button"
-                      class="btn-void tile-remove"
-                      aria-label="Remove {btn}"
-                      onclick={() => {
-                        moduleTiles = moduleTiles.filter(
-                          (tile, index) => index !== i,
-                        );
-                      }}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                {/each}
-              {/if}
-            </div>
-
-            <div class="flex flex-row gap-sm">
-              <select class="flex-1" bind:value={newModuleTile}>
-                <option value={null} hidden>Select Module...</option>
-                <option value="Physics Engine">Physics Engine</option>
-                <option value="Audio Synth">Audio Synth</option>
-                <option value="Visual Renderer">Visual Renderer</option>
-                <option value="Data Analyzer">Data Analyzer</option>
-                <option value="Network Monitor">Network Monitor</option>
-              </select>
-              <button
-                onclick={() => {
-                  moduleTiles.push(newModuleTile!);
-                }}
-                disabled={!newModuleTile}
-              >
-                Add Module
-              </button>
-            </div>
+        <SettingsRow label="Active Modules">
+          <div
+            class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center rounded-md"
+          >
+            {#if moduleTiles.length === 0}
+              <p class="text-uppercase text-dim text-caption">
+                No active modules
+              </p>
+            {:else}
+              {#each moduleTiles as btn, i (btn)}
+                <div class="tile-small" animate:live out:singularity>
+                  <p class="tile-label">{btn}</p>
+                  <button
+                    type="button"
+                    class="btn-void tile-remove"
+                    aria-label="Remove {btn}"
+                    onclick={() => {
+                      moduleTiles = moduleTiles.filter(
+                        (_, index) => index !== i,
+                      );
+                    }}>✕</button
+                  >
+                </div>
+              {/each}
+            {/if}
           </div>
-        </div>
+          <div class="flex flex-row gap-sm">
+            <select class="flex-1" bind:value={newModuleTile}>
+              <option value={null} hidden>Select Module...</option>
+              <option value="Physics Engine">Physics Engine</option>
+              <option value="Audio Synth">Audio Synth</option>
+              <option value="Visual Renderer">Visual Renderer</option>
+              <option value="Data Analyzer">Data Analyzer</option>
+              <option value="Network Monitor">Network Monitor</option>
+            </select>
+            <button
+              onclick={() => {
+                if (newModuleTile) moduleTiles.push(newModuleTile);
+              }}
+              disabled={!newModuleTile}>Add Module</button
+            >
+          </div>
+        </SettingsRow>
 
         <hr />
 
-        <div class="settings-grid">
-          <div class="settings-label">Environment</div>
-          <div class="settings-content">
-            <div
-              class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center"
-            >
-              {#if environmentTiles.length === 0}
-                <p class="text-uppercase text-dim text-caption">
-                  No environments selected
-                </p>
-              {:else}
-                {#each environmentTiles as btn, i (i)}
-                  <div class="tile-small-system" animate:live out:singularity>
-                    <p class="tile-label">{btn}</p>
-                    <button
-                      type="button"
-                      class="btn-void tile-remove"
-                      aria-label="Remove {btn}"
-                      onclick={() => {
-                        environmentTiles = environmentTiles.filter(
-                          (tile, index) => index !== i,
-                        );
-                      }}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                {/each}
-              {/if}
-            </div>
-
-            <div class="flex flex-row gap-sm">
-              <select class="flex-1" bind:value={newEnvironmentTile}>
-                <option value={null} hidden>Select Environment...</option>
-                <option value="Physics Engine">Physics Engine</option>
-                <option value="Audio Synth">Audio Synth</option>
-                <option value="Visual Renderer">Visual Renderer</option>
-                <option value="Data Analyzer">Data Analyzer</option>
-                <option value="Network Monitor">Network Monitor</option>
-              </select>
-              <button
-                class="btn-system"
-                onclick={() => {
-                  environmentTiles.push(newEnvironmentTile!);
-                }}
-                disabled={!newEnvironmentTile}
-              >
-                Add Module
-              </button>
-            </div>
+        <SettingsRow label="Environment">
+          <div
+            class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center rounded-md"
+          >
+            {#if environmentTiles.length === 0}
+              <p class="text-uppercase text-dim text-caption">
+                No environments selected
+              </p>
+            {:else}
+              {#each environmentTiles as btn, i (btn)}
+                <div class="tile-small-system" animate:live out:singularity>
+                  <p class="tile-label">{btn}</p>
+                  <button
+                    type="button"
+                    class="btn-void tile-remove"
+                    aria-label="Remove {btn}"
+                    onclick={() => {
+                      environmentTiles = environmentTiles.filter(
+                        (_, index) => index !== i,
+                      );
+                    }}>✕</button
+                  >
+                </div>
+              {/each}
+            {/if}
           </div>
-        </div>
+          <div class="flex flex-row gap-sm">
+            <select class="flex-1" bind:value={newEnvironmentTile}>
+              <option value={null} hidden>Select Environment...</option>
+              <option value="Physics Engine">Physics Engine</option>
+              <option value="Audio Synth">Audio Synth</option>
+              <option value="Visual Renderer">Visual Renderer</option>
+              <option value="Data Analyzer">Data Analyzer</option>
+              <option value="Network Monitor">Network Monitor</option>
+            </select>
+            <button
+              class="btn-system"
+              onclick={() => {
+                if (newEnvironmentTile)
+                  environmentTiles.push(newEnvironmentTile);
+              }}
+              disabled={!newEnvironmentTile}>Add Module</button
+            >
+          </div>
+        </SettingsRow>
 
         <hr />
 
-        <div class="settings-grid">
-          <div class="settings-label">Premium Modules</div>
-          <div class="settings-content">
-            <div
-              class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center"
-            >
-              {#if premiumTiles.length === 0}
-                <p class="text-uppercase text-dim text-caption">
-                  No premium modules
-                </p>
-              {:else}
-                {#each premiumTiles as btn, i (i)}
-                  <div class="tile-small-premium" animate:live out:singularity>
-                    <p class="tile-label">{btn}</p>
-                    <button
-                      type="button"
-                      class="btn-void tile-remove"
-                      aria-label="Remove {btn}"
-                      onclick={() => {
-                        premiumTiles = premiumTiles.filter(
-                          (tile, index) => index !== i,
-                        );
-                      }}
-                    >
-                      ✕
-                    </button>
-                  </div>
-                {/each}
-              {/if}
-            </div>
-
-            <div class="flex flex-row gap-sm">
-              <select class="flex-1" bind:value={newPremiumTile}>
-                <option value={null} hidden>Select Premium Module...</option>
-                <option value="Quantum Core">Quantum Core</option>
-                <option value="AI Supervisor">AI Supervisor</option>
-                <option value="Neural Interface">Neural Interface</option>
-                <option value="Temporal Anchor">Temporal Anchor</option>
-                <option value="Network Monitor">Network Monitor</option>
-              </select>
-              <button
-                class="btn-premium"
-                onclick={() => {
-                  premiumTiles.push(newPremiumTile!);
-                }}
-                disabled={!newPremiumTile}
-              >
-                Add Module
-              </button>
-            </div>
+        <SettingsRow label="Premium Modules">
+          <div
+            class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center rounded-md"
+          >
+            {#if premiumTiles.length === 0}
+              <p class="text-uppercase text-dim text-caption">
+                No premium modules
+              </p>
+            {:else}
+              {#each premiumTiles as btn, i (btn)}
+                <div class="tile-small-premium" animate:live out:singularity>
+                  <p class="tile-label">{btn}</p>
+                  <button
+                    type="button"
+                    class="btn-void tile-remove"
+                    aria-label="Remove {btn}"
+                    onclick={() => {
+                      premiumTiles = premiumTiles.filter(
+                        (_, index) => index !== i,
+                      );
+                    }}>✕</button
+                  >
+                </div>
+              {/each}
+            {/if}
           </div>
-        </div>
+          <div class="flex flex-row gap-sm">
+            <select class="flex-1" bind:value={newPremiumTile}>
+              <option value={null} hidden>Select Premium Module...</option>
+              <option value="Quantum Core">Quantum Core</option>
+              <option value="AI Supervisor">AI Supervisor</option>
+              <option value="Neural Interface">Neural Interface</option>
+              <option value="Temporal Anchor">Temporal Anchor</option>
+              <option value="Network Monitor">Network Monitor</option>
+            </select>
+            <button
+              class="btn-premium"
+              onclick={() => {
+                if (newPremiumTile) premiumTiles.push(newPremiumTile);
+              }}
+              disabled={!newPremiumTile}>Add Module</button
+            >
+          </div>
+        </SettingsRow>
       </div>
     </section>
 

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { modal } from '../lib/modal-manager.svelte';
-  import { modalRegistry } from '../config/modal-registry';
+  import { modal } from '../../lib/modal-manager.svelte';
+  import { modalRegistry } from '../../config/modal-registry';
 
   let dialog = $state<HTMLDialogElement | null>(null);
 

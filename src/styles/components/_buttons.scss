@@ -98,7 +98,7 @@ button:not(.btn-void),
 
   &:disabled {
     background: rgba(125, 125, 125, 0.1);
-    border-color: transparent;
+    border-color: rgba(125, 125, 125, 0.25);
     color: var(--text-mute);
     cursor: not-allowed;
     box-shadow: none;

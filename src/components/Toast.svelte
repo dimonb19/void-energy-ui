@@ -6,7 +6,7 @@
     info: 'ℹ️', // Standard Info
     success: '✅', // Clear Check
     warning: '⚠️', // Standard Warning
-    error: '🛑', // Stop Sign (Cleaner than X)
+    error: '🛑', // Stop Sign
   };
 </script>
 

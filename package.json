@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "build:tokens": "tsx scripts/generate-tokens.ts",
-    "dev": "npm run build:tokens && astro dev",
+    "dev": "tsx scripts/local-dev.ts",
     "build": "npm run build:tokens && astro build",
     "preview": "astro preview",
     "astro": "astro",
