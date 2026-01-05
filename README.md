@@ -2,7 +2,8 @@
 
 > "We do not paint pixels; we define materials."
 
-The Void Energy UI is a framework-agnostic, physics-based design system for the **CoNexus** storytelling platform. It combines the performance of **Tailwind CSS** (for Layout) with a bespoke **SCSS Physics Engine** (for Materials).
+The Void Energy UI is a framework-agnostic, physics-based design system for the **CoNexus** storytelling platform.
+It combines the performance of **Tailwind CSS** (for Layout) with a bespoke **SCSS Physics Engine** (for Materials).
 
 ## 🚀 The Triad Architecture
 
@@ -10,30 +11,28 @@ Every pixel on screen is calculated by the intersection of three layers:
 
 1.  **Atmosphere (The Soul):** Defines Color (`--energy-primary`) and Fonts.
 2.  **Physics (The Laws):** Defines Texture, Geometry, and Motion (`glass`, `flat`, `retro`).
-3.  **Mode (The Optics):** Handles Light/Dark contrast and Glow intensity.
-
-Note on Customization: While these layers are distinct in code, they are coupled in the user experience. We treat Atmospheres as Strict Presets to ensure visual integrity. See The Law of Immutability below.
+3.  **Mode (The Polarity):** Handles Light/Dark environment switching.
 
 ### The Law of Immutability
-In the Void Energy system, **Atmospheres are strict presets.** * **User Choice:** Users select an **Atmosphere** (e.g., "Void", "Paper", "Terminal").
+In the Void Energy system, **Atmospheres are strict presets.**
+* **User Choice:** Users select an **Atmosphere** (e.g., "Void", "Paper", "Terminal").
 * **System Enforced:** The Atmosphere dictates the **Physics** and **Mode**.
     * *Example:* You cannot have "Void" (Cyberpunk) in "Light Mode".
     * *Example:* You cannot have "Paper" (Flat) with "Glass" physics.
 
-**Why?** CoNexus is a narrative platform. The visual rendering engine is part of the storytelling. Breaking the physics of a theme breaks the immersion of the story. We provide distinct themes to cover accessibility needs (e.g., "Focus" for high contrast), but we do not allow mixing and matching of Triad layers by the end-user.
+**Why?** CoNexus is a narrative platform. The visual rendering engine is part of the storytelling. Breaking the physics of a theme breaks the immersion of the story.
 
 ## ⚠️ ARCHITECTURE & DISCIPLINE (READ BEFORE CODING)
 
-This project uses a strict **Hybrid Protocol** to manage the complexity of the Void Engine. 
-To keep maintenance low for our small team, you must follow these rules.
+This project uses a strict **Hybrid Protocol** to manage the complexity of the Void Engine.
 
 ### 1. The Separation of Concerns (Hybrid Protocol)
 We separate **Layout** (Geometry) from **Materials** (Physics).
 
-* **HTML/Svelte (`.svelte`, `.astro`):** * Use **Tailwind** for Layout, Spacing, and Sizing.
+* **HTML/Svelte (`.svelte`, `.astro`):**
+    * Use **Tailwind** for Layout, Spacing, and Sizing.
     * ✅ `flex flex-col gap-md p-lg w-full`
     * ❌ `<div style="margin-top: 20px">` (Breaks Density Engine)
-    * ❌ `.my-custom-wrapper { margin: 20px }` (SCSS Layout Bleed)
 
 * **SCSS (`src/styles/**/*.scss`):**
     * Use **SCSS** for Visuals, Physics, and Complex States.
@@ -46,10 +45,11 @@ We separate **Layout** (Geometry) from **Materials** (Physics).
 * All colors must use semantic variables (`bg-canvas`, `energy-primary`) to respect the Atmosphere Engine.
 
 ### 3. The Laws of Physics
+
 | Concept | Rule |
 | :--- | :--- |
-| **Light is Signal** | We do not use shadows for contrast; we use **Glows**. If it glows, it is interactive. |
-| **Depth is Logic** | **Float (+Z):** Cards/Modals (Glass). **Sink (-Z):** Inputs/Wells (Void Depth). |
+| **Material is Truth** | **Glass:** Has Blur, Shadows, and Glows.<br>**Flat:** Has Borders, No Shadows, No Glows.<br>**Retro:** Has Pixel Borders, Instant Motion. |
+| **Depth is Tiered** | **Sink (-Z):** Inputs/Wells (`shadow-sunk`).<br>**Float (+Z):** Cards/Surfaces (`shadow-float`).<br>**Lift (++Z):** Interactive/Modals (`shadow-lift`). |
 | **Atmosphere is Context** | The UI adapts to the story. Switching from `void` to `paper` changes physics instantly. |
 
 ### 4. The Single Source of Truth
@@ -60,18 +60,6 @@ We separate **Layout** (Geometry) from **Materials** (Physics).
 * **State lives in the DOM.** Do not use classes like `.active` or `.show`.
 * Use semantic attributes: `[data-state="open"]`, `[aria-pressed="true"]`.
 * This ensures CSS transitions (Enter/Exit) trigger correctly via the Physics Engine.
-
-### 6. Critical Hydration
-* The `ThemeScript` must run synchronously in `<head>`. 
-* Deferring this script will cause a FOUC (Flash of Unstyled Content) where the default Void theme flashes before user preferences load.
-
-## 🧞 Commands
-
-| Command | Action |
-| :--- | :--- |
-| `npm run dev` | Starts local dev server (and auto-builds tokens) |
-| `npm run build:tokens` | Compiles `design-tokens.ts` into SCSS/JSON |
-| `npm run build` | Production build |
 
 ## 📂 Project Structure
 

@@ -211,9 +211,8 @@ textarea {
   // 1. RE-ENABLE STANDARD LISTS
   ul,
   ol {
-    margin-bottom: 1.5rem;
-    padding-left: 1.5rem; // Indent lists
-    line-height: 1.6;
+    margin-bottom: var(--space-md);
+    padding-left: var(--space-md);
   }
 
   ul {
@@ -250,12 +249,12 @@ textarea {
     & > li {
       display: table;
       counter-increment: item;
-      margin-bottom: 0.5rem;
+      margin-bottom: var(--space-xs);
 
       &:before {
         content: counters(item, '.') '. ';
         display: table-cell;
-        padding-right: 0.75rem;
+        padding-right: var(--space-sm);
         color: var(--text-main); // Bright numbering distinguishes hierarchy
         font-weight: 600;
         white-space: nowrap;

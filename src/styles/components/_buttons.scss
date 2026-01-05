@@ -22,8 +22,8 @@
 button:not(.btn-void),
 .btn {
   // --- A. Layout & Accessibility ---
-  min-width: 2.75rem;
-  min-height: 2.75rem;
+  min-height: var(--control-height);
+  min-width: var(--control-height);
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -34,7 +34,7 @@ button:not(.btn-void),
   // --- B. Typography ---
   font-family: var(--font-body);
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: var(--text-small, 0.875rem);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--text-main);
@@ -69,24 +69,16 @@ button:not(.btn-void),
   &:focus-visible {
     outline: none;
     border-color: var(--energy-primary);
-    box-shadow:
-      0 0 0 2px rgba(0, 0, 0, 0.5),
-      0 0 0 4px var(--energy-primary);
+    box-shadow: var(--focus-ring);
   }
 
   @media (hover: hover) {
     &:hover:not(:disabled) {
       background: blend(var(--bg-surface), var(--energy-primary), 8%);
       border-color: var(--energy-primary);
-      transform: translateY(-2px);
+      transform: translateY(var(--lift)) scale(var(--scale, 1));
       color: var(--text-main);
-      box-shadow:
-        0 0 10px optics-alpha(var(--energy-primary), 0.4, '--optics-glow-mult'),
-        inset 0 0 5px
-          optics-alpha(var(--energy-primary), 0.2, '--optics-glow-mult');
-
-      text-shadow: 0 0 8px
-        optics-alpha(var(--energy-primary), 0.6, '--optics-text-glow');
+      box-shadow: var(--shadow-lift);
     }
   }
 
@@ -119,24 +111,14 @@ button:not(.btn-void),
     min-height: var(--space-xl);
     padding-inline: var(--space-md);
 
-    border-radius: var(--radius-full); // Pill Shape
+    border-radius: var(--radius-full);
 
     @media (hover: hover) {
       &:hover:not(:disabled) {
         // Reset base button hover effects that clash
         background: transparent;
         border: none;
-
-        // The Glow
-        box-shadow:
-          var(--hover-shadow),
-          0 0 15px
-            optics-alpha(
-              var(--energy-primary),
-              calc(var(--base-glow-opacity) * 0.8),
-              // Scale relative to base
-              '--optics-glow-mult'
-            );
+        color: var(--text-main);
       }
     }
   }
@@ -156,17 +138,23 @@ button:not(.btn-void),
       &:hover:not(:disabled) {
         border-color: $color-var;
         background: alpha($color-var, 15%);
-        color: #ffffff;
+        color: var(--text-main);
 
-        box-shadow:
-          0 0 10px optics-alpha($color-var, 0.4, '--optics-glow-mult'),
-          inset 0 0 5px optics-alpha($color-var, 0.2, '--optics-glow-mult');
+        box-shadow: var(--shadow-lift);
 
-        text-shadow: 0 0 8px optics-alpha($color-var, 0.6, '--optics-text-glow');
+        // Only apply colored glow if we are in Glass Physics
+        @at-root [data-physics='glass'] & {
+          box-shadow: 0 0 15px alpha($color-var, 40%);
+          text-shadow: 0 0 10px alpha($color-var, 60%);
+        }
 
-        // Automatic Light Mode override for text color
         @at-root [data-mode='light'] & {
-          color: $color-var;
+          color: $color-var; // Keep text readable in light mode
+          text-shadow: none;
+        }
+
+        @at-root [data-physics='retro'] & {
+          box-shadow: 3px 3px 0px alpha($color-var, 50%);
         }
       }
     }
@@ -191,31 +179,23 @@ button:not(.btn-void),
   // ========================================================================
   @include state-active {
     // 1. Solid Fill (The "Lit" Look)
-    background: optics-alpha(var(--energy-primary), 0.15, '--optics-glow-mult');
+    background: alpha(var(--energy-primary), 15%);
     border-color: var(--energy-primary);
 
     // 2. Contrast Text
     color: var(--text-main);
 
     // 3. Glow Effect
-    box-shadow:
-      0 0 15px optics-alpha(var(--energy-primary), 0.3, '--optics-glow-mult'),
-      inset 0 0 10px
-        optics-alpha(var(--energy-primary), 0.1, '--optics-glow-mult');
+    box-shadow: var(--shadow-lift);
 
     // --- MODE EXCEPTIONS ---
     @at-root [data-mode='light'] & {
       background: alpha(var(--energy-primary), 10%);
-      border-color: var(--energy-primary);
       color: var(--energy-primary);
-      box-shadow: none;
     }
 
     @at-root [data-physics='retro'] & {
-      background: transparent;
-      border: 2px solid var(--energy-primary);
-      color: var(--energy-primary);
-      box-shadow: 3px 3px 0 var(--energy-primary);
+      background: alpha(var(--color-success), 20%);
     }
   }
 }
@@ -241,8 +221,8 @@ button:not(.btn-void),
 // Icon Button
 .btn-icon {
   padding: 0;
-  width: 2.75rem;
-  height: 2.75rem;
+  width: var(--control-height);
+  height: var(--control-height);
   border-radius: 50%;
   display: flex;
   align-items: center;

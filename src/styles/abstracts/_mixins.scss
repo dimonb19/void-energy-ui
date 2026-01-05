@@ -31,53 +31,31 @@
   border-left-color: var(--surface-border-side);
   border-right-color: var(--surface-border-side);
 
-  // SHADOW: Scaled by --optics-shadow-mult
-  box-shadow: 0 4px 16px
-    color-mix(
-      in srgb,
-      black calc(0.5 * var(--optics-shadow-mult) * 100%),
-      transparent
-    );
+  // This variable automatically switches between Glow (Glass) and Shadow (Flat)
+  box-shadow: var(--shadow-float);
 
-  // 3. BLUR
+  // 3. MOTION
+  transition:
+    transform var(--speed-base) var(--ease-stabilize),
+    border-color var(--speed-base) var(--ease-snap),
+    background-color var(--speed-base) var(--ease-flow),
+    box-shadow var(--speed-base) var(--ease-flow);
+
+  // 4. BLUR
   @supports (backdrop-filter: blur(1px)) {
     backdrop-filter: blur(var(--physics-blur));
     -webkit-backdrop-filter: blur(var(--physics-blur));
   }
 
-  // 4. MOTION
-  transition:
-    transform var(--speed-base) var(--ease-stabilize),
-    border-color var(--speed-base) var(--ease-snap),
-    background-color var(--speed-base) var(--ease-flow),
-    box-shadow var(--speed-base) var(--ease-snap);
-
   // 5. INTERACTION
   @media (hover: hover) {
     &:hover {
       @if $interactive {
-        // Variable-driven motion (Retro = none, Glass = -2px)
-        transform: var(--hover-transform);
-        border-color: optics-alpha(
-          var(--energy-primary),
-          var(--base-glow-opacity),
-          // <--- CONNECTED HERE
-          '--optics-glow-mult'
-        );
-
-        // HOVER SHADOW & GLOW
-        // If mode=light, the colored glow (2nd part) vanishes because mult is 0.
-        box-shadow:
-          var(--hover-shadow),
-          0
-            0
-            15px
-            optics-alpha(
-              var(--energy-primary),
-              calc(var(--base-glow-opacity) * 0.8),
-              // Scale relative to base
-              '--optics-glow-mult'
-            );
+        // Variable-driven motion
+        transform: translateY(var(--lift));
+        border-color: var(--energy-primary);
+        // Simply swap to the "Lifted" lighting variable
+        box-shadow: var(--shadow-lift);
       }
     }
   }
@@ -88,56 +66,32 @@
 @mixin glass-sunk {
   background: var(--bg-sink);
 
-  @supports (backdrop-filter: blur(1px)) {
-    backdrop-filter: blur(var(--physics-blur));
-    -webkit-backdrop-filter: blur(var(--physics-blur));
-  }
-
-  // Uniform borders for sunk items
   border: var(--physics-border-width) solid var(--border-shadow);
   border-radius: var(--radius-base);
-
-  // Inset shadow is subtle, keep it simple but scale it
-  box-shadow: inset 0 2px 8px
-    color-mix(
-      in srgb,
-      black
-        calc(
-          var(--base-shadow-opacity) * 0.4 * var(--optics-shadow-mult) * 100%
-        ),
-      transparent
-    );
   color: var(--text-main);
+
+  // Unified Depth
+  box-shadow: var(--shadow-sunk);
 
   transition:
     border-color var(--speed-fast) var(--ease-snap),
     box-shadow var(--speed-fast) var(--ease-snap),
     outline var(--speed-fast) var(--ease-snap);
 
+  @supports (backdrop-filter: blur(1px)) {
+    backdrop-filter: blur(var(--physics-blur));
+    -webkit-backdrop-filter: blur(var(--physics-blur));
+  }
+
   &:focus-visible {
     border-color: var(--energy-primary);
-    // Focus glow - obedient to optics
-    box-shadow:
-      inset 0 2px 8px
-        color-mix(
-          in srgb,
-          black calc(0.5 * var(--optics-shadow-mult) * 100%),
-          transparent
-        ),
-      0 0 10px optics-alpha(var(--energy-primary), 0.6, '--optics-glow-mult');
+    box-shadow: var(--focus-ring);
   }
 }
 
 // ==========================================================================
 // 2. TYPOGRAPHY & ENERGY
 // ==========================================================================
-
-// MIXIN: Neon Text Glow
-@mixin text-glow($color: var(--energy-primary)) {
-  color: $color;
-  // If optics-text-glow is 0 (Light Mode), shadow becomes transparent.
-  text-shadow: 0 0 15px optics-alpha($color, 0.6, '--optics-text-glow');
-}
 
 // MIXIN: The "Gemini Laser" Structure
 @mixin gemini-laser {
@@ -150,7 +104,7 @@
   color: var(--text-main);
 
   // Parent radius clips the beam and keeps the gradient contained.
-  border-radius: 999px; // Pill Shape
+  border-radius: var(--radius-full);
 
   // 1. THE ROTATING BEAM (The Gradient)
   &::before {
@@ -179,7 +133,6 @@
     transform: translate(-50%, -50%);
     animation: rotate-laser 4s linear infinite;
     z-index: -2;
-    opacity: 1;
 
     // Retro physics override: segmented radar sweep.
     @at-root :where([data-physics='retro']) & {
@@ -200,8 +153,6 @@
         transparent 240deg,
         transparent 360deg
       );
-      // Slight transparency echoes CRT phosphor.
-      opacity: 0.8;
       // Sharp stepping for retro feel.
       animation-timing-function: steps(64);
     }
@@ -211,13 +162,13 @@
   &::after {
     content: '';
     position: absolute;
-    inset: 2px; // The border thickness
+    inset: var(--physics-border-width);
 
     // Use Solid Color, NOT Glass.
     background: var(--bg-canvas);
 
     z-index: -1;
-    border-radius: 999px; // Pill Shape
+    border-radius: var(--radius-full);
   }
 
   // HOVER EFFECT: SURGE (Brightness + Width)
@@ -317,29 +268,4 @@
   &[data-status='loading'] {
     @content;
   }
-}
-
-// ==========================================================================
-// 5. UTILITIES
-// ==========================================================================
-
-// HELPER: Dynamic Optical Alpha
-// Calculates a color's opacity based on the Global Optical Multiplier.
-// $base-opacity: 0.5 (50%)
-@function optics-alpha($color, $base-opacity, $mult-var: '--optics-glow-mult') {
-  // Logic: If Multiplier is 0, we want 100% transparent.
-  // We approximate this using CSS calc in the color-mix percentage.
-  // Note: Standard Sass cannot compile CSS calc() inside color functions easily,
-  // so we rely on native CSS variables for the multiplier interaction.
-
-  // STRATEGY:
-  // We use color-mix() to inject the optical multiplier variable into the transparency channel.
-  // This allows global light/dark mode switches to instantly affect opacity without JS.
-
-  // We will define the shadow color as a variable that changes.
-  @return color-mix(
-    in srgb,
-    $color calc(#{$base-opacity} * var(#{$mult-var}) * 100%),
-    transparent
-  );
 }

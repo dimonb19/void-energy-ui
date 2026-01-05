@@ -22,6 +22,27 @@
   --space-xl: calc(12 * var(--unit) * var(--density, 1)); // 48px
   --space-2xl: calc(16 * var(--unit) * var(--density, 1)); // 64px
 
+  // 1. The Hard Floor (A11y Standard)
+  // We guarantee no interactive target is smaller than 44px (2.75rem)
+  --size-touch-min: 2.75rem;
+
+  // 2. Dynamic Control Height
+  // Logic: 11 units (2.75rem) * Density.
+  // Safety: We use max() to ensure it never shrinks below 2.25rem (36px) even in ultra-compact mode.
+  // Note: We allow slightly smaller than 44px in High Density (0.75x) for desktop data density,
+  --control-height: max(2.25rem, calc(2.75rem * var(--density, 1)));
+
+  // 3. Dynamic Control Padding (Internal breathing room)
+  // Logic: Scales with density.
+  --control-padding-x: var(--space-sm);
+  --control-padding-y: calc(
+    var(--space-xs) * 0.75
+  ); // Slightly tighter vertical alignment
+
+  // 4. Container Padding (Dialogs/Cards)
+  // Logic: Uses the larger 'md' or 'lg' spaces
+  --surface-padding: var(--space-lg);
+
   // Radius Defaults
   --radius-sm: 4px;
   --radius-md: 8px;
@@ -30,6 +51,7 @@
   --radius-full: 9999px;
 
   --text-scale: 1;
+  --scrollbar-width: 6px;
 }
 
 /* =========================================
@@ -84,8 +106,8 @@ html {
   word-spacing: 0.05em;
 
   &::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: var(--scrollbar-width);
+    height: var(--scrollbar-width);
   }
   &::-webkit-scrollbar-track {
     background: var(--bg-sink);
@@ -134,8 +156,9 @@ textarea {
   transition-timing-function: var(--ease-flow);
 
   &:focus-visible {
-    outline: var(--physics-border-width) solid var(--energy-primary);
-    box-shadow: 0 0 8px var(--energy-primary);
+    outline: none;
+    border-color: var(--energy-primary);
+    box-shadow: var(--focus-ring);
     z-index: z('base');
   }
 }
@@ -178,7 +201,7 @@ ol {
 // Dividers
 hr {
   border: 0;
-  height: 1px;
+  height: var(--physics-border-width);
   background: var(--energy-secondary);
   opacity: 0.3;
   margin: 1.5rem 0;
@@ -215,8 +238,10 @@ hr {
     --border-shadow: ButtonText;
 
     // 5. Kill Visual Noise
-    --physics-blur: 0px; // No blur allowed
-    --optics-glow-mult: 0; // No glows
+    --physics-blur: 0px;
+    --shadow-sunk: none;
+    --shadow-float: none;
+    --shadow-lift: none;
   }
 
   // FORCE VISIBILITY ON INTERACTIVE ELEMENTS

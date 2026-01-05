@@ -20,14 +20,6 @@ $breakpoints: generated.$breakpoints;
 // These remain here as they are implementation details of the container system,
 // not global design tokens.
 
-$radius-scale: (
-  'sm': 4px,
-  'md': 8px,
-  'lg': 16px,
-  'xl': 24px,
-  'full': 9999px,
-);
-
 $container-widths: (
   'tablet': 720px,
   'small-desktop': 960px,

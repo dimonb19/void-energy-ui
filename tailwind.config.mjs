@@ -141,10 +141,6 @@ export default {
         '.backdrop-blur-physics': {
           'backdrop-filter': 'blur(var(--physics-blur))',
         },
-        // Text Glows (Matches Atmosphere)
-        '.text-glow': {
-          'text-shadow': '0 0 15px var(--optics-text-glow)',
-        },
       });
     }),
   ],

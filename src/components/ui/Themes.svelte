@@ -70,7 +70,7 @@
         .orb-wrapper {
           width: 24px;
           height: 24px;
-          border-radius: 50%;
+          border-radius: var(--radius-full);
           background: var(--bg-canvas);
           overflow: hidden;
           border: var(--physics-border-width) solid var(--border-highlight);
@@ -79,6 +79,7 @@
             position: absolute;
             width: 12px;
             height: 12px;
+            border-radius: var(--radius-full);
             background: var(--energy-primary);
             z-index: 1;
           }

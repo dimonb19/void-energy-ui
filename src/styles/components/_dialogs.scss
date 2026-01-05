@@ -23,32 +23,32 @@ dialog {
   // RESPONSIVE WIDTH STRATEGY
   // ------------------------------------------------------------------------
   // Default: "Standard" (Good for forms/inputs)
-  // Logic: "Take full width minus 2rem padding, BUT cap at 32rem (512px)."
-  width: min(calc(100vw - 2rem), 32rem);
+  // Logic: "Take full width minus padding, BUT cap at 32rem (512px)."
+  width: min(calc(100vw - var(--space-xl)), 32rem);
   // Max Height: Ensure header/footer don't get cut off on short screens
-  max-height: calc(100dvh - 4rem);
+  max-height: calc(100dvh - var(--space-2xl));
 
   // Tablet+: Let it breathe a bit more
   @include respond-up('tablet') {
-    width: min(calc(100vw - 4rem), 40rem); // ~640px
+    width: min(calc(100vw - var(--space-2xl)), 40rem); // ~640px
   }
 
   // A. "Mini" (Alerts / Confirmations / Delete)
   &.dialog-sm {
-    width: min(calc(100vw - 2rem), 24rem); // ~380px (Tight)
+    width: min(calc(100vw - var(--space-xl)), 24rem); // ~380px (Tight)
     text-align: center; // Usually centered text for alerts
   }
 
   // B. "Wide" (Complex Grids / File Uploads)
   &.dialog-lg {
-    width: min(calc(100vw - 2rem), 64rem); // ~1024px
+    width: min(calc(100vw - var(--space-xl)), 64rem); // ~1024px
     max-width: 1200px; // Hard cap for ultrawide
   }
 
   // C. "Full" ( immersive takeovers)
   &.dialog-full {
-    width: calc(100vw - 2rem);
-    height: calc(100dvh - 2rem);
+    width: calc(100vw - var(--space-xl));
+    height: calc(100dvh - var(--space-xl));
     max-height: none;
   }
 
@@ -58,7 +58,7 @@ dialog {
   color: var(--text-main);
 
   // Extra Depth: Modals float higher than cards
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+  box-shadow: var(--shadow-lift);
 
   // --- 3. ANIMATION PHYSICS (The Materialize Effect) ---
   // DEFAULT STATE (Open)
@@ -130,8 +130,8 @@ dialog {
   & > div {
     display: flex;
     flex-flow: column nowrap;
-    padding: 2rem;
-    gap: 1.5rem;
+    padding: var(--surface-padding);
+    gap: var(--space-md);
 
     // Typography
     h2,
@@ -153,7 +153,7 @@ dialog {
   scrollbar-color: var(--energy-secondary) transparent;
 
   &::-webkit-scrollbar {
-    width: 6px;
+    width: var(--scrollbar-width);
   }
 
   &::-webkit-scrollbar-track {
@@ -179,15 +179,7 @@ dialog {
   @at-root [data-mode='light'] & {
     background: var(--bg-surface);
     border: var(--physics-border-width) solid var(--border-highlight);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); // Clean shadow
     border-radius: var(--radius-base);
-
-    // Crisp entry, no blur
-    @starting-style {
-      opacity: 0;
-      transform: scale(0.95);
-      filter: none;
-    }
 
     &:not([open]) {
       opacity: 0;

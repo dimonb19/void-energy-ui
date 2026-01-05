@@ -23,21 +23,43 @@
  */
 
 import THEME_REGISTRY from '../config/void-registry.json';
-import { VOID_TOKENS } from '../config/design-tokens';
 import { STORAGE_KEYS, DOM_ATTRS, DEFAULTS } from '../config/constants';
 
+// --- TYPES ---
 interface UserConfig {
   fontHeading: string | null;
   fontBody: string | null;
   scale: number;
-  density: VoidDensity;
+  density: 'high' | 'standard' | 'low';
 }
+
+// 🛡️ SAFETY: A complete palette fallback.
+// This ensures that if the registry.json is missing colors (optimization),
+// the engine can still calculate merges without crashing.
+const FALLBACK_PALETTE: VoidPalette = {
+  'bg-canvas': '#000000',
+  'bg-surface': '#111111',
+  'bg-sink': '#000000',
+  'bg-spotlight': '#222222',
+  'energy-primary': '#ffffff',
+  'energy-secondary': '#888888',
+  'border-highlight': '#444444',
+  'border-shadow': '#222222',
+  'text-main': '#ffffff',
+  'text-dim': '#aaaaaa',
+  'text-mute': '#666666',
+  'color-premium': '#ff0000',
+  'color-system': '#00ff00',
+  'color-success': '#0000ff',
+  'color-error': '#ff0000',
+  'font-atmos-heading': 'sans-serif',
+  'font-atmos-body': 'sans-serif',
+};
 
 // --- THE REACTIVE ENGINE ---
 export class VoidEngine {
   // 1. REACTIVE STATE (The Truth)
   atmosphere = $state<string>(DEFAULTS.ATMOSPHERE);
-
   // Runtime Registry initialized with our static build artifacts
   registry = $state<ThemeRegistry>({ ...(THEME_REGISTRY as any) });
 
@@ -57,39 +79,43 @@ export class VoidEngine {
     // Singleton Initialization
     if (typeof window !== 'undefined') {
       this.init();
-      // Debug helper
-      (window as any).Void = this;
+      // Debug helper & API Entry Point
+      window.Void = this;
     }
   }
 
   // --- ACTIONS ---
 
-  // Registers a theme payload from an API source.
-
   /**
    * Registers a theme with "Safety Merge" logic.
-   * If the incoming theme is missing keys, we fill gaps with the Default Void theme.
+   * If the incoming theme is missing keys (or if the base registry is optimized/empty),
+   * we fill gaps with the Default Void theme to prevent crashes.
    */
   registerTheme(id: string, definition: Partial<VoidThemeDefinition>) {
     console.group(`Void: Registering Atmosphere "${id}"`);
 
     // A. THE SAFETY NET
-    // We grab the "Void" theme from our static registry to use as a base.
-    const baseTheme = this.registry[DEFAULTS.ATMOSPHERE];
+    // We try to grab the default theme from the registry.
+    const registryEntry = this.registry[DEFAULTS.ATMOSPHERE];
 
-    if (!baseTheme) {
-      console.error('CRITICAL: Default Void theme missing from registry.');
-      console.groupEnd();
-      return;
-    }
+    // We reconstruct a "Full Base Theme".
+    // CRITICAL FIX: If the registry entry is missing the palette (common in prod builds),
+    // we use the FALLBACK_PALETTE to ensure we have an object to merge against.
+    const baseTheme: VoidThemeDefinition = {
+      id: DEFAULTS.ATMOSPHERE,
+      mode: (registryEntry?.mode as any) || 'dark',
+      physics: (registryEntry?.physics as any) || 'glass',
+      palette: (registryEntry as any)?.palette || FALLBACK_PALETTE,
+      fonts: [],
+    };
 
-    // B. THE PARTIAL MERGE (The Fix)
+    // B. THE PARTIAL MERGE
     // We strictly reconstruct the object to ensure structural integrity.
     const safeTheme: VoidThemeDefinition = {
       // 1. Metadata: Fallback to base if missing
       id: id,
-      mode: definition.mode || baseTheme.mode || 'dark',
-      physics: definition.physics || baseTheme.physics || 'glass',
+      mode: definition.mode || baseTheme.mode,
+      physics: definition.physics || baseTheme.physics,
 
       // 2. Palette: Deep Merge (Crucial!)
       // This ensures that if they miss 'bg-canvas', we use the Void one.
@@ -109,8 +135,7 @@ export class VoidEngine {
 
     if (missingKeys.length > 0) {
       console.warn(
-        `Void: Theme "${id}" incomplete. Auto-filled ${missingKeys.length} missing keys:`,
-        missingKeys,
+        `Void: Theme "${id}" incomplete. Auto-filled ${missingKeys.length} missing keys.`,
       );
     } else {
       console.log('Void: Theme definition valid.');
@@ -133,6 +158,25 @@ export class VoidEngine {
     }
 
     console.groupEnd();
+  }
+
+  // ✨ Helper for Collaborators / Future API
+  // Allows passing a raw JSON object and validates it against the VoidSchema
+  // before registering it.
+  async loadExternalTheme(url: string) {
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      // Basic validation check
+      if (data.id && data.palette) {
+        this.registerTheme(data.id, data);
+        this.setAtmosphere(data.id);
+        return true;
+      }
+    } catch (e) {
+      console.error('Void: External Theme Load Failed', e);
+      return false;
+    }
   }
 
   setAtmosphere(name: string) {
@@ -199,7 +243,6 @@ export class VoidEngine {
     } else {
       // If we switch back to a static theme, we must CLEANUP the inline styles
       // so the CSS class variables take precedence again.
-      // We can just clear the style property for the keys we know about.
       this.clearPalette(theme.palette || {});
     }
 
@@ -231,7 +274,12 @@ export class VoidEngine {
     );
 
     // Density
-    const densityMap = VOID_TOKENS.density.factors as Record<string, number>;
+    // (Hardcoded map here to avoid circular dependency with tokens during runtime)
+    const densityMap: Record<string, number> = {
+      high: 0.75,
+      standard: 1,
+      low: 1.25,
+    };
     root.style.setProperty('--density', (densityMap[density] || 1).toString());
 
     // Fonts

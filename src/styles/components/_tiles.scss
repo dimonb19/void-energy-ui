@@ -21,10 +21,10 @@
   flex-flow: row nowrap;
   justify-content: flex-start;
   align-items: center;
-  gap: 1.5rem;
+  gap: var(--space-md);
 
   // Padding respects the container layout but adds vertical breathing room
-  padding: 0.5rem 1.5rem 2rem 1.5rem;
+  padding: var(--space-xs) var(--space-md) var(--space-lg) var(--space-md);
 
   overflow-x: auto;
   overflow-y: hidden;
@@ -70,8 +70,11 @@
 .tile {
   position: relative;
   flex: none;
-  width: 10rem; // Mobile width
   aspect-ratio: 2 / 3;
+
+  // Widths should be derived from "Grid Units" or spacing
+  // 40 units * density. This ensures tiles shrink in Compact mode.
+  width: calc(40 * var(--unit) * var(--density, 1));
 
   display: flex;
   flex-direction: column;
@@ -135,7 +138,7 @@
     position: relative;
     z-index: z('decorate');
     margin: 0;
-    padding: 0 0.75rem 0.25rem 0.75rem;
+    padding: 0 var(--space-sm) var(--space-xs) var(--space-sm);
 
     font-family: var(--font-heading);
     color: var(--text-main);
@@ -154,10 +157,10 @@
   .tile-data {
     position: relative;
     z-index: z('decorate');
-    padding: 0 0.75rem 0.75rem 0.75rem;
+    padding: 0 var(--space-sm) var(--space-sm) var(--space-sm);
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: var(--space-xs);
 
     p,
     span {
@@ -177,7 +180,7 @@
     &:focus-visible:not(.loading-tile) {
       // Logic handled by mixin, but we add image scale here
       img {
-        transform: scale(1.05);
+        transform: scale(var(--scale));
       }
 
       // Light up metadata
@@ -190,11 +193,6 @@
 
       @at-root [data-physics='retro'] & {
         border-color: var(--energy-primary);
-        box-shadow: 4px 4px 0px alpha(var(--energy-primary), 25%); // Hard shadow, no blur
-
-        img {
-          transform: scale(1.01);
-        }
       }
     }
   }
@@ -202,13 +200,13 @@
   // --- RESPONSIVE WIDTHS ---
   // Using standard breakpoints logic
   @include respond-up('tablet') {
-    width: 14rem;
+    width: calc(56 * var(--unit) * var(--density, 1));
   }
   @include respond-up('large-desktop') {
-    width: 16rem;
+    width: calc(64 * var(--unit) * var(--density, 1));
   }
   @include respond-up('full-hd') {
-    width: 18rem;
+    width: calc(72 * var(--unit) * var(--density, 1));
   }
 }
 
@@ -253,7 +251,7 @@
   gap: 0;
 
   // Sizing
-  min-height: 2.25rem;
+  min-height: max(2rem, calc(2.25rem * var(--density, 1)));
   padding: 0;
 
   // Typography
@@ -298,7 +296,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2.25rem;
+    width: max(2rem, calc(2.25rem * var(--density, 1)));
 
     // Default Separation (Variant mixin overrides this)
     border-left: var(--physics-border-width) solid alpha(white, 10%);
@@ -337,8 +335,8 @@
   // HOVER
   @media (hover: hover) {
     &:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px alpha(black, 30%);
+      transform: translateY(var(--lift)) scale(var(--scale, 1));
+      box-shadow: var(--shadow-lift);
     }
   }
 
@@ -353,7 +351,6 @@
   // --- 1. DEFAULT (VOID / GLASS) ---
   background: alpha($color, 80%);
   border-color: tint($color, 20%);
-  box-shadow: 0 0 15px alpha($color, 20%);
   color: var(--text-main);
 
   .tile-remove {
@@ -370,7 +367,7 @@
   @media (hover: hover) {
     &:hover:not(:disabled) {
       border-color: tint($color, 50%);
-      box-shadow: 0 0 20px alpha($color, 40%);
+      box-shadow: var(--shadow-lift);
     }
   }
 
@@ -395,7 +392,7 @@
     }
 
     &:hover:not(:disabled) {
-      box-shadow: 4px 4px 0px alpha($color, 50%); // Hard shadow, no blur
+      box-shadow: 3px 3px 0px alpha($color, 50%); // Hard shadow, no blur
     }
   }
 
@@ -404,7 +401,7 @@
     // Pastel background
     background: tint($color, 85%);
     border: var(--physics-border-width) solid $color;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    box-shadow: none;
     // Darker text for readability on light bg
     color: shade($color, 60%);
 
@@ -463,7 +460,7 @@
 // 6. THE ADDON (Label on Top)
 // ==========================================================================
 .tile-labeled {
-  margin-top: 1rem;
+  margin-top: var(--space-sm);
   border-top-left-radius: 0;
 
   &::before {
@@ -472,11 +469,11 @@
 
     // Dynamic positioning based on border width
     // This ensures it sits exactly on the line, whether it's 1px (Glass) or 2px (Retro)
-    top: -1.5rem;
+    top: calc(var(--space-md) * -1);
     left: calc(var(--physics-border-width) * -1);
 
-    height: 1.5rem;
-    padding: 0 0.5rem;
+    height: var(--space-md);
+    padding: 0 var(--space-xs);
 
     background: inherit;
     border: inherit;

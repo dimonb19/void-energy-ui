@@ -31,6 +31,8 @@
   transform: translateY(4px) scale(0.95);
   filter: blur(calc(var(--physics-blur) / 2));
 
+  box-shadow: var(--shadow-lift);
+
   // We explicitly transition specific properties to avoid layout thrashing
   transition:
     opacity var(--speed-base) var(--ease-stabilize),
@@ -52,13 +54,10 @@
     transition: none; // Law: Instant motion
     filter: none; // Law: No blur
     background: var(--bg-canvas); // Opaque
-    box-shadow: 4px 4px 0 var(--border-shadow); // Hard shadow
   }
 
   // FLAT: Clean Paper (Light Mode)
   @at-root [data-mode='light'] & {
-    background: var(--bg-surface);
     filter: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
 }

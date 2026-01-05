@@ -3,126 +3,117 @@
    ==========================================================================
    
    PURPOSE:
-   This file defines the "Material Properties" of the interface. 
-   While `_user-themes.scss` controls COLOR (The Soul), this file controls 
+   This file defines the "Material Properties" of the interface.
+   While `_themes.scss` controls COLOR (The Soul), this file controls 
    BEHAVIOR (The Body).
 
-   WHY DO WE NEED THIS?
-   By separating Physics from Color, we can mix and match realities.
-   - A "Void" theme can look like Glass (Modern) or Flat (Print).
-   - A "Terminal" theme is defined by its motion (instant) and geometry (sharp),
-     regardless of whether it is Green, Amber, or Blue.
+   THE PHYSICS PROTOCOL:
+   We do not manually set shadows or border-radius on elements.
+   Instead, elements inherit properties from the active Physics Mode.
 
-   THE THREE LAWS OF PHYSICS:
-   1. TEXTURE: How does light pass through? (Blur, Opacity)
-   2. GEOMETRY: What is the shape? (Radius, Border Width)
-   3. TIME:    How does it move? (Speed, Easing)
+   THE ADAPTIVE LIGHTING MODEL:
+   1. GLASS (Dark) : Latent Energy. Deep black shadows at rest; Glows on interaction.
+   2. FLAT (Light) : Physical Depth. Casts standard drop shadows. No glows.
+   3. RETRO        : Hard Edges. No glows, no shadows. Instant state changes.
 
    --------------------------------------------------------------------------
-   PROPERTY DICTIONARY
+   THE PROPERTY DICTIONARY
    --------------------------------------------------------------------------
    
-   --- TEXTURE & GEOMETRY ---
-   $physics-blur         : Backdrop blur strength. High = Glass/Water. 0px = Air/Solid.
-   $physics-border-width : Thickness of the container shell.
-   $radius-base          : Corner roundness. 0px = Retro/Machine. 8px+ = Organic.
-   
-   --- LIGHTING & DEPTH ---
-   $border-mode          : Logic for rendering borders.
-                           - 'directional': Top border is lighter (Light from above). Used for 3D Glass.
-                           - 'uniform':     All borders are equal. Used for 2D Paper or Retro screens.
-   $border-opacity       : Base transparency of the border lines.
-   $glow-opacity         : Baseline inner-glow for interactive elements.
-   $glow-strength        : Multiplier for hover states (0 = No reaction, 1 = Full neon).
-   $shadow-strength      : Multiplier for depth shadows (0 = Flat).
-   $void-shadow          : The specific drop-shadow CSS value for floating depth.
-
-   --- TIME (MOTION) ---
-   $speed-base           : Duration of transitions. 0s = Instant/Robotic.
-   $ease-base            : The math of movement. Linear, Ease-Out, or Steps.
-   
-   ==========================================================================
-   ⚠️ SYSTEM ARCHITECTURE WARNING
-   --------------------------------------------------------------------------
    The variables defined here are TIER 2 (System Controlled).
    They are calculated based on the 'physics' mode ('glass', 'flat', 'retro').
 
-   ❌ DO NOT OVERRIDE THESE MANUALLY IN THEMES.
-   ❌ DO NOT USE THESE FOR COLOR (Use --energy-* or --bg-* instead).
+   --radius-base          : Corner roundness. (0px = Retro, 8px+ = Organic).
+   --surface-bg           : The background texture (Solid vs Glass Gradient).
+   --surface-border-*     : Directional lighting on borders.
+   --physics-blur         : Backdrop blur strength.
+   
+   --shadow-sunk          : Inner depth for inputs/wells (Recessed).
+   --shadow-float         : Ambient depth for resting objects (Matter).
+   --shadow-lift          : Interactive depth/glow for active objects (Energy).
+   --focus-ring           : Accessibility outline for keyboard navigation.
 
-   ✅ READ-ONLY API:
-   - var(--physics-blur)
-   - var(--physics-border-width)
-   - var(--speed-base) / var(--speed-fast)
-   - var(--ease-snap) / var(--ease-flow)
+   --speed-base           : Duration of transitions. (0s = Instant/Robotic).
+   --ease-snap            : The math of movement.
+
    ========================================================================== */
 
 @use 'sass:map';
 @use '../config/generated-themes' as generated;
 @use 'functions' as *;
 
-// 1. THE DEFINITIONS
 $physics-presets: (
+  // 1. GLASS PHYSICS (Bioluminescent / Holographic)
+  // Logic: The object IS the light source.
   'glass': map.merge(
       map.get(generated.$generated-physics, 'glass'),
       (
         'radius-base': var(--radius-md),
-        'base-glow-opacity': 0.6,
-        'base-shadow-opacity': 0.5,
+        'radius-full': 9999px,
         'surface-bg': linear-gradient(
             to bottom,
-            color-mix(in srgb, var(--bg-surface), var(--energy-secondary) 10%)
-              0%,
+            blend(var(--bg-surface), var(--energy-secondary), 10%) 0%,
             var(--bg-surface) 100%
           ),
-        'surface-border-top': color-mix(
-            in srgb,
-            var(--border-highlight),
-            transparent 0%
-          ),
-        'surface-border-side': color-mix(
-            in srgb,
-            var(--border-shadow),
-            transparent 0%
-          ),
-        'surface-shadow': 0 4px 16px rgba(0, 0, 0, 0.5),
-        'hover-transform': translateY(-2px),
-        'hover-shadow': 0 8px 32px rgba(0, 0, 0, 0.5),
+        'surface-border-top': var(--border-highlight),
+        'surface-border-side': var(--border-shadow),
+        // SHADOWS & GLOWS
+        'shadow-sunk': inset 0 2px 6px alpha(var(--bg-canvas), 80%),
+        'shadow-float': 0 4px 20px rgba(0, 0, 0, 0.5),
+        'shadow-lift': 0 0 10px alpha(var(--energy-primary), 50%),
+        'focus-ring':
+          '0 0 0 1px var(--bg-canvas), 0 0 0 2px var(--energy-primary), 0 0 10px var(--energy-primary)',
       )
     ),
+  // 2. FLAT PHYSICS (Paper / Clinical)
+  // Logic: External light source casts shadows.
   'flat': map.merge(
       map.get(generated.$generated-physics, 'flat'),
       (
         'radius-base': var(--radius-sm),
-        'base-glow-opacity': 0,
-        'base-shadow-opacity': 0.1,
+        'radius-full': 9999px,
         'surface-bg': var(--bg-surface),
         'surface-border-top': var(--border-highlight),
         'surface-border-side': var(--border-highlight),
-        'surface-shadow': 0 2px 8px rgba(0, 0, 0, 0.08),
-        'hover-transform': translateY(-1px),
-        'hover-shadow': 0 4px 12px rgba(0, 0, 0, 0.12),
+        // SHADOWS (Standard Grey/Black)
+        'shadow-sunk': inset 0 1px 3px rgba(0, 0, 0, 0.1),
+        'shadow-float': 0 2px 6px rgba(0, 0, 0, 0.15),
+        'shadow-lift': 0 3px 12px rgba(0, 0, 0, 0.15),
+        'focus-ring':
+          '0 0 0 2px var(--bg-canvas), 0 0 0 4px var(--energy-primary)',
       )
     ),
+  // 3. RETRO PHYSICS (Terminal / Brutalist)
+  // Logic: No depth map. Pure X/Y coordinates.
   'retro': map.merge(
       map.get(generated.$generated-physics, 'retro'),
       (
         'radius-base': 0px,
-        'base-glow-opacity': 0,
-        'base-shadow-opacity': 1,
+        'radius-full': 0px,
         'surface-bg': var(--bg-surface),
         'surface-border-top': var(--border-highlight),
         'surface-border-side': var(--border-highlight),
-        'surface-shadow': none,
-        'hover-transform': none,
-        'hover-shadow': 4px 4px 0px alpha(var(--energy-primary), 25%),
+        // NULL PHYSICS
+        'shadow-sunk': none,
+        'shadow-float': none,
+        'shadow-lift': 3px 3px 0 alpha(var(--energy-secondary), 50%),
+        'focus-ring': 3px 3px 0 var(--energy-secondary),
       )
-    ),
+    )
 );
 
-// 2. THE EMITTER (Logic Layer)
 @mixin emit-physics {
-  // A. Emit Physics Presets
+  @each $name, $map in $physics-presets {
+    [data-physics='#{$name}'] {
+      @each $key, $val in $map {
+        --#{$key}: #{$val};
+      }
+    }
+  }
+}
+
+// THE EMITTER (Logic Layer)
+@mixin emit-physics {
   @each $name, $map in $physics-presets {
     [data-physics='#{$name}'] {
       @each $key, $val in $map {
@@ -130,17 +121,5 @@ $physics-presets: (
         --#{$key}: #{$val};
       }
     }
-  }
-
-  // B. Emit Optics (Unchanged)
-  [data-mode='dark'] {
-    --optics-glow-mult: 1;
-    --optics-shadow-mult: 1;
-    --optics-text-glow: 1;
-  }
-  [data-mode='light'] {
-    --optics-glow-mult: 0;
-    --optics-shadow-mult: 0.5;
-    --optics-text-glow: 0;
   }
 }

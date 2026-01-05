@@ -70,14 +70,8 @@
     &:hover:not(:disabled) {
       .icon,
       svg {
-        // Physical Lift
-        transform: scale(1.1);
-
-        // Glow (Glass Mode Only)
-        // Uses your optics-alpha function to handle light/dark mode automatically
-        filter: drop-shadow(
-          0 0 5px optics-alpha(currentColor, 0.6, '--optics-glow-mult')
-        );
+        transform: scale(calc(var(--scale) + 0.1));
+        filter: drop-shadow(var(--shadow-lift));
       }
     }
   }
@@ -86,7 +80,7 @@
   &:active:not(:disabled) {
     .icon,
     svg {
-      transform: scale(0.95); // Press down
+      transform: scale(calc(var(--scale) - 0.05));
     }
   }
 

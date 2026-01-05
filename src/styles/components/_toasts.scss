@@ -19,7 +19,7 @@
   display: flex;
   flex-direction: column-reverse; // Newest at bottom visually
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-xs);
   pointer-events: none;
 
   width: 100%;
@@ -40,13 +40,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.6rem; // separation between icon and text
+  gap: var(--space-xs);
 
   // Padding: Slightly less on the left because the icon adds visual weight
-  padding: 0.5rem 1.1rem 0.5rem 0.9rem;
+  padding-block: var(--space-xs);
+  padding-right: var(--space-sm);
+  padding-left: calc(var(--space-sm) * 0.8);
 
-  // Shape: Full Pill
-  border-radius: 999px;
+  border-radius: var(--radius-full);
 
   // --- B. Semantic Mapping ---
   // Maps notification types to system colors
@@ -66,11 +67,9 @@
 
   // --- C. The Holographic Glow ---
   // Subtle border and ambient glow based on the accent color
-  border: 1px solid alpha(var(--toast-accent), 25%);
-  box-shadow:
-    0 4px 15px -5px rgba(0, 0, 0, 0.5),
-    // Depth
-    0 0 10px -4px alpha(var(--toast-accent), 40%); // Signal
+  border: var(--physics-border-width) solid alpha(var(--toast-accent), 25%);
+  // Tint the glass slightly with the accent color
+  background: blend(var(--bg-surface), var(--toast-accent), 15%);
 
   // Motion
   transition:
@@ -81,9 +80,13 @@
   // Hover Effect: Lift & Brighten
   &:hover {
     border-color: alpha(var(--toast-accent), 50%);
-    box-shadow:
-      0 6px 20px -5px rgba(0, 0, 0, 0.6),
-      0 0 15px -4px alpha(var(--toast-accent), 60%);
+    box-shadow: var(--shadow-lift);
+
+    @at-root [data-physics='glass'] & {
+      box-shadow:
+        var(--shadow-lift),
+        0 0 15px -4px alpha(var(--toast-accent), 60%);
+    }
   }
 
   // --- D. PHYSICS OVERRIDES ---
@@ -94,10 +97,8 @@
       --toast-accent: var(--text-main);
     }
 
-    border-radius: 0;
     background: blend(var(--bg-canvas), var(--toast-accent), 10%);
-    border: 2px solid var(--toast-accent);
-    box-shadow: 4px 4px 0 var(--bg-sink); // Hard shadow
+    border: var(--physics-border-width) solid var(--toast-accent);
 
     &:hover {
       background: blend(var(--bg-canvas), var(--toast-accent), 15%);
@@ -107,19 +108,11 @@
   // 2. FLAT (Paper/Light)
   @at-root [data-mode='light'] & {
     background: blend(var(--bg-surface), var(--toast-accent), 5%);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     color: var(--text-main);
 
     &:hover {
       background: blend(var(--bg-surface), var(--toast-accent), 10%);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     }
-  }
-
-  // 3. GLASS (Default)
-  @at-root [data-physics='glass'] & {
-    // Tint the glass slightly with the accent color
-    background: blend(var(--bg-surface), var(--toast-accent), 15%);
   }
 }
 
@@ -174,14 +167,5 @@
 .toast-text {
   position: relative;
   z-index: 1;
-
   color: var(--text-main);
-
-  // Retro Font Override
-  @at-root [data-physics='retro'] & {
-    font-family: var(--font-code);
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-  }
 }
