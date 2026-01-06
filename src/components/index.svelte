@@ -102,7 +102,7 @@
         {/each}
       </select>
 
-      <div class="flex-col gap-xs pt-sm hidden tablet:flex">
+      <div class="flex-col gap-xs pt-sm">
         <div class="flex flex-row justify-between items-end">
           <label for="">Interface Scale</label>
           <span>
@@ -111,7 +111,7 @@
         </div>
 
         <div
-          class="surface-sunk p-xs rounded-md flex flex-row gap-xs justify-between"
+          class="surface-sunk p-xs rounded-md flex flex-row flex-wrap gap-xs justify-center"
         >
           {#each scaleLevels as level (level.value)}
             <button
@@ -124,7 +124,7 @@
         </div>
       </div>
 
-      <div class="hidden tablet:flex flex-col gap-xs pt-sm">
+      <div class="flex-col gap-xs pt-sm">
         <div class="flex flex-row justify-between items-end">
           <label for="density">Spacing Density</label>
           <span>
@@ -133,7 +133,7 @@
         </div>
 
         <div
-          class="surface-sunk p-xs rounded-md flex flex-row gap-xs justify-between"
+          class="surface-sunk p-xs rounded-md flex flex-row flex-wrap gap-xs justify-center"
         >
           {#each densityOptions as opt (opt.value)}
             <button

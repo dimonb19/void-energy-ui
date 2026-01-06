@@ -1,5 +1,6 @@
 <script lang="ts">
   import { modal } from '../../lib/modal-manager.svelte';
+  import { tooltip } from '../../actions/tooltip';
 
   let {
     title = 'Confirm Action',
@@ -28,7 +29,11 @@
   <button class="btn-alert" onclick={() => modal.close(false)}>
     {cancelText}
   </button>
-  <button class="btn-signal" onclick={() => modal.close(true)}>
+  <button
+    class="btn-signal"
+    onclick={() => modal.close(true)}
+    use:tooltip={'Click to confirm'}
+  >
     {confirmText}
   </button>
 </div>

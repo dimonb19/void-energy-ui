@@ -76,6 +76,21 @@ export class VoidEngine {
   registerTheme(id: string, definition: Partial<VoidThemeDefinition>) {
     console.group(`Void: Registering Atmosphere "${id}"`);
 
+    // 🛡️ GUARDRAIL: The Law of Physics
+    if (definition.physics === 'glass' && definition.mode === 'light') {
+      console.warn(
+        `⚠️ Void Violation: Atmosphere "${id}" attempts to use GLASS physics in LIGHT mode. This breaks visibility. Falling back to FLAT physics.`,
+      );
+      definition.physics = 'flat'; // Force correction
+    }
+
+    if (definition.physics === 'retro' && definition.mode === 'light') {
+      console.warn(
+        `⚠️ Void Violation: RETRO physics requires Dark mode for contrast. Forcing Dark mode.`,
+      );
+      definition.mode = 'dark'; // Force correction
+    }
+
     // A. THE SAFETY NET
     const registryEntry = this.registry[DEFAULTS.ATMOSPHERE];
 

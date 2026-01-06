@@ -137,7 +137,7 @@ export function live(
 /**
  * ==========================================================================
  * 1. MATERIALIZE (Entry)
- * Usage: <div in:materialize={{ y: 20 }}>
+ * Usage: <div in:materialize}>
  * ==========================================================================
  */
 export function materialize(

@@ -11,7 +11,7 @@ export function applyTheme(root, theme, constants) {
   // 1. The Triad Attributes
   root.setAttribute(constants.ATMOSPHERE, theme.id);
   root.setAttribute(constants.PHYSICS, theme.physics);
-  root.setAttribute(constants.MODE, theme.mode || theme.type);
+  root.setAttribute(constants.MODE, theme.mode);
 
   // 2. Dynamic Palette Injection
   // If the theme has a custom palette (runtime theme), paint the vars.

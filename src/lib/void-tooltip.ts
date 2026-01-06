@@ -7,6 +7,10 @@
    1. Calculates coordinates using Floating UI (Math).
    2. Manages the DOM lifecycle (Creation/Destruction).
    3. Enforces Physics-aware entry/exit delays (Retro vs. Glass).
+
+  ARCHITECTURE:
+   1. Uses native Popover API to enter the "Top Layer".
+   2. Solves the "Z-Index War" by bypassing stacking contexts entirely.
    
    NOTE: This is a headless class. It does not handle styles, only 
    positioning and state attributes (data-state).
@@ -33,8 +37,8 @@ export class VoidTooltip {
   }
 
   private init() {
-    const showEvents = ['mouseenter', 'focus'];
-    const hideEvents = ['mouseleave', 'blur'];
+    const showEvents = ['pointerenter', 'focus'];
+    const hideEvents = ['pointerleave', 'blur'];
 
     showEvents.forEach((evt) =>
       this.trigger.addEventListener(evt, () => this.show()),
@@ -52,6 +56,9 @@ export class VoidTooltip {
     this.tooltip.className = 'void-tooltip';
     this.tooltip.textContent = this.options.content;
 
+    // This promotes the element to the Top Layer, instantly beating all z-indices.
+    this.tooltip.popover = 'manual';
+
     // 2. Physics & A11y Attributes
     // We rely on global CSS for physics, but enforce accessibility roles here.
     const id = `tooltip-${Math.random().toString(36).substr(2, 9)}`;
@@ -61,6 +68,7 @@ export class VoidTooltip {
 
     // 3. Mount to Body (Escapes stacking contexts of Cards/Modals)
     document.body.appendChild(this.tooltip);
+    this.tooltip.showPopover(); // Native API call
 
     // 4. Start Floating UI (The Math)
     this.cleanupPositioning = autoUpdate(this.trigger, this.tooltip, () => {
@@ -98,7 +106,12 @@ export class VoidTooltip {
     // 2. Cleanup Logic
     const destroy = () => {
       if (this.cleanupPositioning) this.cleanupPositioning();
-      el.remove();
+      try {
+        el.hidePopover(); // Clean up native state
+        el.remove();
+      } catch (e) {
+        // Handle race conditions where element is already gone
+      }
       this.trigger.removeAttribute('aria-describedby');
       this.tooltip = null;
     };
@@ -126,7 +139,5 @@ export class VoidTooltip {
 
   public destroy() {
     this.hide();
-    // Remove listeners if you want a complete cleanup,
-    // though native GC handles elements removed from DOM well.
   }
 }

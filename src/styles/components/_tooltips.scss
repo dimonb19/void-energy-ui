@@ -7,25 +7,31 @@
 @use '../base/typography' as *;
 
 .void-tooltip {
-  // 1. BASE GEOMETRY
+  // 1. POPOVER RESET (Crucial)
+  // Native popovers have a black border and white background in some UAs.
+  border: none;
+  background: transparent;
+  margin: 0;
+  inset: unset; // Let Floating UI handle positions
+
+  // 2. BASE GEOMETRY
   // Depth Logic: Tooltips are "Ephemeral Alerts", so they reside
-  // on the Toast layer (200) to float above Modals (100).
-  z-index: z('toast');
   pointer-events: none; // Allow clicking through the tooltip
   width: max-content;
   max-width: 250px;
 
-  // 2. PHYSICS INHERITANCE
+  // 3. PHYSICS INHERITANCE
   // Applies border, background, and shadow logic based on current Theme
   @include glass-float($interactive: false);
 
-  // 3. TYPOGRAPHY
+  // 4. TYPOGRAPHY
   @include typography('caption');
+  text-transform: uppercase;
   padding: var(--space-xs) var(--space-sm);
   text-align: center;
   color: var(--text-main);
 
-  // 4. ANIMATION STATE (The Materialize Effect)
+  // 5. ANIMATION STATE (The Materialize Effect)
   // Default State: Dematerialized (Closed)
   opacity: 0;
   transform: translateY(4px) scale(0.95);
@@ -46,7 +52,7 @@
     filter: blur(0);
   }
 
-  // 5. PHYSICS OVERRIDES
+  // 6. PHYSICS OVERRIDES
 
   // RETRO: Robotic/Instant (Terminal Theme)
   @at-root [data-physics='retro'] & {

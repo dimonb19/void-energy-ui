@@ -105,21 +105,7 @@ html {
   letter-spacing: 0.015rem;
   word-spacing: 0.05em;
 
-  &::-webkit-scrollbar {
-    width: var(--scrollbar-width);
-    height: var(--scrollbar-width);
-  }
-  &::-webkit-scrollbar-track {
-    background: var(--bg-sink);
-  }
-  &::-webkit-scrollbar-thumb {
-    background: var(--energy-secondary);
-    border-radius: 3px;
-    opacity: 0.5;
-  }
-  &::-webkit-scrollbar-thumb:hover {
-    background: var(--energy-primary);
-  }
+  @include laser-scrollbar;
 }
 
 body {

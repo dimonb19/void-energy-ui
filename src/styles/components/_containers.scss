@@ -52,26 +52,15 @@
 // Role: Handles max-widths and margins across breakpoints.
 // Logic: Pure layout. No visuals (blur/glow) by default.
 .container {
-  // 1. Base Mobile Styles (Zero config)
   width: 100%;
-  margin-inline: auto; // Centers the container
+  margin-inline: auto;
 
-  // Use 'base' padding from the map (16px)
-  padding-inline: map.get($container-paddings, 'base');
+  padding-inline: var(--space-md);
 
-  // 2. Responsive Loop
-  // We iterate through the breakpoints map defined in _variables.scss
-  @each $breakpoint-name, $breakpoint-width in $breakpoints {
-    // Check if we have defined values for this specific breakpoint
-    $target-width: map.get($container-widths, $breakpoint-name);
-    $target-padding: map.get($container-paddings, $breakpoint-name);
-
-    // Only generate media query if values exist
-    @if $target-width and $target-padding {
-      @include respond-up($breakpoint-name) {
-        max-width: $target-width;
-        padding-inline: $target-padding;
-      }
+  // Loop through the max-widths map
+  @each $bp-name, $max-width in $container-widths {
+    @include respond-up($bp-name) {
+      max-width: $max-width;
     }
   }
 }
@@ -81,20 +70,9 @@
 // Logic: 100% width, but respects the grid's side padding.
 .container-fluid {
   width: 100%;
-  padding-inline: map.get($container-paddings, 'base');
+  padding-inline: var(--space-md);
   margin-inline: auto;
   max-width: none; // Unset the limit
-
-  // Still respect responsive edge padding
-  @each $breakpoint-name, $breakpoint-width in $breakpoints {
-    $target-padding: map.get($container-paddings, $breakpoint-name);
-
-    @if $target-padding {
-      @include respond-up($breakpoint-name) {
-        padding-inline: $target-padding;
-      }
-    }
-  }
 }
 
 // ==========================================================================

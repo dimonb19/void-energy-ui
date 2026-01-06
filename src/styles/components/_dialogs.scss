@@ -18,8 +18,6 @@ dialog {
   inset: 0; // Ensure full screen centering context
   overscroll-behavior: contain; // Prevents scroll chaining to the body
 
-  z-index: z('modal'); // Layer: Modal
-
   // RESPONSIVE WIDTH STRATEGY
   // ------------------------------------------------------------------------
   // Default: "Standard" (Good for forms/inputs)
@@ -149,31 +147,7 @@ dialog {
 
   // --- 8. SCROLLBARS (Neon Stream) ---
   overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--energy-secondary) transparent;
-
-  &::-webkit-scrollbar {
-    width: var(--scrollbar-width);
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-    margin-block: 0.5rem;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: linear-gradient(
-      to bottom,
-      var(--energy-secondary),
-      var(--energy-primary)
-    );
-    border-radius: 10px;
-
-    &:hover {
-      background: var(--energy-primary);
-      box-shadow: 0 0 10px var(--energy-primary);
-    }
-  }
+  @include laser-scrollbar;
 
   // --- 9. LIGHT MODE OVERRIDE ---
   @at-root [data-mode='light'] & {

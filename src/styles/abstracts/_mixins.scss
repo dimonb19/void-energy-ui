@@ -269,3 +269,31 @@
     @content;
   }
 }
+
+// ==========================================================================
+// 4. SCROLLBAR
+// ==========================================================================
+
+@mixin laser-scrollbar() {
+  scrollbar-width: thin;
+  scrollbar-color: var(--energy-secondary) var(--bg-sink);
+
+  &::-webkit-scrollbar {
+    width: var(--scrollbar-width);
+    height: var(--scrollbar-width);
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--bg-sink);
+    border-radius: var(--radius-full);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--energy-secondary);
+    border-radius: var(--radius-full);
+
+    &:hover {
+      background: var(--energy-primary);
+    }
+  }
+}

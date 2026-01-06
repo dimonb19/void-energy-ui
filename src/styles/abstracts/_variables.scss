@@ -13,26 +13,4 @@
 // Forwarding the maps so other files can use standard syntax
 $z-layers: generated.$z-layers;
 $breakpoints: generated.$breakpoints;
-
-// =========================================
-// LOCAL VARIABLES (Layout Only)
-// =========================================
-// These remain here as they are implementation details of the container system,
-// not global design tokens.
-
-$container-widths: (
-  'tablet': 720px,
-  'small-desktop': 960px,
-  'large-desktop': 1320px,
-  'full-hd': 1600px,
-  'quad-hd': 1920px,
-);
-
-$container-paddings: (
-  'base': 16px,
-  'tablet': 24px,
-  'small-desktop': 32px,
-  'large-desktop': 40px,
-  'full-hd': 48px,
-  'quad-hd': 64px,
-);
+$container-widths: generated.$container-widths;

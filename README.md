@@ -13,12 +13,17 @@ Every pixel on screen is calculated by the intersection of three layers:
 2.  **Physics (The Laws):** Defines Texture, Geometry, and Motion (`glass`, `flat`, `retro`).
 3.  **Mode (The Polarity):** Handles Light/Dark environment switching.
 
-### The Law of Immutability
+### The Law of Immutability (Active Enforcement)
 In the Void Energy system, **Atmospheres are strict presets.**
+The `VoidEngine` includes an active guardrail system that prevents "broken" physics combinations.
+
 * **User Choice:** Users select an **Atmosphere** (e.g., "Void", "Paper", "Terminal").
-* **System Enforced:** The Atmosphere dictates the **Physics** and **Mode**.
-    * *Example:* You cannot have "Void" (Cyberpunk) in "Light Mode".
-    * *Example:* You cannot have "Paper" (Flat) with "Glass" physics.
+* **System Correction:** If an invalid combination is registered (e.g., via API), the Engine auto-corrects it to preserve legibility.
+
+| Violation Detected | System Correction | Reason |
+| :--- | :--- | :--- |
+| **Glass + Light Mode** | Forces **FLAT** Physics | Glass glows require darkness to be visible. |
+| **Retro + Light Mode** | Forces **DARK** Mode | CRT Phosphor effects require a black canvas. |
 
 **Why?** CoNexus is a narrative platform. The visual rendering engine is part of the storytelling. Breaking the physics of a theme breaks the immersion of the story.
 
@@ -48,13 +53,13 @@ We separate **Layout** (Geometry) from **Materials** (Physics).
 
 | Concept | Rule |
 | :--- | :--- |
-| **Material is Truth** | **Glass:** Has Blur, Shadows, and Glows.<br>**Flat:** Has Borders, No Shadows, No Glows.<br>**Retro:** Has Pixel Borders, Instant Motion. |
+| **Material is Truth** | **Glass:** Blur, Shadows, Glows (0.3s cubic-bezier).<br>**Flat:** Borders, Drop Shadows, No Glows (0.2s ease-out).<br>**Retro:** Pixel Borders, No Shadows (0s steps). |
 | **Depth is Tiered** | **Sink (-Z):** Inputs/Wells (`shadow-sunk`).<br>**Float (+Z):** Cards/Surfaces (`shadow-float`).<br>**Lift (++Z):** Interactive/Modals (`shadow-lift`). |
 | **Atmosphere is Context** | The UI adapts to the story. Switching from `void` to `paper` changes physics instantly. |
 
 ### 4. The Single Source of Truth
-* **DO NOT** edit `_generated-themes.scss` or `void-registry.json`.
-* Edit `src/config/design-tokens.ts` and run `npm run build:tokens`.
+* **DO NOT** edit `_generated-themes.scss`, `void-registry.json`, or `void-physics.json`.
+* **EDIT** `src/config/design-tokens.ts` and run `npm run build:tokens`.
 
 ### 5. The State Protocol
 * **State lives in the DOM.** Do not use classes like `.active` or `.show`.
@@ -65,20 +70,42 @@ We separate **Layout** (Geometry) from **Materials** (Physics).
 
 ```text
 /
+├── scripts/
+│   ├── generate-tokens.ts        <-- 🧠 The Compiler (build:tokens)
+│   └── local-dev.ts              <-- 🛠️ Dev Server Orchestrator
 ├── src/
+│   ├── actions/
+│   │   └── tooltip.ts            <-- Svelte Action for Tooltips
+│   ├── adapters/
+│   │   └── void-engine.svelte.ts <-- ⚡ The Reactive Brain (State)
+│   ├── components/
+│   │   ├── core/
+│   │   │   └── ThemeScript.astro <-- 🚀 The Bootloader (Anti-FOUC)
 │   ├── config/
-│   │   ├── design-tokens.ts      <-- 🧠 EDIT THIS (SSOT)
-│   │   └── void-registry.json    <-- 🤖 Generated (Logic)
+│   │   ├── constants.ts          <-- Shared Keys (Storage/Attr)
+│   │   ├── design-tokens.ts      <-- 🧠 EDIT THIS (Single Source of Truth)
+│   │   ├── modal-registry.ts     <-- Modal Component Map
+│   │   ├── void-dna.json         <-- Raw Values (Grid/Spacing)
+│   │   ├── void-physics.json     <-- 🤖 Generated (Motion Math)
+│   │   └── void-registry.json    <-- 🤖 Generated (Theme Logic)
+│   ├── lib/
+│   │   ├── modal-manager.svelte.ts
+│   │   ├── transitions.svelte.ts <-- 🌌 The Physics Motion Engine
+│   │   ├── void-boot.js          <-- The Shared Kernel (No-Dep)
+│   │   └── void-tooltip.ts       <-- Floating UI Logic
+│   ├── stores/
+│   │   └── toast.svelte.ts       <-- Notification State
 │   ├── styles/
-│   │   ├── abstracts/            <-- Functions, Mixins, Variables
-│   │   ├── base/                 <-- Resets, Typography
-│   │   ├── components/           <-- .btn, .card, .input
+│   │   ├── abstracts/            <-- Tools (No CSS Output)
+│   │   ├── base/                 <-- Global Resets
+│   │   ├── components/           <-- "Materials" (Classes)
 │   │   ├── config/
-│   │   │   └── _generated-themes.scss <-- 🤖 Generated (Styles)
-│   │   └── global.scss           <-- The Cascade Entry Point
-│   └── components/               <-- Svelte/Astro Components
-└── scripts/
-    └── generate-tokens.ts        <-- The Compiler
+│   │   │   └── _generated-themes.scss <-- 🤖 Generated (SCSS Maps)
+│   │   └── global.scss           <-- Main CSS Entry Point
+│   └── types/
+│       └── void-ui.d.ts          <-- Type Definitions
+├── tailwind.config.mjs           <-- The Bridge (Maps Tokens to Tailwind)
+\
 ```
 
 ## 🔌 API Integration (Future Proofing)
@@ -112,3 +139,5 @@ If a collaborator needs to inject a custom brand theme, send a JSON payload matc
 ```
 
 Implementation: Pass this object to voidEngine.registerTheme(id, data) and the system will render it instantly.
+
+⚠️ API Warning: The Active Guardrail system applies here too. If your API payload requests physics: 'glass' but type: 'light', the engine will silently override physics to 'flat' to prevent a broken UI state.

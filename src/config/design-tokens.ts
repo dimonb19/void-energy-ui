@@ -59,6 +59,8 @@
 // 🧩 SHARED ASSETS (Fonts & Colors)
 // --------------------------------------------------------------------------
 
+import DNA from './void-dna.json';
+
 const FONTS = {
   tech: "'Hanken Grotesk', sans-serif",
   clean: "'Inter', sans-serif",
@@ -95,14 +97,7 @@ export const VOID_TOKENS = {
   // 1. DENSITY MAPS (Space & Scale)
   // Controls the global whitespace density of the application.
   density: {
-    scale: {
-      xs: '0.5rem', // 8px
-      sm: '1rem', // 16px
-      md: '1.5rem', // 24px
-      lg: '2rem', // 32px
-      xl: '3rem', // 48px
-      '2xl': '4rem', // 64px
-    },
+    scale: DNA.spacing,
     factors: {
       high: 0.75, // Compact
       standard: 1, // Default
@@ -110,37 +105,26 @@ export const VOID_TOKENS = {
     },
   },
 
+  container: {
+    ...DNA.container,
+  },
+
   // 2. LAYERS
   layers: {
-    sink: -1,
-    floor: 0,
-    base: 1,
-    decorate: 2,
-    float: 10,
-    sticky: 20,
-    header: 40,
-    dropdown: 50,
-    overlay: 90,
-    modal: 100,
-    toast: 200,
+    ...DNA.zindex,
   },
 
   // 3. RESPONSIVE
   // We explicitly define px values here to ensure SCSS and JS match perfectly.
   responsive: {
-    mobile: '0px',
-    tablet: '768px',
-    'small-desktop': '1024px',
-    'large-desktop': '1440px',
-    'full-hd': '1920px',
-    'quad-hd': '2560px',
+    ...DNA.responsive,
   },
 
   // 2. PHYSICS ENGINE (Time & Matter)
   // Defines how elements move and feel.
   physics: {
     glass: {
-      blur: 20,
+      blur: 12,
       borderWidth: 1,
       speedBase: 300,
       speedFast: 200,
@@ -175,10 +159,14 @@ export const VOID_TOKENS = {
   },
 
   // 3. THEME REGISTRY (Color & Mood)
+  // ⚠️ ARCHITECTURAL CONSTRAINT:
+  // - Physics: 'glass'  MUST use mode: 'dark' (Glows require darkness)
+  // - Physics: 'retro'  MUST use mode: 'dark' (CRT phosphor effect)
+  // - Physics: 'flat'   Works best with mode: 'light', but allows 'dark'.
   themes: {
     // 1. [DEFAULT THEME] - The Void
     void: {
-      type: 'dark',
+      mode: 'dark',
       physics: 'glass',
       palette: {
         ...SEMANTIC_DARK,
@@ -200,7 +188,7 @@ export const VOID_TOKENS = {
 
     // 2. [THEME] - Stealth / Cinema
     onyx: {
-      type: 'dark',
+      mode: 'dark',
       physics: 'glass',
       palette: {
         ...SEMANTIC_DARK,
@@ -222,7 +210,7 @@ export const VOID_TOKENS = {
 
     // 3. [THEME] - Retro / Hacker
     terminal: {
-      type: 'dark',
+      mode: 'dark',
       physics: 'retro', // Triggers Pixel fonts & Instant motion
       palette: {
         ...SEMANTIC_DARK,
@@ -245,7 +233,7 @@ export const VOID_TOKENS = {
 
     // 4. [THEME] - Horror / Aggressive
     crimson: {
-      type: 'dark',
+      mode: 'dark',
       physics: 'glass',
       palette: {
         ...SEMANTIC_DARK,
@@ -267,7 +255,7 @@ export const VOID_TOKENS = {
 
     // 5. [THEME] - Nature / Organic
     overgrowth: {
-      type: 'dark',
+      mode: 'dark',
       physics: 'glass',
       palette: {
         ...SEMANTIC_DARK,
@@ -289,7 +277,7 @@ export const VOID_TOKENS = {
 
     // 6. [THEME] - Romance / Soft
     velvet: {
-      type: 'dark',
+      mode: 'dark',
       physics: 'glass',
       palette: {
         ...SEMANTIC_DARK,
@@ -311,7 +299,7 @@ export const VOID_TOKENS = {
 
     // 7. [THEME] - Royal / Gold
     solar: {
-      type: 'dark',
+      mode: 'dark',
       physics: 'glass',
       palette: {
         ...SEMANTIC_DARK,
@@ -333,7 +321,7 @@ export const VOID_TOKENS = {
 
     // 8. [THEME] - Synthwave / Mystery
     nebula: {
-      type: 'dark',
+      mode: 'dark',
       physics: 'glass',
       palette: {
         ...SEMANTIC_DARK,
@@ -355,7 +343,7 @@ export const VOID_TOKENS = {
 
     // 9. [THEME] - Light / Print
     paper: {
-      type: 'light',
+      mode: 'light',
       physics: 'flat', // No blurs, sharp borders
       palette: {
         ...SEMANTIC_LIGHT,
@@ -377,7 +365,7 @@ export const VOID_TOKENS = {
 
     // 10. [THEME] - Clinical / Science
     laboratory: {
-      type: 'light',
+      mode: 'light',
       physics: 'flat',
       palette: {
         ...SEMANTIC_LIGHT,
@@ -399,7 +387,7 @@ export const VOID_TOKENS = {
 
     // 11. [THEME] - Fun / Kids
     playground: {
-      type: 'light',
+      mode: 'light',
       physics: 'flat',
       palette: {
         ...SEMANTIC_LIGHT,
@@ -421,7 +409,7 @@ export const VOID_TOKENS = {
 
     // 12. [THEME] - Distraction Free
     focus: {
-      type: 'light',
+      mode: 'light',
       physics: 'flat',
       palette: {
         ...SEMANTIC_LIGHT,

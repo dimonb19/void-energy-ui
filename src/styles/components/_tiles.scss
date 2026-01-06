@@ -31,38 +31,7 @@
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 
-  // --- DYNAMIC LASER SCROLLBARS ---
-  scrollbar-width: thin;
-  scrollbar-color: var(--energy-secondary) transparent;
-
-  &::-webkit-scrollbar {
-    height: 4px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: calc(var(--radius-base) * 0.5);
-
-    // Paper Override
-    @at-root [data-mode='light'] & {
-      background: rgba(0, 0, 0, 0.05);
-    }
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: linear-gradient(
-      90deg,
-      var(--energy-secondary),
-      var(--energy-primary)
-    );
-    border-radius: calc(var(--radius-base) * 0.5);
-
-    &:hover {
-      background: var(--energy-primary);
-      // Glow works in Void, becomes simple color in Paper
-      box-shadow: 0 0 10px alpha(var(--energy-primary), 60%);
-    }
-  }
+  @include laser-scrollbar;
 }
 
 // 2. THE STORY TILE (Holographic Slate)

@@ -68,11 +68,18 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
   });
   scss += `);\n\n`;
 
+  // 5. CONTAINER MAX-WIDTHS MAP
+  scss += `$container-widths: (\n`;
+  Object.entries(tokens.container).forEach(([key, val]) => {
+    scss += `  '${key}': ${val},\n`;
+  });
+  scss += `);\n\n`;
+
   // 4. THEMES
   scss += `$themes: (\n`;
   Object.entries(tokens.themes).forEach(([themeName, config]) => {
     scss += `  '${themeName}': (\n`;
-    scss += `    'type': '${config.type}',\n`;
+    scss += `    'type': '${config.mode}',\n`;
     scss += `    'physics': '${config.physics}',\n`;
     scss += `    'palette': (\n`;
     // Inject Fonts
@@ -86,6 +93,7 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
     scss += `  ),\n`;
   });
   scss += `);\n`;
+
   return scss;
 }
 
@@ -103,7 +111,7 @@ async function main() {
     // B. Generate Registry (Logic)
     const registry: Record<string, { physics: string; mode: string }> = {};
     Object.entries(VOID_TOKENS.themes).forEach(([key, config]) => {
-      registry[key] = { physics: config.physics, mode: config.type };
+      registry[key] = { physics: config.physics, mode: config.mode };
     });
     fs.writeFileSync(PATHS.registryJson, JSON.stringify(registry, null, 2));
     console.log(`   └─ ⚙️  Registry: src/config/void-registry.json`);

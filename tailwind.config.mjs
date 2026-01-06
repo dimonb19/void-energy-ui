@@ -1,5 +1,15 @@
 /** @type {import('tailwindcss').Config} */
 import plugin from 'tailwindcss/plugin';
+import DNA from './src/config/void-dna.json' with { type: 'json' };
+
+// 🛠️ HELPER: Auto-map JSON keys to CSS Variables
+// Turns "md" -> "var(--space-md)" automatically
+function mapToVars(obj, prefix) {
+  return Object.keys(obj).reduce((acc, key) => {
+    acc[key] = `var(--${prefix}-${key})`;
+    return acc;
+  }, {});
+}
 
 export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
@@ -16,28 +26,16 @@ export default {
   // Do not add custom colors or spacing here.
   // If you need a new value, add it to the Design Tokens and rebuild.
   theme: {
-    // 2. HARDCODED SCREENS (Breakpoints)
-    screens: {
-      mobile: '0px',
-      tablet: '768px',
-      'small-desktop': '1024px',
-      'large-desktop': '1440px',
-      'full-hd': '1920px',
-      'quad-hd': '2560px',
-    },
+    // 2. SCREENS (Breakpoints)
+    screens: DNA.responsive,
 
     // 3. STRICT SPACING (The Density Engine)
     // Developers must use semantic tokens: p-md, gap-lg.
     spacing: {
       0: '0',
       px: '1px',
-      xs: 'var(--space-xs)',
-      sm: 'var(--space-sm)',
-      md: 'var(--space-md)',
-      lg: 'var(--space-lg)',
-      xl: 'var(--space-xl)',
-      '2xl': 'var(--space-2xl)',
       auto: 'auto',
+      ...mapToVars(DNA.spacing, 'space'),
     },
 
     // 4. STRICT PALETTE (The Atmosphere)
@@ -71,11 +69,8 @@ export default {
     // 5. STRICT GEOMETRY (The Physics)
     borderRadius: {
       none: '0',
-      sm: 'var(--radius-sm)',
       DEFAULT: 'var(--radius-md)',
-      lg: 'var(--radius-lg)',
-      xl: 'var(--radius-xl)',
-      full: 'var(--radius-full)',
+      ...mapToVars(DNA.radius, 'radius'),
     },
     borderWidth: {
       DEFAULT: 'var(--physics-border-width)',
@@ -85,19 +80,7 @@ export default {
 
     // 6. STRICT LAYERS (Z-Index)
     // Matches src/config/design-tokens.ts
-    zIndex: {
-      sink: '-1',
-      floor: '0',
-      base: '1',
-      decorate: '2',
-      float: '10',
-      sticky: '20',
-      header: '40',
-      dropdown: '50',
-      overlay: '90',
-      modal: '100',
-      toast: '200',
-    },
+    zIndex: DNA.zindex,
 
     // 7. MOTION
     transitionDuration: {
