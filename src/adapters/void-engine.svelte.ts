@@ -1,29 +1,16 @@
 /*
  * ==========================================================================
- * 🔮 FUTURE SCALING GUIDE: RUNTIME THEME INJECTION
+ * 🔮 VOID ENGINE (ADAPTER)
  * ==========================================================================
- * The Void Engine supports loading external themes (JSON) at runtime without
- * rebuilding the application. This is useful for:
- * 1. Whitelabeling (Collaborators providing their own brand colors).
- * 2. Theme Builders (Live preview of colors).
- *
- * HOW TO IMPLEMENT:
- * 1. Fetch the theme JSON from your API.
- * 2. Ensure it matches the `VoidThemeDefinition` interface (see /types).
- * 3. Register it:
- * voidEngine.registerTheme('my-custom-theme', apiResponse);
- * 4. Activate it:
- * voidEngine.setAtmosphere('my-custom-theme');
- *
- * THE ENGINE WILL AUTOMATICALLY:
- * 1. Detect that 'my-custom-theme' is not in the static CSS registry.
- * 2. Convert the palette object into inline CSS variables (style="--bg-canvas: ...").
- * 3. Apply the correct Physics Mode (Glass/Flat/Retro) via data attributes.
+ * Role: The Reactive Brain.
+ * Responsibility: Manages state, validates inputs, and delegates DOM painting
+ * to the shared Bootloader kernel.
  * ==========================================================================
  */
 
 import THEME_REGISTRY from '../config/void-registry.json';
 import { STORAGE_KEYS, DOM_ATTRS, DEFAULTS } from '../config/constants';
+import { applyTheme, applyPreferences } from '../lib/void-boot';
 
 // --- TYPES ---
 interface UserConfig {
@@ -34,8 +21,6 @@ interface UserConfig {
 }
 
 // 🛡️ SAFETY: A complete palette fallback.
-// This ensures that if the registry.json is missing colors (optimization),
-// the engine can still calculate merges without crashing.
 const FALLBACK_PALETTE: VoidPalette = {
   'bg-canvas': '#000000',
   'bg-surface': '#111111',
@@ -60,6 +45,7 @@ const FALLBACK_PALETTE: VoidPalette = {
 export class VoidEngine {
   // 1. REACTIVE STATE (The Truth)
   atmosphere = $state<string>(DEFAULTS.ATMOSPHERE);
+
   // Runtime Registry initialized with our static build artifacts
   registry = $state<ThemeRegistry>({ ...(THEME_REGISTRY as any) });
 
@@ -76,10 +62,8 @@ export class VoidEngine {
   );
 
   constructor() {
-    // Singleton Initialization
     if (typeof window !== 'undefined') {
       this.init();
-      // Debug helper & API Entry Point
       window.Void = this;
     }
   }
@@ -88,19 +72,13 @@ export class VoidEngine {
 
   /**
    * Registers a theme with "Safety Merge" logic.
-   * If the incoming theme is missing keys (or if the base registry is optimized/empty),
-   * we fill gaps with the Default Void theme to prevent crashes.
    */
   registerTheme(id: string, definition: Partial<VoidThemeDefinition>) {
     console.group(`Void: Registering Atmosphere "${id}"`);
 
     // A. THE SAFETY NET
-    // We try to grab the default theme from the registry.
     const registryEntry = this.registry[DEFAULTS.ATMOSPHERE];
 
-    // We reconstruct a "Full Base Theme".
-    // CRITICAL FIX: If the registry entry is missing the palette (common in prod builds),
-    // we use the FALLBACK_PALETTE to ensure we have an object to merge against.
     const baseTheme: VoidThemeDefinition = {
       id: DEFAULTS.ATMOSPHERE,
       mode: (registryEntry?.mode as any) || 'dark',
@@ -110,47 +88,26 @@ export class VoidEngine {
     };
 
     // B. THE PARTIAL MERGE
-    // We strictly reconstruct the object to ensure structural integrity.
     const safeTheme: VoidThemeDefinition = {
-      // 1. Metadata: Fallback to base if missing
       id: id,
       mode: definition.mode || baseTheme.mode,
       physics: definition.physics || baseTheme.physics,
-
-      // 2. Palette: Deep Merge (Crucial!)
-      // This ensures that if they miss 'bg-canvas', we use the Void one.
       palette: {
-        ...baseTheme.palette, // Lay the foundation
-        ...(definition.palette || {}), // Paint the override
+        ...baseTheme.palette,
+        ...(definition.palette || {}),
       },
-
-      // 3. Fonts: Optional, so we just pass what we have
       fonts: definition.fonts || [],
     };
 
-    // C. VALIDATION REPORT (Optional but helpful for debugging)
-    const missingKeys = Object.keys(baseTheme.palette).filter(
-      (key) => !definition.palette || !(key in definition.palette),
-    );
-
-    if (missingKeys.length > 0) {
-      console.warn(
-        `Void: Theme "${id}" incomplete. Auto-filled ${missingKeys.length} missing keys.`,
-      );
-    } else {
-      console.log('Void: Theme definition valid.');
-    }
-
-    // D. COMMIT TO STATE
+    // C. COMMIT & PERSIST
     this.registry[id] = safeTheme;
 
-    // E. PERSIST TO CACHE (Backpack)
     if (typeof localStorage !== 'undefined') {
       try {
         const cache = JSON.parse(
           localStorage.getItem('void_theme_cache') || '{}',
         );
-        cache[id] = safeTheme; // Save the SANITIZED version, not the raw input
+        cache[id] = safeTheme;
         localStorage.setItem('void_theme_cache', JSON.stringify(cache));
       } catch (e) {
         console.warn('Void: Cache Save Failed', e);
@@ -160,14 +117,10 @@ export class VoidEngine {
     console.groupEnd();
   }
 
-  // ✨ Helper for Collaborators / Future API
-  // Allows passing a raw JSON object and validates it against the VoidSchema
-  // before registering it.
   async loadExternalTheme(url: string) {
     try {
       const res = await fetch(url);
       const data = await res.json();
-      // Basic validation check
       if (data.id && data.palette) {
         this.registerTheme(data.id, data);
         this.setAtmosphere(data.id);
@@ -199,17 +152,20 @@ export class VoidEngine {
 
   private init() {
     const root = document.documentElement;
-    // 1. TRUST THE DOM (The Hydration Script has already run)
+
+    // 1. TRUST THE BOOTLOADER
+    // We do not run hydration logic here. We simply read the
+    // DOM state that the Bootloader script already painted.
     const domAtmosphere = root.getAttribute(DOM_ATTRS.ATMOSPHERE);
 
-    // Only verify it exists in our registry to prevent crashes
+    // Sync Svelte state to match the DOM
     if (domAtmosphere && this.registry[domAtmosphere]) {
       this.atmosphere = domAtmosphere;
     } else {
       this.atmosphere = DEFAULTS.ATMOSPHERE;
     }
 
-    // 2. Load User Prefs
+    // 2. Load User Prefs (into State only)
     const storedConfig = localStorage.getItem(STORAGE_KEYS.USER_CONFIG);
     if (storedConfig) {
       try {
@@ -219,42 +175,36 @@ export class VoidEngine {
       }
     }
 
-    // Ensure we are synced
-    this.syncDOM();
+    // Note: We do NOT call syncDOM() here.
+    // The browser is already painted correctly by ThemeScript.
   }
 
   private syncDOM() {
     if (typeof document === 'undefined') return;
     const root = document.documentElement;
-    const theme = this.currentTheme;
 
-    // 1. Attributes (The Triad)
-    root.setAttribute(DOM_ATTRS.ATMOSPHERE, this.atmosphere);
-    root.setAttribute(DOM_ATTRS.PHYSICS, theme.physics);
-    root.setAttribute(DOM_ATTRS.MODE, theme.mode);
+    // 1. PREPARE DATA
+    const themeData = {
+      ...this.currentTheme,
+      id: this.atmosphere,
+    };
 
-    // 2. Runtime Injection Logic
-    // We check if this theme exists in the STATIC registry (the JSON file).
-    // If it DOES NOT, it means it's a runtime theme, so we must manually paint the variables.
+    // 2. APPLY THEME (Using Shared Kernel)
+    // This handles attributes (triad) and dynamic palette injection
+    applyTheme(root, themeData, DOM_ATTRS);
+
+    // 3. CLEANUP (Engine Exclusive Logic)
+    // The bootloader is additive. The Engine must handle the subtraction.
+    // If we switch back to a STATIC theme (CSS-based), we must remove
+    // the inline styles so the CSS classes can take over.
     const isStatic = Object.keys(THEME_REGISTRY).includes(this.atmosphere);
-
-    if (!isStatic && theme.palette) {
-      this.injectPalette(theme.palette);
-    } else {
-      // If we switch back to a static theme, we must CLEANUP the inline styles
-      // so the CSS class variables take precedence again.
-      this.clearPalette(theme.palette || {});
+    if (isStatic) {
+      // We use the fallback keys to know which vars to wipe
+      this.clearPalette(FALLBACK_PALETTE);
     }
 
-    // 3. User Overrides (Scale/Density/Fonts)
-    this.applyUserOverrides(root);
-  }
-
-  private injectPalette(palette: VoidPalette) {
-    const root = document.documentElement;
-    Object.entries(palette).forEach(([key, value]) => {
-      if (value) root.style.setProperty(`--${key}`, value);
-    });
+    // 4. APPLY PREFS (Using Shared Kernel)
+    applyPreferences(root, this.userConfig);
   }
 
   private clearPalette(palette: Partial<VoidPalette>) {
@@ -262,32 +212,6 @@ export class VoidEngine {
     Object.keys(palette).forEach((key) => {
       root.style.removeProperty(`--${key}`);
     });
-  }
-
-  private applyUserOverrides(root: HTMLElement) {
-    const { scale, density, fontHeading, fontBody } = this.userConfig;
-
-    // Scale
-    root.style.setProperty(
-      '--text-scale',
-      Math.min(Math.max(scale, 0.75), 2).toString(),
-    );
-
-    // Density
-    // (Hardcoded map here to avoid circular dependency with tokens during runtime)
-    const densityMap: Record<string, number> = {
-      high: 0.75,
-      standard: 1,
-      low: 1.25,
-    };
-    root.style.setProperty('--density', (densityMap[density] || 1).toString());
-
-    // Fonts
-    if (fontHeading) root.style.setProperty('--user-font-heading', fontHeading);
-    else root.style.removeProperty('--user-font-heading');
-
-    if (fontBody) root.style.setProperty('--user-font-body', fontBody);
-    else root.style.removeProperty('--user-font-body');
   }
 
   private persist() {
@@ -299,11 +223,9 @@ export class VoidEngine {
     );
   }
 
-  // Helper for UI Lists
   get availableThemes() {
     return Object.keys(this.registry);
   }
 }
 
-// --- SINGLETON EXPORT ---
 export const voidEngine = new VoidEngine();

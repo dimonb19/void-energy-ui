@@ -2,29 +2,31 @@
   "name": "void-energy-ui",
   "type": "module",
   "version": "0.0.1",
+  "private": true,
   "scripts": {
-    "build:tokens": "tsx scripts/generate-tokens.ts",
     "dev": "tsx scripts/local-dev.ts",
     "build": "npm run build:tokens && astro build",
     "preview": "astro preview",
-    "astro": "astro",
+    "build:tokens": "tsx scripts/generate-tokens.ts",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
     "format": "prettier --write ."
   },
   "dependencies": {
+    "astro": "^5.16.0",
+    "svelte": "^5.43.14",
     "@astrojs/svelte": "^7.2.2",
     "@astrojs/tailwind": "^5.1.0",
-    "@floating-ui/dom": "^1.7.4",
-    "astro": "^5.16.0",
-    "prettier": "3.6.2",
-    "prettier-plugin-svelte": "3.4.0",
-    "svelte": "^5.43.14",
-    "typescript": "^5.9.3"
+    "@floating-ui/dom": "^1.7.4"
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.23",
-    "postcss": "^8.5.6",
-    "sass-embedded": "^1.93.3",
+    "typescript": "^5.9.3",
+    "tsx": "^4.21.0",
     "tailwindcss": "^3.4.17",
-    "tsx": "^4.21.0"
+    "postcss": "^8.5.6",
+    "autoprefixer": "^10.4.23",
+    "sass-embedded": "^1.93.3",
+    "svelte-check": "^4.1.0",
+    "prettier": "3.6.2",
+    "prettier-plugin-svelte": "3.4.0"
   }
 }

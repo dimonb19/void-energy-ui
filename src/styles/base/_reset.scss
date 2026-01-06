@@ -271,3 +271,25 @@ hr {
     color: HighlightText;
   }
 }
+
+/* =========================================
+   5. ACCESSIBILITY: MOTION SAFETY (The Kill Switch)
+   ========================================= */
+// This single block handles 95% of the work.
+// It forces all animations to be instant for sensitive users.
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    // 1. Force instant transitions
+    // We use !important to override specific component rules
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+
+    // 2. Kill the "Float" and infinite loop effects entirely
+    // This stops things from moving even if they are instant
+    animation: none !important;
+  }
+}

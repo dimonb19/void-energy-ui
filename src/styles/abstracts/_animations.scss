@@ -20,34 +20,20 @@
 // inside a class (e.g., .fade-in)
 @mixin entry-transition($duration: 0.4s, $delay: 0s) {
   will-change: transform, opacity, filter;
-
-  // Use --ease-stabilize for the "Slide In" feel
-  transition:
-    opacity $duration var(--ease-stabilize) $delay,
-    transform $duration var(--ease-stabilize) $delay,
-    filter $duration var(--ease-stabilize) $delay;
-
   opacity: 1;
   transform: translateY(0) scale(1);
   filter: blur(0);
 
-  @starting-style {
-    opacity: 0;
-    transform: translateY(10px) scale(0.98);
-    filter: blur(var(--physics-blur));
-  }
-
-  // Motion Opt-Out (Direct Override)
-  @media (prefers-reduced-motion: reduce) {
-    transition: none;
-    transform: none;
-    filter: none;
-    opacity: 1;
+  @media (prefers-reduced-motion: no-preference) {
+    transition:
+      opacity $duration var(--ease-stabilize) $delay,
+      transform $duration var(--ease-stabilize) $delay,
+      filter $duration var(--ease-stabilize) $delay;
 
     @starting-style {
-      opacity: 1;
-      transform: none;
-      filter: none;
+      opacity: 0;
+      transform: translateY(10px) scale(0.98);
+      filter: blur(var(--physics-blur));
     }
   }
 }

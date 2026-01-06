@@ -24,6 +24,33 @@
 
   width: 100%;
   max-width: calc(100vw - var(--space-lg));
+
+  /* =========================================
+     POPOVER API RESETS (The Void Fix)
+     ========================================= */
+  &[popover] {
+    // 1. Reset UA Geometry
+    margin: 0; // Popovers default to 'auto' (centered)
+    inset: unset; // Remove default 'inset: 0'
+    border: none;
+    padding: 0;
+
+    // 2. Reset UA Canvas
+    background: transparent; // Popovers default to 'canvas' (white/black)
+    color: inherit;
+
+    // 3. Restore Positioning
+    // We must re-declare fixed positioning because the UA stylesheet
+    // forces it, but we want to ensure our specific top/left vars win.
+    position: fixed;
+    top: var(--space-md);
+    left: 50%;
+    transform: translateX(-50%);
+
+    // 4. Overflow Safety
+    // Popovers can clip content. We need visible for the glows/shadows.
+    overflow: visible;
+  }
 }
 
 // ==========================================================================

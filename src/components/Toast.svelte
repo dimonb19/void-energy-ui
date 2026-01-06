@@ -3,14 +3,41 @@
   import { dematerialize, materialize } from '../lib/transitions.svelte';
 
   const icons: Record<string, string> = {
-    info: 'ℹ️', // Standard Info
-    success: '✅', // Clear Check
-    warning: '⚠️', // Standard Warning
-    error: '🛑', // Stop Sign
+    info: 'ℹ️',
+    success: '✅',
+    warning: '⚠️',
+    error: '🛑',
   };
+
+  // 1. DOM Reference for the Popover API
+  let region = $state<HTMLElement | null>(null);
+
+  // 2. LOGIC: Top Layer Hoisting
+  // The Popover API stacks elements by insertion order.
+  // To ensure Toasts appear ABOVE an active Modal, we must re-insert
+  // the Toast Region into the Top Layer whenever a new message arrives.
+  $effect(() => {
+    if (!region) return;
+
+    if (toast.items.length > 0) {
+      // A. Force Re-hoist (Remove and Add to Top Layer)
+      // This ensures we jump ahead of any Modals opened recently.
+      try {
+        region.hidePopover();
+        region.showPopover();
+      } catch (e) {
+        // Safety: Ignore errors if browser is fighting state
+      }
+    } else {
+      // B. Cleanup (Close popover when empty to prevent blocking clicks)
+      try {
+        region.hidePopover();
+      } catch (e) {}
+    }
+  });
 </script>
 
-<div class="toast-region" aria-live="polite">
+<div bind:this={region} class="toast-region" popover="manual">
   {#each toast.items as item (item.id)}
     <button
       class="toast-message"

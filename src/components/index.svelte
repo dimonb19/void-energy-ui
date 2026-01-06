@@ -339,7 +339,7 @@
                 No active modules
               </p>
             {:else}
-              {#each moduleTiles as btn, i (btn)}
+              {#each moduleTiles as btn, i (i)}
                 <div class="tile-small" animate:live out:singularity>
                   <p class="tile-label">{btn}</p>
                   <button
@@ -385,7 +385,7 @@
                 No environments selected
               </p>
             {:else}
-              {#each environmentTiles as btn, i (btn)}
+              {#each environmentTiles as btn, i (i)}
                 <div class="tile-small-system" animate:live out:singularity>
                   <p class="tile-label">{btn}</p>
                   <button
@@ -433,7 +433,7 @@
                 No premium modules
               </p>
             {:else}
-              {#each premiumTiles as btn, i (btn)}
+              {#each premiumTiles as btn, i (i)}
                 <div class="tile-small-premium" animate:live out:singularity>
                   <p class="tile-label">{btn}</p>
                   <button

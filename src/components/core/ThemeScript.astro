@@ -1,109 +1,40 @@
 ---
 /*
-  ROLE: Critical Rendering Path Script
+  ROLE: Critical Rendering Path Script (The Bootloader)
   RESPONSIBILITY: 
-  1. Blocks painting until the theme is calculated.
-  2. Prevents FOUC (Flash of Unstyled Content).
-  3. Syncs with constants.ts to ensure LocalStorage keys match the Engine.
-  4. HYBRID PROTOCOL: Hydrates both Static (CSS) and Dynamic (JSON) themes.
+  1. Reads the "Shared Kernel" (void-boot.js) as a raw string.
+  2. Injects it directly into the HTML <head>.
+  3. Executes hydration immediately to prevent FOUC.
 */
 
 import THEME_REGISTRY from '../../config/void-registry.json';
 import { STORAGE_KEYS, DOM_ATTRS, DEFAULTS } from '../../config/constants';
+
+// 1. READ THE SHARED KERNEL (THE VITE WAY)
+// The '?raw' suffix tells Vite to import the file content as a string
+// instead of executing it. This works everywhere (Vercel, Netlify, Node).
+import bootSource from '../../lib/void-boot.js?raw';
+
+// 2. SANITIZE FOR INLINE EXECUTION
+// We strip 'export ' keywords so the code runs in a standard <script> tag.
+const cleanBootSource = bootSource.replace(/export /g, '');
 ---
 
 <script
   is:inline
-  define:vars={{
-    registry: THEME_REGISTRY,
-    keys: STORAGE_KEYS,
-    attrs: DOM_ATTRS,
-    defaults: DEFAULTS,
-  }}
->
-  (function () {
-    try {
-      var root = document.documentElement;
+  set:html={`
+    (function() {
+      // A. INJECT THE SHARED KERNEL
+      ${cleanBootSource}
 
-      // 1. READ STORAGE
-      // We need the ID to know which reality to load.
-      var activeAtmosphere =
-        localStorage.getItem(keys.ATMOSPHERE) || defaults.ATMOSPHERE;
-      var localConfig = localStorage.getItem(keys.USER_CONFIG);
-
-      // 2. RESOLVE THEME DATA (The Hybrid Lookup)
-      // First, check if this is a Standard Theme (exists in compiled CSS)
-      var themeData = registry[activeAtmosphere];
-
-      // If NOT in registry, check the "Backpack" (Cached Custom Themes)
-      // This handles the "Collaborator/API" themes that don't exist in your SCSS.
-      if (!themeData) {
-        try {
-          var cache = JSON.parse(
-            localStorage.getItem('void_theme_cache') || '{}'
-          );
-          themeData = cache[activeAtmosphere];
-        } catch (e) {
-          console.warn('Void: Cache Parse Error', e);
-        }
-      }
-
-      // Safety Fallback: If still nothing, revert to Default (Void)
-      if (!themeData) {
-        activeAtmosphere = defaults.ATMOSPHERE;
-        themeData = registry[defaults.ATMOSPHERE];
-      }
-
-      // 3. INJECT ATTRIBUTES (The Triad)
-      // This triggers the CSS variables for Physics and Mode instantly.
-      root.setAttribute(attrs.ATMOSPHERE, activeAtmosphere);
-      root.setAttribute(attrs.PHYSICS, themeData.physics);
-      root.setAttribute(attrs.MODE, themeData.mode || themeData.type); // Handle legacy 'type' vs 'mode'
-
-      // 4. INJECT DYNAMIC PALETTE (Runtime Only)
-      // If this theme has a 'palette' object (meaning it came from Cache/JSON),
-      // we must manually paint the CSS variables now.
-      // Standard themes don't have this property here (it's in the CSS file).
-      if (themeData.palette) {
-        for (var colorKey in themeData.palette) {
-          if (themeData.palette.hasOwnProperty(colorKey)) {
-            root.style.setProperty(
-              '--' + colorKey,
-              themeData.palette[colorKey]
-            );
-          }
-        }
-      }
-
-      // 5. RESTORE USER PREFERENCES
-      if (localConfig) {
-        var config = JSON.parse(localConfig);
-
-        // Scale
-        if (config.scale) {
-          root.style.setProperty('--text-scale', config.scale);
-        }
-
-        // Density (Map locally for speed/simplicity in blocking script)
-        if (config.density) {
-          var densities = { high: 0.75, standard: 1, low: 1.25 };
-          root.style.setProperty('--density', densities[config.density] || 1);
-        }
-
-        // Fonts
-        if (config.fontHeading) {
-          root.style.setProperty('--user-font-heading', config.fontHeading);
-        }
-        if (config.fontBody) {
-          root.style.setProperty('--user-font-body', config.fontBody);
-        }
-      }
-    } catch (e) {
-      console.warn('Void Hydration Error:', e);
-      // Absolute Fail-Safe
-      document.documentElement.setAttribute('data-atmosphere', 'void');
-      document.documentElement.setAttribute('data-physics', 'glass');
-      document.documentElement.setAttribute('data-mode', 'dark');
-    }
-  })();
-</script>
+      // B. EXECUTE HYDRATION
+      // We pass the server-side constants into the kernel
+      hydrate(
+        ${JSON.stringify(THEME_REGISTRY)}, 
+        ${JSON.stringify(STORAGE_KEYS)}, 
+        ${JSON.stringify(DOM_ATTRS)}, 
+        ${JSON.stringify(DEFAULTS)}
+      );
+    })();
+  `}
+/>
