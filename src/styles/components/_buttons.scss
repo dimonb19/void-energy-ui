@@ -103,9 +103,6 @@ button:not(.btn-void),
   &.btn-cta:not(:disabled) {
     @include gemini-laser;
 
-    background: transparent;
-    border: none;
-
     color: var(--energy-primary);
     font-weight: 800;
     min-height: var(--space-xl);
@@ -144,8 +141,8 @@ button:not(.btn-void),
 
         // Only apply colored glow if we are in Glass Physics
         @at-root [data-physics='glass'] & {
-          box-shadow: 0 0 15px alpha($color-var, 40%);
-          text-shadow: 0 0 10px alpha($color-var, 60%);
+          box-shadow: 0 0 15px alpha($color-var, 40%); // void-ignore (Glow Physics)
+          text-shadow: 0 0 10px alpha($color-var, 60%); // void-ignore (Glow Physics)
         }
 
         @at-root [data-mode='light'] & {

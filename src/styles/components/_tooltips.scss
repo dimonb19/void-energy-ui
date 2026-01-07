@@ -18,7 +18,7 @@
   // Depth Logic: Tooltips are "Ephemeral Alerts", so they reside
   pointer-events: none; // Allow clicking through the tooltip
   width: max-content;
-  max-width: 250px;
+  max-width: 250px; // void-ignore (Readability Cap)
 
   // 3. PHYSICS INHERITANCE
   // Applies border, background, and shadow logic based on current Theme
@@ -34,7 +34,7 @@
   // 5. ANIMATION STATE (The Materialize Effect)
   // Default State: Dematerialized (Closed)
   opacity: 0;
-  transform: translateY(4px) scale(0.95);
+  transform: translateY(4px) scale(0.95); // void-ignore (Motion Physics)
   filter: blur(calc(var(--physics-blur) / 2));
 
   box-shadow: var(--shadow-lift);

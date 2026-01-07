@@ -8,6 +8,7 @@
     "build": "npm run build:tokens && astro build",
     "preview": "astro preview",
     "build:tokens": "tsx scripts/generate-tokens.ts",
+    "scan": "tsx scripts/scan-physics.ts",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "format": "prettier --write ."
   },

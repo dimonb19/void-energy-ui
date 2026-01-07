@@ -1,72 +1,78 @@
 <script lang="ts">
   import { modal } from '../../lib/modal-manager.svelte';
   import { modalRegistry } from '../../config/modal-registry';
+  import type { Component } from 'svelte';
 
   let dialog = $state<HTMLDialogElement | null>(null);
 
-  // 1. LOGIC: Watch for activeKey to Open/Close native dialog
+  // 1. VISUAL BUFFERS (Hold state during close animation)
+  let ActiveComponent = $state<Component<any> | null>(null);
+
+  // Buffer the size and props so they don't reset during the fade-out
+  let renderedSize = $state(modal.state.size);
+  let renderedProps = $state(modal.state.props);
+
+  // 2. Sync DOM State
   $effect(() => {
-    if (!dialog) return;
-    if (modal.activeKey && !dialog.open) {
-      dialog.showModal();
-    } else if (!modal.activeKey && dialog.open) {
+    // A. Opening: Sync EVERYTHING immediately
+    if (modal.state.key) {
+      renderedSize = modal.state.size;
+      renderedProps = modal.state.props;
+
+      // Lazy Load the component
+      const loader = modalRegistry[modal.state.key];
+      if (loader) {
+        loader().then((module) => {
+          // Only mount if we are still on the same key (prevent race conditions)
+          if (modal.state.key) {
+            ActiveComponent = module.default;
+            if (dialog && !dialog.open) dialog.showModal();
+          }
+        });
+      }
+
+      if (dialog && !dialog.open) {
+        dialog.showModal();
+      }
+    }
+    // B. Closing: Close dialog, but DO NOT CLEAR BUFFERS yet
+    else if (!modal.state.key && dialog?.open) {
       dialog.close();
+      // ⚠️ IMPORTANT: We intentionally DO NOT update renderedProps here.
+      // So the ghost element looks correct while fading out.
     }
   });
 
-  // 2. LOGIC: Handle Backdrop Click
-  const handleBackdropClick = (e: MouseEvent) => {
-    // If preventClose is on, we do nothing when clicking outside
-    if (modal.windowOptions.preventClose) return;
-
-    if (e.target === e.currentTarget) modal.close(null);
-  };
-
-  // 3. LOGIC: Handle "Escape" Key (The 'cancel' event)
-  const handleCancel = (e: Event) => {
-    // By default, Escape closes a dialog. We must prevent this if the option is set.
-    if (modal.windowOptions.preventClose) {
-      e.preventDefault();
-    } else {
-      // If we allow it, we must ensure our manager knows it closed
-      modal.close(null);
+  // 3. Cleanup after animation
+  const handleTransitionEnd = (e: TransitionEvent) => {
+    if (e.target === dialog && !dialog?.open) {
+      ActiveComponent = null;
+      renderedProps = {};
     }
   };
 
-  // 4. LOGIC: Handle "close" event (Cleanup)
-  const handleClose = () => {
-    // This catches if the dialog was closed via code or other means
-    if (modal.activeKey) modal.close(null);
+  const handleBackdrop = (e: MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      modal.close();
+    }
   };
-
-  // Style: Dynamic Size Class
-  let sizeClass = $derived.by(() => {
-    const s = modal.windowOptions.size ?? 'md';
-    return s === 'md' ? '' : `dialog-${s}`;
-  });
-
-  // Component Resolution
-  let ActiveComponent = $derived(
-    modal.activeKey ? modalRegistry[modal.activeKey] : null,
-  );
 </script>
 
 <dialog
   bind:this={dialog}
-  onclose={handleClose}
-  oncancel={handleCancel}
-  onclick={handleBackdropClick}
-  class={sizeClass}
-  aria-labelledby="modal-title"
-  aria-modal="true"
+  class:dialog-sm={renderedSize === 'sm'}
+  class:dialog-lg={renderedSize === 'lg'}
+  class:dialog-full={renderedSize === 'full'}
+  onclick={handleBackdrop}
+  ontransitionend={handleTransitionEnd}
 >
   <div
-    class="flex flex-col gap-lg"
+    class="modal-content"
     onclick={(e) => e.stopPropagation()}
     role="presentation"
   >
     {#if ActiveComponent}
-      <ActiveComponent {...modal.props} />
+      <ActiveComponent {...renderedProps} />
     {/if}
   </div>
 </dialog>

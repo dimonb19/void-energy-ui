@@ -145,6 +145,10 @@
    - Transform: .text-uppercase, .text-capitalize
    - Access:  .sr-only (Screen reader only)
 
+   - Truncate: .text-truncate (Single line ellipsis)
+               .text-clamp-2, .text-clamp-3 (Multi-line narrative)
+   - Wrap:     .text-break (Force wrap for API keys/Gibberish)
+
    - Radius:  .rounded-sm, .rounded (Base/Md), .rounded-lg, .rounded-none
    - Effect:  .backdrop-blur-physics (Adapts blur to atmosphere)
    

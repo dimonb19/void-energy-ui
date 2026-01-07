@@ -1,56 +1,69 @@
 <script lang="ts">
   import { modal } from '../../lib/modal-manager.svelte';
+  import { toast } from '../../stores/toast.svelte';
 
   let {
-    initialMusicVolume = 50,
-    initialVoiceVolume = 80,
-    enableHaptics = true,
+    initialMusic = 50,
+    initialVoice = 80,
+    initialHaptics = true,
+    // Callback Protocol
+    onSave = (data: any) => console.log('Settings Saved:', data),
   } = $props();
 
-  // LOCAL STATE: This lives only in this modal!
-  // The global manager doesn't need to know about "musicVolume".
-  let music = $state(initialMusicVolume);
-  let voice = $state(initialVoiceVolume);
-  let haptics = $state(enableHaptics);
+  // Buffer State (Local editing state)
+  let music = $state(initialMusic);
+  let voice = $state(initialVoice);
+  let haptics = $state(initialHaptics);
 
   function handleSave() {
-    // We return the complex object back to the caller
-    modal.close({
-      saved: true,
-      music,
-      voice,
-      haptics,
-    });
+    // A. Execute Logic
+    onSave({ music, voice, haptics });
+
+    // B. Provide Feedback
+    toast.show('Configuration Updated', 'success');
+
+    // C. Close
+    modal.close();
   }
 </script>
 
 <div class="flex flex-col gap-lg">
   <div class="text-center">
-    <h2 id="modal-title">Audio & Immersion</h2>
+    <h2 id="modal-title" class="text-h3 text-main">Audio & Immersion</h2>
     <p class="text-dim">Tune the void to your frequency.</p>
   </div>
 
-  <div class="surface-sunk p-md rounded-md flex flex-col gap-md">
-    <label class="flex flex-col gap-xs">
+  <div
+    class="surface-sunk p-md rounded-md flex flex-col gap-md border border-white/5"
+  >
+    <label class="flex flex-col gap-xs cursor-pointer group">
       <div class="flex justify-between">
-        <span class="text-small uppercase tracking-wider">Music Volume</span>
-        <span>{music}%</span>
+        <span
+          class="text-small uppercase tracking-wider text-dim group-hover:text-primary transition-colors"
+          >Music Volume</span
+        >
+        <span class="font-mono text-primary">{music}%</span>
       </div>
-      <input type="range" min="0" max="100" bind:value={music} />
+      <input type="range" min="0" max="100" bind:value={music} class="w-full" />
     </label>
 
-    <label class="flex flex-col gap-xs">
+    <label class="flex flex-col gap-xs cursor-pointer group">
       <div class="flex justify-between">
-        <span class="text-small uppercase tracking-wider">Voice Synthesis</span>
-        <span>{voice}%</span>
+        <span
+          class="text-small uppercase tracking-wider text-dim group-hover:text-primary transition-colors"
+          >Voice Synthesis</span
+        >
+        <span class="font-mono text-primary">{voice}%</span>
       </div>
-      <input type="range" min="0" max="100" bind:value={voice} />
+      <input type="range" min="0" max="100" bind:value={voice} class="w-full" />
     </label>
 
     <hr class="border-white/10" />
 
-    <label class="flex flex-row justify-between items-center cursor-pointer">
-      <span>Haptic Feedback</span>
+    <label
+      class="flex flex-row justify-between items-center cursor-pointer p-xs -mx-xs rounded hover:bg-white/5 transition-colors"
+    >
+      <span class="text-main">Haptic Feedback</span>
       <input
         type="checkbox"
         bind:checked={haptics}
@@ -60,8 +73,11 @@
   </div>
 </div>
 
-<div class="flex flex-row justify-end gap-md pt-sm">
-  <button class="btn-void text-mute" onclick={() => modal.close(null)}>
+<div class="flex flex-row justify-end gap-md pt-lg">
+  <button
+    class="btn-void text-mute hover:text-main"
+    onclick={() => modal.close()}
+  >
     Cancel
   </button>
   <button class="btn-cta" onclick={handleSave}> Save Configuration </button>

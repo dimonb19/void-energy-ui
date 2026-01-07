@@ -1,82 +1,100 @@
+/*
+ * ROLE: Reactive Modal State Manager (Refactored)
+ * PHILOSOPHY: "State-First". The manager only holds the current truth.
+ */
+
 import { MODAL_KEYS } from '../config/modal-registry';
 
+interface ModalState<K extends ModalKey> {
+  key: K | null;
+  props: ModalContract[K];
+  size: 'sm' | 'md' | 'lg' | 'full';
+}
+
 class ModalManager {
-  // The Key determines which component renders
-  activeKey = $state<VoidModalKey | null>(null);
+  state = $state<ModalState<any>>({
+    key: null,
+    props: {},
+    size: 'md',
+  });
 
-  // The Props are passed directly to that component
-  props = $state<Record<string, any>>({});
-
-  // Window options (size) are separate from component props
-  windowOptions = $state<VoidModalOptions>({ size: 'md', preventClose: false });
-
-  private resolvePromise: ((value: any) => void) | null = null;
-  private previousActiveElement: HTMLElement | null = null;
+  // Focus Management (A11y)
+  private returnFocusTo: HTMLElement | null = null;
 
   /**
-   * Opens any modal by Key.
-   * @param key - The registry key (e.g., 'confirm')
-   * @param props - Data to pass to the fragment (title, body, etc.)
-   * @param windowOpts - Window settings (size)
+   * Opens a modal.
+   * @param key - The component key from registry
+   * @param props - Data/Callbacks to pass to the component
+   * @param size - Window size
    */
-  open<T = any>(
-    key: VoidModalKey,
-    props: Record<string, any> = {},
-    windowOpts: VoidModalOptions = {},
-  ): Promise<T | null> {
-    if (this.activeKey) this.close(null);
-
+  open<K extends ModalKey>(
+    key: K,
+    props: ModalContract[K],
+    size: ModalState<K>['size'] = 'md',
+  ) {
+    // Capture the element that triggered the modal
     if (typeof document !== 'undefined') {
-      this.previousActiveElement = document.activeElement as HTMLElement;
+      this.returnFocusTo = document.activeElement as HTMLElement;
     }
 
-    this.activeKey = key;
-    this.props = props;
-
-    // Default to 'md' size if not specified
-    // and preventClose to false if not provided
-    this.windowOptions = {
-      size: 'md',
-      preventClose: false,
-      ...windowOpts,
-    };
-
-    return new Promise((resolve) => {
-      this.resolvePromise = resolve;
-    });
+    this.state = { key, props, size };
   }
 
-  close(result: any) {
-    if (this.resolvePromise) this.resolvePromise(result);
+  /**
+   * Closes the active modal.
+   */
+  close() {
+    this.state = { key: null, props: {}, size: 'md' };
 
-    this.activeKey = null;
-    this.props = {};
-    this.resolvePromise = null;
-
-    if (this.previousActiveElement) {
-      this.previousActiveElement.focus();
-      this.previousActiveElement = null;
+    // Restore focus after a slight delay to allow animation to start
+    if (this.returnFocusTo && typeof requestAnimationFrame !== 'undefined') {
+      requestAnimationFrame(() => {
+        this.returnFocusTo?.focus();
+        this.returnFocusTo = null;
+      });
     }
   }
 
-  // --- Convenience Helpers ---
+  // --- Convenience Methods (Simplified) ---
 
-  async confirm(title: string, body: string, cost = 0): Promise<boolean> {
-    const result = await this.open<boolean>(
+  // Usage: modal.confirm('Delete?', 'Are you sure?', { onConfirm: () => deleteItem() })
+  confirm(
+    title: string,
+    body: string,
+    actions: { onConfirm: () => void; onCancel?: () => void; cost?: number },
+  ) {
+    this.open(
       MODAL_KEYS.CONFIRM,
-      { title, body, cost },
-      { size: 'sm' },
+      {
+        title,
+        body,
+        cost: actions.cost,
+        // We pass the functions directly. The Component invokes them.
+        onConfirm: () => {
+          actions.onConfirm();
+          this.close();
+        },
+        onCancel: () => {
+          if (actions.onCancel) actions.onCancel();
+          this.close();
+        },
+      },
+      'sm',
     );
-    return result ?? false;
   }
 
-  async alert(title: string, body: string): Promise<boolean> {
-    const result = await this.open<boolean>(
+  /**
+   * Shows a simple information modal.
+   */
+  alert(title: string, body: string) {
+    this.open(
       MODAL_KEYS.ALERT,
-      { title, body },
-      { size: 'sm' },
+      {
+        title,
+        body,
+      },
+      'sm',
     );
-    return result ?? true;
   }
 }
 

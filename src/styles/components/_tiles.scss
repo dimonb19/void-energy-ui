@@ -115,9 +115,6 @@
     font-size: 1rem;
     line-height: 1.2;
 
-    // Text shadow for legibility over image
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
-
     @at-root [data-mode='light'] & {
       text-shadow: none;
     }
@@ -136,10 +133,6 @@
       font-size: 0.75rem;
       color: var(--text-mute);
       transition: color var(--speed-base) var(--ease-snap);
-
-      @at-root [data-mode='light'] & {
-        color: rgba(255, 255, 255, 0.7); // Light grey on image
-      }
     }
   }
 
@@ -155,9 +148,6 @@
       // Light up metadata
       .tile-data p {
         color: var(--text-main);
-        @at-root [data-mode='light'] & {
-          color: var(--bg-surface);
-        }
       }
 
       @at-root [data-physics='retro'] & {
@@ -384,11 +374,6 @@
         background: $color; // Full saturation on hover
         color: white;
       }
-    }
-
-    &:hover:not(:disabled) {
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-      transform: translateY(-1px);
     }
 
     &:disabled {

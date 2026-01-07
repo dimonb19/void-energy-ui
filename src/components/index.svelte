@@ -229,22 +229,19 @@
           <button
             class="btn-cta"
             onclick={async () => {
-              // 1. Trigger the Modal and PAUSE execution here
-              const confirmed = await modal.confirm(
+              modal.confirm(
                 'INITIATE SEQUENCE?',
-                'You are about to deploy the production build.<br>This action cannot be undone by standard protocols.',
-                500, // Cost
+                'You are about to deploy the production build.',
+                {
+                  cost: 500,
+                  onConfirm: () => {
+                    toast.show('Sequence Initiated', 'success');
+                  },
+                  onCancel: () => {
+                    toast.show('Aborted', 'info');
+                  },
+                },
               );
-
-              // 2. Only run this if user clicked "Confirm"
-              if (confirmed) {
-                toast.show(
-                  'Sequence Initiated. Void Energy consuming...',
-                  'success',
-                );
-              } else {
-                toast.show('Sequence Aborted.', 'info');
-              }
             }}
           >
             INITIATE SEQUENCE
@@ -263,7 +260,14 @@
           <button
             class="btn-system"
             onclick={() => {
-              toast.show('Running system diagnostics...', 'loading');
+              modal.open('settings', {
+                initialMusic: 65,
+                // The callback handles the data preservation
+                onSave: (prefs: any) => {
+                  console.log('Saving to backend:', prefs);
+                  // e.g. userStore.update(prefs);
+                },
+              });
             }}
           >
             Diagnostics

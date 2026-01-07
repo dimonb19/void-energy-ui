@@ -5,12 +5,12 @@
 </script>
 
 <div class="text-center flex flex-col gap-md">
-  <h2 id="modal-title">{title}</h2>
-  <p>{@html body}</p>
+  <h2 id="modal-title" class="text-h3 text-error">{title}</h2>
+  <p class="text-dim">{@html body}</p>
 </div>
 
-<div class="flex flex-row justify-center pt-sm">
-  <button class="btn-system" onclick={() => modal.close(true)}>
+<div class="flex flex-row justify-center pt-lg">
+  <button class="btn-system min-w-[120px]" onclick={() => modal.close()}>
     Acknowledge
   </button>
 </div>

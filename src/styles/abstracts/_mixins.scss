@@ -297,3 +297,35 @@
     }
   }
 }
+
+// ==========================================================================
+// 5. TEXT UTILITIES
+// ==========================================================================
+
+// TRUNCATE
+// Usage: @include text-truncate(1) for single line
+// Usage: @include text-truncate(3) for multi-line narrative
+@mixin text-truncate($lines: 1) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @if $lines == 1 {
+    white-space: nowrap;
+  } @else {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    // Fallback for extreme edge cases
+    white-space: normal;
+  }
+}
+
+// FORCE WRAP
+// Usage: For API keys, hashes, or user-generated "gibberish"
+@mixin text-wrap-force {
+  // The modern standard: breaks only if necessary, at any point
+  overflow-wrap: anywhere;
+
+  // Fallbacks for older browsers
+  word-break: break-word;
+}

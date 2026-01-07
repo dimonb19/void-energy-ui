@@ -1,5 +1,5 @@
 /**
- * 🤖 VOID TOKEN GENERATOR (Upgraded)
+ * 🤖 VOID TOKEN GENERATOR
  * --------------------------------------------------------------------------
  * Usage: npm run build:tokens
  */

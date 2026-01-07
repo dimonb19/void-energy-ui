@@ -4,7 +4,7 @@
  */
 
 @use 'sass:map';
-@use '../abstracts/breakpoints' as *;
+@use '../abstracts' as *;
 @use '../components/anchors';
 
 /* =========================================
@@ -197,6 +197,24 @@ textarea {
 }
 .text-h5 {
   @include typography('h5');
+}
+
+// SINGLE LINE (Headings / Usernames)
+.text-truncate {
+  @include text-truncate(1);
+}
+
+// MULTI LINE (Narrative Descriptions)
+.text-clamp-2 {
+  @include text-truncate(2);
+}
+.text-clamp-3 {
+  @include text-truncate(3);
+}
+
+// BREAK WORDS (For User Content / Logs)
+.text-break {
+  @include text-wrap-force;
 }
 
 /* =========================================

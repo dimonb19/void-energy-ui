@@ -58,7 +58,7 @@
 
 <style lang="scss">
   .theme-menu {
-    max-height: 330px;
+    max-height: 22rem;
     overflow-y: auto;
 
     .theme-wrapper {
@@ -68,8 +68,8 @@
         position: relative;
 
         .orb-wrapper {
-          width: 24px;
-          height: 24px;
+          width: var(--space-md);
+          height: var(--space-md);
           border-radius: var(--radius-full);
           background: var(--bg-canvas);
           overflow: hidden;
@@ -77,8 +77,8 @@
 
           .orb {
             position: absolute;
-            width: 12px;
-            height: 12px;
+            width: calc(var(--space-md) / 2);
+            height: calc(var(--space-md) / 2);
             border-radius: var(--radius-full);
             background: var(--energy-primary);
             z-index: 1;
