@@ -124,6 +124,8 @@ export const VOID_TOKENS = {
   // Defines how elements move and feel.
   physics: {
     glass: {
+      radiusBase: DNA.radius.md,
+      radiusFull: DNA.radius.full,
       blur: 12,
       borderWidth: 1,
       speedBase: 300,
@@ -135,6 +137,8 @@ export const VOID_TOKENS = {
       scale: 1.02,
     },
     flat: {
+      radiusBase: DNA.radius.sm,
+      radiusFull: DNA.radius.full,
       blur: 0,
       borderWidth: 1,
       speedBase: 200,
@@ -146,6 +150,8 @@ export const VOID_TOKENS = {
       scale: 1.01,
     },
     retro: {
+      radiusBase: '0px',
+      radiusFull: '0px',
       blur: 0,
       borderWidth: 2,
       speedBase: 0,
@@ -194,7 +200,7 @@ export const VOID_TOKENS = {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.clean,
         'font-atmos-body': FONTS.clean,
-        'bg-canvas': '#0a0a0a',
+        'bg-canvas': '#000000',
         'bg-spotlight': '#1c1c1c',
         'bg-surface': 'rgba(30, 30, 30, 0.6)',
         'bg-sink': '#000000',

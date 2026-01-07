@@ -10,6 +10,32 @@
 @use 'variables' as *;
 
 // ==========================================================================
+// COLOR MIXING STRATEGY
+// ==========================================================================
+/**
+ * All color-mix() operations use OKLCH color space for perceptually
+ * uniform blending. This ensures:
+ *
+ * - Consistent perceived lightness across hue shifts
+ * - Smooth gradients without muddy midpoints
+ * - Accessibility-friendly contrast preservation
+ * - Predictable color interpolation behavior
+ *
+ * OKLCH (Oklab cylindrical coordinates) provides:
+ * - Perceptual uniformity: equal numeric changes = equal visual changes
+ * - Hue linearity: mixing colors preserves expected hue progression
+ * - Chroma consistency: saturation remains stable during interpolation
+ *
+ * This is critical for:
+ * - Dynamic theming with CSS variables (see tint/shade/alpha/blend functions)
+ * - Maintaining WCAG contrast ratios when generating color variants
+ * - Ensuring consistent visual weight across different hues
+ *
+ * Reference: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch
+ * Spec: https://www.w3.org/TR/css-color-4/#interpolation-space
+ */
+
+// ==========================================================================
 // COLOR FUNCTIONS (Polymorphic)
 // ==========================================================================
 
@@ -94,6 +120,5 @@
     @return map.get($z-layers, $layer);
   }
 
-  @warn "Unknown z-layer `#{$layer}`.";
-  @return 0;
+  @error "Unknown z-layer '#{$layer}'. Available layers: #{map.keys($z-layers)}";
 }

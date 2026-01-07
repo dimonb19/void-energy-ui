@@ -26,7 +26,7 @@
 
   // 4. TYPOGRAPHY
   @include typography('caption');
-  text-transform: uppercase;
+
   padding: var(--space-xs) var(--space-sm);
   text-align: center;
   color: var(--text-main);

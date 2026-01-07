@@ -35,19 +35,19 @@ dialog {
   }
 
   // A. "Mini" (Alerts / Confirmations / Delete)
-  &.dialog-sm {
+  &[data-size='sm'] {
     width: min(calc(100vw - var(--space-xl)), 24rem); // void-ignore (~380px)
     text-align: center; // Usually centered text for alerts
   }
 
   // B. "Wide" (Complex Grids / File Uploads)
-  &.dialog-lg {
+  &[data-size='lg'] {
     width: min(calc(100vw - var(--space-xl)), 64rem); // void-ignore (~1024px)
     max-width: 1200px; // void-ignore (Ultrawide Cap)
   }
 
   // C. "Full" ( immersive takeovers)
-  &.dialog-full {
+  &[data-size='full'] {
     width: calc(100vw - var(--space-xl));
     height: calc(100dvh - var(--space-xl));
     max-height: none;

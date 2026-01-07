@@ -60,9 +60,7 @@
 
 <dialog
   bind:this={dialog}
-  class:dialog-sm={renderedSize === 'sm'}
-  class:dialog-lg={renderedSize === 'lg'}
-  class:dialog-full={renderedSize === 'full'}
+  data-size={renderedSize}
   onclick={handleBackdrop}
   ontransitionend={handleTransitionEnd}
 >

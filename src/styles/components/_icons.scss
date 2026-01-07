@@ -33,18 +33,15 @@
     color var(--speed-fast) var(--ease-flow);
 
   // --- SIZES ---
-  &.icon-sm {
+  &[data-size='sm'] {
     font-size: 0.875em;
-  } // 14px
-  &.icon-md {
+  }
+  &[data-size='lg'] {
     font-size: 1.25em;
-  } // 20px
-  &.icon-lg {
+  }
+  &[data-size='xl'] {
     font-size: 1.5em;
-  } // 24px
-  &.icon-xl {
-    font-size: 2em;
-  } // 32px
+  }
 
   // --- ANIMATIONS ---
   &.icon-spin {
@@ -58,7 +55,7 @@
 // 2. INTERACTIVE ICONS (Buttons)
 // Usage: Inside <button> or <a>
 .btn-icon,
-.void-btn {
+.btn-void {
   // When an icon is inside a button, define interaction physics
   .icon,
   svg {

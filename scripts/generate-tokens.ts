@@ -25,11 +25,11 @@ function toCssValue(key: string, value: string | number): string {
   if (typeof value === 'string') return value;
   if (value === 0) {
     if (key.includes('speed')) return '0s';
-    if (key.includes('blur') || key.includes('Width')) return '0px';
+    if (key.includes('blur') || key.includes('Width') || key.includes('radius')) return '0px';
     return '0';
   }
   if (key.includes('speed')) return `${value / 1000}s`;
-  if (key.includes('blur') || key.includes('Width')) return `${value}px`;
+  if (key.includes('blur') || key.includes('Width') || key.includes('radius')) return `${value}px`;
   return `${value}`;
 }
 

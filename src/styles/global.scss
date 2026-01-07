@@ -1,233 +1,112 @@
 /*
- * ROLE: Global entry point & Developer Manual.
- * RESPONSIBILITY: Imports layers and provides the master architectural reference.
+ * ROLE: Global System Entry Point
+ * RESPONSIBILITY: Imports layers, enforces the Hybrid Protocol, and initializes the Void Engine.
  */
 
 /* 1. CONFIGURATION & LAYERS (Must be first for Sass Compiler) */
 @use 'abstracts' as *;
-@use 'base'; /* "The Laws of Physics" (Resets, Typography, Themes) */
-@use 'components'; /* "The Materials" (Buttons, Cards, etc.) */
+@use 'base'; /* The Laws: Resets, Typography, Theme Injection */
+@use 'components'; /* The Materials: Surfaces, Buttons, Inputs */
 
 /* 2. TAILWIND LAYERS (The Overrides) */
-/* We load these AFTER our layers so Tailwind utilities (e.g. p-0, hidden) 
-   can successfully override component styles when needed. */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ==========================================================================
-   📘 MASTER DEVELOPER CHEAT SHEET (vFinal - Optimized Architecture)
+   📘 VOID ENERGY UI — SYSTEM MANIFEST
    ==========================================================================
    
-   PHILOSOPHY: "Standard Syntax, Custom Physics."
+   ARCHITECTURAL CONSTITUTION
+   --------------------------------------------------------------------------
+   1. THE HYBRID PROTOCOL (Separation of Concerns)
+      - LAYOUT (Geometry)   :: HTML (Tailwind) -> `flex gap-md p-lg w-full`
+      - MATERIAL (Physics)  :: SCSS (Void)     -> `.surface-glass .btn-cta`
+      - ⛔️ NEVER mix layout rules (width/margin) into SCSS material classes.
+
+   2. THE TOKEN LAW (Single Source of Truth)
+      - 🟢 USE: Semantic Tokens (`var(--space-md)`, `.text-main`)
+      - 🔴 AVOID: Magic Numbers (`24px`), Hex Codes (`#000`)
+      - SOURCE: `src/config/design-tokens.ts`
+
+   3. THE STATE PROTOCOL (DOM-Driven State)
+      - State lives in Attributes, not Classes.
+      - 🟢 USE: `[data-state="open"]`, `[aria-pressed="true"]`
+      - 🔴 AVOID: `.is-active`, `.show`
+
+   ==========================================================================
+   📐 SECTION 1: THE TRIAD (Context Engine)
+   ==========================================================================
+   The UI is a material that reacts to three environmental variables on <html>.
+
+   1. ATMOSPHERE (The Soul) :: `data-atmosphere="..."`
+      - Defines: Color Palettes, Font Families.
+      - Source: `src/config/design-tokens.ts` (Void, Onyx, Terminal, etc.)
+
+   2. PHYSICS (The Laws) :: `data-physics="..."`
+      - Defines: Motion, Blur, Texture.
+      - Glass: Blur 16px, Glows, Organic Motion.
+      - Flat:  No Blur, Solid Borders, Clean Motion.
+      - Retro: No Blur, Hard Edges, Instant (0s) Motion.
+
+   3. MODE (The Polarity) :: `data-mode="light | dark"`
+      - Defines: Luminosity and Contrast handling.
+
+   ==========================================================================
+   📏 SECTION 2: RESPONSIVE & SPACING (Density Engine)
+   ==========================================================================
    
-   1. LAYOUT: We mimic Tailwind syntax (`p-md`, `flex`, `gap-lg`) for developer muscle memory.
-   2. MATERIALS: We use Void classes (`.surface-glass`, `.btn-cta`) for complex physics.
-   3. LOGICAL GEOMETRY: 
-      - We use Logical Properties (`margin-inline`, `padding-block`) for full i18n support.
-      - X = Inline (Left/Right), Y = Block (Top/Bottom).
-   4. TOKENS ARE TRUTH:
-      - `p-md` = `var(--space-md)` (Dynamic Math, NOT fixed pixels).
-      - Spacing scales automatically with the User Density setting (0.75x - 1.25x).
-
-   This architecture relies on strict separation of Layout (Tailwind) and 
-   Materials (SCSS). Breaking this rule creates specificity wars.
-
-   PROTOCOL A: THE HYBRID RULE
+   A. BREAKPOINTS (Layout Only)
    --------------------------------------------------------------------------
-   1. LAYOUT IS TAILWIND: 
-      - Use `flex`, `grid`, `gap-md`, `p-lg`, `w-full` in your HTML.
-      - DO NOT write layout rules (margin, padding, width, display) in these SCSS files
-        unless strictly required for internal component mechanics (e.g. ::before).
+   prefix:      | mobile | tablet | small-desktop | large-desktop | full-hd
+   start (px):  | 0      | 768    | 1024          | 1440          | 1920
    
-   2. MATERIAL IS SCSS:
-      - Use SCSS classes (`.surface-glass`, `.btn-cta`) for Visual Physics.
-      - Includes: Backgrounds, Borders, Shadows, Blurs, Filters, Z-Index.
+   usage:       | <div class="flex-col tablet:flex-row">
 
-   PROTOCOL B: THE TOKEN RULE
+   B. SPACING SCALE (Harmonic & Dense)
    --------------------------------------------------------------------------
-   - NO MAGIC PIXELS. Use `var(--space-md)` or Tailwind `p-md`.
-   - NO MAGIC COLORS. Use `var(--energy-primary)` or Tailwind `text-primary`.
-
-   --------------------------------------------------------------------------
-   1. THE ATMOSPHERES (Logic Layer)
-   --------------------------------------------------------------------------
-   👉 TO MODIFY: Go to `/src/config/design-tokens.ts`.
-
-   | ATTRIBUTE           | SPECTRUM | VIBE             | PHYSICS QUIRK       |
-   | ------------------- | -------- | ---------------- | ------------------- |
-   | [default] "void"    | Tech     | Cyberpunk / Navy | Standard Glow/Blur  |
-   | "onyx"              | Tech     | Stealth / Black  | Minimalist, Cinema  |
-   | "terminal"          | Tech     | Retro / Amber    | 0s Latency, No Blur |
-   | "overgrowth"        | Organic  | Nature / Toxic   | Bioluminescent      |
-   | "crimson"           | Arcane   | Horror / Red     | Aggressive High-Con |
-   | "velvet"            | Arcane   | Romance / Pink   | Soft, Welcoming     |
-   | "solar"             | Arcane   | Divine / Gold    | Luxury, Ancient     |
-   | "nebula"            | Arcane   | Magic / Purple   | Synthwave, Mystery  |
-   | "paper"             | Light    | Ink / Cream      | INVERTED (No Glow)  |
-   | "laboratory"        | Light    | Science / White  | Sterile, Blueprint  |
-   | "playground"        | Light    | Cyan / Magenta   | Fun, High Energy    |
-   | "focus"             | Light    | Pure / Mono      | Zero Distraction    |
-
-   --------------------------------------------------------------------------
-   2. RESPONSIVE SYNTAX (Generated by SCSS Loop)
-   --------------------------------------------------------------------------
-   ⚠️ NOTE: Responsive prefixes apply ONLY to Layout & Sizing.
-   Spacing, Typography, and Radius are static (handled by Density Engine).
-
-   Format: {breakpoint}:{class}
-
-   PREFIX           | WIDTH    | EXAMPLE (Valid Layouts)
-   ---------------- | -------- | --------------------------------------
-   (None)           | 0px+     | class="flex-col"
-   tablet:          | 768px+   | class="tablet:flex-row"
-   small-desktop:   | 1024px+  | class="small-desktop:grid-cols-2"
-   large-desktop:   | 1440px+  | class="large-desktop:w-full"
-   full-hd:         | 1920px+  | class="full-hd:hidden"
-   quad-hd:         | 2560px+  | class="quad-hd:block"
-
-   --------------------------------------------------------------------------
-   3. UTILITIES: SPACING & SIZING (Dynamic Math Scale)
-   --------------------------------------------------------------------------
-   Values shown are for Density: Standard (1x). 
-   These shrink/grow automatically based on user preference.
+   All spacing is dynamic. It scales based on user density preference (0.75x - 1.25x).
    
-   ⚠️ STATIC ONLY: No responsive prefixes (e.g., NO 'tablet:p-md').
-
-   A. THE SCALE (Use these suffixes)
-   | SUFFIX | REF PIXELS | FIGMA TOKEN | USAGE                    |
-   | ------ | ---------- | ----------- | ------------------------ |
-   | xs     | 8px        | 0.5rem      | Tight grouping           |
-   | sm     | 16px       | 1rem        | Standard internal pad    |
-   | md     | 24px       | 1.5rem      | Standard component gap   |
-   | lg     | 32px       | 2rem        | Section spacing          |
-   | xl     | 48px       | 3rem        | Large separation         |
-   | 2xl    | 64px       | 4rem        | Hero / Page spacing      |
-
-   B. SPACING CLASSES (Logical Properties)
-   - Gap:      .gap-{size}              (e.g., .gap-md)
-   - Padding:  .p-{size}
-               .px-{size} (Inline/Horz), .py-{size} (Block/Vert)
-               .pt-{size}, .pb-{size}, .pl-{size}, .pr-{size}
-   - Margin:   .m-{size}
-               .mx-{size} (Inline/Horz), .my-{size} (Block/Vert)
-               .mt-{size}, .mb-{size}, .ml-{size}, .mr-{size}
-   - Auto:     .mx-auto, .my-auto
-
-   C. SIZING CLASSES (Responsive!)
-   - Width:    .w-full, .w-auto, .w-screen, .max-w-full
-   - Height:   .h-full, .h-auto, .h-screen, .min-h-screen
-
-   --------------------------------------------------------------------------
-   4. UTILITIES: LAYOUT & FLEXBOX (Responsive!)
-   --------------------------------------------------------------------------
-   - Display:   .hidden, .block, .inline-block, .flex, .grid, .contents
-   - Direction: .flex-col, .flex-row
-   - Wrap:      .flex-wrap, .flex-nowrap, .flex-1, .flex-none
+   tokens:      | xs | sm | md | lg | xl | 2xl
+   base (1x):   | 8  | 16 | 24 | 32 | 48 | 64  (px)
    
-   - Alignment (Items):
-     .items-center, .items-start, .items-end, .items-stretch
+   usage:       | .gap-md, .p-lg, .my-xl, .w-full, .h-screen
+
+   ==========================================================================
+   🏗️ SECTION 3: COMPONENT CATALOG (Naming Conventions)
+   ==========================================================================
+
+   A. SURFACES (The Skin)
+   --------------------------------------------------------------------------
+   .surface-glass        :: Static floating glass (Cards, containers).
+   .surface-glass-action :: Interactive glass (Hover lift, Border glow).
+   .surface-sunk         :: Recessed depth (Inputs, wells, sidebars).
+   .surface-void         :: Opaque canvas (Modals, masking).
+
+   B. COMPOSITES (Skin + Bone)
+   --------------------------------------------------------------------------
+   .card-glass           :: Surface Glass + Padding + Margin logic.
+   .btn, .btn-cta        :: Interactive buttons with physics states.
+   .dropzone             :: Dashed sunk surface for file inputs.
+   .tile-small           :: Data chips (Premium, System, Success variants).
+
+   C. OVERLAYS (The Ether)
+   --------------------------------------------------------------------------
+   .void-tooltip         :: Headless floating capsule (Use with Floating UI).
+   .toast-message        :: Notification capsule (Success, Error, Info).
+   dialog[data-size=".."]:: Native modal with materialize animation.
+
+   ==========================================================================
+   🛠️ SECTION 4: MIXIN REFERENCE
+   ==========================================================================
    
-   - Justification (Content):
-     .justify-center, .justify-between, .justify-start, .justify-end
-
-   - Grid Columns:
-     .grid-cols-1, .grid-cols-2
-
-   --------------------------------------------------------------------------
-   5. UTILITIES: TEXT & VISUALS (Static Only)
-   --------------------------------------------------------------------------
-   - Align:   .text-center, .text-right, .text-left
-   - Colors:  .text-primary, .text-success, .text-error, 
-              .text-premium, .text-system, .text-dim, .text-main
-   - Size:    .text-caption, .text-small, text-body,
-              .text-h5, .text-h4, .text-h3, .text-h2, .text-h1
-   - Transform: .text-uppercase, .text-capitalize
-   - Access:  .sr-only (Screen reader only)
-
-   - Truncate: .text-truncate (Single line ellipsis)
-               .text-clamp-2, .text-clamp-3 (Multi-line narrative)
-   - Wrap:     .text-break (Force wrap for API keys/Gibberish)
-
-   - Radius:  .rounded-sm, .rounded (Base/Md), .rounded-lg, .rounded-none
-   - Effect:  .backdrop-blur-physics (Adapts blur to atmosphere)
+   @include glass-float($interactive) :: Apply float physics (Blur/Shadow).
+   @include glass-sunk                :: Apply sunk physics (Inset Shadow).
+   @include gemini-laser              :: Apply rotating gradient border (CTA).
+   @include text-truncate($lines)     :: Clamp text to N lines.
    
-   --------------------------------------------------------------------------
-   6. UTILITIES: ICONS & ANIMATION
-   --------------------------------------------------------------------------
-   - Icons:   .icon (1.25em), .icon-sm (1em), .icon-lg (1.5em), .icon-xl (2em)
-   - Spin:    .icon-spin (Continuous rotation)
-   
-   - Loading: .shimmer (Skeleton loader), .loading-logo (Holo-entry)
-   - Pulse:   .cyber-pulse (Breathing glow), .fade-in (Entry transition)
-
-   --------------------------------------------------------------------------
-   7. COMPONENTS: STRUCTURE
-   --------------------------------------------------------------------------
-   - .container        : Max-width constraint + Centered + Side Padding.
-   - .container-fluid  : 100% Width + Padding.
-
-   --------------------------------------------------------------------------
-   8. COMPONENTS: SURFACES
-   --------------------------------------------------------------------------
-   A. ATOMIC (Texture Only - No padding)
-      - .surface-glass        : Floating Glass (Static).
-      - .surface-glass-action : Floating Glass + Hover Rise (Interactive).
-      - .surface-sunk         : Recessed/Darker (Sidebars/Wells).
-      - .surface-void         : Solid Canvas Color (Masking).
-      - .surface-spotlight    : Lighter Solid (Active sections).
-   
-   B. CARDS (Texture + Padding + Responsive Vertical Spacing)
-      - .card-glass           : Glass Surface + Radius + Vertical Margins.
-      - .card-sunk            : Sunk Surface + Radius + Vertical Margins.
-
-   --------------------------------------------------------------------------
-   9. COMPONENTS: BUTTONS
-   --------------------------------------------------------------------------
-   - .btn             : Standard Glass Button.
-   - .btn-cta         : "Gemini Laser" (Primary).
-   - .btn-premium     : Gold/Orange (Upsell or restricted features).
-   - .btn-system      : Purple (Configuration or System Ops).
-   - .btn-signal      : Green (Success)
-   - .btn-alert       : Red (Error)
-   - .btn-icon        : Circle (44px) for SVGs.
-   - .btn-void        : Naked reset.
-
-   --------------------------------------------------------------------------
-   10. COMPONENTS: INPUTS & TILES
-   --------------------------------------------------------------------------
-   - Inputs/Textarea : Auto-styled as Sunk Surfaces.
-   - .dropzone       : Dashed Sunk Surface + Clickable.
-   - .has-error      : Red border for invalid states.
-   
-   - .tile-small          : Data Chip (Blue).
-   - .tile-small-{color}  : Variants (premium, system, success, error).
-   - .tile-labeled        : Adds top tab (via data-label="...").
-
-   --------------------------------------------------------------------------
-   11. STATE PROTOCOL (Attribute-Driven UI)
-   --------------------------------------------------------------------------
-   PHILOSOPHY: "State is DOM, not Memory."
-   We STRICTLY do not use classes like `.active`, `.show`, or `.loading`.
-   We use semantic attributes that describe the CURRENT TRUTH of the component.
-   
-   Why?
-   1. Accessibility is free (Screen readers read attributes, not classes).
-   2. Specificity is consistent (Attributes are equal; classes vary).
-   3. JS Logic is decoupled from CSS styling.
-
-   UNIFIED STATE MAP (Strict Protocol)
-   --------------------------------------------------------------------------
-   CONTEXT          | ATTRIBUTE            | VALUES              | USAGE EXAMPLE
-   ---------------- | -------------------- | ------------------- | -------------------------
-   Toggle Button    | aria-pressed         | true / false        | <button aria-pressed="true">
-   Tabs / Radios    | aria-selected        | true / false        | <button role="tab" aria-selected="true">
-   Checkboxes       | aria-checked         | true / false        | <div role="checkbox" aria-checked="true">
-   ---------------- | -------------------- | ------------------- | -------------------------
-   Visibility       | data-state           | open / closed       | <div data-state="open">
-   Generic Active   | data-state           | active / inactive   | <div class="dropzone" data-state="active">
-   ---------------- | -------------------- | ------------------- | -------------------------
-   Process          | data-status          | loading / idle      | <button data-status="loading">
-   Validation       | aria-invalid         | true / false        | <input aria-invalid="true">
+   STATE MIXINS:
+   @include state-active { ... }      :: targets [aria-pressed="true"], etc.
+   @include state-open   { ... }      :: targets [data-state="open"]
    
    ========================================================================== */

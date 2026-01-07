@@ -48,8 +48,6 @@ $physics-presets: (
   'glass': map.merge(
       map.get(generated.$generated-physics, 'glass'),
       (
-        'radius-base': var(--radius-md),
-        'radius-full': 9999px,
         'surface-bg': linear-gradient(
             to bottom,
             blend(var(--bg-surface), var(--energy-secondary), 10%) 0%,
@@ -58,8 +56,8 @@ $physics-presets: (
         'surface-border-top': var(--border-highlight),
         'surface-border-side': var(--border-shadow),
         // SHADOWS & GLOWS
-        'shadow-sunk': inset 0 2px 6px alpha(var(--bg-canvas), 80%),
-        'shadow-float': 0 4px 20px rgba(0, 0, 0, 0.5),
+        'shadow-sunk': inset 0 2px 4px alpha(var(--bg-canvas), 60%),
+        'shadow-float': 0 2px 8px rgba(0, 0, 0, 0.25),
         'shadow-lift': 0 0 10px alpha(var(--energy-primary), 50%),
         'focus-ring':
           '0 0 0 1px var(--bg-canvas), 0 0 0 2px var(--energy-primary), 0 0 10px var(--energy-primary)',
@@ -70,15 +68,13 @@ $physics-presets: (
   'flat': map.merge(
       map.get(generated.$generated-physics, 'flat'),
       (
-        'radius-base': var(--radius-sm),
-        'radius-full': 9999px,
         'surface-bg': var(--bg-surface),
         'surface-border-top': var(--border-highlight),
         'surface-border-side': var(--border-highlight),
         // SHADOWS (Standard Grey/Black)
-        'shadow-sunk': inset 0 1px 3px rgba(0, 0, 0, 0.1),
-        'shadow-float': 0 2px 6px rgba(0, 0, 0, 0.15),
-        'shadow-lift': 0 3px 12px rgba(0, 0, 0, 0.15),
+        'shadow-sunk': inset 0 1px 2px rgba(0, 0, 0, 0.05),
+        'shadow-float': 0 1px 3px rgba(0, 0, 0, 0.05),
+        'shadow-lift': 0 4px 12px rgba(0, 0, 0, 0.1),
         'focus-ring':
           '0 0 0 2px var(--bg-canvas), 0 0 0 4px var(--energy-primary)',
       )
@@ -88,8 +84,6 @@ $physics-presets: (
   'retro': map.merge(
       map.get(generated.$generated-physics, 'retro'),
       (
-        'radius-base': 0px,
-        'radius-full': 0px,
         'surface-bg': var(--bg-surface),
         'surface-border-top': var(--border-highlight),
         'surface-border-side': var(--border-highlight),
@@ -101,16 +95,6 @@ $physics-presets: (
       )
     )
 );
-
-@mixin emit-physics {
-  @each $name, $map in $physics-presets {
-    [data-physics='#{$name}'] {
-      @each $key, $val in $map {
-        --#{$key}: #{$val};
-      }
-    }
-  }
-}
 
 // THE EMITTER (Logic Layer)
 @mixin emit-physics {
