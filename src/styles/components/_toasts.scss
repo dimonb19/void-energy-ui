@@ -169,14 +169,14 @@
   .track {
     fill: none;
     stroke: var(--text-mute);
-    stroke-width: 2px;
+    stroke-width: calc(var(--physics-border-width) * 2);
     opacity: 0.2;
   }
 
   .car {
     fill: none;
     stroke: var(--text-main);
-    stroke-width: 2px;
+    stroke-width: calc(var(--physics-border-width) * 2);
     stroke-dasharray: 10 20;
     stroke-linecap: round;
   }

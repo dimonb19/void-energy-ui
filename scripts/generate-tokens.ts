@@ -7,7 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { VOID_TOKENS } from '../src/config/design-tokens';
+import { VOID_TOKENS, VOID_TYPOGRAPHY, VOID_STRUCTURAL } from '../src/config/design-tokens';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -16,6 +16,8 @@ const PATHS = {
   scss: path.resolve(__dirname, '../src/styles/config/_generated-themes.scss'),
   registryJson: path.resolve(__dirname, '../src/config/void-registry.json'),
   physicsJson: path.resolve(__dirname, '../src/config/void-physics.json'),
+  typographyJson: path.resolve(__dirname, '../src/config/void-typography.json'),
+  structuralJson: path.resolve(__dirname, '../src/config/void-structural.json'),
 };
 
 /**
@@ -127,6 +129,14 @@ async function main() {
     // C. Generate Physics (Motion)
     fs.writeFileSync(PATHS.physicsJson, JSON.stringify(VOID_TOKENS.physics, null, 2));
     console.log(`   └─ ⚡  Physics: src/config/void-physics.json`);
+
+    // D. Generate Typography (Font Scales, Weights, Line Heights)
+    fs.writeFileSync(PATHS.typographyJson, JSON.stringify(VOID_TYPOGRAPHY, null, 2));
+    console.log(`   └─ 📝 Typography: src/config/void-typography.json`);
+
+    // E. Generate Structural Constants (Radius, Modal Widths, etc.)
+    fs.writeFileSync(PATHS.structuralJson, JSON.stringify(VOID_STRUCTURAL, null, 2));
+    console.log(`   └─ 🏗️  Structural: src/config/void-structural.json`);
 
     console.log('✅ Token Pipeline Complete.\n');
   } catch (error) {

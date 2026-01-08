@@ -48,7 +48,7 @@ a {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -2px; // Distance from text
+    bottom: calc(var(--physics-border-width) * -2); // Distance from text
     height: var(--physics-border-width);
 
     // The Line Color (Matches Text)
@@ -91,8 +91,8 @@ a {
     font-weight: var(--font-weight-semibold);
 
     &::after {
-      height: 2px; // Thicker pen stroke
-      bottom: -3px;
+      height: calc(var(--physics-border-width) * 2); // Thicker pen stroke
+      bottom: calc(var(--physics-border-width) * -3);
     }
 
     &:hover {

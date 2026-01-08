@@ -189,7 +189,7 @@ textarea:disabled {
   cursor: not-allowed;
   opacity: 0.5;
   background-color: var(--bg-sink);
-  border: var(--physics-border-width) solid var(--border-shadow);
+  border: var(--physics-border-width) solid var(--border-color);
   color: var(--text-mute);
 }
 
@@ -246,8 +246,7 @@ hr {
     // 4. Force Borders
     // Glass physics often uses subtle borders. In HCM, we need HARD borders.
     --physics-border-width: 2px; // Force thicker borders
-    --border-highlight: ButtonText; // Standard border color
-    --border-shadow: ButtonText;
+    --border-color: ButtonText; // Standard border color
 
     // 5. Kill Visual Noise
     --physics-blur: 0px;

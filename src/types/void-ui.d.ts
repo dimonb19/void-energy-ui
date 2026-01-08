@@ -19,8 +19,9 @@ interface VoidPalette {
   // ENERGY
   'energy-primary': string;
   'energy-secondary': string;
-  'border-highlight': string;
-  'border-shadow': string;
+
+  // STRUCTURE
+  'border-color': string;
 
   // SIGNAL
   'text-main': string;

@@ -5,6 +5,14 @@
 The Void Energy UI is a framework-agnostic, physics-based design system for the **CoNexus** storytelling platform.
 It combines the performance of **Tailwind CSS** (for Layout) with a bespoke **SCSS Physics Engine** (for Materials).
 
+## 📚 Documentation
+
+- **[CHEAT-SHEET.md](./CHEAT-SHEET.md)** — Quick reference for developers (components, mixins, tokens)
+- **[THEME-GUIDE.md](./THEME-GUIDE.md)** — Step-by-step guide to creating custom themes
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** — Contribution guidelines and PR process
+
+---
+
 ## 🚀 The Triad Architecture
 
 Every pixel on screen is calculated by the intersection of three layers:

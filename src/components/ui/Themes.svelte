@@ -73,7 +73,7 @@
           border-radius: var(--radius-full);
           background: var(--bg-canvas);
           overflow: hidden;
-          border: var(--physics-border-width) solid var(--border-highlight);
+          border: var(--physics-border-width) solid var(--border-color);
 
           .orb {
             position: absolute;

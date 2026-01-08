@@ -1,8 +1,13 @@
 /** @type {import('tailwindcss').Config} */
 import plugin from 'tailwindcss/plugin';
-import DNA from './src/config/void-dna.json' with { type: 'json' };
+import {
+  VOID_SPACING,
+  VOID_RESPONSIVE,
+  VOID_RADIUS,
+  VOID_LAYERS,
+} from './src/config/design-tokens.ts';
 
-// 🛠️ HELPER: Auto-map JSON keys to CSS Variables
+// 🛠️ HELPER: Auto-map token keys to CSS Variables
 // Turns "md" -> "var(--space-md)" automatically
 function mapToVars(obj, prefix) {
   return Object.keys(obj).reduce((acc, key) => {
@@ -27,7 +32,7 @@ export default {
   // If you need a new value, add it to the Design Tokens and rebuild.
   theme: {
     // 2. SCREENS (Breakpoints)
-    screens: DNA.responsive,
+    screens: VOID_RESPONSIVE,
 
     // 3. STRICT SPACING (The Density Engine)
     // Developers must use semantic tokens: p-md, gap-lg.
@@ -35,7 +40,7 @@ export default {
       0: '0',
       px: '1px',
       auto: 'auto',
-      ...mapToVars(DNA.spacing, 'space'),
+      ...mapToVars(VOID_SPACING, 'space'),
     },
 
     // 4. STRICT PALETTE (The Atmosphere)
@@ -52,9 +57,8 @@ export default {
       // Layer 2: Energy
       primary: 'var(--energy-primary)',
       secondary: 'var(--energy-secondary)',
-      // Layer 3: Lighting
-      highlight: 'var(--border-highlight)',
-      shadow: 'var(--border-shadow)',
+      // Layer 3: Structure
+      border: 'var(--border-color)',
       // Layer 4: Signals
       main: 'var(--text-main)',
       dim: 'var(--text-dim)',
@@ -83,7 +87,7 @@ export default {
     borderRadius: {
       none: '0',
       DEFAULT: 'var(--radius-md)',
-      ...mapToVars(DNA.radius, 'radius'),
+      ...mapToVars(VOID_RADIUS, 'radius'),
     },
     borderWidth: {
       DEFAULT: 'var(--physics-border-width)',
@@ -93,7 +97,7 @@ export default {
 
     // 6. STRICT LAYERS (Z-Index)
     // Matches src/config/design-tokens.ts
-    zIndex: DNA.zindex,
+    zIndex: VOID_LAYERS,
 
     // 7. MOTION
     transitionDuration: {

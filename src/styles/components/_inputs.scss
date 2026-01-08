@@ -80,7 +80,7 @@ select {
     opacity: 0.5;
     cursor: not-allowed;
     box-shadow: none;
-    background: rgba(255, 255, 255, 0.05);
+    background: alpha(var(--border-color), 0.15);
   }
 }
 

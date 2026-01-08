@@ -4,62 +4,105 @@
  * ==========================================================================
  *
  * ⚠️ SINGLE SOURCE OF TRUTH
- * This file acts as the database for the entire UI.
- * It controls:
- * 1. THE SOUL (Themes/Colors)
- * 2. THE LAWS (Physics/Motion)
- * 3. THE LOGIC (Density/Scaling)
+ * This file is the ONLY source of truth for all design tokens.
  *
- * --------------------------------------------------------------------------
- * 👨‍💻 DEVELOPER WORKFLOW: HOW TO ADD A NEW THEME
- * --------------------------------------------------------------------------
+ * 📚 DOCUMENTATION:
+ * - How to add themes:  /THEME-GUIDE.md (step-by-step with examples)
+ * - System reference:   /CHEAT-SHEET.md
+ * - Architecture:       /README.md
  *
- * 1. DEFINE:
- * Scroll to `VOID_TOKENS.themes`. Copy the 'void' block, rename the key,
- * and adjust the palette values.
+ * 🛠️ WORKFLOW:
+ * 1. Edit this file to add/modify themes
+ * 2. Run: `npm run build:tokens` to compile
+ * 3. Use: `data-atmosphere="your-theme-name"` in HTML
  *
- * 2. HYDRATE:
- * You MUST run the build script to compile these tokens into SCSS/JSON.
- * 👉 TERMINAL COMMAND: npm run build:tokens
- *
- * 3. USE:
- * Your new theme is now available in the UI via `data-atmosphere="your-theme-name"`.
- *
- * --------------------------------------------------------------------------
- * 🎨 THE PALETTE CONTRACT (What do these keys mean?)
- * --------------------------------------------------------------------------
- * To ensure the 3D Physics Engine renders correctly, you must provide:
- *
- * [LAYER 1: CANVAS - Z-INDEX 0 & -1]
- * - bg-canvas        : The absolute floor (Page Background). Usually the darkest tone.
- * - bg-sink          : Recessed areas (Inputs, Wells). Appears "carved" into the surface.
- * - bg-spotlight     : Ambient light source from the top. Used for gradients/highlights.
- *
- * [LAYER 2: SURFACE - Z-INDEX 1+]
- * - bg-surface       : Floating elements (Cards, Modals, Headers).
- * For 'glass' physics, use RGBA with opacity (e.g., rgba(0,0,0,0.5)).
- *
- * [LAYER 3: ENERGY - INTERACTION]
- * - energy-primary   : The Brand Color. Used for Buttons, Links, Focus states, & Glows.
- * - energy-secondary : Supporting accent. Used for Borders, Scrollbars, & Subtle indicators.
- *
- * [LAYER 4: LIGHTING - THE 3D ILLUSION]
- * - border-highlight : Top/Left border color. Simulates light hitting the edge.
- * - border-shadow    : Bottom/Right border color. Simulates cast shadow.
- *
- * [LAYER 5: SIGNAL - DATA HIERARCHY]
- * - text-main        : High Emphasis (Headings, Active Data).
- * - text-dim         : Medium Emphasis (Body copy, Labels).
- * - text-mute        : Low Emphasis (Placeholders, Disabled states).
+ * 👉 See /THEME-GUIDE.md for:
+ * - The Palette Contract (5 layer system with explanations)
+ * - Physics constraints (glass/flat/retro rules)
+ * - Complete theme example with annotations
+ * - Testing checklist and troubleshooting
  *
  * ==========================================================================
  */
 
 // --------------------------------------------------------------------------
-// 🧩 SHARED ASSETS (Fonts & Colors)
+// 🏗️ FOUNDATION TOKENS (Spacing, Breakpoints, Layers, Radius)
 // --------------------------------------------------------------------------
 
-import DNA from './void-dna.json';
+/**
+ * Spacing Scale
+ * Base unit: 0.25rem (4px)
+ * Scale: xs(8px) → sm(16px) → md(24px) → lg(32px) → xl(48px) → 2xl(64px) → 3xl(96px) → 4xl(128px) → 5xl(160px)
+ */
+export const VOID_SPACING = {
+  xs: '0.5rem', // 8px
+  sm: '1rem', // 16px
+  md: '1.5rem', // 24px
+  lg: '2rem', // 32px
+  xl: '3rem', // 48px
+  '2xl': '4rem', // 64px
+  '3xl': '6rem', // 96px
+  '4xl': '8rem', // 128px
+  '5xl': '10rem', // 160px
+} as const;
+
+/**
+ * Responsive Breakpoints
+ * Mobile-first approach with 6 breakpoints
+ */
+export const VOID_RESPONSIVE = {
+  mobile: '0px',
+  tablet: '768px',
+  'small-desktop': '1024px',
+  'large-desktop': '1440px',
+  'full-hd': '1920px',
+  'quad-hd': '2560px',
+} as const;
+
+/**
+ * Container Max-Widths
+ * Responsive container constraints per breakpoint
+ */
+export const VOID_CONTAINER = {
+  mobile: '100%',
+  tablet: '720px',
+  'small-desktop': '960px',
+  'large-desktop': '1320px',
+  'full-hd': '1600px',
+  'quad-hd': '1920px',
+} as const;
+
+/**
+ * Z-Index Layers
+ * Semantic z-index scale for stacking context management
+ */
+export const VOID_LAYERS = {
+  sink: '-1', // Below canvas (background patterns)
+  floor: '0', // Canvas level
+  base: '1', // Default element layer
+  decorate: '2', // Decorative elements
+  float: '10', // Floating UI elements
+  sticky: '20', // Sticky headers/navigation
+  header: '40', // Main header
+  dropdown: '50', // Dropdown menus
+  overlay: '90', // Modals, dialogs, overlays
+} as const;
+
+/**
+ * Border Radius Scale
+ * Used by Physics Engine for surface curvature
+ */
+export const VOID_RADIUS = {
+  sm: '4px',
+  md: '8px',
+  lg: '16px',
+  xl: '24px',
+  full: '9999px', // Pill shape
+} as const;
+
+// --------------------------------------------------------------------------
+// 🧩 SHARED ASSETS (Fonts & Colors)
+// --------------------------------------------------------------------------
 
 const FONTS = {
   tech: "'Hanken Grotesk', sans-serif",
@@ -118,6 +161,125 @@ const SEMANTIC_LIGHT = {
 };
 
 // --------------------------------------------------------------------------
+// 📝 TYPOGRAPHY TOKENS (Font Scales, Weights, Line Heights)
+// --------------------------------------------------------------------------
+
+export const VOID_TYPOGRAPHY = {
+  // Font Scales (Responsive clamp values for fluid typography)
+  scales: {
+    // Mobile: 11px -> Desktop: 14px
+    caption: {
+      fontSize: 'clamp(0.6875rem, 0.65rem + 0.25vw, 0.875rem)',
+      lineHeight: 1.4,
+    },
+    // Mobile: 12px -> Desktop: 16px
+    small: {
+      fontSize: 'clamp(0.75rem, 0.7rem + 0.3vw, 1rem)',
+      lineHeight: 1.5,
+    },
+    // Mobile: 14px (0.875rem) -> Desktop: 18px (1.125rem)
+    body: {
+      fontSize: 'clamp(0.875rem, 0.8rem + 0.5vw, 1.125rem)',
+      lineHeight: 1.5,
+    },
+    // Mobile: 16px -> Desktop: 20px
+    h5: {
+      fontSize: 'clamp(1rem, 0.95rem + 0.5vw, 1.25rem)',
+      lineHeight: 1.4,
+    },
+    // Mobile: 18px -> Desktop: 24px
+    h4: {
+      fontSize: 'clamp(1.125rem, 1rem + 1vw, 1.5rem)',
+      lineHeight: 1.3,
+    },
+    // Mobile: 20px -> Desktop: 32px
+    h3: {
+      fontSize: 'clamp(1.25rem, 1.1rem + 1.5vw, 2rem)',
+      lineHeight: 1.2,
+    },
+    // Mobile: 24px -> Desktop: 40px
+    h2: {
+      fontSize: 'clamp(1.5rem, 1.25rem + 2vw, 2.5rem)',
+      lineHeight: 1.15,
+    },
+    // Mobile: 32px -> Desktop: 56px (High Contrast Hero)
+    h1: {
+      fontSize: 'clamp(2rem, 1.5rem + 3vw, 3.5rem)',
+      lineHeight: 1.1,
+      // Tablet Override: clamp(2rem, 5vw, 3.5rem)
+      tabletOverride: 'clamp(2rem, 5vw, 3.5rem)',
+    },
+  },
+
+  // Font Weights (Graduated hierarchy)
+  weights: {
+    regular: 400, // Body, Input data
+    medium: 500, // Card Title (h5)
+    semibold: 600, // Subsection (h3, h4)
+    bold: 700, // Structural (h1, h2)
+  },
+
+  // Font Families (Atmosphere-specific, defined in themes)
+  // These are defaults, actual fonts come from theme.palette['font-atmos-heading']
+  families: {
+    heading: "'Hanken Grotesk', sans-serif", // Default for headings
+    body: "'Inter', sans-serif", // Default for body
+    mono: "'Courier Prime', monospace", // Default for code
+  },
+} as const;
+
+// --------------------------------------------------------------------------
+// 🏗️ STRUCTURAL CONSTANTS (Layout & Component Dimensions)
+// --------------------------------------------------------------------------
+
+export const VOID_STRUCTURAL = {
+  // Border Radius Scale (Used by Physics Engine)
+  radius: {
+    ...VOID_RADIUS,
+  },
+
+  // Modal Widths (Component-specific sizing)
+  modal: {
+    sm: '32rem',
+    md: '40rem',
+    lg: '64rem',
+    xl: '75rem',
+  },
+
+  // Tooltip Constraints
+  tooltip: {
+    maxWidth: '250px',
+  },
+
+  // Dialog Gutters (Responsive padding)
+  dialog: {
+    gutter: 'var(--space-xl)', // Standard gutter (48px at standard density)
+    gutterLg: 'var(--space-2xl)', // Large gutter (64px at standard density)
+  },
+
+  // Control Dimensions (Interactive elements)
+  control: {
+    // Base touch target minimum (WCAG AA compliance)
+    touchMin: '2.75rem', // 44px
+    // Dynamic control height with density scaling
+    height: 'max(2.25rem, calc(2.75rem * var(--density, 1)))',
+    // Control padding
+    paddingX: 'var(--space-sm)',
+    paddingY: 'calc(var(--space-xs) * 0.75)',
+  },
+
+  // Surface Padding (Cards, Dialogs, Containers)
+  surface: {
+    padding: 'var(--space-lg)',
+  },
+
+  // Scrollbar Sizing
+  scrollbar: {
+    width: '6px',
+  },
+} as const;
+
+// --------------------------------------------------------------------------
 // 🚀 THE CONFIGURATION (Edit below)
 // --------------------------------------------------------------------------
 
@@ -125,7 +287,7 @@ export const VOID_TOKENS = {
   // 1. DENSITY MAPS (Space & Scale)
   // Controls the global whitespace density of the application.
   density: {
-    scale: DNA.spacing,
+    scale: VOID_SPACING,
     factors: {
       high: 0.75, // Compact
       standard: 1, // Default
@@ -134,32 +296,38 @@ export const VOID_TOKENS = {
   },
 
   container: {
-    ...DNA.container,
+    ...VOID_CONTAINER,
   },
 
   // 2. LAYERS
   layers: {
-    ...DNA.zindex,
+    ...VOID_LAYERS,
   },
 
   // 3. RESPONSIVE
   // We explicitly define px values here to ensure SCSS and JS match perfectly.
   responsive: {
-    ...DNA.responsive,
+    ...VOID_RESPONSIVE,
   },
 
   // 4. STRUCTURAL CONSTANTS
   // Layout constraints and component-specific dimensions
   structural: {
-    ...DNA.structural,
+    'modal-width-sm': '32rem',
+    'modal-width-md': '40rem',
+    'modal-width-lg': '64rem',
+    'modal-width-xl': '75rem',
+    'tooltip-max-width': '250px',
+    'dialog-gutter': 'var(--space-xl)',
+    'dialog-gutter-lg': 'var(--space-2xl)',
   },
 
-  // 2. PHYSICS ENGINE (Time & Matter)
+  // 5. PHYSICS ENGINE (Time & Matter)
   // Defines how elements move and feel.
   physics: {
     glass: {
-      radiusBase: DNA.radius.md,
-      radiusFull: DNA.radius.full,
+      radiusBase: VOID_RADIUS.md,
+      radiusFull: VOID_RADIUS.full,
       blur: 12,
       borderWidth: 1,
       // Animation Durations (Complete Scale)
@@ -179,8 +347,8 @@ export const VOID_TOKENS = {
       scale: 1.02,
     },
     flat: {
-      radiusBase: DNA.radius.sm,
-      radiusFull: DNA.radius.full,
+      radiusBase: VOID_RADIUS.sm,
+      radiusFull: VOID_RADIUS.full,
       blur: 0,
       borderWidth: 1,
       // Animation Durations (Complete Scale)
@@ -242,8 +410,7 @@ export const VOID_TOKENS = {
         'bg-sink': 'rgba(0, 2, 41, 0.6)',
         'energy-primary': '#33e2e6', // Cyan
         'energy-secondary': '#3875fa', // Blue
-        'border-highlight': 'rgba(56, 117, 250, 0.3)',
-        'border-shadow': 'rgba(56, 117, 250, 0.1)',
+        'border-color': 'rgba(56, 117, 250, 0.2)',
         'text-main': '#ffffff',
         'text-dim': 'rgba(255, 255, 255, 0.85)',
         'text-mute': 'rgba(255, 255, 255, 0.6)',
@@ -264,8 +431,7 @@ export const VOID_TOKENS = {
         'bg-sink': '#000000',
         'energy-primary': '#ffffff',
         'energy-secondary': '#a3a3a3',
-        'border-highlight': 'rgba(255, 255, 255, 0.2)',
-        'border-shadow': 'rgba(255, 255, 255, 0.05)',
+        'border-color': 'rgba(255, 255, 255, 0.15)',
         'text-main': '#ffffff',
         'text-dim': '#a3a3a3',
         'text-mute': 'rgba(163, 163, 163, 0.6)',
@@ -286,8 +452,7 @@ export const VOID_TOKENS = {
         'bg-sink': '#000000',
         'energy-primary': '#f5c518', // Amber
         'energy-secondary': '#f5c518',
-        'border-highlight': '#f5c518', // Hard borders (no alpha)
-        'border-shadow': '#f5c518',
+        'border-color': '#f5c518',
         'text-main': '#f5c518',
         'text-dim': 'rgba(245, 197, 24, 0.7)',
         'text-mute': 'rgba(245, 197, 24, 0.5)',
@@ -309,8 +474,7 @@ export const VOID_TOKENS = {
         'bg-sink': 'rgba(20, 0, 0, 0.8)',
         'energy-primary': '#ff6b6b',
         'energy-secondary': '#8a0000',
-        'border-highlight': 'rgba(255, 107, 107, 0.3)',
-        'border-shadow': 'rgba(255, 107, 107, 0.1)',
+        'border-color': 'rgba(255, 107, 107, 0.2)',
         'text-main': '#ffe5e5',
         'text-dim': 'rgba(255, 200, 200, 0.9)',
         'text-mute': 'rgba(255, 180, 180, 0.7)',
@@ -331,8 +495,7 @@ export const VOID_TOKENS = {
         'bg-sink': 'rgba(0, 20, 5, 0.8)',
         'energy-primary': '#39ff14',
         'energy-secondary': '#ffd700',
-        'border-highlight': 'rgba(57, 255, 20, 0.3)',
-        'border-shadow': 'rgba(57, 255, 20, 0.1)',
+        'border-color': 'rgba(57, 255, 20, 0.2)',
         'text-main': '#f0fff4',
         'text-dim': 'rgba(200, 255, 200, 0.8)',
         'text-mute': 'rgba(200, 255, 200, 0.6)',
@@ -353,8 +516,7 @@ export const VOID_TOKENS = {
         'bg-sink': 'rgba(30, 0, 10, 0.8)',
         'energy-primary': '#ff80a0',
         'energy-secondary': '#c71585',
-        'border-highlight': 'rgba(255, 128, 160, 0.3)',
-        'border-shadow': 'rgba(255, 128, 160, 0.1)',
+        'border-color': 'rgba(255, 128, 160, 0.2)',
         'text-main': '#fff0f5',
         'text-dim': 'rgba(255, 200, 220, 0.9)',
         'text-mute': 'rgba(255, 180, 200, 0.7)',
@@ -375,8 +537,7 @@ export const VOID_TOKENS = {
         'bg-sink': 'rgba(0, 0, 0, 0.4)',
         'energy-primary': '#ffaa00',
         'energy-secondary': '#b8860b',
-        'border-highlight': 'rgba(255, 170, 0, 0.4)',
-        'border-shadow': 'rgba(184, 134, 11, 0.1)',
+        'border-color': 'rgba(255, 170, 0, 0.25)',
         'text-main': '#fffbea',
         'text-dim': 'rgba(255, 248, 220, 0.85)',
         'text-mute': 'rgba(255, 248, 220, 0.6)',
@@ -397,8 +558,7 @@ export const VOID_TOKENS = {
         'bg-sink': 'rgba(10, 0, 20, 0.8)',
         'energy-primary': '#d946ef',
         'energy-secondary': '#8b5cf6',
-        'border-highlight': 'rgba(217, 70, 239, 0.3)',
-        'border-shadow': 'rgba(139, 92, 246, 0.1)',
+        'border-color': 'rgba(217, 70, 239, 0.2)',
         'text-main': '#fdf4ff',
         'text-dim': 'rgba(230, 210, 255, 0.9)',
         'text-mute': 'rgba(230, 210, 255, 0.6)',
@@ -419,8 +579,7 @@ export const VOID_TOKENS = {
         'bg-sink': 'rgba(0, 0, 0, 0.03)',
         'energy-primary': '#2c3e50',
         'energy-secondary': '#8d6e63',
-        'border-highlight': '#8d6e63',
-        'border-shadow': 'rgba(141, 110, 99, 0.5)',
+        'border-color': 'rgba(141, 110, 99, 0.7)',
         'text-main': '#2d2420',
         'text-dim': '#4e4239',
         'text-mute': '#796b61',
@@ -441,8 +600,7 @@ export const VOID_TOKENS = {
         'bg-sink': 'rgba(0, 0, 0, 0.05)',
         'energy-primary': '#005bb5',
         'energy-secondary': '#64748b',
-        'border-highlight': 'rgba(0, 91, 181, 0.5)',
-        'border-shadow': 'rgba(100, 116, 139, 0.2)',
+        'border-color': 'rgba(0, 91, 181, 0.35)',
         'text-main': '#0f172a',
         'text-dim': '#334155',
         'text-mute': '#94a3b8',
@@ -463,8 +621,7 @@ export const VOID_TOKENS = {
         'bg-sink': 'rgba(0, 0, 0, 0.05)',
         'energy-primary': '#ff4081',
         'energy-secondary': '#00bcd4',
-        'border-highlight': '#00bcd4',
-        'border-shadow': '#00bcd4',
+        'border-color': '#00bcd4',
         'text-main': '#006064',
         'text-dim': '#00838f',
         'text-mute': '#0097a7',
@@ -485,8 +642,7 @@ export const VOID_TOKENS = {
         'bg-sink': '#f0f0f0',
         'energy-primary': '#000000',
         'energy-secondary': '#000000',
-        'border-highlight': '#000000',
-        'border-shadow': '#000000',
+        'border-color': '#000000',
         'text-main': '#000000',
         'text-dim': '#222222',
         'text-mute': '#444444',

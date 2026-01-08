@@ -35,6 +35,5 @@ pnpm-lock.yaml
 README.md
 
 # config
-/src/config/void-registry.json
-/src/config/void-physics.json
-/src/styles/config/_generated-themes.scss
+/src/config/*.json
+/src/styles/config/*

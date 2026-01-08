@@ -231,7 +231,7 @@
   .tile-label {
     display: flex;
     align-items: center;
-    padding: 0 0.75rem;
+    padding: 0 calc(var(--space-xs) * 1.5); // 0.75rem equivalent
     white-space: nowrap;
     color: inherit;
     font-weight: var(--font-weight-semibold);
@@ -240,11 +240,11 @@
   // 2. SUNKEN VARIANT
   .tile-label-sunken {
     background: var(--bg-sink);
-    border: var(--physics-border-width) solid var(--border-shadow);
+    border: var(--physics-border-width) solid var(--border-color);
     color: var(--text-dim);
-    padding: 0.1rem 0.5rem;
+    padding: calc(var(--space-xs) * 0.25) var(--space-xs); // 0.1rem 0.5rem equivalent
     margin-block: auto;
-    margin-right: 0.5rem;
+    margin-right: var(--space-xs);
     border-radius: calc(var(--radius-base) * 0.5);
     @include typography('caption');
   }

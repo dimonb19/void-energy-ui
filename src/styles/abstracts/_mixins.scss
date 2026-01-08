@@ -25,11 +25,8 @@
   border-style: solid;
   border-width: var(--physics-border-width);
 
-  // 2. LIGHTING (Directional vs Uniform is now handled by these vars)
-  border-top-color: var(--surface-border-top);
-  border-bottom-color: var(--surface-border-side);
-  border-left-color: var(--surface-border-side);
-  border-right-color: var(--surface-border-side);
+  // 2. LIGHTING (Unified border color)
+  border-color: var(--surface-border);
 
   // This variable automatically switches between Glow (Glass) and Shadow (Flat)
   box-shadow: var(--shadow-float);
@@ -66,7 +63,7 @@
 @mixin glass-sunk {
   background: var(--bg-sink);
 
-  border: var(--physics-border-width) solid var(--border-shadow);
+  border: var(--physics-border-width) solid var(--border-color);
   border-radius: var(--radius-base);
   color: var(--text-main);
 

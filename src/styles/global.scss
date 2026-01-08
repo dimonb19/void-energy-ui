@@ -1,6 +1,8 @@
 /*
  * ROLE: Global System Entry Point
  * RESPONSIBILITY: Imports layers, enforces the Hybrid Protocol, and initializes the Void Engine.
+ *
+ * 📚 QUICK REFERENCE: See /CHEAT-SHEET.md for full system documentation
  */
 
 /* 1. CONFIGURATION & LAYERS (Must be first for Sass Compiler) */
@@ -14,99 +16,31 @@
 @tailwind utilities;
 
 /* ==========================================================================
-   📘 VOID ENERGY UI — SYSTEM MANIFEST
-   ==========================================================================
-   
-   ARCHITECTURAL CONSTITUTION
-   --------------------------------------------------------------------------
-   1. THE HYBRID PROTOCOL (Separation of Concerns)
-      - LAYOUT (Geometry)   :: HTML (Tailwind) -> `flex gap-md p-lg w-full`
-      - MATERIAL (Physics)  :: SCSS (Void)     -> `.surface-glass .btn-cta`
-      - ⛔️ NEVER mix layout rules (width/margin) into SCSS material classes.
-
-   2. THE TOKEN LAW (Single Source of Truth)
-      - 🟢 USE: Semantic Tokens (`var(--space-md)`, `.text-main`)
-      - 🔴 AVOID: Magic Numbers (`24px`), Hex Codes (`#000`)
-      - SOURCE: `src/config/design-tokens.ts`
-
-   3. THE STATE PROTOCOL (DOM-Driven State)
-      - State lives in Attributes, not Classes.
-      - 🟢 USE: `[data-state="open"]`, `[aria-pressed="true"]`
-      - 🔴 AVOID: `.is-active`, `.show`
-
-   ==========================================================================
-   📐 SECTION 1: THE TRIAD (Context Engine)
-   ==========================================================================
-   The UI is a material that reacts to three environmental variables on <html>.
-
-   1. ATMOSPHERE (The Soul) :: `data-atmosphere="..."`
-      - Defines: Color Palettes, Font Families.
-      - Source: `src/config/design-tokens.ts` (Void, Onyx, Terminal, etc.)
-
-   2. PHYSICS (The Laws) :: `data-physics="..."`
-      - Defines: Motion, Blur, Texture.
-      - Glass: Blur 16px, Glows, Organic Motion.
-      - Flat:  No Blur, Solid Borders, Clean Motion.
-      - Retro: No Blur, Hard Edges, Instant (0s) Motion.
-
-   3. MODE (The Polarity) :: `data-mode="light | dark"`
-      - Defines: Luminosity and Contrast handling.
-
-   ==========================================================================
-   📏 SECTION 2: RESPONSIVE & SPACING (Density Engine)
-   ==========================================================================
-   
-   A. BREAKPOINTS (Layout Only)
-   --------------------------------------------------------------------------
-   prefix:      | mobile | tablet | small-desktop | large-desktop | full-hd
-   start (px):  | 0      | 768    | 1024          | 1440          | 1920
-   
-   usage:       | <div class="flex-col tablet:flex-row">
-
-   B. SPACING SCALE (Harmonic & Dense)
-   --------------------------------------------------------------------------
-   All spacing is dynamic. It scales based on user density preference (0.75x - 1.25x).
-   
-   tokens:      | xs | sm | md | lg | xl | 2xl | 3xl | 4xl | 5xl
-   base (1x):   | 8  | 16 | 24 | 32 | 48 | 64  | 96  | 128 | 160 (px)
-   
-   usage:       | .gap-md, .p-lg, .my-xl, .w-full, .h-screen
-
-   ==========================================================================
-   🏗️ SECTION 3: COMPONENT CATALOG (Naming Conventions)
+   📘 VOID ENERGY UI — QUICK REFERENCE
    ==========================================================================
 
-   A. SURFACES (The Skin)
-   --------------------------------------------------------------------------
-   .surface-glass        :: Static floating glass (Cards, containers).
-   .surface-glass-action :: Interactive glass (Hover lift, Border glow).
-   .surface-sunk         :: Recessed depth (Inputs, wells, sidebars).
-   .surface-void         :: Opaque canvas (Modals, masking).
+   This file imports all SCSS layers and enforces the Void Engine protocol.
 
-   B. COMPOSITES (Skin + Bone)
-   --------------------------------------------------------------------------
-   .card-glass           :: Surface Glass + Padding + Margin logic.
-   .btn, .btn-cta        :: Interactive buttons with physics states.
-   .dropzone             :: Dashed sunk surface for file inputs.
-   .tile-small           :: Data chips (Premium, System, Success variants).
+   📚 COMPLETE DOCUMENTATION:
+   - System Overview:    /CHEAT-SHEET.md
+   - Theme Creation:     /THEME-GUIDE.md
+   - Project Structure:  /README.md
+   - Contributing:       /CONTRIBUTING.md
 
-   C. OVERLAYS (The Ether)
-   --------------------------------------------------------------------------
-   .void-tooltip         :: Headless floating capsule (Use with Floating UI).
-   .toast-message        :: Notification capsule (Success, Error, Info).
-   dialog[data-size=".."]:: Native modal with materialize animation.
+   ⚠️ CRITICAL RULES (The Hybrid Protocol):
+   1. LAYOUT (Geometry)   → Tailwind (`flex gap-md p-lg`)
+   2. MATERIAL (Physics)  → SCSS (`.surface-glass .btn-cta`)
+   3. STATE (Attributes)  → `[data-state="open"]` NOT `.is-active`
 
-   ==========================================================================
-   🛠️ SECTION 4: MIXIN REFERENCE
-   ==========================================================================
-   
-   @include glass-float($interactive) :: Apply float physics (Blur/Shadow).
-   @include glass-sunk                :: Apply sunk physics (Inset Shadow).
-   @include gemini-laser              :: Apply rotating gradient border (CTA).
-   @include text-truncate($lines)     :: Clamp text to N lines.
-   
-   STATE MIXINS:
-   @include state-active { ... }      :: targets [aria-pressed="true"], etc.
-   @include state-open   { ... }      :: targets [data-state="open"]
-   
+   👉 See /CHEAT-SHEET.md for:
+   - Full component catalog (.surface-glass, .btn-cta, .card-glass)
+   - Mixin reference with examples (@include glass-float, @include glass-sunk)
+   - Spacing & responsive breakpoints (xs, sm, md, lg, xl...)
+   - Copy-paste patterns (modals, cards, inputs, buttons)
+
+   👉 See /THEME-GUIDE.md for:
+   - How to add a new theme (step-by-step)
+   - The Palette Contract (layer explanations)
+   - Physics constraints (glass/flat/retro rules)
+
    ========================================================================== */

@@ -45,7 +45,7 @@ button:not(.btn-void),
   background: var(--bg-surface);
 
   // Borders rely on the physics engine variables
-  border: var(--physics-border-width) solid var(--border-highlight);
+  border: var(--physics-border-width) solid var(--border-color);
   border-radius: var(--radius-base);
 
   // Transitions
@@ -89,8 +89,8 @@ button:not(.btn-void),
   }
 
   &:disabled {
-    background: rgba(125, 125, 125, 0.1);
-    border-color: rgba(125, 125, 125, 0.25);
+    background: alpha(var(--text-mute), 0.1);
+    border-color: alpha(var(--text-mute), 0.25);
     color: var(--text-mute);
     cursor: not-allowed;
     box-shadow: none;

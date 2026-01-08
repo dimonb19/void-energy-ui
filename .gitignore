@@ -34,6 +34,5 @@ global.css
 global.css.map
 
 # config
-/src/config/void-registry.json
-/src/config/void-physics.json
-/src/styles/config/_generated-themes.scss
+/src/config/*.json
+/src/styles/config/*

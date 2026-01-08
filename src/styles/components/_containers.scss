@@ -143,11 +143,11 @@
 .surface-void {
   background: var(--bg-canvas);
   // Optional: add a subtle border to define edges against other void elements
-  border: var(--physics-border-width) solid var(--border-shadow);
+  border: var(--physics-border-width) solid var(--border-color);
 }
 
 // Spotlight Background (Slightly lighter, useful for active sections)
 .surface-spotlight {
   background: var(--bg-spotlight);
-  border: var(--physics-border-width) solid var(--border-shadow);
+  border: var(--physics-border-width) solid var(--border-color);
 }

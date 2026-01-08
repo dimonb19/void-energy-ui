@@ -156,7 +156,7 @@ dialog {
   // --- 9. LIGHT MODE OVERRIDE ---
   @at-root [data-mode='light'] & {
     background: var(--bg-surface);
-    border: var(--physics-border-width) solid var(--border-highlight);
+    border: var(--physics-border-width) solid var(--border-color);
     border-radius: var(--radius-base);
 
     &:not([open]) {

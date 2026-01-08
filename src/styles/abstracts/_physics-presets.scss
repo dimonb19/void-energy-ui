@@ -53,8 +53,7 @@ $physics-presets: (
             blend(var(--bg-surface), var(--energy-secondary), 10%) 0%,
             var(--bg-surface) 100%
           ),
-        'surface-border-top': var(--border-highlight),
-        'surface-border-side': var(--border-shadow),
+        'surface-border': var(--border-color),
         // SEMANTIC SHADOW NAMES (Purpose-Based)
         'shadow-sunk': inset 0 2px 4px alpha(var(--bg-canvas), 60%),
         'shadow-float': 0 2px 8px rgba(0, 0, 0, 0.25),
@@ -69,8 +68,7 @@ $physics-presets: (
       map.get(generated.$generated-physics, 'flat'),
       (
         'surface-bg': var(--bg-surface),
-        'surface-border-top': var(--border-highlight),
-        'surface-border-side': var(--border-highlight),
+        'surface-border': var(--border-color),
         // SEMANTIC SHADOW NAMES (Purpose-Based)
         'shadow-sunk': inset 0 1px 2px rgba(0, 0, 0, 0.05),
         'shadow-float': 0 1px 3px rgba(0, 0, 0, 0.05),
@@ -85,8 +83,7 @@ $physics-presets: (
       map.get(generated.$generated-physics, 'retro'),
       (
         'surface-bg': var(--bg-surface),
-        'surface-border-top': var(--border-highlight),
-        'surface-border-side': var(--border-highlight),
+        'surface-border': var(--border-color),
         // SEMANTIC SHADOW NAMES (Purpose-Based)
         'shadow-sunk': none,
         'shadow-float': none,
