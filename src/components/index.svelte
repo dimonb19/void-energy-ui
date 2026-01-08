@@ -52,16 +52,28 @@
     voidEngine.setPreferences({ density: d });
   }
 
-  // LOCAL STATE (UI Only)
-  let moduleTiles = $state(['Neural Net', 'Firewall', 'Log v.1']);
+  // LOCAL STATE (UI Only) - Using stable IDs for animations
+  let moduleIdCounter = $state(3);
+  let moduleTiles = $state([
+    { id: 1, name: 'Neural Net' },
+    { id: 2, name: 'Firewall' },
+    { id: 3, name: 'Log v.1' },
+  ]);
   let newModuleTile = $state(null);
+
+  let environmentIdCounter = $state(3);
   let environmentTiles = $state([
-    'Physics Engine',
-    'Audio Synth',
-    'Visual Renderer',
+    { id: 1, name: 'Physics Engine' },
+    { id: 2, name: 'Audio Synth' },
+    { id: 3, name: 'Visual Renderer' },
   ]);
   let newEnvironmentTile = $state(null);
-  let premiumTiles = $state(['Quantum Core', 'AI Supervisor']);
+
+  let premiumIdCounter = $state(2);
+  let premiumTiles = $state([
+    { id: 1, name: 'Quantum Core' },
+    { id: 2, name: 'AI Supervisor' },
+  ]);
   let newPremiumTile = $state(null);
 </script>
 
@@ -74,35 +86,39 @@
 
       <ThemeSelector />
 
-      <label for="font-heading" class="text-small">Headings</label>
-      <select
-        id="font-heading"
-        value={voidEngine.userConfig.fontHeading}
-        onchange={(e) =>
-          voidEngine.setPreferences({
-            fontHeading: e.currentTarget.value || null,
-          })}
-      >
-        {#each fontOptions as font}
-          <option value={font.value}>{font.label}</option>
-        {/each}
-      </select>
+      <div class="flex flex-col gap-xs">
+        <label for="font-heading" class="text-small">Headings</label>
+        <select
+          id="font-heading"
+          value={voidEngine.userConfig.fontHeading}
+          onchange={(e) =>
+            voidEngine.setPreferences({
+              fontHeading: e.currentTarget.value || null,
+            })}
+        >
+          {#each fontOptions as font}
+            <option value={font.value}>{font.label}</option>
+          {/each}
+        </select>
+      </div>
 
-      <label for="font-body" class="text-small">Body Text</label>
-      <select
-        id="font-body"
-        value={voidEngine.userConfig.fontBody}
-        onchange={(e) =>
-          voidEngine.setPreferences({
-            fontBody: e.currentTarget.value || null,
-          })}
-      >
-        {#each fontOptions as font (font.label)}
-          <option value={font.value}>{font.label}</option>
-        {/each}
-      </select>
+      <div class="flex flex-col gap-xs">
+        <label for="font-body" class="text-small">Body Text</label>
+        <select
+          id="font-body"
+          value={voidEngine.userConfig.fontBody}
+          onchange={(e) =>
+            voidEngine.setPreferences({
+              fontBody: e.currentTarget.value || null,
+            })}
+        >
+          {#each fontOptions as font (font.label)}
+            <option value={font.value}>{font.label}</option>
+          {/each}
+        </select>
+      </div>
 
-      <div class="flex-col gap-xs pt-sm">
+      <div class="flex flex-col gap-xs">
         <div class="flex flex-row justify-between items-end">
           <label for="">Interface Scale</label>
           <span>
@@ -124,7 +140,7 @@
         </div>
       </div>
 
-      <div class="flex-col gap-xs pt-sm">
+      <div class="flex flex-col gap-xs">
         <div class="flex flex-row justify-between items-end">
           <label for="density">Spacing Density</label>
           <span>
@@ -343,17 +359,15 @@
                 No active modules
               </p>
             {:else}
-              {#each moduleTiles as btn, i (i)}
+              {#each moduleTiles as tile (tile.id)}
                 <div class="tile-small" animate:live out:singularity>
-                  <p class="tile-label">{btn}</p>
+                  <p class="tile-label">{tile.name}</p>
                   <button
                     type="button"
                     class="btn-void tile-remove"
-                    aria-label="Remove {btn}"
+                    aria-label="Remove {tile.name}"
                     onclick={() => {
-                      moduleTiles = moduleTiles.filter(
-                        (_, index) => index !== i,
-                      );
+                      moduleTiles = moduleTiles.filter((t) => t.id !== tile.id);
                     }}>✕</button
                   >
                 </div>
@@ -371,7 +385,14 @@
             </select>
             <button
               onclick={() => {
-                if (newModuleTile) moduleTiles.push(newModuleTile);
+                if (newModuleTile) {
+                  moduleIdCounter++;
+                  moduleTiles.push({
+                    id: moduleIdCounter,
+                    name: newModuleTile,
+                  });
+                  newModuleTile = null;
+                }
               }}
               disabled={!newModuleTile}>Add Module</button
             >
@@ -389,16 +410,16 @@
                 No environments selected
               </p>
             {:else}
-              {#each environmentTiles as btn, i (i)}
+              {#each environmentTiles as tile (tile.id)}
                 <div class="tile-small-system" animate:live out:singularity>
-                  <p class="tile-label">{btn}</p>
+                  <p class="tile-label">{tile.name}</p>
                   <button
                     type="button"
                     class="btn-void tile-remove"
-                    aria-label="Remove {btn}"
+                    aria-label="Remove {tile.name}"
                     onclick={() => {
                       environmentTiles = environmentTiles.filter(
-                        (_, index) => index !== i,
+                        (t) => t.id !== tile.id,
                       );
                     }}>✕</button
                   >
@@ -418,8 +439,14 @@
             <button
               class="btn-system"
               onclick={() => {
-                if (newEnvironmentTile)
-                  environmentTiles.push(newEnvironmentTile);
+                if (newEnvironmentTile) {
+                  environmentIdCounter++;
+                  environmentTiles.push({
+                    id: environmentIdCounter,
+                    name: newEnvironmentTile,
+                  });
+                  newEnvironmentTile = null;
+                }
               }}
               disabled={!newEnvironmentTile}>Add Module</button
             >
@@ -437,16 +464,16 @@
                 No premium modules
               </p>
             {:else}
-              {#each premiumTiles as btn, i (i)}
+              {#each premiumTiles as tile (tile.id)}
                 <div class="tile-small-premium" animate:live out:singularity>
-                  <p class="tile-label">{btn}</p>
+                  <p class="tile-label">{tile.name}</p>
                   <button
                     type="button"
                     class="btn-void tile-remove"
-                    aria-label="Remove {btn}"
+                    aria-label="Remove {tile.name}"
                     onclick={() => {
                       premiumTiles = premiumTiles.filter(
-                        (_, index) => index !== i,
+                        (t) => t.id !== tile.id,
                       );
                     }}>✕</button
                   >
@@ -466,7 +493,14 @@
             <button
               class="btn-premium"
               onclick={() => {
-                if (newPremiumTile) premiumTiles.push(newPremiumTile);
+                if (newPremiumTile) {
+                  premiumIdCounter++;
+                  premiumTiles.push({
+                    id: premiumIdCounter,
+                    name: newPremiumTile,
+                  });
+                  newPremiumTile = null;
+                }
               }}
               disabled={!newPremiumTile}>Add Module</button
             >

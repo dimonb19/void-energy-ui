@@ -62,6 +62,38 @@ $line-heights: (
 );
 
 /* =========================================
+   1.5. EMIT CSS VARIABLES (Runtime Scaling)
+   ========================================= */
+// Generate CSS variables for typography tokens to enable runtime scaling
+:root {
+  // Font Sizes (Dynamic)
+  --font-size-h1: #{map.get($font-scale, 'h1')};
+  --font-size-h2: #{map.get($font-scale, 'h2')};
+  --font-size-h3: #{map.get($font-scale, 'h3')};
+  --font-size-h4: #{map.get($font-scale, 'h4')};
+  --font-size-h5: #{map.get($font-scale, 'h5')};
+  --font-size-body: #{map.get($font-scale, 'body')};
+  --font-size-small: #{map.get($font-scale, 'small')};
+  --font-size-caption: #{map.get($font-scale, 'caption')};
+
+  // Line Heights (Semantic)
+  --line-height-heading: #{map.get($line-heights, 'h1')};
+  --line-height-heading-h2: #{map.get($line-heights, 'h2')};
+  --line-height-heading-h3: #{map.get($line-heights, 'h3')};
+  --line-height-subheading: #{map.get($line-heights, 'h4')};
+  --line-height-title: #{map.get($line-heights, 'h5')};
+  --line-height-body: #{map.get($line-heights, 'body')};
+  --line-height-small: #{map.get($line-heights, 'small')};
+  --line-height-caption: #{map.get($line-heights, 'caption')};
+
+  // Font Weights (Semantic)
+  --font-weight-bold: #{map.get($font-weights, 'h1')};
+  --font-weight-semibold: #{map.get($font-weights, 'h3')};
+  --font-weight-medium: #{map.get($font-weights, 'h5')};
+  --font-weight-regular: #{map.get($font-weights, 'body')};
+}
+
+/* =========================================
    2. THE MIXIN
    ========================================= */
 @mixin typography($level: 'body', $is-input: false) {
@@ -303,7 +335,7 @@ textarea {
   strong,
   b {
     color: var(--text-main); // Highlight key terms (e.g., "SECTION 1")
-    font-weight: 700;
+    font-weight: var(--font-weight-bold);
   }
 
   a {

@@ -18,7 +18,7 @@
 // Standard Entry Transition (The "Cyber Slide")
 // Usage: @include entry-transition;
 // inside a class (e.g., .fade-in)
-@mixin entry-transition($duration: 0.4s, $delay: 0s) {
+@mixin entry-transition($duration: var(--speed-base), $delay: 0s) {
   will-change: transform, opacity, filter;
   opacity: 1;
   transform: translateY(0) scale(1);

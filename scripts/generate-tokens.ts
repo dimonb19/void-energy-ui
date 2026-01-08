@@ -24,11 +24,12 @@ const PATHS = {
 function toCssValue(key: string, value: string | number): string {
   if (typeof value === 'string') return value;
   if (value === 0) {
-    if (key.includes('speed')) return '0s';
+    if (key.includes('speed') || key.includes('delay')) return '0s';
     if (key.includes('blur') || key.includes('Width') || key.includes('radius')) return '0px';
     return '0';
   }
   if (key.includes('speed')) return `${value / 1000}s`;
+  if (key.includes('delay')) return `${value}ms`;
   if (key.includes('blur') || key.includes('Width') || key.includes('radius')) return `${value}px`;
   return `${value}`;
 }
@@ -71,6 +72,13 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
   // 5. CONTAINER MAX-WIDTHS MAP
   scss += `$container-widths: (\n`;
   Object.entries(tokens.container).forEach(([key, val]) => {
+    scss += `  '${key}': ${val},\n`;
+  });
+  scss += `);\n\n`;
+
+  // 6. STRUCTURAL CONSTANTS MAP
+  scss += `$structural-constants: (\n`;
+  Object.entries(tokens.structural).forEach(([key, val]) => {
     scss += `  '${key}': ${val},\n`;
   });
   scss += `);\n\n`;

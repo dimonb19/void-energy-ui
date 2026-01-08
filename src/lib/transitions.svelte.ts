@@ -118,7 +118,7 @@ export function live(
   { from, to }: { from: DOMRect; to: DOMRect },
   params: any = {},
 ) {
-  const { isRetro } = getSystemConfig();
+  const { isRetro, speedBase } = getSystemConfig();
 
   // RETRO: Robotic Quantization
   const steppedEasing = (t: number) => Math.floor(t * 4) / 4;
@@ -127,7 +127,7 @@ export function live(
     node,
     { from, to },
     {
-      duration: params.duration ?? 300,
+      duration: params.duration ?? speedBase,
       easing: isRetro ? steppedEasing : cubicOut,
       ...params,
     },
@@ -151,7 +151,7 @@ export function materialize(
   if (reducedMotion || isRetro) {
     return {
       delay,
-      duration: isRetro ? 0 : 300,
+      duration: isRetro ? 0 : speedBase,
       css: (t: number) => `opacity: ${t};`,
     };
   }
@@ -273,7 +273,7 @@ export function dematerialize(
   if (isRetro) {
     return {
       delay,
-      duration: duration ?? 300,
+      duration: duration ?? speedBase,
       css: (t: number) => {
         const steppedOpacity = Math.floor(t * 4) / 4;
         const steppedScale = 0.9 + Math.floor(t * 2) * 0.05;

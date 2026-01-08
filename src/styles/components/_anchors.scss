@@ -37,7 +37,7 @@ a {
   position: relative;
   display: inline-block; // Required for transform origin logic
   color: var(--energy-primary);
-  font-weight: 500;
+  font-weight: var(--font-weight-medium);
   white-space: nowrap; // Keep the link intact
   border-bottom: var(--physics-border-width) solid
     alpha(var(--energy-primary), 20%);
@@ -88,7 +88,7 @@ a {
 
   // --- C. Light Mode Override ---
   @at-root [data-mode='light'] & {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
 
     &::after {
       height: 2px; // Thicker pen stroke

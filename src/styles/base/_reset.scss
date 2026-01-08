@@ -3,8 +3,10 @@
  * RESPONSIBILITY: Primes the Void canvas and spacing engine.
  */
 
+@use 'sass:map';
 @use '../abstracts' as *;
 @use 'typography' as *;
+@use '../config/generated-themes' as generated;
 
 // =========================================
 // 0. THE DENSITY ENGINE (Bulletproofed)
@@ -52,6 +54,30 @@
 
   --text-scale: 1;
   --scrollbar-width: 6px;
+
+  // 5. Structural Constants (Component-specific layout constraints)
+  --modal-width-sm: #{map.get(
+      generated.$structural-constants,
+      'modal-width-sm'
+    )};
+  --modal-width-md: #{map.get(
+      generated.$structural-constants,
+      'modal-width-md'
+    )};
+  --modal-width-lg: #{map.get(
+      generated.$structural-constants,
+      'modal-width-lg'
+    )};
+  --modal-width-xl: #{map.get(
+      generated.$structural-constants,
+      'modal-width-xl'
+    )};
+  --tooltip-max-width: #{map.get(
+      generated.$structural-constants,
+      'tooltip-max-width'
+    )};
+  --dialog-gutter: var(--space-xl);
+  --dialog-gutter-lg: var(--space-2xl);
 }
 
 /* =========================================

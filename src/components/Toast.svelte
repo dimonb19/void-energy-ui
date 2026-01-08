@@ -37,7 +37,14 @@
   });
 </script>
 
-<div bind:this={region} class="toast-region" popover="manual">
+<div
+  bind:this={region}
+  class="toast-region"
+  popover="manual"
+  role="status"
+  aria-live="polite"
+  aria-atomic="true"
+>
   {#each toast.items as item (item.id)}
     <button
       class="toast-message"

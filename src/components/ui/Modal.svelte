@@ -61,6 +61,8 @@
 <dialog
   bind:this={dialog}
   data-size={renderedSize}
+  aria-labelledby="modal-title"
+  aria-modal="true"
   onclick={handleBackdrop}
   ontransitionend={handleTransitionEnd}
 >

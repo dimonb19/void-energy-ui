@@ -76,17 +76,45 @@ const FONTS = {
 };
 
 const SEMANTIC_DARK = {
+  // Base Colors
   'color-premium': '#ff8c00', // Gold/Orange
   'color-system': '#a078ff', // Purple
   'color-success': '#00e055', // Green
   'color-error': '#ff3c40', // Red
+  // Tint/Shade Variants (Generated via OKLCH in SCSS)
+  'color-premium-light': 'oklch(from #ff8c00 calc(l * 1.2) c h)',
+  'color-premium-dark': 'oklch(from #ff8c00 calc(l * 0.8) c h)',
+  'color-premium-subtle': 'oklch(from #ff8c00 l c h / 0.15)',
+  'color-system-light': 'oklch(from #a078ff calc(l * 1.2) c h)',
+  'color-system-dark': 'oklch(from #a078ff calc(l * 0.8) c h)',
+  'color-system-subtle': 'oklch(from #a078ff l c h / 0.15)',
+  'color-success-light': 'oklch(from #00e055 calc(l * 1.2) c h)',
+  'color-success-dark': 'oklch(from #00e055 calc(l * 0.8) c h)',
+  'color-success-subtle': 'oklch(from #00e055 l c h / 0.15)',
+  'color-error-light': 'oklch(from #ff3c40 calc(l * 1.2) c h)',
+  'color-error-dark': 'oklch(from #ff3c40 calc(l * 0.8) c h)',
+  'color-error-subtle': 'oklch(from #ff3c40 l c h / 0.15)',
 };
 
 const SEMANTIC_LIGHT = {
+  // Base Colors
   'color-premium': '#b45309',
   'color-system': '#6d28d9',
   'color-success': '#15803d',
   'color-error': '#dc2626',
+  // Tint/Shade Variants (Generated via OKLCH in SCSS)
+  'color-premium-light': 'oklch(from #b45309 calc(l * 1.3) c h)',
+  'color-premium-dark': 'oklch(from #b45309 calc(l * 0.7) c h)',
+  'color-premium-subtle': 'oklch(from #b45309 l c h / 0.15)',
+  'color-system-light': 'oklch(from #6d28d9 calc(l * 1.3) c h)',
+  'color-system-dark': 'oklch(from #6d28d9 calc(l * 0.7) c h)',
+  'color-system-subtle': 'oklch(from #6d28d9 l c h / 0.15)',
+  'color-success-light': 'oklch(from #15803d calc(l * 1.3) c h)',
+  'color-success-dark': 'oklch(from #15803d calc(l * 0.7) c h)',
+  'color-success-subtle': 'oklch(from #15803d l c h / 0.15)',
+  'color-error-light': 'oklch(from #dc2626 calc(l * 1.3) c h)',
+  'color-error-dark': 'oklch(from #dc2626 calc(l * 0.7) c h)',
+  'color-error-subtle': 'oklch(from #dc2626 l c h / 0.15)',
 };
 
 // --------------------------------------------------------------------------
@@ -120,6 +148,12 @@ export const VOID_TOKENS = {
     ...DNA.responsive,
   },
 
+  // 4. STRUCTURAL CONSTANTS
+  // Layout constraints and component-specific dimensions
+  structural: {
+    ...DNA.structural,
+  },
+
   // 2. PHYSICS ENGINE (Time & Matter)
   // Defines how elements move and feel.
   physics: {
@@ -128,11 +162,19 @@ export const VOID_TOKENS = {
       radiusFull: DNA.radius.full,
       blur: 12,
       borderWidth: 1,
-      speedBase: 300,
-      speedFast: 200,
+      // Animation Durations (Complete Scale)
+      speedInstant: 100, // Micro-feedback (button press)
+      speedFast: 200, // Quick transitions
+      speedBase: 300, // Standard motion
+      speedSlow: 500, // Dramatic reveals
+      // Animation Delays (Cascading Effects)
+      delayCascade: 50, // Stagger delay for list items
+      delaySequence: 100, // Sequential animation delay
+      // Easing Functions
       easeStabilize: 'cubic-bezier(0.16, 1, 0.3, 1)',
       easeSnap: 'cubic-bezier(0.22, 1, 0.36, 1)',
       easeFlow: 'linear',
+      // Interaction Feedback
       lift: '-3px',
       scale: 1.02,
     },
@@ -141,11 +183,19 @@ export const VOID_TOKENS = {
       radiusFull: DNA.radius.full,
       blur: 0,
       borderWidth: 1,
-      speedBase: 200,
+      // Animation Durations (Complete Scale)
+      speedInstant: 80,
       speedFast: 133,
+      speedBase: 200,
+      speedSlow: 350,
+      // Animation Delays (Cascading Effects)
+      delayCascade: 40,
+      delaySequence: 80,
+      // Easing Functions
       easeStabilize: 'ease-out',
       easeSnap: 'ease-out',
       easeFlow: 'ease-in-out',
+      // Interaction Feedback
       lift: '-2px',
       scale: 1.01,
     },
@@ -154,11 +204,19 @@ export const VOID_TOKENS = {
       radiusFull: '0px',
       blur: 0,
       borderWidth: 2,
-      speedBase: 0,
+      // Animation Durations (Instant for Retro)
+      speedInstant: 0,
       speedFast: 0,
+      speedBase: 0,
+      speedSlow: 0,
+      // Animation Delays (No delays in Retro)
+      delayCascade: 0,
+      delaySequence: 0,
+      // Easing Functions (Step-based)
       easeStabilize: 'steps(2)',
       easeSnap: 'steps(2)',
       easeFlow: 'steps(4)',
+      // Interaction Feedback
       lift: '-2px',
       scale: 1,
     },

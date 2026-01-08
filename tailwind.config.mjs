@@ -59,11 +59,24 @@ export default {
       main: 'var(--text-main)',
       dim: 'var(--text-dim)',
       mute: 'var(--text-mute)',
-      // Layer 5: Semantics
+      // Layer 5: Semantics (Base)
       premium: 'var(--color-premium)',
       system: 'var(--color-system)',
       success: 'var(--color-success)',
       error: 'var(--color-error)',
+      // Layer 5: Semantics (Variants)
+      'premium-light': 'var(--color-premium-light)',
+      'premium-dark': 'var(--color-premium-dark)',
+      'premium-subtle': 'var(--color-premium-subtle)',
+      'system-light': 'var(--color-system-light)',
+      'system-dark': 'var(--color-system-dark)',
+      'system-subtle': 'var(--color-system-subtle)',
+      'success-light': 'var(--color-success-light)',
+      'success-dark': 'var(--color-success-dark)',
+      'success-subtle': 'var(--color-success-subtle)',
+      'error-light': 'var(--color-error-light)',
+      'error-dark': 'var(--color-error-dark)',
+      'error-subtle': 'var(--color-error-subtle)',
     },
 
     // 5. STRICT GEOMETRY (The Physics)
@@ -85,8 +98,15 @@ export default {
     // 7. MOTION
     transitionDuration: {
       0: '0ms',
+      instant: 'var(--speed-instant)',
       fast: 'var(--speed-fast)',
       base: 'var(--speed-base)',
+      slow: 'var(--speed-slow)',
+    },
+    transitionDelay: {
+      0: '0ms',
+      cascade: 'var(--delay-cascade)',
+      sequence: 'var(--delay-sequence)',
     },
     transitionTimingFunction: {
       flow: 'var(--ease-flow)',
@@ -102,16 +122,31 @@ export default {
       body: ['var(--font-body)', 'sans-serif'],
       mono: ['var(--font-code)', 'monospace'],
     },
-    // Prevent random font sizes (optional, but recommended for strictness)
+    // Semantic font sizes using CSS variables (enables runtime scaling)
     fontSize: {
-      caption: 'var(--text-caption, 0.75rem)',
-      small: 'var(--text-small, 0.875rem)',
-      base: '1rem',
-      h5: 'var(--text-h5, 1.25rem)',
-      h4: 'var(--text-h4, 1.5rem)',
-      h3: 'var(--text-h3, 1.75rem)',
-      h2: 'var(--text-h2, 2rem)',
-      h1: 'var(--text-h1, 2.5rem)',
+      caption: 'var(--font-size-caption)',
+      small: 'var(--font-size-small)',
+      base: 'var(--font-size-body)',
+      h5: 'var(--font-size-h5)',
+      h4: 'var(--font-size-h4)',
+      h3: 'var(--font-size-h3)',
+      h2: 'var(--font-size-h2)',
+      h1: 'var(--font-size-h1)',
+    },
+    // Semantic line heights
+    lineHeight: {
+      none: '1',
+      tight: 'var(--line-height-heading)',
+      normal: 'var(--line-height-body)',
+      relaxed: '1.75',
+      loose: '2',
+    },
+    // Semantic font weights
+    fontWeight: {
+      regular: 'var(--font-weight-regular)',
+      medium: 'var(--font-weight-medium)',
+      semibold: 'var(--font-weight-semibold)',
+      bold: 'var(--font-weight-bold)',
     },
   },
 

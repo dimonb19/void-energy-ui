@@ -33,8 +33,8 @@ button:not(.btn-void),
 
   // --- B. Typography ---
   font-family: var(--font-body);
-  font-weight: 600;
-  font-size: var(--text-small, 0.875rem);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-small);
   letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--text-main);

@@ -67,8 +67,8 @@
    --------------------------------------------------------------------------
    All spacing is dynamic. It scales based on user density preference (0.75x - 1.25x).
    
-   tokens:      | xs | sm | md | lg | xl | 2xl
-   base (1x):   | 8  | 16 | 24 | 32 | 48 | 64  (px)
+   tokens:      | xs | sm | md | lg | xl | 2xl | 3xl | 4xl | 5xl
+   base (1x):   | 8  | 16 | 24 | 32 | 48 | 64  | 96  | 128 | 160 (px)
    
    usage:       | .gap-md, .p-lg, .my-xl, .w-full, .h-screen
 

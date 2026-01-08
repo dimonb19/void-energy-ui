@@ -111,9 +111,9 @@
 
     font-family: var(--font-heading);
     color: var(--text-main);
-    font-weight: 700;
-    font-size: 1rem;
-    line-height: 1.2;
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-h5);
+    line-height: var(--line-height-title);
 
     @at-root [data-mode='light'] & {
       text-shadow: none;
@@ -130,7 +130,7 @@
 
     p,
     span {
-      font-size: 0.75rem;
+      font-size: var(--font-size-caption);
       color: var(--text-mute);
       transition: color var(--speed-base) var(--ease-snap);
     }
@@ -234,7 +234,7 @@
     padding: 0 0.75rem;
     white-space: nowrap;
     color: inherit;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
   }
 
   // 2. SUNKEN VARIANT
