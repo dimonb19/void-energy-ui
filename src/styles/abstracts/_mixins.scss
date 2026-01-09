@@ -296,6 +296,7 @@
   } @else {
     display: -webkit-box;
     -webkit-line-clamp: $lines;
+    line-clamp: $lines;
     -webkit-box-orient: vertical;
     white-space: normal;
   }
