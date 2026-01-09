@@ -70,11 +70,6 @@
 </div>
 
 <div class="flex flex-row justify-end gap-md pt-lg">
-  <button
-    class="btn-void text-mute hover:text-main"
-    onclick={() => modal.close()}
-  >
-    Cancel
-  </button>
-  <button class="btn-cta" onclick={handleSave}> Save Configuration </button>
+  <button class="btn-alert" onclick={() => modal.close()}> Cancel </button>
+  <button class="btn-signal" onclick={handleSave}> Save Configuration </button>
 </div>

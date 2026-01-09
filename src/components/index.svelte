@@ -268,7 +268,12 @@
           <button
             class="btn-premium"
             onclick={() => {
-              toast.show('No permission to upgrade core', 'warning');
+              modal.open('settings', {
+                initialMusic: 65,
+                onSave: (prefs) => {
+                  console.log('Saving to backend:', prefs);
+                },
+              });
             }}
           >
             Upgrade Core
@@ -276,12 +281,10 @@
           <button
             class="btn-system"
             onclick={() => {
-              modal.open('settings', {
-                initialMusic: 65,
-                onSave: (prefs) => {
-                  console.log('Saving to backend:', prefs);
-                },
-              });
+              modal.alert(
+                'Anomaly Detected',
+                'Unusual energy fluctuation in sector 7-G. Manual inspection recommended before proceeding.',
+              );
             }}
           >
             Diagnostics
