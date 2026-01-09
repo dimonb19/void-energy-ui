@@ -65,8 +65,22 @@ export function hydrate(registry, storageKeys, attrs, defaults) {
     const localAtmosphere = localStorage.getItem(storageKeys.ATMOSPHERE);
     const localConfig = localStorage.getItem(storageKeys.USER_CONFIG);
 
-    // Resolve active atmosphere ID.
-    let activeId = localAtmosphere || defaults.ATMOSPHERE;
+    // Resolve active atmosphere ID with OS preference detection.
+    let activeId;
+
+    if (localAtmosphere) {
+      // User has a saved theme — use it.
+      activeId = localAtmosphere;
+    } else {
+      // First visit: detect OS color scheme preference.
+      const prefersDark = window.matchMedia(
+        '(prefers-color-scheme: dark)',
+      ).matches;
+      activeId = prefersDark ? defaults.ATMOSPHERE : defaults.LIGHT_ATMOSPHERE;
+
+      // Persist the auto-selected theme.
+      localStorage.setItem(storageKeys.ATMOSPHERE, activeId);
+    }
 
     // Resolve theme data (registry, then cache).
     let themeData = registry[activeId];

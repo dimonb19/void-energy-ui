@@ -11,6 +11,7 @@ export const DOM_ATTRS = {
 
 export const DEFAULTS = {
   ATMOSPHERE: 'void',
+  LIGHT_ATMOSPHERE: 'paper', // Default theme for OS light mode
   PHYSICS: 'glass',
   MODE: 'dark',
 } as const;
