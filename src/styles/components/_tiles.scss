@@ -237,7 +237,7 @@
     justify-content: center;
     width: max(2rem, calc(2.25rem * var(--density, 1)));
 
-    border-left: var(--physics-border-width) solid alpha(white, 10%);
+    border-left: inherit;
     color: var(--text-mute);
 
     border-top-right-radius: var(--radius-base);
@@ -293,7 +293,6 @@
   .tile-remove {
     background: shade($color, 30%);
     color: var(--text-dim);
-    border-left-color: tint($color, 20%);
 
     &:hover {
       background: shade($color, 50%);
@@ -317,7 +316,6 @@
 
     .tile-remove {
       background: transparent;
-      border-left: var(--physics-border-width) solid $color;
       border-top-right-radius: var(--radius-base);
       border-bottom-right-radius: var(--radius-base);
       color: $color;
@@ -342,7 +340,6 @@
 
     .tile-remove {
       background: tint($color, 70%);
-      border-left: var(--physics-border-width) solid $color;
       color: shade($color, 50%);
 
       &:hover {
