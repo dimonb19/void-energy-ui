@@ -4,7 +4,7 @@
  *
  * Lifecycle mapping:
  * - in: materialize
- * - out: singularity (or dematerialize for floating exits)
+ * - out: implode (or dematerialize for floating exits)
  * - animate: live
  *
  * List coordination requires stable keys; otherwise Svelte reuses nodes and
@@ -109,7 +109,7 @@ export function live(
  * - Retro: Instant opacity change (0ms duration)
  *
  * Related:
- * - Pairs with singularity() for exit
+ * - Pairs with implode() for exit
  * - SCSS equivalent: _animations.scss entry-transition mixin
  * - Used in Modal.svelte, Toast.svelte, and card animations
  */
@@ -147,102 +147,8 @@ export function materialize(
 }
 
 /**
- * Exit transition for elements leaving the viewport.
- * Usage: <div out:singularity>
- *
- * Physics behavior:
- * - Glass: Blur + brightness implode effect
- * - Flat: Clean scale + opacity fade
- * - Retro: Instant removal (0ms duration)
- *
- * Related:
- * - Pairs with materialize() for entry
- * - For floating UI (toasts/tooltips), use dematerialize() instead
- */
-export function singularity(
-  node: HTMLElement,
-  { delay = 0, duration = null } = {},
-) {
-  const { speedFast, blurInt, isRetro, isFlat, reducedMotion } =
-    getSystemConfig();
-
-  if (reducedMotion || isRetro) {
-    return { duration: 0, css: () => 'opacity: 0;' };
-  }
-
-  // Flat: clean scale + opacity.
-  if (isFlat) {
-    return {
-      delay,
-      duration: duration ?? speedFast,
-      easing: cubicIn,
-      css: (t: number) => `
-        transform: scale(${0.98 + 0.02 * t});
-        opacity: ${t};
-      `,
-    };
-  }
-
-  // Glass: blur + brightness implode.
-  return {
-    delay,
-    duration: duration ?? speedFast,
-    easing: cubicIn,
-    css: (t: number, u: number) => {
-      const scale = 0.9 + 0.1 * t;
-      const brightness = 1 + u * 2;
-      const blur = blurInt * u;
-      return `
-        transform: scale(${scale});
-        opacity: ${t};
-        filter: blur(${blur}px) brightness(${brightness});
-      `;
-    },
-  };
-}
-
-/**
- * Glitch effect (retro-biased).
- * Special-purpose transition for dramatic reveals or errors.
- *
- * Physics behavior:
- * - Retro: Scanline-style reveal with random opacity flicker
- * - Glass/Flat: Clip-path reveal with horizontal skew
- *
- * Related:
- * - Use sparingly for high-impact moments (errors, loading failures, special effects)
- * - Honors reduced-motion (instant reveal)
- */
-export function glitch(node: HTMLElement, { delay = 0, duration = null } = {}) {
-  const { speedFast, isRetro, reducedMotion } = getSystemConfig();
-
-  if (reducedMotion) return { duration: 0, css: () => '' };
-
-  return {
-    delay,
-    duration: duration ?? speedFast,
-    css: (t: number) => {
-      if (isRetro) {
-        const clipVal = t * 100;
-        return `
-           clip-path: polygon(0 0, 100% 0, 100% ${clipVal}%, 0 ${clipVal}%);
-           opacity: ${Math.random() > 0.5 ? 1 : 0.5};
-         `;
-      }
-      const activeSkew = 1 - t > 0.2 ? (t * 20) % 5 : 0;
-      const clipHeight = t * 100;
-      return `
-        clip-path: polygon(0 0, 100% 0, 100% ${clipHeight}%, 0 ${clipHeight}%);
-        transform: skewX(${activeSkew}deg);
-        opacity: ${t};
-      `;
-    },
-  };
-}
-
-/**
  * Exit transition for floating UI (toasts, tooltips).
- * Differs from singularity() with upward motion instead of scale collapse.
+ * Uses upward motion instead of horizontal collapse.
  * Usage: <div out:dematerialize>
  *
  * Physics behavior:
@@ -252,7 +158,7 @@ export function glitch(node: HTMLElement, { delay = 0, duration = null } = {}) {
  *
  * Related:
  * - Used in Toast.svelte and void-tooltip.ts
- * - For standard elements, use singularity() instead
+ * - For standard elements, use implode() instead
  */
 export function dematerialize(
   node: HTMLElement,

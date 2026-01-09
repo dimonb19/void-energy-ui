@@ -49,7 +49,7 @@ graph LR
 
 ```scss
 /* NEVER put layout rules in SCSS */
-.card-glass {
+.surface-glass {
   width: 300px; /* ❌ Layout bleed */
   margin-bottom: 20px; /* ❌ Layout bleed */
   @include glass-float; /* ✅ OK */
@@ -356,22 +356,6 @@ Base surface classes for applying physics.
 ### B. Composites (Skin + Bone)
 
 Preset components with built-in layout and physics.
-
-#### `.card-glass`
-
-**Description:** Glass surface + Padding + Margin logic
-**Includes:** `@include glass-float` + responsive padding
-
-**Usage:**
-
-```svelte
-<div class="card-glass">
-  <h2>Card Title</h2>
-  <p>Content</p>
-</div>
-```
-
----
 
 #### `.btn` / `.btn-cta`
 

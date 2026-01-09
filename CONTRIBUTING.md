@@ -194,7 +194,7 @@ We separate **Layout** (Geometry) from **Material** (Physics).
 #### ❌ Incorrect
 
 ```scss
-.card-glass {
+.surface-glass {
   width: 300px; /* ❌ Layout in SCSS */
   margin-bottom: 20px; /* ❌ Layout in SCSS */
 }

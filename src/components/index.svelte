@@ -3,7 +3,7 @@
   import { modal } from '../lib/modal-manager.svelte';
   import { tooltip } from '../actions/tooltip';
   import { toast } from '../stores/toast.svelte';
-  import { live, singularity } from '../lib/transitions.svelte';
+  import { live, implode } from '../lib/transitions.svelte';
 
   import ThemeSelector from './ui/Themes.svelte';
   import SettingsRow from './ui/SettingsRow.svelte';
@@ -358,7 +358,7 @@
               </p>
             {:else}
               {#each moduleTiles as tile (tile.id)}
-                <div class="tile-small" animate:live out:singularity>
+                <div class="tile-small" animate:live out:implode>
                   <p class="tile-label">{tile.name}</p>
                   <button
                     type="button"
@@ -409,7 +409,7 @@
               </p>
             {:else}
               {#each environmentTiles as tile (tile.id)}
-                <div class="tile-small-system" animate:live out:singularity>
+                <div class="tile-small-system" animate:live out:implode>
                   <p class="tile-label">{tile.name}</p>
                   <button
                     type="button"
@@ -463,7 +463,7 @@
               </p>
             {:else}
               {#each premiumTiles as tile (tile.id)}
-                <div class="tile-small-premium" animate:live out:singularity>
+                <div class="tile-small-premium" animate:live out:implode>
                   <p class="tile-label">{tile.name}</p>
                   <button
                     type="button"

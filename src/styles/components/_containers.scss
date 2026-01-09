@@ -37,38 +37,7 @@
 }
 
 // ==========================================================================
-// 2. PRESET CARDS (Layout + Visuals)
-// ==========================================================================
-// Use these when you want a standard "Section" block with spacing included.
-
-.card-glass {
-  @include glass-float();
-  border-radius: var(--radius-lg);
-
-  @at-root [data-physics='flat'] & {
-    border-radius: var(--radius-md);
-  }
-
-  @at-root [data-physics='retro'] & {
-    border-radius: var(--radius-base);
-  }
-}
-
-.card-sunk {
-  @include glass-sunk;
-  border-radius: var(--radius-lg);
-
-  @at-root [data-physics='flat'] & {
-    border-radius: var(--radius-md);
-  }
-
-  @at-root [data-physics='retro'] & {
-    border-radius: var(--radius-base);
-  }
-}
-
-// ==========================================================================
-// 3. ATOMIC SURFACES (Texture Only)
+// 2. ATOMIC SURFACES (Texture Only)
 // ==========================================================================
 // Purpose: Apply "Void Physics" to any element without enforcing layout/spacing.
 

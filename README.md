@@ -49,8 +49,8 @@ We separate **Layout** (Geometry) from **Materials** (Physics).
 
 * **SCSS (`src/styles/**/*.scss`):**
     * Use **SCSS** for Visuals, Physics, and Complex States.
-    * ✅ `.card-glass { @include glass-float; }`
-    * ❌ `.card-glass { width: 300px; margin-bottom: 20px; }` (Layout Bleed)
+    * ✅ `.surface-glass { @include glass-float; }`
+    * ❌ `.surface-glass { width: 300px; margin-bottom: 20px; }` (Layout Bleed)
 
 ### 2. The Law of Tokens
 * **Never hardcode pixels or colors.**
