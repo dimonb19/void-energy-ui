@@ -22,10 +22,7 @@ dialog {
 
   // Mini (alerts/confirm).
   &[data-size='sm'] {
-    width: min(
-      calc(100vw - var(--dialog-gutter)),
-      24rem
-    ); // Intentionally smaller than standard
+    width: min(calc(100vw - var(--dialog-gutter)), var(--modal-width-xs));
     text-align: center; // Usually centered text for alerts
   }
 
@@ -88,7 +85,7 @@ dialog {
 
     // Light mode override.
     @at-root [data-mode='light'] & {
-      background: rgba(0, 0, 0, 0.5);
+      background: alpha(var(--text-main), 50%);
     }
 
     @supports (transition-behavior: allow-discrete) {

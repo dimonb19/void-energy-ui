@@ -20,6 +20,9 @@
   --space-lg: calc(8 * var(--unit) * var(--density, 1)); // 32px
   --space-xl: calc(12 * var(--unit) * var(--density, 1)); // 48px
   --space-2xl: calc(16 * var(--unit) * var(--density, 1)); // 64px
+  --space-3xl: calc(24 * var(--unit) * var(--density, 1)); // 96px
+  --space-4xl: calc(32 * var(--unit) * var(--density, 1)); // 128px
+  --space-5xl: calc(40 * var(--unit) * var(--density, 1)); // 160px
 
   // Minimum touch target (WCAG).
   --size-touch-min: 2.75rem;
@@ -47,6 +50,10 @@
   --scrollbar-width: 6px;
 
   // Structural constants (component layout constraints).
+  --modal-width-xs: #{map.get(
+      generated.$structural-constants,
+      'modal-width-xs'
+    )};
   --modal-width-sm: #{map.get(
       generated.$structural-constants,
       'modal-width-sm'
@@ -210,7 +217,7 @@ hr {
   height: var(--physics-border-width);
   background: var(--energy-secondary);
   opacity: 0.3;
-  margin: 1.5rem 0;
+  margin: var(--space-md) 0;
 }
 
 // =========================================

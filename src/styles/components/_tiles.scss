@@ -13,7 +13,6 @@
 // --------------------------------------------------------------------------
 .tiles-collection {
   width: 100%;
-  min-height: 18rem;
   display: flex;
   flex-flow: row nowrap;
   justify-content: flex-start;
@@ -196,7 +195,7 @@
   justify-content: space-between;
   gap: 0;
 
-  min-height: max(2rem, calc(2.25rem * var(--density, 1)));
+  min-height: var(--control-height);
   padding: 0;
 
   color: var(--text-main);
@@ -235,7 +234,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: max(2rem, calc(2.25rem * var(--density, 1)));
+    width: var(--control-height);
 
     border-left: inherit;
     color: var(--text-mute);

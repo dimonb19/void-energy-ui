@@ -79,7 +79,7 @@ select {
 }
 
 textarea {
-  min-height: calc(8rem * var(--density, 1));
+  min-height: calc(var(--space-5xl) * var(--density, 1));
   resize: vertical;
 }
 
@@ -154,7 +154,7 @@ input[type='radio'] {
 
   padding: var(--space-md);
   width: 100%;
-  min-height: calc(10rem * var(--density, 1));
+  min-height: calc(var(--space-5xl) * var(--density, 1));
   border-radius: calc(var(--radius-base) * 2);
 
   border: var(--physics-border-width) dashed alpha(var(--energy-secondary), 30%);

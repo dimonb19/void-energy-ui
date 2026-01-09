@@ -140,6 +140,9 @@ h1,
 h2,
 h3 {
   font-family: var(--font-heading);
+  font-kerning: normal;
+  font-variant-ligatures: common-ligatures;
+  text-rendering: optimizeLegibility;
 }
 
 /* Layer 1: headers (100% opacity). */

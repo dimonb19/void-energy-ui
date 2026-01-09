@@ -228,6 +228,7 @@ export const VOID_STRUCTURAL = {
 
   // Modal Widths (Component-specific sizing)
   modal: {
+    xs: '24rem',
     sm: '32rem',
     md: '40rem',
     lg: '64rem',
@@ -301,6 +302,7 @@ export const VOID_TOKENS = {
   // 4. STRUCTURAL CONSTANTS
   // Layout constraints and component-specific dimensions
   structural: {
+    'modal-width-xs': '24rem',
     'modal-width-sm': '32rem',
     'modal-width-md': '40rem',
     'modal-width-lg': '64rem',
@@ -440,7 +442,7 @@ export const VOID_TOKENS = {
         'bg-sink': '#000000',
         'energy-primary': '#f5c518', // Amber
         'energy-secondary': '#f5c518',
-        'border-color': '#f5c518',
+        'border-color': 'rgba(245, 197, 24, 0.5)',
         'text-main': '#f5c518',
         'text-dim': 'rgba(245, 197, 24, 0.7)',
         'text-mute': 'rgba(245, 197, 24, 0.5)',

@@ -29,13 +29,21 @@
       // Lazy-load the modal fragment.
       const loader = modalRegistry[modal.state.key];
       if (loader) {
-        loader().then((module) => {
-          // Only mount if the key is still active.
-          if (modal.state.key) {
-            ActiveComponent = module.default;
-            if (dialog && !dialog.open) dialog.showModal();
-          }
-        });
+        loader()
+          .then((module) => {
+            // Only mount if the key is still active.
+            if (modal.state.key) {
+              ActiveComponent = module.default;
+              if (dialog && !dialog.open) dialog.showModal();
+            }
+          })
+          .catch((err) => {
+            console.error(
+              `Void: Failed to load modal "${modal.state.key}"`,
+              err,
+            );
+            modal.close();
+          });
       }
 
       if (dialog && !dialog.open) {
