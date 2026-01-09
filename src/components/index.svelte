@@ -8,7 +8,7 @@
   import ThemeSelector from './ui/Themes.svelte';
   import SettingsRow from './ui/SettingsRow.svelte';
 
-  // CONSTANTS
+  // UI options for selectors and toggles.
   const fontOptions = [
     { label: 'System Default (Atmosphere)', value: null },
     { label: 'Hanken Grotesk (Tech)', value: "'Hanken Grotesk', sans-serif" },
@@ -33,7 +33,7 @@
     { value: 'low', label: 'Relaxed', icon: '🥗' },
   ];
 
-  // LOGIC: Derived State from Engine
+  // Derived selection based on engine scale.
   let activeScaleStep = $derived(
     scaleLevels.reduce((prev, curr) =>
       Math.abs(curr.value - voidEngine.userConfig.scale) <
@@ -43,7 +43,7 @@
     ),
   );
 
-  // ACTIONS: Direct Engine Updates
+  // Engine update helpers.
   function setScale(value: number) {
     voidEngine.setPreferences({ scale: value });
   }
@@ -52,7 +52,7 @@
     voidEngine.setPreferences({ density: d });
   }
 
-  // LOCAL STATE (UI Only) - Using stable IDs for animations
+  // Local demo state with stable IDs for list animations.
   let moduleIdCounter = $state(3);
   let moduleTiles = $state([
     { id: 1, name: 'Neural Net' },
@@ -278,10 +278,8 @@
             onclick={() => {
               modal.open('settings', {
                 initialMusic: 65,
-                // The callback handles the data preservation
                 onSave: (prefs: any) => {
                   console.log('Saving to backend:', prefs);
-                  // e.g. userStore.update(prefs);
                 },
               });
             }}

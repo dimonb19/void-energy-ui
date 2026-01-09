@@ -1,11 +1,8 @@
-/*
- * ROLE: Atmosphere Emitter
- * RESPONSIBILITY: Output Color Palettes and Mode settings (Light/Dark).
- */
+/* Atmosphere emitter: outputs palette and mode variables. */
 
 @use 'sass:map';
 
-// Generates strictly the "Soul" (Color/Font) of the theme.
+// Generate the palette and mode for an atmosphere.
 @mixin generate-atmosphere($name, $config) {
   $palette: map.get($config, 'palette');
   $mode: map.get($config, 'type'); // 'light' or 'dark'

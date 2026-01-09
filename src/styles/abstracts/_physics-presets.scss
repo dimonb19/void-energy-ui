@@ -1,50 +1,14 @@
-/* ==========================================================================
-   🌌 VOID PHYSICS ENGINE
-   ==========================================================================
-   
-   PURPOSE:
-   This file defines the "Material Properties" of the interface.
-   While `_themes.scss` controls COLOR (The Soul), this file controls 
-   BEHAVIOR (The Body).
-
-   THE PHYSICS PROTOCOL:
-   We do not manually set shadows or border-radius on elements.
-   Instead, elements inherit properties from the active Physics Mode.
-
-   THE ADAPTIVE LIGHTING MODEL:
-   1. GLASS (Dark) : Latent Energy. Deep black shadows at rest; Glows on interaction.
-   2. FLAT (Light) : Physical Depth. Casts standard drop shadows. No glows.
-   3. RETRO        : Hard Edges. No glows, no shadows. Instant state changes.
-
-   --------------------------------------------------------------------------
-   THE PROPERTY DICTIONARY
-   --------------------------------------------------------------------------
-   
-   The variables defined here are TIER 2 (System Controlled).
-   They are calculated based on the 'physics' mode ('glass', 'flat', 'retro').
-
-   --radius-base          : Corner roundness. (0px = Retro, 8px+ = Organic).
-   --surface-bg           : The background texture (Solid vs Glass Gradient).
-   --surface-border-*     : Directional lighting on borders.
-   --physics-blur         : Backdrop blur strength.
-   
-   --shadow-sunk          : Inner depth for inputs/wells (Recessed).
-   --shadow-float         : Ambient depth for resting objects (Matter).
-   --shadow-lift          : Interactive depth/glow for active objects (Energy).
-   --focus-ring           : Accessibility outline for keyboard navigation.
-
-   --speed-base           : Duration of transitions. (0s = Instant/Robotic).
-   --ease-snap            : The math of movement.
-
-   ========================================================================== */
+/*
+ * Physics presets for material behavior (glass/flat/retro).
+ * Elements inherit shadows, borders, and motion from the active physics mode.
+ */
 
 @use 'sass:map';
 @use '../config/generated-themes' as generated;
 @use 'functions' as *;
 
 $physics-presets: (
-  // 1. GLASS PHYSICS (Bioluminescent / Holographic)
-  // Logic: The object IS the light source.
+  // Glass: object emits light.
   'glass': map.merge(
       map.get(generated.$generated-physics, 'glass'),
       (
@@ -54,7 +18,6 @@ $physics-presets: (
             var(--bg-surface) 100%
           ),
         'surface-border': var(--border-color),
-        // SEMANTIC SHADOW NAMES (Purpose-Based)
         'shadow-sunk': inset 0 2px 4px alpha(var(--bg-canvas), 60%),
         'shadow-float': 0 2px 8px rgba(0, 0, 0, 0.25),
         'shadow-lift': 0 0 10px alpha(var(--energy-primary), 50%),
@@ -62,14 +25,12 @@ $physics-presets: (
           '0 0 0 1px var(--bg-canvas), 0 0 0 2px var(--energy-primary), 0 0 10px var(--energy-primary)',
       )
     ),
-  // 2. FLAT PHYSICS (Paper / Clinical)
-  // Logic: External light source casts shadows.
+  // Flat: external light casts shadows.
   'flat': map.merge(
       map.get(generated.$generated-physics, 'flat'),
       (
         'surface-bg': var(--bg-surface),
         'surface-border': var(--border-color),
-        // SEMANTIC SHADOW NAMES (Purpose-Based)
         'shadow-sunk': inset 0 1px 2px rgba(0, 0, 0, 0.05),
         'shadow-float': 0 1px 3px rgba(0, 0, 0, 0.05),
         'shadow-lift': 0 4px 12px rgba(0, 0, 0, 0.1),
@@ -77,14 +38,12 @@ $physics-presets: (
           '0 0 0 2px var(--bg-canvas), 0 0 0 4px var(--energy-primary)',
       )
     ),
-  // 3. RETRO PHYSICS (Terminal / Brutalist)
-  // Logic: No depth map. Pure X/Y coordinates.
+  // Retro: hard edges, no blur.
   'retro': map.merge(
       map.get(generated.$generated-physics, 'retro'),
       (
         'surface-bg': var(--bg-surface),
         'surface-border': var(--border-color),
-        // SEMANTIC SHADOW NAMES (Purpose-Based)
         'shadow-sunk': none,
         'shadow-float': none,
         'shadow-lift': 3px 3px 0 alpha(var(--energy-secondary), 50%),
@@ -93,12 +52,11 @@ $physics-presets: (
     )
 );
 
-// THE EMITTER (Logic Layer)
+// Emit CSS variables per physics mode.
 @mixin emit-physics {
   @each $name, $map in $physics-presets {
     [data-physics='#{$name}'] {
       @each $key, $val in $map {
-        // Output every key in the map as a CSS variable
         --#{$key}: #{$val};
       }
     }

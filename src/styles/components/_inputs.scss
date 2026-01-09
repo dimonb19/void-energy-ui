@@ -1,7 +1,4 @@
-/*
- * ROLE: Input and form styling.
- * RESPONSIBILITY: Applies sunk physics to native controls and overlays specialized patterns like dropzones.
- */
+/* Input and form styling with sunk physics and native controls. */
 
 @use '../abstracts' as *;
 @use 'buttons';
@@ -14,11 +11,10 @@
 // 1. GLOBAL FORM DEFAULTS
 // --------------------------------------------------------------------------
 :where(input, select, textarea) {
-  // This ensures the native browser UI (Calendar pickers, Arrows)
-  // adapts to the dark background automatically.
+  // Keep native UI aligned with dark canvas.
   color-scheme: dark;
 
-  // Light Mode Exception
+  // Light mode exception.
   @at-root [data-mode='light'] & {
     color-scheme: light;
   }
@@ -42,10 +38,9 @@ select {
   font-size: var(--font-size-body);
   color: var(--text-main);
 
-  // Use the Sunk Mixin for the container physics
+  // Apply sunk physics.
   @include glass-sunk;
 
-  // Standard Transitions
   transition:
     border-color var(--speed-fast) var(--ease-snap),
     box-shadow var(--speed-fast) var(--ease-snap),
@@ -56,11 +51,10 @@ select {
     opacity: 0.7;
   }
 
-  // Focus State
+  // Focus state.
   &:focus {
     outline: none;
     border-color: var(--energy-primary);
-    // Combine the inner depth shadow with the outer focus ring
     box-shadow: var(--shadow-sunk), var(--focus-ring);
 
     @at-root [data-physics='retro'] & {
@@ -68,7 +62,7 @@ select {
     }
   }
 
-  // Error State
+  // Error state.
   &[aria-invalid='true'],
   &.has-error,
   &:invalid:not(:placeholder-shown) {
@@ -92,31 +86,27 @@ textarea {
 // 3. SELECT DROPDOWNS (Native)
 // --------------------------------------------------------------------------
 select {
-  // Restore the native arrow, but keep our box styling.
   appearance: auto;
 
-  // Ensure the arrow isn't right up against the text
   padding-right: var(--space-xl);
   cursor: pointer;
 
-  // Background color fix for Chrome/Safari to ensure options are readable
-  // (The dropdown menu itself is handled by the OS/Browser)
+  // Ensure options are readable in WebKit.
   background-color: var(--bg-sink);
 }
 
 // 4. RANGE SLIDERS (Native + Accent)
 // --------------------------------------------------------------------------
 input[type='range'] {
-  appearance: auto; // Let the browser draw the track
+  appearance: auto; // Let the browser draw the track.
   width: 100%;
   min-height: var(--control-height);
   padding: 0;
   border: none;
   background: transparent;
-  box-shadow: none; // No box shadow on the container
+  box-shadow: none;
 
-  // Accent color paints thumb/track in the active energy channel.
-  // Works across Void (Cyan), Terminal (Amber), Paper (Ink).
+  // Accent color for thumb/track.
   accent-color: var(--energy-primary);
 
   cursor: pointer;
@@ -136,11 +126,9 @@ input[type='range'] {
 input[type='checkbox'],
 input[type='radio'] {
   appearance: auto;
-  // Scale checkboxes slightly with density, but keep readable
   width: calc(1.25rem * var(--density, 1));
   height: calc(1.25rem * var(--density, 1));
 
-  // Accent color keeps native controls aligned with the active energy channel.
   accent-color: var(--energy-primary);
 
   cursor: pointer;
@@ -157,20 +145,18 @@ input[type='radio'] {
 // 6. FILE DROPZONE (Native Overlay Strategy)
 // --------------------------------------------------------------------------
 .dropzone {
-  position: relative; // Crucial for overlaying
+  position: relative; // Required for overlay.
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
 
-  // Layout
   padding: var(--space-md);
   width: 100%;
   min-height: calc(10rem * var(--density, 1));
   border-radius: calc(var(--radius-base) * 2);
 
-  // Style
   border: var(--physics-border-width) dashed alpha(var(--energy-secondary), 30%);
   @include glass-sunk;
   border-style: dashed; // Override sunk solid border
@@ -180,29 +166,26 @@ input[type='radio'] {
     background-color var(--speed-fast) var(--ease-flow),
     border-color var(--speed-fast) var(--ease-snap);
 
-  // --- A. THE REAL INPUT (Invisible Layer) ---
-  // Stretch the native input over the container to capture clicks and drops.
+  // Invisible input overlay for click/drop capture.
   input[type='file'] {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    opacity: 0; // Invisible but clickable
+    opacity: 0; // Invisible but clickable.
     cursor: pointer;
     z-index: z('float');
   }
 
-  // --- B. THE FAKE CONTENT (Visible Layer) ---
-  // Visual affordance sits beneath the invisible input overlay.
+  // Visible affordance layer.
   .dropzone-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--space-sm);
-    pointer-events: none; // Let clicks pass through to the input
+    pointer-events: none; // Let clicks pass through to input.
     z-index: z('base'); // Sit above the sunk background
 
-    // Icon styling
     svg,
     .btn-icon {
       width: var(--space-xl);
@@ -212,14 +195,12 @@ input[type='radio'] {
       transition: color var(--speed-fast) var(--ease-flow);
     }
 
-    // Text styling
     p {
       color: var(--text-mute);
       margin: 0;
     }
 
     .btn-fake {
-      // Styled affordance; pointer events remain on the input overlay.
       @extend .btn; // Inherit your button styles
       @extend .btn-void; // Or use a void button look
       color: var(--energy-primary);
@@ -227,9 +208,7 @@ input[type='radio'] {
     }
   }
 
-  // --- INTERACTION STATES ---
-
-  // Hover or Drag Active
+  // Hover/drag active.
   &:hover,
   &[data-state='active'],
   &.drag-active,
@@ -237,7 +216,6 @@ input[type='radio'] {
     border-color: var(--energy-primary);
     background-color: blend(var(--bg-sink), var(--energy-primary), 5%);
 
-    // Energize the content
     .dropzone-content {
       svg,
       .btn-icon {
@@ -264,16 +242,14 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 textarea:-webkit-autofill {
-  // Force the background to match sunk surface using an infinite internal shadow
+  // Match sunk background.
   -webkit-box-shadow: 0 0 0px 1000px var(--bg-canvas) inset !important;
 
-  // Force the text color
   -webkit-text-fill-color: var(--text-main) !important;
 
-  // Preserve border radius
   border-radius: var(--radius-base);
 
-  transition: background-color 5000s ease-in-out 0s; // Prevent flash
+  transition: background-color 5000s ease-in-out 0s; // Prevent flash.
 }
 
 // 8. AUTOFILL OVERRIDE (Firefox)

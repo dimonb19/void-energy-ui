@@ -1,7 +1,4 @@
-/*
- * ROLE: Toast Notification Physics
- * RESPONSIBILITY: Minimalist Text Capsules with Micro-Indicators
- */
+/* Toast region and capsule styles. */
 
 @use '../abstracts' as *;
 @use 'buttons';
@@ -9,6 +6,7 @@
 // ==========================================================================
 // 1. REGION & LAYOUT
 // ==========================================================================
+
 .toast-region {
   position: fixed;
   top: var(--space-md);
@@ -24,30 +22,25 @@
   width: 100%;
   max-width: calc(100vw - var(--space-lg));
 
-  /* =========================================
-     POPOVER API RESETS (The Void Fix)
-     ========================================= */
+  /* Popover reset to avoid UA styles. */
   &[popover] {
-    // 1. Reset UA Geometry
+    // Reset UA geometry.
     margin: 0; // Popovers default to 'auto' (centered)
     inset: unset; // Remove default 'inset: 0'
     border: none;
     padding: 0;
 
-    // 2. Reset UA Canvas
+    // Reset UA canvas.
     background: transparent; // Popovers default to 'canvas' (white/black)
     color: inherit;
 
-    // 3. Restore Positioning
-    // We must re-declare fixed positioning because the UA stylesheet
-    // forces it, but we want to ensure our specific top/left vars win.
+    // Restore positioning.
     position: fixed;
     top: var(--space-md);
     left: 50%;
     transform: translateX(-50%);
 
-    // 4. Overflow Safety
-    // Popovers can clip content. We need visible for the glows/shadows.
+    // Allow glow/shadow overflow.
     overflow: visible;
   }
 }
@@ -55,28 +48,27 @@
 // ==========================================================================
 // 2. THE CAPSULE (Surface)
 // ==========================================================================
+
 .toast-message {
   @extend .btn-void; // Base button reset
 
-  // --- A. Physics (Glass Capsule) ---
+  // Physics (glass capsule).
   @include glass-float;
   pointer-events: auto;
 
-  // Layout
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-xs);
 
-  // Padding: Slightly less on the left because the icon adds visual weight
+  // Padding: reduce left to balance icon weight.
   padding-block: var(--space-xs);
   padding-right: var(--space-sm);
   padding-left: calc(var(--space-sm) * 0.8);
 
   border-radius: var(--radius-full);
 
-  // --- B. Semantic Mapping ---
-  // Maps notification types to system colors
+  // Map types to accents.
   --toast-accent: var(--color-system);
   &[data-type='success'] {
     --toast-accent: var(--color-success);
@@ -91,19 +83,15 @@
     --toast-accent: var(--text-mute);
   }
 
-  // --- C. The Holographic Glow ---
-  // Subtle border and ambient glow based on the accent color
+  // Accent-driven border/glow.
   border: var(--physics-border-width) solid alpha(var(--toast-accent), 25%);
-  // Tint the glass slightly with the accent color
   background: blend(var(--bg-surface), var(--toast-accent), 15%);
 
-  // Motion
   transition:
     border-color var(--speed-fast) var(--ease-snap),
     box-shadow var(--speed-fast) var(--ease-snap),
     background-color var(--speed-fast) var(--ease-flow);
 
-  // Hover Effect: Lift & Brighten
   &:hover {
     border-color: alpha(var(--toast-accent), 50%);
     box-shadow: var(--shadow-lift);
@@ -115,9 +103,7 @@
     }
   }
 
-  // --- D. PHYSICS OVERRIDES ---
-
-  // 1. RETRO (Terminal)
+  // Retro override.
   @at-root [data-physics='retro'] & {
     &[data-type='loading'] {
       --toast-accent: var(--text-main);
@@ -131,7 +117,7 @@
     }
   }
 
-  // 2. FLAT (Paper/Light)
+  // Flat (light mode) override.
   @at-root [data-mode='light'] & {
     background: blend(var(--bg-surface), var(--toast-accent), 5%);
     color: var(--text-main);
@@ -155,11 +141,11 @@
   width: 1.2em;
   height: 1.2em;
 
-  // Ensure icons don't shrink if text is long
+  // Prevent icon shrink.
   flex-shrink: 0;
 }
 
-// The Quantum Spin Loader (Tiny & Precise)
+// Spin loader.
 .spin-loader {
   width: 1em;
   height: 1em;
@@ -181,7 +167,7 @@
     stroke-linecap: round;
   }
 
-  // Retro Loader Override
+  // Retro override.
   @at-root [data-physics='retro'] & {
     animation-timing-function: steps(8);
   }
@@ -190,6 +176,7 @@
 // ==========================================================================
 // 4. CONTENT
 // ==========================================================================
+
 .toast-text {
   position: relative;
   z-index: 1;

@@ -1,13 +1,16 @@
 /**
- * 🤖 VOID TOKEN GENERATOR
- * --------------------------------------------------------------------------
+ * 🤖 Void token generator.
  * Usage: npm run build:tokens
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { VOID_TOKENS, VOID_TYPOGRAPHY, VOID_STRUCTURAL } from '../src/config/design-tokens';
+import {
+  VOID_TOKENS,
+  VOID_TYPOGRAPHY,
+  VOID_STRUCTURAL,
+} from '../src/config/design-tokens';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -20,9 +23,7 @@ const PATHS = {
   structuralJson: path.resolve(__dirname, '../src/config/void-structural.json'),
 };
 
-/**
- * Helper: Converts raw token numbers to CSS units safely
- */
+// Convert raw token numbers to CSS units.
 function toCssValue(key: string, value: string | number): string {
   if (typeof value === 'string') return value;
   if (value === 0) {
@@ -40,21 +41,21 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
   const timestamp = new Date().toISOString();
   let scss = `// 🤖 AUTO-GENERATED FILE\n// GENERATED AT: ${timestamp}\n\n`;
 
-  // 1. Z-LAYERS MAP
+  // Z-layers map.
   scss += `$z-layers: (\n`;
   Object.entries(tokens.layers).forEach(([key, val]) => {
     scss += `  '${key}': ${val},\n`;
   });
   scss += `);\n\n`;
 
-  // 2. BREAKPOINTS MAP
+  // Breakpoints map.
   scss += `$breakpoints: (\n`;
   Object.entries(tokens.responsive).forEach(([key, val]) => {
     scss += `  '${key}': ${val},\n`;
   });
   scss += `);\n\n`;
   
-  // 3. PHYSICS MAPS
+  // Physics maps.
   scss += `$generated-physics: (\n`;
   Object.entries(tokens.physics).forEach(([mode, rawConfig]) => {
     const config = rawConfig as Record<string, string | number>;
@@ -71,31 +72,31 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
   });
   scss += `);\n\n`;
 
-  // 5. CONTAINER MAX-WIDTHS MAP
+  // Container widths map.
   scss += `$container-widths: (\n`;
   Object.entries(tokens.container).forEach(([key, val]) => {
     scss += `  '${key}': ${val},\n`;
   });
   scss += `);\n\n`;
 
-  // 6. STRUCTURAL CONSTANTS MAP
+  // Structural constants map.
   scss += `$structural-constants: (\n`;
   Object.entries(tokens.structural).forEach(([key, val]) => {
     scss += `  '${key}': ${val},\n`;
   });
   scss += `);\n\n`;
 
-  // 4. THEMES
+  // Themes map.
   scss += `$themes: (\n`;
   Object.entries(tokens.themes).forEach(([themeName, config]) => {
     scss += `  '${themeName}': (\n`;
     scss += `    'type': '${config.mode}',\n`;
     scss += `    'physics': '${config.physics}',\n`;
     scss += `    'palette': (\n`;
-    // Inject Fonts
+    // Inject fonts.
     scss += `      'font-heading': "var(--user-font-heading, var(--font-atmos-heading))",\n`;
     scss += `      'font-body': "var(--user-font-body, var(--font-atmos-body))",\n`;
-    // Inject Palette
+    // Inject palette.
     Object.entries(config.palette).forEach(([key, value]) => {
       scss += `      '${key}': "${value}",\n`;
     });
@@ -113,12 +114,12 @@ async function main() {
     const scssDir = path.dirname(PATHS.scss);
     if (!fs.existsSync(scssDir)) fs.mkdirSync(scssDir, { recursive: true });
 
-    // A. Generate SCSS
+    // Generate SCSS.
     const scssContent = generateSCSS(VOID_TOKENS);
     fs.writeFileSync(PATHS.scss, scssContent);
     console.log(`   └─ 🎨 Styles: src/styles/config/_generated-themes.scss`);
 
-    // B. Generate Registry (Logic)
+    // Generate registry.
     const registry: Record<string, { physics: string; mode: string }> = {};
     Object.entries(VOID_TOKENS.themes).forEach(([key, config]) => {
       registry[key] = { physics: config.physics, mode: config.mode };
@@ -126,15 +127,15 @@ async function main() {
     fs.writeFileSync(PATHS.registryJson, JSON.stringify(registry, null, 2));
     console.log(`   └─ ⚙️  Registry: src/config/void-registry.json`);
 
-    // C. Generate Physics (Motion)
+    // Generate physics.
     fs.writeFileSync(PATHS.physicsJson, JSON.stringify(VOID_TOKENS.physics, null, 2));
     console.log(`   └─ ⚡  Physics: src/config/void-physics.json`);
 
-    // D. Generate Typography (Font Scales, Weights, Line Heights)
+    // Generate typography.
     fs.writeFileSync(PATHS.typographyJson, JSON.stringify(VOID_TYPOGRAPHY, null, 2));
     console.log(`   └─ 📝 Typography: src/config/void-typography.json`);
 
-    // E. Generate Structural Constants (Radius, Modal Widths, etc.)
+    // Generate structural constants.
     fs.writeFileSync(PATHS.structuralJson, JSON.stringify(VOID_STRUCTURAL, null, 2));
     console.log(`   └─ 🏗️  Structural: src/config/void-structural.json`);
 

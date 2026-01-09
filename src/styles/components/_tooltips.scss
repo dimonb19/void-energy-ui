@@ -1,60 +1,51 @@
-/*
- * ROLE: Void Tooltip Surface (Headless)
- * RESPONSIBILITY: Defines the Glass/Retro/Flat physics for Floating UI elements.
- */
+/* Tooltip surface styles for floating UI elements. */
 
 @use '../abstracts' as *;
 @use '../base/typography' as *;
 
 .void-tooltip {
-  // 1. POPOVER RESET (Crucial)
-  // Native popovers have a black border and white background in some UAs.
+  // Popover reset.
   border: none;
   background: transparent;
   margin: 0;
   inset: unset; // Let Floating UI handle positions
 
-  // 2. BASE GEOMETRY
-  // Depth Logic: Tooltips are "Ephemeral Alerts", so they reside
+  // Base geometry.
   pointer-events: none; // Allow clicking through the tooltip
   width: max-content;
   max-width: var(--tooltip-max-width); // Readability constraint
 
-  // 3. PHYSICS INHERITANCE
-  // Applies border, background, and shadow logic based on current Theme
+  // Physics inheritance.
   @include glass-float($interactive: false);
 
-  // 4. TYPOGRAPHY
+  // Typography.
   @include typography('caption');
 
   padding: var(--space-xs) var(--space-sm);
   text-align: center;
   color: var(--text-main);
 
-  // 5. ANIMATION STATE (The Materialize Effect)
-  // Default State: Dematerialized (Closed)
+  // Default (closed) state.
   opacity: 0;
   transform: translateY(4px) scale(0.95); // void-ignore (Motion Physics)
   filter: blur(calc(var(--physics-blur) / 2));
 
   box-shadow: var(--shadow-lift);
 
-  // We explicitly transition specific properties to avoid layout thrashing
+  // Constrain transitions to avoid layout thrashing.
   transition:
     opacity var(--speed-base) var(--ease-stabilize),
     transform var(--speed-base) var(--ease-stabilize),
     filter var(--speed-base) var(--ease-stabilize);
 
-  // Active State: Materialized (Open)
+  // Open state.
   &[data-state='open'] {
     opacity: 1;
     transform: translateY(0) scale(1);
     filter: blur(0);
   }
 
-  // 6. PHYSICS OVERRIDES
-
-  // RETRO: Robotic/Instant (Terminal Theme)
+  // Retro overrides.
   @at-root [data-physics='retro'] & {
     border-radius: 0;
     transition: none; // Law: Instant motion
@@ -62,7 +53,7 @@
     background: var(--bg-canvas); // Opaque
   }
 
-  // FLAT: Clean Paper (Light Mode)
+  // Flat overrides.
   @at-root [data-mode='light'] & {
     filter: none;
   }

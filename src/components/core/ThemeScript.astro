@@ -1,22 +1,16 @@
 ---
 /*
-  ROLE: Critical Rendering Path Script (The Bootloader)
-  RESPONSIBILITY: 
-  1. Reads the "Shared Kernel" (void-boot.js) as a raw string.
-  2. Injects it directly into the HTML <head>.
-  3. Executes hydration immediately to prevent FOUC.
+  Critical render-path bootloader.
+  Inlines void-boot.js and hydrates immediately to prevent FOUC.
 */
 
 import THEME_REGISTRY from '../../config/void-registry.json';
 import { STORAGE_KEYS, DOM_ATTRS, DEFAULTS } from '../../config/constants';
 
-// 1. READ THE SHARED KERNEL (THE VITE WAY)
-// The '?raw' suffix tells Vite to import the file content as a string
-// instead of executing it. This works everywhere (Vercel, Netlify, Node).
+// Import bootloader as a raw string for inline execution.
 import bootSource from '../../lib/void-boot.js?raw';
 
-// 2. SANITIZE FOR INLINE EXECUTION
-// We strip 'export ' keywords so the code runs in a standard <script> tag.
+// Strip exports for inline <script> execution.
 const cleanBootSource = bootSource.replace(/export /g, '');
 ---
 
@@ -24,11 +18,10 @@ const cleanBootSource = bootSource.replace(/export /g, '');
   is:inline
   set:html={`
     (function() {
-      // A. INJECT THE SHARED KERNEL
+      // Inject bootloader.
       ${cleanBootSource}
 
-      // B. EXECUTE HYDRATION
-      // We pass the server-side constants into the kernel
+      // Execute hydration with server-side constants.
       hydrate(
         ${JSON.stringify(THEME_REGISTRY)}, 
         ${JSON.stringify(STORAGE_KEYS)}, 

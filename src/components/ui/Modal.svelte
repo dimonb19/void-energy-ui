@@ -5,25 +5,32 @@
 
   let dialog = $state<HTMLDialogElement | null>(null);
 
-  // 1. VISUAL BUFFERS (Hold state during close animation)
+  // Visual buffers to avoid flicker during close animation.
+  // Problem: If we immediately null the component on close, the exit transition
+  // renders an empty modal (flicker). Solution: Keep the component mounted until
+  // CSS transition completes (see handleTransitionEnd function below).
   let ActiveComponent = $state<Component<any> | null>(null);
 
-  // Buffer the size and props so they don't reset during the fade-out
+  // Hold size/props until fade-out completes.
+  // Rationale: Modal width/content must remain stable during exit animation.
+  // Without this buffer, closing a large modal would snap to default size before fading.
   let renderedSize = $state(modal.state.size);
   let renderedProps = $state(modal.state.props);
 
-  // 2. Sync DOM State
+  // Sync dialog state on open/close.
+  // This effect handles the dialog lifecycle:
+  // 1. When modal.state.key changes from null → 'alert', lazy-load component and showModal()
+  // 2. When modal.state.key changes from 'alert' → null, close() and wait for transition
   $effect(() => {
-    // A. Opening: Sync EVERYTHING immediately
     if (modal.state.key) {
       renderedSize = modal.state.size;
       renderedProps = modal.state.props;
 
-      // Lazy Load the component
+      // Lazy-load the modal fragment.
       const loader = modalRegistry[modal.state.key];
       if (loader) {
         loader().then((module) => {
-          // Only mount if we are still on the same key (prevent race conditions)
+          // Only mount if the key is still active.
           if (modal.state.key) {
             ActiveComponent = module.default;
             if (dialog && !dialog.open) dialog.showModal();
@@ -34,16 +41,14 @@
       if (dialog && !dialog.open) {
         dialog.showModal();
       }
-    }
-    // B. Closing: Close dialog, but DO NOT CLEAR BUFFERS yet
-    else if (!modal.state.key && dialog?.open) {
+    } else if (!modal.state.key && dialog?.open) {
       dialog.close();
-      // ⚠️ IMPORTANT: We intentionally DO NOT update renderedProps here.
-      // So the ghost element looks correct while fading out.
+      // Keep renderedProps to preserve the fading element.
     }
   });
 
-  // 3. Cleanup after animation
+  // Cleanup after transition ends.
+  // This ensures the modal content remains visible during the exit animation.
   const handleTransitionEnd = (e: TransitionEvent) => {
     if (e.target === dialog && !dialog?.open) {
       ActiveComponent = null;
@@ -51,6 +56,8 @@
     }
   };
 
+  // Close modal when clicking the backdrop (dark overlay).
+  // The stopPropagation on modal-content prevents closing when clicking inside.
   const handleBackdrop = (e: MouseEvent) => {
     if (e.target === e.currentTarget) {
       modal.close();

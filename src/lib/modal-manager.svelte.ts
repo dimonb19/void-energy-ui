@@ -1,7 +1,4 @@
-/*
- * ROLE: Reactive Modal State Manager (Refactored)
- * PHILOSOPHY: "State-First". The manager only holds the current truth.
- */
+/* Reactive modal state manager (state-first). */
 
 import { MODAL_KEYS } from '../config/modal-registry';
 
@@ -18,7 +15,7 @@ class ModalManager {
     size: 'md',
   });
 
-  // Focus Management (A11y)
+  // Focus restoration for accessibility.
   private returnFocusTo: HTMLElement | null = null;
 
   /**
@@ -32,7 +29,7 @@ class ModalManager {
     props: ModalContract[K],
     size: ModalState<K>['size'] = 'md',
   ) {
-    // Capture the element that triggered the modal
+    // Capture the element that triggered the modal.
     if (typeof document !== 'undefined') {
       this.returnFocusTo = document.activeElement as HTMLElement;
     }
@@ -46,7 +43,7 @@ class ModalManager {
   close() {
     this.state = { key: null, props: {}, size: 'md' };
 
-    // Restore focus after a slight delay to allow animation to start
+    // Restore focus after animation starts.
     if (this.returnFocusTo && typeof requestAnimationFrame !== 'undefined') {
       requestAnimationFrame(() => {
         this.returnFocusTo?.focus();
@@ -55,7 +52,7 @@ class ModalManager {
     }
   }
 
-  // --- Convenience Methods (Simplified) ---
+  // --- Convenience methods ---
 
   // Usage: modal.confirm('Delete?', 'Are you sure?', { onConfirm: () => deleteItem() })
   confirm(
@@ -69,7 +66,6 @@ class ModalManager {
         title,
         body,
         cost: actions.cost,
-        // We pass the functions directly. The Component invokes them.
         onConfirm: () => {
           actions.onConfirm();
           this.close();

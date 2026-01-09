@@ -1,7 +1,4 @@
-/*
- * ROLE: Tooltip action for Svelte.
- * RESPONSIBILITY: Bridges Svelte DOM lifecycle to the VoidTooltip logic core.
- */
+/* Svelte action wrapper for VoidTooltip. */
 
 import { VoidTooltip } from '../lib/void-tooltip';
 
@@ -9,11 +6,10 @@ export function tooltip(
   node: HTMLElement,
   params: string | VoidTooltipOptions,
 ) {
-  // Normalize input
+  // Accept string shorthand or full options object.
   const config: VoidTooltipOptions =
     typeof params === 'string' ? { content: params } : params;
 
-  // Initialize Logic Core
   const tooltipInstance = new VoidTooltip(node, config);
 
   return {

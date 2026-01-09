@@ -1,4 +1,4 @@
-// 核心 BOOTLOADER LOGIC
+// Core bootloader logic.
 // Pure JS. No external dependencies. No TypeScript types in the runtime code.
 
 /**
@@ -8,13 +8,12 @@
  * @param {Object} constants - DOM Attribute keys
  */
 export function applyTheme(root, theme, constants) {
-  // 1. The Triad Attributes
+  // Apply triad attributes first for CSS to react immediately.
   root.setAttribute(constants.ATMOSPHERE, theme.id);
   root.setAttribute(constants.PHYSICS, theme.physics);
   root.setAttribute(constants.MODE, theme.mode);
 
-  // 2. Dynamic Palette Injection
-  // If the theme has a custom palette (runtime theme), paint the vars.
+  // Inject palette overrides for runtime themes.
   if (theme.palette) {
     Object.entries(theme.palette).forEach(([key, value]) => {
       root.style.setProperty(`--${key}`, value);
@@ -30,26 +29,25 @@ export function applyTheme(root, theme, constants) {
 export function applyPreferences(root, config) {
   if (!config) return;
 
-  // Scale
+  // Text scale modifier.
   if (config.scale) {
     root.style.setProperty('--text-scale', config.scale);
   }
 
-  // Density Map (Hardcoded to ensure this runs zero-dependency)
+  // Density mapping is inline to keep bootloader zero-dependency.
   if (config.density) {
     const densities = { high: 0.75, standard: 1, low: 1.25 };
     root.style.setProperty('--density', densities[config.density] || 1);
   }
 
-  // Font Heading
+  // Heading font override (remove to fall back to theme).
   if (config.fontHeading) {
     root.style.setProperty('--user-font-heading', config.fontHeading);
   } else {
-    // If null/empty, we MUST remove the override so the Theme Layer takes over
     root.style.removeProperty('--user-font-heading');
   }
 
-  // Font Body
+  // Body font override (remove to fall back to theme).
   if (config.fontBody) {
     root.style.setProperty('--user-font-body', config.fontBody);
   } else {
@@ -67,13 +65,12 @@ export function hydrate(registry, storageKeys, attrs, defaults) {
     const localAtmosphere = localStorage.getItem(storageKeys.ATMOSPHERE);
     const localConfig = localStorage.getItem(storageKeys.USER_CONFIG);
 
-    // 1. Resolve Active ID
+    // Resolve active atmosphere ID.
     let activeId = localAtmosphere || defaults.ATMOSPHERE;
 
-    // 2. Resolve Theme Data (Hybrid Lookup)
+    // Resolve theme data (registry, then cache).
     let themeData = registry[activeId];
 
-    // Fallback: Check Backpack (Cache)
     if (!themeData) {
       try {
         const cache = JSON.parse(
@@ -85,16 +82,15 @@ export function hydrate(registry, storageKeys, attrs, defaults) {
       }
     }
 
-    // Safety Net
+    // Safety net if no theme is resolved.
     if (!themeData) {
       activeId = defaults.ATMOSPHERE;
       themeData = registry[defaults.ATMOSPHERE];
     }
 
-    // Attach ID for the apply function
+    // Attach ID for the apply function.
     themeData.id = activeId;
 
-    // 3. EXECUTE
     applyTheme(root, themeData, attrs);
 
     if (localConfig) {
@@ -104,7 +100,7 @@ export function hydrate(registry, storageKeys, attrs, defaults) {
     return activeId;
   } catch (e) {
     console.warn('Void: Hydration Failed', e);
-    // Absolute Fail-Safe
+    // Absolute fail-safe.
     document.documentElement.setAttribute(
       attrs.ATMOSPHERE,
       defaults.ATMOSPHERE,

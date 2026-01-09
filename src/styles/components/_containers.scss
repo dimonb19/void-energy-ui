@@ -1,48 +1,10 @@
-/*
- * ROLE: Container and surface scaffolding.
- * RESPONSIBILITY: Governs layout widths and applies surface physics for cards, grids, and atomic surfaces.
- */
+/* Containers (layout) and surfaces (physics). */
 
 @use 'sass:map';
 @use '../abstracts' as *;
 @use '../base/typography';
 
-/* ==========================================================================
-   VOID ENERGY CONTAINER & SURFACE SYSTEM
-   ==========================================================================
-   
-   PURPOSE:
-   This file manages the "Frame" (Layout) and the "Skin" (Surfaces) of the UI.
-   It separates width constraints from visual physics to allow maximum flexibility.
-
-   PHILOSOPHY: "Separation of Concerns"
-   1. Containers handle WIDTH and MARGINS.
-   2. Surfaces handle BACKGROUNDS, BLURS, and BORDERS.
-   
-   --------------------------------------------------------------------------
-   See global.scss for full API documentation.
-
-   --------------------------------------------------------------------------
-   COMMON PATTERNS (Copy-Paste)
-   --------------------------------------------------------------------------
-
-   A. THE STANDARD PAGE LAYOUT
-      <div class="container flex-col gap-md">
-         <h1>Title</h1>
-         <p>Content...</p>
-      </div>
-
-   B. THE COMPOSABLE GLASS CARD (Preferred)
-      <div class="surface-glass round-16 pad-md flex-col gap-md">
-         <h2>Card Title</h2>
-      </div>
-
-   C. THE CLICKABLE WIDGET
-      <div class="surface-glass-action round-16 pad-md flex-center">
-         <span>Click Me</span>
-      </div>
-
-   -------------------------------------------------------------------------- */
+/* Containers set width/margins; surfaces set background/blur/border. */
 
 // ==========================================================================
 // 1. LAYOUT CONTAINERS (Structure)
@@ -57,7 +19,6 @@
 
   padding-inline: var(--space-md);
 
-  // Loop through the max-widths map
   @each $bp-name, $max-width in $container-widths {
     @include respond-up($bp-name) {
       max-width: $max-width;
@@ -67,7 +28,7 @@
 
 // FLUID CONTAINER
 // Role: Background sections that span viewport edge-to-edge.
-// Logic: 100% width, but respects the grid's side padding.
+// Logic: 100% width, but respects the grid's side
 .container-fluid {
   width: 100%;
   padding-inline: var(--space-md);
@@ -115,14 +76,11 @@
 // --------------------------------------------------------------------------
 
 // Static Glass (Decoration / Wrapper)
-// Does not move on hover.
 .surface-glass {
   @include glass-float($interactive: false);
-  // No padding/margin/radius defined. Combine with _helpers.scss.
 }
 
 // Interactive Glass (Clickable Cards)
-// Rises and glows on hover.
 .surface-glass-action {
   @include glass-float($interactive: true);
   cursor: pointer;
@@ -142,7 +100,6 @@
 // Pure Void Background (Useful for masking or solid headers)
 .surface-void {
   background: var(--bg-canvas);
-  // Optional: add a subtle border to define edges against other void elements
   border: var(--physics-border-width) solid var(--border-color);
 }
 

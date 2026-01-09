@@ -1,26 +1,15 @@
-/*
- * ROLE: Anchor and link styling.
- * RESPONSIBILITY: Provides the base anchor reset and the laser underline treatment aligned with Glass Physics.
- */
+/* Anchor/link styling with laser underline. */
 
 @use '../abstracts' as *;
 
-// ==========================================================================
-// LINKS & ANCHORS
-// ==========================================================================
-
-// 1. GLOBAL RESET (The Safe Base)
-// --------------------------------------------------------------------------
-// Applies to anchors embedded in any surface while avoiding layout side effects.
+// Global reset.
 a {
   text-decoration: none;
   color: inherit; // Inherit from parent to respect surface tone
   cursor: pointer;
 
-  // Subtle interaction for generic links (like in a navbar)
   transition: color var(--speed-fast) var(--ease-flow);
 
-  // Generic hover keeps the interaction subtle without layout shift.
   @media (hover: hover) {
     &:hover {
       color: var(--energy-primary);
@@ -28,11 +17,7 @@ a {
   }
 }
 
-// 2. THE "HYPERLINK" (The Laser Underline)
-// --------------------------------------------------------------------------
-// Usage: Apply class="link" to text anchors inside paragraphs/spans.
-// <p>Read more about the <a href="#" class="link">Void Protocol</a>.</p>
-
+// Laser underline variant.
 .link {
   position: relative;
   display: inline-block; // Required for transform origin logic
@@ -42,7 +27,7 @@ a {
   border-bottom: var(--physics-border-width) solid
     alpha(var(--energy-primary), 20%);
 
-  // --- A. The Laser Line ---
+  // Laser line.
   &::after {
     content: '';
     position: absolute;
@@ -51,27 +36,22 @@ a {
     bottom: calc(var(--physics-border-width) * -2); // Distance from text
     height: var(--physics-border-width);
 
-    // The Line Color (Matches Text)
     background-color: var(--energy-primary);
 
-    // START STATE: Scaled to 0 (Invisible)
     transform: scaleX(0);
 
-    // ORIGIN: Start from the RIGHT (so it exits to the right)
     transform-origin: right;
 
     transition: transform var(--speed-base) var(--ease-snap);
   }
 
-  // --- B. Hover State ---
   @media (hover: hover) {
     &:hover {
-      border-bottom-color: transparent; // Hide base border
+      border-bottom-color: transparent; // Hide base border.
 
-      // Line Animation: Expand
       &::after {
         transform: scaleX(1);
-        transform-origin: left; // ENTRANCE: Expands from LEFT
+        transform-origin: left;
       }
     }
   }
@@ -82,16 +62,16 @@ a {
 
     &::after {
       transform: scaleX(1);
-      transform-origin: left; // ENTRANCE: Expands from LEFT
+      transform-origin: left;
     }
   }
 
-  // --- C. Light Mode Override ---
+  // Light mode tweaks.
   @at-root [data-mode='light'] & {
     font-weight: var(--font-weight-semibold);
 
     &::after {
-      height: calc(var(--physics-border-width) * 2); // Thicker pen stroke
+      height: calc(var(--physics-border-width) * 2); // Thicker stroke.
       bottom: calc(var(--physics-border-width) * -3);
     }
 

@@ -1,18 +1,15 @@
-/*
- * ROLE: Tile and collection styling.
- * RESPONSIBILITY: Provides holographic tile treatments and semantic chip variants aligned with Void physics.
- */
+/* Tile and collection styling. */
 
 @use '../abstracts' as *;
 @use '../base/typography' as *;
 @use 'buttons';
 
 // ==========================================================================
-// TILES & COLLECTIONS
+// 1. TILES & COLLECTIONS
 // Holographic data slates for collections and chips.
 // ==========================================================================
 
-// 1. THE COLLECTION (Horizontal Scroll Container)
+// A. THE COLLECTION (Horizontal Scroll Container)
 // --------------------------------------------------------------------------
 .tiles-collection {
   width: 100%;
@@ -23,7 +20,7 @@
   align-items: center;
   gap: var(--space-md);
 
-  // Padding respects the container layout but adds vertical breathing room
+  // Container-aligned padding with extra vertical breathing room.
   padding: var(--space-xs) var(--space-md) var(--space-lg) var(--space-md);
 
   overflow-x: auto;
@@ -34,23 +31,21 @@
   @include laser-scrollbar;
 }
 
-// 2. THE STORY TILE (Holographic Slate)
+// B. THE STORY TILE (Holographic Slate)
 // --------------------------------------------------------------------------
 .tile {
   position: relative;
   flex: none;
   aspect-ratio: 2 / 3;
 
-  // Widths should be derived from "Grid Units" or spacing
-  // 40 units * density. This ensures tiles shrink in Compact mode.
+  // Width scales with unit * density for compact modes.
   width: calc(40 * var(--unit) * var(--density, 1));
 
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
 
-  // --- PHYSICS BASE ---
-  // We use the mixin for borders/shadows, but override background/padding
+  // Physics base: mixin with custom background/padding.
   @include glass-float($interactive: true);
   padding: 0; // Images are full bleed
   background: var(--bg-sink); // Darker than standard cards
@@ -60,7 +55,7 @@
   border-radius: calc(var(--radius-base) * 1.5);
   border-width: var(--physics-border-width);
 
-  // Explicit transition for hover effects
+  // Hover transitions.
   transition:
     transform var(--speed-base) var(--ease-stabilize),
     border-color var(--speed-base) var(--ease-snap),
@@ -72,7 +67,7 @@
     aspect-ratio: 2 / 3; // Maintains the shape
   }
 
-  // --- THE IMAGE ---
+  // Image layer.
   img {
     position: absolute;
     inset: 0;
@@ -80,10 +75,10 @@
     height: 100%;
     object-fit: cover;
     z-index: z('floor');
-    transition: transform var(--speed-base) var(--ease-stabilize); // Smooth pan effect
+    transition: transform var(--speed-base) var(--ease-stabilize); // Smooth pan.
   }
 
-  // Atmospheric gradient anchors legibility against imagery using the canvas tone.
+  // Gradient overlay anchors legibility.
   &::after {
     content: '';
     position: absolute;
@@ -92,17 +87,15 @@
       to bottom,
       transparent 0%,
       transparent 40%,
-      // Keep top clear
       alpha(var(--bg-canvas), 40%) 60%,
       alpha(var(--bg-canvas), 90%) 80%,
-      var(--bg-canvas) 100% // Solid Floor
+      var(--bg-canvas) 100% // Solid floor.
     );
     z-index: z('base');
     pointer-events: none;
   }
 
-  // --- CONTENT LAYOUT ---
-
+  // Content.
   h5 {
     position: relative;
     z-index: z('decorate');
@@ -136,16 +129,13 @@
     }
   }
 
-  // --- INTERACTION ---
   @media (hover: hover) {
     &:hover:not(.loading-tile),
     &:focus-visible:not(.loading-tile) {
-      // Logic handled by mixin, but we add image scale here
       img {
         transform: scale(var(--scale));
       }
 
-      // Light up metadata
       .tile-data p {
         color: var(--text-main);
       }
@@ -156,8 +146,7 @@
     }
   }
 
-  // --- RESPONSIVE WIDTHS ---
-  // Using standard breakpoints logic
+  // Responsive widths.
   @include respond-up('tablet') {
     width: calc(56 * var(--unit) * var(--density, 1));
   }
@@ -169,14 +158,13 @@
   }
 }
 
-// 3. LOADING TILE (Skeleton)
+// C. LOADING TILE (Skeleton)
 // --------------------------------------------------------------------------
 .loading-tile {
   @extend .tile;
   background: var(--bg-sink);
   pointer-events: none; // Non-interactive
 
-  // Clean slate for the skeleton
   h5,
   .tile-data,
   img {
@@ -189,67 +177,59 @@
     inset: 0;
     z-index: z('float');
 
-    // Apply the animation mixin
     @include shimmer;
   }
 }
 
 // ==========================================================================
-// 4. SMALL TILES ARCHITECTURE
+// 2. SMALL TILES ARCHITECTURE
 // ==========================================================================
 
 // A. THE MIXIN (Structural DNA)
+// --------------------------------------------------------------------------
 @mixin tile-structure {
   @extend .btn-void;
 
-  // Layout
   display: inline-flex;
   flex-flow: row nowrap;
   align-items: stretch;
   justify-content: space-between;
   gap: 0;
 
-  // Sizing
   min-height: max(2rem, calc(2.25rem * var(--density, 1)));
   padding: 0;
 
-  // Typography
   color: var(--text-main);
 
-  // Transitions
   transition:
     transform var(--speed-base) var(--ease-snap),
     box-shadow var(--speed-base) var(--ease-snap),
     border-color var(--speed-base) var(--ease-snap),
     background-color var(--speed-base) var(--ease-snap);
 
-  // Physics Base
   border-radius: var(--radius-base);
   @include glass-float($interactive: true);
 
-  // 1. LABEL
   .tile-label {
     display: flex;
     align-items: center;
-    padding: 0 calc(var(--space-xs) * 1.5); // 0.75rem equivalent
+    padding: 0 calc(var(--space-xs) * 1.5);
     white-space: nowrap;
     color: inherit;
     font-weight: var(--font-weight-semibold);
   }
 
-  // 2. SUNKEN VARIANT
   .tile-label-sunken {
     background: var(--bg-sink);
     border: var(--physics-border-width) solid var(--border-color);
     color: var(--text-dim);
-    padding: calc(var(--space-xs) * 0.25) var(--space-xs); // 0.1rem 0.5rem equivalent
+    padding: calc(var(--space-xs) * 0.25) var(--space-xs);
     margin-block: auto;
     margin-right: var(--space-xs);
     border-radius: calc(var(--radius-base) * 0.5);
     @include typography('caption');
   }
 
-  // 3. REMOVE BUTTON
   .tile-remove {
     @extend .btn-void;
     display: flex;
@@ -257,7 +237,6 @@
     justify-content: center;
     width: max(2rem, calc(2.25rem * var(--density, 1)));
 
-    // Default Separation (Variant mixin overrides this)
     border-left: var(--physics-border-width) solid alpha(white, 10%);
     color: var(--text-mute);
 
@@ -273,7 +252,6 @@
     }
   }
 
-  // DISABLED STATE
   &:disabled {
     cursor: not-allowed;
     background: shade(var(--bg-sink), 50%);
@@ -291,7 +269,6 @@
     }
   }
 
-  // HOVER
   @media (hover: hover) {
     &:hover:not(:disabled) {
       transform: translateY(var(--lift)) scale(var(--scale, 1));
@@ -306,8 +283,9 @@
 }
 
 // B. THE VARIANT MIXIN (Color Logic)
+// --------------------------------------------------------------------------
 @mixin tile-variant($color) {
-  // --- 1. DEFAULT (VOID / GLASS) ---
+  // Default (void/glass).
   background: alpha($color, 80%);
   border-color: tint($color, 20%);
   color: var(--text-main);
@@ -330,7 +308,7 @@
     }
   }
 
-  // --- 2. TERMINAL OVERRIDE (Retro / Contrast) ---
+  // Retro override.
   @at-root [data-physics='retro'] & {
     background: black; // Opaque
     border: var(--physics-border-width) solid $color; // Hard border
@@ -355,17 +333,14 @@
     }
   }
 
-  // --- 3. PAPER OVERRIDE (Ink / Pastel) ---
+  // Light mode override.
   @at-root [data-mode='light'] & {
-    // Pastel background
     background: tint($color, 85%);
     border: var(--physics-border-width) solid $color;
     box-shadow: none;
-    // Darker text for readability on light bg
     color: shade($color, 60%);
 
     .tile-remove {
-      // Slightly darker pastel for the button
       background: tint($color, 70%);
       border-left: var(--physics-border-width) solid $color;
       color: shade($color, 50%);
@@ -382,17 +357,13 @@
   }
 }
 
-// ==========================================================================
-// 5. IMPLEMENTATION
-// ==========================================================================
-
-// Base Class (Void Blue Default)
+// C. IMPLEMENTATION
+// --------------------------------------------------------------------------
 .tile-small {
   @include tile-structure;
   @include tile-variant(var(--energy-secondary));
 }
 
-// Semantic Variants
 .tile-small-system {
   @include tile-structure;
   @include tile-variant(var(--color-system));
@@ -410,9 +381,8 @@
   @include tile-variant(var(--color-error));
 }
 
-// ==========================================================================
-// 6. THE ADDON (Label on Top)
-// ==========================================================================
+// D. THE ADDON (Label on Top)
+// --------------------------------------------------------------------------
 .tile-labeled {
   margin-top: var(--space-sm);
   border-top-left-radius: 0;
@@ -421,8 +391,7 @@
     content: attr(data-label);
     position: absolute;
 
-    // Dynamic positioning based on border width
-    // This ensures it sits exactly on the line, whether it's 1px (Glass) or 2px (Retro)
+    // Position based on border width to align with physics.
     top: calc(var(--space-md) * -1);
     left: calc(var(--physics-border-width) * -1);
 
@@ -441,21 +410,19 @@
     z-index: 1;
     @include typography('caption');
 
-    // Default Text Color (Glass/Void)
     color: inherit;
     text-shadow: none;
     mix-blend-mode: normal;
 
-    // TERMINAL LABEL
+    // Retro label.
     @at-root [data-physics='retro'] & {
       background: black; // Opaque background to hide the parent border behind it
 
-      // When parent hovers and color changes, this updates automatically.
       border: inherit;
       border-bottom: none;
     }
 
-    // PAPER LABEL
+    // Light mode label.
     @at-root [data-mode='light'] & {
       font-weight: 700;
     }

@@ -1,15 +1,6 @@
-/*
- * ROLE: Animation primitives.
- * RESPONSIBILITY: Houses shared keyframes and entry mixins tuned to the Triad Engine timings.
- */
+/* Animation primitives and shared keyframes. */
 
 @use 'functions' as *;
-
-/* ==========================================================================
-   MOTION NOTES
-   - entry-transition mixin: standard slide-and-focus entry tuned to physics easing.
-   - Keyframes: shimmer, cyber-pulse, rotate-laser, progress-fill, logo-enter.
-   ========================================================================== */
 
 // ==========================================================================
 // 1. CONTROL MIXINS
@@ -17,7 +8,6 @@
 
 // Standard Entry Transition (The "Cyber Slide")
 // Usage: @include entry-transition;
-// inside a class (e.g., .fade-in)
 @mixin entry-transition($duration: var(--speed-base), $delay: 0s) {
   will-change: transform, opacity, filter;
   opacity: 1;

@@ -6,23 +6,18 @@
     initialMusic = 50,
     initialVoice = 80,
     initialHaptics = true,
-    // Callback Protocol
     onSave = (data: any) => console.log('Settings Saved:', data),
   } = $props();
 
-  // Buffer State (Local editing state)
+  // Local editing buffer.
   let music = $state(initialMusic);
   let voice = $state(initialVoice);
   let haptics = $state(initialHaptics);
 
   function handleSave() {
-    // A. Execute Logic
+    // Persist, notify, and close.
     onSave({ music, voice, haptics });
-
-    // B. Provide Feedback
     toast.show('Configuration Updated', 'success');
-
-    // C. Close
     modal.close();
   }
 </script>

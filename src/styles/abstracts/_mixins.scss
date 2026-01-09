@@ -1,14 +1,7 @@
-/*
- * ROLE: Physics mixin library.
- * RESPONSIBILITY: Encapsulates Glass Physics surfaces, photonic text effects, and motion utilities for reuse across the Triad Engine.
- */
+/* Physics mixins for surfaces, text effects, and utilities. */
 
 @use 'variables' as *;
 @use 'functions' as *;
-
-// ==========================================================================
-// MIXINS (The Physics Engine)
-// ==========================================================================
 
 // ==========================================================================
 // 1. SURFACES
@@ -18,40 +11,37 @@
 // Context: Positive Z-Index. Floats above the void.
 // $interactive: boolean - Set to true ONLY if the element is clickable (Link/Button)
 @mixin glass-float($interactive: false) {
-  // 1. TEXTURE & GEOMETRY
-  // Now uses the variable injected by the preset
+  // Texture and geometry.
   background: var(--surface-bg);
   border-radius: var(--radius-base);
   border-style: solid;
   border-width: var(--physics-border-width);
 
-  // 2. LIGHTING (Unified border color)
+  // Lighting.
   border-color: var(--surface-border);
 
-  // This variable automatically switches between Glow (Glass) and Shadow (Flat)
+  // Shadow switches by physics preset.
   box-shadow: var(--shadow-float);
 
-  // 3. MOTION
+  // Motion.
   transition:
     transform var(--speed-base) var(--ease-stabilize),
     border-color var(--speed-base) var(--ease-snap),
     background-color var(--speed-base) var(--ease-flow),
     box-shadow var(--speed-base) var(--ease-flow);
 
-  // 4. BLUR
+  // Blur.
   @supports (backdrop-filter: blur(1px)) {
     backdrop-filter: blur(var(--physics-blur));
     -webkit-backdrop-filter: blur(var(--physics-blur));
   }
 
-  // 5. INTERACTION
+  // Interaction.
   @media (hover: hover) {
     &:hover {
       @if $interactive {
-        // Variable-driven motion
         transform: translateY(var(--lift));
         border-color: var(--energy-primary);
-        // Simply swap to the "Lifted" lighting variable
         box-shadow: var(--shadow-lift);
       }
     }
@@ -67,7 +57,7 @@
   border-radius: var(--radius-base);
   color: var(--text-main);
 
-  // Unified Depth
+  // Unified depth.
   box-shadow: var(--shadow-sunk);
 
   transition:
@@ -90,10 +80,9 @@
 // 2. TYPOGRAPHY & ENERGY
 // ==========================================================================
 
-// MIXIN: The "Gemini Laser" Structure
 @mixin gemini-laser {
   position: relative;
-  isolation: isolate; // Force stacking context on the button itself
+  isolation: isolate; // Force stacking context on the button itself.
   background: transparent;
   border: none;
   overflow: hidden;
@@ -103,7 +92,7 @@
   // Parent radius clips the beam and keeps the gradient contained.
   border-radius: var(--radius-full);
 
-  // 1. THE ROTATING BEAM (The Gradient)
+  // Rotating beam.
   &::before {
     content: '';
     position: absolute;
@@ -113,7 +102,7 @@
     height: 500%;
     border-radius: 50%;
 
-    // The "Tail" Effect Gradient
+    // Tail gradient.
     background: conic-gradient(
       from 0deg,
       transparent 0deg,
@@ -131,7 +120,7 @@
     animation: rotate-laser 4s linear infinite;
     z-index: -2;
 
-    // Retro physics override: segmented radar sweep.
+    // Retro override: segmented sweep.
     @at-root :where([data-physics='retro']) & {
       background: conic-gradient(
         from 0deg,
@@ -150,25 +139,23 @@
         transparent 240deg,
         transparent 360deg
       );
-      // Sharp stepping for retro feel.
       animation-timing-function: steps(64);
     }
   }
 
-  // 2. THE INNER MASK (The "Solid" Button)
+  // Inner mask.
   &::after {
     content: '';
     position: absolute;
     inset: var(--physics-border-width);
 
-    // Use Solid Color, NOT Glass.
     background: var(--bg-canvas);
 
     z-index: -1;
     border-radius: var(--radius-full);
   }
 
-  // HOVER EFFECT: SURGE (Brightness + Width)
+  // Hover surge.
   @media (hover: hover) {
     &:hover::before {
       background-color: var(--energy-primary);
@@ -188,13 +175,11 @@
 // MIXIN: Atmospheric Shimmer
 // Usage: Include in any element that acts as a loading skeleton.
 @mixin shimmer {
-  // Wide gradient prevents visible banding during translation.
   background-size: 400% 100%;
 
-  // Time the sweep using the physics easing.
   animation: shimmer 3s infinite linear;
 
-  // Default Void gradient
+  // Default Void gradient.
   background-image: linear-gradient(
     90deg,
     transparent 0%,
@@ -204,7 +189,7 @@
     transparent 100%
   );
 
-  // Light mode override to mimic reflective ink.
+  // Light mode override.
   @at-root :where([data-mode='light']) & {
     background-image: linear-gradient(
       90deg,
@@ -216,7 +201,7 @@
     );
   }
 
-  // Terminal override creates a scanline pulse.
+  // Retro override.
   @at-root :where([data-physics='retro']) & {
     opacity: 0.5;
     background-image: linear-gradient(
@@ -235,7 +220,7 @@
 // 4. STATE MANAGEMENT MIXINS (Strict Protocol)
 // ==========================================================================
 
-// 1. ACTIVE STATE (Interactive)
+// A. ACTIVE STATE (Interactive)
 // Use for: Toggles, Tabs, Selections.
 // ⛔️ DO NOT USE: .active class
 @mixin state-active {
@@ -247,7 +232,7 @@
   }
 }
 
-// 2. OPEN STATE (Visibility)
+// B. OPEN STATE (Visibility)
 // Use for: Dropdowns, Tooltips, Dialogs, Accordions.
 // ⛔️ DO NOT USE: .show, .open classes
 @mixin state-open {
@@ -257,7 +242,7 @@
   }
 }
 
-// 3. LOADING STATE (Process)
+// C. LOADING STATE (Process)
 // Use for: Buttons, Cards, inputs waiting for network.
 // ⛔️ DO NOT USE: .loading class
 @mixin state-loading {
@@ -299,7 +284,7 @@
 // 5. TEXT UTILITIES
 // ==========================================================================
 
-// TRUNCATE
+// MIXIN: Truncate
 // Usage: @include text-truncate(1) for single line
 // Usage: @include text-truncate(3) for multi-line narrative
 @mixin text-truncate($lines: 1) {
@@ -312,17 +297,14 @@
     display: -webkit-box;
     -webkit-line-clamp: $lines;
     -webkit-box-orient: vertical;
-    // Fallback for extreme edge cases
     white-space: normal;
   }
 }
 
-// FORCE WRAP
+// MIXIN: Force wrap
 // Usage: For API keys, hashes, or user-generated "gibberish"
 @mixin text-wrap-force {
-  // The modern standard: breaks only if necessary, at any point
   overflow-wrap: anywhere;
 
-  // Fallbacks for older browsers
   word-break: break-word;
 }

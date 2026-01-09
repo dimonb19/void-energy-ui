@@ -1,30 +1,20 @@
-/*
-  * ROLE: SVG icons styling.
-  * RESPONSIBILITY: Defines how SVG data reacts to the Void Engine.
-  */
+/* SVG icon styling. */
 
 @use '../abstracts' as *;
 
-// ==========================================================================
-// ICON MATERIALS
-// ==========================================================================
-
-// 1. BASE ICON UTILITY
-// Usage: class="icon" or class="icon icon-lg"
+// Base icon utility.
 .icon {
-  // A. Layout & Sizing
+  // Layout and sizing.
   display: inline-block;
   vertical-align: middle;
   width: 1em; // Scales with font-size automatically
   height: 1em;
 
-  // B. Color Inheritance (The most important part!)
-  // This allows the icon to take the color of its parent (text-main, energy-primary, etc)
+  // Inherit color from parent.
   fill: currentColor;
   stroke: currentColor;
 
-  // C. Physics Transitions
-  // We use global speed variables
+  // Transitions.
   transform-origin: center center;
   transition:
     transform var(--speed-fast) var(--ease-stabilize),
@@ -32,7 +22,7 @@
     filter var(--speed-fast) var(--ease-flow),
     color var(--speed-fast) var(--ease-flow);
 
-  // --- SIZES ---
+  // Sizes.
   &[data-size='sm'] {
     font-size: 0.875em;
   }
@@ -43,26 +33,23 @@
     font-size: 1.5em;
   }
 
-  // --- ANIMATIONS ---
+  // Animations.
   &.icon-spin {
     animation: rotate 2s linear infinite;
     @at-root [data-physics='retro'] & {
-      animation-timing-function: steps(8); // Robotic spin
+      animation-timing-function: steps(8); // Stepped spin.
     }
   }
 }
 
-// 2. INTERACTIVE ICONS (Buttons)
-// Usage: Inside <button> or <a>
+// Interactive icons inside buttons/links.
 .btn-icon,
 .btn-void {
-  // When an icon is inside a button, define interaction physics
   .icon,
   svg {
     transition: transform var(--speed-fast) var(--ease-snap);
   }
 
-  // HOVER STATE
   @media (hover: hover) {
     &:hover:not(:disabled) {
       .icon,
@@ -73,7 +60,6 @@
     }
   }
 
-  // ACTIVE STATE
   &:active:not(:disabled) {
     .icon,
     svg {
@@ -81,11 +67,10 @@
     }
   }
 
-  // RETRO MODE OVERRIDE
   @at-root [data-physics='retro'] & {
     .icon,
     svg {
-      // No blurring/softness in retro mode
+      // No blur in retro mode.
       shape-rendering: crisp-edges;
       filter: none !important;
     }

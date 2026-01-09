@@ -1,28 +1,16 @@
 /**
- * ==========================================================================
- * 🌌 VOID ENERGY UI — DESIGN SYSTEM CONFIGURATION (SSOT)
- * ==========================================================================
+ * 🌌 VOID ENERGY UI - Design system configuration (SSOT).
+ * This file is the single source of truth for tokens and themes.
  *
- * ⚠️ SINGLE SOURCE OF TRUTH
- * This file is the ONLY source of truth for all design tokens.
+ * References:
+ * - /THEME-GUIDE.md (palette contract, physics constraints, examples, testing)
+ * - /CHEAT-SHEET.md
+ * - /README.md
  *
- * 📚 DOCUMENTATION:
- * - How to add themes:  /THEME-GUIDE.md (step-by-step with examples)
- * - System reference:   /CHEAT-SHEET.md
- * - Architecture:       /README.md
- *
- * 🛠️ WORKFLOW:
- * 1. Edit this file to add/modify themes
- * 2. Run: `npm run build:tokens` to compile
- * 3. Use: `data-atmosphere="your-theme-name"` in HTML
- *
- * 👉 See /THEME-GUIDE.md for:
- * - The Palette Contract (5 layer system with explanations)
- * - Physics constraints (glass/flat/retro rules)
- * - Complete theme example with annotations
- * - Testing checklist and troubleshooting
- *
- * ==========================================================================
+ * Workflow:
+ * 1. Edit this file
+ * 2. Run `npm run build:tokens`
+ * 3. Apply `data-atmosphere="theme-name"` in HTML
  */
 
 // --------------------------------------------------------------------------
@@ -32,7 +20,7 @@
 /**
  * Spacing Scale
  * Base unit: 0.25rem (4px)
- * Scale: xs(8px) → sm(16px) → md(24px) → lg(32px) → xl(48px) → 2xl(64px) → 3xl(96px) → 4xl(128px) → 5xl(160px)
+ * Scale: xs(8px) -> sm(16px) -> md(24px) -> lg(32px) -> xl(48px) -> 2xl(64px) -> 3xl(96px) -> 4xl(128px) -> 5xl(160px)
  */
 export const VOID_SPACING = {
   xs: '0.5rem', // 8px
@@ -101,7 +89,7 @@ export const VOID_RADIUS = {
 } as const;
 
 // --------------------------------------------------------------------------
-// 🧩 SHARED ASSETS (Fonts & Colors)
+// SHARED ASSETS (Fonts & Colors)
 // --------------------------------------------------------------------------
 
 const FONTS = {
@@ -161,7 +149,7 @@ const SEMANTIC_LIGHT = {
 };
 
 // --------------------------------------------------------------------------
-// 📝 TYPOGRAPHY TOKENS (Font Scales, Weights, Line Heights)
+// TYPOGRAPHY TOKENS (Font Scales, Weights, Line Heights)
 // --------------------------------------------------------------------------
 
 export const VOID_TYPOGRAPHY = {
@@ -229,7 +217,7 @@ export const VOID_TYPOGRAPHY = {
 } as const;
 
 // --------------------------------------------------------------------------
-// 🏗️ STRUCTURAL CONSTANTS (Layout & Component Dimensions)
+// STRUCTURAL CONSTANTS (Layout & Component Dimensions)
 // --------------------------------------------------------------------------
 
 export const VOID_STRUCTURAL = {
@@ -280,7 +268,7 @@ export const VOID_STRUCTURAL = {
 } as const;
 
 // --------------------------------------------------------------------------
-// 🚀 THE CONFIGURATION (Edit below)
+// CONFIGURATION (Edit below)
 // --------------------------------------------------------------------------
 
 export const VOID_TOKENS = {
@@ -391,7 +379,7 @@ export const VOID_TOKENS = {
   },
 
   // 3. THEME REGISTRY (Color & Mood)
-  // ⚠️ ARCHITECTURAL CONSTRAINT:
+  // ARCHITECTURAL CONSTRAINT:
   // - Physics: 'glass'  MUST use mode: 'dark' (Glows require darkness)
   // - Physics: 'retro'  MUST use mode: 'dark' (CRT phosphor effect)
   // - Physics: 'flat'   Works best with mode: 'light', but allows 'dark'.

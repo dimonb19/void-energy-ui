@@ -1,18 +1,13 @@
 /*
- * ==========================================================================
- * 🔮 VOID ENGINE (ADAPTER)
- * ==========================================================================
- * Role: The Reactive Brain.
- * Responsibility: Manages state, validates inputs, and delegates DOM painting
- * to the shared Bootloader kernel.
- * ==========================================================================
+ * 🔮 VOID ENGINE (adapter)
+ * Role: Reactive state coordinator; validates inputs and delegates DOM painting
+ * to the bootloader kernel.
  */
 
 import THEME_REGISTRY from '../config/void-registry.json';
 import { STORAGE_KEYS, DOM_ATTRS, DEFAULTS } from '../config/constants';
 import { applyTheme, applyPreferences } from '../lib/void-boot';
 
-// --- TYPES ---
 interface UserConfig {
   fontHeading: string | null;
   fontBody: string | null;
@@ -20,7 +15,7 @@ interface UserConfig {
   density: 'high' | 'standard' | 'low';
 }
 
-// 🛡️ SAFETY: A complete palette fallback.
+// Palette fallback for incomplete theme definitions.
 const FALLBACK_PALETTE: VoidPalette = {
   'bg-canvas': '#000000',
   'bg-surface': '#111111',
@@ -40,12 +35,11 @@ const FALLBACK_PALETTE: VoidPalette = {
   'font-atmos-body': 'sans-serif',
 };
 
-// --- THE REACTIVE ENGINE ---
 export class VoidEngine {
-  // 1. REACTIVE STATE (The Truth)
+  // Reactive atmosphere state (source of truth).
   atmosphere = $state<string>(DEFAULTS.ATMOSPHERE);
 
-  // Runtime Registry initialized with our static build artifacts
+  // Runtime registry initialized from the build artifacts.
   registry = $state<ThemeRegistry>({ ...(THEME_REGISTRY as any) });
 
   userConfig = $state<UserConfig>({
@@ -55,7 +49,7 @@ export class VoidEngine {
     density: 'standard',
   });
 
-  // Derived state for easy UI consumption
+  // Derived theme snapshot for UI consumption.
   currentTheme = $derived(
     this.registry[this.atmosphere] || this.registry[DEFAULTS.ATMOSPHERE],
   );
@@ -67,15 +61,13 @@ export class VoidEngine {
     }
   }
 
-  // --- ACTIONS ---
-
   /**
    * Registers a theme with "Safety Merge" logic.
    */
   registerTheme(id: string, definition: Partial<VoidThemeDefinition>) {
     console.group(`Void: Registering Atmosphere "${id}"`);
 
-    // 🛡️ GUARDRAIL: The Law of Physics
+    // Enforce physics/mode constraints.
     if (definition.physics === 'glass' && definition.mode === 'light') {
       console.warn(
         `⚠️ Void Violation: Atmosphere "${id}" attempts to use GLASS physics in LIGHT mode. This breaks visibility. Falling back to FLAT physics.`,
@@ -90,7 +82,7 @@ export class VoidEngine {
       definition.mode = 'dark'; // Force correction
     }
 
-    // A. THE SAFETY NET
+    // Build a complete base theme as a safety net.
     const registryEntry = this.registry[DEFAULTS.ATMOSPHERE];
 
     const baseTheme: VoidThemeDefinition = {
@@ -101,7 +93,7 @@ export class VoidEngine {
       fonts: [],
     };
 
-    // B. THE PARTIAL MERGE
+    // Merge partial overrides on top of the base.
     const safeTheme: VoidThemeDefinition = {
       id: id,
       mode: definition.mode || baseTheme.mode,
@@ -113,7 +105,7 @@ export class VoidEngine {
       fonts: definition.fonts || [],
     };
 
-    // C. COMMIT & PERSIST
+    // Commit and persist.
     this.registry[id] = safeTheme;
 
     if (typeof localStorage !== 'undefined') {
@@ -162,24 +154,19 @@ export class VoidEngine {
     this.persist();
   }
 
-  // --- INTERNAL MECHANICS ---
-
   private init() {
     const root = document.documentElement;
 
-    // 1. TRUST THE BOOTLOADER
-    // We do not run hydration logic here. We simply read the
-    // DOM state that the Bootloader script already painted.
+    // Trust the bootloader paint and sync state from the DOM.
     const domAtmosphere = root.getAttribute(DOM_ATTRS.ATMOSPHERE);
 
-    // Sync Svelte state to match the DOM
     if (domAtmosphere && this.registry[domAtmosphere]) {
       this.atmosphere = domAtmosphere;
     } else {
       this.atmosphere = DEFAULTS.ATMOSPHERE;
     }
 
-    // 2. Load User Prefs (into State only)
+    // Load user prefs into state only.
     const storedConfig = localStorage.getItem(STORAGE_KEYS.USER_CONFIG);
     if (storedConfig) {
       try {
@@ -189,35 +176,29 @@ export class VoidEngine {
       }
     }
 
-    // Note: We do NOT call syncDOM() here.
-    // The browser is already painted correctly by ThemeScript.
+    // Note: do not call syncDOM() here; ThemeScript already painted the DOM.
   }
 
   private syncDOM() {
     if (typeof document === 'undefined') return;
     const root = document.documentElement;
 
-    // 1. PREPARE DATA
+    // Prepare theme data for the bootloader.
     const themeData = {
       ...this.currentTheme,
       id: this.atmosphere,
     };
 
-    // 2. APPLY THEME (Using Shared Kernel)
-    // This handles attributes (triad) and dynamic palette injection
+    // Apply theme via the shared bootloader kernel.
     applyTheme(root, themeData, DOM_ATTRS);
 
-    // 3. CLEANUP (Engine Exclusive Logic)
-    // The bootloader is additive. The Engine must handle the subtraction.
-    // If we switch back to a STATIC theme (CSS-based), we must remove
-    // the inline styles so the CSS classes can take over.
+    // Bootloader is additive; engine removes runtime palette when returning to static themes.
     const isStatic = Object.keys(THEME_REGISTRY).includes(this.atmosphere);
     if (isStatic) {
-      // We use the fallback keys to know which vars to wipe
       this.clearPalette(FALLBACK_PALETTE);
     }
 
-    // 4. APPLY PREFS (Using Shared Kernel)
+    // Apply user preferences via the shared kernel.
     applyPreferences(root, this.userConfig);
   }
 

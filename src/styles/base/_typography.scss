@@ -1,17 +1,11 @@
-/*
- * ROLE: Typography scale and semantic mixins.
- * RESPONSIBILITY: Defines clamps, weights, and semantic helpers that adapt to Atmosphere fonts and Triad scaling.
- */
+/* Typography scale and semantic mixins. */
 
 @use 'sass:map';
 @use '../abstracts' as *;
 @use '../components/anchors';
 
-/* =========================================
-   1. THE LOGIC (Scales & Weights)
-   ========================================= */
+// Scales, weights, and line-heights.
 
-// Size logic validated for responsive readability.
 $font-scale: (
   // Mobile: 14px (0.875rem) -> Desktop: 18px (1.125rem)
   'body': clamp(0.875rem, 0.8rem + 0.5vw, 1.125rem),
@@ -31,7 +25,7 @@ $font-scale: (
   'h5': clamp(1rem, 0.95rem + 0.5vw, 1.25rem)
 );
 
-// Weight Logic (Graduated hierarchy)
+// Weight hierarchy.
 $font-weights: (
   // Structural (Bold)
   'h1': 700,
@@ -48,8 +42,7 @@ $font-weights: (
   'input': 400
 );
 
-// Line Height Logic (Optimized for each typographic
-// Based on Apple's SF Pro standard: 1.2 for headlines, 1.5 for body.
+// Line heights tuned for headlines/body.
 $line-heights: (
   'h1': 1.1,
   'h2': 1.15,
@@ -61,12 +54,9 @@ $line-heights: (
   'caption': 1.4,
 );
 
-/* =========================================
-   1.5. EMIT CSS VARIABLES (Runtime Scaling)
-   ========================================= */
-// Generate CSS variables for typography tokens to enable runtime scaling
+/* Emit CSS variables for runtime scaling. */
 :root {
-  // Font Sizes (Dynamic)
+  // Font sizes.
   --font-size-h1: #{map.get($font-scale, 'h1')};
   --font-size-h2: #{map.get($font-scale, 'h2')};
   --font-size-h3: #{map.get($font-scale, 'h3')};
@@ -76,7 +66,7 @@ $line-heights: (
   --font-size-small: #{map.get($font-scale, 'small')};
   --font-size-caption: #{map.get($font-scale, 'caption')};
 
-  // Line Heights (Semantic)
+  // Line heights.
   --line-height-heading: #{map.get($line-heights, 'h1')};
   --line-height-heading-h2: #{map.get($line-heights, 'h2')};
   --line-height-heading-h3: #{map.get($line-heights, 'h3')};
@@ -86,20 +76,17 @@ $line-heights: (
   --line-height-small: #{map.get($line-heights, 'small')};
   --line-height-caption: #{map.get($line-heights, 'caption')};
 
-  // Font Weights (Semantic)
+  // Font weights.
   --font-weight-bold: #{map.get($font-weights, 'h1')};
   --font-weight-semibold: #{map.get($font-weights, 'h3')};
   --font-weight-medium: #{map.get($font-weights, 'h5')};
   --font-weight-regular: #{map.get($font-weights, 'body')};
 }
 
-/* =========================================
-   2. THE MIXIN
-   ========================================= */
+/* Typography mixin. */
 @mixin typography($level: 'body', $is-input: false) {
   @if map.has-key($font-scale, $level) {
-    // 1. FAMILY & WEIGHT ASSIGNMENT
-    // -----------------------------
+    // Headings use heading font; body uses body font with optional input weight.
     @if (
       $level ==
         'h1' or
@@ -124,18 +111,13 @@ $line-heights: (
       }
     }
 
-    // 2. SIZE CALCULATION
-    // -----------------------------
     $base-clamp: map.get($font-scale, $level);
 
-    // Clamp scales with --text-scale while capping growth on ultra-wide viewports.
+    // Scale with --text-scale while keeping the clamp bounds.
     font-size: calc(#{$base-clamp} * var(--text-scale));
     line-height: map.get($line-heights, $level);
 
-    // 3. RESPONSIVE OVERRIDES
-    // -----------------------------
-
-    // Tablet Override for H1 to preserve hero hierarchy on larger canvases.
+    // Tablet override to preserve H1 hierarchy.
     @if $level == 'h1' {
       @include respond-up(tablet) {
         font-size: calc(clamp(2rem, 5vw, 3.5rem) * var(--text-scale));
@@ -146,26 +128,21 @@ $line-heights: (
   }
 }
 
-/* =========================================
-   3. GLOBAL ELEMENTS (Void Semantics)
-   ========================================= */
+/* Global elements. */
 
 body {
-  // Use the active atmosphere family while honoring user overrides.
   font-family: var(--font-body);
 
-  // Applies the scale factor
   font-size: calc(1rem * var(--text-scale));
 }
 
 h1,
 h2,
 h3 {
-  // Headings stay tied to the atmosphere family for identity.
   font-family: var(--font-heading);
 }
 
-/* Layer 1: Headers (100% Opacity) */
+/* Layer 1: headers (100% opacity). */
 h1 {
   @include typography('h1');
   color: var(--text-main);
@@ -179,11 +156,11 @@ h3 {
   color: var(--text-main);
 }
 
-/* Layer 2: Subheaders/Body (85% Opacity) */
+/* Layer 2: subheaders/body (85% opacity). */
 h4 {
   @include typography('h4');
   color: var(--text-dim);
-} // H4 often acts as subheader
+} // H4 often acts as subheader.
 h5 {
   @include typography('h5');
   color: var(--text-dim);
@@ -199,26 +176,22 @@ button {
   color: var(--text-dim);
 }
 
-/* Layer 3: Metadata (60% Opacity) */
+/* Layer 3: metadata (60% opacity). */
 caption,
 small {
   @include typography('small');
   color: var(--text-mute);
 }
 
-/* INPUTS (Special Case) */
-/* Inputs share H5 size but need 'input' weight (Regular) and bright text for data */
+/* Inputs: H5 size with input weight and active text color. */
 input,
 select,
 textarea {
   @include typography('h5', $is-input: true); // Pass flag to force weight: 400
-  // Input data is treated as active signal, so it uses main text color.
   color: var(--text-main);
 }
 
-/* =========================================
-   4. UTILITY CLASSES
-   ========================================= */
+/* Utility classes. */
 .text-caption {
   @include typography('caption');
 }

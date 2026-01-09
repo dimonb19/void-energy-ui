@@ -1,13 +1,10 @@
-/*
- * ROLE: Toast Notification State Manager
- * RESPONSIBILITY: Queues ephemeral system alerts.
- */
+/* Toast notification state manager. */
 
 class ToastStore {
-  // Svelte 5 Reactive State
+  // Reactive toast queue for rendering.
   items = $state<VoidToastItem[]>([]);
 
-  // Internal timer map to handle auto-dismissal
+  // Timer registry for auto-dismiss toasts.
   private timers = new Map<number, ReturnType<typeof setTimeout>>();
 
   /**
@@ -18,10 +15,9 @@ class ToastStore {
   show(message: string, type: VoidToastType = 'info', duration = 4000) {
     const id = Date.now();
 
-    // 1. Add to the reactive stack
+    // Queue immediately, then schedule auto-dismiss unless it's a manual state.
     this.items.push({ id, message, type });
 
-    // 2. Set auto-dismiss timer (unless it's a loading state that needs manual closing)
     if (type !== 'loading') {
       const timer = setTimeout(() => {
         this.close(id);
@@ -29,21 +25,21 @@ class ToastStore {
       this.timers.set(id, timer);
     }
 
-    return id; // Return ID in case we need to close it manually later
+    return id;
   }
 
   /**
    * Removes a specific toast by ID.
    */
   close(id: number) {
-    // 1. Clean up the timer to prevent memory leaks
+    // Clear any pending timer to avoid leaks.
     const timer = this.timers.get(id);
     if (timer) {
       clearTimeout(timer);
       this.timers.delete(id);
     }
 
-    // 2. Remove from the UI
+    // Remove from the queue.
     this.items = this.items.filter((t) => t.id !== id);
   }
 

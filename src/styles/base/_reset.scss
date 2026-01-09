@@ -1,7 +1,4 @@
-/*
- * ROLE: Global reset and canvas conditioning.
- * RESPONSIBILITY: Primes the Void canvas and spacing engine.
- */
+/* Global reset and canvas setup. */
 
 @use 'sass:map';
 @use '../abstracts' as *;
@@ -11,12 +8,12 @@
 // =========================================
 // 0. THE DENSITY ENGINE (Bulletproofed)
 // =========================================
+
 :root {
-  // The Base Unit (4px)
+  // Base unit (4px).
   --unit: 0.25rem;
 
-  // The Calculated Scale
-  // We use var(--density, 1) to prevent "Invalid Property" errors if the variable is unset.
+  // Spacing scale uses --density fallback to avoid invalid values.
   --space-xs: calc(2 * var(--unit) * var(--density, 1)); // 8px
   --space-sm: calc(4 * var(--unit) * var(--density, 1)); // 16px
   --space-md: calc(6 * var(--unit) * var(--density, 1)); // 24px
@@ -24,28 +21,22 @@
   --space-xl: calc(12 * var(--unit) * var(--density, 1)); // 48px
   --space-2xl: calc(16 * var(--unit) * var(--density, 1)); // 64px
 
-  // 1. The Hard Floor (A11y Standard)
-  // We guarantee no interactive target is smaller than 44px (2.75rem)
+  // Minimum touch target (WCAG).
   --size-touch-min: 2.75rem;
 
-  // 2. Dynamic Control Height
-  // Logic: 11 units (2.75rem) * Density.
-  // Safety: We use max() to ensure it never shrinks below 2.25rem (36px) even in ultra-compact mode.
-  // Note: We allow slightly smaller than 44px in High Density (0.75x) for desktop data density,
+  // Control height scales with density but never below 2.25rem.
   --control-height: max(2.25rem, calc(2.75rem * var(--density, 1)));
 
-  // 3. Dynamic Control Padding (Internal breathing room)
-  // Logic: Scales with density.
+  // Control padding scales with density.
   --control-padding-x: var(--space-sm);
   --control-padding-y: calc(
     var(--space-xs) * 0.75
   ); // Slightly tighter vertical alignment
 
-  // 4. Container Padding (Dialogs/Cards)
-  // Logic: Uses the larger 'md' or 'lg' spaces
+  // Default surface padding for cards/dialogs.
   --surface-padding: var(--space-lg);
 
-  // Radius Defaults
+  // Radius scale.
   --radius-sm: 4px;
   --radius-md: 8px;
   --radius-lg: 16px;
@@ -55,7 +46,7 @@
   --text-scale: 1;
   --scrollbar-width: 6px;
 
-  // 5. Structural Constants (Component-specific layout constraints)
+  // Structural constants (component layout constraints).
   --modal-width-sm: #{map.get(
       generated.$structural-constants,
       'modal-width-sm'
@@ -80,9 +71,10 @@
   --dialog-gutter-lg: var(--space-2xl);
 }
 
-/* =========================================
-   1. BOX SIZING & DEFAULTS
-   ========================================= */
+// =========================================
+// 1. BOX SIZING & DEFAULTS
+// =========================================
+
 *,
 *::before,
 *::after {
@@ -92,16 +84,17 @@
   font-family: inherit;
 }
 
-/* =========================================
-   2. THE VOID CANVAS
-   ========================================= */
+// =========================================
+// 2. THE VOID CANVAS
+// =========================================
+
 html {
   scroll-behavior: smooth;
   overscroll-behavior-y: none;
   padding-block: 0;
   overflow-x: hidden;
 
-  // Ensure fluid math is respected on mobile rotation
+  // Keep fluid math stable on mobile rotation.
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 
@@ -116,7 +109,7 @@ html {
   background-repeat: no-repeat;
 
   @media (pointer: coarse) {
-    background-attachment: scroll; // Disables parallax on mobile to fix jitter
+    background-attachment: scroll; // Disable parallax on mobile.
   }
 
   @include typography('body');
@@ -138,9 +131,10 @@ body {
   min-height: 100vh;
 }
 
-/* =========================================
-   3. GLOBAL INTERACTION
-   ========================================= */
+// =========================================
+// 3. GLOBAL INTERACTION
+// =========================================
+
 ::selection {
   background: var(--energy-primary);
   color: var(--bg-canvas);
@@ -159,7 +153,7 @@ textarea {
   color: inherit;
   font-family: inherit;
 
-  // Constrained Transition List
+  // Constrained transition list.
   transition-property:
     color, background-color, border-color, text-decoration-color, fill, stroke,
     opacity, box-shadow, transform, filter, backdrop-filter;
@@ -181,7 +175,7 @@ button,
   cursor: pointer;
 }
 
-// Disabled Logic
+// Disabled states.
 button:disabled,
 input:disabled,
 select:disabled,
@@ -219,9 +213,10 @@ hr {
   margin: 1.5rem 0;
 }
 
-/* =========================================
-   4. ACCESSIBILITY: HIGH CONTRAST MODE
-   ========================================= */
+// =========================================
+// 4. ACCESSIBILITY: HIGH CONTRAST MODE
+// =========================================
+
 // This triggers ONLY when the user has forced system colors (Windows HCM).
 // It overrides your Theme Engine to ensure perfect contrast.
 @media (forced-colors: active) {
@@ -283,9 +278,10 @@ hr {
   }
 }
 
-/* =========================================
-   5. ACCESSIBILITY: MOTION SAFETY (The Kill Switch)
-   ========================================= */
+// =========================================
+// 5. ACCESSIBILITY: MOTION SAFETY (The Kill Switch)
+// =========================================
+
 // This single block handles 95% of the work.
 // It forces all animations to be instant for sensitive users.
 @media (prefers-reduced-motion: reduce) {

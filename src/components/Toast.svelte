@@ -9,27 +9,23 @@
     error: '🛑',
   };
 
-  // 1. DOM Reference for the Popover API
+  // Popover region reference.
   let region = $state<HTMLElement | null>(null);
 
-  // 2. LOGIC: Top Layer Hoisting
-  // The Popover API stacks elements by insertion order.
-  // To ensure Toasts appear ABOVE an active Modal, we must re-insert
-  // the Toast Region into the Top Layer whenever a new message arrives.
+  // Keep toast region ahead of modals in the Top Layer.
   $effect(() => {
     if (!region) return;
 
     if (toast.items.length > 0) {
-      // A. Force Re-hoist (Remove and Add to Top Layer)
-      // This ensures we jump ahead of any Modals opened recently.
+      // Re-show to bump insertion order.
       try {
         region.hidePopover();
         region.showPopover();
       } catch (e) {
-        // Safety: Ignore errors if browser is fighting state
+        // Ignore transient popover state errors.
       }
     } else {
-      // B. Cleanup (Close popover when empty to prevent blocking clicks)
+      // Close when empty to avoid blocking clicks.
       try {
         region.hidePopover();
       } catch (e) {}

@@ -1,16 +1,9 @@
-/*
- * ROLE: Semantic token definitions.
- * RESPONSIBILITY: Defines Sass Maps only. CSS output moved to base/_reset.scss.
- */
+/* Token maps only; CSS output lives in base/_reset.scss. */
 
 @use 'sass:map';
 @use '../config/generated-themes' as generated;
 
-// =========================================
-// SASS MAPS (Inherited from Design Tokens)
-// =========================================
-
-// Forwarding the maps so other files can use standard syntax
+// Sass maps inherited from generated tokens.
 $z-layers: generated.$z-layers;
 $breakpoints: generated.$breakpoints;
 $container-widths: generated.$container-widths;

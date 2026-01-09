@@ -1,14 +1,13 @@
 import type { Component } from 'svelte';
 
-// Define the available modal keys
+// Modal keys.
 export const MODAL_KEYS = {
   ALERT: 'alert',
   CONFIRM: 'confirm',
   SETTINGS: 'settings',
 } as const;
 
-// We use an async importer pattern
-// ⚠️ Note: Svelte 5 handles promises in snippets gracefully
+// Lazy-load modal fragments; Svelte 5 resolves promises in snippets.
 export const modalRegistry: Record<
   string,
   () => Promise<{ default: Component<any> }>

@@ -1,37 +1,26 @@
-/*
- * ROLE: Dialog and modal styling.
- * RESPONSIBILITY: Applies holographic materialization physics to native <dialog> elements and their backdrops.
- */
+/* Dialog and modal styling for native <dialog>. */
 
 @use '../abstracts' as *;
 
-// ==========================================================================
-// DIALOGS & MODALS
-// Materialize from blur, dematerialize upward, and anchor at modal depth.
-// ==========================================================================
-
 dialog {
-  // --- 1. LAYOUT & POSITION ---
+  // Layout and position.
   position: fixed;
   margin: auto; // Centers native dialogs
   padding: 0; // Reset, let inner container handle it
   inset: 0; // Ensure full screen centering context
   overscroll-behavior: contain; // Prevents scroll chaining to the body
 
-  // RESPONSIVE WIDTH STRATEGY
-  // ------------------------------------------------------------------------
-  // Default: "Standard" (Good for forms/inputs)
-  // Logic: "Take full width minus padding, BUT cap at modal-width-sm."
+  // Responsive width strategy.
   width: min(calc(100vw - var(--dialog-gutter)), var(--modal-width-sm));
-  // Max Height: Ensure header/footer don't get cut off on short screens
+  // Max height keeps header/footer visible on short screens.
   max-height: calc(100dvh - var(--dialog-gutter-lg));
 
-  // Tablet+: Let it breathe a bit more
+  // Tablet+.
   @include respond-up('tablet') {
     width: min(calc(100vw - var(--dialog-gutter-lg)), var(--modal-width-md));
   }
 
-  // A. "Mini" (Alerts / Confirmations / Delete)
+  // Mini (alerts/confirm).
   &[data-size='sm'] {
     width: min(
       calc(100vw - var(--dialog-gutter)),
@@ -40,41 +29,37 @@ dialog {
     text-align: center; // Usually centered text for alerts
   }
 
-  // B. "Wide" (Complex Grids / File Uploads)
+  // Wide (complex layouts).
   &[data-size='lg'] {
     width: min(calc(100vw - var(--dialog-gutter)), var(--modal-width-lg));
     max-width: var(--modal-width-xl); // Ultrawide Cap
   }
 
-  // C. "Full" ( immersive takeovers)
+  // Full (immersive).
   &[data-size='full'] {
     width: calc(100vw - var(--dialog-gutter));
     height: calc(100dvh - var(--dialog-gutter));
     max-height: none;
   }
 
-  // --- 2. VOID STYLING ---
+  // Base styling.
   border: none;
   border-radius: calc(var(--radius-base) * 2);
   color: var(--text-main);
 
-  // Extra Depth: Modals float higher than cards
+  // Modals float higher than cards.
   box-shadow: var(--shadow-lift);
 
-  // --- 3. ANIMATION PHYSICS (The Materialize Effect) ---
-  // DEFAULT STATE (Open)
+  // Default (open) state.
   opacity: 1;
   transform: scale(1) translateY(0);
   filter: blur(0);
 
-  // Apply Glass Physics (Static: No hover movement)
+  // Apply glass physics (static).
   @include glass-float($interactive: false);
 
-  // --- 4. PROGRESSIVE ENHANCEMENT ---
-  // We check if the browser supports animating 'display'.
-  // If not, we skip ALL transition logic to prevent "Jumpy" or "Stuck" states.
+  // Progressive enhancement: only animate if display transitions are supported.
   @supports (transition-behavior: allow-discrete) {
-    // The "Materialize" Transitions
     transition:
       opacity var(--speed-base) var(--ease-flow),
       transform var(--speed-base) var(--ease-snap),
@@ -82,15 +67,13 @@ dialog {
       display var(--speed-base) allow-discrete,
       overlay var(--speed-base) allow-discrete;
 
-    // ENTRY STATE (@starting-style)
     @starting-style {
       opacity: 0;
       transform: scale(0.95) translateY(10px); // void-ignore (Motion Physics)
       filter: blur(var(--physics-blur));
     }
 
-    // EXIT STATE
-    // When 'open' is removed (this only works with allow-discrete)
+    // Exit state when [open] is removed.
     &:not([open]) {
       opacity: 0;
       transform: scale(0.95) translateY(-10px); // void-ignore (Motion Physics)
@@ -98,18 +81,16 @@ dialog {
     }
   }
 
-  // --- 6. BACKDROP (The Overlay) ---
+  // Backdrop.
   &::backdrop {
-    // Dynamic: Deep Blue in Void, Dark Grey in Paper
     background: alpha(var(--bg-canvas), 80%);
     opacity: 0;
 
-    // Light Mode Exception: Standard dark overlay
+    // Light mode override.
     @at-root [data-mode='light'] & {
       background: rgba(0, 0, 0, 0.5);
     }
 
-    // Only animate backdrop if supported
     @supports (transition-behavior: allow-discrete) {
       transition:
         opacity var(--speed-base) var(--ease-flow),
@@ -118,7 +99,7 @@ dialog {
     }
   }
 
-  // We target the backdrop ONLY when the parent dialog has [open]
+  // Backdrop only when dialog is open.
   &[open]::backdrop {
     opacity: 1;
 
@@ -127,15 +108,13 @@ dialog {
     }
   }
 
-  // --- 7. INNER CONTENT LAYOUT ---
-  // We target a direct child div to handle padding/scroll
+  // Inner content layout.
   & > div {
     display: flex;
     flex-flow: column nowrap;
     padding: var(--surface-padding);
     gap: var(--space-md);
 
-    // Typography
     h2,
     h3 {
       color: var(--text-main);
@@ -149,11 +128,11 @@ dialog {
     }
   }
 
-  // --- 8. SCROLLBARS (Neon Stream) ---
+  // Scrollbars.
   overflow-y: auto;
   @include laser-scrollbar;
 
-  // --- 9. LIGHT MODE OVERRIDE ---
+  // Light mode override.
   @at-root [data-mode='light'] & {
     background: var(--bg-surface);
     border: var(--physics-border-width) solid var(--border-color);

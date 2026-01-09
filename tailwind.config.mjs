@@ -7,8 +7,7 @@ import {
   VOID_LAYERS,
 } from './src/config/design-tokens.ts';
 
-// 🛠️ HELPER: Auto-map token keys to CSS Variables
-// Turns "md" -> "var(--space-md)" automatically
+// Map token keys to CSS variables (e.g., md -> var(--space-md)).
 function mapToVars(obj, prefix) {
   return Object.keys(obj).reduce((acc, key) => {
     acc[key] = `var(--${prefix}-${key})`;
@@ -19,23 +18,18 @@ function mapToVars(obj, prefix) {
 export default {
   content: ['./src/**/*.{astro,html,js,jsx,md,mdx,svelte,ts,tsx,vue}'],
 
-  // 1. DISABLE CORE PREFLIGHT
-  // We rely on 'src/styles/base/_reset.scss' for the Void Canvas setup.
+  // Disable preflight; base/_reset.scss owns the canvas setup.
   corePlugins: {
     preflight: false,
     container: false, // We use a custom .container class in SCSS
   },
 
-  // ⚠️ ARCHITECTURE WARNING:
-  // This configuration is STRICTLY mapped to `src/config/design-tokens.ts`.
-  // Do not add custom colors or spacing here.
-  // If you need a new value, add it to the Design Tokens and rebuild.
+  // Keep this config mapped to src/config/design-tokens.ts; no custom values here.
   theme: {
-    // 2. SCREENS (Breakpoints)
+    // Breakpoints.
     screens: VOID_RESPONSIVE,
 
-    // 3. STRICT SPACING (The Density Engine)
-    // Developers must use semantic tokens: p-md, gap-lg.
+    // Spacing tokens only (p-md, gap-lg).
     spacing: {
       0: '0',
       px: '1px',
@@ -43,8 +37,7 @@ export default {
       ...mapToVars(VOID_SPACING, 'space'),
     },
 
-    // 4. STRICT PALETTE (The Atmosphere)
-    // Wipes all default colors. Forces usage of Semantic Variables.
+    // Palette tokens only.
     colors: {
       transparent: 'transparent',
       current: 'currentColor',
@@ -83,7 +76,7 @@ export default {
       'error-subtle': 'var(--color-error-subtle)',
     },
 
-    // 5. STRICT GEOMETRY (The Physics)
+    // Geometry tokens.
     borderRadius: {
       none: '0',
       DEFAULT: 'var(--radius-md)',
@@ -95,11 +88,10 @@ export default {
       2: '2px',
     },
 
-    // 6. STRICT LAYERS (Z-Index)
-    // Matches src/config/design-tokens.ts
+    // Z-index layers.
     zIndex: VOID_LAYERS,
 
-    // 7. MOTION
+    // Motion tokens.
     transitionDuration: {
       0: '0ms',
       instant: 'var(--speed-instant)',
@@ -119,14 +111,13 @@ export default {
       linear: 'linear',
     },
 
-    // 8. TYPOGRAPHY
-    // Allows 'font-heading' and 'font-body' usage
+    // Typography tokens.
     fontFamily: {
       heading: ['var(--font-heading)', 'sans-serif'],
       body: ['var(--font-body)', 'sans-serif'],
       mono: ['var(--font-code)', 'monospace'],
     },
-    // Semantic font sizes using CSS variables (enables runtime scaling)
+    // Font sizes via CSS variables (runtime scaling).
     fontSize: {
       caption: 'var(--font-size-caption)',
       small: 'var(--font-size-small)',
@@ -137,7 +128,7 @@ export default {
       h2: 'var(--font-size-h2)',
       h1: 'var(--font-size-h1)',
     },
-    // Semantic line heights
+    // Line heights.
     lineHeight: {
       none: '1',
       tight: 'var(--line-height-heading)',
@@ -145,7 +136,7 @@ export default {
       relaxed: '1.75',
       loose: '2',
     },
-    // Semantic font weights
+    // Font weights.
     fontWeight: {
       regular: 'var(--font-weight-regular)',
       medium: 'var(--font-weight-medium)',
@@ -155,8 +146,7 @@ export default {
   },
 
   plugins: [
-    // 9. THE PHYSICS BRIDGE
-    // Exposes dynamic CSS variables as native Tailwind Utilities.
+    // Physics bridge: expose dynamic CSS variables as utilities.
     plugin(function ({ addUtilities }) {
       addUtilities({
         // Dynamic Blur (Matches current Atmosphere/Physics)

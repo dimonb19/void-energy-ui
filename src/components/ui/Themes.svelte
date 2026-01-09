@@ -1,7 +1,7 @@
 <script lang="ts">
   import { voidEngine } from '../../adapters/void-engine.svelte';
 
-  // Reactive List derived from Engine state
+  // Derived list of atmospheres from engine state.
   let atmospheres = $derived(
     voidEngine.availableThemes.map((id: string) => {
       const meta = voidEngine.registry[id];
