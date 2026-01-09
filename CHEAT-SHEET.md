@@ -388,17 +388,17 @@ Preset components with built-in layout and physics.
 
 ---
 
-#### `.tile-small`
+#### `.chip`
 
 **Description:** Data chips (Premium, System, Success variants)
-**Variants:** `.tile-premium`, `.tile-system`, `.tile-success`
+**Variants:** `.chip-premium`, `.chip-system`, `.chip-success`
 
 **Usage:**
 
 ```svelte
-<span class="tile-small tile-premium">Premium</span>
-<span class="tile-small tile-system">System</span>
-<span class="tile-small tile-success">Active</span>
+<span class="chip chip-premium">Premium</span>
+<span class="chip chip-system">System</span>
+<span class="chip chip-success">Active</span>
 ```
 
 ---

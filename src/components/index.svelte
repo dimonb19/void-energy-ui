@@ -358,11 +358,11 @@
               </p>
             {:else}
               {#each moduleTiles as tile (tile.id)}
-                <div class="tile-small" animate:live out:implode>
-                  <p class="tile-label">{tile.name}</p>
+                <div class="chip" animate:live out:implode>
+                  <p class="chip-label">{tile.name}</p>
                   <button
                     type="button"
-                    class="btn-void tile-remove"
+                    class="btn-void chip-remove"
                     aria-label="Remove {tile.name}"
                     onclick={() => {
                       moduleTiles = moduleTiles.filter((t) => t.id !== tile.id);
@@ -409,11 +409,11 @@
               </p>
             {:else}
               {#each environmentTiles as tile (tile.id)}
-                <div class="tile-small-system" animate:live out:implode>
-                  <p class="tile-label">{tile.name}</p>
+                <div class="chip-system" animate:live out:implode>
+                  <p class="chip-label">{tile.name}</p>
                   <button
                     type="button"
-                    class="btn-void tile-remove"
+                    class="btn-void chip-remove"
                     aria-label="Remove {tile.name}"
                     onclick={() => {
                       environmentTiles = environmentTiles.filter(
@@ -463,11 +463,11 @@
               </p>
             {:else}
               {#each premiumTiles as tile (tile.id)}
-                <div class="tile-small-premium" animate:live out:implode>
-                  <p class="tile-label">{tile.name}</p>
+                <div class="chip-premium" animate:live out:implode>
+                  <p class="chip-label">{tile.name}</p>
                   <button
                     type="button"
-                    class="btn-void tile-remove"
+                    class="btn-void chip-remove"
                     aria-label="Remove {tile.name}"
                     onclick={() => {
                       premiumTiles = premiumTiles.filter(
