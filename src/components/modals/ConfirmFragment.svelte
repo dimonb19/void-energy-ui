@@ -8,7 +8,7 @@
     confirmText = 'Confirm',
     cancelText = 'Abort',
     onConfirm,
-    onCancel,
+    onCancel = () => {},
   } = $props();
 </script>
 
@@ -27,7 +27,7 @@
 </div>
 
 <div class="flex flex-row justify-end gap-md pt-lg">
-  <button class="btn-alert" onclick={onCancel}>
+  <button class="btn-alert" onclick={() => onCancel()}>
     {cancelText}
   </button>
   <button

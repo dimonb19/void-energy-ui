@@ -165,6 +165,15 @@ interface VoidThemeDefinition extends VoidThemeConfig {
  */
 type ThemeRegistry = Record<string, VoidThemeDefinition>;
 
+/**
+ * JSON registry structure for static theme configuration (physics + mode only).
+ * Used when importing void-registry.json before runtime palette generation.
+ */
+type ThemeRegistryJSON = Record<
+  string,
+  { physics: VoidPhysics; mode: VoidMode }
+>;
+
 // ==========================================================================
 // 3. COMPONENT: TOASTS
 // ==========================================================================

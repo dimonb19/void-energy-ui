@@ -31,12 +31,63 @@ type ModalContract = {
     /** Initial music volume (0-100, defaults to stored preference) */
     initialMusic?: number;
     /** Callback fired when user saves preferences */
-    onSave?: (prefs: any) => void;
+    onSave?: (prefs: SettingsPreferences) => void;
   };
 };
+
+/**
+ * User preferences saved from the settings modal.
+ */
+interface SettingsPreferences {
+  music: number;
+  voice: number;
+  haptics: boolean;
+}
 
 /**
  * Union of all valid modal keys.
  * Used in modal manager's type-safe open<K> method.
  */
 type ModalKey = keyof ModalContract;
+
+/**
+ * Modal state when a modal is actively open.
+ */
+interface ModalStateActive<K extends ModalKey> {
+  key: K;
+  props: ModalContract[K];
+  size: 'sm' | 'md' | 'lg' | 'full';
+}
+
+/**
+ * Modal state when no modal is open.
+ */
+interface ModalStateClosed {
+  key: null;
+  props: Record<string, never>;
+  size: 'sm' | 'md' | 'lg' | 'full';
+}
+
+/**
+ * Union type representing all possible modal states.
+ */
+type ModalState = ModalStateClosed | ModalStateActive<ModalKey>;
+
+/**
+ * Lazy loader function type for modal components.
+ */
+type ModalComponentLoader<K extends ModalKey> = () => Promise<{
+  default: import('svelte').Component<ModalContract[K]>;
+}>;
+
+/**
+ * Registry mapping modal keys to their lazy loaders.
+ */
+type ModalRegistryType = {
+  [K in ModalKey]: ModalComponentLoader<K>;
+};
+
+/**
+ * Generic modal component type for dynamic rendering.
+ */
+type ModalComponentType = import('svelte').Component<Record<string, unknown>>;

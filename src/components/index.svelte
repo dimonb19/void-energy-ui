@@ -278,7 +278,7 @@
             onclick={() => {
               modal.open('settings', {
                 initialMusic: 65,
-                onSave: (prefs: any) => {
+                onSave: (prefs) => {
                   console.log('Saving to backend:', prefs);
                 },
               });

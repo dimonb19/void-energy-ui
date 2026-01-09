@@ -40,7 +40,9 @@ export class VoidEngine {
   atmosphere = $state<string>(DEFAULTS.ATMOSPHERE);
 
   // Runtime registry initialized from the build artifacts.
-  registry = $state<ThemeRegistry>({ ...(THEME_REGISTRY as any) });
+  registry = $state<ThemeRegistry>({
+    ...(THEME_REGISTRY as ThemeRegistryJSON as ThemeRegistry),
+  });
 
   userConfig = $state<UserConfig>({
     fontHeading: null,
@@ -87,9 +89,9 @@ export class VoidEngine {
 
     const baseTheme: VoidThemeDefinition = {
       id: DEFAULTS.ATMOSPHERE,
-      mode: (registryEntry?.mode as any) || 'dark',
-      physics: (registryEntry?.physics as any) || 'glass',
-      palette: (registryEntry as any)?.palette || FALLBACK_PALETTE,
+      mode: registryEntry?.mode ?? 'dark',
+      physics: registryEntry?.physics ?? 'glass',
+      palette: registryEntry?.palette ?? FALLBACK_PALETTE,
       fonts: [],
     };
 

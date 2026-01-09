@@ -6,7 +6,8 @@
     initialMusic = 50,
     initialVoice = 80,
     initialHaptics = true,
-    onSave = (data: any) => console.log('Settings Saved:', data),
+    onSave = (data: SettingsPreferences) =>
+      console.log('Settings Saved:', data),
   } = $props();
 
   // Local editing buffer.

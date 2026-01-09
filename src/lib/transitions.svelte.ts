@@ -11,7 +11,7 @@
  * the exit/shift choreography desynchronizes.
  */
 
-import { flip } from 'svelte/animate';
+import { flip, type FlipParams } from 'svelte/animate';
 import { cubicOut, cubicIn } from 'svelte/easing';
 import { voidEngine as theme } from '../adapters/void-engine.svelte';
 import THEME_REGISTRY from '../config/void-registry.json';
@@ -81,7 +81,7 @@ function getSystemConfig() {
 export function live(
   node: HTMLElement,
   { from, to }: { from: DOMRect; to: DOMRect },
-  params: any = {},
+  params: FlipParams = {},
 ) {
   const { isRetro, speedBase } = getSystemConfig();
 

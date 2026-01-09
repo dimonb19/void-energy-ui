@@ -1,5 +1,3 @@
-import type { Component } from 'svelte';
-
 // Modal keys.
 export const MODAL_KEYS = {
   ALERT: 'alert',
@@ -8,10 +6,7 @@ export const MODAL_KEYS = {
 } as const;
 
 // Lazy-load modal fragments; Svelte 5 resolves promises in snippets.
-export const modalRegistry: Record<
-  string,
-  () => Promise<{ default: Component<any> }>
-> = {
+export const modalRegistry: ModalRegistryType = {
   alert: () => import('../components/modals/AlertFragment.svelte'),
   confirm: () => import('../components/modals/ConfirmFragment.svelte'),
   settings: () => import('../components/modals/SettingsFragment.svelte'),

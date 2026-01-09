@@ -2,14 +2,8 @@
 
 import { MODAL_KEYS } from '../config/modal-registry';
 
-interface ModalState<K extends ModalKey> {
-  key: K | null;
-  props: ModalContract[K];
-  size: 'sm' | 'md' | 'lg' | 'full';
-}
-
 class ModalManager {
-  state = $state<ModalState<any>>({
+  state = $state<ModalState>({
     key: null,
     props: {},
     size: 'md',
@@ -27,7 +21,7 @@ class ModalManager {
   open<K extends ModalKey>(
     key: K,
     props: ModalContract[K],
-    size: ModalState<K>['size'] = 'md',
+    size: ModalState['size'] = 'md',
   ) {
     // Capture the element that triggered the modal.
     if (typeof document !== 'undefined') {

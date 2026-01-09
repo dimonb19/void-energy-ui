@@ -1,7 +1,6 @@
 <script lang="ts">
   import { modal } from '../../lib/modal-manager.svelte';
   import { modalRegistry } from '../../config/modal-registry';
-  import type { Component } from 'svelte';
 
   let dialog = $state<HTMLDialogElement | null>(null);
 
@@ -9,7 +8,7 @@
   // Problem: If we immediately null the component on close, the exit transition
   // renders an empty modal (flicker). Solution: Keep the component mounted until
   // CSS transition completes (see handleTransitionEnd function below).
-  let ActiveComponent = $state<Component<any> | null>(null);
+  let ActiveComponent = $state<ModalComponentType | null>(null);
 
   // Hold size/props until fade-out completes.
   // Rationale: Modal width/content must remain stable during exit animation.
@@ -33,7 +32,7 @@
           .then((module) => {
             // Only mount if the key is still active.
             if (modal.state.key) {
-              ActiveComponent = module.default;
+              ActiveComponent = module.default as ModalComponentType;
               if (dialog && !dialog.open) dialog.showModal();
             }
           })
