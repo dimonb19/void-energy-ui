@@ -507,7 +507,7 @@
       </div>
     </section>
 
-    <section class="flex flex-col gap-md mt-md">
+    <section class="flex flex-col gap-md my-md">
       <h2>04 // DATA UPLOAD</h2>
 
       <div class="p-md surface-glass">
@@ -522,7 +522,7 @@
     </section>
   </div>
 
-  <section class="flex flex-col gap-md mt-2xl">
+  <!-- <section class="flex flex-col gap-md mt-2xl">
     <h2 class="container">05 // RECENT ANOMALIES</h2>
 
     <div class="tiles-collection">
@@ -577,5 +577,5 @@
 
       <div class="loading-tile"></div>
     </div>
-  </section>
+  </section> -->
 </main>
