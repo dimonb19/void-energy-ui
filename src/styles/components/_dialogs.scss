@@ -44,6 +44,11 @@ dialog {
   border-radius: calc(var(--radius-base) * 2);
   color: var(--text-main);
 
+  // Remove browser focus outline.
+  &:focus {
+    outline: none;
+  }
+
   // Modals float higher than cards.
   box-shadow: var(--shadow-lift);
 

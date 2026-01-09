@@ -180,6 +180,8 @@ a,
 button,
 [role='button'] {
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent; // Remove iOS blue/gray tap flash
+  touch-action: manipulation; // Disable double-tap zoom, removes 300ms delay
 }
 
 // Disabled states.

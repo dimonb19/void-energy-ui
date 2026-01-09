@@ -28,6 +28,10 @@ button:not(.btn-void),
   padding-block: 0;
   padding-inline: calc(var(--space-sm) + var(--space-xs) / 2);
 
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none; // Prevents iOS long-press context menu
+
   // --- B. Typography ---
   font-family: var(--font-body);
   font-weight: var(--font-weight-semibold);
@@ -71,7 +75,7 @@ button:not(.btn-void),
 
   @media (hover: hover) {
     &:hover:not(:disabled) {
-      background: blend(var(--bg-surface), var(--energy-primary), 8%);
+      background: blend(var(--bg-surface), var(--energy-secondary), 8%);
       border-color: var(--energy-primary);
       transform: translateY(var(--lift)) scale(var(--scale, 1));
       color: var(--text-main);
@@ -80,9 +84,10 @@ button:not(.btn-void),
   }
 
   &:active:not(:disabled) {
-    transform: translateY(0);
+    // Invert the scale for press-down effect (1.02 → 0.98, 1.01 → 0.99, 1 → 1)
+    transform: scale(calc(2 - var(--scale, 1)));
+    background: blend(var(--bg-surface), var(--energy-secondary), 12%);
     border-color: var(--energy-secondary);
-    box-shadow: none;
   }
 
   &:disabled {
@@ -151,6 +156,11 @@ button:not(.btn-void),
           box-shadow: 3px 3px 0px alpha($color-var, 50%);
         }
       }
+    }
+
+    &:active:not(:disabled) {
+      border-color: blend($color-var, var(--energy-secondary), 12%);
+      background: alpha($color-var, 20%);
     }
   }
 
