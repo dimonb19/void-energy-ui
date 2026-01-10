@@ -354,20 +354,17 @@ export const VOID_TOKENS = {
       easeSpringSnappy: 'cubic-bezier(0.34, 1.56, 0.64, 1)', // Quick settle with subtle overshoot
       easeSpringBounce: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)', // Visible bounce-back effect
       easeFlow: 'linear', // Continuous motion (scrolling, progress)
-      // Legacy aliases (deprecated, use spring variants)
-      easeStabilize: 'cubic-bezier(0.34, 1.56, 0.64, 1)', // → use easeSpringSnappy
-      easeSnap: 'cubic-bezier(0.34, 1.56, 0.64, 1)', // → use easeSpringSnappy
       // Interaction Feedback
       lift: '-3px',
       scale: 1.02,
       // Svelte Spring Parameters (for programmatic animations)
-      springStiffness: 0.15, // Tension (0-1)
-      springDamping: 0.8, // Friction (0-1), higher = less bounce
+      springStiffness: 0.35, // Tension (0-1) - tighter, more confident
+      springDamping: 0.92, // Friction (0-1) - less bounce, faster settle
       // Motion Distance Tokens (for entry/exit animations)
       entryDistance: 15, // translateY for entry (px)
       entryScale: 0.96, // scale start for entry
       exitDistance: 20, // translateY for exit (px)
-      overshoot: 1.05, // max spring overshoot clamp
+      overshoot: 1.025, // max spring overshoot clamp - subtle confidence
     },
     flat: {
       radiusBase: VOID_RADIUS.sm,
@@ -388,9 +385,6 @@ export const VOID_TOKENS = {
       easeSpringSnappy: 'cubic-bezier(0.22, 0.61, 0.36, 1)', // Quick but not bouncy
       easeSpringBounce: 'cubic-bezier(0.175, 0.885, 0.32, 1.1)', // Minimal overshoot
       easeFlow: 'ease-in-out',
-      // Legacy aliases (deprecated)
-      easeStabilize: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
-      easeSnap: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
       // Interaction Feedback
       lift: '-2px',
       scale: 1.01,
@@ -422,9 +416,6 @@ export const VOID_TOKENS = {
       easeSpringSnappy: 'steps(2)',
       easeSpringBounce: 'steps(4)',
       easeFlow: 'steps(4)',
-      // Legacy aliases
-      easeStabilize: 'steps(2)',
-      easeSnap: 'steps(2)',
       // Interaction Feedback
       lift: '-2px',
       scale: 1,

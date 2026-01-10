@@ -117,12 +117,6 @@ interface VoidPhysicsPrimitive {
   /** Quick transition duration in milliseconds (micro-interactions) */
   speedFast: number;
 
-  /** Primary easing for stabilization animations (e.g., cubic-bezier(0.16, 1, 0.3, 1)) */
-  easeStabilize: string;
-
-  /** Easing for snap-to-position effects (e.g., cubic-bezier(0.22, 1, 0.36, 1)) */
-  easeSnap: string;
-
   /** Easing for smooth flow transitions (e.g., linear) */
   easeFlow: string;
 }

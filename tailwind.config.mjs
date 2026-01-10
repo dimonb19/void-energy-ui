@@ -106,8 +106,9 @@ export default {
     },
     transitionTimingFunction: {
       flow: 'var(--ease-flow)',
-      snap: 'var(--ease-snap)',
-      stabilize: 'var(--ease-stabilize)',
+      'spring-gentle': 'var(--ease-spring-gentle)',
+      'spring-snappy': 'var(--ease-spring-snappy)',
+      'spring-bounce': 'var(--ease-spring-bounce)',
       linear: 'linear',
     },
 
