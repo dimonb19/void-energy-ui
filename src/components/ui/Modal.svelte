@@ -17,33 +17,13 @@
   let renderedProps = $state(modal.state.props);
 
   // Sync dialog state on open/close.
-  // This effect handles the dialog lifecycle:
-  // 1. When modal.state.key changes from null → 'alert', lazy-load component and showModal()
+  // 1. When modal.state.key changes from null → 'alert', set component and showModal()
   // 2. When modal.state.key changes from 'alert' → null, close() and wait for transition
   $effect(() => {
     if (modal.state.key) {
       renderedSize = modal.state.size;
       renderedProps = modal.state.props;
-
-      // Lazy-load the modal fragment.
-      const loader = modalRegistry[modal.state.key];
-      if (loader) {
-        loader()
-          .then((module) => {
-            // Only mount if the key is still active.
-            if (modal.state.key) {
-              ActiveComponent = module.default as ModalComponentType;
-              if (dialog && !dialog.open) dialog.showModal();
-            }
-          })
-          .catch((err) => {
-            console.error(
-              `Void: Failed to load modal "${modal.state.key}"`,
-              err,
-            );
-            modal.close();
-          });
-      }
+      ActiveComponent = modalRegistry[modal.state.key] as ModalComponentType;
 
       if (dialog && !dialog.open) {
         dialog.showModal();

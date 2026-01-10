@@ -54,14 +54,10 @@ select {
   }
 
   // Focus state.
-  &:focus {
+  &:focus-visible {
     outline: none;
     border-color: var(--energy-primary);
-    box-shadow: var(--shadow-sunk), var(--focus-ring);
-
-    @at-root [data-physics='retro'] & {
-      box-shadow: var(--focus-ring);
-    }
+    box-shadow: var(--focus-ring);
   }
 
   // Error state (use aria-invalid for accessibility).

@@ -82,7 +82,6 @@ function createSpringEasing(
   };
 }
 
-
 // Read physics configuration without DOM reflow.
 function getSystemConfig() {
   // Honor reduced-motion preferences.

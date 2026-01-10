@@ -219,47 +219,7 @@
 }
 
 // ==========================================================================
-// 4. FOCUS STATE (Universal)
-// ==========================================================================
-
-// Universal Focus State Mixin
-// Ensures consistent focus styling across ALL interactive elements.
-// Apple's Rule: Focus states must be visually consistent for muscle memory.
-//
-// @param $include-sunk - Set true for inputs/textareas that have inset shadow
-// @param $is-inline - Set true for inline elements (links) that shouldn't have ring
-@mixin focus-state($include-sunk: false, $is-inline: false) {
-  outline: none;
-
-  @if $is-inline {
-    // Inline elements (links): Use underline + subtle glow instead of ring
-    text-decoration: underline;
-    text-decoration-color: var(--energy-primary);
-    text-underline-offset: 3px;
-
-    @at-root [data-physics='glass'] & {
-      text-shadow: 0 0 8px alpha(var(--energy-primary), 50%);
-    }
-  } @else {
-    // Block elements (buttons, inputs): Use focus ring
-    border-color: var(--energy-primary);
-
-    @if $include-sunk {
-      box-shadow: var(--shadow-sunk), var(--focus-ring);
-    } @else {
-      box-shadow: var(--focus-ring);
-    }
-  }
-
-  // Spring transition for focus (instant feedback)
-  transition:
-    border-color var(--speed-instant) var(--ease-spring-snappy),
-    box-shadow var(--speed-instant) var(--ease-spring-snappy),
-    text-shadow var(--speed-instant) var(--ease-spring-snappy);
-}
-
-// ==========================================================================
-// 5. STATE MANAGEMENT MIXINS (Strict Protocol)
+// 4. STATE MANAGEMENT MIXINS (Strict Protocol)
 // ==========================================================================
 
 // A. ACTIVE STATE (Interactive)
@@ -295,7 +255,7 @@
 }
 
 // ==========================================================================
-// 6. SCROLLBAR
+// 5. SCROLLBAR
 // ==========================================================================
 
 @mixin laser-scrollbar() {
@@ -323,7 +283,7 @@
 }
 
 // ==========================================================================
-// 7. TEXT UTILITIES
+// 6. TEXT UTILITIES
 // ==========================================================================
 
 // MIXIN: Truncate

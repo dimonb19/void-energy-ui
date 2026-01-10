@@ -4,7 +4,7 @@
  *
  * To add a new modal:
  * 1. Add entry here with prop interface
- * 2. Update modal-registry.ts with lazy loader
+ * 2. Update modal-registry.ts with static import
  * 3. Create component in src/components/modals/
  */
 type ModalContract = {
@@ -91,17 +91,10 @@ interface ModalStateClosed {
 type ModalState = ModalStateClosed | ModalStateActive<ModalKey>;
 
 /**
- * Lazy loader function type for modal components.
- */
-type ModalComponentLoader<K extends ModalKey> = () => Promise<{
-  default: import('svelte').Component<ModalContract[K]>;
-}>;
-
-/**
- * Registry mapping modal keys to their lazy loaders.
+ * Registry mapping modal keys to their components.
  */
 type ModalRegistryType = {
-  [K in ModalKey]: ModalComponentLoader<K>;
+  [K in ModalKey]: import('svelte').Component<ModalContract[K]>;
 };
 
 /**

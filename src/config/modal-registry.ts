@@ -1,3 +1,7 @@
+import AlertFragment from '../components/modals/AlertFragment.svelte';
+import ConfirmFragment from '../components/modals/ConfirmFragment.svelte';
+import SettingsFragment from '../components/modals/SettingsFragment.svelte';
+
 // Modal keys.
 export const MODAL_KEYS = {
   ALERT: 'alert',
@@ -5,9 +9,9 @@ export const MODAL_KEYS = {
   SETTINGS: 'settings',
 } as const;
 
-// Lazy-load modal fragments; Svelte 5 resolves promises in snippets.
+// Static modal registry - components are bundled upfront for instant display.
 export const modalRegistry: ModalRegistryType = {
-  alert: () => import('../components/modals/AlertFragment.svelte'),
-  confirm: () => import('../components/modals/ConfirmFragment.svelte'),
-  settings: () => import('../components/modals/SettingsFragment.svelte'),
+  alert: AlertFragment,
+  confirm: ConfirmFragment,
+  settings: SettingsFragment,
 };

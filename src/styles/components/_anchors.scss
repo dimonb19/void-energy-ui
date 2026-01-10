@@ -59,8 +59,8 @@ a {
   }
 
   &:focus-visible {
-    // Use the universal focus state for inline elements
-    @include focus-state($is-inline: true);
+    outline: none;
+    box-shadow: none;
 
     // Also show the laser underline for extra visibility
     &::after {
