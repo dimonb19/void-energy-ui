@@ -62,9 +62,8 @@ select {
     }
   }
 
-  // Error state.
+  // Error state (use aria-invalid for accessibility).
   &[aria-invalid='true'],
-  &[data-error='true'],
   &:invalid:not(:placeholder-shown) {
     border-color: var(--color-error);
     color: var(--color-error);

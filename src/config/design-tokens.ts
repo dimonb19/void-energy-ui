@@ -213,6 +213,7 @@ export const VOID_TYPOGRAPHY = {
     medium: 500, // Card Title (h5)
     semibold: 600, // Subsection (h3, h4)
     bold: 700, // Structural (h1, h2)
+    extrabold: 800, // CTA buttons, high emphasis
   },
 
   // Font Families (Atmosphere-specific, defined in themes)
@@ -434,7 +435,7 @@ export const VOID_TOKENS = {
         'border-color': 'rgba(255, 255, 255, 0.15)',
         'text-main': '#ffffff',
         'text-dim': '#a3a3a3',
-        'text-mute': 'rgba(163, 163, 163, 0.6)',
+        'text-mute': 'rgba(163, 163, 163, 0.75)', // Increased from 0.6 for WCAG AA compliance (~4.1:1 contrast)
       },
     },
 

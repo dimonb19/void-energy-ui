@@ -106,7 +106,7 @@ button:not(.btn-void),
     @include gemini-laser;
 
     color: var(--energy-primary);
-    font-weight: 800;
+    font-weight: var(--font-weight-extrabold);
     min-height: var(--space-xl);
     padding-inline: var(--space-md);
 

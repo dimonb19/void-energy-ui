@@ -34,6 +34,7 @@ $letter-spacings: generated.$letter-spacings;
   --line-height-caption: #{map.get($line-heights, 'caption')};
 
   // Font weights.
+  --font-weight-extrabold: #{map.get($font-weights, 'cta')};
   --font-weight-bold: #{map.get($font-weights, 'h1')};
   --font-weight-semibold: #{map.get($font-weights, 'h3')};
   --font-weight-medium: #{map.get($font-weights, 'h5')};

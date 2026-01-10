@@ -73,6 +73,7 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
   scss += `  'small': ${VOID_TYPOGRAPHY.weights.regular},\n`;
   scss += `  'caption': ${VOID_TYPOGRAPHY.weights.regular},\n`;
   scss += `  'input': ${VOID_TYPOGRAPHY.weights.regular},\n`;
+  scss += `  'cta': ${VOID_TYPOGRAPHY.weights.extrabold},\n`;
   scss += `);\n\n`;
 
   // Z-layers map.
