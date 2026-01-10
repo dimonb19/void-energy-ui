@@ -3,73 +3,102 @@
   import { toast } from '../../stores/toast.svelte';
 
   let {
-    initialMusic = 50,
-    initialVoice = 80,
-    initialHaptics = true,
+    initialSettings = 'default',
+    initialPlayMode = 'play_unlimited',
+    initialDontShowAgain = false,
+    isGuest = false,
     onSave = (data: SettingsPreferences) =>
       console.log('Settings Saved:', data),
+    onDontShowAgainChange = (value: boolean) =>
+      console.log('Dont show again:', value),
+  }: {
+    initialSettings?: SettingMode;
+    initialPlayMode?: PlayMode;
+    initialDontShowAgain?: boolean;
+    isGuest?: boolean;
+    onSave?: (data: SettingsPreferences) => void;
+    onDontShowAgainChange?: (value: boolean) => void;
   } = $props();
 
   // Local editing buffer.
-  let music = $state(initialMusic);
-  let voice = $state(initialVoice);
-  let haptics = $state(initialHaptics);
+  let preferredSettings = $state<SettingMode>(initialSettings);
+  let playMode = $state<PlayMode>(initialPlayMode);
+  let dontShowAgain = $state(initialDontShowAgain);
 
   function handleSave() {
-    // Persist, notify, and close.
-    onSave({ music, voice, haptics });
-    toast.show('Configuration Updated', 'success');
+    onSave({ settings: preferredSettings, play_mode: playMode });
+    if (dontShowAgain) {
+      onDontShowAgainChange(true);
+    }
     modal.close();
   }
 </script>
 
-<div class="flex flex-col gap-lg">
-  <div class="text-center">
-    <h2 id="modal-title" class="text-h3 text-main">Audio & Immersion</h2>
-    <p class="text-dim">Tune the void to your frequency.</p>
+<div class="flex flex-col gap-md items-center">
+  <div class="text-center flex flex-col gap-md">
+    <h2 id="modal-title" class="text-h3">Play options</h2>
+    <p>
+      These choices are also
+      <a class="link" href="/">in your profile.</a>
+      Changes apply immediately.
+    </p>
   </div>
 
   <div
-    class="surface-sunk p-md rounded-md flex flex-col gap-md border border-white/5"
+    class="surface-sunk p-md flex flex-col gap-md large-desktop:w-full large-desktop:grid large-desktop:grid-cols-2"
   >
-    <label class="flex flex-col gap-xs cursor-pointer group">
-      <div class="flex justify-between">
-        <span
-          class="text-small uppercase tracking-wider text-dim group-hover:text-primary transition-colors"
-          >Music Volume</span
-        >
-        <span class="font-mono text-primary">{music}%</span>
+    <div class="flex flex-col items-center gap-md">
+      <div class="flex flex-col justify-center gap-sm">
+        <span class="flex flex-row flex-wrap gap-sm">
+          <p class="uppercase text-main">Settings</p>
+          <p>
+            ({#if preferredSettings === 'personal'}
+              Use your profile settings
+            {:else}
+              Use the author's settings
+            {/if})
+          </p>
+        </span>
+        <select bind:value={preferredSettings}>
+          <option value="personal">Personal</option>
+          <option value="default">Default</option>
+        </select>
       </div>
-      <input type="range" min="0" max="100" bind:value={music} class="w-full" />
-    </label>
+    </div>
 
-    <label class="flex flex-col gap-xs cursor-pointer group">
-      <div class="flex justify-between">
-        <span
-          class="text-small uppercase tracking-wider text-dim group-hover:text-primary transition-colors"
-          >Voice Synthesis</span
-        >
-        <span class="font-mono text-primary">{voice}%</span>
+    <hr class="large-desktop:hidden" />
+
+    <div class="flex flex-col items-center gap-md">
+      <div class="flex flex-col justify-center gap-sm">
+        <span class="flex flex-row flex-wrap gap-sm">
+          <p class="uppercase text-main">Play Mode</p>
+          <p>
+            ({#if playMode === 'play_limited'}
+              No images or audio
+            {:else}
+              Images and audio on each step
+            {/if})
+          </p>
+        </span>
+        <select bind:value={playMode}>
+          <option value="play_limited">Text-only</option>
+          {#if !isGuest}
+            <option value="play_unlimited">With Media</option>
+          {/if}
+        </select>
       </div>
-      <input type="range" min="0" max="100" bind:value={voice} class="w-full" />
-    </label>
-
-    <hr class="border-white/10" />
-
-    <label
-      class="flex flex-row justify-between items-center cursor-pointer p-xs -mx-xs rounded hover:bg-white/5 transition-colors"
-    >
-      <span class="text-main">Haptic Feedback</span>
-      <input
-        type="checkbox"
-        bind:checked={haptics}
-        class="w-5 h-5 accent-primary"
-      />
-    </label>
+    </div>
   </div>
+
+  <label class="flex flex-row items-center gap-xs">
+    <input type="checkbox" bind:checked={dontShowAgain} />
+    Don't show this again
+  </label>
 </div>
 
-<div class="flex flex-row justify-end gap-md pt-lg">
+<div class="flex flex-row justify-center gap-md">
   <button class="btn-alert" onclick={() => modal.close()}> Cancel </button>
-  <button class="btn-signal" onclick={handleSave}> Save Configuration </button>
+  <button class="btn-cta" onclick={handleSave}>
+    {playMode === 'play_limited' ? 'Play: 1 credit' : 'Play: 3 credits'}
+  </button>
 </div>

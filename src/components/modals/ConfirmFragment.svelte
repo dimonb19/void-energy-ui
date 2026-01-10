@@ -13,12 +13,12 @@
 </script>
 
 <div class="text-center flex flex-col gap-md">
-  <h2 id="modal-title" class="text-h3 text-main">{title}</h2>
-  <p class="text-dim">{@html body}</p>
+  <h2 id="modal-title" class="text-h3">{title}</h2>
+  <p>{@html body}</p>
 
   {#if cost > 0}
     <div
-      class="surface-sunk rounded-md p-md flex flex-row gap-md items-center justify-center text-error border border-error/30"
+      class="surface-sunk p-md flex flex-row gap-md items-center justify-center text-premium"
     >
       <span>⚠</span>
       <span>Consumes <strong>{cost} Credits</strong></span>
@@ -26,7 +26,7 @@
   {/if}
 </div>
 
-<div class="flex flex-row justify-end gap-md pt-lg">
+<div class="flex flex-row justify-center gap-md">
   <button class="btn-alert" onclick={() => onCancel()}>
     {cancelText}
   </button>

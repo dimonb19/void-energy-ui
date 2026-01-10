@@ -69,7 +69,7 @@ class ModalManager {
           this.close();
         },
       },
-      'sm',
+      'md',
     );
   }
 
@@ -85,6 +85,17 @@ class ModalManager {
       },
       'sm',
     );
+  }
+
+  /**
+   * Opens the play options settings modal.
+   */
+  settings(options?: {
+    isGuest?: boolean;
+    onSave?: (prefs: SettingsPreferences) => void;
+    onDontShowAgainChange?: (value: boolean) => void;
+  }) {
+    this.open(MODAL_KEYS.SETTINGS, { ...options }, 'lg');
   }
 }
 

@@ -26,22 +26,39 @@ type ModalContract = {
     onCancel?: () => void;
   };
 
-  /** Settings panel modal for user preferences */
+  /** Settings panel modal for play options */
   settings: {
-    /** Initial music volume (0-100, defaults to stored preference) */
-    initialMusic?: number;
+    /** Initial settings mode preference */
+    initialSettings?: SettingMode;
+    /** Initial play mode preference */
+    initialPlayMode?: PlayMode;
+    /** Initial "don't show again" state */
+    initialDontShowAgain?: boolean;
+    /** Whether the user is a guest (limits play mode options) */
+    isGuest?: boolean;
     /** Callback fired when user saves preferences */
     onSave?: (prefs: SettingsPreferences) => void;
+    /** Callback fired when "don't show again" changes */
+    onDontShowAgainChange?: (value: boolean) => void;
   };
 };
+
+/**
+ * Settings mode: use personal profile settings or author's defaults.
+ */
+type SettingMode = 'personal' | 'default';
+
+/**
+ * Play mode: text-only (limited) or with media (unlimited).
+ */
+type PlayMode = 'play_limited' | 'play_unlimited';
 
 /**
  * User preferences saved from the settings modal.
  */
 interface SettingsPreferences {
-  music: number;
-  voice: number;
-  haptics: boolean;
+  settings: SettingMode;
+  play_mode: PlayMode;
 }
 
 /**

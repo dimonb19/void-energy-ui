@@ -197,6 +197,45 @@ interface VoidToastItem {
   type: VoidToastType;
 }
 
+/**
+ * Controller returned by toast.loading() for managing a loading toast.
+ * Provides methods to update, transition, or close the toast.
+ */
+interface VoidLoadingToastController {
+  /** Unique identifier for this toast */
+  readonly id: number;
+
+  /** Update the loading message without changing state */
+  update(message: string): void;
+
+  /** Transition to success state with optional message, then auto-dismiss */
+  success(message?: string, duration?: number): void;
+
+  /** Transition to error state with optional message, then auto-dismiss */
+  error(message?: string, duration?: number): void;
+
+  /** Transition to warning state with optional message, then auto-dismiss */
+  warning(message?: string, duration?: number): void;
+
+  /** Close the toast immediately without transition */
+  close(): void;
+}
+
+/**
+ * Message configuration for toast.promise().
+ * Supports static strings or dynamic functions for success/error messages.
+ */
+interface VoidPromiseMessages<T> {
+  /** Message shown while promise is pending */
+  loading: string;
+
+  /** Message shown on resolve (string or function receiving result) */
+  success: string | ((data: T) => string);
+
+  /** Message shown on reject (string or function receiving error) */
+  error: string | ((err: unknown) => string);
+}
+
 // ==========================================================================
 // 4. COMPONENT: MODALS
 // ==========================================================================

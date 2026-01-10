@@ -715,9 +715,32 @@ h2 {
 ```typescript
 import { toast } from '$lib/stores/toast.svelte';
 
-toast.success('Operation completed!');
-toast.error('Something went wrong.');
-toast.info('FYI: System update available.');
+// Basic toasts (auto-dismiss after 4s)
+toast.show('Operation completed!', 'success');
+toast.show('Something went wrong.', 'error');
+toast.show('FYI: System update available.', 'info');
+toast.show('Careful here!', 'warning');
+
+// Loading toast with controller (persists until resolved)
+const loader = toast.loading('Processing...');
+loader.update('Step 2 of 3...'); // Update message
+loader.success('Done!'); // Transition to success
+// or: loader.error('Failed!');
+// or: loader.close();                  // Close without transition
+
+// Promise wrapper (automatic loading → success/error)
+await toast.promise(fetchData(), {
+  loading: 'Fetching data...',
+  success: 'Data loaded!',
+  error: 'Failed to load data',
+});
+
+// With dynamic messages
+await toast.promise(saveItems(items), {
+  loading: 'Saving...',
+  success: (result) => `Saved ${result.count} items`,
+  error: (err) => `Error: ${err.message}`,
+});
 ```
 
 ---

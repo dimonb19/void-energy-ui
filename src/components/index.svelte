@@ -268,10 +268,17 @@
           <button
             class="btn-premium"
             onclick={() => {
-              modal.open('settings', {
-                initialMusic: 65,
+              modal.settings({
                 onSave: (prefs) => {
-                  console.log('Saving to backend:', prefs);
+                  toast.promise(
+                    new Promise((resolve) => setTimeout(resolve, 2000)),
+                    {
+                      loading: `Launching story with ${prefs.settings} settings...`,
+                      success: 'Story is generated',
+                      error: 'Failed to generate story',
+                    },
+                  );
+                  console.log('Selected preferences:', prefs);
                 },
               });
             }}
