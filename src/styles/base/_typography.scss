@@ -2,57 +2,14 @@
 
 @use 'sass:map';
 @use '../abstracts' as *;
+@use '../config/generated-themes' as generated;
 @use '../components/anchors';
 
-// Scales, weights, and line-heights.
-
-$font-scale: (
-  // Mobile: 14px (0.875rem) -> Desktop: 18px (1.125rem)
-  'body': clamp(0.875rem, 0.8rem + 0.5vw, 1.125rem),
-  // Mobile: 12px -> Desktop: 16px
-  'small': clamp(0.75rem, 0.7rem + 0.3vw, 1rem),
-  // Mobile: 11px -> Desktop: 14px
-  'caption': clamp(0.6875rem, 0.65rem + 0.25vw, 0.875rem),
-  // Mobile: 32px -> Desktop: 56px (High Contrast Hero)
-  'h1': clamp(2rem, 1.5rem + 3vw, 3.5rem),
-  // Mobile: 24px -> Desktop: 40px
-  'h2': clamp(1.5rem, 1.25rem + 2vw, 2.5rem),
-  // Mobile: 20px -> Desktop: 32px
-  'h3': clamp(1.25rem, 1.1rem + 1.5vw, 2rem),
-  // Mobile: 18px -> Desktop: 24px
-  'h4': clamp(1.125rem, 1rem + 1vw, 1.5rem),
-  // Mobile: 16px -> Desktop: 20px
-  'h5': clamp(1rem, 0.95rem + 0.5vw, 1.25rem)
-);
-
-// Weight hierarchy.
-$font-weights: (
-  // Structural (Bold)
-  'h1': 700,
-  // Structural (Bold)
-  'h2': 700,
-  // Section (SemiBold)
-  'h3': 600,
-  // Subsection (SemiBold)
-  'h4': 600,
-  // Card Title (Medium)
-  'h5': 500,
-  'body': 400,
-  // Input data should be legible (Regular)
-  'input': 400
-);
-
-// Line heights tuned for headlines/body.
-$line-heights: (
-  'h1': 1.1,
-  'h2': 1.15,
-  'h3': 1.2,
-  'h4': 1.3,
-  'h5': 1.4,
-  'body': 1.5,
-  'small': 1.5,
-  'caption': 1.4,
-);
+// Typography maps (generated from design-tokens.ts).
+$font-scale: generated.$font-scale;
+$font-weights: generated.$font-weights;
+$line-heights: generated.$line-heights;
+$letter-spacings: generated.$letter-spacings;
 
 /* Emit CSS variables for runtime scaling. */
 :root {
@@ -81,6 +38,16 @@ $line-heights: (
   --font-weight-semibold: #{map.get($font-weights, 'h3')};
   --font-weight-medium: #{map.get($font-weights, 'h5')};
   --font-weight-regular: #{map.get($font-weights, 'body')};
+
+  // Letter-spacing (optical tracking).
+  --letter-spacing-h1: #{map.get($letter-spacings, 'h1')};
+  --letter-spacing-h2: #{map.get($letter-spacings, 'h2')};
+  --letter-spacing-h3: #{map.get($letter-spacings, 'h3')};
+  --letter-spacing-h4: #{map.get($letter-spacings, 'h4')};
+  --letter-spacing-h5: #{map.get($letter-spacings, 'h5')};
+  --letter-spacing-body: #{map.get($letter-spacings, 'body')};
+  --letter-spacing-small: #{map.get($letter-spacings, 'small')};
+  --letter-spacing-caption: #{map.get($letter-spacings, 'caption')};
 }
 
 /* Typography mixin. */
@@ -116,6 +83,7 @@ $line-heights: (
     // Scale with --text-scale while keeping the clamp bounds.
     font-size: calc(#{$base-clamp} * var(--text-scale));
     line-height: map.get($line-heights, $level);
+    letter-spacing: map.get($letter-spacings, $level);
 
     // Tablet override to preserve H1 hierarchy.
     @if $level == 'h1' {

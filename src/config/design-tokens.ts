@@ -159,41 +159,49 @@ export const VOID_TYPOGRAPHY = {
     caption: {
       fontSize: 'clamp(0.6875rem, 0.65rem + 0.25vw, 0.875rem)',
       lineHeight: 1.4,
+      letterSpacing: '0.02em',
     },
     // Mobile: 12px -> Desktop: 16px
     small: {
       fontSize: 'clamp(0.75rem, 0.7rem + 0.3vw, 1rem)',
       lineHeight: 1.5,
+      letterSpacing: '0.01em',
     },
     // Mobile: 14px (0.875rem) -> Desktop: 18px (1.125rem)
     body: {
       fontSize: 'clamp(0.875rem, 0.8rem + 0.5vw, 1.125rem)',
       lineHeight: 1.5,
+      letterSpacing: '0.005em',
     },
     // Mobile: 16px -> Desktop: 20px
     h5: {
       fontSize: 'clamp(1rem, 0.95rem + 0.5vw, 1.25rem)',
       lineHeight: 1.4,
+      letterSpacing: '0em',
     },
     // Mobile: 18px -> Desktop: 24px
     h4: {
       fontSize: 'clamp(1.125rem, 1rem + 1vw, 1.5rem)',
       lineHeight: 1.3,
+      letterSpacing: '0em',
     },
     // Mobile: 20px -> Desktop: 32px
     h3: {
       fontSize: 'clamp(1.25rem, 1.1rem + 1.5vw, 2rem)',
       lineHeight: 1.2,
+      letterSpacing: '-0.01em',
     },
     // Mobile: 24px -> Desktop: 40px
     h2: {
       fontSize: 'clamp(1.5rem, 1.25rem + 2vw, 2.5rem)',
       lineHeight: 1.15,
+      letterSpacing: '-0.015em',
     },
     // Mobile: 32px -> Desktop: 56px (High Contrast Hero)
     h1: {
       fontSize: 'clamp(2rem, 1.5rem + 3vw, 3.5rem)',
       lineHeight: 1.1,
+      letterSpacing: '-0.02em',
       // Tablet Override: clamp(2rem, 5vw, 3.5rem)
       tabletOverride: 'clamp(2rem, 5vw, 3.5rem)',
     },
@@ -377,6 +385,8 @@ export const VOID_TOKENS = {
       // Interaction Feedback
       lift: '-2px',
       scale: 1,
+      // Retro-specific shadow offset (hard pixel shadow)
+      shadowOffset: '3px',
     },
   },
 

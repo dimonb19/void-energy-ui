@@ -1,6 +1,18 @@
 /*
  * Physics presets for material behavior (glass/flat/retro).
- * Elements inherit shadows, borders, and motion from the active physics mode.
+ *
+ * ARCHITECTURE NOTE:
+ * This file extends the generated physics tokens from design-tokens.ts with
+ * derived values that cannot be expressed in TypeScript:
+ *
+ * 1. SCSS functions: blend(), alpha() - computed at build time
+ * 2. CSS variables: var(--bg-surface), var(--energy-primary) - resolved at runtime per theme
+ * 3. Complex CSS: gradients, box-shadows, focus rings - need SCSS composition
+ *
+ * The base values (speeds, radius, blur, easing) come from:
+ *   design-tokens.ts → generate-tokens.ts → _generated-themes.scss
+ *
+ * This file merges those with theme-aware shadows and surfaces.
  */
 
 @use 'sass:map';
@@ -39,6 +51,7 @@ $physics-presets: (
       )
     ),
   // Retro: hard edges, no blur.
+  // Note: shadow-offset comes from generated physics tokens
   'retro': map.merge(
       map.get(generated.$generated-physics, 'retro'),
       (
@@ -46,8 +59,10 @@ $physics-presets: (
         'surface-border': var(--border-color),
         'shadow-sunk': none,
         'shadow-float': none,
-        'shadow-lift': 3px 3px 0 alpha(var(--energy-secondary), 50%),
-        'focus-ring': 3px 3px 0 var(--energy-secondary),
+        'shadow-lift': var(--shadow-offset) var(--shadow-offset) 0
+          alpha(var(--energy-secondary), 50%),
+        'focus-ring': var(--shadow-offset) var(--shadow-offset) 0
+          var(--energy-secondary),
       )
     )
 );

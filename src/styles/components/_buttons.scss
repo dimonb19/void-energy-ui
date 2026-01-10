@@ -153,7 +153,8 @@ button:not(.btn-void),
         }
 
         @at-root [data-physics='retro'] & {
-          box-shadow: 3px 3px 0px alpha($color-var, 50%);
+          box-shadow: var(--shadow-offset) var(--shadow-offset) 0px
+            alpha($color-var, 50%);
         }
       }
     }

@@ -41,6 +41,40 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
   const timestamp = new Date().toISOString();
   let scss = `// 🤖 AUTO-GENERATED FILE\n// GENERATED AT: ${timestamp}\n\n`;
 
+  // Typography: Font scale map.
+  scss += `$font-scale: (\n`;
+  Object.entries(VOID_TYPOGRAPHY.scales).forEach(([level, config]) => {
+    scss += `  '${level}': ${config.fontSize},\n`;
+  });
+  scss += `);\n\n`;
+
+  // Typography: Line heights map.
+  scss += `$line-heights: (\n`;
+  Object.entries(VOID_TYPOGRAPHY.scales).forEach(([level, config]) => {
+    scss += `  '${level}': ${config.lineHeight},\n`;
+  });
+  scss += `);\n\n`;
+
+  // Typography: Letter spacings map.
+  scss += `$letter-spacings: (\n`;
+  Object.entries(VOID_TYPOGRAPHY.scales).forEach(([level, config]) => {
+    scss += `  '${level}': ${config.letterSpacing},\n`;
+  });
+  scss += `);\n\n`;
+
+  // Typography: Font weights map (mapped to levels).
+  scss += `$font-weights: (\n`;
+  scss += `  'h1': ${VOID_TYPOGRAPHY.weights.bold},\n`;
+  scss += `  'h2': ${VOID_TYPOGRAPHY.weights.bold},\n`;
+  scss += `  'h3': ${VOID_TYPOGRAPHY.weights.semibold},\n`;
+  scss += `  'h4': ${VOID_TYPOGRAPHY.weights.semibold},\n`;
+  scss += `  'h5': ${VOID_TYPOGRAPHY.weights.medium},\n`;
+  scss += `  'body': ${VOID_TYPOGRAPHY.weights.regular},\n`;
+  scss += `  'small': ${VOID_TYPOGRAPHY.weights.regular},\n`;
+  scss += `  'caption': ${VOID_TYPOGRAPHY.weights.regular},\n`;
+  scss += `  'input': ${VOID_TYPOGRAPHY.weights.regular},\n`;
+  scss += `);\n\n`;
+
   // Z-layers map.
   scss += `$z-layers: (\n`;
   Object.entries(tokens.layers).forEach(([key, val]) => {

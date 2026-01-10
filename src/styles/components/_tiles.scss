@@ -326,7 +326,8 @@
     }
 
     &:hover:not(:disabled) {
-      box-shadow: 3px 3px 0px alpha($color, 50%); // Hard shadow, no blur
+      box-shadow: var(--shadow-offset) var(--shadow-offset) 0px
+        alpha($color, 50%); // Hard shadow, no blur
     }
   }
 
