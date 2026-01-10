@@ -61,11 +61,12 @@ dialog {
   @include glass-float($interactive: false);
 
   // Progressive enhancement: only animate if display transitions are supported.
+  // Uses spring easing for organic modal entry/exit feel
   @supports (transition-behavior: allow-discrete) {
     transition:
-      opacity var(--speed-base) var(--ease-flow),
-      transform var(--speed-base) var(--ease-snap),
-      filter var(--speed-base) var(--ease-flow),
+      opacity var(--speed-base) var(--ease-spring-gentle),
+      transform var(--speed-base) var(--ease-spring-gentle),
+      filter var(--speed-base) var(--ease-spring-gentle),
       display var(--speed-base) allow-discrete,
       overlay var(--speed-base) allow-discrete;
 
@@ -95,7 +96,7 @@ dialog {
 
     @supports (transition-behavior: allow-discrete) {
       transition:
-        opacity var(--speed-base) var(--ease-flow),
+        opacity var(--speed-base) var(--ease-spring-gentle),
         display var(--speed-base) allow-discrete,
         overlay var(--speed-base) allow-discrete;
     }

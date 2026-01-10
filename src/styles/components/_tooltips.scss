@@ -32,11 +32,11 @@
 
   box-shadow: var(--shadow-lift);
 
-  // Constrain transitions to avoid layout thrashing.
+  // Unified Spring Transitions for organic tooltip reveal
   transition:
-    opacity var(--speed-base) var(--ease-stabilize),
-    transform var(--speed-base) var(--ease-stabilize),
-    filter var(--speed-base) var(--ease-stabilize);
+    opacity var(--speed-base) var(--ease-spring-gentle),
+    transform var(--speed-base) var(--ease-spring-gentle),
+    filter var(--speed-base) var(--ease-spring-gentle);
 
   // Open state.
   &[data-state='open'] {

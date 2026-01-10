@@ -122,9 +122,10 @@ html {
   @include typography('body');
   color: var(--text-dim);
 
+  // Spring transitions for theme changes
   transition:
-    background-color var(--speed-base) var(--ease-flow),
-    color var(--speed-base) var(--ease-flow);
+    background-color var(--speed-base) var(--ease-spring-gentle),
+    color var(--speed-base) var(--ease-spring-gentle);
 
   -webkit-font-smoothing: antialiased;
   text-align: left;
@@ -165,7 +166,7 @@ textarea {
     opacity, box-shadow, transform, filter, backdrop-filter;
 
   transition-duration: var(--speed-fast);
-  transition-timing-function: var(--ease-flow);
+  transition-timing-function: var(--ease-spring-snappy);
 
   &:focus-visible {
     outline: none;

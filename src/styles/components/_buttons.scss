@@ -49,13 +49,17 @@ button:not(.btn-void),
   border: var(--physics-border-width) solid var(--border-color);
   border-radius: var(--radius-base);
 
-  // Transitions
+  // Unified Spring Transitions
+  // Apple's Rule: "One object, one motion curve."
+  // All properties that change together should use the same spring easing
+  // to feel like a single cohesive object.
   transition:
-    color var(--speed-fast) var(--ease-flow),
-    background-color var(--speed-fast) var(--ease-flow),
-    border-color var(--speed-fast) var(--ease-snap),
-    box-shadow var(--speed-fast) var(--ease-snap),
-    transform var(--speed-fast) var(--ease-stabilize);
+    color var(--speed-fast) var(--ease-spring-snappy),
+    background-color var(--speed-fast) var(--ease-spring-snappy),
+    border-color var(--speed-fast) var(--ease-spring-snappy),
+    box-shadow var(--speed-fast) var(--ease-spring-snappy),
+    transform var(--speed-fast) var(--ease-spring-snappy),
+    filter var(--speed-fast) var(--ease-spring-snappy);
 
   cursor: pointer;
   position: relative;
@@ -84,6 +88,11 @@ button:not(.btn-void),
   }
 
   &:active:not(:disabled) {
+    // MICRO-FEEDBACK: Instant visual acknowledgment (no transition delay)
+    // This creates the 3-layer feedback Apple uses: haptic → micro → macro
+    filter: brightness(0.92);
+
+    // MACRO-FEEDBACK: Spring-based scale with bounce-back
     // Invert the scale for press-down effect (1.02 → 0.98, 1.01 → 0.99, 1 → 1)
     transform: scale(calc(2 - var(--scale, 1)));
     background: blend(var(--bg-surface), var(--energy-secondary), 12%);

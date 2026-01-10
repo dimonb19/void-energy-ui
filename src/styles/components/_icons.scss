@@ -14,13 +14,13 @@
   fill: currentColor;
   stroke: currentColor;
 
-  // Transitions.
+  // Unified Spring Transitions
   transform-origin: center center;
   transition:
-    transform var(--speed-fast) var(--ease-stabilize),
-    opacity var(--speed-fast) var(--ease-flow),
-    filter var(--speed-fast) var(--ease-flow),
-    color var(--speed-fast) var(--ease-flow);
+    transform var(--speed-fast) var(--ease-spring-snappy),
+    opacity var(--speed-fast) var(--ease-spring-snappy),
+    filter var(--speed-fast) var(--ease-spring-snappy),
+    color var(--speed-fast) var(--ease-spring-snappy);
 
   // Sizes.
   &[data-size='sm'] {
@@ -47,7 +47,7 @@
 .btn-void {
   .icon,
   svg {
-    transition: transform var(--speed-fast) var(--ease-snap);
+    transition: transform var(--speed-fast) var(--ease-spring-snappy);
   }
 
   @media (hover: hover) {

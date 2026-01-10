@@ -323,6 +323,17 @@ export const VOID_TOKENS = {
 
   // 5. PHYSICS ENGINE (Time & Matter)
   // Defines how elements move and feel.
+  //
+  // SPRING PHYSICS PHILOSOPHY:
+  // Unlike cubic-bezier (mathematical curves), spring animations simulate
+  // real-world physics with mass, tension, and friction. This creates the
+  // "alive" feeling Apple pioneered in iOS 7.
+  //
+  // Spring Parameters (for reference):
+  // - stiffness: How tight the spring (higher = snappier)
+  // - damping: Friction/resistance (lower = more bounce)
+  // - mass: Weight of the object (higher = more inertia)
+  //
   physics: {
     glass: {
       radiusBase: VOID_RADIUS.md,
@@ -337,13 +348,26 @@ export const VOID_TOKENS = {
       // Animation Delays (Cascading Effects)
       delayCascade: 50, // Stagger delay for list items
       delaySequence: 100, // Sequential animation delay
-      // Easing Functions
-      easeStabilize: 'cubic-bezier(0.16, 1, 0.3, 1)',
-      easeSnap: 'cubic-bezier(0.22, 1, 0.36, 1)',
-      easeFlow: 'linear',
+      // Spring Easing Functions (Organic Motion)
+      // These cubic-beziers approximate spring physics behavior
+      easeSpringGentle: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)', // Soft overshoot, like a gentle bounce
+      easeSpringSnappy: 'cubic-bezier(0.34, 1.56, 0.64, 1)', // Quick settle with subtle overshoot
+      easeSpringBounce: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)', // Visible bounce-back effect
+      easeFlow: 'linear', // Continuous motion (scrolling, progress)
+      // Legacy aliases (deprecated, use spring variants)
+      easeStabilize: 'cubic-bezier(0.34, 1.56, 0.64, 1)', // → use easeSpringSnappy
+      easeSnap: 'cubic-bezier(0.34, 1.56, 0.64, 1)', // → use easeSpringSnappy
       // Interaction Feedback
       lift: '-3px',
       scale: 1.02,
+      // Svelte Spring Parameters (for programmatic animations)
+      springStiffness: 0.15, // Tension (0-1)
+      springDamping: 0.8, // Friction (0-1), higher = less bounce
+      // Motion Distance Tokens (for entry/exit animations)
+      entryDistance: 15, // translateY for entry (px)
+      entryScale: 0.96, // scale start for entry
+      exitDistance: 20, // translateY for exit (px)
+      overshoot: 1.05, // max spring overshoot clamp
     },
     flat: {
       radiusBase: VOID_RADIUS.sm,
@@ -353,18 +377,31 @@ export const VOID_TOKENS = {
       // Animation Durations (Complete Scale)
       speedInstant: 80,
       speedFast: 133,
-      speedBase: 200,
+      speedBase: 280,
       speedSlow: 350,
       // Animation Delays (Cascading Effects)
       delayCascade: 40,
       delaySequence: 80,
-      // Easing Functions
-      easeStabilize: 'ease-out',
-      easeSnap: 'ease-out',
+      // Spring Easing Functions (Subtle, Professional)
+      // Flat physics uses gentler springs - less playful, more refined
+      easeSpringGentle: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)', // Smooth deceleration
+      easeSpringSnappy: 'cubic-bezier(0.22, 0.61, 0.36, 1)', // Quick but not bouncy
+      easeSpringBounce: 'cubic-bezier(0.175, 0.885, 0.32, 1.1)', // Minimal overshoot
       easeFlow: 'ease-in-out',
+      // Legacy aliases (deprecated)
+      easeStabilize: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+      easeSnap: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
       // Interaction Feedback
       lift: '-2px',
       scale: 1.01,
+      // Svelte Spring Parameters
+      springStiffness: 0.2, // Stiffer = less wobbly
+      springDamping: 0.95, // More damping = less bounce
+      // Motion Distance Tokens (flatter = less dramatic)
+      entryDistance: 10, // translateY for entry (px)
+      entryScale: 0.98, // scale start for entry
+      exitDistance: 15, // translateY for exit (px)
+      overshoot: 1.02, // minimal overshoot
     },
     retro: {
       radiusBase: '0px',
@@ -379,15 +416,28 @@ export const VOID_TOKENS = {
       // Animation Delays (No delays in Retro)
       delayCascade: 0,
       delaySequence: 0,
-      // Easing Functions (Step-based)
+      // Step-based Easing (CRT/Terminal aesthetic)
+      // No springs - retro is deliberately mechanical
+      easeSpringGentle: 'steps(2)',
+      easeSpringSnappy: 'steps(2)',
+      easeSpringBounce: 'steps(4)',
+      easeFlow: 'steps(4)',
+      // Legacy aliases
       easeStabilize: 'steps(2)',
       easeSnap: 'steps(2)',
-      easeFlow: 'steps(4)',
       // Interaction Feedback
       lift: '-2px',
       scale: 1,
       // Retro-specific shadow offset (hard pixel shadow)
       shadowOffset: '3px',
+      // Svelte Spring Parameters (disabled for retro)
+      springStiffness: 1, // Max stiffness = instant
+      springDamping: 1, // Max damping = no oscillation
+      // Motion Distance Tokens (instant - no animation)
+      entryDistance: 0, // No movement
+      entryScale: 1, // No scaling
+      exitDistance: 0, // No movement
+      overshoot: 1, // No overshoot
     },
   },
 

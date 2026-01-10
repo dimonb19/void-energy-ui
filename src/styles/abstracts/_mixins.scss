@@ -23,12 +23,13 @@
   // Shadow switches by physics preset.
   box-shadow: var(--shadow-float);
 
-  // Motion.
+  // Unified Spring Motion
+  // All properties use the same spring for cohesive "object" feel
   transition:
-    transform var(--speed-base) var(--ease-stabilize),
-    border-color var(--speed-base) var(--ease-snap),
-    background-color var(--speed-base) var(--ease-flow),
-    box-shadow var(--speed-base) var(--ease-flow);
+    transform var(--speed-base) var(--ease-spring-gentle),
+    border-color var(--speed-base) var(--ease-spring-gentle),
+    background-color var(--speed-base) var(--ease-spring-gentle),
+    box-shadow var(--speed-base) var(--ease-spring-gentle);
 
   // Blur.
   @supports (backdrop-filter: blur(1px)) {
@@ -60,10 +61,11 @@
   // Unified depth.
   box-shadow: var(--shadow-sunk);
 
+  // Unified Spring Transitions
   transition:
-    border-color var(--speed-fast) var(--ease-snap),
-    box-shadow var(--speed-fast) var(--ease-snap),
-    outline var(--speed-fast) var(--ease-snap);
+    border-color var(--speed-fast) var(--ease-spring-snappy),
+    box-shadow var(--speed-fast) var(--ease-spring-snappy),
+    outline var(--speed-fast) var(--ease-spring-snappy);
 
   @supports (backdrop-filter: blur(1px)) {
     backdrop-filter: blur(var(--physics-blur));
@@ -113,7 +115,7 @@
       transparent 360deg
     );
 
-    transition: background-color var(--speed-base) var(--ease-flow);
+    transition: background-color var(--speed-base) var(--ease-spring-gentle);
 
     will-change: transform;
     transform: translate(-50%, -50%);
@@ -217,7 +219,47 @@
 }
 
 // ==========================================================================
-// 4. STATE MANAGEMENT MIXINS (Strict Protocol)
+// 4. FOCUS STATE (Universal)
+// ==========================================================================
+
+// Universal Focus State Mixin
+// Ensures consistent focus styling across ALL interactive elements.
+// Apple's Rule: Focus states must be visually consistent for muscle memory.
+//
+// @param $include-sunk - Set true for inputs/textareas that have inset shadow
+// @param $is-inline - Set true for inline elements (links) that shouldn't have ring
+@mixin focus-state($include-sunk: false, $is-inline: false) {
+  outline: none;
+
+  @if $is-inline {
+    // Inline elements (links): Use underline + subtle glow instead of ring
+    text-decoration: underline;
+    text-decoration-color: var(--energy-primary);
+    text-underline-offset: 3px;
+
+    @at-root [data-physics='glass'] & {
+      text-shadow: 0 0 8px alpha(var(--energy-primary), 50%);
+    }
+  } @else {
+    // Block elements (buttons, inputs): Use focus ring
+    border-color: var(--energy-primary);
+
+    @if $include-sunk {
+      box-shadow: var(--shadow-sunk), var(--focus-ring);
+    } @else {
+      box-shadow: var(--focus-ring);
+    }
+  }
+
+  // Spring transition for focus (instant feedback)
+  transition:
+    border-color var(--speed-instant) var(--ease-spring-snappy),
+    box-shadow var(--speed-instant) var(--ease-spring-snappy),
+    text-shadow var(--speed-instant) var(--ease-spring-snappy);
+}
+
+// ==========================================================================
+// 5. STATE MANAGEMENT MIXINS (Strict Protocol)
 // ==========================================================================
 
 // A. ACTIVE STATE (Interactive)
@@ -253,7 +295,7 @@
 }
 
 // ==========================================================================
-// 4. SCROLLBAR
+// 6. SCROLLBAR
 // ==========================================================================
 
 @mixin laser-scrollbar() {
@@ -281,7 +323,7 @@
 }
 
 // ==========================================================================
-// 5. TEXT UTILITIES
+// 7. TEXT UTILITIES
 // ==========================================================================
 
 // MIXIN: Truncate

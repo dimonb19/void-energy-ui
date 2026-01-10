@@ -2,17 +2,21 @@
  * VOID PHYSICS: Motion primitives
  * Role: Map Svelte transitions/animations to Triad physics (glass/flat/retro).
  *
+ * SPRING PHYSICS PHILOSOPHY:
+ * Unlike cubic-bezier animations, spring physics simulate real-world behavior
+ * with mass, tension (stiffness), and friction (damping). This creates the
+ * "alive" feeling Apple pioneered in iOS 7.
+ *
  * Lifecycle mapping:
- * - in: materialize
+ * - in: materialize (spring-based entry)
  * - out: implode (or dematerialize for floating exits)
- * - animate: live
+ * - animate: live (list reflow with spring)
  *
  * List coordination requires stable keys; otherwise Svelte reuses nodes and
  * the exit/shift choreography desynchronizes.
  */
 
 import { flip, type FlipParams } from 'svelte/animate';
-import { cubicOut, cubicIn } from 'svelte/easing';
 import { voidEngine as theme } from '../adapters/void-engine.svelte';
 import THEME_REGISTRY from '../config/void-registry.json';
 import PHYSICS_DATA from '../config/void-physics.json';
@@ -22,10 +26,62 @@ const REGISTRY = THEME_REGISTRY as Registry;
 
 type PhysicsConfig = Record<
   string,
-  { speedBase: number; speedFast: number; blur: number }
+  {
+    speedBase: number;
+    speedFast: number;
+    blur: number;
+    springStiffness?: number;
+    springDamping?: number;
+    // Motion distance tokens
+    entryDistance?: number;
+    entryScale?: number;
+    exitDistance?: number;
+    overshoot?: number;
+  }
 >;
 
 const PHYSICS_PRIMITIVES = PHYSICS_DATA as PhysicsConfig;
+
+/**
+ * Spring easing function generator.
+ * Creates a custom easing curve that simulates spring physics.
+ *
+ * @param stiffness - Spring tension (0-1, higher = snappier)
+ * @param damping - Friction (0-1, higher = less bounce)
+ * @returns Easing function compatible with Svelte transitions
+ */
+function createSpringEasing(
+  stiffness: number = 0.15,
+  damping: number = 0.8,
+): (t: number) => number {
+  // Approximate spring physics with a damped oscillation
+  // This creates the overshoot/settle effect Apple uses
+  return (t: number) => {
+    // Spring physics approximation
+    // The formula creates a damped sinusoidal oscillation
+    const omega = 10 * stiffness; // Angular frequency
+    const zeta = damping; // Damping ratio
+
+    if (zeta >= 1) {
+      // Critically damped or overdamped - no oscillation
+      // Use smooth cubic-out-like curve
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    // Underdamped - oscillation with overshoot
+    const dampedFreq = omega * Math.sqrt(1 - zeta * zeta);
+    const decay = Math.exp(-zeta * omega * t * 3);
+    const oscillation = Math.cos(dampedFreq * t * Math.PI * 2);
+
+    // Blend between pure progress and spring oscillation
+    const springValue = 1 - decay * oscillation;
+
+    // Clamp to prevent negative values at the start
+    // 1.05 allows subtle overshoot without aggressive overflow
+    return Math.max(0, Math.min(1.05, springValue));
+  };
+}
+
 
 // Read physics configuration without DOM reflow.
 function getSystemConfig() {
@@ -59,6 +115,20 @@ function getSystemConfig() {
   // Disable blur for reduced motion or Firefox.
   const blurInt = reducedMotion || isFirefox ? 0 : specs.blur;
 
+  // Spring parameters from physics preset
+  // These control the "feel" of animations - how bouncy vs snappy
+  const springStiffness = specs.springStiffness ?? 0.15;
+  const springDamping = specs.springDamping ?? 0.8;
+
+  // Create spring easing function based on physics preset
+  const springEasing = createSpringEasing(springStiffness, springDamping);
+
+  // Motion distance tokens (from design-tokens.ts)
+  const entryDistance = specs.entryDistance ?? 15;
+  const entryScale = specs.entryScale ?? 0.96;
+  const exitDistance = specs.exitDistance ?? 20;
+  const overshoot = specs.overshoot ?? 1.05;
+
   return {
     speedBase: specs.speedBase,
     speedFast: specs.speedFast,
@@ -66,6 +136,14 @@ function getSystemConfig() {
     isRetro,
     isFlat,
     reducedMotion,
+    springStiffness,
+    springDamping,
+    springEasing,
+    // Motion tokens
+    entryDistance,
+    entryScale,
+    exitDistance,
+    overshoot,
   };
 }
 
@@ -73,27 +151,39 @@ function getSystemConfig() {
  * List reflow animation for keyed {#each} blocks.
  * Usage: <div animate:live>
  *
+ * SPRING PHYSICS: Uses spring easing for organic list reflow.
+ * Items "settle into place" with a subtle bounce rather than
+ * linear movement.
+ *
  * Related:
  * - See Toast.svelte for production usage in list rendering
  * - Physics timing controlled by void-physics.json (speedBase)
- * - Retro mode uses stepped easing
+ * - Retro mode uses stepped easing (no spring)
  */
 export function live(
   node: HTMLElement,
   { from, to }: { from: DOMRect; to: DOMRect },
   params: FlipParams = {},
 ) {
-  const { isRetro, speedBase } = getSystemConfig();
+  const { isRetro, speedBase, springStiffness, springDamping } =
+    getSystemConfig();
 
-  // Retro uses stepped easing to quantize motion.
+  // Retro uses stepped easing to quantize motion (CRT aesthetic).
   const steppedEasing = (t: number) => Math.floor(t * 4) / 4;
+
+  // Slightly higher damping for list reflow to reduce overshoot
+  const liveEasing = createSpringEasing(
+    springStiffness,
+    Math.min(springDamping + 0.05, 1.0),
+  );
 
   return flip(
     node,
     { from, to },
     {
       duration: params.duration ?? speedBase,
-      easing: isRetro ? steppedEasing : cubicOut,
+      // Use damped spring easing for glass/flat, stepped for retro
+      easing: isRetro ? steppedEasing : liveEasing,
       ...params,
     },
   );
@@ -103,10 +193,13 @@ export function live(
  * Entry transition for elements appearing in the viewport.
  * Usage: <div in:materialize>
  *
+ * SPRING PHYSICS: Elements "spring into place" with subtle overshoot.
+ * This creates the "alive" feeling Apple pioneered in iOS 7.
+ *
  * Physics behavior:
- * - Glass: Blur fade-in with Y-axis translation
- * - Flat: Sharp fade-in with scale (no blur)
- * - Retro: Instant opacity change (0ms duration)
+ * - Glass: Spring entry with blur fade-in and Y-axis translation
+ * - Flat: Spring entry with sharp fade-in and scale (no blur)
+ * - Retro: Instant opacity change (0ms duration, no spring)
  *
  * Related:
  * - Pairs with implode() for exit
@@ -115,12 +208,28 @@ export function live(
  */
 export function materialize(
   node: HTMLElement,
-  { delay = 0, duration = null, y = 15 } = {},
+  { delay = 0, duration = null, y = null } = {} as {
+    delay?: number;
+    duration?: number | null;
+    y?: number | null;
+  },
 ) {
-  const { speedBase, blurInt, isRetro, isFlat, reducedMotion } =
-    getSystemConfig();
+  const {
+    speedBase,
+    blurInt,
+    isRetro,
+    isFlat,
+    reducedMotion,
+    springEasing,
+    entryDistance,
+    entryScale,
+    overshoot,
+  } = getSystemConfig();
 
-  // Retro or reduced-motion: opacity-only.
+  // Use token value if y not explicitly overridden
+  const actualY = y ?? entryDistance;
+
+  // Retro or reduced-motion: opacity-only (no spring).
   if (reducedMotion || isRetro) {
     return {
       delay,
@@ -132,14 +241,22 @@ export function materialize(
   return {
     delay,
     duration: duration ?? speedBase,
-    easing: cubicOut,
+    // Spring easing creates organic "settle into place" effect
+    easing: springEasing,
     css: (t: number, u: number) => {
       // Glass uses blur; flat stays sharp.
       const activeBlur = isFlat ? 0 : Math.max(0, blurInt * (u * 2 - 1));
 
+      // Spring easing can overshoot past 1.0, creating subtle bounce
+      // Clamp transform values to prevent visual artifacts (uses overshoot token)
+      const clampedT = Math.min(t, overshoot);
+      // Scale from entryScale to 1.0 (token-driven)
+      const scale = entryScale + (1 - entryScale) * clampedT;
+      const translateY = u * actualY;
+
       return `
-        transform: translateY(${u * y}px) scale(${0.96 + 0.04 * t});
-        opacity: ${t};
+        transform: translateY(${translateY}px) scale(${scale});
+        opacity: ${Math.min(t, 1)};
         filter: blur(${activeBlur}px);
       `;
     },
@@ -162,10 +279,24 @@ export function materialize(
  */
 export function dematerialize(
   node: HTMLElement,
-  { delay = 0, duration = null, y = -20 } = {},
+  { delay = 0, duration = null, y = null } = {} as {
+    delay?: number;
+    duration?: number | null;
+    y?: number | null;
+  },
 ) {
-  const { speedBase, blurInt, isRetro, isFlat, reducedMotion } =
-    getSystemConfig();
+  const {
+    speedBase,
+    blurInt,
+    isRetro,
+    isFlat,
+    reducedMotion,
+    springEasing,
+    exitDistance,
+  } = getSystemConfig();
+
+  // Use token value if y not explicitly overridden (negative for upward exit)
+  const actualY = y ?? -exitDistance;
 
   if (reducedMotion) return { duration: 0, css: () => 'opacity: 0;' };
 
@@ -186,17 +317,18 @@ export function dematerialize(
     };
   }
 
+  // Use spring easing for consistency with materialize()
+  // Spring feels more natural for exit - like object has momentum
   return {
     delay,
     duration: duration ?? speedBase,
-    easing: cubicIn,
+    easing: springEasing,
     css: (t: number, u: number) => {
       const currentBlur = isFlat ? 0 : blurInt * u;
       const opacity = t;
 
       return `
-        transition: none;
-        transform: translateY(${u * y}px) scale(${1 - u * 0.05});
+        transform: translateY(${u * actualY}px) scale(${1 - u * 0.05});
         opacity: ${opacity};
         filter: blur(${currentBlur}px);
       `;
@@ -230,14 +362,15 @@ export function implode(
   const padding =
     parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
 
-  const { speedFast, isRetro, reducedMotion } = getSystemConfig();
+  const { speedFast, isRetro, reducedMotion, springEasing } = getSystemConfig();
 
   if (reducedMotion) return { duration: 0, css: () => 'opacity: 0; width: 0;' };
 
   return {
     delay,
     duration: duration ?? speedFast,
-    easing: cubicOut,
+    // Use spring easing for consistency across all transitions
+    easing: springEasing,
     css: (t: number, u: number) => {
       const filter = isRetro ? `grayscale(${u * 100}%)` : `blur(${u * 5}px)`;
       return `
@@ -249,7 +382,7 @@ export function implode(
         margin-left: ${t * margin * 0.5}px;
         margin-right: ${t * margin * 0.5}px;
         filter: ${filter};
-        white-space: nowrap; 
+        white-space: nowrap;
       `;
     },
   };

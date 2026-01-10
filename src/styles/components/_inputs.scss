@@ -41,10 +41,12 @@ select {
   // Apply sunk physics.
   @include glass-sunk;
 
+  // Unified Spring Transitions
+  // All focus/error state changes use the same spring for cohesive feel
   transition:
-    border-color var(--speed-fast) var(--ease-snap),
-    box-shadow var(--speed-fast) var(--ease-snap),
-    background-color var(--speed-fast) var(--ease-flow);
+    border-color var(--speed-fast) var(--ease-spring-snappy),
+    box-shadow var(--speed-fast) var(--ease-spring-snappy),
+    background-color var(--speed-fast) var(--ease-spring-snappy);
 
   &::placeholder {
     color: var(--text-mute);
@@ -161,9 +163,10 @@ input[type='radio'] {
   border-style: dashed; // Override sunk solid border
 
   cursor: pointer;
+  // Unified spring transitions for drag state changes
   transition:
-    background-color var(--speed-fast) var(--ease-flow),
-    border-color var(--speed-fast) var(--ease-snap);
+    background-color var(--speed-fast) var(--ease-spring-snappy),
+    border-color var(--speed-fast) var(--ease-spring-snappy);
 
   // Invisible input overlay for click/drop capture.
   input[type='file'] {
@@ -191,7 +194,7 @@ input[type='radio'] {
       height: var(--space-xl);
       font-size: var(--space-lg);
       color: var(--text-mute);
-      transition: color var(--speed-fast) var(--ease-flow);
+      transition: color var(--speed-fast) var(--ease-spring-snappy);
     }
 
     p {

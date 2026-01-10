@@ -87,10 +87,11 @@
   border: var(--physics-border-width) solid alpha(var(--toast-accent), 25%);
   background: blend(var(--bg-surface), var(--toast-accent), 15%);
 
+  // Unified Spring Transitions
   transition:
-    border-color var(--speed-fast) var(--ease-snap),
-    box-shadow var(--speed-fast) var(--ease-snap),
-    background-color var(--speed-fast) var(--ease-flow);
+    border-color var(--speed-fast) var(--ease-spring-snappy),
+    box-shadow var(--speed-fast) var(--ease-spring-snappy),
+    background-color var(--speed-fast) var(--ease-spring-snappy);
 
   &:hover {
     border-color: alpha(var(--toast-accent), 50%);

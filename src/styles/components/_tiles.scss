@@ -54,11 +54,11 @@
   border-radius: calc(var(--radius-base) * 1.5);
   border-width: var(--physics-border-width);
 
-  // Hover transitions.
+  // Unified Spring Transitions
   transition:
-    transform var(--speed-base) var(--ease-stabilize),
-    border-color var(--speed-base) var(--ease-snap),
-    box-shadow var(--speed-base) var(--ease-snap);
+    transform var(--speed-base) var(--ease-spring-gentle),
+    border-color var(--speed-base) var(--ease-spring-gentle),
+    box-shadow var(--speed-base) var(--ease-spring-gentle);
 
   &.tile-fluid {
     width: 100%; // Takes the size of the grid column
@@ -74,7 +74,7 @@
     height: 100%;
     object-fit: cover;
     z-index: z('floor');
-    transition: transform var(--speed-base) var(--ease-stabilize); // Smooth pan.
+    transition: transform var(--speed-base) var(--ease-spring-gentle); // Smooth pan with spring.
   }
 
   // Gradient overlay anchors legibility.
@@ -124,7 +124,7 @@
     span {
       font-size: var(--font-size-caption);
       color: var(--text-mute);
-      transition: color var(--speed-base) var(--ease-snap);
+      transition: color var(--speed-base) var(--ease-spring-snappy);
     }
   }
 
@@ -200,11 +200,12 @@
 
   color: var(--text-main);
 
+  // Unified Spring Transitions
   transition:
-    transform var(--speed-base) var(--ease-snap),
-    box-shadow var(--speed-base) var(--ease-snap),
-    border-color var(--speed-base) var(--ease-snap),
-    background-color var(--speed-base) var(--ease-snap);
+    transform var(--speed-base) var(--ease-spring-snappy),
+    box-shadow var(--speed-base) var(--ease-spring-snappy),
+    border-color var(--speed-base) var(--ease-spring-snappy),
+    background-color var(--speed-base) var(--ease-spring-snappy);
 
   border-radius: var(--radius-base);
   @include glass-float($interactive: true);
@@ -242,8 +243,8 @@
     border-top-right-radius: var(--radius-base);
     border-bottom-right-radius: var(--radius-base);
     transition:
-      background-color var(--speed-fast) var(--ease-snap),
-      color var(--speed-fast) var(--ease-snap);
+      background-color var(--speed-fast) var(--ease-spring-snappy),
+      color var(--speed-fast) var(--ease-spring-snappy);
 
     &:hover {
       background: alpha(black, 30%);

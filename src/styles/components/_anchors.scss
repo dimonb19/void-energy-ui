@@ -8,7 +8,8 @@ a {
   color: inherit; // Inherit from parent to respect surface tone
   cursor: pointer;
 
-  transition: color var(--speed-fast) var(--ease-flow);
+  // Spring transition for hover color change
+  transition: color var(--speed-fast) var(--ease-spring-snappy);
 
   @media (hover: hover) {
     &:hover {
@@ -42,7 +43,8 @@ a {
 
     transform-origin: right;
 
-    transition: transform var(--speed-base) var(--ease-snap);
+    // Spring easing for organic underline reveal
+    transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
   @media (hover: hover) {
@@ -57,9 +59,10 @@ a {
   }
 
   &:focus-visible {
-    outline: none;
-    box-shadow: none;
+    // Use the universal focus state for inline elements
+    @include focus-state($is-inline: true);
 
+    // Also show the laser underline for extra visibility
     &::after {
       transform: scaleX(1);
       transform-origin: left;
