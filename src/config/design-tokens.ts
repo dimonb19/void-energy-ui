@@ -324,15 +324,10 @@ export const VOID_TOKENS = {
   // 5. PHYSICS ENGINE (Time & Matter)
   // Defines how elements move and feel.
   //
-  // SPRING PHYSICS PHILOSOPHY:
-  // Unlike cubic-bezier (mathematical curves), spring animations simulate
-  // real-world physics with mass, tension, and friction. This creates the
-  // "alive" feeling Apple pioneered in iOS 7.
-  //
-  // Spring Parameters (for reference):
-  // - stiffness: How tight the spring (higher = snappier)
-  // - damping: Friction/resistance (lower = more bounce)
-  // - mass: Weight of the object (higher = more inertia)
+  // EASING PHILOSOPHY:
+  // We use cubic-bezier curves that approximate spring-like motion.
+  // These provide organic, natural-feeling animations without the complexity
+  // of true physics simulation.
   //
   physics: {
     glass: {
@@ -357,14 +352,6 @@ export const VOID_TOKENS = {
       // Interaction Feedback
       lift: '-3px',
       scale: 1.02,
-      // Svelte Spring Parameters (for programmatic animations)
-      springStiffness: 0.35, // Tension (0-1) - tighter, more confident
-      springDamping: 0.92, // Friction (0-1) - less bounce, faster settle
-      // Motion Distance Tokens (for entry/exit animations)
-      entryDistance: 15, // translateY for entry (px)
-      entryScale: 0.96, // scale start for entry
-      exitDistance: 20, // translateY for exit (px)
-      overshoot: 1.025, // max spring overshoot clamp - subtle confidence
     },
     flat: {
       radiusBase: VOID_RADIUS.sm,
@@ -388,14 +375,6 @@ export const VOID_TOKENS = {
       // Interaction Feedback
       lift: '-2px',
       scale: 1.01,
-      // Svelte Spring Parameters
-      springStiffness: 0.2, // Stiffer = less wobbly
-      springDamping: 0.95, // More damping = less bounce
-      // Motion Distance Tokens (flatter = less dramatic)
-      entryDistance: 10, // translateY for entry (px)
-      entryScale: 0.98, // scale start for entry
-      exitDistance: 15, // translateY for exit (px)
-      overshoot: 1.02, // minimal overshoot
     },
     retro: {
       radiusBase: '0px',
@@ -421,14 +400,6 @@ export const VOID_TOKENS = {
       scale: 1,
       // Retro-specific shadow offset (hard pixel shadow)
       shadowOffset: '3px',
-      // Svelte Spring Parameters (disabled for retro)
-      springStiffness: 1, // Max stiffness = instant
-      springDamping: 1, // Max damping = no oscillation
-      // Motion Distance Tokens (instant - no animation)
-      entryDistance: 0, // No movement
-      entryScale: 1, // No scaling
-      exitDistance: 0, // No movement
-      overshoot: 1, // No overshoot
     },
   },
 
