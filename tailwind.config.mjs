@@ -29,6 +29,13 @@ export default {
     // Breakpoints.
     screens: VOID_RESPONSIVE,
 
+    extend: {
+      // Min-height utilities
+      minHeight: {
+        control: 'var(--control-height)', // Matches chip height for layout stability
+      },
+    },
+
     // Spacing tokens only (p-md, gap-lg).
     spacing: {
       0: '0',

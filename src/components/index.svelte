@@ -363,7 +363,9 @@
             class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center rounded-md"
           >
             {#if moduleTiles.length === 0}
-              <p class="text-uppercase text-dim text-caption">
+              <p
+                class="text-caption min-h-control flex items-center justify-center"
+              >
                 No active modules
               </p>
             {:else}
@@ -414,7 +416,9 @@
             class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center rounded-md"
           >
             {#if environmentTiles.length === 0}
-              <p class="text-uppercase text-dim text-caption">
+              <p
+                class="text-caption min-h-control flex items-center justify-center"
+              >
                 No environments selected
               </p>
             {:else}
@@ -468,7 +472,9 @@
             class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center rounded-md"
           >
             {#if premiumTiles.length === 0}
-              <p class="text-uppercase text-dim text-caption">
+              <p
+                class="text-caption min-h-control flex items-center justify-center"
+              >
                 No premium modules
               </p>
             {:else}
