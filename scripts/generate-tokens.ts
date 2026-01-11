@@ -48,6 +48,15 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
   });
   scss += `);\n\n`;
 
+  // Typography: Tablet overrides map (for H1-H4).
+  scss += `$tablet-overrides: (\n`;
+  Object.entries(VOID_TYPOGRAPHY.scales).forEach(([level, config]) => {
+    if ('tabletOverride' in config) {
+      scss += `  '${level}': ${(config as any).tabletOverride},\n`;
+    }
+  });
+  scss += `);\n\n`;
+
   // Typography: Line heights map.
   scss += `$line-heights: (\n`;
   Object.entries(VOID_TYPOGRAPHY.scales).forEach(([level, config]) => {

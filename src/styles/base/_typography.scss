@@ -7,6 +7,7 @@
 
 // Typography maps (generated from design-tokens.ts).
 $font-scale: generated.$font-scale;
+$tablet-overrides: generated.$tablet-overrides;
 $font-weights: generated.$font-weights;
 $line-heights: generated.$line-heights;
 $letter-spacings: generated.$letter-spacings;
@@ -86,10 +87,11 @@ $letter-spacings: generated.$letter-spacings;
     line-height: map.get($line-heights, $level);
     letter-spacing: map.get($letter-spacings, $level);
 
-    // Tablet override to preserve H1 hierarchy.
-    @if $level == 'h1' {
+    // Tablet overrides for H1-H4 to preserve visual hierarchy.
+    @if map.has-key($tablet-overrides, $level) {
       @include respond-up(tablet) {
-        font-size: calc(clamp(2rem, 5vw, 3.5rem) * var(--text-scale));
+        $override: map.get($tablet-overrides, $level);
+        font-size: calc(#{$override} * var(--text-scale));
       }
     }
   } @else {

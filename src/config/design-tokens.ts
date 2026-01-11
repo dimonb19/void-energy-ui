@@ -184,18 +184,24 @@ export const VOID_TYPOGRAPHY = {
       fontSize: 'clamp(1.125rem, 1rem + 1vw, 1.5rem)',
       lineHeight: 1.3,
       letterSpacing: '0em',
+      // Tablet Override: restores visual hierarchy (ratio 1.25 with H3)
+      tabletOverride: 'clamp(1.125rem, 2.41vw, 1.5rem)',
     },
     // Mobile: 20px -> Desktop: 32px
     h3: {
       fontSize: 'clamp(1.25rem, 1.1rem + 1.5vw, 2rem)',
       lineHeight: 1.2,
       letterSpacing: '-0.01em',
+      // Tablet Override: restores visual hierarchy (ratio 1.25 with H2)
+      tabletOverride: 'clamp(1.25rem, 3.01vw, 2rem)',
     },
     // Mobile: 24px -> Desktop: 40px
     h2: {
       fontSize: 'clamp(1.5rem, 1.25rem + 2vw, 2.5rem)',
       lineHeight: 1.15,
       letterSpacing: '-0.015em',
+      // Tablet Override: restores visual hierarchy (ratio 1.33 with H1)
+      tabletOverride: 'clamp(1.5rem, 3.76vw, 2.5rem)',
     },
     // Mobile: 32px -> Desktop: 56px (High Contrast Hero)
     h1: {
