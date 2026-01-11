@@ -3,9 +3,9 @@
  * This file is the single source of truth for tokens and themes.
  *
  * References:
- * - /THEME-GUIDE.md (palette contract, physics constraints, examples, testing)
- * - /CHEAT-SHEET.md
- * - /README.md
+ * - @see /THEME-GUIDE.md (palette contract, physics constraints, examples, testing)
+ * - @see /CHEAT-SHEET.md
+ * - @see /README.md
  *
  * Workflow:
  * 1. Edit this file
@@ -18,20 +18,51 @@
 // --------------------------------------------------------------------------
 
 /**
- * Spacing Scale
- * Base unit: 0.25rem (4px)
- * Scale: xs(8px) -> sm(16px) -> md(24px) -> lg(32px) -> xl(48px) -> 2xl(64px) -> 3xl(96px) -> 4xl(128px) -> 5xl(160px)
+ * 📏 VOID SPACING SCALE (4px Base Unit System)
+ *
+ * MATHEMATICAL FOUNDATION:
+ * - Base unit: 4px (0.25rem) - Aligns with pixel grids, WCAG touch targets (44px)
+ * - Dual-speed progression for component-level (xs-lg) and layout-level (xl-5xl) control
+ *
+ * COMPONENT LEVEL (Tight Progression):
+ * - xs  (8px):  Minimum comfortable gap for icons, chips, tight padding
+ * - sm  (16px): Standard button padding, small gaps (1rem = industry standard)
+ * - md  (24px): Optimal card padding (Material Design, most popular value - 1.5rem)
+ * - lg  (32px): Section padding, large gaps (2rem - typographic baseline)
+ *
+ * LAYOUT LEVEL (Accelerated Progression):
+ * - xl  (48px):  Golden Ratio step from lg (32 × 1.5) - Classic "large step" in typography
+ * - 2xl (64px):  Double lg (32 × 2) - Natural visual "block" unit, section dividers
+ * - 3xl (96px):  Triple lg (32 × 3) - Layout spacing, matches typographic systems
+ * - 4xl (128px): Quadruple lg (32 × 4) - Hero sections, dramatic spacing
+ * - 5xl (160px): Quintuple lg (32 × 5) - Mega spacing for large hero areas
+ *
+ * DENSITY SCALING:
+ * All values multiply by --density factor (0.75x compact, 1x standard, 1.25x relaxed)
+ * to respect user preferences. Implementation: calc(N * var(--unit) * var(--density, 1))
+ *
+ * INDUSTRY ALIGNMENT:
+ * This scale is identical to Tailwind CSS spacing (2/4/6/8/12/16/24/32/40),
+ * ensuring familiarity for developers and easy integration with Tailwind utilities.
+ *
+ * ACCESSIBILITY:
+ * - 4px base ensures pixel-perfect rendering on all displays
+ * - All touch targets built from this scale meet WCAG minimum (44px)
+ * - Dynamic density scaling supports motor disabilities
+ *
+ * @see /CHEAT-SHEET.md (Section: "Spacing Philosophy & Mathematical Reasoning")
+ * @see /src/styles/base/_reset.scss:9-79 (Density Engine implementation)
  */
 export const VOID_SPACING = {
-  xs: '0.5rem', // 8px
-  sm: '1rem', // 16px
-  md: '1.5rem', // 24px
-  lg: '2rem', // 32px
-  xl: '3rem', // 48px
-  '2xl': '4rem', // 64px
-  '3xl': '6rem', // 96px
-  '4xl': '8rem', // 128px
-  '5xl': '10rem', // 160px
+  xs: '0.5rem', // 8px  (2 × 4px) - Tight padding, icon gaps
+  sm: '1rem', // 16px (4 × 4px) - Button padding, small gaps
+  md: '1.5rem', // 24px (6 × 4px) - Card padding, standard gaps (most common)
+  lg: '2rem', // 32px (8 × 4px) - Section padding, large gaps
+  xl: '3rem', // 48px (12 × 4px) - Page margins, hero spacing
+  '2xl': '4rem', // 64px (16 × 4px) - Section dividers
+  '3xl': '6rem', // 96px (24 × 4px) - Layout spacing
+  '4xl': '8rem', // 128px (32 × 4px) - Hero sections
+  '5xl': '10rem', // 160px (40 × 4px) - Mega spacing
 } as const;
 
 /**

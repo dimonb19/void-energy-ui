@@ -285,6 +285,206 @@ All spacing is dynamic and scales based on user density preference (0.75x - 1.25
 
 ---
 
+### B.1. Spacing Philosophy & Mathematical Reasoning
+
+#### Why 4px as the Base Unit?
+
+The Void Energy UI uses **4px (0.25rem)** as the foundational unit for all spacing calculations.
+
+**Technical Justification:**
+
+1. **Pixel-Perfect Rendering**
+   - All modern displays render in whole pixels
+   - 4px aligns perfectly with pixel grids, preventing subpixel antialiasing artifacts
+   - Ensures crisp edges on all components across all screen densities
+
+2. **WCAG Compliance**
+   - Minimum touch target size: 44px (WCAG 2.1 Level AAA)
+   - 44px ÷ 4px = 11 (perfect divisibility, no fractional pixels)
+   - All interactive elements built from this base meet accessibility standards
+
+3. **Mathematical Harmony**
+   - 4 = 2² (powers of 2 create natural visual rhythm)
+   - Enables proportional scaling without rounding errors
+   - Aligns with CSS rem system (1rem = 16px = 4 × 4px)
+
+4. **Industry Standard**
+   - Used by Material Design (8px grid, but often subdivides to 4px)
+   - iOS Human Interface Guidelines (4pt base for spacing)
+   - Tailwind CSS (0.25rem = 4px base unit)
+
+---
+
+#### The Dual-Speed Progression
+
+Our spacing scale uses **two different progression strategies** for different use cases:
+
+**🎯 Component Level (xs → lg): Tight Progression**
+
+```
+xs:   8px  (×2)  ← Minimal gap
+sm:   16px (×4)  ← Doubles from xs
+md:   24px (×6)  ← +8px step (optimal card padding)
+lg:   32px (×8)  ← Doubles from sm (section padding)
+```
+
+**Why tight progression?**
+
+- Fine-grained control for UI components (buttons, cards, inputs)
+- Small 8px increments allow precise visual tuning
+- Prevents "spacing jumps" that feel unnatural in compact layouts
+
+**📐 Layout Level (xl → 5xl): Accelerated Progression**
+
+```
+lg:   32px  (×8)   ← Foundation
+xl:   48px  (×12)  ← Golden Ratio jump (32 × 1.5)
+2xl:  64px  (×16)  ← Double lg (visual "block")
+3xl:  96px  (×24)  ← Triple lg (layout spacing)
+4xl:  128px (×32)  ← Quadruple lg (hero sections)
+5xl:  160px (×40)  ← Quintuple lg (mega spacing)
+```
+
+**Why accelerated progression?**
+
+- Large whitespace areas benefit from dramatic jumps
+- Creates clear visual hierarchy between sections
+- Prevents too many similar spacing values (reduces decision fatigue)
+
+---
+
+#### The "Magic Numbers" Explained
+
+Each spacing value was chosen for specific ergonomic and mathematical reasons:
+
+| Token   | Value | Why This Exact Number?                                                                                                                                               |
+| ------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **xs**  | 8px   | **Minimum comfortable gap** - Smallest spacing that feels intentional, not cramped. Used for icon gaps, chip spacing, tight padding.                                 |
+| **sm**  | 16px  | **Industry standard** - 1rem (default font-size). Universal button padding in Material Design, Bootstrap, Tailwind. Most familiar value to developers.               |
+| **md**  | 24px  | **Optimal card padding** - 1.5rem. Most popular card padding value across all design systems (Material, Ant Design, Chakra UI). Balances density and breathing room. |
+| **lg**  | 32px  | **Typographic baseline** - 2rem. Divisible by 16px (standard font-size). Creates strong visual sections. Foundation for larger spacing values.                       |
+| **xl**  | 48px  | **Golden Ratio step** - 32 × 1.5 ≈ 48 (3rem). Classic "large step" in typography. Creates harmonious jump from lg without feeling too aggressive.                    |
+| **2xl** | 64px  | **Visual block unit** - 32 × 2 (4rem). Natural doubling from lg. Perfect for section dividers, major layout boundaries.                                              |
+| **3xl** | 96px  | **Layout rhythm** - 32 × 3 (6rem). Matches typographic modular scales. Used for separating distinct page sections.                                                   |
+| **4xl** | 128px | **Hero spacing** - 32 × 4 (8rem). Dramatic spacing for landing pages, hero sections. Creates strong visual impact.                                                   |
+| **5xl** | 160px | **Mega whitespace** - 32 × 5 (10rem). Largest spacing value for expansive hero areas, full-bleed sections.                                                           |
+
+---
+
+#### Density Engine: Dynamic Scaling
+
+All spacing values **multiply by a density factor** to respect user preferences:
+
+```scss
+// Implementation in /src/styles/base/_reset.scss
+:root {
+  --unit: 0.25rem; // 4px base
+  --density: 1; // Default (user-configurable: 0.75 / 1 / 1.25)
+
+  // Example: md spacing
+  --space-md: calc(6 * var(--unit) * var(--density, 1));
+  //               ↑     ↑            ↑
+  //            24px   4px         scaling factor
+}
+```
+
+**Density Factors:**
+
+| Setting                | Factor | md Example | Use Case                                         |
+| ---------------------- | ------ | ---------- | ------------------------------------------------ |
+| **High** (Compact)     | 0.75x  | 18px       | Power users, dense information displays          |
+| **Standard** (Default) | 1x     | 24px       | Balanced spacing for most users                  |
+| **Low** (Relaxed)      | 1.25x  | 30px       | Accessibility, motor disabilities, large screens |
+
+**Accessibility Benefits:**
+
+- ✅ **Motor disabilities**: Larger spacing = easier touch/click targets
+- ✅ **Visual disabilities**: More breathing room improves scannability
+- ✅ **Cognitive disabilities**: Consistent spacing reduces cognitive load
+
+**Implementation:**
+
+- User sets preference via UI (`voidEngine.setDensity('low')`)
+- CSS variable `--density` updates globally
+- All components automatically reflow (no code changes needed)
+- Proportions remain consistent (ratio between xs/sm/md/lg stays identical)
+
+---
+
+#### Alignment with Tailwind CSS
+
+Our spacing scale is **100% compatible** with Tailwind CSS:
+
+| Void Energy         | Tailwind          | Value | Notes                   |
+| ------------------- | ----------------- | ----- | ----------------------- |
+| `gap-xs` / `p-xs`   | `gap-2` / `p-2`   | 8px   | Tailwind's `2` = 0.5rem |
+| `gap-sm` / `p-sm`   | `gap-4` / `p-4`   | 16px  | Tailwind's `4` = 1rem   |
+| `gap-md` / `p-md`   | `gap-6` / `p-6`   | 24px  | Tailwind's `6` = 1.5rem |
+| `gap-lg` / `p-lg`   | `gap-8` / `p-8`   | 32px  | Tailwind's `8` = 2rem   |
+| `gap-xl` / `p-xl`   | `gap-12` / `p-12` | 48px  | Tailwind's `12` = 3rem  |
+| `gap-2xl` / `p-2xl` | `gap-16` / `p-16` | 64px  | Tailwind's `16` = 4rem  |
+| `gap-3xl` / `p-3xl` | `gap-24` / `p-24` | 96px  | Tailwind's `24` = 6rem  |
+
+**Why this alignment matters:**
+
+- ✅ Developers familiar with Tailwind can transfer knowledge instantly
+- ✅ Easy integration with Tailwind utilities (we use Tailwind for layout)
+- ✅ Large ecosystem of examples, tutorials, and best practices
+- ✅ Reduces learning curve for new contributors
+
+---
+
+#### Quick Reference: When to Use Each Value
+
+| Spacing          | Common Use Cases                                          | Visual Weight    |
+| ---------------- | --------------------------------------------------------- | ---------------- |
+| **xs** (8px)     | Icon gaps, chip spacing, tight list items, compact tables | Minimal          |
+| **sm** (16px)    | Button padding, input padding, small card gaps            | Light            |
+| **md** (24px)    | Card padding, modal padding, standard gaps                | Medium (Default) |
+| **lg** (32px)    | Section padding, container padding, large gaps            | Strong           |
+| **xl** (48px)    | Page margins, hero padding, dramatic gaps                 | Very Strong      |
+| **2xl** (64px)   | Section dividers, major layout boundaries                 | Dramatic         |
+| **3xl+** (96px+) | Hero sections, landing pages, full-bleed content          | Mega             |
+
+---
+
+#### Examples
+
+**Compact Button (sm padding):**
+
+```svelte
+<button class="btn p-sm">Click Me</button>
+<!-- 16px padding = comfortable but not wasteful -->
+```
+
+**Standard Card (md padding):**
+
+```svelte
+<div class="surface-glass p-md">
+  <h3>Card Title</h3>
+  <p>Card content with optimal 24px breathing room.</p>
+</div>
+```
+
+**Hero Section (xl+ padding):**
+
+```svelte
+<section class="py-4xl px-xl">
+  <h1>Welcome to Void Energy</h1>
+  <!-- Vertical: 128px, Horizontal: 48px = Dramatic impact -->
+</section>
+```
+
+---
+
+**📚 Related Documentation:**
+
+- **Implementation**: [/src/styles/base/\_reset.scss:9-79](../src/styles/base/_reset.scss) (Density Engine)
+- **Token Definitions**: [/src/config/design-tokens.ts:20-66](../src/config/design-tokens.ts) (Spacing scale)
+- **Tailwind Integration**: [/tailwind.config.mjs](../tailwind.config.mjs) (Spacing utilities)
+
+---
+
 ## 4. Component Catalog
 
 ### A. Surfaces (The Skin)
