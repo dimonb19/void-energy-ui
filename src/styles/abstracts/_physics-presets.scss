@@ -7,7 +7,7 @@
  *
  * 1. SCSS functions: blend(), alpha() - computed at build time
  * 2. CSS variables: var(--bg-surface), var(--energy-primary) - resolved at runtime per theme
- * 3. Complex CSS: gradients, box-shadows, focus rings - need SCSS composition
+ * 3. Complex CSS: gradients, box-shadows - need SCSS composition
  *
  * The base values (speeds, radius, blur, easing) come from:
  *   design-tokens.ts → generate-tokens.ts → _generated-themes.scss
@@ -18,6 +18,7 @@
 @use 'sass:map';
 @use '../config/generated-themes' as generated;
 @use 'functions' as *;
+@use 'variables' as *;
 
 $physics-presets: (
   // Glass: object emits light.
@@ -29,11 +30,9 @@ $physics-presets: (
             blend(var(--bg-surface), var(--energy-secondary), 10%) 0%,
             var(--bg-surface) 100%
           ),
-        'surface-border': var(--border-color),
         'shadow-sunk': inset 0 2px 4px alpha(var(--bg-canvas), 60%),
         'shadow-float': 0 2px 8px rgba(0, 0, 0, 0.25),
         'shadow-lift': 0 0 10px alpha(var(--energy-primary), 50%),
-        'focus-ring': '0 0 0 3px oklch(from var(--energy-primary) l c h / 0.4)',
       )
     ),
   // Flat: external light casts shadows.
@@ -41,12 +40,9 @@ $physics-presets: (
       map.get(generated.$generated-physics, 'flat'),
       (
         'surface-bg': var(--bg-surface),
-        'surface-border': var(--border-color),
         'shadow-sunk': inset 0 1px 2px rgba(0, 0, 0, 0.05),
         'shadow-float': 0 1px 3px rgba(0, 0, 0, 0.05),
         'shadow-lift': 0 4px 12px rgba(0, 0, 0, 0.1),
-        'focus-ring':
-          '0 0 0 2px var(--bg-canvas), 0 0 0 4px var(--energy-primary)',
       )
     ),
   // Retro: hard edges, no blur.
@@ -55,13 +51,10 @@ $physics-presets: (
       map.get(generated.$generated-physics, 'retro'),
       (
         'surface-bg': var(--bg-surface),
-        'surface-border': var(--border-color),
         'shadow-sunk': none,
         'shadow-float': none,
         'shadow-lift': var(--shadow-offset) var(--shadow-offset) 0
           alpha(var(--energy-secondary), 50%),
-        'focus-ring': var(--shadow-offset) var(--shadow-offset) 0
-          var(--energy-secondary),
       )
     )
 );

@@ -18,7 +18,7 @@
   border-width: var(--physics-border-width);
 
   // Lighting.
-  border-color: var(--surface-border);
+  border-color: var(--border-color);
 
   // Shadow switches by physics preset.
   box-shadow: var(--shadow-float);
@@ -122,26 +122,10 @@
     animation: rotate-laser 4s linear infinite;
     z-index: -2;
 
-    // Retro override: segmented sweep.
+    // Retro override: disable animated gradient entirely
+    // Terminal UIs didn't have rotating gradients - use static borders instead
     @at-root :where([data-physics='retro']) & {
-      background: conic-gradient(
-        from 0deg,
-        transparent 0deg,
-        transparent 100deg,
-        var(--energy-primary) 100deg,
-        var(--energy-primary) 115deg,
-        transparent 115deg,
-        transparent 125deg,
-        var(--energy-primary) 125deg,
-        var(--energy-primary) 150deg,
-        transparent 150deg,
-        transparent 160deg,
-        var(--energy-primary) 160deg,
-        var(--energy-primary) 240deg,
-        transparent 240deg,
-        transparent 360deg
-      );
-      animation-timing-function: steps(64);
+      display: none;
     }
   }
 
@@ -155,6 +139,11 @@
 
     z-index: -1;
     border-radius: var(--radius-full);
+
+    // Retro override: disable inner mask (not needed without gradient)
+    @at-root :where([data-physics='retro']) & {
+      display: none;
+    }
   }
 
   // Hover surge.

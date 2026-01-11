@@ -129,6 +129,37 @@ button:not(.btn-void),
         color: var(--text-main);
       }
     }
+
+    // Retro Physics Override: Static double border instead of animated gradient
+    // Terminal UIs (DOS/Unix TUI) used double borders for emphasis, not animations
+    // Note: gemini-laser mixin already disables ::before/::after in retro mode
+    @at-root [data-physics='retro'] & {
+      // Apply double border using border + outline (uses physics tokens)
+      border: var(--physics-border-width) solid var(--energy-primary);
+      outline: var(--physics-border-width) solid var(--energy-primary);
+      outline-offset: calc(
+        var(--physics-border-width) * -2
+      ); // Positions outline inside border for double-frame effect
+      background: var(--bg-surface);
+
+      // Hover state: Swap colors instead of transform
+      @media (hover: hover) {
+        &:hover:not(:disabled) {
+          color: var(--bg-canvas);
+          border: var(--physics-border-width) solid var(--energy-primary);
+          background: var(--energy-primary);
+        }
+      }
+
+      // Active state: Inverted terminal look
+      &:active:not(:disabled) {
+        transform: none;
+        background: var(--energy-primary);
+        color: var(--bg-canvas);
+        border-color: var(--energy-primary);
+        outline-color: var(--energy-primary);
+      }
+    }
   }
 
   // ========================================================================
