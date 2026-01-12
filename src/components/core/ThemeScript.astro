@@ -2,10 +2,12 @@
 /*
   Critical render-path bootloader.
   Inlines void-boot.js and hydrates immediately to prevent FOUC.
+  Also injects font preload links for the active theme to eliminate FOUT.
 */
 
 import THEME_REGISTRY from '../../config/void-registry.json';
 import { STORAGE_KEYS, DOM_ATTRS, DEFAULTS } from '../../config/constants';
+import { FONT_REGISTRY } from '../../config/font-registry';
 
 // Import bootloader as a raw string for inline execution.
 import bootSource from '../../lib/void-boot.js?raw';
@@ -21,11 +23,34 @@ const cleanBootSource = bootSource.replace(/export /g, '');
       // Inject bootloader.
       ${cleanBootSource}
 
+      // Determine active theme ID (same logic as hydrate, but we need it early for font preloading).
+      var storageKey = '${STORAGE_KEYS.ATMOSPHERE}';
+      var defaultTheme = '${DEFAULTS.ATMOSPHERE}';
+      var lightTheme = '${DEFAULTS.LIGHT_ATMOSPHERE}';
+      var savedTheme = null;
+      try { savedTheme = localStorage.getItem(storageKey); } catch(e) {}
+
+      var activeId = savedTheme
+        || (window.matchMedia('(prefers-color-scheme: dark)').matches ? defaultTheme : lightTheme);
+
+      // Inject preload tags for active theme fonts (eliminates FOUT).
+      var fontRegistry = ${JSON.stringify(FONT_REGISTRY)};
+      var fonts = fontRegistry[activeId] || fontRegistry[defaultTheme] || [];
+      fonts.forEach(function(src) {
+        var link = document.createElement('link');
+        link.rel = 'preload';
+        link.as = 'font';
+        link.type = 'font/woff2';
+        link.crossOrigin = 'anonymous';
+        link.href = src;
+        document.head.appendChild(link);
+      });
+
       // Execute hydration with server-side constants.
       hydrate(
-        ${JSON.stringify(THEME_REGISTRY)}, 
-        ${JSON.stringify(STORAGE_KEYS)}, 
-        ${JSON.stringify(DOM_ATTRS)}, 
+        ${JSON.stringify(THEME_REGISTRY)},
+        ${JSON.stringify(STORAGE_KEYS)},
+        ${JSON.stringify(DOM_ATTRS)},
         ${JSON.stringify(DEFAULTS)}
       );
     })();

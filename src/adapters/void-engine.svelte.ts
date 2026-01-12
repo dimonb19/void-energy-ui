@@ -166,9 +166,8 @@ export class VoidEngine {
     document.startViewTransition(() => {
       this.atmosphere = name;
       this.syncDOM();
+      this.persist();
     });
-
-    this.persist();
   }
 
   setPreferences(prefs: Partial<UserConfig>) {
