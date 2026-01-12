@@ -145,8 +145,29 @@ export class VoidEngine {
       console.warn(`Void: Unknown atmosphere "${name}".`);
       return;
     }
-    this.atmosphere = name;
-    this.syncDOM();
+
+    // Check for View Transitions API support and user preferences
+    const prefersReducedMotion =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const supportsViewTransitions =
+      typeof document !== 'undefined' && 'startViewTransition' in document;
+
+    // Fallback for unsupported browsers or reduced motion preference
+    if (!supportsViewTransitions || prefersReducedMotion) {
+      this.atmosphere = name;
+      this.syncDOM();
+      this.persist();
+      return;
+    }
+
+    // Use View Transitions API for smooth theme transitions
+    document.startViewTransition(() => {
+      this.atmosphere = name;
+      this.syncDOM();
+    });
+
     this.persist();
   }
 

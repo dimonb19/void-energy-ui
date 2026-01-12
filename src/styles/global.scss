@@ -14,6 +14,31 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 3. VIEW TRANSITIONS API (Native Browser Animations) */
+/* Smooth transitions for atmosphere/theme changes using physics tokens */
+::view-transition-group(root) {
+  animation-duration: var(--speed-base);
+  animation-timing-function: var(--ease-spring-gentle);
+}
+
+/* Accessibility: respect reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.01s !important;
+  }
+}
+
+/* Retro physics: instant transitions (terminals had no smooth animations) */
+:where([data-physics='retro']) {
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0ms;
+  }
+}
+
 /* ==========================================================================
    📘 VOID ENERGY UI — QUICK REFERENCE
    ==========================================================================
