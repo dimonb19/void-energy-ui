@@ -118,7 +118,14 @@ export class VoidEngine {
         cache[id] = safeTheme;
         localStorage.setItem('void_theme_cache', JSON.stringify(cache));
       } catch (e) {
-        console.warn('Void: Cache Save Failed', e);
+        console.warn('Void: Cache Save Failed - clearing and retrying', e);
+        try {
+          localStorage.removeItem('void_theme_cache');
+          localStorage.setItem(
+            'void_theme_cache',
+            JSON.stringify({ [id]: safeTheme }),
+          );
+        } catch {}
       }
     }
 
@@ -194,7 +201,8 @@ export class VoidEngine {
       try {
         this.userConfig = { ...this.userConfig, ...JSON.parse(storedConfig) };
       } catch (e) {
-        console.error('Void: Corrupt config', e);
+        console.error('Void: Corrupt config - resetting to defaults', e);
+        localStorage.removeItem(STORAGE_KEYS.USER_CONFIG);
       }
     }
 

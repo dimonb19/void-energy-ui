@@ -92,7 +92,10 @@ export function hydrate(registry, storageKeys, attrs, defaults) {
         );
         themeData = cache[activeId];
       } catch (e) {
-        console.warn('Void: Cache Error', e);
+        console.warn('Void: Cache Error - clearing corrupted cache', e);
+        try {
+          localStorage.removeItem('void_theme_cache');
+        } catch {}
       }
     }
 
