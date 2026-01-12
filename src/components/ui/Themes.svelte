@@ -21,7 +21,7 @@
 </script>
 
 <div
-  class="theme-menu surface-sunk rounded-md flex flex-col"
+  class="theme-menu surface-sunk rounded-md flex flex-col tablet:grid tablet:grid-cols-2"
   role="radiogroup"
   aria-label="Select Theme"
 >
@@ -57,9 +57,15 @@
 </div>
 
 <style lang="scss">
+  @use '/src/styles/abstracts' as *;
+
   .theme-menu {
-    max-height: 22rem;
+    max-height: 18rem;
     overflow-y: auto;
+
+    @include respond-up(small-desktop) {
+      min-width: 40rem;
+    }
 
     .theme-wrapper {
       background-color: var(--bg-canvas);

@@ -59,7 +59,7 @@
     { id: 2, name: 'Firewall' },
     { id: 3, name: 'Log v.1' },
   ]);
-  let newModuleTile = $state(null);
+  let newModuleTile = $state('Audio Synth');
 
   let environmentIdCounter = $state(3);
   let environmentTiles = $state([
@@ -67,7 +67,7 @@
     { id: 2, name: 'Audio Synth' },
     { id: 3, name: 'Visual Renderer' },
   ]);
-  let newEnvironmentTile = $state(null);
+  let newEnvironmentTile = $state('Physics Engine');
 
   let premiumIdCounter = $state(2);
   let premiumTiles = $state([
@@ -167,12 +167,96 @@
 
   <div class="container flex flex-col gap-xl">
     <section class="flex flex-col gap-md mt-md">
-      <div class="flex flex-row justify-between items-end">
-        <h2>01 // CONFIGURATION</h2>
-        <p class="hidden tablet:block">SECURE CONNECTION</p>
-      </div>
+      <h2>01 // COMMAND DECK</h2>
 
       <div class="surface-glass p-lg flex flex-col gap-lg">
+        <div class="flex flex-col items-center gap-md">
+          <a class="link" href="https://dgrslabs.ink/"
+            >Visit DGRS LABS website</a
+          >
+          <button
+            class="btn-cta"
+            onclick={async () => {
+              modal.confirm(
+                'INITIATE SEQUENCE?',
+                'You are about to deploy the production build.',
+                {
+                  cost: 500,
+                  onConfirm: () => {
+                    toast.show('Sequence Initiated', 'success');
+                  },
+                  onCancel: () => {
+                    toast.show('Aborted', 'info');
+                  },
+                },
+              );
+            }}
+          >
+            INITIATE SEQUENCE
+          </button>
+        </div>
+
+        <div class="flex flex-row flex-wrap justify-center gap-sm">
+          <button
+            class="btn-premium"
+            onclick={() => {
+              modal.settings({
+                onSave: (prefs) => {
+                  toast.promise(
+                    new Promise((resolve) => setTimeout(resolve, 2000)),
+                    {
+                      loading: `Launching story with ${prefs.settings} settings...`,
+                      success: 'Story is generated (test)',
+                      error: 'Failed to generate story',
+                    },
+                  );
+                  console.log('Selected preferences:', prefs);
+                },
+              });
+            }}
+          >
+            Upgrade Core
+          </button>
+          <button
+            class="btn-system"
+            onclick={() => {
+              modal.alert(
+                'Anomaly Detected',
+                'Unusual energy fluctuation in sector 7-G. Manual inspection recommended before proceeding.',
+              );
+            }}
+          >
+            Diagnostics
+          </button>
+          <button
+            class="btn-signal"
+            use:tooltip={'Click to call SUCCESS message'}
+            onclick={() => {
+              toast.show('Connection Established Successfully!', 'success');
+            }}
+          >
+            Secure Channel
+          </button>
+          <button
+            class="btn-alert"
+            use:tooltip={'Click to call ERROR message'}
+            onclick={() => {
+              toast.show('Cache Purge Failed!', 'error');
+            }}
+          >
+            Purge Cache
+          </button>
+          <button
+            use:tooltip={'Click to call INFO message'}
+            onclick={() => {
+              toast.show('Default action executed.', 'info');
+            }}
+          >
+            Default Action
+          </button>
+          <button disabled>Offline</button>
+        </div>
+
         <div class="flex flex-row flex-wrap gap-md">
           <div class="flex flex-col gap-xs flex-1">
             <label for="system-identifier"> System Identifier </label>
@@ -235,129 +319,9 @@
     </section>
 
     <section class="flex flex-col gap-md mt-md">
-      <h2>02 // COMMAND DECK</h2>
-
-      <div class="surface-glass p-lg flex flex-col gap-lg">
-        <div class="flex flex-col items-center gap-md">
-          <a class="link" href="https://dgrslabs.ink/"
-            >Visit DGRS LABS website</a
-          >
-          <button
-            class="btn-cta"
-            onclick={async () => {
-              modal.confirm(
-                'INITIATE SEQUENCE?',
-                'You are about to deploy the production build.',
-                {
-                  cost: 500,
-                  onConfirm: () => {
-                    toast.show('Sequence Initiated', 'success');
-                  },
-                  onCancel: () => {
-                    toast.show('Aborted', 'info');
-                  },
-                },
-              );
-            }}
-          >
-            INITIATE SEQUENCE
-          </button>
-        </div>
-
-        <div class="flex flex-row flex-wrap justify-center gap-sm">
-          <button
-            class="btn-premium"
-            onclick={() => {
-              modal.settings({
-                onSave: (prefs) => {
-                  toast.promise(
-                    new Promise((resolve) => setTimeout(resolve, 2000)),
-                    {
-                      loading: `Launching story with ${prefs.settings} settings...`,
-                      success: 'Story is generated',
-                      error: 'Failed to generate story',
-                    },
-                  );
-                  console.log('Selected preferences:', prefs);
-                },
-              });
-            }}
-          >
-            Upgrade Core
-          </button>
-          <button
-            class="btn-system"
-            onclick={() => {
-              modal.alert(
-                'Anomaly Detected',
-                'Unusual energy fluctuation in sector 7-G. Manual inspection recommended before proceeding.',
-              );
-            }}
-          >
-            Diagnostics
-          </button>
-          <button
-            class="btn-signal"
-            use:tooltip={'Success Button Styling'}
-            onclick={() => {
-              toast.show('Connection Established Successfully!', 'success');
-            }}
-          >
-            Secure Channel
-          </button>
-          <button
-            class="btn-alert"
-            use:tooltip={'Error Button Styling'}
-            onclick={() => {
-              toast.show('Cache Purge Failed!', 'error');
-            }}
-          >
-            Purge Cache
-          </button>
-          <button
-            use:tooltip={'Standard Button Styling'}
-            onclick={() => {
-              toast.show('Default action executed.', 'info');
-            }}
-          >
-            Default Action
-          </button>
-          <button disabled>Offline</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="flex flex-col gap-md mt-md">
       <h2>03 // PARAMETERS</h2>
 
       <div class="surface-glass p-lg flex flex-col gap-lg">
-        <SettingsRow label="Rendering">
-          <div class="flex flex-row flex-wrap gap-md w-full">
-            <div class="flex flex-col flex-1 gap-xs">
-              <label for="visual-fidelity" class="text-small text-center"
-                >Visual Fidelity</label
-              >
-              <select id="visual-fidelity">
-                <option>ULTRA (4K)</option>
-                <option>HIGH (1440p)</option>
-                <option>PERFORMANCE (1080p)</option>
-              </select>
-            </div>
-            <div class="flex flex-col flex-1 gap-xs">
-              <label for="frame-rate" class="text-small text-center"
-                >Frame Rate</label
-              >
-              <select id="frame-rate">
-                <option>120 HZ</option>
-                <option>60 HZ</option>
-                <option>30 HZ</option>
-              </select>
-            </div>
-          </div>
-        </SettingsRow>
-
-        <hr />
-
         <SettingsRow label="Active Modules">
           <div
             class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center rounded-md"
@@ -401,7 +365,6 @@
                     id: moduleIdCounter,
                     name: newModuleTile,
                   });
-                  newModuleTile = null;
                 }
               }}
               disabled={!newModuleTile}>Add Module</button
@@ -457,7 +420,6 @@
                     id: environmentIdCounter,
                     name: newEnvironmentTile,
                   });
-                  newEnvironmentTile = null;
                 }
               }}
               disabled={!newEnvironmentTile}>Add Module</button
@@ -513,18 +475,44 @@
                     id: premiumIdCounter,
                     name: newPremiumTile,
                   });
-                  newPremiumTile = null;
                 }
               }}
               disabled={!newPremiumTile}>Add Module</button
             >
           </div>
         </SettingsRow>
+
+        <hr />
+
+        <SettingsRow label="Rendering">
+          <div class="flex flex-row flex-wrap gap-md w-full">
+            <div class="flex flex-col flex-1 gap-xs">
+              <label for="visual-fidelity" class="text-small text-center"
+                >Visual Fidelity</label
+              >
+              <select id="visual-fidelity">
+                <option>ULTRA (4K)</option>
+                <option>HIGH (1440p)</option>
+                <option>PERFORMANCE (1080p)</option>
+              </select>
+            </div>
+            <div class="flex flex-col flex-1 gap-xs">
+              <label for="frame-rate" class="text-small text-center"
+                >Frame Rate</label
+              >
+              <select id="frame-rate">
+                <option>120 HZ</option>
+                <option>60 HZ</option>
+                <option>30 HZ</option>
+              </select>
+            </div>
+          </div>
+        </SettingsRow>
       </div>
     </section>
 
     <section class="flex flex-col gap-md my-md">
-      <h2>04 // DATA UPLOAD</h2>
+      <h2>03 // DATA UPLOAD</h2>
 
       <div class="p-md surface-glass">
         <div class="dropzone">
@@ -539,7 +527,7 @@
   </div>
 
   <!-- <section class="flex flex-col gap-md mt-2xl">
-    <h2 class="container">05 // RECENT ANOMALIES</h2>
+    <h2 class="container">04 // RECENT ANOMALIES</h2>
 
     <div class="tiles-collection">
       <button type="button" class="btn-void tile">
