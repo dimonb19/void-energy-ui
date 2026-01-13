@@ -51,6 +51,10 @@ export class VoidEngine {
     density: 'standard',
   });
 
+  // Story mode state (for creator-bound themes).
+  private savedUserTheme: string | null = null;
+  storyTheme = $state<string | null>(null);
+
   // Derived theme snapshot for UI consumption.
   currentTheme = $derived(
     this.registry[this.atmosphere] || this.registry[DEFAULTS.ATMOSPHERE],
@@ -250,6 +254,53 @@ export class VoidEngine {
 
   get availableThemes() {
     return Object.keys(this.registry);
+  }
+
+  /**
+   * Check if currently in story mode.
+   */
+  get isInStoryMode() {
+    return this.storyTheme !== null;
+  }
+
+  /**
+   * Enter story mode - switch to story's theme, save user's preference for restoration.
+   *
+   * @example
+   * // In story player component:
+   * import { voidEngine } from '../adapters/void-engine.svelte';
+   * import { onMount, onDestroy } from 'svelte';
+   *
+   * onMount(() => {
+   *   if (story.theme) voidEngine.enterStoryMode(story.theme);
+   * });
+   *
+   * onDestroy(() => {
+   *   voidEngine.exitStoryMode();
+   * });
+   */
+  enterStoryMode(themeId: string | null) {
+    // If story has no theme or theme doesn't exist, do nothing
+    if (!themeId || !this.registry[themeId]) return;
+
+    // Save current theme for restoration (only if not already in story mode)
+    if (!this.storyTheme) {
+      this.savedUserTheme = this.atmosphere;
+    }
+
+    this.storyTheme = themeId;
+    this.setAtmosphere(themeId);
+  }
+
+  /**
+   * Exit story mode - restore user's preferred theme.
+   */
+  exitStoryMode() {
+    if (this.savedUserTheme) {
+      this.setAtmosphere(this.savedUserTheme);
+    }
+    this.storyTheme = null;
+    this.savedUserTheme = null;
   }
 }
 
