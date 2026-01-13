@@ -450,6 +450,7 @@ export const VOID_TOKENS = {
     void: {
       mode: 'dark',
       physics: 'glass',
+      tagline: 'Default / Cyber',
       palette: {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.tech,
@@ -467,10 +468,11 @@ export const VOID_TOKENS = {
       },
     },
 
-    // 2. [THEME] - Stealth / Cinema
+    // 2. ONYX - Stealth / Cinema
     onyx: {
       mode: 'dark',
       physics: 'glass',
+      tagline: 'Stealth / Cinema',
       palette: {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.clean,
@@ -488,10 +490,11 @@ export const VOID_TOKENS = {
       },
     },
 
-    // 3. [THEME] - Retro / Hacker
+    // 3. TERMINAL - Hacker / Retro
     terminal: {
       mode: 'dark',
       physics: 'retro', // Triggers Pixel fonts & Instant motion
+      tagline: 'Hacker / Retro',
       palette: {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.code,
@@ -510,10 +513,11 @@ export const VOID_TOKENS = {
       },
     },
 
-    // 4. [THEME] - Horror / Aggressive
+    // 4. CRIMSON - Horror / Intense
     crimson: {
       mode: 'dark',
       physics: 'glass',
+      tagline: 'Horror / Intense',
       palette: {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.horror,
@@ -531,10 +535,11 @@ export const VOID_TOKENS = {
       },
     },
 
-    // 5. [THEME] - Nature / Organic
+    // 5. OVERGROWTH - Nature / Organic
     overgrowth: {
       mode: 'dark',
       physics: 'glass',
+      tagline: 'Nature / Organic',
       palette: {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.nature,
@@ -552,10 +557,11 @@ export const VOID_TOKENS = {
       },
     },
 
-    // 6. [THEME] - Romance / Soft
+    // 6. VELVET - Romance / Soft
     velvet: {
       mode: 'dark',
       physics: 'glass',
+      tagline: 'Romance / Soft',
       palette: {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.hand,
@@ -573,10 +579,11 @@ export const VOID_TOKENS = {
       },
     },
 
-    // 7. [THEME] - Royal / Gold
+    // 7. SOLAR - Royal / Gold
     solar: {
       mode: 'dark',
       physics: 'glass',
+      tagline: 'Royal / Gold',
       palette: {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.arcane,
@@ -594,10 +601,11 @@ export const VOID_TOKENS = {
       },
     },
 
-    // 8. [THEME] - Synthwave / Mystery
+    // 8. NEBULA - Synthwave / Cosmic
     nebula: {
       mode: 'dark',
       physics: 'glass',
+      tagline: 'Synthwave / Cosmic',
       palette: {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.mystic,
@@ -615,10 +623,11 @@ export const VOID_TOKENS = {
       },
     },
 
-    // 9. [THEME] - Light / Print
+    // 9. PAPER - Light / Print
     paper: {
       mode: 'light',
       physics: 'flat', // No blurs, sharp borders
+      tagline: 'Light / Print',
       palette: {
         ...SEMANTIC_LIGHT,
         'font-atmos-heading': FONTS.book,
@@ -636,10 +645,11 @@ export const VOID_TOKENS = {
       },
     },
 
-    // 10. [THEME] - Clinical / Science
+    // 10. LABORATORY - Science / Clinical
     laboratory: {
       mode: 'light',
       physics: 'flat',
+      tagline: 'Science / Clinical',
       palette: {
         ...SEMANTIC_LIGHT,
         'font-atmos-heading': FONTS.lab,
@@ -657,10 +667,11 @@ export const VOID_TOKENS = {
       },
     },
 
-    // 11. [THEME] - Fun / Kids
+    // 11. PLAYGROUND - Playful / Vibrant
     playground: {
       mode: 'light',
       physics: 'flat',
+      tagline: 'Playful / Vibrant',
       palette: {
         ...SEMANTIC_LIGHT,
         'font-atmos-heading': FONTS.fun,
@@ -678,10 +689,11 @@ export const VOID_TOKENS = {
       },
     },
 
-    // 12. [THEME] - Distraction Free
+    // 12. FOCUS - Distraction Free
     focus: {
       mode: 'light',
       physics: 'flat',
+      tagline: 'Distraction Free',
       palette: {
         ...SEMANTIC_LIGHT,
         'font-atmos-heading': FONTS.clean,

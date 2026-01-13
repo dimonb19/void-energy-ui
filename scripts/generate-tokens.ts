@@ -164,9 +164,13 @@ async function main() {
     console.log(`   └─ 🎨 Styles: src/styles/config/_generated-themes.scss`);
 
     // Generate registry.
-    const registry: Record<string, { physics: string; mode: string }> = {};
+    const registry: Record<string, { physics: string; mode: string; tagline?: string }> = {};
     Object.entries(VOID_TOKENS.themes).forEach(([key, config]) => {
-      registry[key] = { physics: config.physics, mode: config.mode };
+      registry[key] = {
+        physics: config.physics,
+        mode: config.mode,
+        tagline: config.tagline,
+      };
     });
     fs.writeFileSync(PATHS.registryJson, JSON.stringify(registry, null, 2));
     console.log(`   └─ ⚙️  Registry: src/config/void-registry.json`);

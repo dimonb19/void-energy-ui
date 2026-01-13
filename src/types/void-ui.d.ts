@@ -143,6 +143,9 @@ interface VoidThemeDefinition extends VoidThemeConfig {
   /** Human-readable theme name (e.g., "Brand X") */
   label?: string;
 
+  /** Short mood descriptor (e.g., "Stealth / Cinema") */
+  tagline?: string;
+
   /** Required color and typography tokens (see VoidPalette interface) */
   palette: VoidPalette;
 
@@ -160,12 +163,12 @@ interface VoidThemeDefinition extends VoidThemeConfig {
 type ThemeRegistry = Record<string, VoidThemeDefinition>;
 
 /**
- * JSON registry structure for static theme configuration (physics + mode only).
+ * JSON registry structure for static theme configuration.
  * Used when importing void-registry.json before runtime palette generation.
  */
 type ThemeRegistryJSON = Record<
   string,
-  { physics: VoidPhysics; mode: VoidMode }
+  { physics: VoidPhysics; mode: VoidMode; tagline?: string }
 >;
 
 // ==========================================================================

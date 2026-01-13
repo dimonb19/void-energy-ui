@@ -9,6 +9,7 @@
       return {
         id,
         label: id.charAt(0).toUpperCase() + id.slice(1),
+        tagline: meta.tagline,
         physics: meta.physics,
         mode: meta.mode,
       };
@@ -21,13 +22,13 @@
 </script>
 
 <div
-  class="theme-menu surface-sunk rounded-md flex flex-col tablet:grid tablet:grid-cols-2"
+  class="theme-menu surface-sunk rounded-md flex flex-col tablet:grid tablet:grid-cols-2 gap-xs p-xs"
   role="radiogroup"
   aria-label="Select Theme"
 >
   {#each atmospheres as atm (atm.id)}
     <div
-      class="theme-wrapper p-sm"
+      class="theme-wrapper p-sm rounded-sm"
       data-atmosphere={atm.id}
       data-physics={atm.physics}
       data-mode={atm.mode}
@@ -40,17 +41,18 @@
         onclick={() => selectTheme(atm.id)}
       >
         <div
-          class="orb-wrapper relative flex items-center justify-center"
+          class="orb-wrapper relative hidden tablet:flex items-center justify-center"
           aria-hidden="true"
         >
           <span class="orb relative rounded-full"></span>
         </div>
 
-        <span class="flex-1">{atm.label}</span>
-
-        {#if voidEngine.atmosphere === atm.id}
-          <span class="text-primary">●</span>
-        {/if}
+        <span class="w-full flex flex-row items-center justify-between gap-sm">
+          <span>{atm.label}</span>
+          {#if atm.tagline}
+            <span class="text-caption">{atm.tagline}</span>
+          {/if}
+        </span>
       </button>
     </div>
   {/each}
