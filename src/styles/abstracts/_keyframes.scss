@@ -1,0 +1,80 @@
+/* Core keyframes for physics-aware animations. */
+
+@use 'functions' as *;
+
+// ==========================================================================
+// KEYFRAMES
+// ==========================================================================
+
+// A. SHIMMER (Loading/Energy)
+// Used by: @include shimmer in _mixins.scss
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// B. CYBER PULSE (Active States)
+// Used by: glowing elements
+@keyframes cyber-pulse {
+  0%,
+  100% {
+    opacity: 1;
+    box-shadow: 0 0 10px alpha(var(--energy-primary), 40%);
+  }
+  50% {
+    opacity: 0.9;
+    box-shadow: 0 0 20px alpha(var(--energy-primary), 80%);
+  }
+}
+
+// C. ROTATE LASER (Gemini Button)
+// Used by: .btn-cta via @include gemini-laser
+@keyframes rotate-laser {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+// D. ROTATE (Generic)
+// Used by: loading spinners
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// E. PROGRESS FILL
+// Used by: progress bars
+@keyframes progress-fill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+// F. LOGO ENTRY (Holographic Materialization)
+// Used by: loading screens
+@keyframes logo-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.8); // Starts slightly smaller
+    filter: blur(var(--physics-blur)); // Starts out of focus (Void Physics)
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0); // Snaps into focus
+  }
+}

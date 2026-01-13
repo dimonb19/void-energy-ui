@@ -1,7 +1,6 @@
-/* Abstract layer index (functions, breakpoints, variables, mixins, animations). */
+/* Abstract layer index: functions, engine, mixins, keyframes. */
 
 @forward 'functions';
-@forward 'breakpoints';
-@forward 'variables';
+@forward 'engine';
 @forward 'mixins';
-@forward 'animations';
+@forward 'keyframes';

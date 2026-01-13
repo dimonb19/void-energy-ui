@@ -1,14 +1,13 @@
 /* Triad theme entry: emits physics and atmosphere layers with defaults. */
 
 @use 'sass:map';
-@use '../abstracts/physics-presets' as physics;
-@use '../abstracts/theme-engine' as engine;
+@use '../abstracts/engine' as engine;
 @use '../config/generated-themes' as config;
 
 // Global defaults for initial paint before JS sets attributes.
 :root {
   // Default physics preset.
-  $default-physics: map.get(physics.$physics-presets, 'glass');
+  $default-physics: map.get(engine.$physics-presets, 'glass');
 
   @each $key, $val in $default-physics {
     --#{$key}: #{$val};
@@ -25,7 +24,7 @@
 }
 
 // Emit [data-physics="..."] layer.
-@include physics.emit-physics;
+@include engine.emit-physics;
 
 // Emit [data-atmosphere="..."] layer.
 @each $name, $theme-config in config.$themes {

@@ -1,0 +1,116 @@
+/*
+ * Void Engine: Theme generation, physics presets, and global variables.
+ *
+ * This file consolidates all "system-level" concerns:
+ * 1. Global variables (focus-ring, z-layers, breakpoints, container-widths)
+ * 2. Physics presets (glass/flat/retro with derived shadows and surfaces)
+ * 3. Atmosphere generator (emits palette CSS variables per theme)
+ *
+ * ARCHITECTURE NOTE:
+ * Physics presets extend generated tokens from design-tokens.ts with
+ * derived values that cannot be expressed in TypeScript:
+ * - SCSS functions: blend(), alpha() - computed at build time
+ * - CSS variables: var(--bg-surface) - resolved at runtime per theme
+ * - Complex CSS: gradients, box-shadows - need SCSS composition
+ */
+
+@use 'sass:map';
+@use '../config/generated-themes' as generated;
+@use 'functions' as *;
+
+// ==========================================================================
+// 1. GLOBAL VARIABLES
+// ==========================================================================
+
+// Sass maps inherited from generated tokens.
+// Note: $z-layers is in _functions.scss to avoid circular dependency with z()
+$breakpoints: generated.$breakpoints;
+$container-widths: generated.$container-widths;
+
+// Unified focus ring (physics-independent accessibility feature)
+$focus-ring:
+  0 0 0 calc(var(--physics-border-width) * 2) var(--bg-canvas),
+  0 0 0 calc(var(--physics-border-width) * 4) var(--energy-primary);
+
+:root {
+  --focus-ring: #{$focus-ring};
+}
+
+// ==========================================================================
+// 2. PHYSICS PRESETS
+// ==========================================================================
+
+$physics-presets: (
+  // Glass: object emits light.
+  'glass': map.merge(
+      map.get(generated.$generated-physics, 'glass'),
+      (
+        'surface-bg': linear-gradient(
+            to bottom,
+            blend(var(--bg-surface), var(--energy-secondary), 10%) 0%,
+            var(--bg-surface) 100%
+          ),
+        'shadow-sunk': inset 0 2px 4px alpha(var(--bg-canvas), 60%),
+        'shadow-float': 0 2px 8px rgba(0, 0, 0, 0.25),
+        'shadow-lift': 0 0 10px alpha(var(--energy-primary), 50%),
+      )
+    ),
+  // Flat: external light casts shadows.
+  'flat': map.merge(
+      map.get(generated.$generated-physics, 'flat'),
+      (
+        'surface-bg': var(--bg-surface),
+        'shadow-sunk': inset 0 1px 2px rgba(0, 0, 0, 0.05),
+        'shadow-float': 0 1px 3px rgba(0, 0, 0, 0.05),
+        'shadow-lift': 0 4px 12px rgba(0, 0, 0, 0.1),
+      )
+    ),
+  // Retro: hard edges, no blur.
+  // Note: shadow-offset comes from generated physics tokens
+  'retro': map.merge(
+      map.get(generated.$generated-physics, 'retro'),
+      (
+        'surface-bg': var(--bg-surface),
+        'shadow-sunk': none,
+        'shadow-float': none,
+        'shadow-lift': var(--shadow-offset) var(--shadow-offset) 0
+          alpha(var(--energy-secondary), 50%),
+      )
+    )
+);
+
+// Emit CSS variables per physics mode.
+@mixin emit-physics {
+  @each $name, $map in $physics-presets {
+    [data-physics='#{$name}'] {
+      @each $key, $val in $map {
+        --#{$key}: #{$val};
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// 3. ATMOSPHERE GENERATOR
+// ==========================================================================
+
+// Generate the palette and mode for an atmosphere.
+@mixin generate-atmosphere($name, $config) {
+  $palette: map.get($config, 'palette');
+  $mode: map.get($config, 'type'); // 'light' or 'dark'
+
+  @if $palette == null {
+    @warn "No palette provided for atmosphere `#{$name}`.";
+    $palette: ();
+  }
+
+  // Selector: [data-atmosphere="void"]
+  [data-atmosphere='#{$name}'] {
+    color-scheme: if($mode == 'light', light, dark);
+
+    // Output Palette Variables
+    @each $key, $value in $palette {
+      --#{$key}: #{$value};
+    }
+  }
+}

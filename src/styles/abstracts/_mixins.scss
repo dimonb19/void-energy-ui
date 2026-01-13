@@ -1,6 +1,7 @@
 /* Physics mixins for surfaces, text effects, and utilities. */
 
-@use 'variables' as *;
+@use 'sass:map';
+@use 'engine' as *;
 @use 'functions' as *;
 
 // ==========================================================================
@@ -207,13 +208,39 @@
   }
 }
 
+// Standard Entry Transition (The "Cyber Slide")
+// Usage: @include entry-transition;
+//
+// SPRING PHYSICS: Uses easeSpringGentle for organic entry feel.
+// The overshoot creates the "settling into place" effect Apple pioneered.
+@mixin entry-transition($duration: var(--speed-base), $delay: 0s) {
+  will-change: transform, opacity, filter;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  filter: blur(0);
+
+  @media (prefers-reduced-motion: no-preference) {
+    // Use spring easing for organic feel
+    transition:
+      opacity $duration var(--ease-spring-gentle) $delay,
+      transform $duration var(--ease-spring-gentle) $delay,
+      filter $duration var(--ease-spring-gentle) $delay;
+
+    @starting-style {
+      opacity: 0;
+      transform: translateY(10px) scale(0.98);
+      filter: blur(var(--physics-blur));
+    }
+  }
+}
+
 // ==========================================================================
 // 4. STATE MANAGEMENT MIXINS (Strict Protocol)
 // ==========================================================================
 
 // A. ACTIVE STATE (Interactive)
 // Use for: Toggles, Tabs, Selections.
-// ⛔️ DO NOT USE: .active class
+// DO NOT USE: .active class
 @mixin state-active {
   &[aria-pressed='true'],
   &[aria-selected='true'],
@@ -225,7 +252,7 @@
 
 // B. OPEN STATE (Visibility)
 // Use for: Dropdowns, Tooltips, Dialogs, Accordions.
-// ⛔️ DO NOT USE: .show, .open classes
+// DO NOT USE: .show, .open classes
 @mixin state-open {
   &[data-state='open'],
   &[open] {
@@ -235,7 +262,7 @@
 
 // C. LOADING STATE (Process)
 // Use for: Buttons, Cards, inputs waiting for network.
-// ⛔️ DO NOT USE: .loading class
+// DO NOT USE: .loading class
 @mixin state-loading {
   &[aria-busy='true'],
   &[data-status='loading'] {
@@ -299,4 +326,24 @@
   overflow-wrap: anywhere;
 
   word-break: break-word;
+}
+
+// ==========================================================================
+// 7. RESPONSIVE BREAKPOINTS
+// ==========================================================================
+
+@mixin respond-up($breakpoint) {
+  @if map.has-key($breakpoints, $breakpoint) {
+    @media (min-width: map.get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @warn "Breakpoint `#{$breakpoint}` not found.";
+  }
+}
+
+@mixin mobile-only {
+  @media (max-width: map.get($breakpoints, 'tablet')) {
+    @content;
+  }
 }

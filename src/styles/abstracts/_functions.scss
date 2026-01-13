@@ -4,13 +4,19 @@
 @use 'sass:meta';
 @use 'sass:math';
 @use 'sass:map';
-@use 'variables' as *;
+@use '../config/generated-themes' as generated;
 
 /**
  * color-mix() uses OKLCH for perceptual uniformity and predictable blending.
  * References: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch
  * Spec: https://www.w3.org/TR/css-color-4/#interpolation-space
  */
+
+// ==========================================================================
+// Z-INDEX LAYER MAP
+// ==========================================================================
+
+$z-layers: generated.$z-layers;
 
 // ==========================================================================
 // COLOR FUNCTIONS (Polymorphic)
