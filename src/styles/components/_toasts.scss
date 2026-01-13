@@ -93,6 +93,12 @@
     box-shadow var(--speed-fast) var(--ease-spring-snappy),
     background-color var(--speed-fast) var(--ease-spring-snappy);
 
+  // Blur
+  @supports (backdrop-filter: blur(1px)) {
+    backdrop-filter: blur(var(--physics-blur));
+    -webkit-backdrop-filter: blur(var(--physics-blur));
+  }
+
   &:hover {
     border-color: alpha(var(--toast-accent), 50%);
     box-shadow: var(--shadow-lift);

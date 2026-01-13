@@ -32,12 +32,6 @@
     background-color var(--speed-base) var(--ease-spring-gentle),
     box-shadow var(--speed-base) var(--ease-spring-gentle);
 
-  // Blur.
-  @supports (backdrop-filter: blur(1px)) {
-    backdrop-filter: blur(var(--physics-blur));
-    -webkit-backdrop-filter: blur(var(--physics-blur));
-  }
-
   // Interaction.
   @media (hover: hover) {
     &:hover {
@@ -67,11 +61,6 @@
     border-color var(--speed-fast) var(--ease-spring-snappy),
     box-shadow var(--speed-fast) var(--ease-spring-snappy),
     outline var(--speed-fast) var(--ease-spring-snappy);
-
-  @supports (backdrop-filter: blur(1px)) {
-    backdrop-filter: blur(var(--physics-blur));
-    -webkit-backdrop-filter: blur(var(--physics-blur));
-  }
 
   &:focus-visible {
     border-color: var(--energy-primary);
