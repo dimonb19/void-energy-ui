@@ -88,14 +88,21 @@ button:not(.btn-void),
   }
 
   &:active:not(:disabled) {
-    // MICRO-FEEDBACK: Instant visual acknowledgment (no transition delay)
-    // This creates the 3-layer feedback Apple uses: haptic → micro → macro
-    filter: brightness(0.92);
+    // MICRO-TRANSITION: Soft press for mouse, instant for touch/retro.
+    transition-duration: 50ms;
 
-    // MACRO-FEEDBACK: Spring-based scale with bounce-back
-    // Invert the scale for press-down effect (1.02 → 0.98, 1.01 → 0.99, 1 → 1)
-    transform: scale(calc(2 - var(--scale, 1)));
-    background: blend(var(--bg-surface), var(--energy-secondary), 12%);
+    @media (pointer: coarse) {
+      transition-duration: 0ms;
+    }
+
+    @at-root [data-physics='retro'] & {
+      transition-duration: 0ms;
+    }
+
+    // STRONGER VISUAL CHANGE: More perceptible on quick taps.
+    filter: brightness(0.85);
+    transform: scale(0.96);
+    background: blend(var(--bg-surface), var(--energy-secondary), 18%);
     border-color: var(--energy-secondary);
   }
 
@@ -153,6 +160,12 @@ button:not(.btn-void),
 
       // Active state: Inverted terminal look
       &:active:not(:disabled) {
+        transition-duration: 50ms;
+
+        @media (pointer: coarse) {
+          transition-duration: 0ms;
+        }
+
         transform: none;
         background: var(--energy-primary);
         color: var(--bg-canvas);
@@ -200,8 +213,20 @@ button:not(.btn-void),
     }
 
     &:active:not(:disabled) {
+      transition-duration: 50ms;
+
+      @media (pointer: coarse) {
+        transition-duration: 0ms;
+      }
+
+      @at-root [data-physics='retro'] & {
+        transition-duration: 0ms;
+      }
+
+      filter: brightness(0.85);
+      transform: scale(0.96);
       border-color: blend($color-var, var(--energy-secondary), 12%);
-      background: alpha($color-var, 20%);
+      background: alpha($color-var, 25%);
     }
   }
 

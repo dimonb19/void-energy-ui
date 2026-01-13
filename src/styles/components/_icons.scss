@@ -63,7 +63,17 @@
   &:active:not(:disabled) {
     .icon,
     svg {
-      transform: scale(calc(var(--scale) - 0.05));
+      transition-duration: 50ms;
+
+      @media (pointer: coarse) {
+        transition-duration: 0ms;
+      }
+
+      @at-root [data-physics='retro'] & {
+        transition-duration: 0ms;
+      }
+
+      transform: scale(0.9);
     }
   }
 
