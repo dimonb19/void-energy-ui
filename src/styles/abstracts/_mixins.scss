@@ -44,6 +44,16 @@
   }
 }
 
+// MIXIN: Glass Blur (Backdrop Filter)
+// Context: Progressive enhancement for frosted glass effect.
+// Note: Falls back gracefully - if not supported, no blur is applied.
+@mixin glass-blur {
+  @supports (backdrop-filter: blur(1px)) {
+    backdrop-filter: blur(var(--physics-blur));
+    -webkit-backdrop-filter: blur(var(--physics-blur));
+  }
+}
+
 // MIXIN: Sunk Surface (Inputs, Sidebars)
 // Context: Negative Z-Index. Carved into the void.
 @mixin glass-sunk {
@@ -69,88 +79,7 @@
 }
 
 // ==========================================================================
-// 2. TYPOGRAPHY & ENERGY
-// ==========================================================================
-
-@mixin gemini-laser {
-  position: relative;
-  isolation: isolate; // Force stacking context on the button itself.
-  background: transparent;
-  border: none;
-  overflow: hidden;
-  z-index: z('base');
-  color: var(--text-main);
-
-  // Parent radius clips the beam and keeps the gradient contained.
-  border-radius: var(--radius-full);
-
-  // Rotating beam.
-  &::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 500%;
-    height: 500%;
-    border-radius: 50%;
-
-    // Tail gradient.
-    background: conic-gradient(
-      from 0deg,
-      transparent 0deg,
-      var(--energy-secondary) 100deg,
-      var(--energy-primary) 160deg,
-      var(--energy-primary) 200deg,
-      var(--energy-secondary) 260deg,
-      transparent 360deg
-    );
-
-    transition: background-color var(--speed-base) var(--ease-spring-gentle);
-
-    will-change: transform;
-    transform: translate(-50%, -50%);
-    animation: rotate-laser 4s linear infinite;
-    z-index: -2;
-
-    // Retro override: disable animated gradient entirely
-    // Terminal UIs didn't have rotating gradients - use static borders instead
-    @at-root :where([data-physics='retro']) & {
-      display: none;
-    }
-  }
-
-  // Inner mask.
-  &::after {
-    content: '';
-    position: absolute;
-    inset: var(--physics-border-width);
-
-    background: var(--bg-canvas);
-
-    z-index: -1;
-    border-radius: var(--radius-full);
-
-    // Retro override: disable inner mask (not needed without gradient)
-    @at-root :where([data-physics='retro']) & {
-      display: none;
-    }
-  }
-
-  // Hover surge.
-  @media (hover: hover) {
-    &:hover::before {
-      background-color: var(--energy-primary);
-      animation-play-state: paused;
-    }
-
-    &:hover::after {
-      background: blend(var(--bg-canvas), var(--energy-primary), 6%);
-    }
-  }
-}
-
-// ==========================================================================
-// 3. ANIMATIONS
+// 2. ANIMATIONS
 // ==========================================================================
 
 // MIXIN: Atmospheric Shimmer
@@ -171,7 +100,7 @@
   );
 
   // Light mode override.
-  @at-root :where([data-mode='light']) & {
+  @include when-light($low-specificity: true) {
     background-image: linear-gradient(
       90deg,
       transparent 0%,
@@ -183,7 +112,7 @@
   }
 
   // Retro override.
-  @at-root :where([data-physics='retro']) & {
+  @include when-retro($low-specificity: true) {
     opacity: 0.5;
     background-image: linear-gradient(
       90deg,
@@ -226,36 +155,64 @@
 // ==========================================================================
 // 4. STATE MANAGEMENT MIXINS (Strict Protocol)
 // ==========================================================================
+//
+// Use data attributes and ARIA states instead of utility classes.
+// This ensures state is accessible and visible to CSS selectors.
+//
+// NAMING CONVENTION: when-state($state) matches when-physics() and when-mode()
+//
+// Available states:
+// - 'active'   : Toggles, Tabs, Selections (aria-pressed, aria-selected, etc.)
+// - 'open'     : Dropdowns, Tooltips, Dialogs (data-state="open", [open])
+// - 'loading'  : Network operations (aria-busy, data-status="loading")
+// - 'disabled' : Non-interactive elements (disabled, aria-disabled)
+// - 'error'    : Validation errors (aria-invalid, data-state="error")
+//
+// ==========================================================================
 
-// A. ACTIVE STATE (Interactive)
-// Use for: Toggles, Tabs, Selections.
-// DO NOT USE: .active class
-@mixin state-active {
-  &[aria-pressed='true'],
-  &[aria-selected='true'],
-  &[aria-checked='true'],
-  &[data-state='active'] {
-    @content;
-  }
-}
-
-// B. OPEN STATE (Visibility)
-// Use for: Dropdowns, Tooltips, Dialogs, Accordions.
-// DO NOT USE: .show, .open classes
-@mixin state-open {
-  &[data-state='open'],
-  &[open] {
-    @content;
-  }
-}
-
-// C. LOADING STATE (Process)
-// Use for: Buttons, Cards, inputs waiting for network.
-// DO NOT USE: .loading class
-@mixin state-loading {
-  &[aria-busy='true'],
-  &[data-status='loading'] {
-    @content;
+/// Universal state selector mixin.
+///
+/// @param {String} $state - State name: 'active', 'open', 'loading', 'disabled', 'error'
+/// @content Styles to apply when state is active
+///
+/// @example scss
+///   .btn {
+///     @include when-state('active') {
+///       background: var(--energy-primary);
+///     }
+///   }
+///
+@mixin when-state($state) {
+  @if $state == 'active' {
+    &[aria-pressed='true'],
+    &[aria-selected='true'],
+    &[aria-checked='true'],
+    &[data-state='active'] {
+      @content;
+    }
+  } @else if $state == 'open' {
+    &[data-state='open'],
+    &[open] {
+      @content;
+    }
+  } @else if $state == 'loading' {
+    &[aria-busy='true'],
+    &[data-status='loading'] {
+      @content;
+    }
+  } @else if $state == 'disabled' {
+    &:disabled,
+    &[aria-disabled='true'],
+    &[data-state='disabled'] {
+      @content;
+    }
+  } @else if $state == 'error' {
+    &[aria-invalid='true'],
+    &[data-state='error'] {
+      @content;
+    }
+  } @else {
+    @warn "Unknown state '#{$state}'. Available: active, open, loading, disabled, error";
   }
 }
 
@@ -333,6 +290,89 @@
 
 @mixin mobile-only {
   @media (max-width: map.get($breakpoints, 'tablet')) {
+    @content;
+  }
+}
+
+// ==========================================================================
+// 8. PHYSICS & MODE OVERRIDES
+// ==========================================================================
+// Centralized mixins for physics and mode-specific styling.
+// Use these instead of raw @at-root [data-physics='...'] & patterns.
+
+/// Apply styles when a specific physics preset is active.
+/// @param {String} $physics - The physics preset name ('glass', 'flat', 'retro')
+/// @param {Boolean} $low-specificity [false] - Use :where() for lower specificity
+/// @content The styles to apply when this physics is active
+@mixin when-physics($physics, $low-specificity: false) {
+  @if $low-specificity {
+    @at-root :where([data-physics='#{$physics}']) & {
+      @content;
+    }
+  } @else {
+    @at-root [data-physics='#{$physics}'] & {
+      @content;
+    }
+  }
+}
+
+/// Apply styles when a specific mode (light/dark) is active.
+/// @param {String} $mode - The mode name ('light', 'dark')
+/// @param {Boolean} $low-specificity [false] - Use :where() for lower specificity
+/// @content The styles to apply when this mode is active
+@mixin when-mode($mode, $low-specificity: false) {
+  @if $low-specificity {
+    @at-root :where([data-mode='#{$mode}']) & {
+      @content;
+    }
+  } @else {
+    @at-root [data-mode='#{$mode}'] & {
+      @content;
+    }
+  }
+}
+
+/// Apply styles for a specific physics + mode combination.
+/// Use sparingly - most overrides should be physics OR mode, not both.
+/// @param {String} $physics - The physics preset name
+/// @param {String} $mode - The mode name
+/// @content The styles to apply
+@mixin when-physics-mode($physics, $mode) {
+  @at-root [data-physics='#{$physics}'][data-mode='#{$mode}'] & {
+    @content;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Convenience Aliases
+// ---------------------------------------------------------------------------
+
+@mixin when-retro($low-specificity: false) {
+  @include when-physics('retro', $low-specificity) {
+    @content;
+  }
+}
+
+@mixin when-glass($low-specificity: false) {
+  @include when-physics('glass', $low-specificity) {
+    @content;
+  }
+}
+
+@mixin when-flat($low-specificity: false) {
+  @include when-physics('flat', $low-specificity) {
+    @content;
+  }
+}
+
+@mixin when-light($low-specificity: false) {
+  @include when-mode('light', $low-specificity) {
+    @content;
+  }
+}
+
+@mixin when-dark($low-specificity: false) {
+  @include when-mode('dark', $low-specificity) {
     @content;
   }
 }

@@ -61,10 +61,7 @@ dialog {
   @include glass-float($interactive: false);
 
   // Blur
-  @supports (backdrop-filter: blur(1px)) {
-    backdrop-filter: blur(var(--physics-blur));
-    -webkit-backdrop-filter: blur(var(--physics-blur));
-  }
+  @include glass-blur;
 
   // Progressive enhancement: only animate if display transitions are supported.
   // Uses spring easing for organic modal entry/exit feel
@@ -96,7 +93,7 @@ dialog {
     opacity: 0;
 
     // Light mode override.
-    @at-root [data-mode='light'] & {
+    @include when-light {
       background: alpha(var(--text-main), 50%);
     }
 
@@ -142,7 +139,7 @@ dialog {
   @include laser-scrollbar;
 
   // Light mode override.
-  @at-root [data-mode='light'] & {
+  @include when-light {
     background: var(--bg-surface);
     border: var(--physics-border-width) solid var(--border-color);
     border-radius: var(--radius-base);

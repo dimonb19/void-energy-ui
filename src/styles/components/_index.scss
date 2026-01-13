@@ -1,10 +1,43 @@
-/* Component layer index (tooltips, dialogs, anchors, buttons, inputs, containers, tiles). */
+/* ==========================================================================
+ * COMPONENT LAYER INDEX
+ * ==========================================================================
+ *
+ * This file imports all Void Energy UI components in dependency order.
+ * Each component file is self-contained but may reference shared mixins.
+ *
+ * ARCHITECTURE:
+ * - Abstracts (mixins, functions) must be loaded before components
+ * - Components are loaded in logical dependency order
+ * - Later components may extend earlier ones (e.g., tiles extends buttons)
+ *
+ * COMPONENT CATALOG:
+ *
+ * | File          | Purpose                              | Key Mixins       |
+ * |---------------|--------------------------------------|------------------|
+ * | _tooltips     | Floating tooltip surfaces            | glass-float      |
+ * | _dialogs      | Modal dialog styling                 | glass-float      |
+ * | _anchors      | Link/anchor styling with laser line  | -                |
+ * | _buttons      | Button base + CTA + semantic vars    | btn-variant      |
+ * | _inputs       | Form inputs, selects, dropzone       | glass-sunk       |
+ * | _toasts       | Notification toast styling           | glass-float      |
+ * | _containers   | Layout containers + surface classes  | glass-float/sunk |
+ * | _tiles        | Tile cards + chips architecture      | chip-structure   |
+ *
+ * HYBRID PROTOCOL:
+ * - Layout (padding, gap, flex) -> Tailwind utilities
+ * - Material (glass, glow, physics) -> SCSS classes
+ * - State (open, active, loading) -> data-* / aria-* attributes
+ *
+ * @see /CHEAT-SHEET.md for full component usage examples
+ * @see /src/styles/abstracts/_mixins.scss for shared mixins
+ * ==========================================================================
+ */
 
-@forward 'tooltips';
-@forward 'dialogs';
-@forward 'anchors';
-@forward 'buttons';
-@forward 'inputs';
-@forward 'toasts';
-@forward 'containers';
-@forward 'tiles';
+@forward 'tooltips'; // Floating UI tooltip surfaces
+@forward 'dialogs'; // Native <dialog> modal styling
+@forward 'anchors'; // Link styling with laser underline
+@forward 'buttons'; // Button system (base, CTA, semantic variants)
+@forward 'inputs'; // Form inputs, selects, file dropzone
+@forward 'toasts'; // Notification toast styling
+@forward 'containers'; // Layout containers + atomic surfaces
+@forward 'tiles'; // Story tiles + chips architecture

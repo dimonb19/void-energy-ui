@@ -94,16 +94,13 @@
     background-color var(--speed-fast) var(--ease-spring-snappy);
 
   // Blur
-  @supports (backdrop-filter: blur(1px)) {
-    backdrop-filter: blur(var(--physics-blur));
-    -webkit-backdrop-filter: blur(var(--physics-blur));
-  }
+  @include glass-blur;
 
   &:hover {
     border-color: alpha(var(--toast-accent), 50%);
     box-shadow: var(--shadow-lift);
 
-    @at-root [data-physics='glass'] & {
+    @include when-glass {
       box-shadow:
         var(--shadow-lift),
         0 0 15px -4px alpha(var(--toast-accent), 60%);
@@ -111,7 +108,7 @@
   }
 
   // Retro override.
-  @at-root [data-physics='retro'] & {
+  @include when-retro {
     &[data-type='loading'] {
       --toast-accent: var(--text-main);
     }
@@ -125,7 +122,7 @@
   }
 
   // Flat (light mode) override.
-  @at-root [data-mode='light'] & {
+  @include when-light {
     background: blend(var(--bg-surface), var(--toast-accent), 5%);
     color: var(--text-main);
 
@@ -175,7 +172,7 @@
   }
 
   // Retro override.
-  @at-root [data-physics='retro'] & {
+  @include when-retro {
     animation-timing-function: steps(8);
   }
 }

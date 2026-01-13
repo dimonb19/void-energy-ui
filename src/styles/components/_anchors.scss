@@ -70,7 +70,7 @@ a {
   }
 
   // Light mode tweaks.
-  @at-root [data-mode='light'] & {
+  @include when-light {
     font-weight: var(--font-weight-semibold);
 
     &::after {

@@ -46,15 +46,15 @@
   }
 
   // Retro overrides.
-  @at-root [data-physics='retro'] & {
+  @include when-retro {
     border-radius: 0;
     transition: none; // Law: Instant motion
     filter: none; // Law: No blur
     background: var(--bg-canvas); // Opaque
   }
 
-  // Flat overrides.
-  @at-root [data-mode='light'] & {
+  // Light mode overrides.
+  @include when-light {
     filter: none;
   }
 }

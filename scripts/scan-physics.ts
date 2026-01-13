@@ -13,16 +13,17 @@ const SRC_DIR = path.resolve(__dirname, '../src');
 // Allowlist of pixel exceptions.
 const ALLOWED_PIXELS = ['0px', '1px', '2px', '3px', '-1px', '-2px', '-3px'];
 
+// Directories to skip entirely (core definitions).
+const IGNORE_DIRS = ['abstracts'];
+
 // Ignore list.
 const IGNORE_FILES = [
-  '_reset.scss',           // Defines the density vars
-  '_typography.scss',      // Defines the font scales
-  '_physics-presets.scss', // Defines the border radii
-  '_animations.scss',      // Defines the motion laws (requires raw px)
-  '_generated-themes.scss',// Auto-generated tokens
-  'global.scss',           // The "Manual" (docs)
-  'void-dna.json',         // Raw JSON data
-  'scan-physics.ts'        // This script itself
+  '_reset.scss',            // base/ - Defines the density vars
+  '_typography.scss',       // base/ - Defines the font scales
+  '_generated-themes.scss', // config/ - Auto-generated tokens
+  'global.scss',            // The "Manual" (docs)
+  'void-dna.json',          // Raw JSON data
+  'scan-physics.ts'         // This script itself
 ];
 
 // Strict px matcher.
@@ -39,6 +40,8 @@ function scanDirectory(dir: string) {
     const stat = fs.statSync(fullPath);
 
     if (stat.isDirectory()) {
+      // Skip ignored directories (core definitions).
+      if (IGNORE_DIRS.includes(file)) return;
       scanDirectory(fullPath);
     } else if (file.endsWith('.scss') || file.endsWith('.svelte')) {
       checkFile(fullPath, file);

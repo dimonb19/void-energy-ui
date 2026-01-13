@@ -1,8 +1,245 @@
-/* Tile and collection styling. */
+/* ==========================================================================
+ * TILES & CHIPS
+ * ==========================================================================
+ *
+ * Holographic data slates for collections and interactive chips.
+ *
+ * ARCHITECTURE:
+ * - Section 1: Tiles & Collections
+ *   - .tiles-collection : Horizontal scroll container
+ *   - .tile             : Story card with image, gradient overlay, content
+ *   - .tile-fluid       : Responsive tile that fills grid column
+ *   - .loading-tile     : Skeleton loading state
+ *
+ * - Section 2: Chips Architecture
+ *   - .chip             : Base chip with energy-secondary color
+ *   - .chip-system      : Purple semantic chip
+ *   - .chip-premium     : Gold semantic chip
+ *   - .chip-success     : Green semantic chip
+ *   - .chip-error       : Red semantic chip
+ *   - .chip-labeled     : Chip with floating label tab
+ *
+ * PHYSICS BEHAVIOR:
+ * - Glass: Semi-transparent backgrounds, soft shadows, blur effects
+ * - Flat:  Solid backgrounds, subtle shadows, no blur
+ * - Retro: Hard borders, pixel shadows, instant state changes
+ *
+ * CHIP ANATOMY:
+ * - .chip-label        : Main text content area
+ * - .chip-label-sunken : Secondary label with recessed styling
+ * - .chip-remove       : Dismissal button (X icon area)
+ *
+ * @see /CHEAT-SHEET.md for usage examples
+ * ==========================================================================
+ */
 
 @use '../abstracts' as *;
-@use '../base/typography' as *;
-@use 'buttons';
+
+// ==========================================================================
+// CHIP-SPECIFIC MIXINS
+// ==========================================================================
+// These mixins are only used by chips, so they live here with their
+// component rather than in abstracts/_mixins.scss.
+// ==========================================================================
+
+// MIXIN: Chip Structure
+// Creates the structural DNA for interactive chip components.
+// Note: Cannot use @extend .btn-void here (abstracts loads before components).
+// --------------------------------------------------------------------------
+@mixin _chip-structure {
+  // Inline btn-void reset (cannot @extend from abstracts)
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  min-width: unset;
+  min-height: unset;
+
+  display: inline-flex;
+  flex-flow: row nowrap;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 0;
+
+  min-height: var(--control-height);
+  padding: 0;
+
+  color: var(--text-main);
+
+  // Unified Spring Transitions
+  transition:
+    transform var(--speed-base) var(--ease-spring-snappy),
+    box-shadow var(--speed-base) var(--ease-spring-snappy),
+    border-color var(--speed-base) var(--ease-spring-snappy),
+    background-color var(--speed-base) var(--ease-spring-snappy);
+
+  border-radius: var(--radius-base);
+  @include glass-float($interactive: true);
+
+  .chip-label {
+    display: flex;
+    align-items: center;
+    padding: 0 calc(var(--space-xs) * 1.5);
+    white-space: nowrap;
+    color: inherit;
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .chip-label-sunken {
+    background: var(--bg-sink);
+    border: var(--physics-border-width) solid var(--border-color);
+    color: var(--text-dim);
+    padding: calc(var(--space-xs) * 0.25) var(--space-xs);
+    margin-block: auto;
+    margin-right: var(--space-xs);
+    border-radius: calc(var(--radius-base) * 0.5);
+    // Typography caption level (inline, cannot use @include typography)
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-caption);
+    letter-spacing: var(--letter-spacing-caption);
+  }
+
+  .chip-remove {
+    // Inline btn-void reset
+    appearance: none;
+    background: transparent;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    color: inherit;
+    font: inherit;
+    min-width: unset;
+    min-height: unset;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--control-height);
+
+    border-left: inherit;
+    color: var(--text-mute);
+
+    border-top-right-radius: var(--radius-base);
+    border-bottom-right-radius: var(--radius-base);
+    transition:
+      background-color var(--speed-fast) var(--ease-spring-snappy),
+      color var(--speed-fast) var(--ease-spring-snappy);
+
+    &:hover {
+      background: alpha(black, 30%);
+      color: var(--text-main);
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    background: shade(var(--bg-sink), 50%);
+    color: shade(var(--text-mute), 20%);
+    border-color: shade(var(--text-mute), 50%) !important;
+    box-shadow: none !important;
+    opacity: 0.8;
+    transform: none;
+
+    .chip-remove {
+      pointer-events: none;
+      border-left-color: shade(var(--text-mute), 50%);
+      color: shade(var(--text-mute), 20%);
+      background: transparent;
+    }
+  }
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      transform: translateY(var(--lift)) scale(var(--scale, 1));
+      box-shadow: var(--shadow-lift);
+    }
+  }
+
+  @starting-style {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+// MIXIN: Chip Variant
+// Creates semantic chip variants with physics-aware styling.
+// Usage: @include _chip-variant(var(--energy-secondary));
+// --------------------------------------------------------------------------
+@mixin _chip-variant($color) {
+  // Default (void/glass).
+  background: alpha($color, 80%);
+  border-color: tint($color, 20%);
+  color: var(--text-main);
+
+  .chip-remove {
+    background: shade($color, 30%);
+    color: var(--text-dim);
+
+    &:hover {
+      background: shade($color, 50%);
+      color: white;
+    }
+  }
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      border-color: tint($color, 50%);
+      box-shadow: var(--shadow-lift);
+    }
+  }
+
+  // Retro override.
+  @include when-retro {
+    background: black; // Opaque
+    border: var(--physics-border-width) solid $color; // Hard border
+    box-shadow: none; // No soft glow
+    color: $color;
+
+    .chip-remove {
+      background: transparent;
+      border-top-right-radius: var(--radius-base);
+      border-bottom-right-radius: var(--radius-base);
+      color: $color;
+
+      &:hover {
+        background: $color; // Invert on hover
+        color: black;
+      }
+    }
+
+    &:hover:not(:disabled) {
+      box-shadow: var(--shadow-offset) var(--shadow-offset) 0px
+        alpha($color, 50%); // Hard shadow, no blur
+    }
+  }
+
+  // Light mode override.
+  @include when-light {
+    background: tint($color, 85%);
+    border: var(--physics-border-width) solid $color;
+    box-shadow: none;
+    color: shade($color, 60%);
+
+    .chip-remove {
+      background: tint($color, 70%);
+      color: shade($color, 50%);
+
+      &:hover {
+        background: $color; // Full saturation on hover
+        color: white;
+      }
+    }
+
+    &:disabled {
+      border-color: alpha(shade($color, 60%), 10%) !important;
+    }
+  }
+}
 
 // ==========================================================================
 // 1. TILES & COLLECTIONS
@@ -107,7 +344,7 @@
     font-size: var(--font-size-h5);
     line-height: var(--line-height-title);
 
-    @at-root [data-mode='light'] & {
+    @include when-light {
       text-shadow: none;
     }
   }
@@ -139,7 +376,7 @@
         color: var(--text-main);
       }
 
-      @at-root [data-physics='retro'] & {
+      @include when-retro {
         border-color: var(--energy-primary);
       }
     }
@@ -182,201 +419,32 @@
 
 // ==========================================================================
 // 2. CHIPS ARCHITECTURE
+// Structural and variant mixins are defined at the top of this file
 // ==========================================================================
 
-// A. THE MIXIN (Structural DNA)
-// --------------------------------------------------------------------------
-@mixin chip-structure {
-  @extend .btn-void;
-
-  display: inline-flex;
-  flex-flow: row nowrap;
-  align-items: stretch;
-  justify-content: space-between;
-  gap: 0;
-
-  min-height: var(--control-height);
-  padding: 0;
-
-  color: var(--text-main);
-
-  // Unified Spring Transitions
-  transition:
-    transform var(--speed-base) var(--ease-spring-snappy),
-    box-shadow var(--speed-base) var(--ease-spring-snappy),
-    border-color var(--speed-base) var(--ease-spring-snappy),
-    background-color var(--speed-base) var(--ease-spring-snappy);
-
-  border-radius: var(--radius-base);
-  @include glass-float($interactive: true);
-
-  .chip-label {
-    display: flex;
-    align-items: center;
-    padding: 0 calc(var(--space-xs) * 1.5);
-    white-space: nowrap;
-    color: inherit;
-    font-weight: var(--font-weight-semibold);
-  }
-
-  .chip-label-sunken {
-    background: var(--bg-sink);
-    border: var(--physics-border-width) solid var(--border-color);
-    color: var(--text-dim);
-    padding: calc(var(--space-xs) * 0.25) var(--space-xs);
-    margin-block: auto;
-    margin-right: var(--space-xs);
-    border-radius: calc(var(--radius-base) * 0.5);
-    @include typography('caption');
-  }
-
-  .chip-remove {
-    @extend .btn-void;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--control-height);
-
-    border-left: inherit;
-    color: var(--text-mute);
-
-    border-top-right-radius: var(--radius-base);
-    border-bottom-right-radius: var(--radius-base);
-    transition:
-      background-color var(--speed-fast) var(--ease-spring-snappy),
-      color var(--speed-fast) var(--ease-spring-snappy);
-
-    &:hover {
-      background: alpha(black, 30%);
-      color: var(--text-main);
-    }
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    background: shade(var(--bg-sink), 50%);
-    color: shade(var(--text-mute), 20%);
-    border-color: shade(var(--text-mute), 50%) !important;
-    box-shadow: none !important;
-    opacity: 0.8;
-    transform: none;
-
-    .chip-remove {
-      pointer-events: none;
-      border-left-color: shade(var(--text-mute), 50%);
-      color: shade(var(--text-mute), 20%);
-      background: transparent;
-    }
-  }
-
-  @media (hover: hover) {
-    &:hover:not(:disabled) {
-      transform: translateY(var(--lift)) scale(var(--scale, 1));
-      box-shadow: var(--shadow-lift);
-    }
-  }
-
-  @starting-style {
-    opacity: 0;
-    transform: scale(0.9);
-  }
-}
-
-// B. THE VARIANT MIXIN (Color Logic)
-// --------------------------------------------------------------------------
-@mixin chip-variant($color) {
-  // Default (void/glass).
-  background: alpha($color, 80%);
-  border-color: tint($color, 20%);
-  color: var(--text-main);
-
-  .chip-remove {
-    background: shade($color, 30%);
-    color: var(--text-dim);
-
-    &:hover {
-      background: shade($color, 50%);
-      color: white;
-    }
-  }
-
-  @media (hover: hover) {
-    &:hover:not(:disabled) {
-      border-color: tint($color, 50%);
-      box-shadow: var(--shadow-lift);
-    }
-  }
-
-  // Retro override.
-  @at-root [data-physics='retro'] & {
-    background: black; // Opaque
-    border: var(--physics-border-width) solid $color; // Hard border
-    box-shadow: none; // No soft glow
-    color: $color;
-
-    .chip-remove {
-      background: transparent;
-      border-top-right-radius: var(--radius-base);
-      border-bottom-right-radius: var(--radius-base);
-      color: $color;
-
-      &:hover {
-        background: $color; // Invert on hover
-        color: black;
-      }
-    }
-
-    &:hover:not(:disabled) {
-      box-shadow: var(--shadow-offset) var(--shadow-offset) 0px
-        alpha($color, 50%); // Hard shadow, no blur
-    }
-  }
-
-  // Light mode override.
-  @at-root [data-mode='light'] & {
-    background: tint($color, 85%);
-    border: var(--physics-border-width) solid $color;
-    box-shadow: none;
-    color: shade($color, 60%);
-
-    .chip-remove {
-      background: tint($color, 70%);
-      color: shade($color, 50%);
-
-      &:hover {
-        background: $color; // Full saturation on hover
-        color: white;
-      }
-    }
-
-    &:disabled {
-      border-color: alpha(shade($color, 60%), 10%) !important;
-    }
-  }
-}
-
-// C. IMPLEMENTATION
+// CHIP IMPLEMENTATIONS
+// Uses _chip-structure and _chip-variant mixins defined above
 // --------------------------------------------------------------------------
 .chip {
-  @include chip-structure;
-  @include chip-variant(var(--energy-secondary));
+  @include _chip-structure;
+  @include _chip-variant(var(--energy-secondary));
 }
 
 .chip-system {
-  @include chip-structure;
-  @include chip-variant(var(--color-system));
+  @include _chip-structure;
+  @include _chip-variant(var(--color-system));
 }
 .chip-premium {
-  @include chip-structure;
-  @include chip-variant(var(--color-premium));
+  @include _chip-structure;
+  @include _chip-variant(var(--color-premium));
 }
 .chip-success {
-  @include chip-structure;
-  @include chip-variant(var(--color-success));
+  @include _chip-structure;
+  @include _chip-variant(var(--color-success));
 }
 .chip-error {
-  @include chip-structure;
-  @include chip-variant(var(--color-error));
+  @include _chip-structure;
+  @include _chip-variant(var(--color-error));
 }
 
 // D. THE ADDON (Label on Top)
@@ -406,14 +474,19 @@
     display: flex;
     align-items: center;
     z-index: 1;
-    @include typography('caption');
+    // Typography caption level (inline, avoids circular dependency)
+    font-size: var(--font-size-caption);
+    line-height: var(--line-height-caption);
+    letter-spacing: var(--letter-spacing-caption);
+    font-family: var(--font-body);
+    font-weight: var(--font-weight-regular);
 
     color: inherit;
     text-shadow: none;
     mix-blend-mode: normal;
 
     // Retro label.
-    @at-root [data-physics='retro'] & {
+    @include when-retro {
       background: black; // Opaque background to hide the parent border behind it
 
       border: inherit;
@@ -421,7 +494,7 @@
     }
 
     // Light mode label.
-    @at-root [data-mode='light'] & {
+    @include when-light {
       font-weight: 700;
     }
   }

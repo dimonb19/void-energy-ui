@@ -370,7 +370,7 @@ export const VOID_TOKENS = {
     glass: {
       radiusBase: VOID_RADIUS.md,
       radiusFull: VOID_RADIUS.full,
-      blur: 12,
+      blur: 20,
       borderWidth: 1,
       // Animation Durations (Complete Scale)
       speedInstant: 100, // Micro-feedback (button press)

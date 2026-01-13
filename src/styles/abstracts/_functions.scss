@@ -1,16 +1,36 @@
-/* Color helpers for tint/shade/alpha/blend and z-layer lookup. */
+/* ==========================================================================
+ * VOID ENERGY - Color Functions & Utilities
+ * ==========================================================================
+ *
+ * Polymorphic color manipulation functions that work with BOTH:
+ * - Sass colors: #ff0000, rgb(255, 0, 0), hsl(0, 100%, 50%)
+ * - CSS variables: var(--energy-primary), var(--color-premium)
+ *
+ * POLYMORPHIC BEHAVIOR:
+ * ┌─────────────────┬────────────────────────────────────────────────────┐
+ * │ Input Type      │ Processing                                         │
+ * ├─────────────────┼────────────────────────────────────────────────────┤
+ * │ Sass color      │ Native Sass functions (compile-time, precise)      │
+ * │ CSS variable    │ color-mix() in OKLCH (runtime, browser-computed)   │
+ * └─────────────────┴────────────────────────────────────────────────────┘
+ *
+ * WHY OKLCH?
+ * OKLCH is perceptually uniform - equal steps in lightness/chroma produce
+ * visually equal differences. This prevents "muddy" blends common with RGB.
+ *
+ * BROWSER SUPPORT:
+ * color-mix() requires Chrome 111+, Firefox 113+, Safari 16.2+
+ * For older browsers, use Sass colors or provide fallbacks.
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch
+ * @see https://www.w3.org/TR/css-color-4/#interpolation-space
+ * ========================================================================== */
 
 @use 'sass:color';
 @use 'sass:meta';
 @use 'sass:math';
 @use 'sass:map';
 @use '../config/generated-themes' as generated;
-
-/**
- * color-mix() uses OKLCH for perceptual uniformity and predictable blending.
- * References: https://developer.mozilla.org/en-US/docs/Web/CSS/color_value/oklch
- * Spec: https://www.w3.org/TR/css-color-4/#interpolation-space
- */
 
 // ==========================================================================
 // Z-INDEX LAYER MAP
@@ -19,10 +39,23 @@
 $z-layers: generated.$z-layers;
 
 // ==========================================================================
-// COLOR FUNCTIONS (Polymorphic)
+// COLOR FUNCTIONS
 // ==========================================================================
 
-// 1. TINT (Mix with White)
+/// TINT - Mix color with WHITE to create a lighter variant.
+///
+/// @param {Color|String} $color - Sass color (#fff) or CSS variable (var(--x))
+/// @param {Percentage} $percentage - Amount of white to mix (0-100%)
+/// @return {Color|String} - Lightened color value
+///
+/// @example scss - With Sass color (compile-time)
+///   background: tint(#3875fa, 20%);
+///   // Output: #6091fb
+///
+/// @example scss - With CSS variable (runtime)
+///   background: tint(var(--energy-primary), 20%);
+///   // Output: color-mix(in oklch, var(--energy-primary), white 20%)
+///
 @function tint($color, $percentage) {
   @if meta.type-of($color) == 'color' {
     @return color.mix(white, $color, $percentage);
@@ -31,7 +64,20 @@ $z-layers: generated.$z-layers;
   }
 }
 
-// 2. SHADE (Mix with Black)
+/// SHADE - Mix color with BLACK to create a darker variant.
+///
+/// @param {Color|String} $color - Sass color (#fff) or CSS variable (var(--x))
+/// @param {Percentage} $percentage - Amount of black to mix (0-100%)
+/// @return {Color|String} - Darkened color value
+///
+/// @example scss - With Sass color (compile-time)
+///   background: shade(#3875fa, 30%);
+///   // Output: #2752af
+///
+/// @example scss - With CSS variable (runtime)
+///   background: shade(var(--energy-primary), 30%);
+///   // Output: color-mix(in oklch, var(--energy-primary), black 30%)
+///
 @function shade($color, $percentage) {
   @if meta.type-of($color) == 'color' {
     @return color.mix(black, $color, $percentage);
@@ -40,7 +86,12 @@ $z-layers: generated.$z-layers;
   }
 }
 
-// Internal: normalize opacity input to a percentage value.
+// ---------------------------------------------------------------------------
+// INTERNAL HELPERS (Not for direct use)
+// ---------------------------------------------------------------------------
+
+/// Normalize opacity input to a percentage value.
+/// @access private
 @function _normalize-opacity($value) {
   @if meta.type-of($value) == 'number' {
     $percent: if(math.is-unitless($value), $value * 100%, $value);
@@ -52,7 +103,8 @@ $z-layers: generated.$z-layers;
   @return $value;
 }
 
-// Internal: compute the complementary transparency term.
+/// Compute the complementary transparency term for color-mix().
+/// @access private
 @function _opacity-complement($percent) {
   @if meta.type-of($percent) == 'number' {
     @return 100% - $percent;
@@ -60,8 +112,30 @@ $z-layers: generated.$z-layers;
   @return calc(100% - #{$percent});
 }
 
-// 3. ALPHA (Set explicit opacity)
-// Usage: alpha(red, 20%) -> 20% opacity (80% transparent)
+// ---------------------------------------------------------------------------
+// PUBLIC FUNCTIONS (continued)
+// ---------------------------------------------------------------------------
+
+/// ALPHA - Set explicit opacity on a color.
+///
+/// Creates a semi-transparent version of a color. The opacity parameter
+/// specifies how VISIBLE the color is (20% = 20% visible, 80% transparent).
+///
+/// @param {Color|String} $color - Sass color or CSS variable
+/// @param {Number|Percentage} $opacity - Visibility level (0-1 or 0%-100%)
+/// @return {Color|String} - Color with specified opacity
+///
+/// @example scss - With Sass color
+///   background: alpha(#3875fa, 0.2);
+///   // Output: rgba(56, 117, 250, 0.2)
+///
+/// @example scss - With CSS variable
+///   background: alpha(var(--energy-primary), 20%);
+///   // Output: color-mix(in oklch, var(--energy-primary) 20%, transparent 80%)
+///
+/// @example scss - For overlays
+///   box-shadow: 0 0 10px alpha(var(--energy-primary), 50%);
+///
 @function alpha($color, $opacity) {
   $percent: _normalize-opacity($opacity);
 
@@ -88,7 +162,29 @@ $z-layers: generated.$z-layers;
   );
 }
 
-// 4. BLEND (Mix Two Colors)
+/// BLEND - Mix two colors together.
+///
+/// Creates a mixture of two colors. The percentage determines how much
+/// of the second color ($other) is mixed into the first ($color).
+///
+/// @param {Color|String} $color - Base color (Sass or CSS variable)
+/// @param {Color|String} $other - Color to mix in (Sass or CSS variable)
+/// @param {Percentage} $other-percentage - Amount of $other to mix (0-100%)
+/// @return {Color|String} - Blended color
+///
+/// @example scss - With Sass colors
+///   background: blend(#3875fa, #ff0000, 30%);
+///   // Output: 70% blue + 30% red
+///
+/// @example scss - With CSS variables
+///   background: blend(var(--bg-surface), var(--energy-primary), 10%);
+///   // Output: color-mix(in oklch, var(--bg-surface), var(--energy-primary) 10%)
+///
+/// @example scss - For hover states
+///   &:hover {
+///     background: blend(var(--bg-surface), var(--energy-secondary), 8%);
+///   }
+///
 @function blend($color, $other, $other-percentage) {
   @if meta.type-of($color) == 'color' and meta.type-of($other) == 'color' {
     @return color.mix($other, $color, $other-percentage);
@@ -97,7 +193,35 @@ $z-layers: generated.$z-layers;
   }
 }
 
-// 5. Z-INDEX FETCH
+// ==========================================================================
+// Z-INDEX UTILITY
+// ==========================================================================
+
+/// Z - Fetch z-index value from the semantic layer map.
+///
+/// Returns the z-index value for a named layer. Prevents magic numbers
+/// and ensures consistent stacking across components.
+///
+/// @param {String} $layer - Layer name from $z-layers map
+/// @return {Number} - Z-index value
+/// @throws Error if layer name is not found
+///
+/// Available layers:
+/// - sink (-1)     : Below canvas (background patterns)
+/// - floor (0)     : Canvas level
+/// - base (1)      : Default element layer
+/// - decorate (2)  : Decorative elements
+/// - float (10)    : Floating UI elements
+/// - sticky (20)   : Sticky headers/navigation
+/// - header (40)   : Main header
+/// - dropdown (50) : Dropdown menus
+/// - overlay (90)  : Modals, dialogs, overlays
+///
+/// @example scss
+///   .modal { z-index: z('overlay'); }    // 90
+///   .header { z-index: z('header'); }    // 40
+///   .tooltip { z-index: z('dropdown'); } // 50
+///
 @function z($layer) {
   @if map.has-key($z-layers, $layer) {
     @return map.get($z-layers, $layer);

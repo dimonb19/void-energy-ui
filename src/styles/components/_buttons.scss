@@ -1,13 +1,183 @@
-/* Button system skin (base, CTA, semantic variants). */
+/* ==========================================================================
+ * BUTTON SYSTEM
+ * ==========================================================================
+ *
+ * Comprehensive button styling with physics-aware states.
+ *
+ * ARCHITECTURE:
+ * - Section 1: Base Button - Layout, typography, physics, interaction states
+ * - Section 2: CTA (Gemini Laser) - Animated gradient border variant
+ * - Section 3: Semantic Variants - Premium, system, signal, alert colors
+ * - Section 4: Active State - Toggle/selection styling
+ * - Section 5: Utilities - btn-void (reset), btn-icon (circular)
+ *
+ * CLASSES:
+ * - .btn         : Base button (also applies to <button> elements)
+ * - .btn-cta     : Call-to-action with animated laser border
+ * - .btn-premium : Gold/orange semantic variant
+ * - .btn-system  : Purple semantic variant
+ * - .btn-signal  : Green/success semantic variant
+ * - .btn-alert   : Red/error semantic variant
+ * - .btn-void    : Reset class for unstyled buttons
+ * - .btn-icon    : Circular icon-only button
+ *
+ * PHYSICS BEHAVIOR:
+ * - Glass: Glowing hover states, blur effects, gradient CTA
+ * - Flat:  Subtle shadows, no glow, no gradient animation
+ * - Retro: Hard borders, instant transitions, pixel shadows
+ *
+ * DESIGN NOTES:
+ * - Resting state carries potential energy through glass/border treatments
+ * - Hover/Focus converts to kinetic energy via glow, lift, and brightness
+ * - Active press uses 50ms micro-transition (instant on touch/retro)
+ *
+ * @see /CHEAT-SHEET.md for usage examples
+ * ==========================================================================
+ */
 
 @use '../abstracts' as *;
 
-/* ==========================================================================
-   BUTTON NOTES
-   - Resting state carries potential energy through glass/border treatments.
-   - Hover/Focus converts to kinetic energy via glow, lift, and brightness.
-   - See global.scss SYSTEM NOTES for a compact API summary.
-   ========================================================================== */
+// ==========================================================================
+// BUTTON-SPECIFIC MIXINS
+// ==========================================================================
+// These mixins are only used by buttons, so they live here with their
+// component rather than in abstracts/_mixins.scss.
+// ==========================================================================
+
+// MIXIN: Gemini Laser (CTA Button Effect)
+// Creates an animated rotating gradient border for call-to-action buttons.
+// The gradient rotates continuously, creating a "laser beam" effect around
+// the button edge.
+// --------------------------------------------------------------------------
+@mixin _gemini-laser {
+  position: relative;
+  isolation: isolate; // Force stacking context on the button itself.
+  background: transparent;
+  border: none;
+  overflow: hidden;
+  z-index: z('base');
+  color: var(--text-main);
+
+  // Parent radius clips the beam and keeps the gradient contained.
+  border-radius: var(--radius-full);
+
+  // Rotating beam.
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 500%;
+    height: 500%;
+    border-radius: 50%;
+
+    // Tail gradient.
+    background: conic-gradient(
+      from 0deg,
+      transparent 0deg,
+      var(--energy-secondary) 100deg,
+      var(--energy-primary) 160deg,
+      var(--energy-primary) 200deg,
+      var(--energy-secondary) 260deg,
+      transparent 360deg
+    );
+
+    transition: background-color var(--speed-base) var(--ease-spring-gentle);
+
+    will-change: transform;
+    transform: translate(-50%, -50%);
+    animation: rotate-laser 4s linear infinite;
+    z-index: -2;
+
+    // Retro override: disable animated gradient entirely
+    // Terminal UIs didn't have rotating gradients - use static borders instead
+    @include when-retro($low-specificity: true) {
+      display: none;
+    }
+  }
+
+  // Inner mask.
+  &::after {
+    content: '';
+    position: absolute;
+    inset: var(--physics-border-width);
+
+    background: var(--bg-canvas);
+
+    z-index: -1;
+    border-radius: var(--radius-full);
+
+    // Retro override: disable inner mask (not needed without gradient)
+    @include when-retro($low-specificity: true) {
+      display: none;
+    }
+  }
+
+  // Hover surge.
+  @media (hover: hover) {
+    &:hover::before {
+      background-color: var(--energy-primary);
+      animation-play-state: paused;
+    }
+
+    &:hover::after {
+      background: blend(var(--bg-canvas), var(--energy-primary), 6%);
+    }
+  }
+}
+
+// MIXIN: Button Variant
+// Creates semantic button variants with physics-aware hover states.
+// Usage: @include _btn-variant(var(--color-premium));
+// --------------------------------------------------------------------------
+@mixin _btn-variant($color-var) {
+  border-color: alpha($color-var, 50%);
+  background: alpha($color-var, 10%);
+  color: $color-var;
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      border-color: $color-var;
+      background: alpha($color-var, 15%);
+      color: var(--text-main);
+
+      box-shadow: var(--shadow-lift);
+
+      // Only apply colored glow if we are in Glass Physics
+      @include when-glass {
+        box-shadow: 0 0 15px alpha($color-var, 40%); // void-ignore (Glow Physics)
+        text-shadow: 0 0 10px alpha($color-var, 60%); // void-ignore (Glow Physics)
+      }
+
+      @include when-light {
+        color: $color-var; // Keep text readable in light mode
+        text-shadow: none;
+      }
+
+      @include when-retro {
+        box-shadow: var(--shadow-offset) var(--shadow-offset) 0px
+          alpha($color-var, 50%);
+      }
+    }
+  }
+
+  &:active:not(:disabled) {
+    transition-duration: 50ms;
+
+    @media (pointer: coarse) {
+      transition-duration: 0ms;
+    }
+
+    @include when-retro {
+      transition-duration: 0ms;
+    }
+
+    filter: brightness(0.85);
+    transform: scale(0.96);
+    border-color: blend($color-var, var(--energy-secondary), 12%);
+    background: alpha($color-var, 25%);
+  }
+}
 
 // ==========================================================================
 // BUTTONS
@@ -65,7 +235,7 @@ button:not(.btn-void),
   position: relative;
   overflow: hidden;
 
-  @at-root [data-mode='light'] & {
+  @include when-light {
     background: blend(var(--bg-surface), var(--energy-primary), 5%);
   }
 
@@ -95,7 +265,7 @@ button:not(.btn-void),
       transition-duration: 0ms;
     }
 
-    @at-root [data-physics='retro'] & {
+    @include when-retro {
       transition-duration: 0ms;
     }
 
@@ -119,7 +289,7 @@ button:not(.btn-void),
   // Nested to override Base Styles properly
   // ========================================================================
   &.btn-cta:not(:disabled) {
-    @include gemini-laser;
+    @include _gemini-laser;
 
     color: var(--energy-primary);
     font-weight: var(--font-weight-extrabold);
@@ -140,7 +310,7 @@ button:not(.btn-void),
     // Retro Physics Override: Static double border instead of animated gradient
     // Terminal UIs (DOS/Unix TUI) used double borders for emphasis, not animations
     // Note: gemini-laser mixin already disables ::before/::after in retro mode
-    @at-root [data-physics='retro'] & {
+    @include when-retro {
       // Apply double border using border + outline (uses physics tokens)
       border: var(--physics-border-width) solid var(--energy-primary);
       outline: var(--physics-border-width) solid var(--energy-primary);
@@ -177,77 +347,27 @@ button:not(.btn-void),
 
   // ========================================================================
   // 3. SEMANTIC VARIANTS
-  // Nested to override Base Styles properly
+  // Uses _btn-variant mixin defined above
   // ========================================================================
 
-  // Mixin for clean overrides
-  @mixin btn-variant($color-var) {
-    border-color: alpha($color-var, 50%);
-    background: alpha($color-var, 10%);
-    color: $color-var;
-
-    @media (hover: hover) {
-      &:hover:not(:disabled) {
-        border-color: $color-var;
-        background: alpha($color-var, 15%);
-        color: var(--text-main);
-
-        box-shadow: var(--shadow-lift);
-
-        // Only apply colored glow if we are in Glass Physics
-        @at-root [data-physics='glass'] & {
-          box-shadow: 0 0 15px alpha($color-var, 40%); // void-ignore (Glow Physics)
-          text-shadow: 0 0 10px alpha($color-var, 60%); // void-ignore (Glow Physics)
-        }
-
-        @at-root [data-mode='light'] & {
-          color: $color-var; // Keep text readable in light mode
-          text-shadow: none;
-        }
-
-        @at-root [data-physics='retro'] & {
-          box-shadow: var(--shadow-offset) var(--shadow-offset) 0px
-            alpha($color-var, 50%);
-        }
-      }
-    }
-
-    &:active:not(:disabled) {
-      transition-duration: 50ms;
-
-      @media (pointer: coarse) {
-        transition-duration: 0ms;
-      }
-
-      @at-root [data-physics='retro'] & {
-        transition-duration: 0ms;
-      }
-
-      filter: brightness(0.85);
-      transform: scale(0.96);
-      border-color: blend($color-var, var(--energy-secondary), 12%);
-      background: alpha($color-var, 25%);
-    }
-  }
-
   &.btn-premium:not(:disabled) {
-    @include btn-variant(var(--color-premium));
+    @include _btn-variant(var(--color-premium));
   }
   &.btn-system:not(:disabled) {
-    @include btn-variant(var(--color-system));
+    @include _btn-variant(var(--color-system));
   }
   &.btn-signal:not(:disabled) {
-    @include btn-variant(var(--color-success));
+    @include _btn-variant(var(--color-success));
   }
   &.btn-alert:not(:disabled) {
-    @include btn-variant(var(--color-error));
+    @include _btn-variant(var(--color-error));
   }
 
   // ========================================================================
   // ACTIVE STATE (Toggle / Selected)
   // Usage: <button class="btn" aria-pressed="true">
   // ========================================================================
-  @include state-active {
+  @include when-state('active') {
     // 1. Solid Fill (The "Lit" Look)
     background: alpha(var(--energy-primary), 15%);
     border-color: var(--energy-primary);
@@ -259,12 +379,12 @@ button:not(.btn-void),
     box-shadow: var(--shadow-lift);
 
     // --- MODE EXCEPTIONS ---
-    @at-root [data-mode='light'] & {
+    @include when-light {
       background: alpha(var(--energy-primary), 10%);
       color: var(--energy-primary);
     }
 
-    @at-root [data-physics='retro'] & {
+    @include when-retro {
       background: alpha(var(--color-success), 20%);
     }
   }

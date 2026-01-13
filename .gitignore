@@ -26,8 +26,8 @@ pnpm-debug.log*
 package-lock.json
 
 # context for AI
-generate_context.py
-void_context.txt
+scripts/generate_context.py
+void_context.md
 
 # css map files
 global.css
