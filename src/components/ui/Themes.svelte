@@ -16,10 +16,34 @@
     }),
   );
 
+  // Capitalize theme name for display.
+  function formatThemeName(id: string): string {
+    return id.charAt(0).toUpperCase() + id.slice(1);
+  }
+
   function selectTheme(id: string) {
     voidEngine.setAtmosphere(id);
   }
+
+  function handleRestore() {
+    voidEngine.restoreUserTheme();
+  }
 </script>
+
+<!-- Temporary Theme Indicator -->
+{#if voidEngine.hasTemporaryTheme}
+  {@const info = voidEngine.temporaryThemeInfo}
+  <div
+    class="temp-theme-notice surface-glass flex items-center justify-between gap-sm p-sm"
+  >
+    <span class="text-dim text-caption">
+      {info?.label} active
+    </span>
+    <button class="system-btn" onclick={handleRestore}>
+      Return to {formatThemeName(info?.returnTo ?? '')}
+    </button>
+  </div>
+{/if}
 
 <div
   class="theme-menu surface-sunk rounded-md flex flex-col tablet:grid tablet:grid-cols-2 gap-xs p-xs"
@@ -60,6 +84,11 @@
 
 <style lang="scss">
   @use '/src/styles/abstracts' as *;
+
+  .temp-theme-notice {
+    @include glass-float;
+    margin-bottom: var(--space-sm);
+  }
 
   .theme-menu {
     max-height: 18rem;

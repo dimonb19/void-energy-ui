@@ -51,9 +51,13 @@ export class VoidEngine {
     density: 'standard',
   });
 
-  // Story mode state (for creator-bound themes).
-  private savedUserTheme: string | null = null;
-  storyTheme = $state<string | null>(null);
+  // Temporary theme context (for story themes, previews, or forced contexts).
+  // When active, user can restore via UI or manual theme change clears it.
+  temporaryTheme = $state<{
+    id: string;
+    label: string;
+    returnTo: string;
+  } | null>(null);
 
   // Derived theme snapshot for UI consumption.
   currentTheme = $derived(
@@ -151,12 +155,29 @@ export class VoidEngine {
     }
   }
 
+  /**
+   * Set atmosphere (user-initiated). Clears any temporary theme context.
+   */
   setAtmosphere(name: string) {
     if (!this.registry[name]) {
       console.warn(`Void: Unknown atmosphere "${name}".`);
       return;
     }
 
+    // Clear temporary theme on manual selection (user chose a new theme)
+    if (this.temporaryTheme) {
+      this.temporaryTheme = null;
+    }
+
+    this._applyAtmosphere(name);
+    this.persist();
+  }
+
+  /**
+   * Internal: Apply atmosphere without clearing temporary context or persisting.
+   * Used by temporary theme API to avoid side effects.
+   */
+  private _applyAtmosphere(name: string) {
     // Check for View Transitions API support and user preferences
     const prefersReducedMotion =
       typeof window !== 'undefined' &&
@@ -169,7 +190,6 @@ export class VoidEngine {
     if (!supportsViewTransitions || prefersReducedMotion) {
       this.atmosphere = name;
       this.syncDOM();
-      this.persist();
       return;
     }
 
@@ -177,7 +197,6 @@ export class VoidEngine {
     document.startViewTransition(() => {
       this.atmosphere = name;
       this.syncDOM();
-      this.persist();
     });
   }
 
@@ -256,51 +275,98 @@ export class VoidEngine {
     return Object.keys(this.registry);
   }
 
+  // ===========================================================================
+  // TEMPORARY THEME API
+  // ===========================================================================
+
   /**
-   * Check if currently in story mode.
+   * Check if a temporary theme is currently active.
    */
-  get isInStoryMode() {
-    return this.storyTheme !== null;
+  get hasTemporaryTheme(): boolean {
+    return this.temporaryTheme !== null;
   }
 
   /**
-   * Enter story mode - switch to story's theme, save user's preference for restoration.
+   * Get temporary theme info for UI display.
+   */
+  get temporaryThemeInfo() {
+    return this.temporaryTheme;
+  }
+
+  /**
+   * Apply a temporary theme with save/restore capability.
+   * If user manually changes theme while active, temporary context is cleared.
+   *
+   * @param themeId - The theme to apply temporarily
+   * @param label - Display label for UI (e.g., "Story theme", "Preview")
    *
    * @example
-   * // In story player component:
-   * import { voidEngine } from '../adapters/void-engine.svelte';
-   * import { onMount, onDestroy } from 'svelte';
+   * // Story player
+   * voidEngine.applyTemporaryTheme('crimson', 'Story theme');
    *
-   * onMount(() => {
-   *   if (story.theme) voidEngine.enterStoryMode(story.theme);
-   * });
-   *
-   * onDestroy(() => {
-   *   voidEngine.exitStoryMode();
-   * });
+   * // Theme preview on hover
+   * voidEngine.applyTemporaryTheme('nebula', 'Preview');
    */
-  enterStoryMode(themeId: string | null) {
-    // If story has no theme or theme doesn't exist, do nothing
-    if (!themeId || !this.registry[themeId]) return;
-
-    // Save current theme for restoration (only if not already in story mode)
-    if (!this.storyTheme) {
-      this.savedUserTheme = this.atmosphere;
+  applyTemporaryTheme(themeId: string, label: string = 'Custom theme') {
+    if (!this.registry[themeId]) {
+      console.warn(`Void: Unknown atmosphere "${themeId}"`);
+      return;
     }
 
-    this.storyTheme = themeId;
-    this.setAtmosphere(themeId);
+    // Only save returnTo if not already in temporary mode
+    if (!this.temporaryTheme) {
+      this.temporaryTheme = {
+        id: themeId,
+        label,
+        returnTo: this.atmosphere,
+      };
+    } else {
+      // Update temporary theme but keep original returnTo
+      this.temporaryTheme = {
+        ...this.temporaryTheme,
+        id: themeId,
+        label,
+      };
+    }
+
+    // Apply without triggering the "clear" logic
+    this._applyAtmosphere(themeId);
   }
 
   /**
-   * Exit story mode - restore user's preferred theme.
+   * Exit temporary theme and restore user's preference.
+   */
+  restoreUserTheme() {
+    if (this.temporaryTheme) {
+      const returnTo = this.temporaryTheme.returnTo;
+      this.temporaryTheme = null;
+      this._applyAtmosphere(returnTo);
+    }
+  }
+
+  // ===========================================================================
+  // BACKWARDS COMPATIBILITY (Story Mode Aliases)
+  // ===========================================================================
+
+  /**
+   * @deprecated Use `hasTemporaryTheme` instead.
+   */
+  get isInStoryMode(): boolean {
+    return this.hasTemporaryTheme;
+  }
+
+  /**
+   * @deprecated Use `applyTemporaryTheme(themeId, 'Story theme')` instead.
+   */
+  enterStoryMode(themeId: string | null) {
+    if (themeId) this.applyTemporaryTheme(themeId, 'Story theme');
+  }
+
+  /**
+   * @deprecated Use `restoreUserTheme()` instead.
    */
   exitStoryMode() {
-    if (this.savedUserTheme) {
-      this.setAtmosphere(this.savedUserTheme);
-    }
-    this.storyTheme = null;
-    this.savedUserTheme = null;
+    this.restoreUserTheme();
   }
 }
 
