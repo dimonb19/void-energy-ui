@@ -269,12 +269,18 @@
 
 // B. THE STORY TILE (Holographic Slate)
 // --------------------------------------------------------------------------
+// NOTE: Width properties intentionally in SCSS (not Tailwind) because:
+// - Widths scale with --density (physics concern, not pure layout)
+// - Values depend on --unit CSS variable cascade
+// - Responsive widths are physics-coupled, not arbitrary breakpoint styling
+// --------------------------------------------------------------------------
 .tile {
   position: relative;
   flex: none;
   aspect-ratio: 2 / 3;
 
   // Width scales with unit * density for compact modes.
+  // void-hybrid-exception: density-coupled width
   width: calc(40 * var(--unit) * var(--density, 1));
 
   display: flex;
@@ -382,7 +388,7 @@
     }
   }
 
-  // Responsive widths.
+  // Responsive widths (void-hybrid-exception: density-coupled)
   @include respond-up('tablet') {
     width: calc(56 * var(--unit) * var(--density, 1));
   }

@@ -1,0 +1,110 @@
+/* ==========================================================================
+ * ACCESSIBILITY OVERRIDES
+ * ==========================================================================
+ *
+ * Centralized accessibility rules for:
+ * - High Contrast Mode (Windows HCM / forced-colors)
+ * - Reduced Motion preferences
+ *
+ * These rules use !important where necessary because they MUST override
+ * all component-level styling to ensure accessibility compliance.
+ *
+ * TESTING:
+ * - High Contrast: Windows Settings > Accessibility > Contrast Themes
+ * - Reduced Motion: macOS System Settings > Accessibility > Display > Reduce motion
+ *                   Windows Settings > Accessibility > Visual effects > Animation effects
+ *
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/@media/forced-colors
+ * @see https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion
+ * ========================================================================== */
+
+@use '../abstracts' as *;
+
+// ==========================================================================
+// 1. HIGH CONTRAST MODE (Windows HCM)
+// ==========================================================================
+// Triggers ONLY when user has forced system colors.
+// Overrides the Theme Engine to ensure perfect contrast.
+// ==========================================================================
+
+@media (forced-colors: active) {
+  :root {
+    // A. Map Canvas to System Background
+    // Ensures background matches OS theme (White in Light, Black in Dark).
+    --bg-canvas: Canvas;
+    --bg-spotlight: Canvas;
+    --bg-surface: Canvas;
+    --bg-sink: Canvas;
+
+    // B. Map Text to System Text
+    // Dim/mute text is often unreadable in HCM — force full contrast.
+    --text-main: CanvasText;
+    --text-dim: CanvasText;
+    --text-mute: CanvasText;
+
+    // C. Map Energy/Action to System Highlight
+    // 'Highlight' is the OS accent color (e.g., Hot Pink, Cyan, Yellow).
+    --energy-primary: Highlight;
+    --energy-secondary: CanvasText;
+
+    // D. Force Hard Borders
+    // Glass physics uses subtle borders; HCM needs HARD edges.
+    --physics-border-width: 2px;
+    --border-color: ButtonText;
+
+    // E. Kill Visual Noise
+    // Blur and shadows obscure content in HCM.
+    --physics-blur: 0px;
+    --shadow-sunk: none;
+    --shadow-float: none;
+    --shadow-lift: none;
+  }
+
+  // Force visibility on interactive elements.
+  // Glass backgrounds are invisible in HCM — borders define edges.
+  button,
+  .btn,
+  input,
+  select,
+  textarea,
+  .surface-glass,
+  .surface-sunk {
+    border: 2px solid ButtonText !important;
+  }
+
+  // Link visibility.
+  a,
+  .link {
+    color: LinkText;
+    text-decoration: underline; // Enforce for safety
+  }
+
+  // Selection.
+  ::selection {
+    background: Highlight;
+    color: HighlightText;
+  }
+}
+
+// ==========================================================================
+// 2. REDUCED MOTION (The Kill Switch)
+// ==========================================================================
+// Forces all animations to be instant for vestibular disorder users.
+// This single block handles 95% of motion safety.
+// ==========================================================================
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    // Force instant transitions.
+    // !important overrides component-specific rules.
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+
+    // Kill infinite/float animations entirely.
+    animation: none !important;
+  }
+}

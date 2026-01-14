@@ -1,6 +1,7 @@
-/* Base layer aggregator (reset, fonts, typography, themes). */
+/* Base layer aggregator (reset, fonts, typography, themes, accessibility). */
 
 @forward 'reset';
 @forward 'fonts';
 @forward 'typography';
 @forward 'themes';
+@forward 'accessibility'; // High Contrast Mode + Reduced Motion overrides

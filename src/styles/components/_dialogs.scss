@@ -1,4 +1,11 @@
 /* Dialog and modal styling for native <dialog>. */
+/* ==========================================================================
+ * NOTE: Width properties intentionally in SCSS (not Tailwind) because:
+ * - Widths are driven by data-size attribute (State Protocol)
+ * - Values use --modal-width-* and --dialog-gutter tokens (physics-coupled)
+ * - This is state-driven sizing, not arbitrary layout
+ * void-hybrid-exception: state-driven modal sizing
+ * ========================================================================== */
 
 @use '../abstracts' as *;
 
@@ -10,7 +17,7 @@ dialog {
   inset: 0; // Ensure full screen centering context
   overscroll-behavior: contain; // Prevents scroll chaining to the body
 
-  // Responsive width strategy.
+  // Responsive width strategy (void-hybrid-exception: state-driven sizing)
   width: min(calc(100vw - var(--dialog-gutter)), var(--modal-width-sm));
   // Max height keeps header/footer visible on short screens.
   max-height: calc(100dvh - var(--dialog-gutter-lg));
