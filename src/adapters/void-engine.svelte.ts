@@ -271,7 +271,7 @@ export class VoidEngine {
     );
   }
 
-  get availableThemes() {
+  get availableAtmospheres() {
     return Object.keys(this.registry);
   }
 

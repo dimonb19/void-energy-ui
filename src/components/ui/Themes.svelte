@@ -3,7 +3,7 @@
 
   // Derived list of atmospheres from engine state.
   let atmospheres = $derived(
-    voidEngine.availableThemes.map((id: string) => {
+    voidEngine.availableAtmospheres.map((id: string) => {
       const meta = voidEngine.registry[id];
 
       return {
