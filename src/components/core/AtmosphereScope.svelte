@@ -35,10 +35,30 @@
   {/if}
   ```
 
-  @prop theme - Atmosphere ID (e.g., 'crimson', 'void', 'terminal')
+  @example Brand Collaboration - Custom Theme Object
+  ```svelte
+  <script>
+    const brandTheme = {
+      id: 'partner-acme',
+      mode: 'dark',
+      physics: 'glass',
+      palette: {
+        'bg-canvas': '#0a0a1a',
+        'energy-primary': '#ff6b00',
+      }
+    };
+  </script>
+
+  <AtmosphereScope theme={brandTheme} label="ACME Experience">
+    <BrandedContent />
+  </AtmosphereScope>
+  ```
+
+  @prop theme - Atmosphere ID (string) or VoidThemeDefinition object
   @prop label - Optional label for UI indicator (default: 'Page theme')
 
   @see voidEngine.applyTemporaryTheme - Underlying API
+  @see voidEngine.registerTheme - Used for object themes
   @see voidEngine.restoreUserTheme - Called on unmount
 -->
 <script lang="ts">
@@ -50,13 +70,23 @@
     label = 'Page theme',
     children,
   }: {
-    theme: string;
+    theme: string | VoidThemeDefinition;
     label?: string;
     children: Snippet;
   } = $props();
 
   $effect(() => {
-    voidEngine.applyTemporaryTheme(theme, label);
+    let themeId: string;
+
+    if (typeof theme === 'string') {
+      themeId = theme;
+    } else {
+      // Theme object: register it first, then apply
+      themeId = theme.id ?? `__brand_${Date.now()}`;
+      voidEngine.registerTheme(themeId, theme);
+    }
+
+    voidEngine.applyTemporaryTheme(themeId, label);
     return () => voidEngine.restoreUserTheme();
   });
 </script>

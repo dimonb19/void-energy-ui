@@ -1,127 +1,56 @@
 <script lang="ts">
   import { voidEngine } from '../../adapters/void-engine.svelte';
-
-  // Derived list of atmospheres from engine state.
-  let atmospheres = $derived(
-    voidEngine.availableAtmospheres.map((id: string) => {
-      const meta = voidEngine.registry[id];
-
-      return {
-        id,
-        label: id.charAt(0).toUpperCase() + id.slice(1),
-        tagline: meta.tagline,
-        physics: meta.physics,
-        mode: meta.mode,
-      };
-    }),
-  );
-
-  // Capitalize theme name for display.
-  function formatThemeName(id: string): string {
-    return id.charAt(0).toUpperCase() + id.slice(1);
-  }
-
-  function selectTheme(id: string) {
-    voidEngine.setAtmosphere(id);
-  }
-
-  function handleRestore() {
-    voidEngine.restoreUserTheme();
-  }
+  import { modal } from '../../lib/modal-manager.svelte';
 </script>
 
-<!-- Temporary Theme Indicator -->
-{#if voidEngine.hasTemporaryTheme}
-  {@const info = voidEngine.temporaryThemeInfo}
-  <div
-    class="temp-theme-notice surface-glass flex items-center justify-between gap-sm p-sm"
-  >
-    <span class="text-dim text-caption">
-      {info?.label} active
-    </span>
-    <button class="system-btn" onclick={handleRestore}>
-      Return to {formatThemeName(info?.returnTo ?? '')}
-    </button>
-  </div>
-{/if}
-
-<div
-  class="theme-menu surface-sunk rounded-md flex flex-col tablet:grid tablet:grid-cols-2 gap-xs p-xs"
-  role="radiogroup"
-  aria-label="Select Theme"
->
-  {#each atmospheres as atm (atm.id)}
-    <div
-      class="theme-wrapper p-sm rounded-sm"
-      data-atmosphere={atm.id}
-      data-physics={atm.physics}
-      data-mode={atm.mode}
-    >
-      <button
-        class="theme-option w-full flex items-center gap-sm p-xs rounded-sm text-dim text-left"
-        role="radio"
-        aria-checked={voidEngine.atmosphere === atm.id}
-        tabindex={voidEngine.atmosphere === atm.id ? 0 : -1}
-        onclick={() => selectTheme(atm.id)}
+<section class="surface-sunk p-md flex flex-col gap-sm">
+  <h5 class="text-primary pb-xs flex gap-xs justify-center items-center">
+    {#if voidEngine.currentTheme.mode === 'dark'}
+      <svg class="icon moon" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"
+          fill="currentColor"
+        />
+      </svg>
+    {:else}
+      <svg class="icon sun" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="4" fill="currentColor" />
+        <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="12" y1="1" x2="12" y2="4" />
+          <line x1="12" y1="20" x2="12" y2="23" />
+          <line x1="1" y1="12" x2="4" y2="12" />
+          <line x1="20" y1="12" x2="23" y2="12" />
+          <line x1="4.22" y1="4.22" x2="6.34" y2="6.34" />
+          <line x1="17.66" y1="17.66" x2="19.78" y2="19.78" />
+          <line x1="4.22" y1="19.78" x2="6.34" y2="17.66" />
+          <line x1="17.66" y1="6.34" x2="19.78" y2="4.22" />
+        </g>
+      </svg>
+    {/if}
+    Atmosphere
+  </h5>
+  <div class="grid grid-cols-4 items-center gap-sm">
+    <span class="text-right">Theme:</span>
+    <strong class="surface-glass text-center uppercase py-xs px-sm col-span-3">
+      {voidEngine.atmosphere}
+      <span class="text-mute text-caption pl-xs"
+        >({voidEngine.currentTheme.tagline})</span
       >
-        <div
-          class="orb-wrapper relative hidden tablet:flex items-center justify-center"
-          aria-hidden="true"
-        >
-          <span class="orb relative rounded-full"></span>
-        </div>
-
-        <span class="w-full flex flex-row items-center justify-between gap-sm">
-          <span>{atm.label}</span>
-          {#if atm.tagline}
-            <span class="text-caption">{atm.tagline}</span>
-          {/if}
-        </span>
-      </button>
-    </div>
-  {/each}
-</div>
-
-<style lang="scss">
-  @use '/src/styles/abstracts' as *;
-
-  .temp-theme-notice {
-    @include glass-float;
-    margin-bottom: var(--space-sm);
-  }
-
-  .theme-menu {
-    max-height: 18rem;
-    overflow-y: auto;
-
-    @include respond-up(small-desktop) {
-      min-width: 40rem;
-    }
-
-    .theme-wrapper {
-      background-color: var(--bg-canvas);
-
-      .theme-option {
-        position: relative;
-
-        .orb-wrapper {
-          width: var(--space-md);
-          height: var(--space-md);
-          border-radius: var(--radius-full);
-          background: var(--bg-canvas);
-          overflow: hidden;
-          border: var(--physics-border-width) solid var(--border-color);
-
-          .orb {
-            position: absolute;
-            width: calc(var(--space-md) / 2);
-            height: calc(var(--space-md) / 2);
-            border-radius: var(--radius-full);
-            background: var(--energy-primary);
-            z-index: 1;
-          }
-        }
-      }
-    }
-  }
-</style>
+    </strong>
+  </div>
+  <div class="grid grid-cols-4 items-center gap-sm">
+    <span class="text-right">Mode:</span>
+    <strong class="surface-glass text-center uppercase py-xs px-sm col-span-3">
+      {voidEngine.currentTheme.mode}
+    </strong>
+  </div>
+  <div class="grid grid-cols-4 items-center gap-sm">
+    <span class="text-right">Physics:</span>
+    <strong class="surface-glass text-center uppercase py-xs px-sm col-span-3">
+      {voidEngine.currentTheme.physics}
+    </strong>
+  </div>
+  <button class="btn-system mt-sm" onclick={() => modal.themes()}>
+    Customize your workspace
+  </button>
+</section>

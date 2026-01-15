@@ -41,6 +41,9 @@ type ModalContract = {
     /** Callback fired when "don't show again" changes */
     onDontShowAgainChange?: (value: boolean) => void;
   };
+
+  /** Atmospheres selector */
+  themes: {};
 };
 
 /**

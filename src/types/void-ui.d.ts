@@ -281,3 +281,23 @@ interface VoidTooltipOptions {
    */
   placement?: import('@floating-ui/dom').Placement;
 }
+
+// ==========================================================================
+// 6. COMPONENT: SWITCHER / SELECT
+// ==========================================================================
+
+interface SwitcherOption {
+  value: string | number | null;
+  label: string;
+  icon?: string;
+}
+
+interface SwitcherProps {
+  options: SwitcherOption[];
+  value: string | number | null;
+  onchange?: (value: string) => void;
+  label?: string;
+  id?: string;
+  disabled?: boolean;
+  class?: string;
+}

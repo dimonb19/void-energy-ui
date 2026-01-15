@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { voidEngine } from '../adapters/void-engine.svelte';
   import { modal } from '../lib/modal-manager.svelte';
   import { tooltip } from '../actions/tooltip';
   import { toast } from '../stores/toast.svelte';
@@ -7,50 +6,6 @@
 
   import ThemeSelector from './ui/Themes.svelte';
   import SettingsRow from './ui/SettingsRow.svelte';
-
-  // UI options for selectors and toggles.
-  const fontOptions = [
-    { label: 'System Default (Atmosphere)', value: null },
-    { label: 'Hanken Grotesk (Tech)', value: "'Hanken Grotesk', sans-serif" },
-    { label: 'Inter (Clean)', value: "'Inter', sans-serif" },
-    { label: 'Courier Prime (Code)', value: "'Courier Prime', monospace" },
-    { label: 'Lora (Serif)', value: "'Lora', serif" },
-    { label: 'Open Sans (Standard)', value: "'Open Sans', sans-serif" },
-    { label: 'Comic Neue (Casual)', value: "'Comic Neue', sans-serif" },
-  ];
-
-  const scaleLevels = [
-    { label: 'XS', value: 0.85, name: 'Minimal' },
-    { label: 'S', value: 0.925, name: 'Compact' },
-    { label: 'M', value: 1.0, name: 'Standard' },
-    { label: 'L', value: 1.125, name: 'Large' },
-    { label: 'XL', value: 1.25, name: 'Extra' },
-  ];
-
-  const densityOptions = [
-    { value: 'high', label: 'Compact', icon: '🥓' },
-    { value: 'standard', label: 'Standard', icon: '🍔' },
-    { value: 'low', label: 'Relaxed', icon: '🥗' },
-  ];
-
-  // Derived selection based on engine scale.
-  let activeScaleStep = $derived(
-    scaleLevels.reduce((prev, curr) =>
-      Math.abs(curr.value - voidEngine.userConfig.scale) <
-      Math.abs(prev.value - voidEngine.userConfig.scale)
-        ? curr
-        : prev,
-    ),
-  );
-
-  // Engine update helpers.
-  function setScale(value: number) {
-    voidEngine.setPreferences({ scale: value });
-  }
-
-  function setDensity(d: 'high' | 'standard' | 'low') {
-    voidEngine.setPreferences({ density: d });
-  }
 
   // Local demo state with stable IDs for list animations.
   let moduleIdCounter = $state(3);
@@ -78,95 +33,15 @@
 </script>
 
 <main class="w-full min-h-screen">
-  <header class="container flex flex-col items-center gap-md mt-md">
-    <h1 class="text-primary text-glow">VOID ENERGY</h1>
-
+  <header class="container flex flex-col items-center gap-md mt-xl">
     <div class="flex flex-col p-md gap-sm surface-glass">
-      <p>System Architecture // Component Library</p>
-
+      <p class="text-center">Void Energy // Component Library</p>
       <ThemeSelector />
-
-      <div class="flex flex-col gap-xs">
-        <label for="font-heading" class="text-small">Headings</label>
-        <select
-          id="font-heading"
-          value={voidEngine.userConfig.fontHeading}
-          onchange={(e) =>
-            voidEngine.setPreferences({
-              fontHeading: e.currentTarget.value || null,
-            })}
-        >
-          {#each fontOptions as font}
-            <option value={font.value}>{font.label}</option>
-          {/each}
-        </select>
-      </div>
-
-      <div class="flex flex-col gap-xs">
-        <label for="font-body" class="text-small">Body Text</label>
-        <select
-          id="font-body"
-          value={voidEngine.userConfig.fontBody}
-          onchange={(e) =>
-            voidEngine.setPreferences({
-              fontBody: e.currentTarget.value || null,
-            })}
-        >
-          {#each fontOptions as font (font.label)}
-            <option value={font.value}>{font.label}</option>
-          {/each}
-        </select>
-      </div>
-
-      <div class="flex flex-col gap-xs">
-        <div class="flex flex-row justify-between items-end">
-          <label for="">Interface Scale</label>
-          <span>
-            {activeScaleStep.name} ({Math.round(activeScaleStep.value * 100)}%)
-          </span>
-        </div>
-
-        <div
-          class="surface-sunk p-xs rounded-md flex flex-row flex-wrap gap-xs justify-center"
-        >
-          {#each scaleLevels as level (level.value)}
-            <button
-              aria-pressed={activeScaleStep.value === level.value}
-              onclick={() => setScale(level.value)}
-            >
-              {level.label}
-            </button>
-          {/each}
-        </div>
-      </div>
-
-      <div class="flex flex-col gap-xs">
-        <div class="flex flex-row justify-between items-end">
-          <label for="density">Spacing Density</label>
-          <span>
-            ({voidEngine.userConfig.density})
-          </span>
-        </div>
-
-        <div
-          class="surface-sunk p-xs rounded-md flex flex-row flex-wrap gap-xs justify-center"
-        >
-          {#each densityOptions as opt (opt.value)}
-            <button
-              aria-pressed={voidEngine.userConfig.density === opt.value}
-              onclick={() =>
-                setDensity(opt.value as 'high' | 'standard' | 'low')}
-            >
-              {opt.label}
-            </button>
-          {/each}
-        </div>
-      </div>
     </div>
   </header>
 
   <div class="container flex flex-col gap-xl">
-    <section class="flex flex-col gap-md mt-md">
+    <section class="flex flex-col gap-md mt-xl">
       <h2>01 // COMMAND DECK</h2>
 
       <div class="surface-glass p-lg flex flex-col gap-lg">
@@ -176,7 +51,7 @@
           >
           <button
             class="btn-cta"
-            onclick={async () => {
+            onclick={() => {
               modal.confirm(
                 'INITIATE SEQUENCE?',
                 'You are about to deploy the production build.',

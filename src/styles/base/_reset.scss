@@ -201,7 +201,7 @@ img,
 picture,
 video,
 canvas,
-svg {
+svg:not(.icon) {
   display: block;
   max-width: 100%;
   height: auto;

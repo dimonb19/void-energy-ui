@@ -33,6 +33,7 @@
  * ==========================================================================
  */
 
+@forward 'icons'; // SVG icon sizing and interactions
 @forward 'tooltips'; // Floating UI tooltip surfaces
 @forward 'dialogs'; // Native <dialog> modal styling
 @forward 'anchors'; // Link styling with laser underline

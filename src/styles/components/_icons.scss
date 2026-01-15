@@ -7,12 +7,15 @@
   // Layout and sizing.
   display: inline-block;
   vertical-align: middle;
-  width: 1em; // Scales with font-size automatically
+  width: 1em;
   height: 1em;
+  font-size: inherit; // Match surrounding text by default
 
   // Inherit color from parent.
   fill: currentColor;
   stroke: currentColor;
+
+  background-color: transparent;
 
   // Unified Spring Transitions
   transform-origin: center center;
@@ -22,15 +25,15 @@
     filter var(--speed-fast) var(--ease-spring-snappy),
     color var(--speed-fast) var(--ease-spring-snappy);
 
-  // Sizes.
+  // Sizes: sm (caption) < md (body, default) < lg < xl
   &[data-size='sm'] {
-    font-size: 0.875em;
+    font-size: var(--font-size-caption);
   }
   &[data-size='lg'] {
-    font-size: 1.25em;
+    font-size: var(--font-size-h5);
   }
   &[data-size='xl'] {
-    font-size: 1.5em;
+    font-size: var(--font-size-h4);
   }
 
   // Animations.

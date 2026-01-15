@@ -97,6 +97,13 @@ class ModalManager {
   }) {
     this.open(MODAL_KEYS.SETTINGS, { ...options }, 'lg');
   }
+
+  /**
+   * Opens the Atmospheres selector modal.
+   */
+  themes() {
+    this.open(MODAL_KEYS.THEMES, {}, 'lg');
+  }
 }
 
 export const modal = new ModalManager();

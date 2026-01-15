@@ -169,15 +169,14 @@ export class VoidEngine {
       this.temporaryTheme = null;
     }
 
-    this._applyAtmosphere(name);
-    this.persist();
+    this._applyAtmosphere(name, true);
   }
 
   /**
    * Internal: Apply atmosphere without clearing temporary context or persisting.
    * Used by temporary theme API to avoid side effects.
    */
-  private _applyAtmosphere(name: string) {
+  private _applyAtmosphere(name: string, shouldPersist: boolean = false) {
     // Check for View Transitions API support and user preferences
     const prefersReducedMotion =
       typeof window !== 'undefined' &&
@@ -190,6 +189,7 @@ export class VoidEngine {
     if (!supportsViewTransitions || prefersReducedMotion) {
       this.atmosphere = name;
       this.syncDOM();
+      if (shouldPersist) this.persist();
       return;
     }
 
@@ -197,6 +197,7 @@ export class VoidEngine {
     document.startViewTransition(() => {
       this.atmosphere = name;
       this.syncDOM();
+      if (shouldPersist) this.persist();
     });
   }
 

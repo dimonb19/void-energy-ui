@@ -186,7 +186,7 @@
 // 1. BASE BUTTON & VARIANTS
 // --------------------------------------------------------------------------
 // We define everything inside this block to ensure specificity works correctly.
-button:not(.btn-void),
+button:not(.btn-void, .btn-icon),
 .btn {
   // --- A. Layout & Accessibility ---
   min-height: var(--control-height);
