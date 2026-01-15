@@ -33,24 +33,45 @@
 </script>
 
 <main class="w-full min-h-screen">
-  <header class="container flex flex-col items-center gap-md mt-xl">
-    <div class="flex flex-col p-md gap-sm surface-glass">
-      <p class="text-center">Void Energy // Component Library</p>
-      <ThemeSelector />
-    </div>
-  </header>
-
   <div class="container flex flex-col gap-xl">
     <section class="flex flex-col gap-md mt-xl">
-      <h2>01 // COMMAND DECK</h2>
+      <h2>01 // COMPONENT LIBRARY</h2>
 
       <div class="surface-glass p-lg flex flex-col gap-lg">
-        <div class="flex flex-col items-center gap-md">
-          <a class="link" href="https://dgrslabs.ink/"
-            >Visit DGRS LABS website</a
-          >
+        <div class="flex flex-row flex-wrap gap-md">
+          <div class="flex flex-col gap-xs flex-1">
+            <label for="system-identifier"> System Identifier </label>
+            <input
+              id="system-identifier"
+              type="text"
+              placeholder="Enter Agent ID..."
+            />
+          </div>
+
+          <div class="flex flex-col gap-xs flex-1">
+            <label for="security-clearance"> Security Clearance </label>
+            <select id="security-clearance">
+              <option>Level 1 - Observer</option>
+              <option>Level 2 - Operator</option>
+              <option>Level 3 - Administrator</option>
+            </select>
+          </div>
+        </div>
+
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+          aliquip ex ea commodo consequat. Duis aute irure dolor in
+          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+          culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+
+        <div
+          class="grid grid-cols-1 tablet:grid-cols-2 small-desktop:grid-cols-3 full-hd:grid-cols-4 gap-md"
+        >
           <button
-            class="btn-cta"
             onclick={() => {
               modal.confirm(
                 'INITIATE SEQUENCE?',
@@ -67,11 +88,9 @@
               );
             }}
           >
-            INITIATE SEQUENCE
+            Initiate Sequence
           </button>
-        </div>
-
-        <div class="flex flex-row flex-wrap justify-center gap-sm">
+          <ThemeSelector className="btn-cta" />
           <button
             class="btn-premium"
             onclick={() => {
@@ -121,46 +140,8 @@
           >
             Purge Cache
           </button>
-          <button
-            use:tooltip={'Click to call INFO message'}
-            onclick={() => {
-              toast.show('Default action executed.', 'info');
-            }}
-          >
-            Default Action
-          </button>
           <button disabled>Offline</button>
         </div>
-
-        <div class="flex flex-row flex-wrap gap-md">
-          <div class="flex flex-col gap-xs flex-1">
-            <label for="system-identifier"> System Identifier </label>
-            <input
-              id="system-identifier"
-              type="text"
-              placeholder="Enter Agent ID..."
-            />
-          </div>
-
-          <div class="flex flex-col gap-xs flex-1">
-            <label for="security-clearance"> Security Clearance </label>
-            <select id="security-clearance">
-              <option>Level 1 - Observer</option>
-              <option>Level 2 - Operator</option>
-              <option>Level 3 - Administrator</option>
-            </select>
-          </div>
-        </div>
-
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat. Duis aute irure dolor in
-          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-          culpa qui officia deserunt mollit anim id est laborum.
-        </p>
 
         <div class="flex flex-col gap-xs flex-1">
           <label for="energy-output">Energy Output</label>

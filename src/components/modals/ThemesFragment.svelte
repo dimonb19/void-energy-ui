@@ -80,7 +80,7 @@
 
   function selectTheme(id: string) {
     voidEngine.setAtmosphere(id);
-    toast.show(`${id.toUpperCase()} theme applied`, 'success');
+    toast.show(`${id.toUpperCase()} theme selected`, 'success');
   }
 
   function handleRestore() {
@@ -99,7 +99,9 @@
   }
 </script>
 
-<h2 class="text-h3 text-center">Atmosphere</h2>
+<h2 class="text-h3 text-center">
+  Atmosphere: {voidEngine.atmosphere.toUpperCase()}
+</h2>
 
 <!-- Temporary Theme Indicator -->
 {#if voidEngine.hasTemporaryTheme}
@@ -168,12 +170,6 @@
     />
     Allow the interface to adapt its Atmosphere to match the current story's mood.
   </label>
-  <button
-    aria-pressed={showAdvancedSettings}
-    onclick={() => (showAdvancedSettings = !showAdvancedSettings)}
-  >
-    Advanced Settings
-  </button>
 </div>
 
 {#if showAdvancedSettings}
@@ -250,6 +246,12 @@
 
 <div class="flex justify-center gap-md">
   <button class="btn-alert" onclick={() => modal.close()}> Close </button>
+  <button
+    aria-pressed={showAdvancedSettings}
+    onclick={() => (showAdvancedSettings = !showAdvancedSettings)}
+  >
+    Advanced Settings
+  </button>
 </div>
 
 <style lang="scss">
