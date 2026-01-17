@@ -1,6 +1,7 @@
 <script lang="ts">
   import { modal } from '../../lib/modal-manager.svelte';
-  import { toast } from '../../stores/toast.svelte';
+
+  import Select from '../ui/Select.svelte';
 
   let {
     initialSettings = 'default',
@@ -48,45 +49,31 @@
     class="surface-sunk p-md flex flex-col gap-md large-desktop:w-full large-desktop:grid large-desktop:grid-cols-2"
   >
     <div class="flex flex-col items-center gap-md">
-      <div class="flex flex-col justify-center gap-sm">
-        <span class="flex flex-row flex-wrap gap-sm">
-          <p class="uppercase text-main">Settings</p>
-          <p>
-            ({#if preferredSettings === 'personal'}
-              Use your profile settings
-            {:else}
-              Use the author's settings
-            {/if})
-          </p>
-        </span>
-        <select bind:value={preferredSettings}>
-          <option value="personal">Personal</option>
-          <option value="default">Default</option>
-        </select>
-      </div>
+      <Select
+        label="SETTINGS: {preferredSettings === 'personal'
+          ? 'Use your profile settings'
+          : "Use the author's settings"}"
+        options={[
+          { value: 'personal', label: 'Personal' },
+          { value: 'default', label: "Author's Default" },
+        ]}
+        bind:value={preferredSettings}
+      />
     </div>
 
     <hr class="large-desktop:hidden" />
 
     <div class="flex flex-col items-center gap-md">
-      <div class="flex flex-col justify-center gap-sm">
-        <span class="flex flex-row flex-wrap gap-sm">
-          <p class="uppercase text-main">Play Mode</p>
-          <p>
-            ({#if playMode === 'play_limited'}
-              No images or audio
-            {:else}
-              Images and audio on each step
-            {/if})
-          </p>
-        </span>
-        <select bind:value={playMode}>
-          <option value="play_limited">Text-only</option>
-          {#if !isGuest}
-            <option value="play_unlimited">With Media</option>
-          {/if}
-        </select>
-      </div>
+      <Select
+        label="PLAY MODE: {playMode === 'play_limited'
+          ? 'No images or audio'
+          : 'Images and audio on each step'}"
+        options={[
+          { value: 'play_limited', label: 'Text-only (1 credit)' },
+          { value: 'play_unlimited', label: 'With Media (3 credits)' },
+        ]}
+        bind:value={playMode}
+      />
     </div>
   </div>
 

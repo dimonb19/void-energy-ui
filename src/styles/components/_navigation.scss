@@ -261,7 +261,7 @@
   align-items: center;
   gap: var(--space-xs);
   width: 100%;
-  padding: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-base);
 
   font-weight: var(--font-weight-semibold);
@@ -275,7 +275,13 @@
 
   // Active/Selected state (use data-state="active" or aria-selected="true")
   @include when-state('active') {
-    background-color: var(--energy-primary);
-    color: var(--bg-canvas);
+    &:not(.expandable) {
+      background-color: var(--energy-primary);
+      color: var(--bg-canvas);
+    }
+
+    &.expandable {
+      color: var(--energy-primary);
+    }
   }
 }

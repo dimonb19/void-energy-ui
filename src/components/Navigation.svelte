@@ -1,8 +1,10 @@
 <script lang="ts">
   import { materialize, dematerialize } from '../lib/transitions.svelte';
 
-  import Burger from './ui/Burger.svelte';
-  import Logo from './ui/Logo.svelte';
+  import Burger from './icons/Burger.svelte';
+  import Logo from './icons/Logo.svelte';
+  import Search from './icons/Search.svelte';
+  import Door from './icons/Door.svelte';
   import ThemeSelector from './ui/Themes.svelte';
 
   let sidebarOpen = $state<boolean>(false);
@@ -12,6 +14,14 @@
   const clamp = 64; // px after which hiding can kick in
   let lastY = 0;
   let ticking = false;
+
+  let searchInput: HTMLInputElement | null;
+  let svgFocus = $state<boolean>(false);
+  const handleSearchFocus = () => {
+    // clicking the magnifier should focus the native input for accessibility shortcuts
+    if (!searchInput) return;
+    searchInput.focus();
+  };
 
   const onscroll = (event: Event) => {
     const y = window.scrollY;
@@ -67,12 +77,20 @@
         Dream
       </a>
     </li>
-    <li>
+    <li class="flex">
+      <Search
+        onclick={handleSearchFocus}
+        {svgFocus}
+        className="text-secondary"
+      />
       <input
         id="search"
         type="text"
         placeholder="Search..."
         aria-label="Search"
+        bind:this={searchInput}
+        onfocus={() => (svgFocus = true)}
+        onblur={() => (svgFocus = false)}
       />
     </li>
   </ul>
@@ -112,7 +130,7 @@
       Dashboard
     </a>
     <a
-      class="subtab"
+      class="subtab expandable"
       href="/"
       data-state={activeTab === 'Account' ? 'active' : ''}
       onclick={(e) => selectTab(e, 'Account')}
@@ -138,8 +156,6 @@
           <a
             class="subtab"
             href="/"
-            data-state={activeTab === 'Overview' ? 'active' : ''}
-            onclick={(e) => selectTab(e, 'Overview')}
             in:materialize
             out:dematerialize={{ delay: 50 }}
           >
@@ -150,8 +166,6 @@
           <a
             class="subtab"
             href="/"
-            data-state={activeTab === 'Bookmarks' ? 'active' : ''}
-            onclick={(e) => selectTab(e, 'Bookmarks')}
             in:materialize={{ delay: 50 }}
             out:dematerialize
           >
@@ -169,6 +183,13 @@
       Settings
     </a>
     <ThemeSelector className="btn-void subtab flex-row-reverse" />
+    <Door
+      state="outside"
+      text="Sign Out"
+      className="subtab flex-row-reverse"
+      voidBtn={true}
+      onclick={() => console.log('Sign Out')}
+    />
   </aside>
 </nav>
 
