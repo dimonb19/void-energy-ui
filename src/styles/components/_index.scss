@@ -14,6 +14,7 @@
  *
  * | File          | Purpose                              | Key Mixins       |
  * |---------------|--------------------------------------|------------------|
+ * | _icons        | SVG icon sizing and interactions     | -                |
  * | _tooltips     | Floating tooltip surfaces            | glass-float      |
  * | _dialogs      | Modal dialog styling                 | glass-float      |
  * | _anchors      | Link/anchor styling with laser line  | -                |
@@ -21,7 +22,9 @@
  * | _inputs       | Form inputs, selects, dropzone       | glass-sunk       |
  * | _toasts       | Notification toast styling           | glass-float      |
  * | _containers   | Layout containers + surface classes  | glass-float/sunk |
- * | _tiles        | Tile cards + chips architecture      | chip-structure   |
+ * | _navigation   | Top nav bar + tab system             | when-state       |
+ * | _chips        | Interactive data chips               | chip-structure   |
+ * | _tiles        | Story tile cards                     | glass-float      |
  *
  * HYBRID PROTOCOL:
  * - Layout (padding, gap, flex) -> Tailwind utilities
@@ -41,4 +44,6 @@
 @forward 'inputs'; // Form inputs, selects, file dropzone
 @forward 'toasts'; // Notification toast styling
 @forward 'containers'; // Layout containers + atomic surfaces
-@forward 'tiles'; // Story tiles + chips architecture
+@forward 'navigation'; // Top navigation bar + reusable tab system
+@forward 'chips'; // Interactive data chips (tags, filters, selections)
+@forward 'tiles'; // Story tile cards

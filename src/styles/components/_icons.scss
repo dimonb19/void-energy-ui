@@ -35,57 +35,21 @@
   &[data-size='xl'] {
     font-size: var(--font-size-h4);
   }
+  &[data-size='2xl'] {
+    font-size: var(--font-size-h3);
+  }
+  &[data-size='3xl'] {
+    font-size: var(--font-size-h2);
+  }
+  &[data-size='4xl'] {
+    font-size: var(--font-size-h1);
+  }
 
   // Animations.
   &.icon-spin {
     animation: rotate 2s linear infinite;
     @include when-retro {
       animation-timing-function: steps(8); // Stepped spin.
-    }
-  }
-}
-
-// Interactive icons inside buttons/links.
-.btn-icon,
-.btn-void {
-  .icon,
-  svg {
-    transition: transform var(--speed-fast) var(--ease-spring-snappy);
-  }
-
-  @media (hover: hover) {
-    &:hover:not(:disabled) {
-      .icon,
-      svg {
-        transform: scale(calc(var(--scale) + 0.1));
-        filter: drop-shadow(var(--shadow-lift));
-      }
-    }
-  }
-
-  &:active:not(:disabled) {
-    .icon,
-    svg {
-      transition-duration: 50ms;
-
-      @media (pointer: coarse) {
-        transition-duration: 0ms;
-      }
-
-      @include when-retro {
-        transition-duration: 0ms;
-      }
-
-      transform: scale(0.9);
-    }
-  }
-
-  @include when-retro {
-    .icon,
-    svg {
-      // No blur in retro mode.
-      shape-rendering: crisp-edges;
-      filter: none !important;
     }
   }
 }

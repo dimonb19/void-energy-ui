@@ -35,6 +35,6 @@
     </svg>
   {/if}
   {#if !icon}
-    {voidEngine.atmosphere.toUpperCase()}: {voidEngine.currentTheme.tagline}
+    {voidEngine.currentTheme.tagline ?? voidEngine.atmosphere}
   {/if}
 </button>

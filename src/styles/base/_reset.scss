@@ -13,6 +13,9 @@
   // Base unit (4px).
   --unit: 0.25rem;
 
+  // Navigation height (for global padding).
+  --nav-height: calc(16 * var(--unit) * var(--density, 1)); // 64px
+
   // Spacing scale uses --density fallback to avoid invalid values.
   --space-xs: calc(2 * var(--unit) * var(--density, 1)); // 8px
   --space-sm: calc(4 * var(--unit) * var(--density, 1)); // 16px

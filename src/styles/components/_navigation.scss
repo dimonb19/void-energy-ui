@@ -1,0 +1,281 @@
+/* ==========================================================================
+ * NAVIGATION & TABS
+ * ==========================================================================
+ *
+ * Top-level navigation bar and reusable tab system.
+ *
+ * ARCHITECTURE:
+ * - Section 1: Navigation Bar
+ *   - .nav-bar : Top navigation container (use with .surface-glass)
+ *
+ * - Section 2: Tab System
+ *   - .tab          : Base tab link/button
+ *   - .tab-profile  : Tab variant with profile icon
+ *
+ * PHYSICS BEHAVIOR:
+ * - Glass: Subtle color transitions, border glow on active
+ * - Flat:  Solid backgrounds, crisp state changes
+ * - Retro: Hard borders, instant transitions
+ *
+ * USAGE:
+ * ```html
+ * <nav class="nav-bar surface-glass backdrop-blur-physics ...">
+ *   <a class="tab" href="/">Home</a>
+ *   <a class="tab" data-state="active" href="/about">About</a>
+ * </nav>
+ * ```
+ *
+ * @see /CHEAT-SHEET.md for usage examples
+ * ==========================================================================
+ */
+
+@use '../abstracts' as *;
+
+// ==========================================================================
+// 1. NAVIGATION BAR
+// ==========================================================================
+// The nav-bar class modifies .surface-glass for header-specific styling.
+// Use with: class="nav-bar surface-glass backdrop-blur-physics ..."
+// ==========================================================================
+
+.nav-bar {
+  @include glass-float;
+  background: var(--bg-canvas);
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: z('header');
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-sm);
+
+  // Remove rounded corners for full-width header
+  border-radius: 0;
+
+  // Remove top/side borders (sits flush against viewport edges)
+  border-top: none;
+  border-left: none;
+  border-right: none;
+
+  // Hide-on-scroll transition
+  transition: transform var(--speed-base) var(--ease-spring-gentle);
+
+  &[data-hidden='true'] {
+    transform: translateY(-100%);
+  }
+
+  &::before {
+    content: '';
+    background: inherit;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    z-index: -1;
+  }
+
+  #search {
+    width: var(--space-4xl);
+    transition: width var(--speed-base) var(--ease-spring-gentle);
+
+    &:focus {
+      width: calc(var(--space-4xl) * 2);
+    }
+  }
+}
+
+// ==========================================================================
+// 2. TAB SYSTEM
+// ==========================================================================
+// Reusable tab styling for navigation, settings panels, and tab bars.
+// Tabs are text-based links/buttons with hover and active states.
+// ==========================================================================
+
+.tab-list {
+  height: var(--space-2xl);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.tab {
+  // --- A. Layout & Sizing ---
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-xs) var(--space-sm);
+
+  // --- B. Typography ---
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  text-decoration: none;
+
+  // --- C. Visual ---
+  border-radius: var(--radius-base);
+  color: var(--energy-secondary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  // --- D. Transitions ---
+  transition:
+    color var(--speed-fast) var(--ease-spring-snappy),
+    background-color var(--speed-fast) var(--ease-spring-snappy),
+    border-color var(--speed-fast) var(--ease-spring-snappy);
+
+  // --- E. Interaction States ---
+
+  &:hover {
+    color: var(--energy-primary);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  &.line-left,
+  &.line-right {
+    position: relative;
+    height: var(--space-2xl);
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: var(--physics-border-width);
+      background-color: var(--border-color);
+
+      @include when-glass {
+        box-shadow: -1px 0 2px black;
+      }
+    }
+
+    &:hover {
+      background-color: alpha(var(--energy-secondary), 10%);
+    }
+  }
+
+  &.line-left {
+    padding-left: var(--space-sm);
+    margin-left: var(--space-xs);
+
+    &::after {
+      content: '';
+      right: 100%;
+    }
+  }
+
+  &.line-right {
+    padding-right: var(--space-sm);
+    margin-right: var(--space-xs);
+
+    &::after {
+      content: '';
+      left: 100%;
+    }
+  }
+
+  // Active/Selected state (use data-state="active" or aria-selected="true")
+  @include when-state('active') {
+    background-color: var(--energy-primary);
+    color: var(--bg-canvas);
+  }
+}
+
+// ==========================================================================
+// 3. SIDEBAR
+// ==========================================================================
+
+.sidebar {
+  @include glass-float;
+  background: var(--bg-canvas);
+
+  position: absolute;
+  top: 100%;
+  right: 0;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+
+  // Remove rounded corners for flush alignment with nav-bar
+  border-radius: 0;
+  border-bottom-left-radius: var(--radius-base);
+  border-right: none;
+
+  transform: translateX(100%);
+  transition: transform var(--speed-base) var(--ease-spring-bounce);
+
+  &.open {
+    transform: translateY(0);
+  }
+
+  @include respond-up(tablet) {
+    min-width: calc(var(--space-4xl) * 2);
+  }
+}
+
+.sidebar-scrim {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 100vw;
+  background: alpha(var(--bg-canvas), 80%);
+  z-index: z('sticky');
+  transform: none !important; // override scale and translate from materialize
+
+  // Light mode override.
+  @include when-light {
+    background: alpha(var(--text-main), 50%);
+  }
+}
+
+.submenu {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-xs);
+  margin-left: var(--space-sm);
+  border-left: var(--physics-border-width) solid var(--border-color);
+}
+
+.subtab {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-xs);
+  width: 100%;
+  padding: var(--space-xs);
+  border-radius: var(--radius-base);
+
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  text-decoration: none;
+
+  &:hover {
+    background-color: alpha(var(--energy-secondary), 10%);
+  }
+
+  // Active/Selected state (use data-state="active" or aria-selected="true")
+  @include when-state('active') {
+    background-color: var(--energy-primary);
+    color: var(--bg-canvas);
+  }
+}
