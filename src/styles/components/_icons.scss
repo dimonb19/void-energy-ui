@@ -17,12 +17,10 @@
 
   background-color: transparent;
 
-  // Unified Spring Transitions
+  // Spring Transitions (transform for rotation, color for hover)
   transform-origin: center center;
   transition:
     transform var(--speed-fast) var(--ease-spring-snappy),
-    opacity var(--speed-fast) var(--ease-spring-snappy),
-    filter var(--speed-fast) var(--ease-spring-snappy),
     color var(--speed-fast) var(--ease-spring-snappy);
 
   // Sizes: sm (caption) < md (body, default) < lg < xl
@@ -51,5 +49,11 @@
     @include when-retro {
       animation-timing-function: steps(8); // Stepped spin.
     }
+  }
+
+  // State-driven rotation (expandable menus, accordions).
+  // Usage: <svg class="icon" data-expanded={isOpen}>
+  &[data-expanded='true'] {
+    transform: rotate(90deg);
   }
 }

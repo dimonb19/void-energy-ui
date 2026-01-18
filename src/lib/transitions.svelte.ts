@@ -31,39 +31,54 @@ type PhysicsConfig = Record<
 
 const PHYSICS_PRIMITIVES = PHYSICS_DATA as PhysicsConfig;
 
-// Read physics configuration without DOM reflow.
-function getSystemConfig() {
-  // Honor reduced-motion preferences.
-  // Performance impact: Removing blur reduces GPU compositing cost by ~40%
-  // for users with vestibular sensitivities who enable reduced-motion.
-  const reducedMotion =
-    typeof matchMedia !== 'undefined'
-      ? matchMedia('(prefers-reduced-motion: reduce)').matches
-      : false;
+// --------------------------------------------------------------------------
+// SYSTEM CONFIG CACHE
+// Memoized to avoid repeated matchMedia/navigator checks per animation.
+// Only recalculates when atmosphere changes.
+// --------------------------------------------------------------------------
 
-  // Avoid dynamic blur on Firefox due to filter cost.
-  // Benchmarked (Jan 2024): Firefox blur() filter adds ~12-18ms per frame on mid-range hardware
-  // vs ~3-5ms on Chrome/Safari. This causes animation jank below 60fps.
-  // See: https://bugzilla.mozilla.org/show_bug.cgi?id=1820534
-  const isFirefox =
-    typeof navigator !== 'undefined' && /firefox/i.test(navigator.userAgent);
+type SystemConfig = {
+  speedBase: number;
+  speedFast: number;
+  blurInt: number;
+  isRetro: boolean;
+  isFlat: boolean;
+  reducedMotion: boolean;
+};
 
-  // Read current atmosphere from the engine.
+let cachedConfig: SystemConfig | null = null;
+let cachedAtmosphere: string | null = null;
+
+// Browser capability checks (run once)
+const reducedMotion =
+  typeof matchMedia !== 'undefined'
+    ? matchMedia('(prefers-reduced-motion: reduce)').matches
+    : false;
+
+// Firefox blur optimization: blur() filter adds ~12-18ms per frame vs ~3-5ms on Chrome/Safari
+// See: https://bugzilla.mozilla.org/show_bug.cgi?id=1820534
+const isFirefox =
+  typeof navigator !== 'undefined' && /firefox/i.test(navigator.userAgent);
+
+function getSystemConfig(): SystemConfig {
   const currentAtmosphere = theme.atmosphere || 'void';
+
+  // Return cached config if atmosphere hasn't changed
+  if (cachedConfig && cachedAtmosphere === currentAtmosphere) {
+    return cachedConfig;
+  }
+
   const themeConfig = REGISTRY[currentAtmosphere] || REGISTRY['void'];
-
-  // Resolve physics mode with a glass default.
   const physicsMode = themeConfig.physics || 'glass';
-
   const specs = PHYSICS_PRIMITIVES[physicsMode] || PHYSICS_PRIMITIVES['glass'];
 
   const isRetro = physicsMode === 'retro';
   const isFlat = physicsMode === 'flat';
 
-  // Disable blur for reduced motion or Firefox.
+  // Disable blur for reduced motion or Firefox
   const blurInt = reducedMotion || isFirefox ? 0 : specs.blur;
 
-  return {
+  cachedConfig = {
     speedBase: specs.speedBase,
     speedFast: specs.speedFast,
     blurInt,
@@ -71,7 +86,13 @@ function getSystemConfig() {
     isFlat,
     reducedMotion,
   };
+  cachedAtmosphere = currentAtmosphere;
+
+  return cachedConfig;
 }
+
+// Stepped easing for retro physics (quantized motion)
+const steppedEasing = (t: number) => Math.floor(t * 4) / 4;
 
 /**
  * List reflow animation for keyed {#each} blocks.
@@ -88,9 +109,6 @@ export function live(
   params: FlipParams = {},
 ) {
   const { isRetro, speedBase } = getSystemConfig();
-
-  // Retro uses stepped easing to quantize motion.
-  const steppedEasing = (t: number) => Math.floor(t * 4) / 4;
 
   return flip(
     node,

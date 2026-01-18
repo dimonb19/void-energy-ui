@@ -28,7 +28,9 @@
       // Close when empty to avoid blocking clicks.
       try {
         region.hidePopover();
-      } catch (e) {}
+      } catch (e) {
+        if (import.meta.env.DEV) console.warn('Popover API error:', e);
+      }
     }
   });
 </script>
@@ -62,8 +64,6 @@
       </span>
 
       <span class="toast-text">{item.message}</span>
-
-      <div class="toast-glow"></div>
     </button>
   {/each}
 </div>

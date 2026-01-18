@@ -19,9 +19,18 @@ export class VoidTooltip {
   private cleanupPositioning: (() => void) | null = null;
   private options: VoidTooltipOptions;
 
+  // Bound handlers for proper cleanup
+  private boundShow: () => void;
+  private boundHide: () => void;
+
   constructor(node: HTMLElement, options: VoidTooltipOptions) {
     this.trigger = node;
     this.options = { placement: 'top', ...options };
+
+    // Bind handlers once for consistent reference
+    this.boundShow = this.show.bind(this);
+    this.boundHide = this.hide.bind(this);
+
     this.init();
   }
 
@@ -30,10 +39,10 @@ export class VoidTooltip {
     const hideEvents = ['pointerleave', 'blur'];
 
     showEvents.forEach((evt) =>
-      this.trigger.addEventListener(evt, () => this.show()),
+      this.trigger.addEventListener(evt, this.boundShow),
     );
     hideEvents.forEach((evt) =>
-      this.trigger.addEventListener(evt, () => this.hide()),
+      this.trigger.addEventListener(evt, this.boundHide),
     );
   }
 
@@ -117,6 +126,17 @@ export class VoidTooltip {
   }
 
   public destroy() {
+    // Remove event listeners to prevent memory leaks
+    const showEvents = ['pointerenter', 'focus'];
+    const hideEvents = ['pointerleave', 'blur'];
+
+    showEvents.forEach((evt) =>
+      this.trigger.removeEventListener(evt, this.boundShow),
+    );
+    hideEvents.forEach((evt) =>
+      this.trigger.removeEventListener(evt, this.boundHide),
+    );
+
     this.hide();
   }
 }

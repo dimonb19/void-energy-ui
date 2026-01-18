@@ -395,17 +395,7 @@ button:not(.btn-void, .btn-icon),
 
 // Naked Reset (Use this class to opt-out of the block above)
 .btn-void {
-  appearance: none;
-  background: transparent;
-  border: none;
-  padding: 0;
-  margin: 0;
-  cursor: pointer;
-  color: inherit;
-  font: inherit;
-  min-width: unset;
-  min-height: unset;
-  display: inline-flex;
+  @include btn-reset;
 }
 
 // Icon Button

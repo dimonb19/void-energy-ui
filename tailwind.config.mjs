@@ -136,13 +136,31 @@ export default {
       h2: 'var(--font-size-h2)',
       h1: 'var(--font-size-h1)',
     },
-    // Line heights.
+    // Line heights (mapped to typography scale).
     lineHeight: {
       none: '1',
-      tight: 'var(--line-height-heading)',
+      h1: 'var(--line-height-h1)',
+      h2: 'var(--line-height-h2)',
+      h3: 'var(--line-height-h3)',
+      h4: 'var(--line-height-h4)',
+      title: 'var(--line-height-title)', // h5
+      body: 'var(--line-height-body)',
+      small: 'var(--line-height-small)',
+      caption: 'var(--line-height-caption)',
+      // Legacy aliases for backwards compatibility
+      tight: 'var(--line-height-h1)',
       normal: 'var(--line-height-body)',
-      relaxed: '1.75',
-      loose: '2',
+    },
+    // Letter spacing (optical tracking per typography level).
+    letterSpacing: {
+      h1: 'var(--letter-spacing-h1)',
+      h2: 'var(--letter-spacing-h2)',
+      h3: 'var(--letter-spacing-h3)',
+      h4: 'var(--letter-spacing-h4)',
+      title: 'var(--letter-spacing-title)', // h5
+      body: 'var(--letter-spacing-body)',
+      small: 'var(--letter-spacing-small)',
+      caption: 'var(--letter-spacing-caption)',
     },
     // Font weights.
     fontWeight: {

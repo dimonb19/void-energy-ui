@@ -376,3 +376,31 @@
     @content;
   }
 }
+
+// ==========================================================================
+// 9. BUTTON RESET
+// ==========================================================================
+
+/// Naked button reset for unstyled buttons.
+/// Removes all default button styling while preserving accessibility.
+/// Usage: @include btn-reset;
+///
+/// @example scss
+///   .custom-button {
+///     @include btn-reset;
+///     // Add custom styles
+///   }
+///
+@mixin btn-reset {
+  appearance: none;
+  background: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  min-width: unset;
+  min-height: unset;
+  display: inline-flex;
+}

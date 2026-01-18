@@ -17,6 +17,7 @@
 
   // Physics inheritance.
   @include glass-float($interactive: false);
+  @include glass-blur;
 
   // Typography.
   @include typography('caption');

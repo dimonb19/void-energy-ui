@@ -7,10 +7,13 @@
  * ARCHITECTURE:
  * - Section 1: Navigation Bar
  *   - .nav-bar : Top navigation container (use with .surface-glass)
+ *   - .sidebar  : Slide-out sidebar menu
+ *   - .bottom-bar  : Nested submenu within sidebar
  *
  * - Section 2: Tab System
  *   - .tab          : Base tab link/button
- *   - .tab-profile  : Tab variant with profile icon
+ *   - .submenu      : Container for nested subtab links
+ *   - .subtab       : Nested tab within sidebar
  *
  * PHYSICS BEHAVIOR:
  * - Glass: Subtle color transitions, border glow on active
@@ -49,12 +52,6 @@
   width: 100%;
   z-index: z('header');
 
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-xs);
-
   // Remove rounded corners for full-width header
   border-radius: 0;
 
@@ -87,10 +84,12 @@
     transition: width var(--speed-base) var(--ease-spring-gentle);
 
     @include respond-up(tablet) {
-      width: var(--space-4xl);
+      width: var(--space-5xl);
     }
 
     @include respond-up(small-desktop) {
+      width: var(--space-4xl);
+
       &:focus {
         width: calc(var(--space-4xl) * 2);
       }
@@ -206,10 +205,6 @@
   top: 100%;
   right: 0;
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-xs);
   padding: var(--space-sm);
 
   border-radius: 0;
@@ -304,7 +299,6 @@
 // 4. MOBILE BOTTOM NAVIGATION
 // ==========================================================================
 
-// Iherits styles from .nav-bar
 .bottom-nav {
   @include glass-float;
   @include glass-blur;
@@ -316,20 +310,11 @@
   transform: translateX(-50%);
   z-index: z('header');
 
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
-
   width: calc(100% - var(--space-lg) * 2);
 
   .tab {
     width: 100%;
     white-space: nowrap;
     font-size: var(--font-size-h3);
-  }
-
-  @include respond-up(tablet) {
-    display: none;
   }
 }

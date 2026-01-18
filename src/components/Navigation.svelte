@@ -52,7 +52,11 @@
 
 <svelte:window {onscroll} />
 
-<nav class="nav-bar" aria-label="Navigation" data-hidden={navHidden}>
+<nav
+  class="nav-bar flex flex-row items-center justify-between gap-xs"
+  aria-label="Navigation"
+  data-hidden={navHidden}
+>
   <!-- Mobile logo -->
   <a class="tab line-right small-desktop:hidden" href="/" aria-label="Logo">
     <Quill />
@@ -67,7 +71,7 @@
   </a>
 
   <!-- Desktop Nav Links -->
-  <ul class="hidden tablet:flex gap-xs">
+  <ul class="hidden tablet:flex gap-xs items-center h-full">
     <li>
       <a
         class="tab"
@@ -109,7 +113,7 @@
   </span>
 
   <!-- Right Side: Profile + Burger -->
-  <div class="flex gap-xs">
+  <div class="flex gap-xs h-full">
     <!-- Profile Button -->
     <a
       class="tab hidden tablet:flex px-md"
@@ -133,7 +137,10 @@
     </button>
   </div>
 
-  <aside class="sidebar" data-hidden={!sidebarOpen}>
+  <aside
+    class="sidebar flex flex-col items-center gap-xs"
+    data-hidden={!sidebarOpen}
+  >
     <a
       class="subtab"
       href="/"
@@ -156,9 +163,7 @@
         aria-hidden="true"
         fill="none"
         stroke-width="2"
-        style:transform={activeTab === 'Account'
-          ? 'rotate(90deg)'
-          : 'rotate(0deg)'}
+        data-expanded={activeTab === 'Account'}
       >
         <polyline points="9 6 15 12 9 18" />
       </svg>
@@ -206,7 +211,7 @@
   </aside>
 </nav>
 
-<nav class="bottom-nav">
+<nav class="bottom-nav flex flex-row items-center justify-center tablet:hidden">
   <a
     class="tab"
     href="/"

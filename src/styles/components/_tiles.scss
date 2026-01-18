@@ -81,8 +81,20 @@
   flex: none;
   aspect-ratio: 2 / 3;
 
-  // Width scales with unit * density for compact modes.
+  // Width scales with unit × density for compact modes.
   // void-hybrid-exception: density-coupled width
+  //
+  // TILE WIDTH PROGRESSION (2:3 aspect ratio targets):
+  // ┌─────────────┬────────────┬─────────────┬──────────────┐
+  // │ Breakpoint  │ Multiplier │ Base Width  │ Height (2:3) │
+  // ├─────────────┼────────────┼─────────────┼──────────────┤
+  // │ Mobile      │ 40 × 4px   │ 160px       │ 240px        │
+  // │ Tablet      │ 56 × 4px   │ 224px       │ 336px        │
+  // │ Desktop     │ 64 × 4px   │ 256px       │ 384px        │
+  // │ Full HD     │ 72 × 4px   │ 288px       │ 432px        │
+  // └─────────────┴────────────┴─────────────┴──────────────┘
+  // Multipliers chosen to maintain readable title text at each breakpoint
+  // while respecting the 2:3 portrait card ratio (standard book cover).
   width: calc(40 * var(--unit) * var(--density, 1));
 
   display: flex;

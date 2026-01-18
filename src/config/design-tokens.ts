@@ -266,52 +266,14 @@ export const VOID_TYPOGRAPHY = {
 // STRUCTURAL CONSTANTS (Layout & Component Dimensions)
 // --------------------------------------------------------------------------
 
-export const VOID_STRUCTURAL = {
-  // Border Radius Scale (Used by Physics Engine)
-  radius: {
-    ...VOID_RADIUS,
-  },
-
-  // Modal Widths (Component-specific sizing)
-  modal: {
-    xs: '24rem',
-    sm: '32rem',
-    md: '40rem',
-    lg: '64rem',
-    xl: '75rem',
-  },
-
-  // Tooltip Constraints
-  tooltip: {
-    maxWidth: '250px',
-  },
-
-  // Dialog Gutters (Responsive padding)
-  dialog: {
-    gutter: 'var(--space-xl)', // Standard gutter (48px at standard density)
-    gutterLg: 'var(--space-2xl)', // Large gutter (64px at standard density)
-  },
-
-  // Control Dimensions (Interactive elements)
-  control: {
-    // Base touch target minimum (WCAG AA compliance)
-    touchMin: '2.75rem', // 44px
-    // Dynamic control height with density scaling
-    height: 'max(2.25rem, calc(2.75rem * var(--density, 1)))',
-    // Control padding
-    paddingX: 'var(--space-sm)',
-    paddingY: 'calc(var(--space-xs) * 0.75)',
-  },
-
-  // Surface Padding (Cards, Dialogs, Containers)
-  surface: {
-    padding: 'var(--space-lg)',
-  },
-
-  // Scrollbar Sizing
-  scrollbar: {
-    width: '6px',
-  },
+// Structural constants for component dimensions
+// Note: Modal widths are flattened for SCSS generation in VOID_TOKENS.structural
+const STRUCTURAL_MODAL = {
+  xs: '24rem',
+  sm: '32rem',
+  md: '40rem',
+  lg: '64rem',
+  xl: '75rem',
 } as const;
 
 // --------------------------------------------------------------------------
@@ -348,11 +310,11 @@ export const VOID_TOKENS = {
   // 4. STRUCTURAL CONSTANTS
   // Layout constraints and component-specific dimensions
   structural: {
-    'modal-width-xs': '24rem',
-    'modal-width-sm': '32rem',
-    'modal-width-md': '40rem',
-    'modal-width-lg': '64rem',
-    'modal-width-xl': '75rem',
+    'modal-width-xs': STRUCTURAL_MODAL.xs,
+    'modal-width-sm': STRUCTURAL_MODAL.sm,
+    'modal-width-md': STRUCTURAL_MODAL.md,
+    'modal-width-lg': STRUCTURAL_MODAL.lg,
+    'modal-width-xl': STRUCTURAL_MODAL.xl,
     'tooltip-max-width': '250px',
     'dialog-gutter': 'var(--space-xl)',
     'dialog-gutter-lg': 'var(--space-2xl)',

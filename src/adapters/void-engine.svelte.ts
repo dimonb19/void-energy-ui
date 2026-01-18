@@ -52,12 +52,9 @@ export class VoidEngine {
   });
 
   // Temporary theme context (for story themes, previews, or forced contexts).
-  // When active, user can restore via UI or manual theme change clears it.
-  temporaryTheme = $state<{
-    id: string;
-    label: string;
-    returnTo: string;
-  } | null>(null);
+  // Stores the previous atmosphere to restore when exiting temporary mode.
+  private previousAtmosphere = $state<string | null>(null);
+  temporaryLabel = $state<string | null>(null);
 
   // Derived theme snapshot for UI consumption.
   currentTheme = $derived(
@@ -118,23 +115,15 @@ export class VoidEngine {
     // Commit and persist.
     this.registry[id] = safeTheme;
 
-    if (typeof localStorage !== 'undefined') {
-      try {
-        const cache = JSON.parse(
-          localStorage.getItem('void_theme_cache') || '{}',
-        );
-        cache[id] = safeTheme;
-        localStorage.setItem('void_theme_cache', JSON.stringify(cache));
-      } catch (e) {
-        console.warn('Void: Cache Save Failed - clearing and retrying', e);
-        try {
-          localStorage.removeItem('void_theme_cache');
-          localStorage.setItem(
-            'void_theme_cache',
-            JSON.stringify({ [id]: safeTheme }),
-          );
-        } catch {}
-      }
+    // Cache theme to localStorage (non-critical, failures are silently ignored)
+    try {
+      const cache = JSON.parse(
+        localStorage.getItem('void_theme_cache') || '{}',
+      );
+      cache[id] = safeTheme;
+      localStorage.setItem('void_theme_cache', JSON.stringify(cache));
+    } catch {
+      // Storage full or unavailable - continue without caching
     }
 
     console.groupEnd();
@@ -165,9 +154,8 @@ export class VoidEngine {
     }
 
     // Clear temporary theme on manual selection (user chose a new theme)
-    if (this.temporaryTheme) {
-      this.temporaryTheme = null;
-    }
+    this.previousAtmosphere = null;
+    this.temporaryLabel = null;
 
     this._applyAtmosphere(name, true);
   }
@@ -284,14 +272,19 @@ export class VoidEngine {
    * Check if a temporary theme is currently active.
    */
   get hasTemporaryTheme(): boolean {
-    return this.temporaryTheme !== null;
+    return this.previousAtmosphere !== null;
   }
 
   /**
    * Get temporary theme info for UI display.
    */
   get temporaryThemeInfo() {
-    return this.temporaryTheme;
+    if (!this.previousAtmosphere) return null;
+    return {
+      id: this.atmosphere,
+      label: this.temporaryLabel || 'Custom theme',
+      returnTo: this.previousAtmosphere,
+    };
   }
 
   /**
@@ -300,13 +293,6 @@ export class VoidEngine {
    *
    * @param themeId - The theme to apply temporarily
    * @param label - Display label for UI (e.g., "Story theme", "Preview")
-   *
-   * @example
-   * // Story player
-   * voidEngine.applyTemporaryTheme('crimson', 'Story theme');
-   *
-   * // Theme preview on hover
-   * voidEngine.applyTemporaryTheme('nebula', 'Preview');
    */
   applyTemporaryTheme(themeId: string, label: string = 'Custom theme') {
     if (!this.registry[themeId]) {
@@ -315,22 +301,11 @@ export class VoidEngine {
     }
 
     // Only save returnTo if not already in temporary mode
-    if (!this.temporaryTheme) {
-      this.temporaryTheme = {
-        id: themeId,
-        label,
-        returnTo: this.atmosphere,
-      };
-    } else {
-      // Update temporary theme but keep original returnTo
-      this.temporaryTheme = {
-        ...this.temporaryTheme,
-        id: themeId,
-        label,
-      };
+    if (!this.previousAtmosphere) {
+      this.previousAtmosphere = this.atmosphere;
     }
+    this.temporaryLabel = label;
 
-    // Apply without triggering the "clear" logic
     this._applyAtmosphere(themeId);
   }
 
@@ -338,9 +313,10 @@ export class VoidEngine {
    * Exit temporary theme and restore user's preference.
    */
   restoreUserTheme() {
-    if (this.temporaryTheme) {
-      const returnTo = this.temporaryTheme.returnTo;
-      this.temporaryTheme = null;
+    if (this.previousAtmosphere) {
+      const returnTo = this.previousAtmosphere;
+      this.previousAtmosphere = null;
+      this.temporaryLabel = null;
       this._applyAtmosphere(returnTo);
     }
   }

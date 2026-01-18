@@ -39,42 +39,71 @@ $focus-ring:
 // ==========================================================================
 // 2. PHYSICS PRESETS
 // ==========================================================================
+//
+// DERIVED VALUES DOCUMENTATION
+// These values extend generated tokens with SCSS-computed shadows and surfaces.
+// They cannot be expressed in design-tokens.ts because they require SCSS functions.
+//
+// OPACITY/BLEND RATIONALE:
+// ┌───────────────────┬───────┬─────────────────────────────────────────────┐
+// │ Value             │ %     │ Purpose                                     │
+// ├───────────────────┼───────┼─────────────────────────────────────────────┤
+// │ surface-accent    │ 10%   │ Subtle energy tint on glass surfaces        │
+// │ shadow-sunk       │ 60%   │ High contrast inset for depth perception    │
+// │ shadow-float      │ 25%   │ Standard drop shadow (Material Design spec) │
+// │ glow-lift         │ 50%   │ Visible but not overwhelming hover glow     │
+// │ shadow-flat-*     │ 5-10% │ Minimal shadows for flat/paper aesthetics   │
+// │ retro-offset      │ 50%   │ Pixel shadow visibility on CRT-style        │
+// └───────────────────┴───────┴─────────────────────────────────────────────┘
+//
+// To tune these values, edit the percentages below and rebuild.
+// ==========================================================================
 
 $physics-presets: (
-  // Glass: object emits light.
+  // Glass: object emits light (cyberpunk, neon, sci-fi).
   'glass': map.merge(
       map.get(generated.$generated-physics, 'glass'),
       (
         'surface-bg': linear-gradient(
             to bottom,
             blend(var(--bg-surface), var(--energy-secondary), 10%) 0%,
+            // 10% = subtle energy tint
             var(--bg-surface) 100%
           ),
         'shadow-sunk': inset 0 2px 4px alpha(var(--bg-canvas), 60%),
+        // 60% = strong depth
         'shadow-float': 0 2px 8px rgba(0, 0, 0, 0.25),
+        // 25% = Material standard
         'shadow-lift': 0 0 10px alpha(var(--energy-primary), 50%),
+        // 50% = visible glow
       )
     ),
-  // Flat: external light casts shadows.
+  // Flat: external light casts shadows (paper, clinical, minimal).
   'flat': map.merge(
       map.get(generated.$generated-physics, 'flat'),
       (
         'surface-bg': var(--bg-surface),
         'shadow-sunk': inset 0 1px 2px rgba(0, 0, 0, 0.05),
+        // 5% = barely visible
         'shadow-float': 0 1px 3px rgba(0, 0, 0, 0.05),
+        // 5% = subtle lift
         'shadow-lift': 0 4px 12px rgba(0, 0, 0, 0.1),
+        // 10% = hover emphasis
       )
     ),
-  // Retro: hard edges, no blur.
-  // Note: shadow-offset comes from generated physics tokens
+  // Retro: hard edges, no blur (terminal, CRT, pixel art).
+  // Note: shadow-offset comes from generated physics tokens (3px default)
   'retro': map.merge(
       map.get(generated.$generated-physics, 'retro'),
       (
         'surface-bg': var(--bg-surface),
         'shadow-sunk': none,
+        // No depth in retro
         'shadow-float': none,
+        // No soft shadows
         'shadow-lift': var(--shadow-offset) var(--shadow-offset) 0
           alpha(var(--energy-secondary), 50%),
+        // 50% = pixel shadow
       )
     )
 );

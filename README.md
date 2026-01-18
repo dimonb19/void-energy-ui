@@ -94,8 +94,8 @@ We separate **Layout** (Geometry) from **Materials** (Physics).
 │   │   ├── design-tokens.ts      <-- 🧠 EDIT THIS (Single Source of Truth)
 │   │   ├── modal-registry.ts     <-- Modal Component Map
 │   │   ├── void-dna.json         <-- Raw Values (Grid/Spacing)
-│   │   ├── void-physics.json     <-- 🤖 Generated (Motion Math)
-│   │   └── void-registry.json    <-- 🤖 Generated (Theme Logic)
+│   │   ├── void-physics.json     <-- 🤖 Generated (Physics per preset)
+│   │   └── void-registry.json    <-- 🤖 Generated (Theme metadata)
 │   ├── lib/
 │   │   ├── modal-manager.svelte.ts
 │   │   ├── transitions.svelte.ts <-- 🌌 The Physics Motion Engine
