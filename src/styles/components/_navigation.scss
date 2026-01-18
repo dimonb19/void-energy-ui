@@ -41,6 +41,7 @@
 .nav-bar {
   @include glass-float;
   background: var(--bg-canvas);
+  height: var(--nav-height);
 
   position: fixed;
   top: 0;
@@ -50,9 +51,9 @@
 
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
   align-items: center;
-  gap: var(--space-sm);
+  justify-content: space-between;
+  gap: var(--space-xs);
 
   // Remove rounded corners for full-width header
   border-radius: 0;
@@ -81,11 +82,18 @@
   }
 
   #search {
-    width: var(--space-4xl);
+    width: 100%;
+    margin-right: var(--space-lg);
     transition: width var(--speed-base) var(--ease-spring-gentle);
 
-    &:focus {
-      width: calc(var(--space-4xl) * 2);
+    @include respond-up(tablet) {
+      width: var(--space-4xl);
+    }
+
+    @include respond-up(small-desktop) {
+      &:focus {
+        width: calc(var(--space-4xl) * 2);
+      }
     }
   }
 }
@@ -98,7 +106,7 @@
 // ==========================================================================
 
 .tab-list {
-  height: var(--space-2xl);
+  height: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -146,7 +154,8 @@
   &.line-left,
   &.line-right {
     position: relative;
-    height: var(--space-2xl);
+    height: 100%;
+    border-radius: 0;
 
     &::after {
       content: '';
@@ -211,20 +220,34 @@
   gap: var(--space-xs);
   padding: var(--space-sm);
 
-  // Remove rounded corners for flush alignment with nav-bar
   border-radius: 0;
-  border-bottom-left-radius: var(--radius-base);
-  border-right: none;
+  border: none;
+  border-top: var(--physics-border-width) solid var(--border-color);
+  border-bottom: var(--physics-border-width) solid var(--border-color);
 
+  min-width: 100%;
   transform: translateX(100%);
   transition: transform var(--speed-base) var(--ease-spring-bounce);
 
   &.open {
-    transform: translateY(0);
+    transform: translateX(0);
+  }
+
+  &::before {
+    content: '';
+    background: inherit;
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 100%;
+    z-index: -1;
   }
 
   @include respond-up(tablet) {
-    min-width: calc(var(--space-4xl) * 2);
+    min-width: calc(var(--space-5xl) * 2);
+    border-bottom-left-radius: var(--radius-base);
+    border-left: var(--physics-border-width) solid var(--border-color);
   }
 }
 
@@ -259,7 +282,7 @@
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-sm);
   width: 100%;
   padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-base);

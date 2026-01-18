@@ -3,8 +3,9 @@
 
   import Burger from './icons/Burger.svelte';
   import Logo from './icons/Logo.svelte';
-  import Search from './icons/Search.svelte';
-  import Door from './icons/Door.svelte';
+  import Quill from './icons/Quill.svelte';
+  import SearchBtn from './icons/SearchBtn.svelte';
+  import DoorBtn from './icons/DoorBtn.svelte';
   import ThemeSelector from './ui/Themes.svelte';
 
   let sidebarOpen = $state<boolean>(false);
@@ -50,13 +51,21 @@
 <svelte:window {onscroll} />
 
 <nav class="nav-bar" aria-label="Navigation" data-hidden={navHidden}>
+  <!-- Mobile logo -->
+  <a class="tab line-right small-desktop:hidden" href="/" aria-label="Logo">
+    <Quill />
+  </a>
+  <!-- Desktop logo -->
+  <a
+    class="tab line-right hidden small-desktop:flex"
+    href="/"
+    aria-label="Logo"
+  >
+    <Logo />
+  </a>
+
   <!-- Desktop Nav Links -->
   <ul class="tab-list hidden tablet:flex">
-    <li>
-      <a class="tab line-right logo" href="/" aria-label="Logo">
-        <Logo />
-      </a>
-    </li>
     <li>
       <a
         class="tab"
@@ -77,29 +86,31 @@
         Dream
       </a>
     </li>
-    <li class="flex">
-      <Search
-        onclick={handleSearchFocus}
-        {svgFocus}
-        className="text-secondary"
-      />
-      <input
-        id="search"
-        type="text"
-        placeholder="Search..."
-        aria-label="Search"
-        bind:this={searchInput}
-        onfocus={() => (svgFocus = true)}
-        onblur={() => (svgFocus = false)}
-      />
-    </li>
   </ul>
+
+  <!-- Search input -->
+  <span class="flex w-full">
+    <SearchBtn
+      onclick={handleSearchFocus}
+      {svgFocus}
+      className="text-secondary"
+    />
+    <input
+      id="search"
+      type="text"
+      placeholder="Search..."
+      aria-label="Search"
+      bind:this={searchInput}
+      onfocus={() => (svgFocus = true)}
+      onblur={() => (svgFocus = false)}
+    />
+  </span>
 
   <!-- Right Side: Profile + Burger -->
   <div class="tab-list">
     <!-- Profile Button -->
     <a
-      class="tab pr-xs"
+      class="tab hidden tablet:flex px-md"
       href="/"
       data-state={activeTab === 'Profile' ? 'active' : ''}
       onclick={(e) => selectTab(e, 'Profile')}
@@ -180,10 +191,10 @@
       data-state={activeTab === 'Settings' ? 'active' : ''}
       onclick={(e) => selectTab(e, 'Settings')}
     >
-      Settings
+      Personal Settings
     </a>
     <ThemeSelector className="btn-void subtab flex-row-reverse" />
-    <Door
+    <DoorBtn
       state="outside"
       text="Sign Out"
       className="subtab flex-row-reverse"

@@ -34,7 +34,7 @@
 
 <style>
   svg {
-    width: var(--space-3xl);
+    height: var(--space-lg);
     fill: var(--energy-primary);
     background-color: transparent;
   }

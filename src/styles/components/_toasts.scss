@@ -21,6 +21,7 @@
 
   width: 100%;
   max-width: calc(100vw - var(--space-lg));
+  z-index: z('overlay');
 
   /* Popover reset to avoid UA styles. */
   &[popover] {
