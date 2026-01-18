@@ -105,14 +105,6 @@
 // Tabs are text-based links/buttons with hover and active states.
 // ==========================================================================
 
-.tab-list {
-  height: 100%;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: var(--space-xs);
-}
-
 .tab {
   // --- A. Layout & Sizing ---
   display: flex;
@@ -226,11 +218,10 @@
   border-bottom: var(--physics-border-width) solid var(--border-color);
 
   min-width: 100%;
-  transform: translateX(100%);
   transition: transform var(--speed-base) var(--ease-spring-bounce);
 
-  &.open {
-    transform: translateX(0);
+  &[data-hidden='true'] {
+    transform: translateX(100%);
   }
 
   &::before {
@@ -306,5 +297,39 @@
     &.expandable {
       color: var(--energy-primary);
     }
+  }
+}
+
+// ==========================================================================
+// 4. MOBILE BOTTOM NAVIGATION
+// ==========================================================================
+
+// Iherits styles from .nav-bar
+.bottom-nav {
+  @include glass-float;
+  @include glass-blur;
+
+  position: fixed;
+  top: unset;
+  bottom: var(--space-sm);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: z('header');
+
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+
+  width: calc(100% - var(--space-lg) * 2);
+
+  .tab {
+    width: 100%;
+    white-space: nowrap;
+    font-size: var(--font-size-h3);
+  }
+
+  @include respond-up(tablet) {
+    display: none;
   }
 }

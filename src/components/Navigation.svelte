@@ -6,6 +6,8 @@
   import Quill from './icons/Quill.svelte';
   import SearchBtn from './icons/SearchBtn.svelte';
   import DoorBtn from './icons/DoorBtn.svelte';
+  import Dream from './icons/Dream.svelte';
+  import Home from './icons/Home.svelte';
   import ThemeSelector from './ui/Themes.svelte';
 
   let sidebarOpen = $state<boolean>(false);
@@ -65,7 +67,7 @@
   </a>
 
   <!-- Desktop Nav Links -->
-  <ul class="tab-list hidden tablet:flex">
+  <ul class="hidden tablet:flex gap-xs">
     <li>
       <a
         class="tab"
@@ -107,7 +109,7 @@
   </span>
 
   <!-- Right Side: Profile + Burger -->
-  <div class="tab-list">
+  <div class="flex gap-xs">
     <!-- Profile Button -->
     <a
       class="tab hidden tablet:flex px-md"
@@ -131,7 +133,7 @@
     </button>
   </div>
 
-  <aside class="sidebar" class:open={sidebarOpen}>
+  <aside class="sidebar" data-hidden={!sidebarOpen}>
     <a
       class="subtab"
       href="/"
@@ -202,6 +204,33 @@
       onclick={() => console.log('Sign Out')}
     />
   </aside>
+</nav>
+
+<nav class="bottom-nav">
+  <a
+    class="tab"
+    href="/"
+    data-state={activeTab === 'Stories' ? 'active' : ''}
+    onclick={(e) => selectTab(e, 'Stories')}
+  >
+    <Home />
+  </a>
+  <a
+    class="tab"
+    href="/"
+    data-state={activeTab === 'Dream' ? 'active' : ''}
+    onclick={(e) => selectTab(e, 'Dream')}
+  >
+    <Dream />
+  </a>
+  <a
+    class="tab"
+    href="/"
+    data-state={activeTab === 'Profile' ? 'active' : ''}
+    onclick={(e) => selectTab(e, 'Profile')}
+  >
+    <img class="icon rounded-full" src="/pfp.jpg" alt="PFP" />
+  </a>
 </nav>
 
 {#if sidebarOpen}
