@@ -9,7 +9,7 @@
 
 .toast-region {
   position: fixed;
-  top: var(--space-md);
+  top: var(--space-lg);
   left: 50%;
   transform: translateX(-50%);
 
@@ -37,7 +37,7 @@
 
     // Restore positioning.
     position: fixed;
-    top: var(--space-md);
+    top: var(--space-lg);
     left: 50%;
     transform: translateX(-50%);
 

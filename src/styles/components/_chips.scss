@@ -120,7 +120,7 @@
       color var(--speed-fast) var(--ease-spring-snappy);
 
     &:hover {
-      background: alpha(black, 30%);
+      background: alpha(var(--bg-canvas), 30%);
       color: var(--text-main);
     }
   }
@@ -171,7 +171,7 @@
 
     &:hover {
       background: shade($color, 50%);
-      color: white;
+      color: var(--bg-canvas);
     }
   }
 
@@ -184,7 +184,7 @@
 
   // Retro override.
   @include when-retro {
-    background: black; // Opaque
+    background: var(--bg-canvas); // Opaque
     border: var(--physics-border-width) solid $color; // Hard border
     box-shadow: none; // No soft glow
     color: $color;
@@ -197,7 +197,7 @@
 
       &:hover {
         background: $color; // Invert on hover
-        color: black;
+        color: var(--bg-canvas);
       }
     }
 
@@ -220,7 +220,7 @@
 
       &:hover {
         background: $color; // Full saturation on hover
-        color: white;
+        color: var(--bg-canvas);
       }
     }
 
@@ -303,7 +303,9 @@
 
     // Retro label.
     @include when-retro {
-      background: black; // Opaque background to hide the parent border behind it
+      background: var(
+        --bg-canvas
+      ); // Opaque background to hide the parent border behind it
 
       border: inherit;
       border-bottom: none;

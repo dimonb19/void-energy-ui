@@ -63,8 +63,10 @@
   // Hide-on-scroll transition
   transition: transform var(--speed-base) var(--ease-spring-gentle);
 
-  &[data-hidden='true'] {
-    transform: translateY(-100%);
+  @include respond-up(tablet) {
+    &[data-hidden='true'] {
+      transform: translateY(-100%);
+    }
   }
 
   &::before {
@@ -157,7 +159,7 @@
       background-color: var(--border-color);
 
       @include when-glass {
-        box-shadow: -1px 0 2px black;
+        box-shadow: -1px 0 2px shade(var(--bg-canvas), 80%);
       }
     }
 
@@ -305,10 +307,11 @@
 
   position: fixed;
   top: unset;
-  bottom: var(--space-sm);
+  bottom: var(--space-xs);
   left: 50%;
   transform: translateX(-50%);
   z-index: z('header');
+  border-radius: var(--radius-full);
 
   width: calc(100% - var(--space-lg) * 2);
 
@@ -316,5 +319,6 @@
     width: 100%;
     white-space: nowrap;
     font-size: var(--font-size-h3);
+    border-radius: var(--radius-full);
   }
 }

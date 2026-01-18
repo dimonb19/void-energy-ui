@@ -144,17 +144,18 @@ const SEMANTIC_DARK = {
   'color-success': '#00e055', // Green
   'color-error': '#ff3c40', // Red
   // Tint/Shade Variants (Generated via OKLCH in SCSS)
-  'color-premium-light': 'oklch(from #ff8c00 calc(l * 1.2) c h)',
-  'color-premium-dark': 'oklch(from #ff8c00 calc(l * 0.8) c h)',
+  // Unified multipliers: 1.25x lighter, 0.75x darker (consistent across light/dark modes)
+  'color-premium-light': 'oklch(from #ff8c00 calc(l * 1.25) c h)',
+  'color-premium-dark': 'oklch(from #ff8c00 calc(l * 0.75) c h)',
   'color-premium-subtle': 'oklch(from #ff8c00 l c h / 0.15)',
-  'color-system-light': 'oklch(from #a078ff calc(l * 1.2) c h)',
-  'color-system-dark': 'oklch(from #a078ff calc(l * 0.8) c h)',
+  'color-system-light': 'oklch(from #a078ff calc(l * 1.25) c h)',
+  'color-system-dark': 'oklch(from #a078ff calc(l * 0.75) c h)',
   'color-system-subtle': 'oklch(from #a078ff l c h / 0.15)',
-  'color-success-light': 'oklch(from #00e055 calc(l * 1.2) c h)',
-  'color-success-dark': 'oklch(from #00e055 calc(l * 0.8) c h)',
+  'color-success-light': 'oklch(from #00e055 calc(l * 1.25) c h)',
+  'color-success-dark': 'oklch(from #00e055 calc(l * 0.75) c h)',
   'color-success-subtle': 'oklch(from #00e055 l c h / 0.15)',
-  'color-error-light': 'oklch(from #ff3c40 calc(l * 1.2) c h)',
-  'color-error-dark': 'oklch(from #ff3c40 calc(l * 0.8) c h)',
+  'color-error-light': 'oklch(from #ff3c40 calc(l * 1.25) c h)',
+  'color-error-dark': 'oklch(from #ff3c40 calc(l * 0.75) c h)',
   'color-error-subtle': 'oklch(from #ff3c40 l c h / 0.15)',
 };
 
@@ -165,17 +166,18 @@ const SEMANTIC_LIGHT = {
   'color-success': '#15803d',
   'color-error': '#dc2626',
   // Tint/Shade Variants (Generated via OKLCH in SCSS)
-  'color-premium-light': 'oklch(from #b45309 calc(l * 1.3) c h)',
-  'color-premium-dark': 'oklch(from #b45309 calc(l * 0.7) c h)',
+  // Unified multipliers: 1.25x lighter, 0.75x darker (consistent across light/dark modes)
+  'color-premium-light': 'oklch(from #b45309 calc(l * 1.25) c h)',
+  'color-premium-dark': 'oklch(from #b45309 calc(l * 0.75) c h)',
   'color-premium-subtle': 'oklch(from #b45309 l c h / 0.15)',
-  'color-system-light': 'oklch(from #6d28d9 calc(l * 1.3) c h)',
-  'color-system-dark': 'oklch(from #6d28d9 calc(l * 0.7) c h)',
+  'color-system-light': 'oklch(from #6d28d9 calc(l * 1.25) c h)',
+  'color-system-dark': 'oklch(from #6d28d9 calc(l * 0.75) c h)',
   'color-system-subtle': 'oklch(from #6d28d9 l c h / 0.15)',
-  'color-success-light': 'oklch(from #15803d calc(l * 1.3) c h)',
-  'color-success-dark': 'oklch(from #15803d calc(l * 0.7) c h)',
+  'color-success-light': 'oklch(from #15803d calc(l * 1.25) c h)',
+  'color-success-dark': 'oklch(from #15803d calc(l * 0.75) c h)',
   'color-success-subtle': 'oklch(from #15803d l c h / 0.15)',
-  'color-error-light': 'oklch(from #dc2626 calc(l * 1.3) c h)',
-  'color-error-dark': 'oklch(from #dc2626 calc(l * 0.7) c h)',
+  'color-error-light': 'oklch(from #dc2626 calc(l * 1.25) c h)',
+  'color-error-dark': 'oklch(from #dc2626 calc(l * 0.75) c h)',
   'color-error-subtle': 'oklch(from #dc2626 l c h / 0.15)',
 };
 
