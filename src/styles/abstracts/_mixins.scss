@@ -49,8 +49,8 @@
 // Note: Falls back gracefully - if not supported, no blur is applied.
 @mixin glass-blur {
   @supports (backdrop-filter: blur(1px)) {
-    backdrop-filter: blur(var(--physics-blur));
-    -webkit-backdrop-filter: blur(var(--physics-blur));
+    backdrop-filter: blur(var(--physics-blur)) saturate(140%);
+    -webkit-backdrop-filter: blur(var(--physics-blur)) saturate(140%);
   }
 }
 

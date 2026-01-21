@@ -15,6 +15,7 @@
   {onclick}
   class:focused={svgFocus}
   aria-label="Search"
+  tabindex="-1"
 >
   <svg
     class="icon"
@@ -29,7 +30,7 @@
 </button>
 
 <style>
-  button.focused {
+  button.focused svg {
     transform: rotate(90deg);
   }
 </style>

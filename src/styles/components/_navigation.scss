@@ -43,25 +43,32 @@
 
 .nav-bar {
   @include glass-float;
-  background: var(--bg-canvas);
-  height: var(--nav-height);
+  @include glass-blur;
+
+  height: calc(var(--nav-height) + var(--space-md)); // Accommodate padding
+  padding-top: var(--space-md);
 
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  z-index: z('header');
+  z-index: z('overlay');
 
   // Remove rounded corners for full-width header
   border-radius: 0;
-
-  // Remove top/side borders (sits flush against viewport edges)
-  border-top: none;
-  border-left: none;
-  border-right: none;
+  border: none;
 
   // Hide-on-scroll transition
-  transition: transform var(--speed-base) var(--ease-spring-gentle);
+  transition: transform var(--speed-base) var(--ease-spring-bounce);
+  transform: translateY(calc(-1 * var(--space-md)));
+
+  @include when-retro {
+    transition-duration: 0.3s; // Stepped transition
+  }
+
+  @include when-light {
+    box-shadow: var(--shadow-lift); // Subtle shadow for separation
+  }
 
   @include respond-up(tablet) {
     &[data-hidden='true'] {
@@ -69,31 +76,31 @@
     }
   }
 
-  &::before {
-    content: '';
-    background: inherit;
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    bottom: 100%;
-    left: 0;
-    z-index: -1;
-  }
+  .search {
+    position: relative;
 
-  #search {
-    width: 100%;
-    margin-right: var(--space-lg);
-    transition: width var(--speed-base) var(--ease-spring-gentle);
-
-    @include respond-up(tablet) {
-      width: var(--space-5xl);
+    button {
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--text-mute);
     }
 
-    @include respond-up(small-desktop) {
-      width: var(--space-4xl);
+    #search {
+      width: 100%;
+      padding-left: var(--space-xl);
+      transition: width var(--speed-base) var(--ease-spring-gentle);
 
-      &:focus {
-        width: calc(var(--space-4xl) * 2);
+      @include respond-up(tablet) {
+        width: var(--space-5xl);
+      }
+
+      @include respond-up(small-desktop) {
+        &:focus {
+          width: calc(var(--space-5xl) * 2);
+        }
       }
     }
   }
@@ -122,7 +129,7 @@
 
   // --- C. Visual ---
   border-radius: var(--radius-base);
-  color: var(--energy-secondary);
+  color: var(--text-dim);
   background: transparent;
   border: none;
   cursor: pointer;
@@ -144,98 +151,78 @@
     box-shadow: var(--focus-ring);
   }
 
-  &.line-left,
-  &.line-right {
-    position: relative;
-    height: 100%;
-    border-radius: 0;
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      height: 100%;
-      width: var(--physics-border-width);
-      background-color: var(--border-color);
-
-      @include when-glass {
-        box-shadow: -1px 0 2px shade(var(--bg-canvas), 80%);
-      }
-    }
-
-    &:hover {
-      background-color: alpha(var(--energy-secondary), 10%);
-    }
-  }
-
-  &.line-left {
-    padding-left: var(--space-sm);
-    margin-left: var(--space-xs);
-
-    &::after {
-      content: '';
-      right: 100%;
-    }
-  }
-
-  &.line-right {
-    padding-right: var(--space-sm);
-    margin-right: var(--space-xs);
-
-    &::after {
-      content: '';
-      left: 100%;
-    }
-  }
-
   // Active/Selected state (use data-state="active" or aria-selected="true")
   @include when-state('active') {
-    background-color: var(--energy-primary);
-    color: var(--bg-canvas);
+    background-color: alpha(var(--energy-secondary), 12%);
+    color: var(--energy-primary);
+  }
+
+  // Expandable tab (shows arrow)
+  .arrow {
+    width: var(--space-xs);
+    height: var(--space-xs);
+    aspect-ratio: 1 / 1;
+    flex: none;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+
+    // Only show arrow on hover-capable devices (desktop with mouse)
+    // Touch-only devices use the burger menu instead
+    display: none;
+
+    @media (hover: hover) {
+      display: inline-flex;
+    }
+  }
+
+  &:hover .arrow {
+    transform: scaleY(1.1) translateY(10%) rotate(45deg);
+  }
+}
+
+.burger-tab {
+  @include respond-up(tablet) {
+    display: inline-flex;
+
+    @media (hover: hover) {
+      display: none;
+    }
   }
 }
 
 // ==========================================================================
 // 3. SIDEBAR
 // ==========================================================================
+// Used for both mobile slide-in menu and desktop hover dropdown.
+// CSS capability queries handle the behavioral difference.
 
 .sidebar {
-  @include glass-float;
-  background: var(--bg-canvas);
-
-  position: absolute;
-  top: 100%;
+  position: fixed;
+  top: var(--nav-height);
   right: 0;
-
+  z-index: z('overlay');
   padding: var(--space-sm);
-
-  border-radius: 0;
-  border: none;
-  border-top: var(--physics-border-width) solid var(--border-color);
-  border-bottom: var(--physics-border-width) solid var(--border-color);
-
   min-width: 100%;
-  transition: transform var(--speed-base) var(--ease-spring-bounce);
-
-  &[data-hidden='true'] {
-    transform: translateX(100%);
-  }
-
-  &::before {
-    content: '';
-    background: inherit;
-    height: 100%;
-    width: 100%;
-    position: absolute;
-    top: 0;
-    left: 100%;
-    z-index: -1;
-  }
+  background-image: linear-gradient(to bottom, var(--bg-canvas), transparent);
 
   @include respond-up(tablet) {
     min-width: calc(var(--space-5xl) * 2);
-    border-bottom-left-radius: var(--radius-base);
-    border-left: var(--physics-border-width) solid var(--border-color);
+    background-image: radial-gradient(
+      circle at 100% 0,
+      var(--bg-canvas),
+      transparent 80%
+    );
+  }
+
+  @include when-light {
+    background-image: none;
+    background-color: var(--bg-surface);
+    transform: none !important;
+
+    @include respond-up(tablet) {
+      border-bottom-left-radius: var(--radius-base);
+    }
   }
 }
 
@@ -246,7 +233,7 @@
   height: 100vh;
   width: 100vw;
   background: alpha(var(--bg-canvas), 80%);
-  z-index: z('sticky');
+  z-index: z('dropdown');
   transform: none !important; // override scale and translate from materialize
 
   // Light mode override.

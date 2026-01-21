@@ -1,7 +1,7 @@
 <script lang="ts">
   let {
     className = '',
-    size = '2xl',
+    size = 'xl',
   }: {
     className?: string;
     size?: string;
@@ -25,7 +25,6 @@
 
 <style>
   svg {
-    height: var(--space-md);
     fill: var(--energy-primary);
     background-color: transparent;
   }
