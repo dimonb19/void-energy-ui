@@ -32,7 +32,7 @@
   let newPremiumTile = $state(null);
 </script>
 
-<main class="w-full min-h-screen" style="padding-top: var(--nav-height);">
+<main class="w-full min-h-screen">
   <div class="container flex flex-col gap-xl">
     <section class="flex flex-col gap-md mt-xl">
       <h2>01 // COMPONENT LIBRARY</h2>
