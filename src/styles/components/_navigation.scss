@@ -62,18 +62,16 @@
   transition: transform var(--speed-base) var(--ease-spring-bounce);
   transform: translateY(calc(-1 * var(--space-md)));
 
+  &[data-hidden='true'] {
+    transform: translateY(-100%);
+  }
+
   @include when-retro {
     transition-duration: 0.3s; // Stepped transition
   }
 
   @include when-light {
     box-shadow: var(--shadow-lift); // Subtle shadow for separation
-  }
-
-  @include respond-up(tablet) {
-    &[data-hidden='true'] {
-      transform: translateY(-100%);
-    }
   }
 
   .search {

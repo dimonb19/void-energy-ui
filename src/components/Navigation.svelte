@@ -124,6 +124,32 @@
     searchInput.focus();
   };
 
+  // "The Peek" - reveal navbar on mouse hover at top edge
+  let peekTimer: ReturnType<typeof setTimeout> | null = null;
+  const PEEK_THRESHOLD = 12; // px from top edge (the stratosphere)
+  const PEEK_DELAY = 300; // ms debounce for intent
+
+  const onmousemove = (event: MouseEvent) => {
+    // Only activate when navbar is hidden and page is scrolled
+    if (!navHidden || window.scrollY <= clamp) return;
+
+    if (event.clientY <= PEEK_THRESHOLD) {
+      // Mouse in the stratosphere - start peek timer
+      if (!peekTimer) {
+        peekTimer = setTimeout(() => {
+          navHidden = false;
+          peekTimer = null;
+        }, PEEK_DELAY);
+      }
+    } else {
+      // Mouse left the stratosphere - cancel peek
+      if (peekTimer) {
+        clearTimeout(peekTimer);
+        peekTimer = null;
+      }
+    }
+  };
+
   const onscroll = (event: Event) => {
     const y = window.scrollY;
     if (ticking) return;
@@ -148,7 +174,7 @@
   };
 </script>
 
-<svelte:window {onscroll} />
+<svelte:window {onscroll} {onmousemove} />
 
 <nav
   class="nav-bar flex flex-row items-center justify-between tablet:justify-normal gap-xs px-xs"
