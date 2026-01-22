@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Component } from 'svelte';
   import { materialize, dematerialize } from '../lib/transitions.svelte';
 
   import Burger from './icons/Burger.svelte';
@@ -9,6 +10,86 @@
   import Dream from './icons/Dream.svelte';
   import Home from './icons/Home.svelte';
   import ThemeSelector from './ui/Themes.svelte';
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Navigation Data Structure
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  type NavItem = {
+    id: string;
+    label: string;
+    href: string;
+    icon?: Component;
+    children?: NavItem[];
+  };
+
+  type SidebarItem =
+    | NavItem
+    | {
+        id: string;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        component: Component<any>;
+        props?: Record<string, unknown>;
+      };
+
+  // Main navigation tabs (desktop header + mobile bottom nav)
+  const navItems: NavItem[] = [
+    { id: 'Stories', label: 'Stories', href: '/', icon: Home },
+    { id: 'Dream', label: 'Dream', href: '/', icon: Dream },
+    { id: 'Profile', label: 'Profile', href: '/' },
+  ];
+
+  // Sidebar/dropdown menu items
+  const sidebarItems: SidebarItem[] = [
+    { id: 'Dashboard', label: 'Dashboard', href: '/' },
+    {
+      id: 'Account',
+      label: 'Account',
+      href: '/',
+      children: [
+        { id: 'Overview', label: 'Overview', href: '/' },
+        { id: 'Bookmarks', label: 'Bookmarks', href: '/' },
+      ],
+    },
+    { id: 'Settings', label: 'Personal Settings', href: '/' },
+    {
+      id: 'ThemeSelector',
+      component: ThemeSelector,
+      props: { className: 'btn-void subtab flex-row-reverse' },
+    },
+    {
+      id: 'SignOut',
+      component: DoorBtn,
+      props: {
+        state: 'outside',
+        text: 'Sign Out',
+        className: 'subtab flex-row-reverse',
+        voidBtn: true,
+        onclick: () => console.log('Sign Out'),
+      },
+    },
+  ];
+
+  // Helper to check if item is a component slot (not a link)
+  const isComponentItem = (
+    item: SidebarItem,
+  ): item is {
+    id: string;
+    component: Component;
+    props?: Record<string, unknown>;
+  } => 'component' in item;
+
+  // Helper to check if an expandable item should be open
+  const isExpanded = (item: NavItem): boolean => {
+    if (!item.children) return false;
+    return (
+      activeTab === item.id || item.children.some((c) => activeTab === c.id)
+    );
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // State
+  // ─────────────────────────────────────────────────────────────────────────────
 
   let sidebarOpen = $state<boolean>(false);
   let activeTab = $state<string>('Stories');
@@ -85,26 +166,18 @@
 
   <!-- Desktop Nav Links -->
   <ul class="hidden tablet:flex items-center gap-xs">
-    <li>
-      <a
-        class="tab"
-        href="/"
-        data-state={activeTab === 'Stories' ? 'active' : ''}
-        onclick={(e) => selectTab(e, 'Stories')}
-      >
-        Stories
-      </a>
-    </li>
-    <li>
-      <a
-        class="tab"
-        href="/"
-        data-state={activeTab === 'Dream' ? 'active' : ''}
-        onclick={(e) => selectTab(e, 'Dream')}
-      >
-        Dream
-      </a>
-    </li>
+    {#each navItems.filter((t) => t.id !== 'Profile') as tab}
+      <li>
+        <a
+          class="tab"
+          href={tab.href}
+          data-state={activeTab === tab.id ? 'active' : ''}
+          onclick={(e) => selectTab(e, tab.id)}
+        >
+          {tab.label}
+        </a>
+      </li>
+    {/each}
   </ul>
 
   <!-- Search input -->
@@ -139,7 +212,7 @@
     <span class="arrow icon" data-size="sm" aria-hidden="true"></span>
   </a>
 
-  <!-- Burger Button (Mobile) -->
+  <!-- Burger Button (Mobile & Touch screens) -->
   <button
     class="burger-tab btn-void text-primary tab"
     onclick={() => (sidebarOpen = !sidebarOpen)}
@@ -151,31 +224,22 @@
   </button>
 </nav>
 
+<!-- Mobile Nav Links -->
 <nav class="bottom-nav flex flex-row items-center justify-center tablet:hidden">
-  <a
-    class="tab"
-    href="/"
-    data-state={activeTab === 'Stories' ? 'active' : ''}
-    onclick={(e) => selectTab(e, 'Stories')}
-  >
-    <Home />
-  </a>
-  <a
-    class="tab"
-    href="/"
-    data-state={activeTab === 'Dream' ? 'active' : ''}
-    onclick={(e) => selectTab(e, 'Dream')}
-  >
-    <Dream />
-  </a>
-  <a
-    class="tab"
-    href="/"
-    data-state={activeTab === 'Profile' ? 'active' : ''}
-    onclick={(e) => selectTab(e, 'Profile')}
-  >
-    <img class="icon rounded-full" src="/pfp.jpg" alt="PFP" />
-  </a>
+  {#each navItems as tab}
+    <a
+      class="tab"
+      href={tab.href}
+      data-state={activeTab === tab.id ? 'active' : ''}
+      onclick={(e) => selectTab(e, tab.id)}
+    >
+      {#if tab.id === 'Profile'}
+        <img class="icon rounded-full" src="/pfp.jpg" alt="PFP" />
+      {:else if tab.icon}
+        <tab.icon />
+      {/if}
+    </a>
+  {/each}
 </nav>
 
 {#if sidebarOpen}
@@ -188,68 +252,55 @@
     in:materialize
     out:dematerialize={{ y: 0 }}
   >
-    <a
-      class="subtab"
-      href="/"
-      data-state={activeTab === 'Dashboard' ? 'active' : ''}
-      onclick={(e) => selectTab(e, 'Dashboard')}
-      in:materialize
-    >
-      Dashboard
-    </a>
-    <a
-      class="subtab expandable"
-      href="/"
-      data-state={activeTab === 'Account' ? 'active' : ''}
-      onclick={(e) => selectTab(e, 'Account')}
-      in:materialize={{ delay: 50 }}
-    >
-      Account
-      <svg
-        class="icon"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-        fill="none"
-        stroke-width="2"
-        data-expanded={activeTab === 'Account'}
-      >
-        <polyline points="9 6 15 12 9 18" />
-      </svg>
-    </a>
-    {#if activeTab === 'Account' || activeTab === 'Overview' || activeTab === 'Bookmarks'}
-      <ul class="submenu" in:materialize>
-        <li>
-          <a class="subtab" href="/" in:materialize> Overview </a>
-        </li>
-        <li>
-          <a class="subtab" href="/" in:materialize={{ delay: 50 }}>
-            Bookmarks
-          </a>
-        </li>
-      </ul>
-    {/if}
-    <a
-      class="subtab"
-      href="/"
-      data-state={activeTab === 'Settings' ? 'active' : ''}
-      onclick={(e) => selectTab(e, 'Settings')}
-      in:materialize={{ delay: 100 }}
-    >
-      Personal Settings
-    </a>
-    <span class="w-full" in:materialize={{ delay: 150 }}>
-      <ThemeSelector className="btn-void subtab flex-row-reverse" />
-    </span>
-    <span class="w-full" in:materialize={{ delay: 200 }}>
-      <DoorBtn
-        state="outside"
-        text="Sign Out"
-        className="subtab flex-row-reverse"
-        voidBtn={true}
-        onclick={() => console.log('Sign Out')}
-      />
-    </span>
+    {#each sidebarItems as item, i (item.id)}
+      {#if isComponentItem(item)}
+        <span class="w-full" style="--item-index: {i}">
+          <item.component {...item.props} />
+        </span>
+      {:else if item.children}
+        <a
+          class="subtab expandable"
+          href={item.href}
+          style="--item-index: {i}"
+          data-state={activeTab === item.id ? 'active' : ''}
+          onclick={(e) => selectTab(e, item.id)}
+        >
+          {item.label}
+          <svg
+            class="icon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            fill="none"
+            stroke-width="2"
+            data-expanded={isExpanded(item)}
+          >
+            <polyline points="9 6 15 12 9 18" />
+          </svg>
+        </a>
+        {#if isExpanded(item)}
+          <ul class="submenu">
+            {#each item.children as child, j (child.id)}
+              <li style="--item-index: {j}">
+                <a class="subtab" href={child.href}>
+                  {child.label}
+                </a>
+              </li>
+            {/each}
+          </ul>
+        {/if}
+      {:else}
+        <a
+          class="subtab"
+          href={item.href}
+          style="--item-index: {i}"
+          data-state={activeTab === item.id ? 'active' : ''}
+          onclick={(e) => selectTab(e, item.id)}
+        >
+          {item.label}
+        </a>
+      {/if}
+    {/each}
   </div>
 
   <div

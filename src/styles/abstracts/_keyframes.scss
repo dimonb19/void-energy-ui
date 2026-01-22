@@ -78,3 +78,22 @@
     filter: blur(0); // Snaps into focus
   }
 }
+
+// G. STAGGER ENTRY (List item materialization)
+// Used by: Sidebar items, submenu items via --item-index CSS custom property
+// Svelte equivalent: in:materialize{{ delay: i * 50 }} (doesn't work in {#each}{#if} blocks)
+
+// Usage:
+// 1. Set --item-index on each element: style="--item-index: {i}"
+// 2. Apply animation in CSS: animation: stagger-enter var(--speed-base) ... backwards;
+// 3. Calculate delay: animation-delay: calc(var(--item-index, 0) * 50ms);
+@keyframes stagger-enter {
+  0% {
+    opacity: 0;
+    transform: translateY(15px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

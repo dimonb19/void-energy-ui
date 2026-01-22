@@ -285,6 +285,35 @@
 }
 
 // ==========================================================================
+// 5. STAGGERED ENTRY ANIMATION
+// ==========================================================================
+// CSS-based stagger animation for sidebar items.
+// Replaces Svelte in:materialize which doesn't work inside {#each} blocks.
+//
+// Usage: Set --item-index on each element via style attribute.
+// Example: <a style="--item-index: {i}">
+
+.sidebar > *,
+.sidebar > span > * {
+  animation: stagger-enter var(--speed-base) var(--ease-spring-snappy) backwards;
+  animation-delay: calc(var(--item-index, 0) * 50ms);
+
+  // Accessibility: respect reduced motion preference
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.submenu > li {
+  animation: stagger-enter var(--speed-base) var(--ease-spring-snappy) backwards;
+  animation-delay: calc(var(--item-index, 0) * 50ms);
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+// ==========================================================================
 // 4. MOBILE BOTTOM NAVIGATION
 // ==========================================================================
 
