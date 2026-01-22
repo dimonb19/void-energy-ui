@@ -27,6 +27,7 @@
 
       if (dialog && !dialog.open) {
         dialog.showModal();
+        document.dispatchEvent(new CustomEvent('void:modal-opened'));
       }
     } else if (!modal.state.key && dialog?.open) {
       dialog.close();

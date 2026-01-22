@@ -9,28 +9,36 @@
     error: '🛑',
   };
 
-  // Popover region reference.
   let region = $state<HTMLElement | null>(null);
+  let animatingOut = $state(false);
 
-  // Keep toast region ahead of modals in the Top Layer.
+  // Show popover when items exist.
   $effect(() => {
-    if (!region) return;
+    if (!region || toast.items.length === 0) return;
+    try {
+      region.showPopover();
+    } catch (e) {}
+  });
 
-    if (toast.items.length > 0) {
-      // Re-show to bump insertion order.
-      try {
+  // Re-bump toast above modal when modal opens.
+  $effect(() => {
+    const rebump = () => {
+      if (region?.matches(':popover-open') && toast.items.length > 0) {
         region.hidePopover();
         region.showPopover();
-      } catch (e) {
-        // Ignore transient popover state errors.
       }
-    } else {
-      // Close when empty to avoid blocking clicks.
+    };
+    document.addEventListener('void:modal-opened', rebump);
+    return () => document.removeEventListener('void:modal-opened', rebump);
+  });
+
+  // Hide popover when empty AND not animating.
+  $effect(() => {
+    if (!region || toast.items.length > 0 || animatingOut) return;
+    if (region.matches(':popover-open')) {
       try {
         region.hidePopover();
-      } catch (e) {
-        if (import.meta.env.DEV) console.warn('Popover API error:', e);
-      }
+      } catch (e) {}
     }
   });
 </script>
@@ -51,6 +59,8 @@
       onclick={() => toast.close(item.id)}
       in:materialize
       out:dematerialize={{ y: 0 }}
+      onoutrostart={() => (animatingOut = true)}
+      onoutroend={() => (animatingOut = false)}
     >
       <span class="toast-icon">
         {#if item.type === 'loading'}
