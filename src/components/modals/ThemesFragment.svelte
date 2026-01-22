@@ -2,25 +2,36 @@
   import { modal } from '../../lib/modal-manager.svelte';
   import { voidEngine } from '../../adapters/void-engine.svelte';
   import { toast } from '../../stores/toast.svelte';
-
-  import Switcher from '../ui/Switcher.svelte';
-  import Select from '../ui/Select.svelte';
-  import SettingsRow from '../ui/SettingsRow.svelte';
   import { dematerialize, materialize } from '../../lib/transitions.svelte';
 
-  // Derived list of atmospheres from engine state.
-  let atmospheres = $derived(
-    voidEngine.availableAtmospheres.map((id: string) => {
-      const meta = voidEngine.registry[id];
+  import Switcher from '../ui/Switcher.svelte';
+  import Selector from '../ui/Selector.svelte';
+  import SettingsRow from '../ui/SettingsRow.svelte';
+  import Sun from '../icons/Sun.svelte';
+  import Moon from '../icons/Moon.svelte';
 
-      return {
-        id,
-        label: id.charAt(0).toUpperCase() + id.slice(1),
-        tagline: meta.tagline,
-        physics: meta.physics,
-        mode: meta.mode,
-      };
-    }),
+  const modeOptions: SwitcherOption[] = [
+    { value: 'dark', label: 'Dark', icon: Moon },
+    { value: 'light', label: 'Light', icon: Sun },
+  ];
+
+  // Default tab to current theme's mode
+  let activeMode = $state<'dark' | 'light'>(voidEngine.currentTheme.mode);
+
+  // Filter themes by mode - registry order is the source of truth
+  let filteredAtmospheres = $derived(
+    voidEngine.availableAtmospheres
+      .filter((id: string) => voidEngine.registry[id]?.mode === activeMode)
+      .map((id: string) => {
+        const meta = voidEngine.registry[id];
+        return {
+          id,
+          label: id.charAt(0).toUpperCase() + id.slice(1),
+          tagline: meta.tagline,
+          physics: meta.physics,
+          mode: meta.mode,
+        };
+      }),
   );
 
   // UI options for selectors and toggles.
@@ -103,6 +114,18 @@
   Atmosphere: {voidEngine.atmosphere.toUpperCase()}
 </h2>
 
+<span
+  class="surface-sunk flex flex-col items-center justify-center gap-sm p-sm"
+>
+  <p class="text-center">Tune how your interface looks, moves, and breathes.</p>
+
+  <Switcher
+    options={modeOptions}
+    value={activeMode}
+    onchange={(value) => (activeMode = value as 'dark' | 'light')}
+  />
+</span>
+
 <!-- Temporary Theme Indicator -->
 {#if voidEngine.hasTemporaryTheme}
   {@const info = voidEngine.temporaryThemeInfo}
@@ -118,14 +141,12 @@
   </div>
 {/if}
 
-<p class="text-center">Tune how your interface looks, moves, and breathes.</p>
-
 <div
   class="theme-menu surface-sunk rounded-md flex flex-col tablet:grid tablet:grid-cols-2 gap-xs p-xs"
   role="radiogroup"
   aria-label="Select Theme"
 >
-  {#each atmospheres as atm (atm.id)}
+  {#each filteredAtmospheres as atm (atm.id)}
     <div
       class="theme-wrapper p-sm rounded-sm"
       data-atmosphere={atm.id}
@@ -205,7 +226,7 @@
       <hr />
       <SettingsRow label="Typography">
         <div class="flex flex-col small-desktop:flex-row justify-center gap-sm">
-          <Select
+          <Selector
             label="Heading Font"
             options={fontOptions}
             value={voidEngine.userConfig.fontHeading}
@@ -219,7 +240,7 @@
               else toast.show(`Headings updated to ${v}`, 'info');
             }}
           />
-          <Select
+          <Selector
             label="Body Font"
             options={fontOptions}
             value={voidEngine.userConfig.fontBody}
@@ -263,11 +284,9 @@
   }
 
   .theme-menu {
-    max-height: calc(var(--space-5xl) * 2);
-    overflow-y: auto;
-
     .theme-wrapper {
       background-color: var(--bg-canvas);
+      transition: opacity var(--speed-fast) var(--ease-spring-snappy);
 
       .theme-option {
         position: relative;

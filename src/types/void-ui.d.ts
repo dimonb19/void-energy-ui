@@ -289,7 +289,7 @@ interface VoidTooltipOptions {
 interface SwitcherOption {
   value: string | number | null;
   label: string;
-  icon?: string;
+  icon?: string | import('svelte').Component;
 }
 
 interface SwitcherProps {
@@ -299,5 +299,5 @@ interface SwitcherProps {
   label?: string;
   id?: string;
   disabled?: boolean;
-  class?: string;
+  className?: string;
 }

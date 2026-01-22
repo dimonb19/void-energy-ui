@@ -36,7 +36,7 @@
     label,
     id,
     disabled = false,
-    class: className = '',
+    className = '',
   }: SwitcherProps = $props();
 
   // Auto-generate ID for label association if not provided
@@ -103,7 +103,14 @@
         onkeydown={(e) => handleKeydown(e, i)}
       >
         {#if option.icon}
-          <span class="switcher__icon" aria-hidden="true">{option.icon}</span>
+          <span class="switcher__icon" aria-hidden="true">
+            {#if typeof option.icon === 'string'}
+              {option.icon}
+            {:else}
+              {@const Icon = option.icon}
+              <Icon />
+            {/if}
+          </span>
         {/if}
         <span class="switcher__label">{option.label}</span>
       </button>

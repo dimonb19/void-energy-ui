@@ -477,73 +477,29 @@ export const VOID_TOKENS = {
       },
     },
 
-    // 4. CRIMSON - Horror / Intense
-    crimson: {
+    // 4. NEBULA - Synthwave / Cosmic
+    nebula: {
       mode: 'dark',
       physics: 'glass',
-      tagline: 'Horror / Intense',
+      tagline: 'Synthwave / Cosmic',
       palette: {
         ...SEMANTIC_DARK,
-        'font-atmos-heading': FONTS.horror,
-        'font-atmos-body': FONTS.horror,
-        'bg-canvas': '#180808',
-        'bg-spotlight': '#2b0f0f',
-        'bg-surface': 'rgba(60, 0, 0, 0.6)',
-        'bg-sink': 'rgba(20, 0, 0, 0.8)',
-        'energy-primary': '#ff6b6b',
-        'energy-secondary': '#8a0000',
-        'border-color': 'rgba(255, 107, 107, 0.2)',
-        'text-main': '#ffe5e5',
-        'text-dim': 'rgba(255, 200, 200, 0.9)',
-        'text-mute': 'rgba(255, 180, 180, 0.7)',
+        'font-atmos-heading': FONTS.mystic,
+        'font-atmos-body': FONTS.clean,
+        'bg-canvas': '#0a0014',
+        'bg-spotlight': '#240046',
+        'bg-surface': 'rgba(20, 0, 40, 0.6)',
+        'bg-sink': 'rgba(10, 0, 20, 0.8)',
+        'energy-primary': '#d946ef',
+        'energy-secondary': '#8b5cf6',
+        'border-color': 'rgba(217, 70, 239, 0.2)',
+        'text-main': '#fdf4ff',
+        'text-dim': 'rgba(230, 210, 255, 0.9)',
+        'text-mute': 'rgba(230, 210, 255, 0.6)',
       },
     },
 
-    // 5. OVERGROWTH - Nature / Organic
-    overgrowth: {
-      mode: 'dark',
-      physics: 'glass',
-      tagline: 'Nature / Organic',
-      palette: {
-        ...SEMANTIC_DARK,
-        'font-atmos-heading': FONTS.nature,
-        'font-atmos-body': FONTS.nature,
-        'bg-canvas': '#051a0a',
-        'bg-spotlight': '#0e2e14',
-        'bg-surface': 'rgba(0, 40, 10, 0.5)',
-        'bg-sink': 'rgba(0, 20, 5, 0.8)',
-        'energy-primary': '#39ff14',
-        'energy-secondary': '#ffd700',
-        'border-color': 'rgba(57, 255, 20, 0.2)',
-        'text-main': '#f0fff4',
-        'text-dim': 'rgba(200, 255, 200, 0.8)',
-        'text-mute': 'rgba(200, 255, 200, 0.6)',
-      },
-    },
-
-    // 6. VELVET - Romance / Soft
-    velvet: {
-      mode: 'dark',
-      physics: 'glass',
-      tagline: 'Romance / Soft',
-      palette: {
-        ...SEMANTIC_DARK,
-        'font-atmos-heading': FONTS.hand,
-        'font-atmos-body': FONTS.book,
-        'bg-canvas': '#1a0510',
-        'bg-spotlight': '#2e0b1d',
-        'bg-surface': 'rgba(50, 0, 20, 0.5)',
-        'bg-sink': 'rgba(30, 0, 10, 0.8)',
-        'energy-primary': '#ff80a0',
-        'energy-secondary': '#c71585',
-        'border-color': 'rgba(255, 128, 160, 0.2)',
-        'text-main': '#fff0f5',
-        'text-dim': 'rgba(255, 200, 220, 0.9)',
-        'text-mute': 'rgba(255, 180, 200, 0.7)',
-      },
-    },
-
-    // 7. SOLAR - Royal / Gold
+    // 5. SOLAR - Royal / Gold
     solar: {
       mode: 'dark',
       physics: 'glass',
@@ -565,27 +521,75 @@ export const VOID_TOKENS = {
       },
     },
 
-    // 8. NEBULA - Synthwave / Cosmic
-    nebula: {
+    // 6. OVERGROWTH - Nature / Organic
+    overgrowth: {
       mode: 'dark',
       physics: 'glass',
-      tagline: 'Synthwave / Cosmic',
+      tagline: 'Nature / Organic',
       palette: {
         ...SEMANTIC_DARK,
-        'font-atmos-heading': FONTS.mystic,
-        'font-atmos-body': FONTS.clean,
-        'bg-canvas': '#0a0014',
-        'bg-spotlight': '#240046',
-        'bg-surface': 'rgba(20, 0, 40, 0.6)',
-        'bg-sink': 'rgba(10, 0, 20, 0.8)',
-        'energy-primary': '#d946ef',
-        'energy-secondary': '#8b5cf6',
-        'border-color': 'rgba(217, 70, 239, 0.2)',
-        'text-main': '#fdf4ff',
-        'text-dim': 'rgba(230, 210, 255, 0.9)',
-        'text-mute': 'rgba(230, 210, 255, 0.6)',
+        'font-atmos-heading': FONTS.nature,
+        'font-atmos-body': FONTS.nature,
+        'bg-canvas': '#051a0a',
+        'bg-spotlight': '#0e2e14',
+        'bg-surface': 'rgba(0, 40, 10, 0.5)',
+        'bg-sink': 'rgba(0, 20, 5, 0.8)',
+        'energy-primary': '#39ff14',
+        'energy-secondary': '#ffd700',
+        'border-color': 'rgba(57, 255, 20, 0.2)',
+        'text-main': '#f0fff4',
+        'text-dim': 'rgba(200, 255, 200, 0.8)',
+        'text-mute': 'rgba(200, 255, 200, 0.6)',
       },
     },
+
+    // 7. VELVET - Romance / Soft
+    velvet: {
+      mode: 'dark',
+      physics: 'glass',
+      tagline: 'Romance / Soft',
+      palette: {
+        ...SEMANTIC_DARK,
+        'font-atmos-heading': FONTS.hand,
+        'font-atmos-body': FONTS.book,
+        'bg-canvas': '#1a0510',
+        'bg-spotlight': '#2e0b1d',
+        'bg-surface': 'rgba(50, 0, 20, 0.5)',
+        'bg-sink': 'rgba(30, 0, 10, 0.8)',
+        'energy-primary': '#ff80a0',
+        'energy-secondary': '#c71585',
+        'border-color': 'rgba(255, 128, 160, 0.2)',
+        'text-main': '#fff0f5',
+        'text-dim': 'rgba(255, 200, 220, 0.9)',
+        'text-mute': 'rgba(255, 180, 200, 0.7)',
+      },
+    },
+
+    // 8. CRIMSON - Horror / Intense
+    crimson: {
+      mode: 'dark',
+      physics: 'glass',
+      tagline: 'Horror / Intense',
+      palette: {
+        ...SEMANTIC_DARK,
+        'font-atmos-heading': FONTS.horror,
+        'font-atmos-body': FONTS.horror,
+        'bg-canvas': '#180808',
+        'bg-spotlight': '#2b0f0f',
+        'bg-surface': 'rgba(60, 0, 0, 0.6)',
+        'bg-sink': 'rgba(20, 0, 0, 0.8)',
+        'energy-primary': '#ff6b6b',
+        'energy-secondary': '#8a0000',
+        'border-color': 'rgba(255, 107, 107, 0.2)',
+        'text-main': '#ffe5e5',
+        'text-dim': 'rgba(255, 200, 200, 0.9)',
+        'text-mute': 'rgba(255, 180, 180, 0.7)',
+      },
+    },
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // LIGHT THEMES (neutral → vibrant)
+    // ─────────────────────────────────────────────────────────────────────────
 
     // 9. PAPER - Light / Print
     paper: {
@@ -609,7 +613,29 @@ export const VOID_TOKENS = {
       },
     },
 
-    // 10. LABORATORY - Science / Clinical
+    // 10. FOCUS - Distraction Free
+    focus: {
+      mode: 'light',
+      physics: 'flat',
+      tagline: 'Distraction Free',
+      palette: {
+        ...SEMANTIC_LIGHT,
+        'font-atmos-heading': FONTS.clean,
+        'font-atmos-body': FONTS.clean,
+        'bg-canvas': '#ffffff',
+        'bg-spotlight': '#f5f5f5',
+        'bg-surface': '#ffffff',
+        'bg-sink': '#f0f0f0',
+        'energy-primary': '#000000',
+        'energy-secondary': '#000000',
+        'border-color': '#000000',
+        'text-main': '#000000',
+        'text-dim': '#222222',
+        'text-mute': '#444444',
+      },
+    },
+
+    // 11. LABORATORY - Science / Clinical
     laboratory: {
       mode: 'light',
       physics: 'flat',
@@ -631,7 +657,7 @@ export const VOID_TOKENS = {
       },
     },
 
-    // 11. PLAYGROUND - Playful / Vibrant
+    // 12. PLAYGROUND - Playful / Vibrant
     playground: {
       mode: 'light',
       physics: 'flat',
@@ -650,28 +676,6 @@ export const VOID_TOKENS = {
         'text-main': '#006064',
         'text-dim': '#00838f',
         'text-mute': '#0097a7',
-      },
-    },
-
-    // 12. FOCUS - Distraction Free
-    focus: {
-      mode: 'light',
-      physics: 'flat',
-      tagline: 'Distraction Free',
-      palette: {
-        ...SEMANTIC_LIGHT,
-        'font-atmos-heading': FONTS.clean,
-        'font-atmos-body': FONTS.clean,
-        'bg-canvas': '#ffffff',
-        'bg-spotlight': '#f5f5f5',
-        'bg-surface': '#ffffff',
-        'bg-sink': '#f0f0f0',
-        'energy-primary': '#000000',
-        'energy-secondary': '#000000',
-        'border-color': '#000000',
-        'text-main': '#000000',
-        'text-dim': '#222222',
-        'text-mute': '#444444',
       },
     },
   },

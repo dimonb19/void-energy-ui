@@ -31,7 +31,7 @@
     label,
     id,
     disabled = false,
-    class: className = '',
+    className = '',
   }: SwitcherProps = $props();
 
   // Auto-generate ID for label association if not provided
