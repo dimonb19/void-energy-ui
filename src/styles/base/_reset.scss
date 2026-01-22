@@ -202,9 +202,7 @@ textarea:disabled {
 // Media
 img,
 picture,
-video,
-canvas,
-svg:not(.icon) {
+video {
   display: block;
   max-width: 100%;
   height: auto;
