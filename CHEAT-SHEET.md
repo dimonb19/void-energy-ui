@@ -663,6 +663,68 @@ See [modal-manager.svelte.ts](src/lib/modal-manager.svelte.ts) for programmatic 
 
 ---
 
+### D. Gestures
+
+Touch and pointer-based interaction components.
+
+#### `<PullRefresh>` (Pull-to-Refresh)
+
+**Description:** Touch/wheel gesture to trigger data refresh
+**Location:** [src/components/ui/PullRefresh.svelte](src/components/ui/PullRefresh.svelte)
+
+**Props:**
+
+| Prop        | Type                       | Default | Description                   |
+| ----------- | -------------------------- | ------- | ----------------------------- |
+| `children`  | `Snippet`                  | req     | Content to wrap               |
+| `onrefresh` | `() => Promise<void>`      | req     | Async refresh callback        |
+| `onerror`   | `(error: unknown) => void` | —       | Error handler                 |
+| `threshold` | `number`                   | `48`    | Pull distance (px) to trigger |
+| `disabled`  | `boolean`                  | `false` | Disable gesture               |
+
+**States:** `idle` → `pulling` → `threshold` → `refreshing` → `done`/`error` → `idle`
+
+**Usage:**
+
+```svelte
+<PullRefresh onrefresh={handleRefresh} onerror={handleError}>
+  <main class="feed-container">
+    <!-- Feed content -->
+  </main>
+</PullRefresh>
+```
+
+**Handler Example (Redis Cache Invalidation):**
+
+```typescript
+async function handleRefresh() {
+  await api.getData({ refresh: true }); // Invalidates Redis cache
+}
+```
+
+**Architecture Notes:**
+
+| Decision                                 | Rationale                                                                                                   |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| **Selective PTR**                        | Only on pages where "refresh" has semantic meaning (feeds, dashboards). No global fallback.                 |
+| **Global `overscroll-behavior-y: none`** | Set on `html` in [\_reset.scss:107](src/styles/base/_reset.scss). Disables native browser PTR app-wide.     |
+| **No reload fallback**                   | PTR = "invalidate cache + refetch." A generic page reload would dilute this semantic and destroy SPA state. |
+| **Industry pattern**                     | Twitter, Instagram, Discord: PTR on feeds, nothing on settings/profile pages. Users adapt.                  |
+
+**Interaction Model:**
+
+- **Touch:** Pull down → release at threshold → triggers refresh
+- **Wheel:** Scroll up at top → instant trigger when threshold crossed
+- **Haptic:** Vibration pulse at threshold crossing (touch only)
+
+**Physics:**
+
+- Rubber-band resistance: `2.0` (pull distance / resistance)
+- Activation threshold: `6px` (prevents accidental triggers)
+- Cooldown: `500ms` between refreshes
+
+---
+
 ## 5. Mixin Reference
 
 ### Surface Mixins

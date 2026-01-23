@@ -100,6 +100,10 @@
 
 html {
   scroll-behavior: smooth;
+
+  // Disable native pull-to-refresh globally.
+  // Custom PTR component provides consistent, styled, SPA-safe refresh.
+  // Native PTR varies across browsers and triggers full page reload.
   overscroll-behavior-y: none;
   padding-block: 0;
   overflow-x: hidden;

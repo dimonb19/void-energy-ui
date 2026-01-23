@@ -143,8 +143,6 @@
   justify-content: center;
   font-size: 1.1em; // Emojis look better slightly larger
   line-height: 1;
-  width: 1.2em;
-  height: 1.2em;
 
   // Prevent icon shrink.
   flex-shrink: 0;
@@ -152,8 +150,6 @@
 
 // Spin loader.
 .spin-loader {
-  width: 1em;
-  height: 1em;
   animation: rotate 1s linear infinite;
 
   .track {

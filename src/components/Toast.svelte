@@ -1,12 +1,17 @@
 <script lang="ts">
   import { toast } from '../stores/toast.svelte';
   import { dematerialize, materialize } from '../lib/transitions.svelte';
+  import Info from './icons/Info.svelte';
+  import Checkmark from './icons/Checkmark.svelte';
+  import Warning from './icons/Warning.svelte';
+  import XMark from './icons/XMark.svelte';
+  import SpinLoader from './icons/SpinLoader.svelte';
 
-  const icons: Record<string, string> = {
-    info: 'ℹ️',
-    success: '✅',
-    warning: '⚠️',
-    error: '🛑',
+  const icons: Record<string, typeof Info> = {
+    info: Info,
+    success: Checkmark,
+    warning: Warning,
+    error: XMark,
   };
 
   let region = $state<HTMLElement | null>(null);
@@ -64,12 +69,10 @@
     >
       <span class="toast-icon">
         {#if item.type === 'loading'}
-          <svg class="spin-loader" viewBox="0 0 24 24">
-            <circle class="track" cx="12" cy="12" r="10" />
-            <circle class="car" cx="12" cy="12" r="10" />
-          </svg>
+          <SpinLoader data-size="lg" />
         {:else}
-          {icons[item.type] ?? icons.info}
+          {@const Icon = icons[item.type] ?? icons.info}
+          <Icon />
         {/if}
       </span>
 

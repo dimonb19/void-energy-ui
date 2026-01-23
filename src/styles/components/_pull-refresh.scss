@@ -1,0 +1,302 @@
+/* Pull-to-Refresh component styles.
+ *
+ * Indicator floats ON TOP of content (z: float).
+ * Content translates down, indicator stays fixed at top.
+ */
+
+@use '../abstracts' as *;
+
+// ==========================================================================
+// CONTAINER
+// ==========================================================================
+
+.pull-refresh {
+  position: relative;
+  overflow: hidden; // Clip indicator when fully hidden
+  min-height: 100%;
+
+  // CSS Custom Properties (set via JS, defaults here for fallback)
+  --pull-distance: 0px;
+  --pull-progress: 0;
+  --pull-threshold: 48px; // void-ignore (Synced from JS prop, fallback value)
+}
+
+// ==========================================================================
+// INDICATOR (Floats on top, fixed at top)
+// ==========================================================================
+
+.pull-indicator {
+  position: absolute;
+  top: var(--space-md);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: z('float'); // ABOVE content (10)
+
+  // Glass capsule surface
+  @include glass-float;
+  @include glass-blur;
+
+  // Sizing
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-full);
+
+  // Layout
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+
+  // Visibility based on pull progress
+  opacity: var(--pull-progress);
+  pointer-events: none;
+
+  // Spring transitions for state changes
+  transition:
+    opacity var(--speed-fast) var(--ease-spring-snappy),
+    transform var(--speed-base) var(--ease-spring-gentle);
+
+  // Progress ring (uses .icon utility for sizing)
+  .progress-ring {
+    .track {
+      fill: none;
+      stroke: alpha(var(--energy-primary), 25%);
+      stroke-width: 2;
+    }
+
+    .value {
+      fill: none;
+      stroke: var(--energy-primary);
+      stroke-width: 2;
+      stroke-linecap: round;
+      transform-origin: center;
+      transform: rotate(-90deg); // Start arc from 12 o'clock
+      transition: stroke-dashoffset var(--speed-fast) linear;
+    }
+  }
+
+  // Dashed spinner (uses .icon utility for sizing)
+  .spin-loader {
+    animation: rotate 1s linear infinite;
+
+    .track {
+      fill: none;
+      stroke: var(--energy-primary);
+      stroke-width: 2;
+      opacity: 0.2;
+    }
+
+    .car {
+      fill: none;
+      stroke: var(--energy-primary);
+      stroke-width: 2;
+      stroke-dasharray: 10 20;
+      stroke-linecap: round;
+    }
+
+    @include when-retro {
+      animation-timing-function: steps(8);
+    }
+  }
+
+  // Arrow icon (overlays progress ring)
+  .pull-arrow {
+    position: absolute;
+    fill: none;
+    left: calc(var(--space-sm) + 0.25em); // Center on ring
+    color: var(--text-main);
+    transition: transform var(--speed-fast) var(--ease-spring-snappy);
+    transform: scale(0.75);
+  }
+
+  // Message text
+  .pull-message {
+    font-size: var(--font-size-small);
+    line-height: var(--line-height-small);
+    color: var(--text-dim);
+    white-space: nowrap;
+    margin: 0;
+  }
+
+  // Checkmark (success state) - SVG with draw animation
+  .pull-checkmark {
+    --check-path-length: 24; // Approximate polyline length
+    fill: none;
+    color: var(--color-success);
+
+    polyline {
+      stroke-dasharray: var(--check-path-length);
+      stroke-dashoffset: var(--check-path-length);
+      animation: ptr-check-draw var(--speed-base) var(--ease-spring-snappy)
+        forwards;
+    }
+  }
+
+  // Error X mark - SVG with draw animation
+  .pull-error {
+    --x-path-length: 17; // sqrt(12^2 + 12^2) ≈ 17
+    fill: none;
+    color: var(--color-error);
+
+    line {
+      stroke-dasharray: var(--x-path-length);
+      stroke-dashoffset: var(--x-path-length);
+      animation: ptr-check-draw var(--speed-base) var(--ease-spring-snappy)
+        forwards;
+
+      &:last-child {
+        animation-delay: var(--speed-instant);
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// STATE-SPECIFIC STYLES
+// ==========================================================================
+
+// Idle: fully hidden
+.pull-refresh[data-state='idle'] {
+  .pull-indicator {
+    opacity: 0;
+  }
+}
+
+// Threshold reached: arrow flips, glow pulse
+.pull-refresh[data-state='threshold'] {
+  .pull-indicator {
+    box-shadow: var(--shadow-lift);
+  }
+
+  .pull-arrow {
+    color: var(--energy-primary);
+  }
+
+  .progress-ring .value {
+    color: var(--energy-primary);
+  }
+}
+
+// Refreshing: spinner animation, scroll locked
+.pull-refresh[data-state='refreshing'] {
+  overflow: hidden;
+
+  .pull-indicator {
+    opacity: 1;
+  }
+
+  .pull-content {
+    pointer-events: none; // Prevent scroll/interaction during refresh
+  }
+
+  .pull-arrow {
+    opacity: 0;
+  }
+}
+
+// Done: checkmark visible
+.pull-refresh[data-state='done'] {
+  .pull-indicator {
+    opacity: 1;
+    border-color: var(--color-success-subtle);
+  }
+
+  .progress-ring .value {
+    stroke: var(--color-success);
+    stroke-dasharray: 62.83; // Full circle (2πr, r=10)
+    stroke-dashoffset: 0;
+  }
+
+  .pull-message {
+    color: var(--color-success);
+  }
+}
+
+// Error: X mark visible
+.pull-refresh[data-state='error'] {
+  .pull-indicator {
+    opacity: 1;
+    border-color: var(--color-error-subtle);
+  }
+
+  .progress-ring .value {
+    stroke: var(--color-error);
+    stroke-dasharray: 62.83; // Full circle (2πr, r=10)
+    stroke-dashoffset: 0;
+  }
+
+  .pull-message {
+    color: var(--color-error);
+  }
+}
+
+// ==========================================================================
+// CONTENT WRAPPER
+// ==========================================================================
+
+.pull-content {
+  position: relative;
+  z-index: z('base');
+  min-height: 100%;
+
+  // Translate down based on pull distance
+  transform: translateY(var(--pull-distance));
+
+  // Smooth spring return when releasing
+  transition: transform var(--speed-base) var(--ease-spring-gentle);
+
+  // Allow native vertical scroll (locked during pull to prevent browser takeover)
+  touch-action: pan-y;
+
+  // Disable transition during active pull for immediate response
+  // Lock touch-action to prevent browser scroll interference
+  [data-state='pulling'] > &,
+  [data-state='threshold'] > & {
+    transition: none;
+    touch-action: none;
+    will-change: transform; // Compositor hint for layer promotion
+  }
+}
+
+// ==========================================================================
+// KEYFRAMES
+// ==========================================================================
+
+@keyframes ptr-check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+// ==========================================================================
+// PHYSICS OVERRIDES
+// ==========================================================================
+
+// Retro: No blur (spin-loader retro handled via @include when-retro)
+[data-physics='retro'] {
+  .pull-indicator {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+// ==========================================================================
+// REDUCED MOTION
+// ==========================================================================
+
+@media (prefers-reduced-motion: reduce) {
+  .pull-indicator,
+  .pull-content,
+  .pull-arrow,
+  .progress-ring .value {
+    transition: none;
+  }
+
+  .spin-loader {
+    animation: none;
+  }
+
+  .pull-checkmark polyline,
+  .pull-error line {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
