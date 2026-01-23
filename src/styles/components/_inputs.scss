@@ -130,7 +130,6 @@ input[type='radio'] {
 
   cursor: pointer;
   vertical-align: middle;
-  margin-right: var(--space-xs);
 
   &:disabled {
     opacity: 0.5;
@@ -195,7 +194,6 @@ input[type='radio'] {
 
     p {
       color: var(--text-mute);
-      margin: 0;
     }
 
     .btn-fake {

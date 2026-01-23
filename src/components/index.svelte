@@ -4,6 +4,9 @@
   import { toast } from '../stores/toast.svelte';
   import { live, implode } from '../lib/transitions.svelte';
 
+  import { FONTS } from '../config/design-tokens';
+  import { voidEngine } from '../adapters/void-engine.svelte';
+
   import ThemeSelector from './ui/Themes.svelte';
   import SettingsRow from './ui/SettingsRow.svelte';
   import PullRefresh from './ui/PullRefresh.svelte';
@@ -40,7 +43,54 @@
     { id: 1, name: 'Quantum Core' },
     { id: 2, name: 'AI Supervisor' },
   ]);
-  let newPremiumTile = $state(null);
+  let newPremiumTile = $state('Quantum Core');
+
+  // Test functions for temporary theme feature
+  function testCustomTheme() {
+    // Don't register if adaptation is disabled
+    if (!voidEngine.userConfig.adaptAtmosphere) {
+      toast.show(
+        'Theme override blocked (adaptAtmosphere disabled)',
+        'warning',
+      );
+      return;
+    }
+
+    voidEngine.registerTheme('cyberpunk', {
+      mode: 'dark',
+      physics: 'glass',
+      tagline: 'High Tech / Low Life',
+      palette: {
+        'font-atmos-heading': FONTS.mystic.family,
+        'font-atmos-body': FONTS.tech.family,
+        'bg-canvas': '#05010a',
+        'bg-spotlight': '#1a0526',
+        'bg-surface': 'rgba(20, 5, 30, 0.6)',
+        'bg-sink': 'rgba(10, 0, 15, 0.8)',
+        'energy-primary': '#ff0077',
+        'energy-secondary': '#00e5ff',
+        'border-color': 'rgba(255, 0, 119, 0.3)',
+        'text-dim': 'rgba(255, 230, 240, 0.85)',
+      },
+    });
+    voidEngine.applyTemporaryTheme('cyberpunk', 'Story: Neon Dreams');
+    toast.show('Cyberpunk theme applied temporarily', 'success');
+  }
+
+  function testExistingTheme() {
+    const applied = voidEngine.applyTemporaryTheme(
+      'crimson',
+      'Story: Blood Moon',
+    );
+    if (applied) {
+      toast.show('Crimson theme applied temporarily', 'success');
+    } else {
+      toast.show(
+        'Theme override blocked (adaptAtmosphere disabled)',
+        'warning',
+      );
+    }
+  }
 </script>
 
 <PullRefresh onrefresh={handleRefresh} onerror={handleRefreshError}>
@@ -195,7 +245,22 @@
       <section class="flex flex-col gap-md mt-md">
         <h2>03 // PARAMETERS</h2>
 
-        <div class="surface-glass p-lg flex flex-col gap-lg">
+        <div class="surface-glass p-lg flex flex-col gap-md">
+          <SettingsRow label="Theme Override">
+            <div
+              class="surface-sunk flex flex-col justify-center tablet:flex-row gap-sm p-sm"
+            >
+              <button class="btn-premium" onclick={testCustomTheme}>
+                Test Custom Theme
+              </button>
+              <button class="btn-system" onclick={testExistingTheme}>
+                Test Existing Theme
+              </button>
+            </div>
+          </SettingsRow>
+
+          <hr />
+
           <SettingsRow label="Active Modules">
             <div
               class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center rounded-md"

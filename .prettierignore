@@ -32,8 +32,9 @@ pnpm-lock.yaml
 
 # astro.config.mjs
 
-README.md
+*.md
 
 # config
+/src/config/font-registry.ts
 /src/config/*.json
 /src/styles/config/*

@@ -7,44 +7,69 @@
 
 import THEME_REGISTRY from '../../config/void-registry.json';
 import { STORAGE_KEYS, DOM_ATTRS, DEFAULTS } from '../../config/constants';
-import { FONT_REGISTRY } from '../../config/font-registry';
+import { FONT_REGISTRY, USER_FONT_MAP } from '../../config/font-registry';
 
 // Import bootloader as a raw string for inline execution.
 import bootSource from '../../lib/void-boot.js?raw';
 
-// Strip exports for inline <script> execution.
-const cleanBootSource = bootSource.replace(/export /g, '');
+// Strip export keywords for inline <script> execution.
+// Uses specific pattern to avoid corrupting string literals containing "export".
+const cleanBootSource = bootSource.replace(/^export\s+(?=function\s)/gm, '');
 ---
 
 <script
   is:inline
   set:html={`
     (function() {
-      // Inject bootloader.
+      // Inject bootloader (includes resolveTheme, applyTheme, applyPreferences, hydrate).
       ${cleanBootSource}
 
-      // Determine active theme ID (same logic as hydrate, but we need it early for font preloading).
-      var storageKey = '${STORAGE_KEYS.ATMOSPHERE}';
-      var defaultTheme = '${DEFAULTS.ATMOSPHERE}';
-      var lightTheme = '${DEFAULTS.LIGHT_ATMOSPHERE}';
-      var savedTheme = null;
-      try { savedTheme = localStorage.getItem(storageKey); } catch(e) {}
-
-      var activeId = savedTheme
-        || (window.matchMedia('(prefers-color-scheme: dark)').matches ? defaultTheme : lightTheme);
+      // Resolve active theme ID using shared logic (DRY - same as hydrate uses).
+      var activeId = resolveTheme('${STORAGE_KEYS.ATMOSPHERE}', ${JSON.stringify(DEFAULTS)});
 
       // Inject preload tags for active theme fonts (eliminates FOUT).
       var fontRegistry = ${JSON.stringify(FONT_REGISTRY)};
-      var fonts = fontRegistry[activeId] || fontRegistry[defaultTheme] || [];
+      var fonts = fontRegistry[activeId] || fontRegistry['${DEFAULTS.ATMOSPHERE}'] || [];
+      var preloaded = {}; // O(1) lookup for duplicate prevention
       fonts.forEach(function(src) {
+        preloaded[src] = true;
         var link = document.createElement('link');
         link.rel = 'preload';
         link.as = 'font';
         link.type = 'font/woff2';
         link.crossOrigin = 'anonymous';
+        link.fetchPriority = 'high';
         link.href = src;
         document.head.appendChild(link);
       });
+
+      // Preload user font overrides (eliminates FOUT for custom fonts).
+      var userConfig = null;
+      try { userConfig = JSON.parse(localStorage.getItem('${STORAGE_KEYS.USER_CONFIG}')); } catch(e) {}
+
+      if (userConfig) {
+        var userFontMap = ${JSON.stringify(USER_FONT_MAP)};
+        [userConfig.fontHeading, userConfig.fontBody].forEach(function(val) {
+          if (!val) return;
+          // Extract font-family from "'Font Name', fallback" format
+          var match = val.match(/^'([^']+)'/);
+          if (match && userFontMap[match[1]]) {
+            userFontMap[match[1]].forEach(function(src) {
+              // Skip if already preloaded (O(1) lookup)
+              if (preloaded[src]) return;
+              preloaded[src] = true;
+              var link = document.createElement('link');
+              link.rel = 'preload';
+              link.as = 'font';
+              link.type = 'font/woff2';
+              link.crossOrigin = 'anonymous';
+              link.fetchPriority = 'high';
+              link.href = src;
+              document.head.appendChild(link);
+            });
+          }
+        });
+      }
 
       // Execute hydration with server-side constants.
       hydrate(

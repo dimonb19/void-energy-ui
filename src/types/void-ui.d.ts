@@ -79,7 +79,7 @@ interface VoidPalette {
   /** Low contrast text for metadata and placeholders (60% opacity) */
   'text-mute': string;
 
-  // SEMANTIC: Status indicators
+  // SEMANTIC: Status indicators (base colors)
   /** Premium features, warnings, or gold-tier content (e.g., orange #ff8c00) */
   'color-premium': string;
 
@@ -91,6 +91,20 @@ interface VoidPalette {
 
   /** Error states and destructive actions (e.g., red #ff3c40) */
   'color-error': string;
+
+  // SEMANTIC: Auto-generated variants (lighter, darker, subtle backgrounds)
+  'color-premium-light': string;
+  'color-premium-dark': string;
+  'color-premium-subtle': string;
+  'color-system-light': string;
+  'color-system-dark': string;
+  'color-system-subtle': string;
+  'color-success-light': string;
+  'color-success-dark': string;
+  'color-success-subtle': string;
+  'color-error-light': string;
+  'color-error-dark': string;
+  'color-error-subtle': string;
 
   // TYPOGRAPHY: Atmosphere-specific fonts
   /** Font stack for headings (e.g., 'Hanken Grotesk', sans-serif) */
@@ -155,6 +169,15 @@ interface VoidThemeDefinition extends VoidThemeConfig {
     url: string;
   }>;
 }
+
+/**
+ * Partial theme definition for registerTheme().
+ * Allows providing only the palette keys you want to override.
+ * Missing keys are filled from the base theme via Safety Merge.
+ */
+type PartialThemeDefinition = Partial<Omit<VoidThemeDefinition, 'palette'>> & {
+  palette?: Partial<VoidPalette>;
+};
 
 /**
  * Runtime theme registry mapping atmosphere names to theme definitions.

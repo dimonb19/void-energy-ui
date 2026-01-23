@@ -3,12 +3,24 @@
   import { voidEngine } from '../../adapters/void-engine.svelte';
   import { toast } from '../../stores/toast.svelte';
   import { dematerialize, materialize } from '../../lib/transitions.svelte';
+  import {
+    FONTS,
+    FONT_FAMILY_TO_KEY,
+    VOID_TOKENS,
+  } from '../../config/design-tokens';
 
   import Switcher from '../ui/Switcher.svelte';
   import Selector from '../ui/Selector.svelte';
   import SettingsRow from '../ui/SettingsRow.svelte';
   import Sun from '../icons/Sun.svelte';
   import Moon from '../icons/Moon.svelte';
+
+  // Helper to capitalize strings (e.g., "void" → "Void")
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+  // Helper to extract font display name from CSS font-family string
+  const extractFontName = (family: string) =>
+    family.match(/^'([^']+)'/)?.[1] || family;
 
   const modeOptions: SwitcherOption[] = [
     { value: 'dark', label: 'Dark', icon: Moon },
@@ -18,15 +30,15 @@
   // Default tab to current theme's mode
   let activeMode = $state<'dark' | 'light'>(voidEngine.currentTheme.mode);
 
-  // Filter themes by mode - registry order is the source of truth
+  // Filter themes by mode - only show built-in themes (not story themes)
   let filteredAtmospheres = $derived(
-    voidEngine.availableAtmospheres
+    voidEngine.builtInAtmospheres
       .filter((id: string) => voidEngine.registry[id]?.mode === activeMode)
       .map((id: string) => {
         const meta = voidEngine.registry[id];
         return {
           id,
-          label: id.charAt(0).toUpperCase() + id.slice(1),
+          label: capitalize(id),
           tagline: meta.tagline,
           physics: meta.physics,
           mode: meta.mode,
@@ -34,16 +46,49 @@
       }),
   );
 
-  // UI options for selectors and toggles.
-  const fontOptions = [
-    { label: 'System Default (Atmosphere)', value: null },
-    { label: 'Hanken Grotesk (Tech)', value: "'Hanken Grotesk', sans-serif" },
-    { label: 'Inter (Clean)', value: "'Inter', sans-serif" },
-    { label: 'Courier Prime (Code)', value: "'Courier Prime', monospace" },
-    { label: 'Lora (Serif)', value: "'Lora', serif" },
-    { label: 'Open Sans (Standard)', value: "'Open Sans', sans-serif" },
-    { label: 'Comic Neue (Casual)', value: "'Comic Neue', sans-serif" },
-  ];
+  // Get current atmosphere's theme definition (single lookup, used by both font keys)
+  let currentThemeDef = $derived(
+    VOID_TOKENS.themes[
+      voidEngine.atmosphere as keyof typeof VOID_TOKENS.themes
+    ],
+  );
+
+  // Get current atmosphere's font keys for dynamic "System Default" labels
+  let currentHeadingKey = $derived.by(() => {
+    if (!currentThemeDef) return 'Unknown';
+    const family = currentThemeDef.palette['font-atmos-heading'];
+    const key = FONT_FAMILY_TO_KEY[family];
+    return key ? capitalize(key) : 'Unknown';
+  });
+
+  let currentBodyKey = $derived.by(() => {
+    if (!currentThemeDef) return 'Unknown';
+    const family = currentThemeDef.palette['font-atmos-body'];
+    const key = FONT_FAMILY_TO_KEY[family];
+    return key ? capitalize(key) : 'Unknown';
+  });
+
+  // Static font options (without System Default)
+  const staticFontOptions = Object.entries(FONTS).map(([key, def]) => {
+    const fontName = extractFontName(def.family);
+    const styleName = capitalize(key);
+    return {
+      label: `${styleName} (${fontName})`,
+      value: def.family,
+    };
+  });
+
+  // Dynamic heading font options with atmosphere-aware "System Default"
+  let headingFontOptions = $derived([
+    { label: `System Default (${currentHeadingKey})`, value: null },
+    ...staticFontOptions,
+  ]);
+
+  // Dynamic body font options with atmosphere-aware "System Default"
+  let bodyFontOptions = $derived([
+    { label: `System Default (${currentBodyKey})`, value: null },
+    ...staticFontOptions,
+  ]);
 
   const scaleLevels = [
     { label: 'XS', value: 0.85, name: 'Minimal' },
@@ -72,21 +117,18 @@
   // Advanced settings toggle.
   let showAdvancedSettings = $state<boolean>(false);
 
-  // Adaptive Atmosphere toggle.
-  let adaptAtmosphere = $state<boolean>(true);
-  const handleAdaptAtmosphereChange = () => {
-    if (adaptAtmosphere) {
+  // Toggle adaptive atmosphere (persisted via voidEngine.userConfig)
+  function toggleAdaptAtmosphere(event: Event, value?: boolean) {
+    const newValue = value ?? !voidEngine.userConfig.adaptAtmosphere;
+    voidEngine.setPreferences({ adaptAtmosphere: newValue });
+
+    if (newValue) {
       toast.show("Interface will now adapt to the story's mood.", 'success');
     } else {
       toast.show(
         'Theme locked to your preference. No further changes will occur.',
       );
     }
-  };
-
-  // Capitalize theme name for display.
-  function formatThemeName(id: string): string {
-    return id.charAt(0).toUpperCase() + id.slice(1);
   }
 
   function selectTheme(id: string) {
@@ -96,6 +138,7 @@
 
   function handleRestore() {
     voidEngine.restoreUserTheme();
+    toast.show('Returned to your preferred theme', 'success');
   }
 
   // Engine update helpers.
@@ -130,14 +173,27 @@
 {#if voidEngine.hasTemporaryTheme}
   {@const info = voidEngine.temporaryThemeInfo}
   <div
-    class="temp-theme-notice surface-glass flex items-center justify-between gap-sm p-sm"
+    class="surface-sunk flex flex-col items-center gap-sm p-sm"
+    out:dematerialize
   >
-    <span class="text-dim text-caption">
-      {info?.label} active
+    <h5>Story Override Active</h5>
+    <p>
+      <strong>{info?.label}</strong>
+      is using
+      <strong>{info?.id}</strong>
+      atmosphere.
+    </p>
+    <span class="flex flex-row flex-wrap justify-center gap-sm">
+      <button class="btn-system" onclick={handleRestore}>
+        Return to {capitalize(info?.returnTo ?? '')}
+      </button>
+      <button
+        class="btn-alert"
+        onclick={(event) => toggleAdaptAtmosphere(event, false)}
+      >
+        Don't adapt to stories
+      </button>
     </span>
-    <button class="system-btn" onclick={handleRestore}>
-      Return to {formatThemeName(info?.returnTo ?? '')}
-    </button>
   </div>
 {/if}
 
@@ -146,12 +202,13 @@
   role="radiogroup"
   aria-label="Select Theme"
 >
-  {#each filteredAtmospheres as atm (atm.id)}
+  {#each filteredAtmospheres as atm, i (atm.id)}
     <div
       class="theme-wrapper p-sm rounded-sm"
       data-atmosphere={atm.id}
       data-physics={atm.physics}
       data-mode={atm.mode}
+      in:materialize={{ delay: i * 25 }}
     >
       <button
         class="theme-option w-full flex items-center gap-sm p-xs rounded-sm text-dim text-left"
@@ -186,10 +243,11 @@
     <input
       id="platform-override-theme"
       type="checkbox"
-      bind:checked={adaptAtmosphere}
-      onchange={handleAdaptAtmosphereChange}
+      checked={voidEngine.userConfig.adaptAtmosphere}
+      onchange={toggleAdaptAtmosphere}
     />
-    Allow the interface to adapt its Atmosphere to match the current story's mood.
+    Adapt to story mood. Stories can temporarily override your theme.
+    <!-- Allow the interface to adapt its Atmosphere to match the current story's mood. -->
   </label>
 </div>
 
@@ -228,7 +286,7 @@
         <div class="flex flex-col small-desktop:flex-row justify-center gap-sm">
           <Selector
             label="Heading Font"
-            options={fontOptions}
+            options={headingFontOptions}
             value={voidEngine.userConfig.fontHeading}
             onchange={(v) => {
               voidEngine.setPreferences({ fontHeading: v || null });
@@ -237,12 +295,13 @@
                   'Custom font cleared. Reverted to Atmosphere recommendation.',
                   'success',
                 );
-              else toast.show(`Headings updated to ${v}`, 'info');
+              else
+                toast.show(`Headings updated to ${extractFontName(v)}`, 'info');
             }}
           />
           <Selector
             label="Body Font"
-            options={fontOptions}
+            options={bodyFontOptions}
             value={voidEngine.userConfig.fontBody}
             onchange={(v) => {
               voidEngine.setPreferences({ fontBody: v || null });
@@ -251,7 +310,11 @@
                   'Custom font cleared. Reverted to Atmosphere recommendation.',
                   'success',
                 );
-              else toast.show(`Reading font updated to ${v}`, 'info');
+              else
+                toast.show(
+                  `Reading font updated to ${extractFontName(v)}`,
+                  'info',
+                );
             }}
           />
         </div>
@@ -277,11 +340,6 @@
 
 <style lang="scss">
   @use '/src/styles/abstracts' as *;
-
-  .temp-theme-notice {
-    @include glass-float;
-    margin-bottom: var(--space-sm);
-  }
 
   .theme-menu {
     .theme-wrapper {

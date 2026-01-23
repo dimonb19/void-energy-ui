@@ -2,6 +2,26 @@
 // Pure JS. No external dependencies. No TypeScript types in the runtime code.
 
 /**
+ * Resolves the active theme ID from localStorage or OS preference.
+ * Pure function with no side effects - just returns the resolved ID.
+ *
+ * @param {string} storageKey - localStorage key for saved theme
+ * @param {Object} defaults - Default theme IDs { ATMOSPHERE, LIGHT_ATMOSPHERE }
+ * @returns {string} The resolved theme ID
+ */
+export function resolveTheme(storageKey, defaults) {
+  try {
+    var saved = localStorage.getItem(storageKey);
+    if (saved) return saved;
+  } catch (e) {
+    // localStorage unavailable (private browsing, etc.)
+  }
+  // First visit or no saved preference: detect OS color scheme
+  var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  return prefersDark ? defaults.ATMOSPHERE : defaults.LIGHT_ATMOSPHERE;
+}
+
+/**
  * Applies the Atmosphere, Physics, and Mode to the DOM.
  * @param {HTMLElement} root - The document root
  * @param {Object} theme - The theme definition object
@@ -15,9 +35,11 @@ export function applyTheme(root, theme, constants) {
 
   // Inject palette overrides for runtime themes.
   if (theme.palette) {
-    Object.entries(theme.palette).forEach(([key, value]) => {
-      root.style.setProperty(`--${key}`, value);
-    });
+    var keys = Object.keys(theme.palette);
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      root.style.setProperty('--' + key, theme.palette[key]);
+    }
   }
 }
 
@@ -36,7 +58,7 @@ export function applyPreferences(root, config) {
 
   // Density mapping is inline to keep bootloader zero-dependency.
   if (config.density) {
-    const densities = { high: 0.75, standard: 1, low: 1.25 };
+    var densities = { high: 0.75, standard: 1, low: 1.25 };
     root.style.setProperty('--density', densities[config.density] || 1);
   }
 
@@ -58,36 +80,32 @@ export function applyPreferences(root, config) {
 /**
  * The Main Hydration Function.
  * Returns the active theme ID so the Engine knows what happened.
+ *
+ * Note: Uses ES5 syntax (var) for render-blocking script compatibility.
  */
 export function hydrate(registry, storageKeys, attrs, defaults) {
   try {
-    const root = document.documentElement;
-    const localAtmosphere = localStorage.getItem(storageKeys.ATMOSPHERE);
-    const localConfig = localStorage.getItem(storageKeys.USER_CONFIG);
+    var root = document.documentElement;
+    var localConfig = localStorage.getItem(storageKeys.USER_CONFIG);
 
-    // Resolve active atmosphere ID with OS preference detection.
-    let activeId;
+    // Resolve active atmosphere ID using shared logic.
+    var activeId = resolveTheme(storageKeys.ATMOSPHERE, defaults);
 
-    if (localAtmosphere) {
-      // User has a saved theme — use it.
-      activeId = localAtmosphere;
-    } else {
-      // First visit: detect OS color scheme preference.
-      const prefersDark = window.matchMedia(
-        '(prefers-color-scheme: dark)',
-      ).matches;
-      activeId = prefersDark ? defaults.ATMOSPHERE : defaults.LIGHT_ATMOSPHERE;
-
-      // Persist the auto-selected theme.
-      localStorage.setItem(storageKeys.ATMOSPHERE, activeId);
+    // Persist the resolved theme if not already saved.
+    try {
+      if (!localStorage.getItem(storageKeys.ATMOSPHERE)) {
+        localStorage.setItem(storageKeys.ATMOSPHERE, activeId);
+      }
+    } catch (e) {
+      // localStorage unavailable
     }
 
     // Resolve theme data (registry, then cache).
-    let themeData = registry[activeId];
+    var themeData = registry[activeId];
 
     if (!themeData) {
       try {
-        const cache = JSON.parse(
+        var cache = JSON.parse(
           localStorage.getItem('void_theme_cache') || '{}',
         );
         themeData = cache[activeId];
@@ -95,7 +113,7 @@ export function hydrate(registry, storageKeys, attrs, defaults) {
         console.warn('Void: Cache Error - clearing corrupted cache', e);
         try {
           localStorage.removeItem('void_theme_cache');
-        } catch {}
+        } catch (ignored) {}
       }
     }
 

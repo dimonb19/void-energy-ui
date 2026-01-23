@@ -40,9 +40,9 @@ export const VOID_TOKENS = {
         // Semantic colors (auto-generated variants)
         ...SEMANTIC_DARK,  // or SEMANTIC_LIGHT for light mode
 
-        // Fonts
-        'font-atmos-heading': FONTS.tech,
-        'font-atmos-body': FONTS.tech,
+        // Fonts (use .family to get the CSS font-family string)
+        'font-atmos-heading': FONTS.tech.family,
+        'font-atmos-body': FONTS.tech.family,
 
         // Layer 1: Canvas
         'bg-canvas': '#010020',
@@ -79,8 +79,12 @@ npm run build:tokens
 
 This compiles your theme into:
 
-- **SCSS variables** → `src/styles/config/_generated-themes.scss`
+- **Theme SCSS** → `src/styles/config/_generated-themes.scss`
+- **Font @font-face** → `src/styles/config/_fonts.scss` *(auto-generated)*
+- **Font preload registry** → `src/config/font-registry.ts` *(auto-generated)*
 - **JSON registry** → `src/config/void-registry.json`
+
+> **Note:** The font files are auto-generated from the `FONTS` definition in `design-tokens.ts`. Never edit `_fonts.scss` or `font-registry.ts` directly.
 
 ---
 
@@ -264,30 +268,113 @@ Define typography atmosphere with `font-atmos-heading` and `font-atmos-body`.
 
 #### Available Fonts
 
+The font system uses structured `FontDefinition` objects that contain the CSS family string, file mappings, and preload weights:
+
 ```typescript
-const FONTS = {
-  tech: "'Hanken Grotesk', sans-serif", // Modern, Tech
-  clean: "'Inter', sans-serif", // Clean, Professional
-  code: "'Courier Prime', monospace", // Retro, Terminal
-  horror: "'Merriweather', serif", // Gothic, Dramatic
-  nature: "'Lora', serif", // Organic, Literary
-  hand: "'Caveat', cursive", // Handwritten, Personal
-  book: "'PT Serif Caption', serif", // Classic, Readable
-  arcane: "'Cinzel', serif", // Elegant, Royal
-  mystic: "'Exo 2', sans-serif", // Futuristic, Synthwave
-  lab: "'Open Sans', sans-serif", // Clinical, Scientific
-  fun: "'Comic Neue', sans-serif", // Playful, Kids
+const FONTS: Record<string, FontDefinition> = {
+  tech: {
+    family: "'Hanken Grotesk', sans-serif",  // Modern, Tech
+    files: { 400: 'HankenGrotesk-Regular.woff2', 700: 'HankenGrotesk-Bold.woff2' },
+    preloadWeights: [400, 700],
+  },
+  clean: {
+    family: "'Inter', sans-serif",  // Clean, Professional
+    files: { 400: 'Inter-Regular.woff2', 700: 'Inter-Bold.woff2' },
+    preloadWeights: [400, 700],
+  },
+  // ... and more: code, horror, nature, hand, book, arcane, mystic, lab, fun
 };
 ```
+
+| Key      | Family              | Style                    |
+|----------|---------------------|--------------------------|
+| `tech`   | Hanken Grotesk      | Modern, Tech             |
+| `clean`  | Inter               | Clean, Professional      |
+| `code`   | Courier Prime       | Retro, Terminal          |
+| `horror` | Merriweather        | Gothic, Dramatic         |
+| `nature` | Lora                | Organic, Literary        |
+| `hand`   | Caveat              | Handwritten, Personal    |
+| `book`   | PT Serif Caption    | Classic, Readable        |
+| `arcane` | Cinzel              | Elegant, Royal           |
+| `mystic` | Exo 2               | Futuristic, Synthwave    |
+| `lab`    | Open Sans           | Clinical, Scientific     |
+| `fun`    | Comic Neue          | Playful, Kids            |
 
 **Usage:**
 
 ```typescript
 palette: {
-  'font-atmos-heading': FONTS.tech,  // For h1-h6
-  'font-atmos-body': FONTS.clean,    // For body text
+  'font-atmos-heading': FONTS.tech.family,   // Use .family to get CSS string
+  'font-atmos-body': FONTS.clean.family,
 }
 ```
+
+---
+
+### Adding Custom Fonts
+
+To add a new font to the system, follow these steps:
+
+#### Step 1: Add Font Files
+
+Place `.woff2` files in `/public/fonts/`. Use the naming convention `FontName-Weight.woff2`:
+
+```
+/public/fonts/
+  MyNewFont-Regular.woff2
+  MyNewFont-Bold.woff2
+```
+
+> **Important:** Google Fonts CDN links won't work—the system requires local files. Use [google-webfonts-helper](https://gwfh.mranftl.com/fonts) to download woff2 files from Google Fonts.
+
+#### Step 2: Register Font in design-tokens.ts
+
+Add your font to the `FONTS` object:
+
+```typescript
+export const FONTS: Record<string, FontDefinition> = {
+  // ... existing fonts ...
+
+  myNewFont: {
+    family: "'My New Font', sans-serif",  // CSS font-family value
+    files: {
+      400: 'MyNewFont-Regular.woff2',      // Weight → filename
+      700: 'MyNewFont-Bold.woff2',
+    },
+    preloadWeights: [400, 700],            // Weights to preload for performance
+  },
+};
+```
+
+#### Step 3: Use in Theme (Optional)
+
+Reference in a theme palette:
+
+```typescript
+'myTheme': {
+  mode: 'dark',
+  physics: 'glass',
+  palette: {
+    'font-atmos-heading': FONTS.myNewFont.family,
+    'font-atmos-body': FONTS.myNewFont.family,
+    // ... other palette values
+  },
+}
+```
+
+#### Step 4: Generate Files
+
+Run the token generator:
+
+```bash
+npm run build:tokens
+```
+
+This regenerates:
+- `src/styles/config/_fonts.scss` — @font-face declarations
+- `src/config/font-registry.ts` — preload mappings + user font map
+
+Your font is now available for user selection in the theme picker.
 
 ---
 
@@ -375,9 +462,9 @@ Here's a fully annotated theme to use as a template.
     // 1. SEMANTIC COLORS (Auto-generated variants)
     ...SEMANTIC_DARK,
 
-    // 2. FONTS
-    'font-atmos-heading': FONTS.mystic,  // Exo 2 (Futuristic)
-    'font-atmos-body': FONTS.clean,      // Inter (Readable)
+    // 2. FONTS (use .family to get CSS string)
+    'font-atmos-heading': FONTS.mystic.family,  // Exo 2 (Futuristic)
+    'font-atmos-body': FONTS.clean.family,      // Inter (Readable)
 
     // 3. LAYER 1: CANVAS (Foundation)
     'bg-canvas': '#0a0014',              // Deep purple-black
@@ -652,6 +739,8 @@ Increase opacity or adjust base color:
 - **Design Tokens:** [src/config/design-tokens.ts](src/config/design-tokens.ts)
 - **Void Engine (Guardrails):** [src/adapters/void-engine.svelte.ts](src/adapters/void-engine.svelte.ts)
 - **Generated Themes (SCSS):** [src/styles/config/\_generated-themes.scss](src/styles/config/_generated-themes.scss)
+- **Generated Fonts (SCSS):** [src/styles/config/\_fonts.scss](src/styles/config/_fonts.scss) *(auto-generated)*
+- **Font Registry (TS):** [src/config/font-registry.ts](src/config/font-registry.ts) *(auto-generated)*
 - **Theme Registry (JSON):** [src/config/void-registry.json](src/config/void-registry.json)
 
 ---

@@ -1,6 +1,7 @@
 export const STORAGE_KEYS = {
   ATMOSPHERE: 'void_atmosphere',
   USER_CONFIG: 'void_user_config',
+  THEME_CACHE: 'void_theme_cache',
 } as const;
 
 export const DOM_ATTRS = {

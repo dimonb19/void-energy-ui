@@ -10,7 +10,7 @@
 <div
   class="grid grid-cols-1 small-desktop:grid-cols-[12rem_1fr] gap-md w-full items-start"
 >
-  <h4 class="small-desktop:my-auto small-desktop:text-left">
+  <h4 class="text-center small-desktop:text-left small-desktop:my-auto">
     {label}
   </h4>
 

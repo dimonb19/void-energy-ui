@@ -123,18 +123,118 @@ export const VOID_RADIUS = {
 // SHARED ASSETS (Fonts & Colors)
 // --------------------------------------------------------------------------
 
-const FONTS = {
-  tech: "'Hanken Grotesk', sans-serif",
-  clean: "'Inter', sans-serif",
-  code: "'Courier Prime', monospace",
-  horror: "'Merriweather', serif",
-  nature: "'Lora', serif",
-  hand: "'Caveat', cursive",
-  book: "'PT Serif Caption', serif",
-  arcane: "'Cinzel', serif",
-  mystic: "'Exo 2', sans-serif",
-  lab: "'Open Sans', sans-serif",
-  fun: "'Comic Neue', sans-serif",
+/**
+ * Default font weights to preload via <link rel="preload">.
+ *
+ * 400 (regular) + 700 (bold) covers ~90% of initial viewport text.
+ * Non-critical weights (300, 500, 600) load on-demand via @font-face with font-display: swap.
+ */
+export const DEFAULT_PRELOAD_WEIGHTS = [400, 700] as const;
+
+/**
+ * Font Definition System (Single Source of Truth)
+ *
+ * Each font entry contains:
+ * - family: CSS font-family string with fallbacks
+ * - files: Weight → filename mapping (generates @font-face rules)
+ * - preloadWeights: (optional) Override DEFAULT_PRELOAD_WEIGHTS if needed
+ *
+ * This definition is used to generate:
+ * 1. _fonts.scss (@font-face declarations)
+ * 2. font-registry.ts (preload mappings)
+ */
+export interface FontDefinition {
+  family: string;
+  files: Record<number, string>;
+  /** Override DEFAULT_PRELOAD_WEIGHTS if this font needs different preload behavior */
+  preloadWeights?: number[];
+}
+
+export const FONTS: Record<string, FontDefinition> = {
+  tech: {
+    family: "'Hanken Grotesk', sans-serif",
+    files: {
+      300: 'HankenGrotesk-Light.woff2',
+      400: 'HankenGrotesk-Regular.woff2',
+      500: 'HankenGrotesk-Medium.woff2',
+      600: 'HankenGrotesk-SemiBold.woff2',
+      700: 'HankenGrotesk-Bold.woff2',
+    },
+  },
+  clean: {
+    family: "'Inter', sans-serif",
+    files: {
+      400: 'Inter-Regular.woff2',
+      500: 'Inter-Medium.woff2',
+      600: 'Inter-SemiBold.woff2',
+      700: 'Inter-Bold.woff2',
+    },
+  },
+  code: {
+    family: "'Courier Prime', monospace",
+    files: {
+      400: 'CourierPrime-Regular.woff2',
+      700: 'CourierPrime-Bold.woff2',
+    },
+  },
+  horror: {
+    family: "'Merriweather', serif",
+    files: {
+      400: 'Merriweather24pt-Regular.woff2',
+      700: 'Merriweather24pt-Bold.woff2',
+    },
+  },
+  nature: {
+    family: "'Lora', serif",
+    files: {
+      400: 'Lora-Regular.woff2',
+      700: 'Lora-Bold.woff2',
+    },
+  },
+  hand: {
+    family: "'Caveat', cursive",
+    files: {
+      400: 'Caveat-Regular.woff2',
+      700: 'Caveat-Bold.woff2',
+    },
+  },
+  book: {
+    family: "'PT Serif Caption', serif",
+    files: {
+      400: 'PTSerifCaption-Regular.woff2',
+      700: 'PTSerif-Bold.woff2',
+    },
+  },
+  arcane: {
+    family: "'Cinzel', serif",
+    files: {
+      400: 'Cinzel-Regular.woff2',
+      700: 'Cinzel-Bold.woff2',
+    },
+  },
+  mystic: {
+    family: "'Exo 2', sans-serif",
+    files: {
+      400: 'Exo2-Regular.woff2',
+      700: 'Exo2-Bold.woff2',
+    },
+  },
+  lab: {
+    family: "'Open Sans', sans-serif",
+    files: {
+      400: 'OpenSans-Regular.woff2',
+      500: 'OpenSans-Medium.woff2',
+      600: 'OpenSans-SemiBold.woff2',
+      700: 'OpenSans-Bold.woff2',
+    },
+  },
+  fun: {
+    family: "'Comic Neue', sans-serif",
+    files: {
+      400: 'ComicNeue-Regular.woff2',
+      700: 'ComicNeue-Bold.woff2',
+    },
+  },
 };
 
 const SEMANTIC_DARK = {
@@ -258,9 +358,9 @@ export const VOID_TYPOGRAPHY = {
   // Font Families (Atmosphere-specific, defined in themes)
   // These are defaults, actual fonts come from theme.palette['font-atmos-heading']
   families: {
-    heading: "'Hanken Grotesk', sans-serif", // Default for headings
-    body: "'Inter', sans-serif", // Default for body
-    mono: "'Courier Prime', monospace", // Default for code
+    heading: FONTS.tech.family, // Default for headings
+    body: FONTS.clean.family, // Default for body
+    mono: FONTS.code.family, // Default for code
   },
 } as const;
 
@@ -417,8 +517,8 @@ export const VOID_TOKENS = {
       tagline: 'Default / Cyber',
       palette: {
         ...SEMANTIC_DARK,
-        'font-atmos-heading': FONTS.tech,
-        'font-atmos-body': FONTS.tech,
+        'font-atmos-heading': FONTS.tech.family,
+        'font-atmos-body': FONTS.tech.family,
         'bg-canvas': '#010020',
         'bg-spotlight': '#0a0c2b',
         'bg-surface': 'rgba(22, 30, 95, 0.4)', // 40% Opacity for Glass
@@ -439,8 +539,8 @@ export const VOID_TOKENS = {
       tagline: 'Stealth / Cinema',
       palette: {
         ...SEMANTIC_DARK,
-        'font-atmos-heading': FONTS.clean,
-        'font-atmos-body': FONTS.clean,
+        'font-atmos-heading': FONTS.clean.family,
+        'font-atmos-body': FONTS.clean.family,
         'bg-canvas': '#000000',
         'bg-spotlight': '#1c1c1c',
         'bg-surface': 'rgba(30, 30, 30, 0.6)',
@@ -461,8 +561,8 @@ export const VOID_TOKENS = {
       tagline: 'Hacker / Retro',
       palette: {
         ...SEMANTIC_DARK,
-        'font-atmos-heading': FONTS.code,
-        'font-atmos-body': FONTS.code,
+        'font-atmos-heading': FONTS.code.family,
+        'font-atmos-body': FONTS.code.family,
         'bg-canvas': '#050505',
         'bg-spotlight': '#141414',
         'bg-surface': 'rgba(0, 20, 0, 0.9)',
@@ -484,8 +584,8 @@ export const VOID_TOKENS = {
       tagline: 'Synthwave / Cosmic',
       palette: {
         ...SEMANTIC_DARK,
-        'font-atmos-heading': FONTS.mystic,
-        'font-atmos-body': FONTS.clean,
+        'font-atmos-heading': FONTS.mystic.family,
+        'font-atmos-body': FONTS.clean.family,
         'bg-canvas': '#0a0014',
         'bg-spotlight': '#240046',
         'bg-surface': 'rgba(20, 0, 40, 0.6)',
@@ -506,8 +606,8 @@ export const VOID_TOKENS = {
       tagline: 'Royal / Gold',
       palette: {
         ...SEMANTIC_DARK,
-        'font-atmos-heading': FONTS.arcane,
-        'font-atmos-body': FONTS.book,
+        'font-atmos-heading': FONTS.arcane.family,
+        'font-atmos-body': FONTS.book.family,
         'bg-canvas': '#120a00',
         'bg-spotlight': '#2b1d00',
         'bg-surface': 'rgba(20, 10, 0, 0.6)',
@@ -528,8 +628,8 @@ export const VOID_TOKENS = {
       tagline: 'Nature / Organic',
       palette: {
         ...SEMANTIC_DARK,
-        'font-atmos-heading': FONTS.nature,
-        'font-atmos-body': FONTS.nature,
+        'font-atmos-heading': FONTS.nature.family,
+        'font-atmos-body': FONTS.nature.family,
         'bg-canvas': '#051a0a',
         'bg-spotlight': '#0e2e14',
         'bg-surface': 'rgba(0, 40, 10, 0.5)',
@@ -550,8 +650,8 @@ export const VOID_TOKENS = {
       tagline: 'Romance / Soft',
       palette: {
         ...SEMANTIC_DARK,
-        'font-atmos-heading': FONTS.hand,
-        'font-atmos-body': FONTS.book,
+        'font-atmos-heading': FONTS.hand.family,
+        'font-atmos-body': FONTS.book.family,
         'bg-canvas': '#1a0510',
         'bg-spotlight': '#2e0b1d',
         'bg-surface': 'rgba(50, 0, 20, 0.5)',
@@ -572,8 +672,8 @@ export const VOID_TOKENS = {
       tagline: 'Horror / Intense',
       palette: {
         ...SEMANTIC_DARK,
-        'font-atmos-heading': FONTS.horror,
-        'font-atmos-body': FONTS.horror,
+        'font-atmos-heading': FONTS.horror.family,
+        'font-atmos-body': FONTS.horror.family,
         'bg-canvas': '#180808',
         'bg-spotlight': '#2b0f0f',
         'bg-surface': 'rgba(60, 0, 0, 0.6)',
@@ -598,8 +698,8 @@ export const VOID_TOKENS = {
       tagline: 'Light / Print',
       palette: {
         ...SEMANTIC_LIGHT,
-        'font-atmos-heading': FONTS.book,
-        'font-atmos-body': FONTS.book,
+        'font-atmos-heading': FONTS.book.family,
+        'font-atmos-body': FONTS.book.family,
         'bg-canvas': '#faeed1',
         'bg-spotlight': '#fff8e1',
         'bg-surface': '#fdf6e3',
@@ -620,8 +720,8 @@ export const VOID_TOKENS = {
       tagline: 'Distraction Free',
       palette: {
         ...SEMANTIC_LIGHT,
-        'font-atmos-heading': FONTS.clean,
-        'font-atmos-body': FONTS.clean,
+        'font-atmos-heading': FONTS.clean.family,
+        'font-atmos-body': FONTS.clean.family,
         'bg-canvas': '#ffffff',
         'bg-spotlight': '#f5f5f5',
         'bg-surface': '#ffffff',
@@ -642,8 +742,8 @@ export const VOID_TOKENS = {
       tagline: 'Science / Clinical',
       palette: {
         ...SEMANTIC_LIGHT,
-        'font-atmos-heading': FONTS.lab,
-        'font-atmos-body': FONTS.lab,
+        'font-atmos-heading': FONTS.lab.family,
+        'font-atmos-body': FONTS.lab.family,
         'bg-canvas': '#f1f5f9',
         'bg-spotlight': '#ffffff',
         'bg-surface': '#ffffff',
@@ -664,8 +764,8 @@ export const VOID_TOKENS = {
       tagline: 'Playful / Vibrant',
       palette: {
         ...SEMANTIC_LIGHT,
-        'font-atmos-heading': FONTS.fun,
-        'font-atmos-body': FONTS.fun,
+        'font-atmos-heading': FONTS.fun.family,
+        'font-atmos-body': FONTS.fun.family,
         'bg-canvas': '#e0f7fa',
         'bg-spotlight': '#ffffff',
         'bg-surface': '#ffffff',
@@ -680,3 +780,66 @@ export const VOID_TOKENS = {
     },
   },
 };
+
+// --------------------------------------------------------------------------
+// FONT UTILITIES (For Build-Time Generation)
+// --------------------------------------------------------------------------
+
+/**
+ * Reverse lookup: font-family string → font key
+ * Used by generate-tokens.ts to find which font files to preload for a theme.
+ */
+export const FONT_FAMILY_TO_KEY: Record<string, keyof typeof FONTS> =
+  Object.fromEntries(
+    Object.entries(FONTS).map(([key, def]) => [
+      def.family,
+      key as keyof typeof FONTS,
+    ]),
+  ) as Record<string, keyof typeof FONTS>;
+
+/**
+ * Get preload files for a theme based on its font families.
+ * Returns an array of font file paths to preload.
+ */
+export function getThemePreloadFonts(
+  themeId: keyof typeof VOID_TOKENS.themes,
+): string[] {
+  const theme = VOID_TOKENS.themes[themeId];
+  if (!theme) return [];
+
+  const headingFamily = theme.palette['font-atmos-heading'];
+  const bodyFamily = theme.palette['font-atmos-body'];
+
+  const files: string[] = [];
+  const seenFamilies = new Set<string>();
+
+  for (const family of [headingFamily, bodyFamily]) {
+    if (seenFamilies.has(family)) continue;
+    seenFamilies.add(family);
+
+    const fontKey = FONT_FAMILY_TO_KEY[family];
+    if (!fontKey) continue;
+
+    const fontDef = FONTS[fontKey];
+    const preloadWeights = fontDef.preloadWeights ?? DEFAULT_PRELOAD_WEIGHTS;
+    for (const weight of preloadWeights) {
+      const file = fontDef.files[weight];
+      if (file) {
+        files.push(`/fonts/${file}`);
+      }
+    }
+  }
+
+  return files;
+}
+
+/**
+ * Get user-selectable font name from font key.
+ * Extracts the display name from the font-family string.
+ */
+export function getFontDisplayName(fontKey: keyof typeof FONTS): string {
+  const family = FONTS[fontKey].family;
+  // Extract name from "'Font Name', fallback" format
+  const match = family.match(/^'([^']+)'/);
+  return match ? match[1] : fontKey;
+}
