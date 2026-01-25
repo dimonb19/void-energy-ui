@@ -4,19 +4,13 @@
 </script>
 
 <svg
-  class="icon text-premium fill-none {className ?? ''}"
-  viewBox="0 0 24 24"
-  fill="none"
-  stroke="currentColor"
-  stroke-width="2"
-  stroke-linecap="round"
-  stroke-linejoin="round"
+  class="icon text-premium {className ?? ''}"
+  viewBox="0 0 123.996 123.996"
+  fill="currentColor"
   aria-hidden="true"
   {...rest}
 >
   <path
-    d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"
+    d="M9.821,118.048h104.4c7.3,0,12-7.7,8.7-14.2l-52.2-92.5c-3.601-7.199-13.9-7.199-17.5,0l-52.2,92.5 C-2.179,110.348,2.521,118.048,9.821,118.048z M70.222,96.548c0,4.8-3.5,8.5-8.5,8.5s-8.5-3.7-8.5-8.5v-0.2c0-4.8,3.5-8.5,8.5-8.5 s8.5,3.7,8.5,8.5V96.548z M57.121,34.048h9.801c2.699,0,4.3,2.3,4,5.2l-4.301,37.6c-0.3,2.7-2.1,4.4-4.6,4.4s-4.3-1.7-4.6-4.4 l-4.301-37.6C52.821,36.348,54.422,34.048,57.121,34.048z"
   />
-  <line x1="12" y1="9" x2="12" y2="13" />
-  <circle cx="12" cy="17" r="1" fill="currentColor" stroke="none" />
 </svg>
