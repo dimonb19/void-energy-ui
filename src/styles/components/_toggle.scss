@@ -1,0 +1,295 @@
+/* ==========================================================================
+ * TOGGLE
+ * ==========================================================================
+ *
+ * Physics-aware toggle switch for boolean on/off states.
+ * Uses role="switch" semantics (distinct from Switcher's role="radiogroup").
+ *
+ * ANATOMY:
+ * - .toggle-wrapper      : Container with optional label (geometry via Tailwind)
+ * - .toggle              : Button element (role="switch")
+ * - .toggle__track       : Background track (sunk surface)
+ * - .toggle__content     : Icon container (positioned right, fades on check)
+ * - .toggle__thumb       : Sliding indicator (floats)
+ * - .toggle__label       : Optional external text label
+ *
+ * SIZE VARIANTS (data-size attribute, same scale as icons):
+ * - sm: caption size
+ * - md: body size (default)
+ * - lg: h5 size
+ * - xl: h4 size
+ * - 2xl/3xl/4xl: h3/h2/h1 sizes
+ *
+ * ICON DESIGN:
+ * - Default: Only OFF indicator (○) shown, fades when checked
+ * - Custom: Both iconOn (left) and iconOff (right) supported
+ * - Icons cross-fade based on aria-checked state
+ * data-size controls font-size → dimensions scale proportionally.
+ *
+ * @see /CHEAT-SHEET.md for usage examples
+ * ==========================================================================
+ */
+
+@use '../abstracts' as *;
+
+// ==========================================================================
+// TOGGLE WRAPPER
+// ==========================================================================
+
+.toggle-wrapper {
+  // Geometry (inline-flex, items-center, gap-xs) handled by Tailwind in markup
+
+  &--disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .toggle__label {
+    user-select: none;
+    cursor: pointer;
+
+    .toggle-wrapper--disabled & {
+      cursor: not-allowed;
+    }
+  }
+}
+
+// ==========================================================================
+// TOGGLE
+// ==========================================================================
+
+.toggle {
+  @include btn-reset;
+
+  position: relative;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+
+  // ---------------------------------------------------------------------------
+  // Base font-size (md) — controls icon size, toggle scales around it
+  // ---------------------------------------------------------------------------
+
+  font-size: var(--font-size-body);
+
+  // ---------------------------------------------------------------------------
+  // Unified dimensions (icon-first architecture)
+  // ---------------------------------------------------------------------------
+
+  --_content-size: calc(1.6em * var(--density, 1));
+  --_track-width: calc(4em * var(--density, 1));
+  --_thumb-size: calc(1.5em * var(--density, 1));
+  --_thumb-offset: calc(0.25em * var(--density, 1));
+  // Track height = thumb + padding×2 + border×2 (ensures symmetric gaps all sides)
+  --_track-height: calc(
+    var(--_thumb-size) + var(--_thumb-offset) * 2 +
+      var(--physics-border-width) * 2
+  );
+  // Travel distance accounts for border width (2px in retro, 1px in glass/flat)
+  --_thumb-travel: calc(
+    var(--_track-width) - var(--_thumb-size) - var(--_thumb-offset) *
+      2 - var(--physics-border-width) * 2
+  );
+
+  // ---------------------------------------------------------------------------
+  // Size variants — only font-size changes, everything else scales
+  // Matches icon system: sm (caption) < md (body, default) < lg < xl < 2xl...
+  // ---------------------------------------------------------------------------
+
+  &[data-size='sm'] {
+    font-size: var(--font-size-caption);
+  }
+  &[data-size='lg'] {
+    font-size: var(--font-size-h5);
+  }
+  &[data-size='xl'] {
+    font-size: var(--font-size-h4);
+  }
+  &[data-size='2xl'] {
+    font-size: var(--font-size-h3);
+  }
+  &[data-size='3xl'] {
+    font-size: var(--font-size-h2);
+  }
+  &[data-size='4xl'] {
+    font-size: var(--font-size-h1);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Track
+  // ---------------------------------------------------------------------------
+
+  &__track {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: var(--_track-width);
+    height: var(--_track-height);
+    padding: var(--_thumb-offset);
+
+    @include glass-sunk;
+    border-radius: var(--radius-full);
+
+    transition:
+      background-color var(--speed-fast) var(--ease-spring-snappy),
+      border-color var(--speed-fast) var(--ease-spring-snappy),
+      box-shadow var(--speed-fast) var(--ease-spring-snappy);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Content (icons in track, left=ON, right=OFF)
+  // ---------------------------------------------------------------------------
+
+  &__content {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    z-index: 0;
+
+    width: var(--_content-size);
+    height: var(--_content-size);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-mute);
+
+    transition:
+      opacity var(--speed-fast) var(--ease-spring-snappy),
+      color var(--speed-fast) var(--ease-spring-snappy);
+
+    &--left {
+      // Center icon at thumb's OFF position (left side)
+      left: calc(
+        var(--_thumb-offset) + var(--_thumb-size) / 2 - var(--_content-size) / 2
+      );
+      opacity: 0; // Hidden by default (no default ON icon)
+    }
+
+    &--right {
+      // Center icon at thumb's ON position (right side)
+      right: calc(
+        var(--_thumb-offset) + var(--_thumb-size) / 2 - var(--_content-size) / 2
+      );
+      opacity: 0.7; // Visible by default (default OFF icon)
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Thumb
+  // ---------------------------------------------------------------------------
+
+  &__thumb {
+    position: relative;
+    z-index: 1;
+    width: var(--_thumb-size);
+    height: var(--_thumb-size);
+    border-radius: var(--radius-full);
+
+    background: var(--energy-secondary);
+
+    transition:
+      transform var(--speed-fast) var(--ease-spring-snappy),
+      background-color var(--speed-fast) var(--ease-spring-snappy),
+      border-color var(--speed-fast) var(--ease-spring-snappy),
+      box-shadow var(--speed-fast) var(--ease-spring-snappy);
+
+    transform: translateX(0);
+
+    @include when-light {
+      background: var(--text-dim);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // State: Unchecked
+  // ---------------------------------------------------------------------------
+
+  &[aria-checked='false'] {
+    opacity: 0.85;
+
+    .toggle__track {
+      border-color: alpha(var(--energy-secondary), 50%);
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // State: Checked
+  // ---------------------------------------------------------------------------
+
+  &[aria-checked='true'] {
+    .toggle__track {
+      background: alpha(var(--energy-primary), 15%);
+      border-color: var(--energy-primary);
+
+      @include when-glass {
+        background: alpha(var(--energy-primary), 25%);
+      }
+    }
+
+    .toggle__thumb {
+      transform: translateX(var(--_thumb-travel));
+      background: var(--energy-primary);
+    }
+
+    .toggle__content--left {
+      opacity: 1; // ON icon visible when checked
+      color: var(--energy-primary);
+    }
+
+    .toggle__content--right {
+      opacity: 0; // OFF icon fades when checked
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // State: Disabled
+  // ---------------------------------------------------------------------------
+
+  &:disabled {
+    cursor: not-allowed;
+
+    .toggle__track {
+      background: alpha(var(--border-color), 15%);
+      border-color: alpha(var(--border-color), 30%);
+      box-shadow: none;
+    }
+
+    .toggle__thumb {
+      background: var(--text-mute);
+      opacity: 0.5;
+      box-shadow: none;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // State: Hover (Desktop Only)
+  // ---------------------------------------------------------------------------
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      .toggle__thumb {
+        transform: translateX(0) scale(var(--scale, 1));
+      }
+
+      // When checked, thumb is already at far right - only scale, no additional translate
+      &[aria-checked='true'] .toggle__thumb {
+        transform: translateX(var(--_thumb-travel)) scale(var(--scale, 1));
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // State: Active (Press)
+  // ---------------------------------------------------------------------------
+
+  &:active:not(:disabled) {
+    .toggle__thumb {
+      transform: translateX(0) scale(0.96);
+    }
+
+    &[aria-checked='true'] .toggle__thumb {
+      transform: translateX(var(--_thumb-travel)) scale(0.96);
+    }
+  }
+}

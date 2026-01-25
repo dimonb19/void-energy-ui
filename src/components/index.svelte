@@ -10,6 +10,10 @@
   import ThemeSelector from './ui/Themes.svelte';
   import SettingsRow from './ui/SettingsRow.svelte';
   import PullRefresh from './ui/PullRefresh.svelte';
+  import Toggle from './ui/Toggle.svelte';
+
+  import Sun from './icons/Sun.svelte';
+  import Moon from './icons/Moon.svelte';
 
   // Pull-to-refresh handlers
   async function handleRefresh(): Promise<void> {
@@ -45,12 +49,19 @@
   ]);
   let newPremiumTile = $state('Quantum Core');
 
+  // Local state for the showcase
+  let systemMode = $state(true);
+  let aiSentiment = $state(true);
+  let telemetry = $state(true);
+  let stealth = $state(false);
+  let rootAccess = $state(false); // Disabled state
+
   // Test functions for temporary theme feature
   function testCustomTheme() {
     // Don't register if adaptation is disabled
     if (!voidEngine.userConfig.adaptAtmosphere) {
       toast.show(
-        'Theme override blocked (adaptAtmosphere disabled)',
+        'Enable "Adapt Atmosphere" to allow theme changes.',
         'warning',
       );
       return;
@@ -86,7 +97,7 @@
       toast.show('Crimson theme applied temporarily', 'success');
     } else {
       toast.show(
-        'Theme override blocked (adaptAtmosphere disabled)',
+        'Enable "Adapt Atmosphere" to allow theme changes.',
         'warning',
       );
     }
@@ -447,6 +458,46 @@
                   <option>30 HZ</option>
                 </select>
               </div>
+            </div>
+          </SettingsRow>
+
+          <hr />
+
+          <SettingsRow label="System Controls">
+            <div
+              class="surface-sunk p-sm flex flex-col flex-wrap justify-center items-center tablet:flex-row gap-md"
+            >
+              <Toggle
+                bind:checked={systemMode}
+                id="toggle-mode"
+                label="System Mode"
+                iconOn={Sun}
+                iconOff={Moon}
+              />
+              <Toggle
+                bind:checked={aiSentiment}
+                id="toggle-sentiment"
+                label="AI Sentiment"
+                iconOn="😄"
+                iconOff="😡"
+              />
+              <Toggle
+                bind:checked={telemetry}
+                id="toggle-telemetry"
+                label="Telemetry Sync"
+              />
+              <Toggle
+                bind:checked={stealth}
+                id="toggle-stealth"
+                label="Stealth Protocol"
+                hideIcons={true}
+              />
+              <Toggle
+                bind:checked={rootAccess}
+                id="toggle-root"
+                label="Root Access"
+                disabled={true}
+              />
             </div>
           </SettingsRow>
         </div>

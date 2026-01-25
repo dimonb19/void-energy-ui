@@ -324,3 +324,26 @@ interface SwitcherProps {
   disabled?: boolean;
   className?: string;
 }
+
+interface ToggleProps {
+  /** Current state (bindable) */
+  checked: boolean;
+  /** Callback when toggle changes */
+  onchange?: (checked?: boolean) => void;
+  /** Accessible label (displayed if provided) */
+  label?: string;
+  /** ID for label association (auto-generated if omitted) */
+  id?: string;
+  /** Disable interaction */
+  disabled?: boolean;
+  /** Additional CSS classes */
+  className?: string;
+  /** Size variant (same scale as icons): sm | md | lg | xl | 2xl | 3xl | 4xl */
+  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
+  /** ON state icon, displayed on left (optional, no default) */
+  iconOn?: string | import('svelte').Component;
+  /** OFF state icon, displayed on right (default: circle ○) */
+  iconOff?: string | import('svelte').Component;
+  /** Hide icons entirely */
+  hideIcons?: boolean;
+}

@@ -15,6 +15,8 @@
   import Sun from '../icons/Sun.svelte';
   import Moon from '../icons/Moon.svelte';
 
+  import Toggle from '../ui/Toggle.svelte';
+
   // Helper to capitalize strings (e.g., "void" → "Void")
   const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -118,7 +120,7 @@
   let showAdvancedSettings = $state<boolean>(false);
 
   // Toggle adaptive atmosphere (persisted via voidEngine.userConfig)
-  function toggleAdaptAtmosphere(event: Event, value?: boolean) {
+  function toggleAdaptAtmosphere(value?: boolean) {
     const newValue = value ?? !voidEngine.userConfig.adaptAtmosphere;
     voidEngine.setPreferences({ adaptAtmosphere: newValue });
 
@@ -151,15 +153,15 @@
     voidEngine.setPreferences({ density: d });
     toast.show(`${d.toUpperCase()} density applied`);
   }
+
+  let enabled = $state(false);
 </script>
 
 <h2 class="text-h3 text-center">
   Atmosphere: {voidEngine.atmosphere.toUpperCase()}
 </h2>
 
-<span
-  class="surface-sunk flex flex-col items-center justify-center gap-sm p-sm"
->
+<div class="surface-sunk flex flex-col items-center justify-center gap-sm p-sm">
   <p class="text-center">Tune how your interface looks, moves, and breathes.</p>
 
   <Switcher
@@ -167,7 +169,7 @@
     value={activeMode}
     onchange={(value) => (activeMode = value as 'dark' | 'light')}
   />
-</span>
+</div>
 
 <!-- Temporary Theme Indicator -->
 {#if voidEngine.hasTemporaryTheme}
@@ -189,7 +191,7 @@
       </button>
       <button
         class="btn-alert"
-        onclick={(event) => toggleAdaptAtmosphere(event, false)}
+        onclick={(event) => toggleAdaptAtmosphere(false)}
       >
         Don't adapt to stories
       </button>
@@ -235,20 +237,15 @@
   {/each}
 </div>
 
-<div class="flex flex-row flex-wrap justify-center gap-md">
-  <label
-    for="platform-override-theme"
-    class="flex items-center gap-xs text-small text-mute"
-  >
-    <input
-      id="platform-override-theme"
-      type="checkbox"
-      checked={voidEngine.userConfig.adaptAtmosphere}
-      onchange={toggleAdaptAtmosphere}
-    />
-    Adapt to story mood. Stories can temporarily override your theme.
-    <!-- Allow the interface to adapt its Atmosphere to match the current story's mood. -->
-  </label>
+<div class="flex flex-col items-center gap-xs">
+  <Toggle
+    bind:checked={voidEngine.userConfig.adaptAtmosphere}
+    label="Adapt to story mood"
+    onchange={toggleAdaptAtmosphere}
+  />
+  <p class="text-caption text-mute">
+    (Stories can temporarily override your theme)
+  </p>
 </div>
 
 {#if showAdvancedSettings}
