@@ -8,14 +8,6 @@ import THEME_REGISTRY from '../config/void-registry.json';
 import { STORAGE_KEYS, DOM_ATTRS, DEFAULTS } from '../config/constants';
 import { applyTheme, applyPreferences } from '../lib/void-boot';
 
-interface UserConfig {
-  fontHeading: string | null;
-  fontBody: string | null;
-  scale: number;
-  density: 'high' | 'standard' | 'low';
-  adaptAtmosphere: boolean; // Allow theme to adapt to story mood
-}
-
 // Mode-aware palette fallbacks for incomplete theme definitions.
 // Uses SEMANTIC_DARK/SEMANTIC_LIGHT from design-tokens.ts for correct semantic colors.
 const FALLBACK_DARK: VoidPalette = {

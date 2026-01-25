@@ -56,6 +56,19 @@
    2. MATERIAL (Physics)  → SCSS (`.surface-glass .btn-cta`)
    3. STATE (Attributes)  → `[data-state="open"]` NOT `.is-active`
 
+   📝 SCSS NAMING CONVENTION:
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ .component              → Root element                                  │
+   │ .component-element      → Sub-element (single hyphen, no __)           │
+   │ .component-variant      → Semantic variant                              │
+   │ .component-element-mod  → Sub-element with modifier (no --)            │
+   │                                                                         │
+   │ States via data/ARIA attributes only:                                   │
+   │   ✓ .toggle[aria-checked='true']                                        │
+   │   ✓ .chip[data-type='success']                                          │
+   │   ✗ .toggle--checked, .is-active, .has-error                           │
+   └─────────────────────────────────────────────────────────────────────────┘
+
    👉 See /CHEAT-SHEET.md for:
    - Full component catalog (.surface-glass, .surface-sunk, .btn-cta)
    - Mixin reference with examples (@include glass-float, @include glass-sunk)

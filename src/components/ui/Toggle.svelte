@@ -40,6 +40,21 @@
   @see /_toggle.scss for physics-aware styling
 -->
 <script lang="ts">
+  import type { Component } from 'svelte';
+
+  interface ToggleProps {
+    checked: boolean;
+    onchange?: (checked?: boolean) => void;
+    label?: string;
+    id?: string;
+    disabled?: boolean;
+    className?: string;
+    size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
+    iconOn?: string | Component;
+    iconOff?: string | Component;
+    hideIcons?: boolean;
+  }
+
   let {
     checked = $bindable(false),
     onchange,
@@ -77,12 +92,9 @@
   </svg>
 {/snippet}
 
-<div
-  class="toggle-wrapper inline-flex items-center gap-xs {className}"
-  class:toggle-wrapper--disabled={disabled}
->
+<div class="toggle-wrapper inline-flex items-center gap-xs {className}">
   {#if label}
-    <label for={inputId} class="toggle__label text-small">
+    <label for={inputId} class="toggle-label text-small">
       {label}
     </label>
   {/if}
@@ -98,14 +110,11 @@
     {disabled}
     onclick={toggle}
   >
-    <span class="toggle__track">
+    <span class="toggle-track">
       {#if !hideIcons}
         <!-- Left (ON) icon: only rendered if custom iconOn provided -->
         {#if iconOn}
-          <span
-            class="toggle__content toggle__content--left"
-            aria-hidden="true"
-          >
+          <span class="toggle-content toggle-content-left" aria-hidden="true">
             {#if typeof iconOn === 'string'}
               {iconOn}
             {:else}
@@ -116,7 +125,7 @@
         {/if}
 
         <!-- Right (OFF) icon: custom or default circle -->
-        <span class="toggle__content toggle__content--right" aria-hidden="true">
+        <span class="toggle-content toggle-content-right" aria-hidden="true">
           {#if iconOff}
             {#if typeof iconOff === 'string'}
               {iconOff}
@@ -130,7 +139,7 @@
         </span>
       {/if}
 
-      <span class="toggle__thumb" aria-hidden="true"></span>
+      <span class="toggle-thumb" aria-hidden="true"></span>
     </span>
   </button>
 </div>

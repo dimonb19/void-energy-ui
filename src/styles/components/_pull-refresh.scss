@@ -1,7 +1,8 @@
 /* Pull-to-Refresh component styles.
  *
- * Indicator floats ON TOP of content (z: float).
- * Content translates down, indicator stays fixed at top.
+ * Indicator emerges FROM BEHIND the navbar (modern mobile convention).
+ * Uses fixed positioning + transform to create the emergence effect.
+ * Navbar z-index (90) masks indicator z-index (20) until pull reveals it.
  */
 
 @use '../abstracts' as *;
@@ -22,15 +23,27 @@
 }
 
 // ==========================================================================
-// INDICATOR (Floats on top, fixed at top)
+// INDICATOR (Emerges from behind navbar)
 // ==========================================================================
 
 .pull-indicator {
-  position: absolute;
-  top: var(--space-md);
+  position: fixed;
+  top: 0; // Anchor at viewport top
   left: 50%;
-  transform: translateX(-50%);
-  z-index: z('float'); // ABOVE content (10)
+
+  // Emerge from behind navbar, end up at same position as before (nav-height + space-md)
+  // At idle: positioned within navbar zone (hidden by navbar's z-index)
+  // At threshold+: emerges below navbar at the familiar position
+  --nav-offset: calc(var(--nav-hidden, 0) * var(--nav-height) * -1);
+  transform: translateX(-50%)
+    translateY(
+      calc(
+        var(--nav-height) + var(--space-md) - var(--pull-threshold) +
+          var(--pull-distance) + var(--nav-offset)
+      )
+    );
+
+  z-index: z('sticky'); // Below navbar (90), above content (1)
 
   // Glass capsule surface
   @include glass-float;
@@ -160,6 +173,14 @@
   }
 }
 
+// Active pull: disable transform transition for direct manipulation feel
+.pull-refresh[data-state='pulling'],
+.pull-refresh[data-state='threshold'] {
+  .pull-indicator {
+    transition: opacity var(--speed-fast) var(--ease-spring-snappy);
+  }
+}
+
 // Threshold reached: arrow flips, glow pulse
 .pull-refresh[data-state='threshold'] {
   .pull-indicator {
@@ -275,6 +296,11 @@
   .pull-indicator {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
+  }
+
+  // Binary visibility - no smooth fade, "pops" like terminal UI
+  .pull-refresh:not([data-state='idle']) .pull-indicator {
+    opacity: 1;
   }
 }
 

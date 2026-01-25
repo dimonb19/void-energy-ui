@@ -116,6 +116,14 @@
   let lastY = 0;
   let ticking = false;
 
+  // Expose navbar visibility to CSS for pull-refresh coordination
+  $effect(() => {
+    document.documentElement.style.setProperty(
+      '--nav-hidden',
+      navHidden ? '1' : '0',
+    );
+  });
+
   let searchInput: HTMLInputElement | null;
   let svgFocus = $state<boolean>(false);
   const handleSearchFocus = () => {

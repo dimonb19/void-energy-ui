@@ -195,6 +195,27 @@ type ThemeRegistryJSON = Record<
 >;
 
 // ==========================================================================
+// 2.5 USER CONFIGURATION
+// ==========================================================================
+
+/**
+ * User preferences for the Void Engine.
+ * Persisted to localStorage and applied via applyPreferences().
+ */
+interface UserConfig {
+  /** Custom heading font (null = use theme default) */
+  fontHeading: string | null;
+  /** Custom body font (null = use theme default) */
+  fontBody: string | null;
+  /** UI scale multiplier (1 = 100%) */
+  scale: number;
+  /** Spacing density factor */
+  density: VoidDensity;
+  /** Allow themes to adapt to story mood */
+  adaptAtmosphere: boolean;
+}
+
+// ==========================================================================
 // 3. COMPONENT: TOASTS
 // ==========================================================================
 
@@ -257,37 +278,7 @@ interface VoidPromiseMessages<T> {
 }
 
 // ==========================================================================
-// 4. COMPONENT: MODALS
-// ==========================================================================
-
-/**
- * Valid modal identifiers registered in modal-registry.ts.
- * Update this list when adding new modals.
- */
-type VoidModalKey = 'alert' | 'confirm' | 'settings' | 'input';
-
-/**
- * Modal configuration options.
- */
-interface VoidModalOptions {
-  /**
-   * Modal size preset mapped to CSS width tokens.
-   * - sm: Compact confirmations, alerts (32rem)
-   * - md: Standard forms, settings panels (40rem, default)
-   * - lg: Data-heavy views, complex forms (64rem)
-   * - full: Viewport-filling experiences (100vw)
-   */
-  size?: 'sm' | 'md' | 'lg' | 'full';
-
-  /**
-   * When true, prevents closing via backdrop click or Escape key.
-   * Use for critical workflows requiring explicit completion (e.g., unsaved changes).
-   */
-  preventClose?: boolean;
-}
-
-// ==========================================================================
-// 5. COMPONENT: TOOLTIPS
+// 4. COMPONENT: TOOLTIPS
 // ==========================================================================
 
 /**
@@ -306,7 +297,7 @@ interface VoidTooltipOptions {
 }
 
 // ==========================================================================
-// 6. COMPONENT: SWITCHER / SELECT
+// 5. COMPONENT: SWITCHER / SELECT
 // ==========================================================================
 
 interface SwitcherOption {
@@ -323,27 +314,4 @@ interface SwitcherProps {
   id?: string;
   disabled?: boolean;
   className?: string;
-}
-
-interface ToggleProps {
-  /** Current state (bindable) */
-  checked: boolean;
-  /** Callback when toggle changes */
-  onchange?: (checked?: boolean) => void;
-  /** Accessible label (displayed if provided) */
-  label?: string;
-  /** ID for label association (auto-generated if omitted) */
-  id?: string;
-  /** Disable interaction */
-  disabled?: boolean;
-  /** Additional CSS classes */
-  className?: string;
-  /** Size variant (same scale as icons): sm | md | lg | xl | 2xl | 3xl | 4xl */
-  size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
-  /** ON state icon, displayed on left (optional, no default) */
-  iconOn?: string | import('svelte').Component;
-  /** OFF state icon, displayed on right (default: circle ○) */
-  iconOff?: string | import('svelte').Component;
-  /** Hide icons entirely */
-  hideIcons?: boolean;
 }

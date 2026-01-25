@@ -50,10 +50,10 @@
   let newPremiumTile = $state('Quantum Core');
 
   // Local state for the showcase
-  let systemMode = $state(true);
-  let aiSentiment = $state(true);
   let telemetry = $state(true);
+  let systemMode = $state(true);
   let stealth = $state(false);
+  let aiSentiment = $state(true);
   let rootAccess = $state(false); // Disabled state
 
   // Test functions for temporary theme feature
@@ -468,6 +468,11 @@
               class="surface-sunk p-sm flex flex-col flex-wrap justify-center items-center tablet:flex-row gap-md"
             >
               <Toggle
+                bind:checked={telemetry}
+                id="toggle-telemetry"
+                label="Telemetry Sync"
+              />
+              <Toggle
                 bind:checked={systemMode}
                 id="toggle-mode"
                 label="System Mode"
@@ -475,22 +480,17 @@
                 iconOff={Moon}
               />
               <Toggle
+                bind:checked={stealth}
+                id="toggle-stealth"
+                label="Stealth Protocol"
+                hideIcons={true}
+              />
+              <Toggle
                 bind:checked={aiSentiment}
                 id="toggle-sentiment"
                 label="AI Sentiment"
                 iconOn="😄"
                 iconOff="😡"
-              />
-              <Toggle
-                bind:checked={telemetry}
-                id="toggle-telemetry"
-                label="Telemetry Sync"
-              />
-              <Toggle
-                bind:checked={stealth}
-                id="toggle-stealth"
-                label="Stealth Protocol"
-                hideIcons={true}
               />
               <Toggle
                 bind:checked={rootAccess}

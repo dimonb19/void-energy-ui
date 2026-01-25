@@ -92,7 +92,7 @@
       <button
         bind:this={optionRefs[i]}
         type="button"
-        class="switcher__option"
+        class="switcher-option"
         role="radio"
         aria-checked={value === option.value}
         tabindex={value === option.value ? 0 : -1}
@@ -103,7 +103,7 @@
         onkeydown={(e) => handleKeydown(e, i)}
       >
         {#if option.icon}
-          <span class="switcher__icon" aria-hidden="true">
+          <span class="switcher-icon" aria-hidden="true">
             {#if typeof option.icon === 'string'}
               {option.icon}
             {:else}
@@ -112,7 +112,7 @@
             {/if}
           </span>
         {/if}
-        <span class="switcher__label">{option.label}</span>
+        <span class="switcher-label">{option.label}</span>
       </button>
     {/each}
   </div>
