@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { tooltip } from '../../actions/tooltip';
+  import { tooltip } from '@actions/tooltip';
+
+  import Warning from '../icons/Warning.svelte';
 
   let {
     title = 'Confirm Action',
@@ -20,7 +22,7 @@
     <div
       class="surface-sunk p-md flex flex-row gap-md items-center justify-center text-premium"
     >
-      <span>⚠</span>
+      <Warning />
       <span>Consumes <strong>{cost} Credits</strong></span>
     </div>
   {/if}

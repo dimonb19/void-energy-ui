@@ -1,12 +1,12 @@
 <script lang="ts">
   import type { Component } from 'svelte';
-  import { materialize, dematerialize } from '../lib/transitions.svelte';
+  import { materialize, dematerialize } from '@lib/transitions.svelte';
 
   import Burger from './icons/Burger.svelte';
   import Logo from './icons/Logo.svelte';
   import Quill from './icons/Quill.svelte';
-  import SearchBtn from './icons/SearchBtn.svelte';
-  import DoorBtn from './icons/DoorBtn.svelte';
+  import Search from './icons/Search.svelte';
+  import BtnDoor from './icons/BtnDoor.svelte';
   import Dream from './icons/Dream.svelte';
   import Home from './icons/Home.svelte';
   import ThemeSelector from './ui/Themes.svelte';
@@ -55,15 +55,15 @@
     {
       id: 'ThemeSelector',
       component: ThemeSelector,
-      props: { className: 'btn-void subtab flex-row-reverse' },
+      props: { class: 'btn-void subtab flex-row-reverse' },
     },
     {
       id: 'SignOut',
-      component: DoorBtn,
+      component: BtnDoor,
       props: {
         state: 'outside',
         text: 'Sign Out',
-        className: 'subtab flex-row-reverse',
+        class: 'subtab flex-row-reverse',
         voidBtn: true,
         onclick: () => console.log('Sign Out'),
       },
@@ -126,11 +126,6 @@
 
   let searchInput: HTMLInputElement | null;
   let svgFocus = $state<boolean>(false);
-  const handleSearchFocus = () => {
-    // clicking the magnifier should focus the native input for accessibility shortcuts
-    if (!searchInput) return;
-    searchInput.focus();
-  };
 
   // "The Peek" - reveal navbar on mouse hover at top edge
   let peekTimer: ReturnType<typeof setTimeout> | null = null;
@@ -216,11 +211,7 @@
 
   <!-- Search input -->
   <span class="search">
-    <SearchBtn
-      onclick={handleSearchFocus}
-      {svgFocus}
-      className="text-secondary"
-    />
+    <Search class="text-secondary" data-state={svgFocus ? 'active' : ''} />
     <input
       id="search"
       type="text"
@@ -254,7 +245,7 @@
     aria-label={sidebarOpen ? 'Close menu' : 'Open menu'}
     aria-controls="burger-menu"
   >
-    <Burger open={sidebarOpen} />
+    <Burger data-size="2xl" data-state={sidebarOpen ? 'active' : ''} />
   </button>
 </nav>
 

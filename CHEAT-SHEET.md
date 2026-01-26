@@ -10,6 +10,11 @@
 2. [The Triad (Context Engine)](#2-the-triad-context-engine)
 3. [Responsive & Spacing (Density Engine)](#3-responsive--spacing-density-engine)
 4. [Component Catalog](#4-component-catalog)
+   - [Surfaces](#a-surfaces-the-skin)
+   - [Composites](#b-composites-skin--bone)
+   - [Overlays](#c-overlays-the-ether)
+   - [Gestures](#d-gestures)
+   - [Icons](#e-icons)
 5. [Mixin Reference](#5-mixin-reference)
 6. [Quick Patterns (Copy-Paste)](#6-quick-patterns-copy-paste)
 
@@ -184,7 +189,7 @@ Defines: **Motion**, **Blur**, **Texture**
 
 | Physics | Blur | Borders   | Motion                      | Use Cases                |
 | ------- | ---- | --------- | --------------------------- | ------------------------ |
-| `glass` | 12px | 1px Glow  | Organic (0.3s cubic-bezier) | Premium UI, Modern Apps  |
+| `glass` | 20px | 1px Glow  | Organic (0.3s cubic-bezier) | Premium UI, Modern Apps  |
 | `flat`  | 0px  | 1px Solid | Clean (0.2s ease-out)       | Professional, Accessible |
 | `retro` | 0px  | 2px Hard  | Instant (0s steps)          | Retro Games, Terminals   |
 
@@ -725,6 +730,92 @@ async function handleRefresh() {
 
 ---
 
+### E. Icons
+
+All icons are in `src/components/icons/`. Two strict categories exist (see README.md Rule #6):
+
+#### Button Icons (`Btn*.svelte`)
+
+Interactive wrappers with `onclick`, `state`, `text`, `disabled` props.
+
+| Icon | Description | States |
+| :--- | :--- | :--- |
+| `BtnDoor` | Sign in/out with label | `inside` / `outside` |
+
+**Usage:**
+
+```svelte
+<BtnDoor state="outside" text="Sign In" onclick={handleAuth} />
+```
+
+---
+
+#### Pure Icons (`Name.svelte`)
+
+SVG elements only. Use `HTMLAttributes<SVGElement>` spread pattern.
+
+**Status Icons:**
+
+| Icon | Description | Animated |
+| :--- | :--- | :--- |
+| `Checkmark` | Success indicator | — |
+| `XMark` | Error/close | — |
+| `Warning` | Alert triangle | — |
+| `Info` | Information circle | — |
+| `SpinLoader` | Loading spinner | Yes |
+
+**Navigation/UI Icons:**
+
+| Icon | Description | Animated |
+| :--- | :--- | :--- |
+| `Home` | Home/dashboard | — |
+| `Burger` | Hamburger menu | Yes (transforms to X via `data-state="active"`) |
+| `Search` | Search/magnifier | Yes (rotates via `data-state="active"`) |
+
+**Theme Icons:**
+
+| Icon | Description | Animated |
+| :--- | :--- | :--- |
+| `Sun` | Light mode | — |
+| `Moon` | Dark mode | — |
+
+**Brand Icons:**
+
+| Icon | Description | Animated |
+| :--- | :--- | :--- |
+| `Logo` | CoNexus logo | — |
+| `Quill` | Writing/author | — |
+| `Dream` | Dream mode | — |
+
+**Usage:**
+
+```svelte
+<!-- Basic -->
+<Checkmark />
+
+<!-- With size -->
+<SpinLoader data-size="lg" />
+
+<!-- With custom class -->
+<Warning class="text-error" />
+
+<!-- All SVG attributes supported -->
+<Info aria-label="More information" onclick={showHelp} />
+```
+
+**Sizing via `data-size`:**
+
+| Value | Font Size |
+| :--- | :--- |
+| `sm` | `--font-size-caption` |
+| `lg` | `--font-size-h5` |
+| `xl` | `--font-size-h4` |
+| `2xl` | `--font-size-h3` |
+| `3xl` | `--font-size-h2` |
+| `4xl` | `--font-size-h1` |
+
+---
+
 ## 5. Mixin Reference
 
 ### Surface Mixins
@@ -975,7 +1066,7 @@ h2 {
 ### H. Toast Notification (Programmatic)
 
 ```typescript
-import { toast } from '$lib/stores/toast.svelte';
+import { toast } from '@stores/toast.svelte';
 
 // Basic toasts (auto-dismiss after 4s)
 toast.show('Operation completed!', 'success');

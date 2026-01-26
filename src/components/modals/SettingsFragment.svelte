@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { modal } from '../../lib/modal-manager.svelte';
+  import { modal } from '@lib/modal-manager.svelte';
 
   import Selector from '../ui/Selector.svelte';
 

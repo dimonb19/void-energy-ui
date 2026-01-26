@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { modal } from '../../lib/modal-manager.svelte';
+  import { modal } from '@lib/modal-manager.svelte';
 
   let { title = 'System Alert', body } = $props();
 </script>

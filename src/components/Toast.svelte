@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { toast } from '../stores/toast.svelte';
-  import { dematerialize, materialize } from '../lib/transitions.svelte';
+  import { toast } from '@stores/toast.svelte';
+  import { dematerialize, materialize } from '@lib/transitions.svelte';
   import Info from './icons/Info.svelte';
   import Checkmark from './icons/Checkmark.svelte';
   import Warning from './icons/Warning.svelte';

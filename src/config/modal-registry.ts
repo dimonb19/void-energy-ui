@@ -1,7 +1,7 @@
-import AlertFragment from '../components/modals/AlertFragment.svelte';
-import ConfirmFragment from '../components/modals/ConfirmFragment.svelte';
-import SettingsFragment from '../components/modals/SettingsFragment.svelte';
-import ThemesFragment from '../components/modals/ThemesFragment.svelte';
+import AlertFragment from '@components/modals/AlertFragment.svelte';
+import ConfirmFragment from '@components/modals/ConfirmFragment.svelte';
+import SettingsFragment from '@components/modals/SettingsFragment.svelte';
+import ThemesFragment from '@components/modals/ThemesFragment.svelte';
 
 // Modal keys.
 export const MODAL_KEYS = {

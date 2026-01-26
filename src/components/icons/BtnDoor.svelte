@@ -6,7 +6,7 @@
     text = '',
     cta = false,
     voidBtn = false,
-    className = '',
+    class: className = '',
   }: {
     state: 'inside' | 'outside';
     onclick: () => void | Promise<void>;
@@ -14,7 +14,7 @@
     text: string;
     cta?: boolean;
     voidBtn?: boolean;
-    className?: string;
+    class?: string;
   } = $props();
 </script>
 

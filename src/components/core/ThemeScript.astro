@@ -5,12 +5,12 @@
   Also injects font preload links for the active theme to eliminate FOUT.
 */
 
-import THEME_REGISTRY from '../../config/void-registry.json';
-import { STORAGE_KEYS, DOM_ATTRS, DEFAULTS } from '../../config/constants';
-import { FONT_REGISTRY, USER_FONT_MAP } from '../../config/font-registry';
+import THEME_REGISTRY from '@config/void-registry.json';
+import { STORAGE_KEYS, DOM_ATTRS, DEFAULTS } from '@config/constants';
+import { FONT_REGISTRY, USER_FONT_MAP } from '@config/font-registry';
 
 // Import bootloader as a raw string for inline execution.
-import bootSource from '../../lib/void-boot.js?raw';
+import bootSource from '@lib/void-boot.js?raw';
 
 // Strip export keywords for inline <script> execution.
 // Uses specific pattern to avoid corrupting string literals containing "export".

@@ -1,9 +1,9 @@
 <script lang="ts">
   let {
-    className = '',
+    class: className = '',
     size = 'xl',
   }: {
-    className?: string;
+    class?: string;
     size?: string;
   } = $props();
 </script>

@@ -4,9 +4,9 @@
  * to the bootloader kernel.
  */
 
-import THEME_REGISTRY from '../config/void-registry.json';
-import { STORAGE_KEYS, DOM_ATTRS, DEFAULTS } from '../config/constants';
-import { applyTheme, applyPreferences } from '../lib/void-boot';
+import THEME_REGISTRY from '@config/void-registry.json';
+import { STORAGE_KEYS, DOM_ATTRS, DEFAULTS } from '@config/constants';
+import { applyTheme, applyPreferences } from '@lib/void-boot';
 
 // Mode-aware palette fallbacks for incomplete theme definitions.
 // Uses SEMANTIC_DARK/SEMANTIC_LIGHT from design-tokens.ts for correct semantic colors.

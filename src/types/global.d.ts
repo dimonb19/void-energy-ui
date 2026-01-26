@@ -1,4 +1,4 @@
-import type { VoidEngine } from '../adapters/void-engine.svelte';
+import type { VoidEngine } from '@adapters/void-engine.svelte';
 
 declare global {
   interface Window {

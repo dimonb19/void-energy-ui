@@ -1,19 +1,31 @@
 <script lang="ts">
-  import { modal } from '../lib/modal-manager.svelte';
-  import { tooltip } from '../actions/tooltip';
-  import { toast } from '../stores/toast.svelte';
-  import { live, implode } from '../lib/transitions.svelte';
+  import { modal } from '@lib/modal-manager.svelte';
+  import { tooltip } from '@actions/tooltip';
+  import { toast } from '@stores/toast.svelte';
+  import { live, implode } from '@lib/transitions.svelte';
 
-  import { FONTS } from '../config/design-tokens';
-  import { voidEngine } from '../adapters/void-engine.svelte';
+  import { FONTS } from '@config/design-tokens';
+  import { voidEngine } from '@adapters/void-engine.svelte';
 
   import ThemeSelector from './ui/Themes.svelte';
   import SettingsRow from './ui/SettingsRow.svelte';
   import PullRefresh from './ui/PullRefresh.svelte';
   import Toggle from './ui/Toggle.svelte';
+  import Selector from './ui/Selector.svelte';
 
-  import Sun from './icons/Sun.svelte';
+  import Burger from './icons/Burger.svelte';
+  import Checkmark from './icons/Checkmark.svelte';
+  import Dream from './icons/Dream.svelte';
+  import Home from './icons/Home.svelte';
+  import Info from './icons/Info.svelte';
+  // import Logo from './icons/Logo.svelte';
   import Moon from './icons/Moon.svelte';
+  // import Quill from './icons/Quill.svelte';
+  import Search from './icons/Search.svelte';
+  import SpinLoader from './icons/SpinLoader.svelte';
+  import Sun from './icons/Sun.svelte';
+  import Warning from './icons/Warning.svelte';
+  import XMark from './icons/XMark.svelte';
 
   // Pull-to-refresh handlers
   async function handleRefresh(): Promise<void> {
@@ -56,6 +68,20 @@
   let aiSentiment = $state(true);
   let rootAccess = $state(false); // Disabled state
 
+  // Local sate for icons
+  let iconSize = $state('md');
+  let sizeList = $state([
+    { value: 'sm', label: 'Small' },
+    { value: 'md', label: 'Medium' },
+    { value: 'lg', label: 'Large' },
+    { value: 'xl', label: 'Extra Large' },
+    { value: '2xl', label: 'Double Extra Large' },
+    { value: '3xl', label: 'Triple Extra Large' },
+    { value: '4xl', label: 'Quadra Extra Large' },
+  ]);
+  // Interactive icons state
+  let burgerFocus = $state(false);
+
   // Test functions for temporary theme feature
   function testCustomTheme() {
     // Don't register if adaptation is disabled
@@ -84,15 +110,12 @@
         'text-dim': 'rgba(255, 230, 240, 0.85)',
       },
     });
-    voidEngine.applyTemporaryTheme('cyberpunk', 'Story: Neon Dreams');
+    voidEngine.applyTemporaryTheme('cyberpunk', 'Neon Dreams');
     toast.show('Cyberpunk theme applied temporarily', 'success');
   }
 
   function testExistingTheme() {
-    const applied = voidEngine.applyTemporaryTheme(
-      'crimson',
-      'Story: Blood Moon',
-    );
+    const applied = voidEngine.applyTemporaryTheme('crimson', 'Blood Moon');
     if (applied) {
       toast.show('Crimson theme applied temporarily', 'success');
     } else {
@@ -108,12 +131,14 @@
   <main class="w-full min-h-screen">
     <div class="container flex flex-col gap-xl">
       <section class="flex flex-col gap-md mt-xl">
-        <h2>01 // COMPONENT LIBRARY</h2>
+        <h2>01 // VOID ENERGY</h2>
 
         <div class="surface-glass p-lg flex flex-col gap-lg">
           <div class="flex flex-row flex-wrap gap-md">
             <div class="flex flex-col gap-xs flex-1">
-              <label for="system-identifier"> System Identifier </label>
+              <label class="text-small px-xs" for="system-identifier">
+                System Identifier
+              </label>
               <input
                 id="system-identifier"
                 type="text"
@@ -121,14 +146,17 @@
               />
             </div>
 
-            <div class="flex flex-col gap-xs flex-1">
-              <label for="security-clearance"> Security Clearance </label>
-              <select id="security-clearance">
-                <option>Level 1 - Observer</option>
-                <option>Level 2 - Operator</option>
-                <option>Level 3 - Administrator</option>
-              </select>
-            </div>
+            <Selector
+              id="security-clearance"
+              label="Security Clearance"
+              options={[
+                { value: 'observer', label: 'Level 1 - Observer' },
+                { value: 'operator', label: 'Level 2 - Operator' },
+                { value: 'admin', label: 'Level 3 - Administrator' },
+              ]}
+              class="flex-1"
+              align="start"
+            />
           </div>
 
           <p>
@@ -163,7 +191,7 @@
             >
               Initiate Sequence
             </button>
-            <ThemeSelector className="btn-cta" />
+            <ThemeSelector class="btn-cta" />
             <button
               class="btn-premium"
               onclick={() => {
@@ -254,7 +282,7 @@
       </section>
 
       <section class="flex flex-col gap-md mt-md">
-        <h2>03 // PARAMETERS</h2>
+        <h2>02 // COMPONENT LIBRARY</h2>
 
         <div class="surface-glass p-lg flex flex-col gap-md">
           <SettingsRow label="Theme Override">
@@ -301,14 +329,18 @@
               {/if}
             </div>
             <div class="flex flex-row gap-sm">
-              <select class="flex-1" bind:value={newModuleTile}>
-                <option value={null} hidden>Select Module...</option>
-                <option value="Physics Engine">Physics Engine</option>
-                <option value="Audio Synth">Audio Synth</option>
-                <option value="Visual Renderer">Visual Renderer</option>
-                <option value="Data Analyzer">Data Analyzer</option>
-                <option value="Network Monitor">Network Monitor</option>
-              </select>
+              <Selector
+                bind:value={newModuleTile}
+                placeholder="Select Module..."
+                class="flex-1"
+                options={[
+                  { value: 'Physics Engine', label: 'Physics Engine' },
+                  { value: 'Audio Synth', label: 'Audio Synth' },
+                  { value: 'Visual Renderer', label: 'Visual Renderer' },
+                  { value: 'Data Analyzer', label: 'Data Analyzer' },
+                  { value: 'Network Monitor', label: 'Network Monitor' },
+                ]}
+              />
               <button
                 onclick={() => {
                   if (newModuleTile) {
@@ -355,14 +387,18 @@
               {/if}
             </div>
             <div class="flex flex-row gap-sm">
-              <select class="flex-1" bind:value={newEnvironmentTile}>
-                <option value={null} hidden>Select Environment...</option>
-                <option value="Physics Engine">Physics Engine</option>
-                <option value="Audio Synth">Audio Synth</option>
-                <option value="Visual Renderer">Visual Renderer</option>
-                <option value="Data Analyzer">Data Analyzer</option>
-                <option value="Network Monitor">Network Monitor</option>
-              </select>
+              <Selector
+                bind:value={newEnvironmentTile}
+                placeholder="Select Environment..."
+                class="flex-1"
+                options={[
+                  { value: 'Physics Engine', label: 'Physics Engine' },
+                  { value: 'Audio Synth', label: 'Audio Synth' },
+                  { value: 'Visual Renderer', label: 'Visual Renderer' },
+                  { value: 'Data Analyzer', label: 'Data Analyzer' },
+                  { value: 'Network Monitor', label: 'Network Monitor' },
+                ]}
+              />
               <button
                 class="btn-system"
                 onclick={() => {
@@ -410,14 +446,18 @@
               {/if}
             </div>
             <div class="flex flex-row gap-sm">
-              <select class="flex-1" bind:value={newPremiumTile}>
-                <option value={null} hidden>Select Premium Module...</option>
-                <option value="Quantum Core">Quantum Core</option>
-                <option value="AI Supervisor">AI Supervisor</option>
-                <option value="Neural Interface">Neural Interface</option>
-                <option value="Temporal Anchor">Temporal Anchor</option>
-                <option value="Network Monitor">Network Monitor</option>
-              </select>
+              <Selector
+                bind:value={newPremiumTile}
+                placeholder="Select Premium Module..."
+                class="flex-1"
+                options={[
+                  { value: 'Quantum Core', label: 'Quantum Core' },
+                  { value: 'AI Supervisor', label: 'AI Supervisor' },
+                  { value: 'Neural Interface', label: 'Neural Interface' },
+                  { value: 'Temporal Anchor', label: 'Temporal Anchor' },
+                  { value: 'Network Monitor', label: 'Network Monitor' },
+                ]}
+              />
               <button
                 class="btn-premium"
                 onclick={() => {
@@ -436,36 +476,9 @@
 
           <hr />
 
-          <SettingsRow label="Rendering">
-            <div class="flex flex-row flex-wrap gap-md w-full">
-              <div class="flex flex-col flex-1 gap-xs">
-                <label for="visual-fidelity" class="text-small text-center"
-                  >Visual Fidelity</label
-                >
-                <select id="visual-fidelity">
-                  <option>ULTRA (4K)</option>
-                  <option>HIGH (1440p)</option>
-                  <option>PERFORMANCE (1080p)</option>
-                </select>
-              </div>
-              <div class="flex flex-col flex-1 gap-xs">
-                <label for="frame-rate" class="text-small text-center"
-                  >Frame Rate</label
-                >
-                <select id="frame-rate">
-                  <option>120 HZ</option>
-                  <option>60 HZ</option>
-                  <option>30 HZ</option>
-                </select>
-              </div>
-            </div>
-          </SettingsRow>
-
-          <hr />
-
           <SettingsRow label="System Controls">
             <div
-              class="surface-sunk p-sm flex flex-col flex-wrap justify-center items-center tablet:flex-row gap-md"
+              class="surface-sunk p-sm flex flex-col flex-wrap justify-center items-center gap-sm tablet:flex-row"
             >
               <Toggle
                 bind:checked={telemetry}
@@ -504,9 +517,61 @@
       </section>
 
       <section class="flex flex-col gap-md my-md">
-        <h2>03 // DATA UPLOAD</h2>
+        <h2>03 // RENDERING</h2>
+        <div class="surface-glass p-lg flex flex-col gap-md">
+          <div class="flex flex-col gap-xs items-center">
+            <h5>Static Icons</h5>
+            <div
+              class="w-full surface-sunk p-sm flex flex-row flex-wrap gap-sm justify-center items-center"
+            >
+              <Checkmark data-size={iconSize} />
+              <Dream />
+              <Home />
+              <Info data-size={iconSize} />
+              <Moon />
+              <Search data-size={iconSize} />
+              <SpinLoader data-size={iconSize} />
+              <Sun />
+              <Warning data-size={iconSize} />
+              <XMark data-size={iconSize} />
+            </div>
+          </div>
 
-        <div class="p-md surface-glass">
+          <hr />
+
+          <div class="flex flex-col gap-xs items-center">
+            <h5>Interactive Icons</h5>
+            <div
+              class="w-full surface-sunk p-sm flex flex-row flex-wrap gap-sm justify-center items-center"
+            >
+              <button
+                class="btn-void"
+                onclick={() => (burgerFocus = !burgerFocus)}
+              >
+                <Burger
+                  data-state={burgerFocus ? 'active' : ''}
+                  data-size={iconSize}
+                />
+              </button>
+            </div>
+            <p class="text-caption text-mute">(Hover to see animation)</p>
+          </div>
+
+          <hr />
+
+          <Selector
+            bind:value={iconSize}
+            options={sizeList}
+            id="icon-size"
+            label="Icons Size"
+          />
+        </div>
+      </section>
+
+      <section class="flex flex-col gap-md my-md">
+        <h2>04 // DATA UPLOAD</h2>
+
+        <div class="p-sm surface-glass">
           <div class="dropzone">
             <input type="file" />
             <div class="dropzone-content">

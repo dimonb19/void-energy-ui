@@ -26,7 +26,7 @@
   - label: Accessible label text (displayed externally)
   - id: Optional ID for label association
   - disabled: Disables interaction
-  - className: Additional CSS classes
+  - class: Additional CSS classes
   - size: Toggle size variant ('sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl')
   - iconOn: ON state icon, left side (optional, no default)
   - iconOff: OFF state icon, right side (default: circle ○)
@@ -48,7 +48,7 @@
     label?: string;
     id?: string;
     disabled?: boolean;
-    className?: string;
+    class?: string;
     size?: 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4xl';
     iconOn?: string | Component;
     iconOff?: string | Component;
@@ -61,7 +61,7 @@
     label,
     id,
     disabled = false,
-    className = '',
+    class: className = '',
     size,
     iconOn,
     iconOff,

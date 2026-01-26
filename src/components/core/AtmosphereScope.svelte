@@ -63,7 +63,7 @@
 -->
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import { voidEngine } from '../../adapters/void-engine.svelte';
+  import { voidEngine } from '@adapters/void-engine.svelte';
 
   let {
     theme,

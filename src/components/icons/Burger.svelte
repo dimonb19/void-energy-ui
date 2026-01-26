@@ -1,15 +1,15 @@
 <script lang="ts">
-  let { open = false }: { open?: boolean } = $props();
+  import type { HTMLAttributes } from 'svelte/elements';
+  let { class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
 </script>
 
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 24 24"
   class="icon"
-  class:open
-  data-size="2xl"
   aria-hidden="true"
   stroke-width="2"
+  {...rest}
 >
   <line class="top" x1="4" y1="7" x2="20" y2="7" />
   <line class="middle" x1="4" y1="12" x2="20" y2="12" />
@@ -26,7 +26,7 @@
       opacity var(--speed-base) var(--ease-spring-snappy);
   }
 
-  svg.open {
+  :global(svg[data-state='active']) {
     .top {
       transform: translate(-4px, 3px) rotate(45deg); // void-ignore
     }

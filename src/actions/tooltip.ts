@@ -1,6 +1,6 @@
 /* Svelte action wrapper for VoidTooltip. */
 
-import { VoidTooltip } from '../lib/void-tooltip';
+import { VoidTooltip } from '@lib/void-tooltip';
 
 export function tooltip(
   node: HTMLElement,

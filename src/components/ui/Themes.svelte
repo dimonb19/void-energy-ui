@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { voidEngine } from '../../adapters/void-engine.svelte';
-  import { modal } from '../../lib/modal-manager.svelte';
+  import { voidEngine } from '@adapters/void-engine.svelte';
+  import { modal } from '@lib/modal-manager.svelte';
   import Sun from '../icons/Sun.svelte';
   import Moon from '../icons/Moon.svelte';
 
   let {
     icon = false,
-    className = '',
+    class: className = '',
   }: {
     icon?: boolean;
-    className?: string;
+    class?: string;
   } = $props();
 </script>
 

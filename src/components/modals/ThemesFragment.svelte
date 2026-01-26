@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { modal } from '../../lib/modal-manager.svelte';
-  import { voidEngine } from '../../adapters/void-engine.svelte';
-  import { toast } from '../../stores/toast.svelte';
-  import { dematerialize, materialize } from '../../lib/transitions.svelte';
+  import { modal } from '@lib/modal-manager.svelte';
+  import { voidEngine } from '@adapters/void-engine.svelte';
+  import { toast } from '@stores/toast.svelte';
+  import { dematerialize, materialize } from '@lib/transitions.svelte';
   import {
     FONTS,
     FONT_FAMILY_TO_KEY,
     VOID_TOKENS,
-  } from '../../config/design-tokens';
+  } from '@config/design-tokens';
 
   import Switcher from '../ui/Switcher.svelte';
   import Selector from '../ui/Selector.svelte';

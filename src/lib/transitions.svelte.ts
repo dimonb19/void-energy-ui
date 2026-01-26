@@ -13,9 +13,9 @@
 
 import { flip, type FlipParams } from 'svelte/animate';
 import { cubicOut, cubicIn } from 'svelte/easing';
-import { voidEngine as theme } from '../adapters/void-engine.svelte';
-import THEME_REGISTRY from '../config/void-registry.json';
-import PHYSICS_DATA from '../config/void-physics.json';
+import { voidEngine as theme } from '@adapters/void-engine.svelte';
+import THEME_REGISTRY from '@config/void-registry.json';
+import PHYSICS_DATA from '@config/void-physics.json';
 
 type Registry = Record<string, { physics: string; mode: string }>;
 const REGISTRY = THEME_REGISTRY as Registry;

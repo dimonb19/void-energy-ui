@@ -19,7 +19,7 @@
 
 ### Step 1: Define Your Theme
 
-Navigate to [src/config/design-tokens.ts](src/config/design-tokens.ts), and find the `VOID_TOKENS.themes` object (around line 430).
+Navigate to [src/config/design-tokens.ts](src/config/design-tokens.ts), and find the `VOID_TOKENS.themes` object (around line 512).
 
 Copy an existing theme block (e.g., `void`) and rename it:
 
@@ -99,7 +99,7 @@ Your theme is now available in the UI. Set it via the `data-atmosphere` attribut
 Or programmatically via the Void Engine adapter:
 
 ```typescript
-import { voidEngine } from '$lib/adapters/void-engine.svelte';
+import { voidEngine } from '@adapters/void-engine.svelte';
 
 voidEngine.setAtmosphere('my-theme');
 ```
@@ -764,7 +764,7 @@ Here are the 12 built-in themes you can use as templates:
 | `playground` | light | flat    | Fun / Kids          |
 | `focus`      | light | flat    | Distraction Free    |
 
-Explore their definitions in [design-tokens.ts](src/config/design-tokens.ts:430-683) for inspiration.
+Explore their definitions in [design-tokens.ts](src/config/design-tokens.ts) (search for `themes:`) for inspiration.
 
 ---
 

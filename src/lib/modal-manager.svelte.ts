@@ -1,6 +1,6 @@
 /* Reactive modal state manager (state-first). */
 
-import { MODAL_KEYS } from '../config/modal-registry';
+import { MODAL_KEYS } from '@config/modal-registry';
 
 class ModalManager {
   state = $state<ModalState>({

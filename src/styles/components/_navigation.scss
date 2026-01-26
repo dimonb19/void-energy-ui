@@ -77,11 +77,11 @@
   .search {
     position: relative;
 
-    button {
+    svg {
       position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
+      left: var(--space-sm);
+      top: 0;
+      height: 100%;
       pointer-events: none;
       color: var(--text-mute);
     }
