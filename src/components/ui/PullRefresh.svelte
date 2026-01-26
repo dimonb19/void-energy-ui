@@ -3,6 +3,7 @@
   import Checkmark from '../icons/Checkmark.svelte';
   import XMark from '../icons/XMark.svelte';
   import SpinLoader from '../icons/SpinLoader.svelte';
+  import { morph } from '@actions/morph';
 
   // ─────────────────────────────────────────────────────────────────────────────
   // Props
@@ -403,7 +404,7 @@
   bind:this={containerEl}
 >
   <!-- Indicator: Floats above content, revealed on pull -->
-  <div class="pull-indicator">
+  <div class="pull-indicator" use:morph={{ height: false, width: true }}>
     {#if pullState === 'done'}
       <Checkmark class="pull-checkmark" />
     {:else if pullState === 'error'}

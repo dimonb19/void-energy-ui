@@ -26,6 +26,7 @@
   import Sun from './icons/Sun.svelte';
   import Warning from './icons/Warning.svelte';
   import XMark from './icons/XMark.svelte';
+  import { morph } from '@actions/morph';
 
   // Pull-to-refresh handlers
   async function handleRefresh(): Promise<void> {
@@ -257,22 +258,22 @@
 
           <div class="flex flex-row flex-wrap gap-lg pt-lg border-top">
             <div class="flex flex-col gap-sm">
-              <label>
+              <label class="flex flex-row items-center gap-xs">
                 <input type="radio" name="mode" checked />
                 <span>Manual Override</span>
               </label>
-              <label>
+              <label class="flex flex-row items-center gap-xs">
                 <input type="radio" name="mode" />
                 <span>Auto-Pilot</span>
               </label>
             </div>
 
             <div class="flex flex-col gap-sm">
-              <label>
+              <label class="flex flex-row items-center gap-xs">
                 <input type="checkbox" checked />
                 <span>Enable Telemetry</span>
               </label>
-              <label>
+              <label class="flex flex-row items-center gap-xs">
                 <input type="checkbox" />
                 <span>Allow External Connections</span>
               </label>
@@ -302,7 +303,8 @@
 
           <SettingsRow label="Active Modules">
             <div
-              class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center rounded-md"
+              class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center"
+              use:morph={{ height: true, width: false }}
             >
               {#if moduleTiles.length === 0}
                 <p
@@ -328,7 +330,7 @@
                 {/each}
               {/if}
             </div>
-            <div class="flex flex-row gap-sm">
+            <div class="flex flex-row gap-xs">
               <Selector
                 bind:value={newModuleTile}
                 placeholder="Select Module..."
@@ -360,7 +362,8 @@
 
           <SettingsRow label="Environment">
             <div
-              class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center rounded-md"
+              class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center"
+              use:morph={{ height: true, width: false }}
             >
               {#if environmentTiles.length === 0}
                 <p
@@ -386,7 +389,7 @@
                 {/each}
               {/if}
             </div>
-            <div class="flex flex-row gap-sm">
+            <div class="flex flex-row gap-xs">
               <Selector
                 bind:value={newEnvironmentTile}
                 placeholder="Select Environment..."
@@ -419,7 +422,8 @@
 
           <SettingsRow label="Premium Modules">
             <div
-              class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center rounded-md"
+              class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center"
+              use:morph={{ height: true, width: false }}
             >
               {#if premiumTiles.length === 0}
                 <p
@@ -445,7 +449,7 @@
                 {/each}
               {/if}
             </div>
-            <div class="flex flex-row gap-sm">
+            <div class="flex flex-row gap-xs">
               <Selector
                 bind:value={newPremiumTile}
                 placeholder="Select Premium Module..."
@@ -516,7 +520,7 @@
         </div>
       </section>
 
-      <section class="flex flex-col gap-md my-md">
+      <!-- <section class="flex flex-col gap-md my-md">
         <h2>03 // RENDERING</h2>
         <div class="surface-glass p-lg flex flex-col gap-md">
           <div class="flex flex-col gap-xs items-center">
@@ -566,12 +570,12 @@
             label="Icons Size"
           />
         </div>
-      </section>
+      </section> -->
 
       <section class="flex flex-col gap-md my-md">
-        <h2>04 // DATA UPLOAD</h2>
+        <h2>03 // DATA UPLOAD</h2>
 
-        <div class="p-sm surface-glass">
+        <div class="p-md surface-glass">
           <div class="dropzone">
             <input type="file" />
             <div class="dropzone-content">

@@ -3,6 +3,7 @@
   import { voidEngine } from '@adapters/void-engine.svelte';
   import { toast } from '@stores/toast.svelte';
   import { dematerialize, materialize } from '@lib/transitions.svelte';
+  import { morph } from '@actions/morph';
   import {
     FONTS,
     FONT_FAMILY_TO_KEY,
@@ -14,7 +15,6 @@
   import SettingsRow from '../ui/SettingsRow.svelte';
   import Sun from '../icons/Sun.svelte';
   import Moon from '../icons/Moon.svelte';
-
   import Toggle from '../ui/Toggle.svelte';
 
   // Helper to capitalize strings (e.g., "void" → "Void")
@@ -153,186 +153,202 @@
     voidEngine.setPreferences({ density: d });
     toast.show(`${d.toUpperCase()} density applied`);
   }
-
-  let enabled = $state(false);
 </script>
 
-<h2 class="text-h3 text-center">
-  Atmosphere: {voidEngine.atmosphere.toUpperCase()}
-</h2>
-
-<div class="surface-sunk flex flex-col items-center justify-center gap-sm p-sm">
-  <p class="text-center">Tune how your interface looks, moves, and breathes.</p>
-
-  <Switcher
-    options={modeOptions}
-    value={activeMode}
-    onchange={(value) => (activeMode = value as 'dark' | 'light')}
-  />
-</div>
-
-<!-- Temporary Theme Indicator -->
-{#if voidEngine.hasTemporaryTheme}
-  {@const info = voidEngine.temporaryThemeInfo}
-  <div
-    class="surface-sunk flex flex-col items-center gap-sm p-sm"
-    out:dematerialize
-  >
-    <h5>Story Override Active</h5>
-    <p>
-      <strong>{info?.label}</strong>
-      is using
-      <strong>{info?.id}</strong>
-      atmosphere.
-    </p>
-    <span class="flex flex-row flex-wrap justify-center gap-sm">
-      <button class="btn-system" onclick={handleRestore}>
-        Return to {capitalize(info?.returnTo ?? '')}
-      </button>
-      <button
-        class="btn-alert"
-        onclick={(event) => toggleAdaptAtmosphere(false)}
-      >
-        Don't adapt to stories
-      </button>
-    </span>
-  </div>
-{/if}
-
 <div
-  class="theme-menu surface-sunk rounded-md flex flex-col tablet:grid tablet:grid-cols-2 gap-xs p-xs"
-  role="radiogroup"
-  aria-label="Select Theme"
+  class="modal-content"
+  onclick={(e) => e.stopPropagation()}
+  role="presentation"
+  use:morph={{ height: true, width: false }}
 >
-  {#each filteredAtmospheres as atm, i (atm.id)}
-    <div
-      class="theme-wrapper p-sm rounded-sm"
-      data-atmosphere={atm.id}
-      data-physics={atm.physics}
-      data-mode={atm.mode}
-      in:materialize={{ delay: i * 25 }}
-    >
-      <button
-        class="theme-option w-full flex items-center gap-sm p-xs rounded-sm text-dim text-left"
-        role="radio"
-        aria-checked={voidEngine.atmosphere === atm.id}
-        tabindex={voidEngine.atmosphere === atm.id ? 0 : -1}
-        onclick={() => selectTheme(atm.id)}
-      >
-        <div
-          class="orb-wrapper relative hidden tablet:flex items-center justify-center"
-          aria-hidden="true"
-        >
-          <span class="orb relative rounded-full"></span>
-        </div>
+  <h2 class="text-h3 text-center">
+    Atmosphere: {voidEngine.atmosphere.toUpperCase()}
+  </h2>
 
-        <span class="w-full flex flex-row items-center justify-between gap-sm">
-          <span>{atm.label}</span>
-          {#if atm.tagline}
-            <span class="text-caption">{atm.tagline}</span>
-          {/if}
-        </span>
-      </button>
-    </div>
-  {/each}
-</div>
-
-<div class="flex flex-col items-center gap-xs">
-  <Toggle
-    bind:checked={voidEngine.userConfig.adaptAtmosphere}
-    label="Adapt to story mood"
-    onchange={toggleAdaptAtmosphere}
-  />
-  <p class="text-caption text-mute">
-    (Stories can temporarily override your theme)
-  </p>
-</div>
-
-{#if showAdvancedSettings}
-  <div class="flex flex-col justify-center gap-md">
-    <div in:materialize={{ delay: 0 }} out:dematerialize={{ delay: 100 }}>
-      <hr />
-      <SettingsRow label="Text Scale">
-        <div class="surface-sunk p-sm">
-          <Switcher
-            options={scaleLevels}
-            value={activeScaleStep.value}
-            onchange={(value) => setScale(Number(value))}
-          />
-        </div>
-      </SettingsRow>
-    </div>
-
-    <div in:materialize={{ delay: 50 }} out:dematerialize={{ delay: 50 }}>
-      <hr />
-      <SettingsRow label="Spacing Density">
-        <div class="surface-sunk p-sm">
-          <Switcher
-            options={densityOptions}
-            value={voidEngine.userConfig.density}
-            onchange={(value) =>
-              setDensity(value as 'high' | 'standard' | 'low')}
-          />
-        </div>
-      </SettingsRow>
-    </div>
-
-    <div in:materialize={{ delay: 100 }} out:dematerialize={{ delay: 0 }}>
-      <hr />
-      <SettingsRow label="Typography">
-        <div class="flex flex-col small-desktop:flex-row justify-center gap-sm">
-          <Selector
-            label="Heading Font"
-            options={headingFontOptions}
-            value={voidEngine.userConfig.fontHeading}
-            onchange={(v) => {
-              voidEngine.setPreferences({ fontHeading: v || null });
-              if (!v)
-                toast.show(
-                  'Custom font cleared. Reverted to Atmosphere recommendation.',
-                  'success',
-                );
-              else
-                toast.show(`Headings updated to ${extractFontName(v)}`, 'info');
-            }}
-          />
-          <Selector
-            label="Body Font"
-            options={bodyFontOptions}
-            value={voidEngine.userConfig.fontBody}
-            onchange={(v) => {
-              voidEngine.setPreferences({ fontBody: v || null });
-              if (!v)
-                toast.show(
-                  'Custom font cleared. Reverted to Atmosphere recommendation.',
-                  'success',
-                );
-              else
-                toast.show(
-                  `Reading font updated to ${extractFontName(v)}`,
-                  'info',
-                );
-            }}
-          />
-        </div>
-        <p class="text-center text-caption text-mute">
-          Note: Changing fonts may affect the intended atmosphere of the
-          selected theme.
-        </p>
-      </SettingsRow>
-      <hr />
-    </div>
-  </div>
-{/if}
-
-<div class="flex justify-center gap-md">
-  <button class="btn-alert" onclick={() => modal.close()}> Close </button>
-  <button
-    aria-pressed={showAdvancedSettings}
-    onclick={() => (showAdvancedSettings = !showAdvancedSettings)}
+  <div
+    class="surface-sunk flex flex-col items-center justify-center gap-sm p-sm"
   >
-    Advanced Settings
-  </button>
+    <p class="text-center">
+      Tune how your interface looks, moves, and breathes.
+    </p>
+
+    <Switcher
+      options={modeOptions}
+      value={activeMode}
+      onchange={(value) => (activeMode = value as 'dark' | 'light')}
+    />
+  </div>
+
+  <!-- Temporary Theme Indicator -->
+  {#if voidEngine.hasTemporaryTheme}
+    {@const info = voidEngine.temporaryThemeInfo}
+    <div
+      class="surface-sunk flex flex-col items-center gap-sm p-sm"
+      out:dematerialize
+    >
+      <h5>Story Override Active</h5>
+      <p>
+        <strong>{info?.label}</strong>
+        is using
+        <strong>{info?.id}</strong>
+        atmosphere.
+      </p>
+      <span class="flex flex-row flex-wrap justify-center gap-sm">
+        <button class="btn-system" onclick={handleRestore}>
+          Return to {capitalize(info?.returnTo ?? '')}
+        </button>
+        <button
+          class="btn-alert"
+          onclick={(event) => toggleAdaptAtmosphere(false)}
+        >
+          Don't adapt to stories
+        </button>
+      </span>
+    </div>
+  {/if}
+
+  <div
+    class="theme-menu surface-sunk rounded-md flex flex-col tablet:grid tablet:grid-cols-2 gap-xs p-xs"
+    role="radiogroup"
+    aria-label="Select Theme"
+  >
+    {#each filteredAtmospheres as atm, i (atm.id)}
+      <div
+        class="theme-wrapper p-sm rounded-sm"
+        data-atmosphere={atm.id}
+        data-physics={atm.physics}
+        data-mode={atm.mode}
+        in:materialize={{ delay: i * 25 }}
+      >
+        <button
+          class="theme-option w-full flex items-center gap-sm p-xs rounded-sm text-dim text-left"
+          role="radio"
+          aria-checked={voidEngine.atmosphere === atm.id}
+          tabindex={voidEngine.atmosphere === atm.id ? 0 : -1}
+          onclick={() => selectTheme(atm.id)}
+        >
+          <div
+            class="orb-wrapper relative hidden tablet:flex items-center justify-center"
+            aria-hidden="true"
+          >
+            <span class="orb relative rounded-full"></span>
+          </div>
+
+          <span
+            class="w-full flex flex-row items-center justify-between gap-sm"
+          >
+            <span>{atm.label}</span>
+            {#if atm.tagline}
+              <span class="text-caption">{atm.tagline}</span>
+            {/if}
+          </span>
+        </button>
+      </div>
+    {/each}
+  </div>
+
+  <div class="flex flex-col items-center gap-xs">
+    <Toggle
+      bind:checked={voidEngine.userConfig.adaptAtmosphere}
+      label="Adapt to story mood"
+      onchange={toggleAdaptAtmosphere}
+    />
+    <p class="text-caption text-mute">
+      (Stories can temporarily override your theme)
+    </p>
+  </div>
+
+  {#if showAdvancedSettings}
+    <div class="flex flex-col justify-center gap-md">
+      <div in:materialize={{ delay: 0 }} out:dematerialize>
+        <hr />
+        <SettingsRow label="Text Scale">
+          <div class="surface-sunk p-sm">
+            <Switcher
+              options={scaleLevels}
+              value={activeScaleStep.value}
+              onchange={(value) => setScale(Number(value))}
+            />
+          </div>
+        </SettingsRow>
+      </div>
+
+      <div in:materialize={{ delay: 50 }} out:dematerialize>
+        <hr />
+        <SettingsRow label="Spacing Density">
+          <div class="surface-sunk p-sm">
+            <Switcher
+              options={densityOptions}
+              value={voidEngine.userConfig.density}
+              onchange={(value) =>
+                setDensity(value as 'high' | 'standard' | 'low')}
+            />
+          </div>
+        </SettingsRow>
+      </div>
+
+      <div in:materialize={{ delay: 100 }} out:dematerialize>
+        <hr />
+        <SettingsRow label="Typography">
+          <div
+            class="flex flex-col small-desktop:flex-row justify-center gap-sm"
+          >
+            <Selector
+              label="Heading Font"
+              options={headingFontOptions}
+              value={voidEngine.userConfig.fontHeading}
+              onchange={(v) => {
+                voidEngine.setPreferences({ fontHeading: v || null });
+                if (!v)
+                  toast.show(
+                    'Custom font cleared. Reverted to Atmosphere recommendation.',
+                    'success',
+                  );
+                else
+                  toast.show(
+                    `Headings updated to ${extractFontName(v)}`,
+                    'info',
+                  );
+              }}
+            />
+            <Selector
+              label="Body Font"
+              options={bodyFontOptions}
+              value={voidEngine.userConfig.fontBody}
+              onchange={(v) => {
+                voidEngine.setPreferences({ fontBody: v || null });
+                if (!v)
+                  toast.show(
+                    'Custom font cleared. Reverted to Atmosphere recommendation.',
+                    'success',
+                  );
+                else
+                  toast.show(
+                    `Reading font updated to ${extractFontName(v)}`,
+                    'info',
+                  );
+              }}
+            />
+          </div>
+          <p class="text-center text-caption text-mute">
+            Note: Changing fonts may affect the intended atmosphere of the
+            selected theme.
+          </p>
+        </SettingsRow>
+        <hr />
+      </div>
+    </div>
+  {/if}
+
+  <div class="flex justify-center gap-md">
+    <button class="btn-alert" onclick={() => modal.close()}> Close </button>
+    <button
+      aria-pressed={showAdvancedSettings}
+      onclick={() => (showAdvancedSettings = !showAdvancedSettings)}
+    >
+      Advanced Settings
+    </button>
+  </div>
 </div>
 
 <style lang="scss">

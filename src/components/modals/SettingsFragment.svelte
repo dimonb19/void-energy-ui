@@ -33,57 +33,63 @@
   }
 </script>
 
-<div class="flex flex-col gap-md items-center">
-  <div class="text-center flex flex-col gap-md">
-    <h2 id="modal-title" class="text-h3">Play options</h2>
-    <p>
-      These choices are also
-      <a class="link" href="/">in your profile.</a>
-      Changes apply immediately.
-    </p>
-  </div>
-
-  <div
-    class="surface-sunk p-md flex flex-col gap-md large-desktop:w-full large-desktop:grid large-desktop:grid-cols-2"
-  >
-    <div class="flex flex-col items-center gap-md">
-      <Selector
-        label="SETTINGS: {preferredSettings === 'personal'
-          ? 'Use your profile settings'
-          : "Use the author's settings"}"
-        options={[
-          { value: 'personal', label: 'Personal' },
-          { value: 'default', label: "Author's Default" },
-        ]}
-        bind:value={preferredSettings}
-      />
+<div
+  class="modal-content"
+  onclick={(e) => e.stopPropagation()}
+  role="presentation"
+>
+  <div class="flex flex-col gap-md items-center">
+    <div class="text-center flex flex-col gap-md">
+      <h2 id="modal-title" class="text-h3">Play options</h2>
+      <p>
+        These choices are also
+        <a class="link" href="/">in your profile.</a>
+        Changes apply immediately.
+      </p>
     </div>
 
-    <hr class="large-desktop:hidden" />
+    <div
+      class="surface-sunk p-md flex flex-col gap-md large-desktop:w-full large-desktop:grid large-desktop:grid-cols-2"
+    >
+      <div class="flex flex-col items-center gap-md">
+        <Selector
+          label="SETTINGS: {preferredSettings === 'personal'
+            ? 'Use your profile settings'
+            : "Use the author's settings"}"
+          options={[
+            { value: 'personal', label: 'Personal' },
+            { value: 'default', label: "Author's Default" },
+          ]}
+          bind:value={preferredSettings}
+        />
+      </div>
 
-    <div class="flex flex-col items-center gap-md">
-      <Selector
-        label="PLAY MODE: {playMode === 'play_limited'
-          ? 'No images or audio'
-          : 'Images and audio on each step'}"
-        options={[
-          { value: 'play_limited', label: 'Text-only (1 credit)' },
-          { value: 'play_unlimited', label: 'With Media (3 credits)' },
-        ]}
-        bind:value={playMode}
-      />
+      <hr class="large-desktop:hidden" />
+
+      <div class="flex flex-col items-center gap-md">
+        <Selector
+          label="PLAY MODE: {playMode === 'play_limited'
+            ? 'No images or audio'
+            : 'Images and audio on each step'}"
+          options={[
+            { value: 'play_limited', label: 'Text-only (1 credit)' },
+            { value: 'play_unlimited', label: 'With Media (3 credits)' },
+          ]}
+          bind:value={playMode}
+        />
+      </div>
     </div>
+
+    <label class="flex flex-row items-center gap-xs">
+      <input type="checkbox" bind:checked={dontShowAgain} />
+      Don't show this again
+    </label>
   </div>
 
-  <label class="flex flex-row items-center gap-xs">
-    <input type="checkbox" bind:checked={dontShowAgain} />
-    Don't show this again
-  </label>
-</div>
-
-<div class="flex flex-row justify-center gap-md">
-  <button class="btn-alert" onclick={() => modal.close()}> Cancel </button>
-  <button class="btn-cta" onclick={handleSave}>
-    {playMode === 'play_limited' ? 'Play: 1 credit' : 'Play: 3 credits'}
-  </button>
+  <div class="flex flex-row justify-center gap-md">
+    <button class="btn-alert" onclick={() => modal.close()}> Cancel </button>
+    <button class="btn-cta" onclick={handleSave}>
+      {playMode === 'play_limited' ? 'Play: 1 credit' : 'Play: 3 credits'}
+    </button>
+  </div>
 </div>

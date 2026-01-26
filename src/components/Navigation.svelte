@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Component } from 'svelte';
   import { materialize, dematerialize } from '@lib/transitions.svelte';
+  import { morph } from '@actions/morph';
 
   import Burger from './icons/Burger.svelte';
   import Logo from './icons/Logo.svelte';
@@ -276,6 +277,7 @@
     onpointerleave={closeSidebarDelayed}
     in:materialize
     out:dematerialize={{ y: 0 }}
+    use:morph={{ height: true, width: false }}
   >
     {#each sidebarItems as item, i (item.id)}
       {#if isComponentItem(item)}
@@ -304,7 +306,7 @@
           </svg>
         </a>
         {#if isExpanded(item)}
-          <ul class="submenu">
+          <ul class="submenu" out:dematerialize>
             {#each item.children as child, j (child.id)}
               <li style="--item-index: {j}">
                 <a class="subtab" href={child.href}>

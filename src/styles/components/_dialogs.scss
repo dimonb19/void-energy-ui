@@ -125,7 +125,7 @@ dialog {
   & > div {
     display: flex;
     flex-flow: column nowrap;
-    padding: var(--surface-padding);
+    padding: var(--space-lg);
     gap: var(--space-md);
 
     h2,

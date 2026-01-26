@@ -332,3 +332,40 @@ interface SelectorProps {
   /** CSS classes applied to the wrapper div */
   class?: string;
 }
+
+// ==========================================================================
+// 6. ACTION: MORPH
+// ==========================================================================
+
+/**
+ * Configuration options for the morph Svelte action.
+ * Enables smooth container resize animations when content changes.
+ *
+ * Uses ResizeObserver + Web Animations API with proper FLIP technique.
+ * Respects physics tokens (--speed-base, --ease-spring-gentle) and reduced motion.
+ *
+ * @example Both dimensions (default)
+ * <div use:morph>
+ *   {#if expanded}<LargeContent />{:else}<SmallContent />{/if}
+ * </div>
+ *
+ * @example Width only (text containers)
+ * <p use:morph={{ height: false }}>{dynamicMessage}</p>
+ *
+ * @example Height only
+ * <div use:morph={{ width: false }}>
+ *   {#each items as item}<Item />{/each}
+ * </div>
+ */
+interface MorphOptions {
+  /** Animate width changes (default: true) */
+  width?: boolean;
+  /** Animate height changes (default: true) */
+  height?: boolean;
+  /** Minimum size change in pixels to trigger animation (default: 2) */
+  threshold?: number;
+  /** Callback fired when morph animation starts */
+  onStart?: () => void;
+  /** Callback fired when morph animation completes */
+  onComplete?: () => void;
+}

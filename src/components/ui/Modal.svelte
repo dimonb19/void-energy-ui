@@ -61,13 +61,7 @@
   onclick={handleBackdrop}
   ontransitionend={handleTransitionEnd}
 >
-  <div
-    class="modal-content"
-    onclick={(e) => e.stopPropagation()}
-    role="presentation"
-  >
-    {#if ActiveComponent}
-      <ActiveComponent {...renderedProps} />
-    {/if}
-  </div>
+  {#if ActiveComponent}
+    <ActiveComponent {...renderedProps} />
+  {/if}
 </dialog>

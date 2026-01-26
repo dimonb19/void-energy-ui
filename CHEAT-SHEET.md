@@ -17,6 +17,7 @@
    - [Icons](#e-icons)
 5. [Mixin Reference](#5-mixin-reference)
 6. [Quick Patterns (Copy-Paste)](#6-quick-patterns-copy-paste)
+7. [Svelte Actions](#7-svelte-actions)
 
 ---
 
@@ -1112,6 +1113,101 @@ await toast.promise(saveItems(items), {
 
 ---
 
+## 7. Svelte Actions
+
+Reusable behaviors attached to elements via `use:action` directive.
+
+### A. Size Morphing (`use:morph`)
+
+**Purpose:** Automatically animate container dimensions when content changes
+**Location:** [src/actions/morph.ts](src/actions/morph.ts)
+
+#### When to Use
+
+Use `use:morph` for any container with dynamic content that changes size:
+- Chip containers (line wrapping)
+- Toast messages (loading → success)
+- Text that changes length
+- Any element where content determines dimensions
+
+#### Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `width` | `boolean` | `true` | Animate width changes |
+| `height` | `boolean` | `true` | Animate height changes |
+| `threshold` | `number` | `2` | Minimum px change to trigger animation |
+| `onStart` | `() => void` | — | Callback when animation starts |
+| `onComplete` | `() => void` | — | Callback when animation ends |
+
+#### Physics Integration
+
+- Reads `--speed-base` and `--ease-spring-gentle` from CSS
+- **Glass**: Spring easing with standard duration
+- **Flat**: Snappy easing
+- **Retro**: Instant (0s, no animation)
+- Respects `prefers-reduced-motion` preference
+
+#### Dialog Integration
+
+When used inside a `<dialog>` element, morph automatically:
+- Waits for dialog CSS transition to complete before capturing dimensions
+- Resets state on dialog open/close to prevent stale animations
+- No configuration needed — detected via `node.closest('dialog')`
+
+#### Constraints
+
+- **No CSS width/height transitions**: Elements using `use:morph` should NOT have
+  `transition: width` or `transition: height` in CSS (causes double-animation conflict)
+- **Modal content**: Apply to inner containers, not the `<dialog>` element itself
+- **Threshold tuning**: Increase `threshold` for elements with micro-fluctuations
+
+#### Usage Examples
+
+**Chip Container (height only):**
+
+```svelte
+<div use:morph={{ height: true, width: false }}>
+  {#each chips as chip (chip.id)}
+    <button class="chip" out:implode>{chip.label}</button>
+  {/each}
+</div>
+```
+
+**Toast Message (width only):**
+
+```svelte
+<button class="toast-message" use:morph={{ height: false }}>
+  {#if loading}<SpinLoader />{:else}<Checkmark />{/if}
+  <span>{message}</span>
+</button>
+```
+
+**PullRefresh Indicator:**
+
+```svelte
+<p class="pull-message" use:morph={{ height: false }}>{stateMessage}</p>
+```
+
+---
+
+### B. Tooltip (`use:tooltip`)
+
+**Purpose:** Floating tooltip positioning via Floating UI
+**Location:** [src/actions/tooltip.ts](src/actions/tooltip.ts)
+
+**Usage:**
+
+```svelte
+<button use:tooltip={{ content: 'Click to save', placement: 'top' }}>
+  Save
+</button>
+```
+
+See [tooltip.ts](src/actions/tooltip.ts) for full API.
+
+---
+
 ## 📚 Related Documentation
 
 - **[THEME-GUIDE.md](./THEME-GUIDE.md)** — How to create custom themes
@@ -1126,3 +1222,4 @@ await toast.promise(saveItems(items), {
 - **Global Styles:** [src/styles/global.scss](src/styles/global.scss)
 - **Mixins:** [src/styles/abstracts/\_mixins.scss](src/styles/abstracts/_mixins.scss)
 - **Components:** [src/styles/components/](src/styles/components/)
+- **Actions:** [src/actions/](src/actions/)

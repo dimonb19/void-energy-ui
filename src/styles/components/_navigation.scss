@@ -267,6 +267,7 @@
 
   &:hover {
     background-color: alpha(var(--energy-secondary), 10%);
+    color: var(--energy-primary);
   }
 
   // Active/Selected state (use data-state="active" or aria-selected="true")
