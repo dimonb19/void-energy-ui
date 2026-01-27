@@ -47,6 +47,7 @@
 
   height: calc(var(--nav-height) + var(--space-md)); // Accommodate padding
   padding-top: var(--space-md);
+  background: var(--bg-surface);
 
   position: fixed;
   top: 0;
@@ -202,25 +203,16 @@
   z-index: z('overlay');
   padding: var(--space-sm);
   min-width: 100%;
-  background-image: linear-gradient(to bottom, var(--bg-canvas), transparent);
+  background-color: var(--bg-surface);
+  transform: none !important; // Disable scale and translate from materialize
 
   @include respond-up(tablet) {
     min-width: calc(var(--space-5xl) * 2);
-    background-image: radial-gradient(
-      circle at 100% 0,
-      var(--bg-canvas),
-      transparent 80%
-    );
+    border-bottom-left-radius: var(--radius-base);
   }
 
-  @include when-light {
-    background-image: none;
-    background-color: var(--bg-surface);
-    transform: none !important;
-
-    @include respond-up(tablet) {
-      border-bottom-left-radius: var(--radius-base);
-    }
+  @include when-glass {
+    @include glass-blur;
   }
 }
 

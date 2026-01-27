@@ -117,6 +117,21 @@ $physics-presets: (
       }
     }
   }
+
+  // Force square borders in retro physics by overriding Tailwind utilities
+  [data-physics='retro'] {
+    .rounded,
+    .rounded-xs,
+    .rounded-sm,
+    .rounded-md,
+    .rounded-lg,
+    .rounded-xl,
+    .rounded-2xl,
+    .rounded-3xl,
+    .rounded-full {
+      border-radius: 0;
+    }
+  }
 }
 
 // ==========================================================================

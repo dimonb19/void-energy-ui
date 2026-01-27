@@ -42,6 +42,7 @@
 
   // Sidebar/dropdown menu items
   const sidebarItems: SidebarItem[] = [
+    { id: 'MyProfile', label: 'My Profile', href: '/' },
     { id: 'Dashboard', label: 'Dashboard', href: '/' },
     {
       id: 'Account',
