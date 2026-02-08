@@ -520,7 +520,7 @@
         </div>
       </section>
 
-      <!-- <section class="flex flex-col gap-md my-md">
+      <section class="flex flex-col gap-md my-md">
         <h2>03 // RENDERING</h2>
         <div class="surface-glass p-lg flex flex-col gap-md">
           <div class="flex flex-col gap-xs items-center">
@@ -570,7 +570,7 @@
             label="Icons Size"
           />
         </div>
-      </section> -->
+      </section>
 
       <section class="flex flex-col gap-md my-md">
         <h2>03 // DATA UPLOAD</h2>
@@ -586,62 +586,5 @@
         </div>
       </section>
     </div>
-
-    <!-- <section class="flex flex-col gap-md mt-2xl">
-    <h2 class="container">04 // RECENT ANOMALIES</h2>
-
-    <div class="tiles-collection">
-      <button type="button" class="btn-void tile">
-        <img
-          src="https://media.dgrslabs.ink/conexus-sections/dischordiansaga.avif"
-          alt="Sector 7G Cover"
-        />
-        <div class="tile-data">
-          <h5>Sector 7G</h5>
-          <p>
-            Status: <strong>Active</strong>
-          </p>
-        </div>
-      </button>
-
-      <button type="button" class="btn-void tile">
-        <img
-          src="https://media.dgrslabs.ink/conexus-sections/communitypicks.avif"
-          alt="Core Dump Cover"
-        />
-        <div class="tile-data">
-          <h5>Core Dump</h5>
-          <p>Size: 4.2 TB</p>
-        </div>
-      </button>
-
-      <button type="button" class="btn-void tile">
-        <img
-          src="https://media.dgrslabs.ink/conexus-sections/collabs.avif"
-          alt="Collaborations Cover"
-        />
-        <div class="tile-data">
-          <h5>Collaborations</h5>
-        </div>
-      </button>
-
-      <button type="button" class="btn-void tile">
-        <img
-          src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=800&auto=format&fit=crop"
-          alt="Deep Net Cover"
-        />
-        <div class="tile-data">
-          <h5>Deep Net</h5>
-          <p>Signal: 98%</p>
-        </div>
-      </button>
-
-      <div class="loading-tile"></div>
-
-      <div class="loading-tile"></div>
-
-      <div class="loading-tile"></div>
-    </div>
-  </section> -->
   </main>
 </PullRefresh>
