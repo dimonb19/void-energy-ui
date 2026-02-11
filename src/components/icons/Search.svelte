@@ -31,11 +31,11 @@
     transform: rotate(90deg);
   }
 
-  :global(.search-icon[data-zoom="in"]) .zoom-in {
+  :global(.search-icon[data-zoom='in']) .zoom-in {
     display: block;
   }
 
-  :global(.search-icon[data-zoom="out"]) .zoom-out {
+  :global(.search-icon[data-zoom='out']) .zoom-out {
     display: block;
   }
 </style>

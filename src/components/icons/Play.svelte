@@ -29,7 +29,7 @@
       opacity var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.play-icon[data-state="active"]) {
+  :global(.play-icon[data-state='active']) {
     polygon {
       transform: scale(1.5);
     }

@@ -32,9 +32,9 @@
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.quit-icon[data-state="active"]) {
+  :global(.quit-icon[data-state='active']) {
     transform: scale(1.1);
-    
+
     #quit-svg-mask path {
       transform: scale(1.2);
     }

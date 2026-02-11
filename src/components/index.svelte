@@ -21,35 +21,32 @@
   import Checkmark from './icons/Checkmark.svelte';
   import Copy from './icons/Copy.svelte';
   import Delete from './icons/Delete.svelte';
-  // import DGRSLogo from './icons/DGRSLogo.svelte';
   // import Discord from './icons/Discord.svelte';
   import DoorIn from './icons/DoorIn.svelte';
   import DoorOut from './icons/DoorOut.svelte';
   import Dream from './icons/Dream.svelte';
   import Edit from './icons/Edit.svelte';
   import Eye from './icons/Eye.svelte';
-  // import FilledEye from './icons/FilledEye.svelte';
   import Filter from './icons/Filter.svelte';
-  // import Fullscreen from './icons/Fullscreen.svelte';
+  import Fullscreen from './icons/Fullscreen.svelte';
   import Gear from './icons/Gear.svelte';
   import Grid from './icons/Grid.svelte';
   import Home from './icons/Home.svelte';
   import Info from './icons/Info.svelte';
-  // import Loading from './icons/Loading.svelte';
   import Lock from './icons/Lock.svelte';
-  // import Logo from './icons/Logo.svelte';
+  import LogoDGRS from './icons/LogoDGRS.svelte';
+  import LogoCoNexus from './icons/LogoCoNexus.svelte';
   import Moon from './icons/Moon.svelte';
   import Music from './icons/Music.svelte';
   import Picker from './icons/Picker.svelte';
   import Play from './icons/Play.svelte';
-  // import Profile from './icons/Profile.svelte';
+  import Profile from './icons/Profile.svelte';
   // import Quill from './icons/Quill.svelte';
   import Quit from './icons/Quit.svelte';
   import Reset from './icons/Reset.svelte';
   import Restart from './icons/Restart.svelte';
   import Search from './icons/Search.svelte';
   import Sorting from './icons/Sorting.svelte';
-  // import Sound from './icons/Sound.svelte';
   import SpinLoader from './icons/SpinLoader.svelte';
   import Star from './icons/Star.svelte';
   // import Step from './icons/Step.svelte';
@@ -116,6 +113,7 @@
   let burgerActive = $state(false);
   let copyActive = $state(false);
   let eyeActive = $state(false);
+  let fullscreenActive = $state(false);
   let musicActive = $state(false);
   let voiceActive = $state(false);
 
@@ -123,8 +121,10 @@
   let doorInFocus = $state(false);
   let doorOutFocus = $state(false);
   let editFocus = $state(false);
+  let fullscreenFocus = $state(false);
   let pickerFocus = $state(false);
   let playFocus = $state(false);
+  let profileFocus = $state(false);
   let quitFocus = $state(false);
   let resetFocus = $state(false);
   let restartFocus = $state(false);
@@ -596,7 +596,7 @@
                   copyActive = true;
                   timeout = setTimeout(() => {
                     copyActive = false;
-                  }, 1000)
+                  }, 1000);
                 }}
               >
                 <Copy
@@ -604,7 +604,7 @@
                   data-size={iconSize}
                 />
               </button>
-                <button
+              <button
                 class="btn-void"
                 onpointerenter={() => (doorInFocus = true)}
                 onpointerleave={() => (doorInFocus = false)}
@@ -636,6 +636,18 @@
               </button>
               <button
                 class="btn-void"
+                onclick={() => (fullscreenActive = !fullscreenActive)}
+                onpointerenter={() => (fullscreenFocus = true)}
+                onpointerleave={() => (fullscreenFocus = false)}
+              >
+                <Fullscreen
+                  data-state={fullscreenFocus ? 'active' : ''}
+                  data-size={iconSize}
+                  data-fullscreen={fullscreenActive}
+                />
+              </button>
+              <button
+                class="btn-void"
                 onpointerenter={() => (playFocus = true)}
                 onpointerleave={() => (playFocus = false)}
               >
@@ -654,32 +666,20 @@
                   data-size={iconSize}
                 />
               </button>
-              <button
-                class="btn-void"
-                onclick={() => (eyeActive = !eyeActive)}
-              >
-                <Eye
-                  data-size={iconSize}
-                  data-muted={eyeActive}
-                />
+              <button class="btn-void" onclick={() => (eyeActive = !eyeActive)}>
+                <Eye data-size={iconSize} data-muted={eyeActive} />
               </button>
               <button
                 class="btn-void"
                 onclick={() => (musicActive = !musicActive)}
               >
-                <Music
-                  data-size={iconSize}
-                  data-muted={musicActive}
-                />
+                <Music data-size={iconSize} data-muted={musicActive} />
               </button>
               <button
                 class="btn-void"
                 onclick={() => (voiceActive = !voiceActive)}
               >
-                <Voice
-                  data-size={iconSize}
-                  data-muted={voiceActive}
-                />
+                <Voice data-size={iconSize} data-muted={voiceActive} />
               </button>
               <button
                 class="btn-void"
@@ -793,6 +793,7 @@
               <Info data-size={iconSize} />
               <Lock data-size={iconSize} />
               <Moon data-size={iconSize} />
+              <Profile data-size={iconSize} />
               <SpinLoader data-size={iconSize} />
               <Star data-size={iconSize} />
               <Sun data-size={iconSize} />

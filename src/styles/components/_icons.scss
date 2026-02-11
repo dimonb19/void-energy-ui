@@ -49,3 +49,10 @@
     transform: rotate(90deg);
   }
 }
+
+// Logo icon utility.
+:where(.logo-icon) {
+  @extend .icon;
+  width: unset;
+  min-width: var(--space-4xl);
+}

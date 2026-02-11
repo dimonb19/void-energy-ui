@@ -36,10 +36,7 @@
     </mask>
   </defs>
 
-  <path
-    d="M -80 0 L 30 0 L 5 -25 M 30 0 L 5 25"
-    fill="none"
-  />
+  <path d="M -80 0 L 30 0 L 5 -25 M 30 0 L 5 25" fill="none" />
   <rect
     x="-25"
     y="-75"
@@ -55,7 +52,7 @@
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.door-in[data-state="active"] path) {
+  :global(.door-in[data-state='active'] path) {
     transform: translateX(10%);
   }
 </style>

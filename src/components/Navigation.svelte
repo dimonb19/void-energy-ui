@@ -4,7 +4,7 @@
   import { morph } from '@actions/morph';
 
   import Burger from './icons/Burger.svelte';
-  import Logo from './icons/Logo.svelte';
+  import LogoDGRS from './icons/LogoDGRS.svelte';
   import Quill from './icons/Quill.svelte';
   import Search from './icons/Search.svelte';
   import BtnDoor from './icons/BtnDoor.svelte';
@@ -192,7 +192,7 @@
   </a>
   <!-- Desktop logo -->
   <a class="tab hidden small-desktop:flex" href="/" aria-label="Logo">
-    <Logo />
+    <LogoDGRS class="text-primary" />
   </a>
 
   <!-- Desktop Nav Links -->

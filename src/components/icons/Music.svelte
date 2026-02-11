@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
   let { class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
+  // data-muted attribute
 </script>
 
 <svg
@@ -14,22 +15,10 @@
 >
   <defs>
     <mask id="music-svg-top-mask">
-      <rect
-        x="-100"
-        y="-100"
-        width="200"
-        height="200"
-        fill="white"
-      />
+      <rect x="-100" y="-100" width="200" height="200" fill="white" />
     </mask>
     <mask id="music-svg-bottom-mask">
-      <rect
-        x="100"
-        y="-100"
-        width="200"
-        height="200"
-        fill="white"
-      />
+      <rect x="100" y="-100" width="200" height="200" fill="white" />
     </mask>
     <mask id="music-svg-crossed-out-mask">
       <g fill="white" stroke="white">
@@ -80,7 +69,7 @@
     }
   }
 
-  :global(.music-icon[data-muted="true"]) {
+  :global(.music-icon[data-muted='true']) {
     opacity: 0.5;
 
     #music-svg-top-mask rect,

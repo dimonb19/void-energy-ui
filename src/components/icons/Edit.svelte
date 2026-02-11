@@ -25,7 +25,7 @@
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.edit-icon[data-state="active"] .pencil) {
+  :global(.edit-icon[data-state='active'] .pencil) {
     transform: translate(-10px, 10px);
   }
 </style>

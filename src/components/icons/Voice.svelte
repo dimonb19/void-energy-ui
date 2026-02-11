@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
   let { class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
+  // data-muted attribute
 </script>
 
 <svg
@@ -14,22 +15,10 @@
 >
   <defs>
     <mask id="voice-svg-top-mask">
-      <rect
-        x="-100"
-        y="-100"
-        width="200"
-        height="200"
-        fill="white"
-      />
+      <rect x="-100" y="-100" width="200" height="200" fill="white" />
     </mask>
     <mask id="voice-svg-bottom-mask">
-      <rect
-        x="100"
-        y="-100"
-        width="200"
-        height="200"
-        fill="white"
-      />
+      <rect x="100" y="-100" width="200" height="200" fill="white" />
     </mask>
     <mask id="voice-svg-crossed-out-mask">
       <g fill="white" stroke="white">
@@ -66,10 +55,7 @@
       ry="40"
       stroke="none"
     />
-    <path
-      d="M -55 -10 C -60 74 60 74 55 -10"
-      fill="none"
-    />
+    <path d="M -55 -10 C -60 74 60 74 55 -10" fill="none" />
     <path d="M 0 55 L 0 85 M 25 85 L -25 85" fill="none" />
   </g>
 
@@ -101,7 +87,7 @@
     }
   }
 
-  :global(.voice-icon[data-muted="true"]) {
+  :global(.voice-icon[data-muted='true']) {
     opacity: 0.5;
 
     #voice-svg-top-mask rect,

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
   let { class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
+  // aria-disabled attribute
 </script>
 
 <svg
@@ -17,18 +18,8 @@
     <path d="M -70 -40 A 80 80 0 1 1 -50 50" fill="none" />
     <polygon points="-70 -40 -70 -80 -30 -50" />
   </g>
-  <line
-    x1="0"
-    y1="-5"
-    x2="0"
-    y2="-50"
-  />
-  <line
-    x1="2.5"
-    y1="-2.5"
-    x2="20"
-    y2="10"
-  />
+  <line x1="0" y1="-5" x2="0" y2="-50" />
+  <line x1="2.5" y1="-2.5" x2="20" y2="10" />
 </svg>
 
 <style lang="scss">
@@ -40,8 +31,8 @@
     transition: transform var(--speed-base) var(--ease-flow);
   }
 
-  :global(.restart-icon[data-state="active"]) {
-    &:not([data-muted="true"]) {
+  :global(.restart-icon[data-state='active']) {
+    &:not([aria-disabled='true']) {
       g {
         transform: rotate(-15deg);
       }

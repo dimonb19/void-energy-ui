@@ -21,7 +21,7 @@
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.picker-icon[data-state="active"] polygon) {
+  :global(.picker-icon[data-state='active'] polygon) {
     transform: scaleX(1.5);
   }
 </style>

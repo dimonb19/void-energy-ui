@@ -5,10 +5,11 @@
 
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  class="icon {className ?? ''}"
+  viewBox="-75 -75 150 150"
+  class="profile-icon icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
-  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+  <circle cy="-25" r="30" />
+  <path d="M -55 55 Q -60 20 -25 15 L 25 15 Q 60 20 55 55 Z" />
 </svg>

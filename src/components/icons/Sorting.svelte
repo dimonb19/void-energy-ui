@@ -26,7 +26,7 @@
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.sorting-icon[data-state="active"]) {
+  :global(.sorting-icon[data-state='active']) {
     transform: scale(1.1);
 
     path {

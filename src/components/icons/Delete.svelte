@@ -27,7 +27,7 @@
       opacity var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.delete-icon[data-state="active"]) {
+  :global(.delete-icon[data-state='active']) {
     path {
       transform: scale(1.5);
     }

@@ -25,10 +25,7 @@
     </mask>
   </defs>
 
-  <circle
-    r="100"
-    mask="url(#back-step-arrow-svg-mask)"
-  />
+  <circle r="100" mask="url(#back-step-arrow-svg-mask)" />
 </svg>
 
 <style>
@@ -36,7 +33,7 @@
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.switch-icon[data-state="active"]) {
+  :global(.switch-icon[data-state='active']) {
     transform: scale(1.1);
 
     g {

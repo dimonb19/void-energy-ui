@@ -22,7 +22,7 @@
     transition-timing-function: var(--ease-flow);
   }
 
-  :global(.reset-icon[data-state="active"]) {
+  :global(.reset-icon[data-state='active']) {
     transform: rotate(300deg);
   }
 </style>
