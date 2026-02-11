@@ -6,9 +6,9 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 24 24"
-  class="icon"
-  aria-hidden="true"
   stroke-width="2"
+  class="burger-toggle icon {className ?? ''}"
+  aria-hidden="true"
   {...rest}
 >
   <line class="top" x1="4" y1="7" x2="20" y2="7" />
@@ -17,8 +17,6 @@
 </svg>
 
 <style lang="scss">
-  @use '/src/styles/abstracts' as *;
-
   line {
     transform-origin: 12px 12px; // void-ignore
     transition:
@@ -26,7 +24,7 @@
       opacity var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(svg[data-state='active']) {
+  :global(.burger-toggle[data-state='active']) {
     .top {
       transform: translate(-4px, 3px) rotate(45deg); // void-ignore
     }

@@ -43,14 +43,6 @@
     font-size: var(--font-size-h1);
   }
 
-  // Animations.
-  &.icon-spin {
-    animation: rotate 2s linear infinite;
-    @include when-retro {
-      animation-timing-function: steps(8); // Stepped spin.
-    }
-  }
-
   // State-driven rotation (expandable menus, accordions).
   // Usage: <svg class="icon" data-expanded={isOpen}>
   &[data-expanded='true'] {

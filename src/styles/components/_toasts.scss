@@ -143,34 +143,10 @@
   justify-content: center;
   font-size: 1.1em; // Emojis look better slightly larger
   line-height: 1;
+  color: var(--toast-accent);
 
   // Prevent icon shrink.
   flex-shrink: 0;
-}
-
-// Spin loader.
-.spin-loader {
-  animation: rotate 1s linear infinite;
-
-  .track {
-    fill: none;
-    stroke: var(--text-mute);
-    stroke-width: calc(var(--physics-border-width) * 2);
-    opacity: 0.2;
-  }
-
-  .car {
-    fill: none;
-    stroke: var(--text-main);
-    stroke-width: calc(var(--physics-border-width) * 2);
-    stroke-dasharray: 10 20;
-    stroke-linecap: round;
-  }
-
-  // Retro override.
-  @include when-retro {
-    animation-timing-function: steps(8);
-  }
 }
 
 // ==========================================================================

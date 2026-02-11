@@ -5,13 +5,14 @@
 
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 24 24"
-  stroke-width="2.5"
-  stroke-linecap="round"
-  stroke-linejoin="round"
-  class="icon fill-none {className ?? ''}"
+  viewBox="-80 -80 160 160"
+  class="icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
-  <polyline points="20 6 9 17 4 12" />
+  <path
+    d="M -14 -30 L -14 -64 L -76 -9 L -14 48 L -14 12 Q 36 14 60 52 Q 60 -26 -12 -30 Z"
+    stroke-width="4"
+    stroke-linejoin="round"
+  />
 </svg>

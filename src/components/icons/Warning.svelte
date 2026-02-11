@@ -4,9 +4,9 @@
 </script>
 
 <svg
-  class="icon text-premium {className ?? ''}"
+  xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 123.996 123.996"
-  fill="currentColor"
+  class="icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >

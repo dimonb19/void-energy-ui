@@ -1,6 +1,18 @@
-<svg class="icon sun" viewBox="0 0 24 24" aria-hidden="true">
-  <circle cx="12" cy="12" r="4" fill="currentColor" />
-  <g stroke="currentColor" stroke-width="2" stroke-linecap="round">
+<script lang="ts">
+  import type { HTMLAttributes } from 'svelte/elements';
+  let { class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
+</script>
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 24 24"
+  stroke-linecap="round"
+  class="icon {className ?? ''}"
+  aria-hidden="true"
+  {...rest}
+>
+  <circle cx="12" cy="12" r="4" />
+  <g stroke-width="2">
     <line x1="12" y1="1" x2="12" y2="4" />
     <line x1="12" y1="20" x2="12" y2="23" />
     <line x1="1" y1="12" x2="4" y2="12" />

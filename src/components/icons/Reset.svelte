@@ -6,17 +6,23 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="-100 -100 200 200"
-  stroke-width="15"
+  stroke-width="20"
   stroke-linecap="round"
   stroke-linejoin="round"
-  class="icon {className ?? ''}"
+  class="reset-icon icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
-  <path
-    d="M -65 -17.5 L -65 70 L 65 70 L 65 -17.5 M -80 -10 L 0 -75 L 80 -10"
-    fill="none"
-  />
-  <rect x="-15" y="15" width="30" height="50" />
-  <rect x="60" y="-57.5" width="5" height="30" />
+  <path d="M 70 -50 A 85 85 0 1 0 85 0" fill="none" />
+  <polygon points="70 -50 60 -90 30 -55" />
 </svg>
+
+<style>
+  svg {
+    transition-timing-function: var(--ease-flow);
+  }
+
+  :global(.reset-icon[data-state="active"]) {
+    transform: rotate(300deg);
+  }
+</style>

@@ -86,30 +86,6 @@
     }
   }
 
-  // Dashed spinner (uses .icon utility for sizing)
-  .spin-loader {
-    animation: rotate 1s linear infinite;
-
-    .track {
-      fill: none;
-      stroke: var(--energy-primary);
-      stroke-width: 2;
-      opacity: 0.2;
-    }
-
-    .car {
-      fill: none;
-      stroke: var(--energy-primary);
-      stroke-width: 2;
-      stroke-dasharray: 10 20;
-      stroke-linecap: round;
-    }
-
-    @include when-retro {
-      animation-timing-function: steps(8);
-    }
-  }
-
   // Arrow icon (overlays progress ring)
   .pull-arrow {
     position: absolute;
@@ -314,10 +290,6 @@
   .pull-arrow,
   .progress-ring .value {
     transition: none;
-  }
-
-  .spin-loader {
-    animation: none;
   }
 
   .pull-checkmark polyline,

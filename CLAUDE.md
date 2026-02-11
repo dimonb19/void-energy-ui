@@ -154,6 +154,14 @@ Radius:   --radius-sm(4px)  --radius-md(8px)  --radius-lg(16px)  --radius-xl(24p
 </svg>
 ```
 
+### Icon Color
+Icons inherit color from their parent via `currentColor`. Color is always decided at the usage site.
+
+- **Inside a button/container**: icon inherits parent color — no class needed
+- **Standalone semantic indicator**: apply Tailwind class — `<Checkmark class="text-success" />`
+- **Hover color transitions**: set on parent — `<button class="text-mute hover:text-error"><XMark /></button>`
+- **Component-scoped color**: use SCSS on parent — `.toast-icon { color: var(--toast-accent); }`
+
 ---
 
 ## 4. SCSS TOOLKIT
