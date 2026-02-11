@@ -9,7 +9,7 @@
   stroke-width="20"
   stroke-linecap="round"
   stroke-linejoin="round"
-  class="reset-icon icon {className ?? ''}"
+  class="icon-reset icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
@@ -22,7 +22,7 @@
     transition-timing-function: var(--ease-flow);
   }
 
-  :global(.reset-icon[data-state='active']) {
+  :global(.icon-reset[data-state='active']) {
     transform: rotate(300deg);
   }
 </style>

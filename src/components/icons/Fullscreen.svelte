@@ -10,7 +10,7 @@
   stroke-width="20"
   stroke-linecap="round"
   stroke-linejoin="round"
-  class="fullscreen-icon icon {className ?? ''}"
+  class="icon-fullscreen icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
@@ -92,7 +92,7 @@
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.fullscreen-icon[data-fullscreen='true']) {
+  :global(.icon-fullscreen[data-fullscreen='true']) {
     .fullscreen-view {
       visibility: visible;
     }
@@ -104,7 +104,7 @@
     }
   }
 
-  :global(.fullscreen-icon[data-fullscreen='false']) {
+  :global(.icon-fullscreen[data-fullscreen='false']) {
     .window-view {
       visibility: visible;
     }

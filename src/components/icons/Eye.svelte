@@ -10,18 +10,18 @@
   stroke-width="15"
   stroke-linejoin="round"
   stroke-linecap="round"
-  class="eye-icon icon fill-none {className ?? ''}"
+  class="icon-eye icon fill-none {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
   <defs>
-    <mask id="eye-svg-top-mask">
+    <mask id="eye-top-mask">
       <rect x="-100" y="-100" width="200" height="200" fill="white" />
     </mask>
-    <mask id="eye-svg-bottom-mask">
+    <mask id="eye-bottom-mask">
       <rect x="100" y="-100" width="200" height="200" fill="white" />
     </mask>
-    <mask id="eye-svg-crossed-out-mask">
+    <mask id="eye-crossed-mask">
       <g stroke="white">
         <circle r="20" />
         <path d="M -80 0 Q 0 -90 80 0 Q 0 90 -80 0 Z" />
@@ -30,13 +30,13 @@
     </mask>
   </defs>
 
-  <g mask="url(#eye-svg-top-mask)">
+  <g mask="url(#eye-top-mask)">
     <circle r="20" />
     <path d="M -80 0 Q 0 -90 80 0 Q 0 90 -80 0 Z" />
   </g>
 
-  <g mask="url(#eye-svg-bottom-mask)">
-    <g mask="url(#eye-svg-crossed-out-mask)">
+  <g mask="url(#eye-bottom-mask)">
+    <g mask="url(#eye-crossed-mask)">
       <circle r="20" />
       <path d="M -80 0 Q 0 -90 80 0 Q 0 90 -80 0 Z" />
     </g>
@@ -48,17 +48,17 @@
   svg {
     transition: opacity var(--speed-base) var(--ease-spring-snappy);
 
-    #eye-svg-top-mask rect,
-    #eye-svg-bottom-mask rect {
+    #eye-top-mask rect,
+    #eye-bottom-mask rect {
       transition: transform var(--speed-base) var(--ease-flow);
     }
   }
 
-  :global(.eye-icon[data-muted='true']) {
+  :global(.icon-eye[data-muted='true']) {
     opacity: 0.5;
 
-    #eye-svg-top-mask rect,
-    #eye-svg-bottom-mask rect {
+    #eye-top-mask rect,
+    #eye-bottom-mask rect {
       transform: translateX(-200px);
     }
   }

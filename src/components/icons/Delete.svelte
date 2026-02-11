@@ -8,7 +8,7 @@
   viewBox="-100 -100 200 200"
   stroke-width="15"
   stroke-linecap="round"
-  class="delete-icon icon fill-none {className ?? ''}"
+  class="icon-delete icon fill-none {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
@@ -27,7 +27,7 @@
       opacity var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.delete-icon[data-state='active']) {
+  :global(.icon-delete[data-state='active']) {
     path {
       transform: scale(1.5);
     }

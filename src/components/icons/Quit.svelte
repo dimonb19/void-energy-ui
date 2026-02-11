@@ -6,12 +6,12 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="-100 -100 200 200"
-  class="quit-icon icon {className ?? ''}"
+  class="icon-quit icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
   <defs>
-    <mask id="quit-svg-mask">
+    <mask id="quit-mask">
       <circle r="100" fill="white" />
       <path
         d="M 50 0 L -50 0 L 0 -50 M -50 0 L 0 50"
@@ -24,18 +24,18 @@
     </mask>
   </defs>
 
-  <circle r="100" mask="url(#quit-svg-mask)" />
+  <circle r="100" mask="url(#quit-mask)" />
 </svg>
 
 <style lang="scss">
-  #quit-svg-mask path {
+  #quit-mask path {
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.quit-icon[data-state='active']) {
+  :global(.icon-quit[data-state='active']) {
     transform: scale(1.1);
 
-    #quit-svg-mask path {
+    #quit-mask path {
       transform: scale(1.2);
     }
   }

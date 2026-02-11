@@ -7,7 +7,7 @@
   xmlns="http://www.w3.org/2000/svg"
   viewBox="-100 -100 200 200"
   stroke-linejoin="round"
-  class="sorting-icon icon {className ?? ''}"
+  class="icon-sorting icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
@@ -26,7 +26,7 @@
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.sorting-icon[data-state='active']) {
+  :global(.icon-sorting[data-state='active']) {
     transform: scale(1.1);
 
     path {

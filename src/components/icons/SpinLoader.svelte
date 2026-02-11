@@ -6,7 +6,7 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 24 24"
-  class="spin-loader icon {className ?? ''}"
+  class="icon-spin-loader icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
@@ -17,7 +17,7 @@
 <style lang="scss">
   @use '/src/styles/abstracts' as *;
 
-  .spin-loader {
+  .icon-spin-loader {
     animation: rotate 1s linear infinite;
 
     .track {
@@ -37,7 +37,7 @@
   }
 
   // Retro override.
-  :global([data-physics='retro'] .spin-loader) {
+  :global([data-physics='retro'] .icon-spin-loader) {
     animation-timing-function: steps(8);
   }
 </style>

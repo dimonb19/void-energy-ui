@@ -9,7 +9,7 @@
   stroke-width="15"
   stroke-linecap="round"
   stroke-linejoin="round"
-  class="edit-icon icon fill-none {className ?? ''}"
+  class="icon-edit icon fill-none {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
@@ -25,7 +25,7 @@
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.edit-icon[data-state='active'] .pencil) {
+  :global(.icon-edit[data-state='active'] .pencil) {
     transform: translate(-10px, 10px);
   }
 </style>

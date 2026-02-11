@@ -9,7 +9,7 @@
   stroke-width="20"
   stroke-linecap="round"
   stroke-linejoin="round"
-  class="picker-icon icon {className ?? ''}"
+  class="icon-picker icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
@@ -21,7 +21,7 @@
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.picker-icon[data-state='active'] polygon) {
+  :global(.icon-picker[data-state='active'] polygon) {
     transform: scaleX(1.5);
   }
 </style>

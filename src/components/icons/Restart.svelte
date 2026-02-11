@@ -10,7 +10,7 @@
   stroke-width="20"
   stroke-linejoin="round"
   stroke-linecap="round"
-  class="restart-icon icon {className ?? ''}"
+  class="icon-restart icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
@@ -31,7 +31,7 @@
     transition: transform var(--speed-base) var(--ease-flow);
   }
 
-  :global(.restart-icon[data-state='active']) {
+  :global(.icon-restart[data-state='active']) {
     &:not([aria-disabled='true']) {
       g {
         transform: rotate(-15deg);

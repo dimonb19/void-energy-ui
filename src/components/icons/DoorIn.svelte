@@ -9,12 +9,12 @@
   stroke-width="12"
   stroke-linecap="round"
   stroke-linejoin="round"
-  class="door-in icon {className ?? ''}"
+  class="icon-door-in icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
   <defs>
-    <mask id="door-svg-mask">
+    <mask id="door-in-mask">
       <rect
         x="-25"
         y="-75"
@@ -43,7 +43,7 @@
     width="100"
     height="150"
     rx="15"
-    mask="url(#door-svg-mask)"
+    mask="url(#door-in-mask)"
   />
 </svg>
 
@@ -52,7 +52,7 @@
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.door-in[data-state='active'] path) {
+  :global(.icon-door-in[data-state='active'] path) {
     transform: translateX(10%);
   }
 </style>

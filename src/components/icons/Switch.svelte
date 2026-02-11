@@ -6,12 +6,12 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="-100 -100 200 200"
-  class="switch-icon icon {className ?? ''}"
+  class="icon-switch icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
   <defs>
-    <mask id="back-step-arrow-svg-mask">
+    <mask id="switch-mask">
       <circle r="100" fill="white" />
       <g fill="black" stroke="black">
         <polygon
@@ -25,7 +25,7 @@
     </mask>
   </defs>
 
-  <circle r="100" mask="url(#back-step-arrow-svg-mask)" />
+  <circle r="100" mask="url(#switch-mask)" />
 </svg>
 
 <style>
@@ -33,7 +33,7 @@
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.switch-icon[data-state='active']) {
+  :global(.icon-switch[data-state='active']) {
     transform: scale(1.1);
 
     g {

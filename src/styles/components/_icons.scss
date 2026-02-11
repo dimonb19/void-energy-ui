@@ -23,9 +23,12 @@
     transform var(--speed-fast) var(--ease-spring-snappy),
     color var(--speed-fast) var(--ease-spring-snappy);
 
-  // Sizes: sm (caption) < md (body, default) < lg < xl
+  // Sizes: sm (caption) < md (body) < lg < xl < 2xl < 3xl < 4xl
   &[data-size='sm'] {
     font-size: var(--font-size-caption);
+  }
+  &[data-size='md'] {
+    font-size: var(--font-size-body);
   }
   &[data-size='lg'] {
     font-size: var(--font-size-h5);

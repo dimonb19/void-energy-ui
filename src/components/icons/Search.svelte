@@ -8,7 +8,7 @@
   viewBox="-100 -100 200 200"
   stroke-width="15"
   stroke-linecap="round"
-  class="search-icon icon fill-none {className ?? ''}"
+  class="icon-search icon fill-none {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
@@ -27,15 +27,15 @@
     display: none;
   }
 
-  :global(.search-icon[data-state='active']) {
+  :global(.icon-search[data-state='active']) {
     transform: rotate(90deg);
   }
 
-  :global(.search-icon[data-zoom='in']) .zoom-in {
+  :global(.icon-search[data-zoom='in']) .zoom-in {
     display: block;
   }
 
-  :global(.search-icon[data-zoom='out']) .zoom-out {
+  :global(.icon-search[data-zoom='out']) .zoom-out {
     display: block;
   }
 </style>

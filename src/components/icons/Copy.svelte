@@ -9,7 +9,7 @@
   stroke-width="15"
   stroke-linejoin="round"
   stroke-linecap="round"
-  class="copy-icon icon fill-none {className ?? ''}"
+  class="icon-copy icon fill-none {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
@@ -24,7 +24,7 @@
     transition: opacity var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.copy-icon[data-state='active'] .copy-checkmark) {
+  :global(.icon-copy[data-state='active'] .copy-checkmark) {
     opacity: 1;
   }
 </style>

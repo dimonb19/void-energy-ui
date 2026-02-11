@@ -7,7 +7,7 @@
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 24 24"
   stroke-width="2"
-  class="burger-toggle icon {className ?? ''}"
+  class="icon-burger icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
@@ -24,7 +24,7 @@
       opacity var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.burger-toggle[data-state='active']) {
+  :global(.icon-burger[data-state='active']) {
     .top {
       transform: translate(-4px, 3px) rotate(45deg); // void-ignore
     }

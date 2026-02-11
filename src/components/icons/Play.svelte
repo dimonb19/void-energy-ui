@@ -9,7 +9,7 @@
   stroke-width="15"
   stroke-linecap="round"
   stroke-linejoin="round"
-  class="play-icon icon fill-none {className ?? ''}"
+  class="icon-play icon fill-none {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
@@ -29,7 +29,7 @@
       opacity var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.play-icon[data-state='active']) {
+  :global(.icon-play[data-state='active']) {
     polygon {
       transform: scale(1.5);
     }

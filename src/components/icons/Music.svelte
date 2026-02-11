@@ -9,18 +9,18 @@
   viewBox="-100 -100 200 200"
   stroke-linejoin="round"
   stroke-linecap="round"
-  class="music-icon icon {className ?? ''}"
+  class="icon-music icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
   <defs>
-    <mask id="music-svg-top-mask">
+    <mask id="music-top-mask">
       <rect x="-100" y="-100" width="200" height="200" fill="white" />
     </mask>
-    <mask id="music-svg-bottom-mask">
+    <mask id="music-bottom-mask">
       <rect x="100" y="-100" width="200" height="200" fill="white" />
     </mask>
-    <mask id="music-svg-crossed-out-mask">
+    <mask id="music-crossed-mask">
       <g fill="white" stroke="white">
         <polygon points="-40 -50 85 -85 85 -55 -40 -20" stroke-width="15" />
         <line x1="-35" y1="-40" x2="-35" y2="68" stroke-width="25" />
@@ -39,7 +39,7 @@
     </mask>
   </defs>
 
-  <g mask="url(#music-svg-top-mask)">
+  <g mask="url(#music-top-mask)">
     <polygon points="-40 -50 85 -85 85 -55 -40 -20" stroke-width="15" />
     <line x1="-35" y1="-40" x2="-35" y2="68" stroke-width="25" />
     <line x1="80" y1="-60" x2="80" y2="44" stroke-width="25" />
@@ -47,8 +47,8 @@
     <ellipse cx="57" cy="46" rx="35" ry="22" />
   </g>
 
-  <g mask="url(#music-svg-bottom-mask)">
-    <g mask="url(#music-svg-crossed-out-mask)">
+  <g mask="url(#music-bottom-mask)">
+    <g mask="url(#music-crossed-mask)">
       <polygon points="-40 -50 85 -85 85 -55 -40 -20" stroke-width="15" />
       <line x1="-35" y1="-40" x2="-35" y2="68" stroke-width="25" />
       <line x1="80" y1="-60" x2="80" y2="44" stroke-width="25" />
@@ -63,17 +63,17 @@
   svg {
     transition: opacity var(--speed-base) var(--ease-spring-snappy);
 
-    #music-svg-top-mask rect,
-    #music-svg-bottom-mask rect {
+    #music-top-mask rect,
+    #music-bottom-mask rect {
       transition: transform var(--speed-base) var(--ease-flow);
     }
   }
 
-  :global(.music-icon[data-muted='true']) {
+  :global(.icon-music[data-muted='true']) {
     opacity: 0.5;
 
-    #music-svg-top-mask rect,
-    #music-svg-bottom-mask rect {
+    #music-top-mask rect,
+    #music-bottom-mask rect {
       transform: translateX(-200px);
     }
   }

@@ -28,7 +28,7 @@
 >
   {#if state === 'outside'}
     <svg
-      class="outside-door icon"
+      class="icon-door-outside icon"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="-100 -100 200 200"
       fill="none"
@@ -37,7 +37,7 @@
       stroke-linejoin="round"
     >
       <defs>
-        <mask id="door-svg-mask">
+        <mask id="btn-door-out-mask">
           <rect
             x="-25"
             y="-75"
@@ -75,12 +75,12 @@
         width="100"
         height="150"
         rx="15"
-        mask="url(#door-svg-mask)"
+        mask="url(#btn-door-out-mask)"
       />
     </svg>
   {:else if state === 'inside'}
     <svg
-      class="inside-door icon"
+      class="icon-door-inside icon"
       xmlns="http://www.w3.org/2000/svg"
       viewBox="-100 -100 200 200"
       fill="none"
@@ -90,7 +90,7 @@
       stroke-linejoin="round"
     >
       <defs>
-        <mask id="door-svg-mask">
+        <mask id="btn-door-in-mask">
           <rect
             x="-25"
             y="-75"
@@ -128,7 +128,7 @@
         width="100"
         height="150"
         rx="15"
-        mask="url(#door-svg-mask)"
+        mask="url(#btn-door-in-mask)"
       />
     </svg>
   {/if}
@@ -144,11 +144,11 @@
     &:hover,
     &:active,
     &:focus-visible {
-      .outside-door path {
+      .icon-door-outside path {
         transform: translateX(-7.5%);
       }
 
-      .inside-door path {
+      .icon-door-inside path {
         transform: translateX(10%);
       }
     }

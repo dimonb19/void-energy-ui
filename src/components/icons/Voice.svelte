@@ -9,18 +9,18 @@
   viewBox="-100 -100 200 200"
   stroke-width="15"
   stroke-linecap="round"
-  class="voice-icon icon {className ?? ''}"
+  class="icon-voice icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
   <defs>
-    <mask id="voice-svg-top-mask">
+    <mask id="voice-top-mask">
       <rect x="-100" y="-100" width="200" height="200" fill="white" />
     </mask>
-    <mask id="voice-svg-bottom-mask">
+    <mask id="voice-bottom-mask">
       <rect x="100" y="-100" width="200" height="200" fill="white" />
     </mask>
-    <mask id="voice-svg-crossed-out-mask">
+    <mask id="voice-crossed-mask">
       <g fill="white" stroke="white">
         <rect
           x="-35"
@@ -45,7 +45,7 @@
     </mask>
   </defs>
 
-  <g mask="url(#voice-svg-top-mask)">
+  <g mask="url(#voice-top-mask)">
     <rect
       x="-35"
       y="-90"
@@ -59,8 +59,8 @@
     <path d="M 0 55 L 0 85 M 25 85 L -25 85" fill="none" />
   </g>
 
-  <g mask="url(#voice-svg-bottom-mask)">
-    <g mask="url(#voice-svg-crossed-out-mask)">
+  <g mask="url(#voice-bottom-mask)">
+    <g mask="url(#voice-crossed-mask)">
       <rect
         x="-35"
         y="-90"
@@ -81,17 +81,17 @@
   svg {
     transition: opacity var(--speed-base) var(--ease-spring-snappy);
 
-    #voice-svg-top-mask rect,
-    #voice-svg-bottom-mask rect {
+    #voice-top-mask rect,
+    #voice-bottom-mask rect {
       transition: transform var(--speed-base) var(--ease-flow);
     }
   }
 
-  :global(.voice-icon[data-muted='true']) {
+  :global(.icon-voice[data-muted='true']) {
     opacity: 0.5;
 
-    #voice-svg-top-mask rect,
-    #voice-svg-bottom-mask rect {
+    #voice-top-mask rect,
+    #voice-bottom-mask rect {
       transform: translateX(-200px);
     }
   }
