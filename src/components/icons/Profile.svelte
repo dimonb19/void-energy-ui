@@ -6,7 +6,7 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="-75 -75 150 150"
-  class="profile-icon icon {className ?? ''}"
+  class="icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >

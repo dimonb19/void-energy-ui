@@ -1,0 +1,28 @@
+---
+import '@styles/global.scss';
+
+import ThemeScript from '@components/core/ThemeScript.astro';
+import Navigation from '@components/Navigation.svelte';
+import Modal from '@components/ui/Modal.svelte';
+import Toast from '@components/Toast.svelte';
+---
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Void Energy UI</title>
+    <ThemeScript />
+  </head>
+  <body>
+    <main>
+      <Navigation client:load />
+      <slot />
+    </main>
+
+    <Modal client:idle />
+    <Modal client:load />
+    <Toast client:load />
+  </body>
+</html>

@@ -21,7 +21,6 @@
   import Checkmark from './icons/Checkmark.svelte';
   import Copy from './icons/Copy.svelte';
   import Delete from './icons/Delete.svelte';
-  // import Discord from './icons/Discord.svelte';
   import DoorIn from './icons/DoorIn.svelte';
   import DoorOut from './icons/DoorOut.svelte';
   import Dream from './icons/Dream.svelte';
@@ -34,14 +33,12 @@
   import Home from './icons/Home.svelte';
   import Info from './icons/Info.svelte';
   import Lock from './icons/Lock.svelte';
-  import LogoDGRS from './icons/LogoDGRS.svelte';
-  import LogoCoNexus from './icons/LogoCoNexus.svelte';
   import Moon from './icons/Moon.svelte';
   import Music from './icons/Music.svelte';
   import Picker from './icons/Picker.svelte';
   import Play from './icons/Play.svelte';
   import Profile from './icons/Profile.svelte';
-  // import Quill from './icons/Quill.svelte';
+  import Quill from './icons/Quill.svelte';
   import Quit from './icons/Quit.svelte';
   import Reset from './icons/Reset.svelte';
   import Restart from './icons/Restart.svelte';
@@ -182,7 +179,7 @@
 <PullRefresh onrefresh={handleRefresh} onerror={handleRefreshError}>
   <main class="w-full min-h-screen">
     <div class="container flex flex-col gap-xl">
-      <section class="flex flex-col gap-md mt-xl">
+      <section class="flex flex-col gap-md mt-md">
         <h2>01 // VOID ENERGY</h2>
 
         <div class="surface-glass p-lg flex flex-col gap-lg">
@@ -636,6 +633,16 @@
               </button>
               <button
                 class="btn-void"
+                onpointerenter={() => (playFocus = true)}
+                onpointerleave={() => (playFocus = false)}
+              >
+                <Play
+                  data-state={playFocus ? 'active' : ''}
+                  data-size={iconSize}
+                />
+              </button>
+              <button
+                class="btn-void"
                 onclick={() => (fullscreenActive = !fullscreenActive)}
                 onpointerenter={() => (fullscreenFocus = true)}
                 onpointerleave={() => (fullscreenFocus = false)}
@@ -644,16 +651,6 @@
                   data-state={fullscreenFocus ? 'active' : ''}
                   data-size={iconSize}
                   data-fullscreen={fullscreenActive}
-                />
-              </button>
-              <button
-                class="btn-void"
-                onpointerenter={() => (playFocus = true)}
-                onpointerleave={() => (playFocus = false)}
-              >
-                <Play
-                  data-state={playFocus ? 'active' : ''}
-                  data-size={iconSize}
                 />
               </button>
               <button
@@ -794,6 +791,7 @@
               <Lock data-size={iconSize} />
               <Moon data-size={iconSize} />
               <Profile data-size={iconSize} />
+              <Quill data-size={iconSize} />
               <SpinLoader data-size={iconSize} />
               <Star data-size={iconSize} />
               <Sun data-size={iconSize} />

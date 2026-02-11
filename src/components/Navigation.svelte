@@ -6,9 +6,6 @@
   import Burger from './icons/Burger.svelte';
   import LogoDGRS from './icons/LogoDGRS.svelte';
   import Quill from './icons/Quill.svelte';
-  import Search from './icons/Search.svelte';
-  import BtnDoor from './icons/BtnDoor.svelte';
-  import Dream from './icons/Dream.svelte';
   import Home from './icons/Home.svelte';
   import ThemeSelector from './ui/Themes.svelte';
 
@@ -19,7 +16,7 @@
   type NavItem = {
     id: string;
     label: string;
-    href: string;
+    href?: string;
     icon?: Component;
     children?: NavItem[];
   };
@@ -35,40 +32,23 @@
 
   // Main navigation tabs (desktop header + mobile bottom nav)
   const navItems: NavItem[] = [
-    { id: 'Stories', label: 'Stories', href: '/', icon: Home },
-    { id: 'Dream', label: 'Dream', href: '/', icon: Dream },
-    { id: 'Profile', label: 'Profile', href: '/' },
+    { id: 'components', label: 'Components', href: '/components', icon: Home },
   ];
 
   // Sidebar/dropdown menu items
   const sidebarItems: SidebarItem[] = [
-    { id: 'MyProfile', label: 'My Profile', href: '/' },
-    { id: 'Dashboard', label: 'Dashboard', href: '/' },
     {
-      id: 'Account',
-      label: 'Account',
-      href: '/',
+      id: 'library',
+      label: 'Library',
       children: [
-        { id: 'Overview', label: 'Overview', href: '/' },
-        { id: 'Bookmarks', label: 'Bookmarks', href: '/' },
+        { id: 'Buttons', label: 'Buttons', href: '/' },
+        { id: 'Icons', label: 'Icons', href: '/' },
       ],
     },
-    { id: 'Settings', label: 'Personal Settings', href: '/' },
     {
       id: 'ThemeSelector',
       component: ThemeSelector,
       props: { class: 'btn-void subtab flex-row-reverse' },
-    },
-    {
-      id: 'SignOut',
-      component: BtnDoor,
-      props: {
-        state: 'outside',
-        text: 'Sign Out',
-        class: 'subtab flex-row-reverse',
-        voidBtn: true,
-        onclick: () => console.log('Sign Out'),
-      },
     },
   ];
 
@@ -94,12 +74,13 @@
   // ─────────────────────────────────────────────────────────────────────────────
 
   let sidebarOpen = $state<boolean>(false);
-  let activeTab = $state<string>('Stories');
+  let activeTab = $state<string>('');
 
   // Sidebar hover control (desktop dropdown behavior)
   let sidebarTimer: ReturnType<typeof setTimeout> | null = null;
 
-  function openSidebar() {
+  function openSidebar(event: PointerEvent) {
+    if (event.pointerType === 'touch') return;
     if (sidebarTimer) clearTimeout(sidebarTimer);
     sidebarOpen = true;
   }
@@ -126,8 +107,14 @@
     );
   });
 
-  let searchInput: HTMLInputElement | null;
-  let svgFocus = $state<boolean>(false);
+  // Resolve active tab from current URL on mount
+  $effect(() => {
+    const path = window.location.pathname.replace(/\/+$/, '') || '/';
+    const match = navItems.find(
+      (t) => t.href && t.href.replace(/\/+$/, '') === path,
+    );
+    if (match) activeTab = match.id;
+  });
 
   // "The Peek" - reveal navbar on mouse hover at top edge
   let peekTimer: ReturnType<typeof setTimeout> | null = null;
@@ -169,11 +156,21 @@
     });
   };
 
-  const selectTab = (event: Event, tabName: string) => {
-    event.preventDefault();
-    if (tabName === activeTab) {
-      activeTab = '';
-      return;
+  const selectTab = (
+    event: Event,
+    tabName: string,
+    hasChildren: boolean = false,
+  ) => {
+    if (hasChildren) {
+      // Expandable parent: toggle open/closed, prevent navigation
+      event.preventDefault();
+      if (tabName === activeTab) {
+        activeTab = '';
+        return;
+      }
+    } else {
+      // Leaf item: let the browser navigate, close sidebar
+      sidebarOpen = false;
     }
     activeTab = tabName;
   };
@@ -188,16 +185,16 @@
 >
   <!-- Mobile logo -->
   <a class="tab small-desktop:hidden" href="/" aria-label="Logo">
-    <Quill />
+    <Quill data-size="2xl" />
   </a>
   <!-- Desktop logo -->
   <a class="tab hidden small-desktop:flex" href="/" aria-label="Logo">
-    <LogoDGRS class="text-primary" />
+    <LogoDGRS class="text-primary w-4xl" />
   </a>
 
   <!-- Desktop Nav Links -->
   <ul class="hidden tablet:flex items-center gap-xs">
-    {#each navItems.filter((t) => t.id !== 'Profile') as tab}
+    {#each navItems as tab}
       <li>
         <a
           class="tab"
@@ -211,41 +208,15 @@
     {/each}
   </ul>
 
-  <!-- Search input -->
-  <span class="search">
-    <Search class="text-secondary" data-state={svgFocus ? 'active' : ''} />
-    <input
-      id="search"
-      type="text"
-      placeholder="Search..."
-      aria-label="Search"
-      bind:this={searchInput}
-      onfocus={() => (svgFocus = true)}
-      onblur={() => (svgFocus = false)}
-    />
-  </span>
-
-  <!-- Profile Button (Desktop) - Hover triggers sidebar as dropdown -->
-  <a
-    class="tab hidden tablet:flex ml-auto"
-    href="/"
-    data-state={activeTab === 'Profile' ? 'active' : ''}
-    onclick={(e) => selectTab(e, 'Profile')}
-    onpointerenter={openSidebar}
-    onpointerleave={closeSidebarDelayed}
-  >
-    <img class="icon rounded-full" src="/pfp.jpg" alt="PFP" data-size="2xl" />
-    Profile
-    <span class="arrow icon" data-size="sm" aria-hidden="true"></span>
-  </a>
-
-  <!-- Burger Button (Mobile & Touch screens) -->
+  <!-- Burger Button -->
   <button
-    class="burger-tab btn-void text-primary tab"
+    class="btn-void text-primary tab ml-auto"
     onclick={() => (sidebarOpen = !sidebarOpen)}
     aria-expanded={sidebarOpen}
     aria-label={sidebarOpen ? 'Close menu' : 'Open menu'}
     aria-controls="burger-menu"
+    onpointerenter={openSidebar}
+    onpointerleave={closeSidebarDelayed}
   >
     <Burger data-size="2xl" data-state={sidebarOpen ? 'active' : ''} />
   </button>
@@ -260,9 +231,7 @@
       data-state={activeTab === tab.id ? 'active' : ''}
       onclick={(e) => selectTab(e, tab.id)}
     >
-      {#if tab.id === 'Profile'}
-        <img class="icon rounded-full" src="/pfp.jpg" alt="PFP" />
-      {:else if tab.icon}
+      {#if tab.icon}
         <tab.icon />
       {/if}
     </a>
@@ -286,12 +255,13 @@
           <item.component {...item.props} />
         </span>
       {:else if item.children}
-        <a
-          class="subtab expandable"
-          href={item.href}
+        <button
+          class="btn-void subtab expandable"
+          type="button"
           style="--item-index: {i}"
           data-state={activeTab === item.id ? 'active' : ''}
-          onclick={(e) => selectTab(e, item.id)}
+          aria-expanded={isExpanded(item)}
+          onclick={(e) => selectTab(e, item.id, true)}
         >
           {item.label}
           <svg
@@ -305,12 +275,17 @@
           >
             <polyline points="9 6 15 12 9 18" />
           </svg>
-        </a>
+        </button>
         {#if isExpanded(item)}
           <ul class="submenu" out:dematerialize>
             {#each item.children as child, j (child.id)}
               <li style="--item-index: {j}">
-                <a class="subtab" href={child.href}>
+                <a
+                  class="subtab"
+                  href={child.href}
+                  data-state={activeTab === child.id ? 'active' : ''}
+                  onclick={(e) => selectTab(e, child.id)}
+                >
                   {child.label}
                 </a>
               </li>

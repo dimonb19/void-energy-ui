@@ -6,7 +6,7 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 2341 546"
-  class="logo-icon {className ?? ''}"
+  class="icon {className ?? ''}"
   aria-label="DGRS LABS"
   {...rest}
 >
