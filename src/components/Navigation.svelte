@@ -3,11 +3,12 @@
   import { materialize, dematerialize } from '@lib/transitions.svelte';
   import { morph } from '@actions/morph';
 
+  import ThemeSelector from './ui/Themes.svelte';
+
   import Burger from './icons/Burger.svelte';
   import LogoDGRS from './icons/LogoDGRS.svelte';
   import Quill from './icons/Quill.svelte';
-  import Home from './icons/Home.svelte';
-  import ThemeSelector from './ui/Themes.svelte';
+  import Grid from './icons/Grid.svelte';
 
   // ─────────────────────────────────────────────────────────────────────────────
   // Navigation Data Structure
@@ -32,7 +33,8 @@
 
   // Main navigation tabs (desktop header + mobile bottom nav)
   const navItems: NavItem[] = [
-    { id: 'components', label: 'Components', href: '/components', icon: Home },
+    { id: 'conexus', label: 'CoNexus', href: '/conexus', icon: Quill },
+    { id: 'components', label: 'Components', href: '/components', icon: Grid },
   ];
 
   // Sidebar/dropdown menu items
@@ -183,12 +185,7 @@
   aria-label="Navigation"
   data-hidden={navHidden}
 >
-  <!-- Mobile logo -->
-  <a class="tab small-desktop:hidden" href="/" aria-label="Logo">
-    <Quill data-size="2xl" />
-  </a>
-  <!-- Desktop logo -->
-  <a class="tab hidden small-desktop:flex" href="/" aria-label="Logo">
+  <a class="tab" href="/" aria-label="Logo">
     <LogoDGRS class="text-primary w-4xl" />
   </a>
 

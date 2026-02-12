@@ -25,7 +25,6 @@
   import Picker from '../icons/Picker.svelte';
   import Play from '../icons/Play.svelte';
   import Profile from '../icons/Profile.svelte';
-  import Quill from '../icons/Quill.svelte';
   import Quit from '../icons/Quit.svelte';
   import Reset from '../icons/Reset.svelte';
   import Restart from '../icons/Restart.svelte';
@@ -275,7 +274,6 @@
         <Lock data-size={iconSize} />
         <Moon data-size={iconSize} />
         <Profile data-size={iconSize} />
-        <Quill data-size={iconSize} />
         <SpinLoader data-size={iconSize} />
         <Star data-size={iconSize} />
         <Sun data-size={iconSize} />
