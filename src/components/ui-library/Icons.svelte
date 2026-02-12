@@ -76,7 +76,7 @@
 </script>
 
 <section class="flex flex-col gap-md mt-md">
-  <h2>01 // ICONS</h2>
+  <h2>03 // ICONS</h2>
   <div class="surface-glass p-lg flex flex-col gap-md">
     <div class="flex flex-col gap-xs items-center">
       <h5>Interactive Icons</h5>

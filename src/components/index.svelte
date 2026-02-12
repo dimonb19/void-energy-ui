@@ -28,39 +28,38 @@
   }
 
   // Local demo state with stable IDs for list animations.
-  let moduleIdCounter = $state(3);
-  let moduleTiles = $state([
-    { id: 1, name: 'Neural Net' },
-    { id: 2, name: 'Firewall' },
-    { id: 3, name: 'Log v.1' },
+  let tokenIdCounter = $state(3);
+  let tokenTags = $state([
+    { id: 1, name: 'Spacing' },
+    { id: 2, name: 'Typography' },
+    { id: 3, name: 'Color' },
   ]);
-  let newModuleTile = $state('Audio Synth');
+  let newTokenTag = $state('Motion');
 
-  let environmentIdCounter = $state(3);
-  let environmentTiles = $state([
-    { id: 1, name: 'Physics Engine' },
-    { id: 2, name: 'Audio Synth' },
-    { id: 3, name: 'Visual Renderer' },
+  let layerIdCounter = $state(3);
+  let systemLayers = $state([
+    { id: 1, name: 'Surfaces' },
+    { id: 2, name: 'Components' },
+    { id: 3, name: 'Layouts' },
   ]);
-  let newEnvironmentTile = $state('Physics Engine');
+  let newSystemLayer = $state('Inputs');
 
-  let premiumIdCounter = $state(2);
-  let premiumTiles = $state([
-    { id: 1, name: 'Quantum Core' },
-    { id: 2, name: 'AI Supervisor' },
+  let featureIdCounter = $state(2);
+  let premiumFeatures = $state([
+    { id: 1, name: 'Runtime Theming' },
+    { id: 2, name: 'Density Engine' },
   ]);
-  let newPremiumTile = $state('Quantum Core');
+  let newPremiumFeature = $state('Physics Presets');
 
   // Local state for the showcase
-  let telemetry = $state(true);
-  let systemMode = $state(true);
-  let stealth = $state(false);
-  let aiSentiment = $state(true);
-  let rootAccess = $state(false); // Disabled state
+  let animations = $state(true);
+  let colorMode = $state(true);
+  let reducedMotion = $state(false);
+  let satisfaction = $state(true);
+  let adminOverride = $state(false); // Disabled state
 
-  // Test functions for temporary theme feature
-  function testCustomTheme() {
-    // Don't register if adaptation is disabled
+  // Temporary theme preview functions
+  function previewCustomAtmosphere() {
     if (!voidEngine.userConfig.adaptAtmosphere) {
       toast.show(
         'Enable "Adapt Atmosphere" to allow theme changes.',
@@ -87,13 +86,13 @@
       },
     });
     voidEngine.applyTemporaryTheme('cyberpunk', 'Neon Dreams');
-    toast.show('Cyberpunk theme applied temporarily', 'success');
+    toast.show('Custom atmosphere applied', 'success');
   }
 
-  function testExistingTheme() {
+  function previewBuiltInAtmosphere() {
     const applied = voidEngine.applyTemporaryTheme('crimson', 'Blood Moon');
     if (applied) {
-      toast.show('Crimson theme applied temporarily', 'success');
+      toast.show('Crimson atmosphere active', 'success');
     } else {
       toast.show(
         'Enable "Adapt Atmosphere" to allow theme changes.',
@@ -104,184 +103,386 @@
 </script>
 
 <PullRefresh onrefresh={handleRefresh} onerror={handleRefreshError}>
-  <div class="container flex flex-col gap-xl py-md">
-    <section class="flex flex-col gap-md mt-md">
-      <h2>01 // VOID ENERGY</h2>
+  <div class="container flex flex-col gap-2xl py-2xl">
+    <h1 class="text-center text-primary">Void Energy</h1>
 
-      <div class="surface-glass p-lg flex flex-col gap-lg">
-        <div class="flex flex-row flex-wrap gap-md">
-          <div class="flex flex-col gap-xs flex-1">
-            <label class="text-small px-xs" for="system-identifier">
-              System Identifier
-            </label>
-            <input
-              id="system-identifier"
-              type="text"
-              placeholder="Enter Agent ID..."
-            />
-          </div>
+    <div class="surface-glass p-lg flex flex-col gap-lg">
+      <p class="text-center">
+        We have discarded static pixels in favor of <strong
+          >reactive materials</strong
+        >. In this system, we do not paint screens; we simulate environments.
+        This is an engine where interfaces obey strict laws of light, motion,
+        and depth. Here, <strong>atmosphere is context</strong>. Content does
+        not float in a vacuum; it exists within a living environment that exerts
+        physical force on the user's experience. Every element is a living
+        object that instinctively adapts to the narrative of the user, expanding
+        and contracting its geometry to match the density of the task at hand.
+      </p>
+      <span class="flex justify-center">
+        <ThemeSelector class="btn-cta" />
+      </span>
+      <div class="surface-sunk p-lg flex flex-col gap-sm">
+        <h3>The Hybrid Protocol</h3>
+        <p>
+          We separate <strong>Geometry</strong> (Layout) from
+          <strong>Physics</strong> (Material).
+        </p>
+        <ul class="list-disc list-inside">
+          <li>
+            <b>Layout:</b> Defined by rigid grids and fluid spacing (Tailwind).
+          </li>
+          <li>
+            <b>Material:</b> Defined by texture, motion, and light (SCSS).
+          </li>
+        </ul>
 
-          <Selector
-            id="security-clearance"
-            label="Security Clearance"
-            options={[
-              { value: 'observer', label: 'Level 1 - Observer' },
-              { value: 'operator', label: 'Level 2 - Operator' },
-              { value: 'admin', label: 'Level 3 - Administrator' },
-            ]}
-            class="flex-1"
-            align="start"
-          />
-        </div>
+        <br />
+
+        <h3>The Triad Architecture</h3>
+        <p>Every pixel is calculated by the intersection of three variables.</p>
+        <h4>1. Atmosphere (The Soul)</h4>
+        <p>Defines the mood, color palette, and typography.</p>
+        <ul class="list-disc list-inside">
+          <li>
+            <i>Examples:</i> Void (Sci-Fi), Onyx (Stealth), Terminal (Retro), Paper
+            (Light).
+          </li>
+        </ul>
+
+        <h4>2. Physics (The Laws)</h4>
+        <p>Defines how materials react to light and interaction.</p>
+        <ul class="list-disc list-inside">
+          <li>
+            <b>Glass:</b> Translucent, blurred backgrounds, glowing borders. High
+            GPU cost.
+          </li>
+          <li>
+            <b>Flat:</b> Opaque, sharp borders, efficient rendering, clean lines.
+          </li>
+          <li>
+            <b>Retro:</b> Hard pixels, no anti-aliasing, stepped animation (CRT style).
+          </li>
+        </ul>
+
+        <h4>3. Mode (The Polarity)</h4>
+        <p>Defines the contrast environment.</p>
+        <ul class="list-disc list-inside">
+          <li>
+            <b>Dark:</b> Low luminosity background, light text.
+          </li>
+          <li>
+            <b>Light:</b> High luminosity background, dark text.
+          </li>
+        </ul>
+
+        <br />
 
         <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-          eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
-          minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          aliquip ex ea commodo consequat. Duis aute irure dolor in
-          reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
-          pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-          culpa qui officia deserunt mollit anim id est laborum.
+          <b>Engineering Note:</b> The system automatically enforces the Physics
+          Compatibility Matrix. For example, Glass and Retro physics are physically
+          impossible in Light mode and will auto-resolve to Flat to preserve contrast.
+          Flat physics is the only universally compatible protocol that maintains
+          absolute optical integrity across all environments. Refractive blurs and
+          glow-emitters render as invisible noise against high-luminosity backgrounds,
+          while CRT phosphor simulations require a pure black substrate to maintain
+          scanline definition.
         </p>
 
-        <div
-          class="grid grid-cols-1 tablet:grid-cols-2 small-desktop:grid-cols-3 full-hd:grid-cols-4 gap-md"
-        >
-          <button
-            onclick={() => {
-              modal.confirm(
-                'INITIATE SEQUENCE?',
-                'You are about to deploy the production build.',
-                {
-                  cost: 500,
-                  onConfirm: () => {
-                    toast.show('Sequence Initiated', 'success');
-                  },
-                  onCancel: () => {
-                    toast.show('Aborted', 'info');
-                  },
-                },
-              );
-            }}
-          >
-            Initiate Sequence
-          </button>
-          <ThemeSelector class="btn-cta" />
-          <button
-            class="btn-premium"
-            onclick={() => {
-              modal.settings({
-                onSave: (prefs) => {
-                  toast.promise(
-                    new Promise((resolve) => setTimeout(resolve, 2000)),
-                    {
-                      loading: `Launching story with ${prefs.settings} settings...`,
-                      success: 'Story is generated (test)',
-                      error: 'Failed to generate story',
-                    },
-                  );
-                  console.log('Selected preferences:', prefs);
-                },
-              });
-            }}
-          >
-            Upgrade Core
-          </button>
-          <button
-            class="btn-system"
-            onclick={() => {
-              modal.alert(
-                'Anomaly Detected',
-                'Unusual energy fluctuation in sector 7-G. Manual inspection recommended before proceeding.',
-              );
-            }}
-          >
-            Diagnostics
-          </button>
-          <button
-            class="btn-signal"
-            use:tooltip={'Click to call SUCCESS message'}
-            onclick={() => {
-              toast.show('Connection Established Successfully!', 'success');
-            }}
-          >
-            Secure Channel
-          </button>
-          <button
-            class="btn-alert"
-            use:tooltip={'Click to call ERROR message'}
-            onclick={() => {
-              toast.show('Cache Purge Failed!', 'error');
-            }}
-          >
-            Purge Cache
-          </button>
-          <button disabled>Offline</button>
-        </div>
+        <br />
 
-        <div class="flex flex-col gap-xs flex-1">
-          <label for="energy-output">Energy Output</label>
-          <input id="energy-output" type="range" value="50" min="0" max="100" />
-        </div>
+        <h3>The Density Engine & T-Shirt Sizing</h3>
+        <p>
+          We do not manually reduce pixels for compact views. Instead, the
+          system uses <b>Fluid Spacing</b>, where every margin, padding, and gap
+          is calculated relative to a global density coefficient.
+        </p>
+        <h4>The T-Shirt Size Protocol</h4>
+        <p>
+          We have abolished raw pixel values in favor of a semantic <b
+            >T-Shirt Scale</b
+          >. Developers must describe the <i>intent of the space</i>, not the
+          measurement.
+        </p>
+        <ul class="list-disc list-inside">
+          <li>
+            <b>Micro (<code>xs</code>, <code>sm</code>)</b>: Atomic grouping.
+            Used for spacing inside buttons or between an icon and text.
+          </li>
+          <li>
+            <b>Structure (<code>md</code>, <code>lg</code>)</b>: Component
+            definition. Used for padding inside cards or gaps between form
+            elements.
+          </li>
+          <li>
+            <b>Macro (<code>xl</code>, <code>2xl</code>, <code>4xl</code>)</b>:
+            Layout geometry. Used for separating major sections or defining the
+            page grid.
+          </li>
+        </ul>
+        <h4>The Density Multipliers</h4>
+        <p>
+          Because we use tokens, the engine can mathematically scale the
+          interface to match the user's cognitive load.
+        </p>
+        <ul class="list-disc list-inside">
+          <li>
+            <b>Standard (1x):</b> The default target. Balanced for general readability
+            and touch targets.
+          </li>
+          <li>
+            <b>High Density (0.75x):</b> The system automatically tightens the
+            gravitational constant of the UI. All md and lg gaps contract. Ideal
+            for complex <b>Data Grids</b> and command centers.
+          </li>
+          <li>
+            <b>Low Density (1.25x):</b> The system expands the atmosphere.
+            Spacing relaxes to improve focus. Ideal for <b>Reading Modes</b>.
+          </li>
+        </ul>
+      </div>
+    </div>
 
-        <div class="flex flex-row flex-wrap gap-lg pt-lg border-top">
+    <section class="flex flex-col gap-md">
+      <h2>01 // THE PALETTE CONTRACT</h2>
+
+      <div class="surface-glass p-lg flex flex-col gap-lg">
+        <p class="text-center">
+          Colors are semantic, not absolute. Every palette is organized into a <strong
+            >5-Layer System</strong
+          > — from the deepest canvas to the highest text signal. Each layer has
+          a fixed role. Atmospheres change the values; the architecture never moves.
+        </p>
+
+        <div class="surface-sunk p-lg flex flex-col gap-md">
           <div class="flex flex-col gap-sm">
-            <label class="flex flex-row items-center gap-xs">
-              <input type="radio" name="mode" checked />
-              <span>Manual Override</span>
-            </label>
-            <label class="flex flex-row items-center gap-xs">
-              <input type="radio" name="mode" />
-              <span>Auto-Pilot</span>
-            </label>
+            <h4>Layer 1: Canvas (Foundation)</h4>
+            <p>
+              The absolute floor. Recessed areas are carved into it; ambient
+              light radiates from above.
+            </p>
+            <div class="flex flex-row gap-sm flex-wrap">
+              <div class="flex flex-col items-center gap-xs">
+                <span
+                  class="block w-2xl h-lg rounded-sm bg-canvas border-solid border-2 border-mute"
+                ></span>
+                <code class="text-caption">bg-canvas</code>
+              </div>
+              <div class="flex flex-col items-center gap-xs">
+                <span
+                  class="block w-2xl h-lg rounded-sm bg-sink border-solid border-2 border-mute"
+                ></span>
+                <code class="text-caption">bg-sink</code>
+              </div>
+              <div class="flex flex-col items-center gap-xs">
+                <span
+                  class="block w-2xl h-lg rounded-sm bg-spotlight border-solid border-2 border-mute"
+                ></span>
+                <code class="text-caption">bg-spotlight</code>
+              </div>
+            </div>
           </div>
 
           <div class="flex flex-col gap-sm">
-            <label class="flex flex-row items-center gap-xs">
-              <input type="checkbox" checked />
-              <span>Enable Telemetry</span>
-            </label>
-            <label class="flex flex-row items-center gap-xs">
-              <input type="checkbox" />
-              <span>Allow External Connections</span>
-            </label>
+            <h4>Layer 2: Surface (Float)</h4>
+            <p>
+              Floating elements — cards, modals, headers. Rendered above the
+              canvas with depth.
+            </p>
+            <div class="flex flex-row gap-sm">
+              <div class="flex flex-col items-center gap-xs">
+                <span
+                  class="block w-2xl h-lg rounded-sm bg-surface border-solid border-2 border-mute"
+                ></span>
+                <code class="text-caption">bg-surface</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-sm">
+            <h4>Layer 3: Energy (Interaction)</h4>
+            <p>
+              Brand and interaction colors. Drives buttons, focus states, and
+              emphasis.
+            </p>
+            <div class="flex flex-row gap-sm">
+              <div class="flex flex-col items-center gap-xs">
+                <span class="block w-2xl h-lg rounded-sm bg-primary"></span>
+                <code class="text-caption">energy-primary</code>
+              </div>
+              <div class="flex flex-col items-center gap-xs">
+                <span class="block w-2xl h-lg rounded-sm bg-secondary"></span>
+                <code class="text-caption">energy-secondary</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-sm">
+            <h4>Layer 4: Structure (Borders)</h4>
+            <p>Unified border system. 1px in Glass and Flat, 2px in Retro.</p>
+            <div class="flex flex-row gap-sm">
+              <div class="flex flex-col items-center gap-xs">
+                <span
+                  class="block w-2xl h-lg rounded-sm bg-surface border-solid border border-border"
+                ></span>
+                <code class="text-caption">border-color</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-sm">
+            <h4>Layer 5: Signal (Text Hierarchy)</h4>
+            <p>Three levels of emphasis for information hierarchy.</p>
+            <div class="flex flex-row gap-lg items-baseline">
+              <span class="text-main font-bold">Main</span>
+              <span class="text-dim">Dim</span>
+              <span class="text-mute">Mute</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="surface-sunk p-lg flex flex-col gap-md">
+          <h3>Semantic Colors</h3>
+          <p>
+            Four signal colors provide consistent meaning across all
+            atmospheres. Each generates light, dark, and subtle variants
+            automatically via OKLCH.
+          </p>
+          <div class="grid grid-cols-2 tablet:grid-cols-4 gap-sm">
+            <div
+              class="flex flex-col items-center gap-xs p-sm rounded-sm bg-success-subtle"
+            >
+              <span class="block w-lg h-lg rounded-full bg-success"></span>
+              <b class="text-success">Success</b>
+              <p class="text-caption text-center">
+                Positive outcome, confirmation
+              </p>
+            </div>
+            <div
+              class="flex flex-col items-center gap-xs p-sm rounded-sm bg-error-subtle"
+            >
+              <span class="block w-lg h-lg rounded-full bg-error"></span>
+              <b class="text-error">Error</b>
+              <p class="text-caption text-center">Destructive, failure</p>
+            </div>
+            <div
+              class="flex flex-col items-center gap-xs p-sm rounded-sm bg-premium-subtle"
+            >
+              <span class="block w-lg h-lg rounded-full bg-premium"></span>
+              <b class="text-premium">Premium</b>
+              <p class="text-caption text-center">Attention, cost, exclusive</p>
+            </div>
+            <div
+              class="flex flex-col items-center gap-xs p-sm rounded-sm bg-system-subtle"
+            >
+              <span class="block w-lg h-lg rounded-full bg-system"></span>
+              <b class="text-system">System</b>
+              <p class="text-caption text-center">Informational, neutral</p>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="flex flex-col gap-md my-md">
-      <h2>02 // COMPONENT LIBRARY</h2>
+    <section class="flex flex-col gap-md">
+      <h2>02 // INTERACTIVE SANDBOX</h2>
 
       <div class="surface-glass p-lg flex flex-col gap-md">
-        <SettingsRow label="Theme Override">
+        <SettingsRow label="Atmosphere Preview">
           <div
             class="surface-sunk flex flex-col justify-center tablet:flex-row gap-sm p-sm"
           >
-            <button class="btn-premium" onclick={testCustomTheme}>
-              Test Custom Theme
+            <button class="btn-premium" onclick={previewCustomAtmosphere}>
+              Apply Custom Palette
             </button>
-            <button class="btn-system" onclick={testExistingTheme}>
-              Test Existing Theme
+            <button class="btn-system" onclick={previewBuiltInAtmosphere}>
+              Preview Built-in Atmosphere
             </button>
           </div>
         </SettingsRow>
 
         <hr />
 
-        <SettingsRow label="Active Modules">
+        <SettingsRow label="Feedback Patterns">
+          <div
+            class="surface-sunk p-lg flex flex-row flex-wrap gap-md justify-center"
+          >
+            <button
+              onclick={() => {
+                modal.confirm(
+                  'Confirm Deployment?',
+                  'You are about to push changes to the production environment. This action requires authorization.',
+                  {
+                    cost: 500,
+                    onConfirm: () => {
+                      toast.show('Deployment initiated', 'success');
+                    },
+                    onCancel: () => {
+                      toast.show('Deployment cancelled', 'info');
+                    },
+                  },
+                );
+              }}
+            >
+              Confirm Action
+            </button>
+            <button
+              class="btn-premium"
+              onclick={() => {
+                modal.settings({
+                  onSave: (prefs) => {
+                    toast.promise(
+                      new Promise((resolve) => setTimeout(resolve, 2000)),
+                      {
+                        loading: `Applying ${prefs.settings} preferences...`,
+                        success: 'Preferences saved successfully',
+                        error: 'Failed to save preferences',
+                      },
+                    );
+                    console.log('Selected preferences:', prefs);
+                  },
+                });
+              }}
+            >
+              Open Settings
+            </button>
+            <button
+              class="btn-system"
+              onclick={() => {
+                modal.alert(
+                  'Maintenance Scheduled',
+                  'A maintenance window is approaching. Review pending changes before the system enters read-only mode.',
+                );
+              }}
+            >
+              System Alert
+            </button>
+            <button
+              class="btn-alert"
+              use:tooltip={'Demonstrates error toast notification'}
+              onclick={() => {
+                toast.show('Connection timeout — retry in 30s', 'error');
+              }}
+            >
+              Show Error
+            </button>
+          </div>
+        </SettingsRow>
+
+        <hr />
+
+        <SettingsRow label="Token Tags">
           <div
             class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center"
             use:morph={{ height: true, width: false }}
           >
-            {#if moduleTiles.length === 0}
+            {#if tokenTags.length === 0}
               <p
                 class="text-caption min-h-control flex items-center justify-center"
               >
-                No active modules
+                No tokens selected
               </p>
             {:else}
-              {#each moduleTiles as tile (tile.id)}
+              {#each tokenTags as tile (tile.id)}
                 <div class="chip" animate:live out:implode>
                   <p class="chip-label">{tile.name}</p>
                   <button
@@ -289,7 +490,7 @@
                     class="btn-void chip-remove"
                     aria-label="Remove {tile.name}"
                     onclick={() => {
-                      moduleTiles = moduleTiles.filter((t) => t.id !== tile.id);
+                      tokenTags = tokenTags.filter((t) => t.id !== tile.id);
                     }}>✕</button
                   >
                 </div>
@@ -298,47 +499,47 @@
           </div>
           <div class="flex flex-row gap-xs">
             <Selector
-              bind:value={newModuleTile}
-              placeholder="Select Module..."
+              bind:value={newTokenTag}
+              placeholder="Select token..."
               class="flex-1"
               options={[
-                { value: 'Physics Engine', label: 'Physics Engine' },
-                { value: 'Audio Synth', label: 'Audio Synth' },
-                { value: 'Visual Renderer', label: 'Visual Renderer' },
-                { value: 'Data Analyzer', label: 'Data Analyzer' },
-                { value: 'Network Monitor', label: 'Network Monitor' },
+                { value: 'Spacing', label: 'Spacing' },
+                { value: 'Typography', label: 'Typography' },
+                { value: 'Color', label: 'Color' },
+                { value: 'Motion', label: 'Motion' },
+                { value: 'Elevation', label: 'Elevation' },
               ]}
             />
             <button
               onclick={() => {
-                if (newModuleTile) {
-                  moduleIdCounter++;
-                  moduleTiles.push({
-                    id: moduleIdCounter,
-                    name: newModuleTile,
+                if (newTokenTag) {
+                  tokenIdCounter++;
+                  tokenTags.push({
+                    id: tokenIdCounter,
+                    name: newTokenTag,
                   });
                 }
               }}
-              disabled={!newModuleTile}>Add Module</button
+              disabled={!newTokenTag}>Add Tag</button
             >
           </div>
         </SettingsRow>
 
         <hr />
 
-        <SettingsRow label="Environment">
+        <SettingsRow label="System Layers">
           <div
             class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center"
             use:morph={{ height: true, width: false }}
           >
-            {#if environmentTiles.length === 0}
+            {#if systemLayers.length === 0}
               <p
                 class="text-caption min-h-control flex items-center justify-center"
               >
-                No environments selected
+                No layers selected
               </p>
             {:else}
-              {#each environmentTiles as tile (tile.id)}
+              {#each systemLayers as tile (tile.id)}
                 <div class="chip-system" animate:live out:implode>
                   <p class="chip-label">{tile.name}</p>
                   <button
@@ -346,7 +547,7 @@
                     class="btn-void chip-remove"
                     aria-label="Remove {tile.name}"
                     onclick={() => {
-                      environmentTiles = environmentTiles.filter(
+                      systemLayers = systemLayers.filter(
                         (t) => t.id !== tile.id,
                       );
                     }}>✕</button
@@ -357,48 +558,48 @@
           </div>
           <div class="flex flex-row gap-xs">
             <Selector
-              bind:value={newEnvironmentTile}
-              placeholder="Select Environment..."
+              bind:value={newSystemLayer}
+              placeholder="Select layer..."
               class="flex-1"
               options={[
-                { value: 'Physics Engine', label: 'Physics Engine' },
-                { value: 'Audio Synth', label: 'Audio Synth' },
-                { value: 'Visual Renderer', label: 'Visual Renderer' },
-                { value: 'Data Analyzer', label: 'Data Analyzer' },
-                { value: 'Network Monitor', label: 'Network Monitor' },
+                { value: 'Surfaces', label: 'Surfaces' },
+                { value: 'Components', label: 'Components' },
+                { value: 'Layouts', label: 'Layouts' },
+                { value: 'Inputs', label: 'Inputs' },
+                { value: 'Navigation', label: 'Navigation' },
               ]}
             />
             <button
               class="btn-system"
               onclick={() => {
-                if (newEnvironmentTile) {
-                  environmentIdCounter++;
-                  environmentTiles.push({
-                    id: environmentIdCounter,
-                    name: newEnvironmentTile,
+                if (newSystemLayer) {
+                  layerIdCounter++;
+                  systemLayers.push({
+                    id: layerIdCounter,
+                    name: newSystemLayer,
                   });
                 }
               }}
-              disabled={!newEnvironmentTile}>Add Module</button
+              disabled={!newSystemLayer}>Add Layer</button
             >
           </div>
         </SettingsRow>
 
         <hr />
 
-        <SettingsRow label="Premium Modules">
+        <SettingsRow label="Premium Features">
           <div
             class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center"
             use:morph={{ height: true, width: false }}
           >
-            {#if premiumTiles.length === 0}
+            {#if premiumFeatures.length === 0}
               <p
                 class="text-caption min-h-control flex items-center justify-center"
               >
-                No premium modules
+                No features selected
               </p>
             {:else}
-              {#each premiumTiles as tile (tile.id)}
+              {#each premiumFeatures as tile (tile.id)}
                 <div class="chip-premium" animate:live out:implode>
                   <p class="chip-label">{tile.name}</p>
                   <button
@@ -406,7 +607,7 @@
                     class="btn-void chip-remove"
                     aria-label="Remove {tile.name}"
                     onclick={() => {
-                      premiumTiles = premiumTiles.filter(
+                      premiumFeatures = premiumFeatures.filter(
                         (t) => t.id !== tile.id,
                       );
                     }}>✕</button
@@ -417,68 +618,68 @@
           </div>
           <div class="flex flex-row gap-xs">
             <Selector
-              bind:value={newPremiumTile}
-              placeholder="Select Premium Module..."
+              bind:value={newPremiumFeature}
+              placeholder="Select feature..."
               class="flex-1"
               options={[
-                { value: 'Quantum Core', label: 'Quantum Core' },
-                { value: 'AI Supervisor', label: 'AI Supervisor' },
-                { value: 'Neural Interface', label: 'Neural Interface' },
-                { value: 'Temporal Anchor', label: 'Temporal Anchor' },
-                { value: 'Network Monitor', label: 'Network Monitor' },
+                { value: 'Runtime Theming', label: 'Runtime Theming' },
+                { value: 'Density Engine', label: 'Density Engine' },
+                { value: 'Physics Presets', label: 'Physics Presets' },
+                { value: 'Adaptive Typography', label: 'Adaptive Typography' },
+                { value: 'Token Generation', label: 'Token Generation' },
               ]}
             />
             <button
               class="btn-premium"
               onclick={() => {
-                if (newPremiumTile) {
-                  premiumIdCounter++;
-                  premiumTiles.push({
-                    id: premiumIdCounter,
-                    name: newPremiumTile,
+                if (newPremiumFeature) {
+                  featureIdCounter++;
+                  premiumFeatures.push({
+                    id: featureIdCounter,
+                    name: newPremiumFeature,
                   });
                 }
               }}
-              disabled={!newPremiumTile}>Add Module</button
+              disabled={!newPremiumFeature}>Add Feature</button
             >
           </div>
         </SettingsRow>
 
         <hr />
 
-        <SettingsRow label="System Controls">
+        <SettingsRow label="Toggle Variants">
           <div
             class="surface-sunk p-sm flex flex-col flex-wrap justify-center items-center gap-sm tablet:flex-row"
           >
             <Toggle
-              bind:checked={telemetry}
-              id="toggle-telemetry"
-              label="Telemetry Sync"
+              bind:checked={animations}
+              id="toggle-animations"
+              label="Animations"
             />
             <Toggle
-              bind:checked={systemMode}
-              id="toggle-mode"
-              label="System Mode"
+              bind:checked={colorMode}
+              id="toggle-color-mode"
+              label="Color Mode"
               iconOn={Sun}
               iconOff={Moon}
             />
             <Toggle
-              bind:checked={stealth}
-              id="toggle-stealth"
-              label="Stealth Protocol"
+              bind:checked={reducedMotion}
+              id="toggle-reduced-motion"
+              label="Reduced Motion"
               hideIcons={true}
             />
             <Toggle
-              bind:checked={aiSentiment}
-              id="toggle-sentiment"
-              label="AI Sentiment"
+              bind:checked={satisfaction}
+              id="toggle-satisfaction"
+              label="Satisfaction"
               iconOn="😄"
               iconOff="😡"
             />
             <Toggle
-              bind:checked={rootAccess}
-              id="toggle-root"
-              label="Root Access"
+              bind:checked={adminOverride}
+              id="toggle-admin"
+              label="Admin Override"
               disabled={true}
             />
           </div>

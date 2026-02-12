@@ -50,6 +50,9 @@ $letter-spacings: generated.$letter-spacings;
   --letter-spacing-body: #{map.get($letter-spacings, 'body')};
   --letter-spacing-small: #{map.get($letter-spacings, 'small')};
   --letter-spacing-caption: #{map.get($letter-spacings, 'caption')};
+
+  // Code font (theme-independent — always monospace).
+  --font-code: 'Courier Prime', monospace;
 }
 
 /* Typography mixin. */
@@ -129,12 +132,12 @@ h3 {
   @include typography('h3');
   color: var(--text-main);
 }
-
-/* Layer 2: subheaders/body (85% opacity). */
 h4 {
   @include typography('h4');
-  color: var(--text-dim);
-} // H4 often acts as subheader.
+  color: var(--text-main);
+}
+
+/* Layer 2: subheaders/body (85% opacity). */
 h5 {
   @include typography('h5');
   color: var(--text-dim);
@@ -288,4 +291,121 @@ textarea {
   a {
     @extend .link; // Apply system link styling for consistent emphasis
   }
+}
+
+/* =========================================
+   6. CODE ELEMENTS (code, pre, kbd, samp, var)
+   ========================================= */
+
+// ---------------------------------------------------------------------------
+// 6a. INLINE CODE
+// ---------------------------------------------------------------------------
+// Subtle recessed inline fragment. Same pattern as .chip-label-sunken.
+// Uses em-relative sizing to scale with parent context.
+
+code {
+  font-family: var(--font-code);
+  font-size: 0.875em;
+  font-weight: var(--font-weight-regular);
+  line-height: inherit;
+  color: var(--text-main);
+
+  // Inline recessed surface (lighter than glass-sunk).
+  background: var(--bg-sink);
+  border: var(--physics-border-width) solid var(--border-color);
+  border-radius: calc(var(--radius-base) * 0.5);
+  padding: 0.125em 0.375em;
+
+  // Prevent line-break inside short code fragments.
+  white-space: nowrap;
+
+  // Light mode: bg-sink can be too subtle (3-5% opacity).
+  @include when-light($low-specificity: true) {
+    background: rgba(0, 0, 0, 0.07);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 6b. CODE BLOCKS
+// ---------------------------------------------------------------------------
+// Block-level recessed surface for multi-line code.
+
+pre {
+  font-family: var(--font-code);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+  color: var(--text-main);
+  tab-size: 2;
+
+  // Block recessed surface.
+  @include glass-sunk;
+  padding: var(--space-md);
+  overflow-x: auto;
+  @include laser-scrollbar;
+
+  // Reset inline code styles when nested inside pre.
+  // Markdown renderers output <pre><code>...</code></pre>.
+  code {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    font-size: inherit;
+    color: inherit;
+    white-space: inherit;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 6c. KEYBOARD INPUT
+// ---------------------------------------------------------------------------
+// Raised surface mimicking a physical key cap.
+
+kbd {
+  font-family: var(--font-code);
+  font-size: 0.875em;
+  font-weight: var(--font-weight-regular);
+  line-height: inherit;
+  color: var(--text-main);
+
+  // Raised surface (key cap).
+  background: var(--bg-surface);
+  border: var(--physics-border-width) solid var(--border-color);
+  border-radius: calc(var(--radius-base) * 0.5);
+  box-shadow: var(--shadow-float);
+  padding: 0.125em 0.375em;
+
+  // Slightly thicker bottom border for 3D key effect.
+  border-bottom-width: calc(var(--physics-border-width) * 2);
+
+  // Retro: uniform hard edges, no 3D effect.
+  @include when-retro($low-specificity: true) {
+    box-shadow: none;
+    border-bottom-width: var(--physics-border-width);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 6d. SAMPLE OUTPUT
+// ---------------------------------------------------------------------------
+// Program/system output. Font change only, no surface.
+
+samp {
+  font-family: var(--font-code);
+  font-size: 0.875em;
+  line-height: inherit;
+  color: var(--text-dim);
+}
+
+// ---------------------------------------------------------------------------
+// 6e. VARIABLE / PLACEHOLDER
+// ---------------------------------------------------------------------------
+// Mathematical or code variable. Italic + energy color for emphasis.
+
+var {
+  font-family: var(--font-code);
+  font-size: 0.875em;
+  font-style: italic;
+  line-height: inherit;
+  color: var(--energy-primary);
 }

@@ -260,6 +260,17 @@ palette: {
 }
 ```
 
+#### Usage Guide
+
+| Color | When to Use |
+|-------|-------------|
+| **Success** (green) | Confirmation dialogs, form validation passed, upload complete, save success, positive status indicators |
+| **Error** (red) | Destructive action prompts, form validation failed, operation errors, connection timeouts, alert badges |
+| **Premium** (orange) | Credit cost indicators, upgrade prompts, paid feature badges, caution warnings, exclusive content markers |
+| **System** (purple) | System notifications, AI-generated content markers, informational alerts, settings categories, metadata |
+
+**Component mapping:** Buttons (`btn-signal`, `btn-alert`, `btn-premium`, `btn-system`), Chips (`chip`, `chip-system`, `chip-premium`), Toasts (all 4 types), Pull-to-refresh states, Input validation.
+
 ---
 
 ### Font Families
