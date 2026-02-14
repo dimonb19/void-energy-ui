@@ -777,7 +777,7 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 | `Play` | Hover | `data-state="active"` |
 | `Edit` | Hover | `data-state="active"` |
 | `Delete` | Hover | `data-state="active"` |
-| `Approve` | Hover | `data-state="active"` |
+| `Contract` | Hover | `data-state="active"` |
 | `DoorIn` | Hover | `data-state="active"` |
 | `DoorOut` | Hover | `data-state="active"` |
 | `Caret` | Hover | `data-state="active"` |

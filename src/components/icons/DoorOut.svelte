@@ -1,6 +1,10 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  let { class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
+  let {
+    id = 'door-out',
+    class: className,
+    ...rest
+  }: HTMLAttributes<SVGElement> = $props();
 </script>
 
 <svg
@@ -16,7 +20,7 @@
   {...rest}
 >
   <defs>
-    <mask id="door-out-mask">
+    <mask id="{id}-mask">
       <rect
         x="-25"
         y="-75"
@@ -45,7 +49,7 @@
     width="100"
     height="150"
     rx="15"
-    mask="url(#door-out-mask)"
+    mask="url(#{id}-mask)"
   />
 </svg>
 

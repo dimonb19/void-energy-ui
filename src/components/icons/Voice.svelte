@@ -1,6 +1,10 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  let { class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
+  let {
+    id = 'voice',
+    class: className,
+    ...rest
+  }: HTMLAttributes<SVGElement> = $props();
   // data-muted attribute
 </script>
 
@@ -16,13 +20,27 @@
   {...rest}
 >
   <defs>
-    <mask id="voice-top-mask">
-      <rect x="-100" y="-100" width="200" height="200" fill="white" />
+    <mask id="{id}-top-mask">
+      <rect
+        class="mask-rect"
+        x="-100"
+        y="-100"
+        width="200"
+        height="200"
+        fill="white"
+      />
     </mask>
-    <mask id="voice-bottom-mask">
-      <rect x="100" y="-100" width="200" height="200" fill="white" />
+    <mask id="{id}-bottom-mask">
+      <rect
+        class="mask-rect"
+        x="100"
+        y="-100"
+        width="200"
+        height="200"
+        fill="white"
+      />
     </mask>
-    <mask id="voice-crossed-mask">
+    <mask id="{id}-crossed-mask">
       <g fill="white" stroke="white">
         <rect
           x="-35"
@@ -47,7 +65,7 @@
     </mask>
   </defs>
 
-  <g mask="url(#voice-top-mask)">
+  <g mask="url(#{id}-top-mask)">
     <rect
       x="-35"
       y="-90"
@@ -61,8 +79,8 @@
     <path d="M 0 55 L 0 85 M 25 85 L -25 85" fill="none" />
   </g>
 
-  <g mask="url(#voice-bottom-mask)">
-    <g mask="url(#voice-crossed-mask)">
+  <g mask="url(#{id}-bottom-mask)">
+    <g mask="url(#{id}-crossed-mask)">
       <rect
         x="-35"
         y="-90"
@@ -83,18 +101,12 @@
   svg {
     transition: opacity var(--speed-base) var(--ease-spring-snappy);
 
-    #voice-top-mask rect,
-    #voice-bottom-mask rect {
+    .mask-rect {
       transition: transform var(--speed-base) var(--ease-flow);
     }
   }
 
-  :global(.icon-voice[data-muted='true']) {
-    opacity: 0.5;
-
-    #voice-top-mask rect,
-    #voice-bottom-mask rect {
-      transform: translateX(-200px);
-    }
+  :global(.icon-voice[data-muted='true'] .mask-rect) {
+    transform: translateX(-200px);
   }
 </style>

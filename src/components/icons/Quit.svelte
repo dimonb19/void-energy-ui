@@ -1,6 +1,10 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  let { class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
+  let {
+    id = 'quit',
+    class: className,
+    ...rest
+  }: HTMLAttributes<SVGElement> = $props();
 </script>
 
 <svg
@@ -13,9 +17,10 @@
   {...rest}
 >
   <defs>
-    <mask id="quit-mask">
+    <mask id="{id}-mask">
       <circle r="100" fill="white" />
       <path
+        class="mask-x"
         d="M 50 0 L -50 0 L 0 -50 M -50 0 L 0 50"
         fill="none"
         stroke="black"
@@ -26,18 +31,18 @@
     </mask>
   </defs>
 
-  <circle r="100" mask="url(#quit-mask)" />
+  <circle r="100" mask="url(#{id}-mask)" />
 </svg>
 
 <style lang="scss">
-  #quit-mask path {
+  .mask-x {
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
   :global(.icon-quit[data-state='active']) {
     transform: scale(1.1);
 
-    #quit-mask path {
+    .mask-x {
       transform: scale(1.2);
     }
   }

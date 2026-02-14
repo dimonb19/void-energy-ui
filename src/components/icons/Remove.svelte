@@ -10,7 +10,7 @@
   fill="none"
   stroke-width="15"
   stroke-linecap="round"
-  class="icon-delete icon {className ?? ''}"
+  class="icon-remove icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
@@ -29,7 +29,7 @@
       opacity var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.icon-delete[data-state='active']) {
+  :global(.icon-remove[data-state='active']) {
     path {
       transform: scale(1.5);
     }

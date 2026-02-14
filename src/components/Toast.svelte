@@ -66,7 +66,7 @@
     >
       <span class="toast-icon">
         {#if item.type === 'loading'}
-          <SpinLoader data-size="lg" />
+          <SpinLoader class="text-main" data-size="lg" />
         {:else}
           {@const Icon = icons[item.type] ?? icons.info}
           <Icon class="icon" />

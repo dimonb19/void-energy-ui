@@ -4,9 +4,9 @@
   // Custom icons
   import ArrowBack from '@components/icons/ArrowBack.svelte';
   import Burger from '@components/icons/Burger.svelte';
-  import Approve from '@components/icons/Approve.svelte';
+  import Contract from '@components/icons/Contract.svelte';
   import Copy from '@components/icons/Copy.svelte';
-  import Delete from '@components/icons/Delete.svelte';
+  import Remove from '@components/icons/Remove.svelte';
   import DoorIn from '@components/icons/DoorIn.svelte';
   import DoorOut from '@components/icons/DoorOut.svelte';
   import Dream from '@components/icons/Dream.svelte';
@@ -31,8 +31,8 @@
   import {
     ArrowDown,
     Check,
-    Feather,
     Heart,
+    House,
     Info,
     LayoutGrid,
     Moon,
@@ -55,6 +55,17 @@
     { value: '4xl', label: 'Quadra Extra Large' },
   ]);
 
+  let iconColor = $state('text-main');
+  let colorList = $state([
+    { value: 'text-main', label: 'Main' },
+    { value: 'text-dim', label: 'Dim' },
+    { value: 'text-mute', label: 'Mute' },
+    { value: 'text-premium', label: 'Premium' },
+    { value: 'text-system', label: 'System' },
+    { value: 'text-success', label: 'Success' },
+    { value: 'text-error', label: 'Error' },
+  ]);
+
   // Toggle state (click to switch)
   let burgerActive = $state(false);
   let copyActive = $state(false);
@@ -64,8 +75,8 @@
   let voiceActive = $state(false);
 
   // Hover state (pointer enter/leave)
-  let approveFocus = $state(false);
-  let deleteFocus = $state(false);
+  let contractFocus = $state(false);
+  let removeFocus = $state(false);
   let doorInFocus = $state(false);
   let doorOutFocus = $state(false);
   let editFocus = $state(false);
@@ -101,7 +112,9 @@
         <code>data-state</code>, <code>data-muted</code>, or
         <code>data-fullscreen</code>.
       </p>
-      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
+      <div
+        class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
+      >
         <div class="flex flex-col items-center gap-xs">
           <button
             class="btn-void"
@@ -117,21 +130,29 @@
 
         <div class="flex flex-col items-center gap-xs">
           <button class="btn-void" onclick={() => (eyeActive = !eyeActive)}>
-            <Eye data-size={iconSize} data-muted={eyeActive} />
+            <Eye id="eye-demo" data-size={iconSize} data-muted={eyeActive} />
           </button>
           <span class="text-caption text-mute">Eye</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
           <button class="btn-void" onclick={() => (musicActive = !musicActive)}>
-            <Music data-size={iconSize} data-muted={musicActive} />
+            <Music
+              id="music-demo"
+              data-size={iconSize}
+              data-muted={musicActive}
+            />
           </button>
           <span class="text-caption text-mute">Music</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
           <button class="btn-void" onclick={() => (voiceActive = !voiceActive)}>
-            <Voice data-size={iconSize} data-muted={voiceActive} />
+            <Voice
+              id="voice-demo"
+              data-size={iconSize}
+              data-muted={voiceActive}
+            />
           </button>
           <span class="text-caption text-mute">Voice</span>
         </div>
@@ -167,7 +188,9 @@
         <strong>Search</strong> — supports
         <code>data-zoom</code> variants for zoom-in and zoom-out.
       </p>
-      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
+      <div
+        class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
+      >
         <div class="flex flex-col items-center gap-xs">
           <button
             class="btn-void"
@@ -217,7 +240,9 @@
       <p class="text-small text-dim">
         <strong>Playback</strong> — media and control flow.
       </p>
-      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
+      <div
+        class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
+      >
         <div class="flex flex-col items-center gap-xs">
           <button
             class="btn-void"
@@ -273,7 +298,9 @@
       <p class="text-small text-dim">
         <strong>Navigation</strong> — entry, exit, and state switching.
       </p>
-      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
+      <div
+        class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
+      >
         <div class="flex flex-col items-center gap-xs">
           <button
             class="btn-void"
@@ -281,6 +308,7 @@
             onpointerleave={() => (doorInFocus = false)}
           >
             <DoorIn
+              id="door-in-demo"
               data-state={doorInFocus ? 'active' : ''}
               data-size={iconSize}
             />
@@ -295,6 +323,7 @@
             onpointerleave={() => (doorOutFocus = false)}
           >
             <DoorOut
+              id="door-out-demo"
               data-state={doorOutFocus ? 'active' : ''}
               data-size={iconSize}
             />
@@ -308,7 +337,11 @@
             onpointerenter={() => (quitFocus = true)}
             onpointerleave={() => (quitFocus = false)}
           >
-            <Quit data-state={quitFocus ? 'active' : ''} data-size={iconSize} />
+            <Quit
+              id="quit-demo"
+              data-state={quitFocus ? 'active' : ''}
+              data-size={iconSize}
+            />
           </button>
           <span class="text-caption text-mute">Quit</span>
         </div>
@@ -320,6 +353,7 @@
             onpointerleave={() => (switchFocus = false)}
           >
             <Switch
+              id="switch-demo"
               data-state={switchFocus ? 'active' : ''}
               data-size={iconSize}
             />
@@ -332,7 +366,9 @@
       <p class="text-small text-dim">
         <strong>Actions</strong> — content operations and data manipulation.
       </p>
-      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
+      <div
+        class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
+      >
         <div class="flex flex-col items-center gap-xs">
           <button
             class="btn-void"
@@ -365,29 +401,29 @@
         <div class="flex flex-col items-center gap-xs">
           <button
             class="btn-void"
-            onpointerenter={() => (deleteFocus = true)}
-            onpointerleave={() => (deleteFocus = false)}
+            onpointerenter={() => (removeFocus = true)}
+            onpointerleave={() => (removeFocus = false)}
           >
-            <Delete
-              data-state={deleteFocus ? 'active' : ''}
+            <Remove
+              data-state={removeFocus ? 'active' : ''}
               data-size={iconSize}
             />
           </button>
-          <span class="text-caption text-mute">Delete</span>
+          <span class="text-caption text-mute">Remove</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
           <button
             class="btn-void"
-            onpointerenter={() => (approveFocus = true)}
-            onpointerleave={() => (approveFocus = false)}
+            onpointerenter={() => (contractFocus = true)}
+            onpointerleave={() => (contractFocus = false)}
           >
-            <Approve
-              data-state={approveFocus ? 'active' : ''}
+            <Contract
+              data-state={contractFocus ? 'active' : ''}
               data-size={iconSize}
             />
           </button>
-          <span class="text-caption text-mute">Approve</span>
+          <span class="text-caption text-mute">Contract</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
@@ -425,7 +461,9 @@
         <code>data-size</code>. SpinLoader is physics-aware: smooth rotation in
         glass/flat, stepped in retro.
       </p>
-      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
+      <div
+        class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
+      >
         <div class="flex flex-col items-center gap-xs">
           <ArrowBack data-size={iconSize} />
           <span class="text-caption text-mute">ArrowBack</span>
@@ -458,11 +496,19 @@
           target="_blank"
           rel="noopener noreferrer">Lucide</a
         >
-        directly. Always pass
+        — an open-source library with 1500+ icons. Below are just a few examples;
+        browse the full set at
+        <a
+          href="https://lucide.dev/icons"
+          target="_blank"
+          rel="noopener noreferrer">lucide.dev/icons</a
+        >. Always pass
         <code>class="icon"</code>
         for base styling and <code>data-size</code> for sizing.
       </p>
-      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
+      <div
+        class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
+      >
         <div class="flex flex-col items-center gap-xs">
           <ArrowDown class="icon" data-size={iconSize} />
           <span class="text-caption text-mute">ArrowDown</span>
@@ -474,13 +520,13 @@
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <Feather class="icon" data-size={iconSize} />
-          <span class="text-caption text-mute">Feather</span>
+          <Heart class="icon" data-size={iconSize} />
+          <span class="text-caption text-mute">Heart</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <Heart class="icon" data-size={iconSize} />
-          <span class="text-caption text-mute">Heart</span>
+          <House class="icon" data-size={iconSize} />
+          <span class="text-caption text-mute">House</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
@@ -529,12 +575,30 @@
       </p>
     </div>
 
-    <!-- ─── SIZE SELECTOR ────────────────────────────────────────────── -->
-    <Selector
-      bind:value={iconSize}
-      options={sizeList}
-      id="icon-size"
-      label="Icons Size"
-    />
+    <hr />
+
+    <!-- ─── SELECTORS ──────────────────────────────────────────────── -->
+    <p class="text-small text-mute">
+      All icons inherit <code>currentColor</code> from their parent and scale
+      via <code>data-size</code>. Use these controls to test both behaviors
+      across every icon above.
+    </p>
+
+    <div class="flex flex-col gap-md small-desktop:flex-row">
+      <Selector
+        bind:value={iconColor}
+        options={colorList}
+        id="icon-color"
+        label="Color"
+        class="flex-1"
+      />
+      <Selector
+        bind:value={iconSize}
+        options={sizeList}
+        id="icon-size"
+        label="Size"
+        class="flex-1"
+      />
+    </div>
   </div>
 </section>

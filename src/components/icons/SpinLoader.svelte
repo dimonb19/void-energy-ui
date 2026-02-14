@@ -29,7 +29,7 @@
 
     .car {
       fill: none;
-      stroke: var(--text-main);
+      stroke: currentColor;
       stroke-width: calc(var(--physics-border-width) * 2);
       stroke-dasharray: 10 20;
       stroke-linecap: round;

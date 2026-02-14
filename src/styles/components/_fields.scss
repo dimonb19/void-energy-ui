@@ -1,0 +1,136 @@
+/* ==========================================================================
+ * FIELD COMPOSITES
+ * ==========================================================================
+ *
+ * Overlay anatomy for composite input components that combine icons with
+ * native inputs. The input keeps ALL native styling from _inputs.scss.
+ * Icons are absolutely positioned inside using slot containers.
+ *
+ * ANATOMY:
+ * ┌─ .field (position: relative) ─────────────────────────────────────┐
+ * │  ┌─ input (native glass-sunk, extra padding) ──────────────────┐  │
+ * │  │  [.field-slot-left]    text    [.field-slot-right]           │  │
+ * │  │   abs left               ↕      abs right                   │  │
+ * │  └─────────────────────────────────────────────────────────────┘  │
+ * └────────────────────────────────────────────────────────────────────┘
+ *
+ * CLASSES:
+ * - .field            : Relative wrapper (no visual styling — input owns that)
+ * - .field-slot-left  : Absolutely positioned left icon container
+ * - .field-slot-right : Absolutely positioned right icon container
+ *
+ * COMPOSITES USING THIS PATTERN:
+ * - SearchField   : Search icon (left) + text input
+ * - PasswordField : Password input + Eye toggle (right)
+ * - EditField     : Undo (left, editing) + text input + Edit/Check (right)
+ * - CopyField     : Readonly input + Copy button (right)
+ *
+ * NON-FIELD COMPOSITES:
+ * - MediaSlider   : Mute toggle + range slider + replay (own anatomy)
+ *
+ * @see /src/components/ui/SearchField.svelte
+ * @see /src/components/ui/PasswordField.svelte
+ * @see /src/components/ui/EditField.svelte
+ * @see /src/components/ui/CopyField.svelte
+ * @see /src/components/ui/MediaSlider.svelte
+ * ==========================================================================
+ */
+
+@use '../abstracts' as *;
+
+// Slot width: icon (1em at body size) + padding on each side
+$_slot-width: var(--control-padding-x);
+
+// ==========================================================================
+// 1. FIELD WRAPPER (transparent — input owns all visual styling)
+// ==========================================================================
+
+.field {
+  position: relative;
+
+  // Search input: hide native clear button (we manage state ourselves)
+  input[type='search'] {
+    &::-webkit-search-cancel-button,
+    &::-webkit-search-decoration {
+      -webkit-appearance: none;
+      appearance: none;
+    }
+  }
+
+  // --- Padding adjustments via :has() ---
+  // Left slot present → pad input-left to make room for icon
+  &:has(.field-slot-left) input {
+    padding-left: calc(#{$_slot-width} + var(--space-lg));
+  }
+
+  // Right slot present → pad input-right for icon(s)
+  &:has(.field-slot-right) input {
+    padding-right: calc(#{$_slot-width} + var(--space-lg));
+  }
+
+  // Two buttons in right slot (EditField editing state) → double the space
+  &:has(.field-slot-right > :nth-child(2)) input {
+    padding-right: calc((#{$_slot-width} + var(--space-lg)) * 2);
+  }
+}
+
+// ==========================================================================
+// 2. SLOT CONTAINERS (absolute, centered vertically)
+// ==========================================================================
+
+.field-slot-left,
+.field-slot-right {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-xs) / 2);
+  pointer-events: none; // Let clicks pass through to input
+  color: var(--text-main);
+  transition: color var(--speed-fast) var(--ease-spring-snappy);
+
+  // Interactive elements inside slots get pointer events back
+  button {
+    pointer-events: auto;
+    cursor: pointer;
+
+    @media (hover: hover) {
+      &:hover {
+        color: var(--energy-primary);
+      }
+    }
+
+    &:disabled {
+      color: var(--text-main);
+      pointer-events: none;
+      opacity: 0.5;
+      background: transparent;
+      border: none;
+    }
+  }
+}
+
+.field-slot-left {
+  left: var(--control-padding-x);
+}
+
+.field-slot-right {
+  right: var(--control-padding-x);
+}
+
+// ==========================================================================
+// 3. MEDIA SLIDER (non-field composite)
+// ==========================================================================
+
+.media-slider {
+  // Dim slider when muted
+  input[type='range'] {
+    transition: opacity var(--speed-fast) var(--ease-spring-snappy);
+  }
+
+  &[data-muted='true'] input[type='range'] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}

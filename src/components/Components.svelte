@@ -9,6 +9,7 @@
   import { morph } from '@actions/morph';
 
   import Icons from './ui-library/Icons.svelte';
+  import Composites from './ui-library/Composites.svelte';
 
   import ThemeSelector from './ui/Themes.svelte';
   import SettingsRow from './ui/SettingsRow.svelte';
@@ -489,8 +490,10 @@
 
     <Icons />
 
+    <Composites />
+
     <section class="flex flex-col gap-md my-md">
-      <h2>04 // DATA UPLOAD</h2>
+      <h2>05 // DATA UPLOAD</h2>
 
       <div class="p-md surface-glass">
         <div class="dropzone">

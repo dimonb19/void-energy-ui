@@ -23,9 +23,11 @@
 // 2. TEXT FIELDS (Text, Password, Email, Textarea)
 // --------------------------------------------------------------------------
 // We still apply the "Sunk" look to the box itself, as this is safe styling.
-input:not([type='checkbox']):not([type='radio']):not([type='range']):not(
-    [type='file']
-  ),
+input:where(
+  :not([type='checkbox']):not([type='radio']):not([type='range']):not(
+      [type='file']
+    )
+),
 textarea,
 select {
   appearance: none; // Reset default borders

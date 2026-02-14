@@ -410,7 +410,7 @@
       <X class="icon pull-error" />
     {:else}
       {#if pullState === 'refreshing'}
-        <SpinLoader data-size="lg" />
+        <SpinLoader class="text-main" data-size="lg" />
       {:else}
         <!-- Progress ring -->
         <svg class="icon progress-ring" data-size="lg" viewBox="0 0 24 24">

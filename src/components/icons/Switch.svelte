@@ -1,6 +1,10 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  let { class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
+  let {
+    id = 'switch',
+    class: className,
+    ...rest
+  }: HTMLAttributes<SVGElement> = $props();
 </script>
 
 <svg
@@ -13,7 +17,7 @@
   {...rest}
 >
   <defs>
-    <mask id="switch-mask">
+    <mask id="{id}-mask">
       <circle r="100" fill="white" />
       <g fill="black" stroke="black">
         <polygon
@@ -27,7 +31,7 @@
     </mask>
   </defs>
 
-  <circle r="100" mask="url(#switch-mask)" />
+  <circle r="100" mask="url(#{id}-mask)" />
 </svg>
 
 <style>

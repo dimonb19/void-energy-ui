@@ -11,11 +11,11 @@
   stroke-width="7.5"
   stroke-linejoin="round"
   stroke-linecap="round"
-  class="icon-approve icon {className ?? ''}"
+  class="icon-contract icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
-  <g class="icon-approve-paper">
+  <g class="icon-contract-paper">
     <path
       d="M -10 75 L -85 75 L -85 -85 L 45 -85 L 45 -15"
       fill="none"
@@ -25,7 +25,7 @@
     <path d="M -40 -30 L -25 -15 L 0 -40" fill="none" />
     <path d="M -65 25 L -15 25 M -65 45 L -25 45" />
   </g>
-  <g class="icon-approve-hammer">
+  <g class="icon-contract-hammer">
     <g transform="rotate(45) translate(40 -30)">
       <ellipse rx="35" ry="10" cx="15" cy="60" fill="none" />
       <path
@@ -46,20 +46,20 @@
 </svg>
 
 <style lang="scss">
-  .icon-approve-paper {
+  .icon-contract-paper {
     transition: opacity var(--speed-base) var(--ease-spring-snappy);
   }
 
-  .icon-approve-hammer {
+  .icon-contract-hammer {
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.icon-approve[data-state='active']) {
-    .icon-approve-paper {
-      opacity: 0.5;
+  :global(.icon-contract[data-state='active']) {
+    .icon-contract-paper {
+      opacity: 0.75;
     }
 
-    .icon-approve-hammer {
+    .icon-contract-hammer {
       transform: scale(1.1) translate(-5%, -2.5%);
     }
   }

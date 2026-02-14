@@ -1,6 +1,10 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  let { class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
+  let {
+    id = 'eye',
+    class: className,
+    ...rest
+  }: HTMLAttributes<SVGElement> = $props();
   // data-muted attribute
 </script>
 
@@ -17,13 +21,27 @@
   {...rest}
 >
   <defs>
-    <mask id="eye-top-mask">
-      <rect x="-100" y="-100" width="200" height="200" fill="white" />
+    <mask id="{id}-top-mask">
+      <rect
+        class="mask-rect"
+        x="-100"
+        y="-100"
+        width="200"
+        height="200"
+        fill="white"
+      />
     </mask>
-    <mask id="eye-bottom-mask">
-      <rect x="100" y="-100" width="200" height="200" fill="white" />
+    <mask id="{id}-bottom-mask">
+      <rect
+        class="mask-rect"
+        x="100"
+        y="-100"
+        width="200"
+        height="200"
+        fill="white"
+      />
     </mask>
-    <mask id="eye-crossed-mask">
+    <mask id="{id}-crossed-mask">
       <g stroke="white">
         <circle r="20" />
         <path d="M -80 0 Q 0 -90 80 0 Q 0 90 -80 0 Z" />
@@ -32,13 +50,13 @@
     </mask>
   </defs>
 
-  <g mask="url(#eye-top-mask)">
+  <g mask="url(#{id}-top-mask)">
     <circle r="20" />
     <path d="M -80 0 Q 0 -90 80 0 Q 0 90 -80 0 Z" />
   </g>
 
-  <g mask="url(#eye-bottom-mask)">
-    <g mask="url(#eye-crossed-mask)">
+  <g mask="url(#{id}-bottom-mask)">
+    <g mask="url(#{id}-crossed-mask)">
       <circle r="20" />
       <path d="M -80 0 Q 0 -90 80 0 Q 0 90 -80 0 Z" />
     </g>
@@ -50,18 +68,12 @@
   svg {
     transition: opacity var(--speed-base) var(--ease-spring-snappy);
 
-    #eye-top-mask rect,
-    #eye-bottom-mask rect {
+    .mask-rect {
       transition: transform var(--speed-base) var(--ease-flow);
     }
   }
 
-  :global(.icon-eye[data-muted='true']) {
-    opacity: 0.5;
-
-    #eye-top-mask rect,
-    #eye-bottom-mask rect {
-      transform: translateX(-200px);
-    }
+  :global(.icon-eye[data-muted='true'] .mask-rect) {
+    transform: translateX(-200px);
   }
 </style>
