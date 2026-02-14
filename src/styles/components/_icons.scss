@@ -11,10 +11,6 @@
   height: 1em;
   font-size: inherit; // Match surrounding text by default
 
-  // Inherit color from parent.
-  fill: currentColor;
-  stroke: currentColor;
-
   background-color: transparent;
 
   // Spring Transitions (transform for rotation, color for hover)
@@ -44,11 +40,5 @@
   }
   &[data-size='4xl'] {
     font-size: var(--font-size-h1);
-  }
-
-  // State-driven rotation (expandable menus, accordions).
-  // Usage: <svg class="icon" data-expanded={isOpen}>
-  &[data-expanded='true'] {
-    transform: rotate(90deg);
   }
 }

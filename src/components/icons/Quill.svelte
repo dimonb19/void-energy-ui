@@ -1,3 +1,4 @@
+<!-- CoNexus Brand Logo -->
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
   let { class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
@@ -6,6 +7,7 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 351 615"
+  fill="currentColor"
   class="icon {className ?? ''}"
   aria-hidden="true"
   {...rest}

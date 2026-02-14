@@ -5,14 +5,16 @@
 
 <svg
   xmlns="http://www.w3.org/2000/svg"
-  viewBox="-100 -100 200 200"
-  stroke-width="6"
-  stroke-linejoin="round"
+  viewBox="-80 -80 160 160"
+  stroke="currentColor"
+  fill="currentColor"
   class="icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
   <path
-    d="M -25 60 L -25 -15 L -95 -85 L -95 -95 L 95 -95 L 95 -85 L 25 -15 L 25 95 L 20 95 Z"
+    d="M -14 -30 L -14 -64 L -76 -9 L -14 48 L -14 12 Q 36 14 60 52 Q 60 -26 -12 -30 Z"
+    stroke-width="4"
+    stroke-linejoin="round"
   />
 </svg>

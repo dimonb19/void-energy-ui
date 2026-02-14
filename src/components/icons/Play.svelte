@@ -6,20 +6,21 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="-100 -100 200 200"
+  stroke="currentColor"
+  fill="currentColor"
   stroke-width="15"
   stroke-linecap="round"
   stroke-linejoin="round"
-  class="icon-play icon fill-none {className ?? ''}"
+  class="icon-play icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
   <polygon points="-26 -36 -26 36 36 0" />
-  <circle r="90" />
+  <circle r="90" fill="none" />
 </svg>
 
 <style lang="scss">
   polygon {
-    fill: currentColor;
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 

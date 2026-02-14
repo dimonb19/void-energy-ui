@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
-  import Checkmark from '../icons/Checkmark.svelte';
-  import XMark from '../icons/XMark.svelte';
+  import { Check, X, ArrowDown } from '@lucide/svelte';
   import SpinLoader from '../icons/SpinLoader.svelte';
   import { morph } from '@actions/morph';
 
@@ -406,9 +405,9 @@
   <!-- Indicator: Floats above content, revealed on pull -->
   <div class="pull-indicator" use:morph={{ height: false, width: true }}>
     {#if pullState === 'done'}
-      <Checkmark class="pull-checkmark" />
+      <Check class="icon pull-checkmark" />
     {:else if pullState === 'error'}
-      <XMark class="pull-error" />
+      <X class="icon pull-error" />
     {:else}
       {#if pullState === 'refreshing'}
         <SpinLoader data-size="lg" />
@@ -438,19 +437,7 @@
 
       <!-- Arrow icon (inside ring area) -->
       {#if pullState !== 'refreshing'}
-        <svg
-          class="icon pull-arrow"
-          data-size="sm"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <line x1="12" y1="5" x2="12" y2="19" />
-          <polyline points="19 12 12 19 5 12" />
-        </svg>
+        <ArrowDown class="icon pull-arrow" data-size="sm" />
       {/if}
     {/if}
 

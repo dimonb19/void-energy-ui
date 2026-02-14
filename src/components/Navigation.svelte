@@ -8,7 +8,7 @@
   import Burger from './icons/Burger.svelte';
   import LogoDGRS from './icons/LogoDGRS.svelte';
   import Quill from './icons/Quill.svelte';
-  import Grid from './icons/Grid.svelte';
+  import { LayoutGrid, ChevronRight } from '@lucide/svelte';
 
   // ─────────────────────────────────────────────────────────────────────────────
   // Navigation Data Structure
@@ -27,14 +27,19 @@
     | {
         id: string;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        component: Component<any>;
+        component: Component;
         props?: Record<string, unknown>;
       };
 
   // Main navigation tabs (desktop header + mobile bottom nav)
   const navItems: NavItem[] = [
     { id: 'conexus', label: 'CoNexus', href: '/conexus', icon: Quill },
-    { id: 'components', label: 'Components', href: '/components', icon: Grid },
+    {
+      id: 'components',
+      label: 'Components',
+      href: '/components',
+      icon: LayoutGrid,
+    },
   ];
 
   // Sidebar/dropdown menu items
@@ -261,17 +266,7 @@
           onclick={(e) => selectTab(e, item.id, true)}
         >
           {item.label}
-          <svg
-            class="icon"
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-            fill="none"
-            stroke-width="2"
-            data-expanded={isExpanded(item)}
-          >
-            <polyline points="9 6 15 12 9 18" />
-          </svg>
+          <ChevronRight class="icon" data-expanded={isExpanded(item)} />
         </button>
         {#if isExpanded(item)}
           <ul class="submenu" out:dematerialize>

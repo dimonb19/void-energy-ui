@@ -6,10 +6,12 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="-100 -100 200 200"
+  stroke="currentColor"
+  fill="none"
   stroke-width="15"
   stroke-linejoin="round"
   stroke-linecap="round"
-  class="icon-copy icon fill-none {className ?? ''}"
+  class="icon-copy icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >

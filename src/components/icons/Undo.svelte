@@ -6,10 +6,12 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="-100 -100 200 200"
+  stroke="currentColor"
+  fill="currentColor"
   stroke-width="20"
   stroke-linecap="round"
   stroke-linejoin="round"
-  class="icon-reset icon {className ?? ''}"
+  class="icon-undo icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
@@ -22,7 +24,7 @@
     transition-timing-function: var(--ease-flow);
   }
 
-  :global(.icon-reset[data-state='active']) {
+  :global(.icon-undo[data-state='active']) {
     transform: rotate(300deg);
   }
 </style>

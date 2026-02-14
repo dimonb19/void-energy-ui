@@ -1,17 +1,14 @@
 <script lang="ts">
   import { toast } from '@stores/toast.svelte';
   import { dematerialize, materialize } from '@lib/transitions.svelte';
-  import Info from './icons/Info.svelte';
-  import Checkmark from './icons/Checkmark.svelte';
-  import Warning from './icons/Warning.svelte';
-  import XMark from './icons/XMark.svelte';
+  import { Info, Check, TriangleAlert, X } from '@lucide/svelte';
   import SpinLoader from './icons/SpinLoader.svelte';
 
   const icons: Record<string, typeof Info> = {
     info: Info,
-    success: Checkmark,
-    warning: Warning,
-    error: XMark,
+    success: Check,
+    warning: TriangleAlert,
+    error: X,
   };
 
   let region = $state<HTMLElement | null>(null);
@@ -72,7 +69,7 @@
           <SpinLoader data-size="lg" />
         {:else}
           {@const Icon = icons[item.type] ?? icons.info}
-          <Icon />
+          <Icon class="icon" />
         {/if}
       </span>
 

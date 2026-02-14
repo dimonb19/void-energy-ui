@@ -143,14 +143,25 @@ Radius:   --radius-sm(4px)  --radius-md(8px)  --radius-lg(16px)  --radius-xl(24p
 }
 ```
 
-### Icon Component
+### Static Icon (Lucide)
+Static icons come from `@lucide/svelte` (ISC license, commercial-safe). Browse all icons at [lucide.dev/icons](https://lucide.dev/icons).
+```svelte
+<script lang="ts">
+  import { Heart, TriangleAlert } from '@lucide/svelte';
+</script>
+<Heart class="icon" data-size="lg" />
+<TriangleAlert class="icon text-error" />
+```
+
+### Interactive Icon (Custom)
+Animated icons with state-driven transitions live in `src/components/icons/`. They use scoped `<style>` blocks and the `icon-[name]` class namespace.
 ```svelte
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
   let { class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
 </script>
-<svg class="icon {className ?? ''}" viewBox="0 0 24 24" fill="none" aria-hidden="true" {...rest}>
-  <!-- paths -->
+<svg class="icon-burger icon {className ?? ''}" viewBox="0 0 24 24" aria-hidden="true" {...rest}>
+  <!-- animated SVG elements with scoped <style> -->
 </svg>
 ```
 
@@ -158,9 +169,15 @@ Radius:   --radius-sm(4px)  --radius-md(8px)  --radius-lg(16px)  --radius-xl(24p
 Icons inherit color from their parent via `currentColor`. Color is always decided at the usage site.
 
 - **Inside a button/container**: icon inherits parent color — no class needed
-- **Standalone semantic indicator**: apply Tailwind class — `<Checkmark class="text-success" />`
-- **Hover color transitions**: set on parent — `<button class="text-mute hover:text-error"><XMark /></button>`
+- **Standalone semantic indicator**: apply Tailwind class — `<Check class="icon text-success" />`
+- **Hover color transitions**: set on parent — `<button class="text-mute hover:text-error"><X class="icon" /></button>`
 - **Component-scoped color**: use SCSS on parent — `.toast-icon { color: var(--toast-accent); }`
+
+### Icon Rules
+- **Static icons**: Always from `@lucide/svelte`. Always `class="icon"`.
+- **Interactive icons**: Custom components in `src/components/icons/`. Class pattern: `icon-[name] icon`.
+- **Never create custom static SVG icon components** — use Lucide instead.
+- **Sizing**: `data-size` attribute (sm | md | lg | xl | 2xl | 3xl | 4xl).
 
 ---
 

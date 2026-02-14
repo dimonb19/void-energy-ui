@@ -6,8 +6,10 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="-100 -100 200 200"
+  stroke="currentColor"
+  fill="currentColor"
   stroke-linejoin="round"
-  class="icon-sorting icon {className ?? ''}"
+  class="icon-sort icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
@@ -26,7 +28,7 @@
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.icon-sorting[data-state='active']) {
+  :global(.icon-sort[data-state='active']) {
     transform: scale(1.1);
 
     path {

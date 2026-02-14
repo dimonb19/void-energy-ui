@@ -6,10 +6,12 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="-100 -100 200 200"
+  stroke="currentColor"
+  fill="currentColor"
   stroke-width="20"
   stroke-linecap="round"
   stroke-linejoin="round"
-  class="icon-picker icon {className ?? ''}"
+  class="icon-caret icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
@@ -21,7 +23,7 @@
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.icon-picker[data-state='active'] polygon) {
+  :global(.icon-caret[data-state='active'] polygon) {
     transform: scaleX(1.5);
   }
 </style>

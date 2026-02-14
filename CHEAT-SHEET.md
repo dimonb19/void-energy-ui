@@ -733,7 +733,67 @@ async function handleRefresh() {
 
 ### E. Icons
 
-All icons are in `src/components/icons/`. Two strict categories exist (see README.md Rule #6):
+The icon system has two tiers:
+
+- **Static icons** — sourced from [`@lucide/svelte`](https://lucide.dev/icons) (1500+ stroke-based icons, ISC license).
+- **Interactive icons** — custom animated components in `src/components/icons/`.
+
+#### Static Icons (Lucide)
+
+Import directly from `@lucide/svelte`. Always apply `class="icon"`.
+
+```svelte
+<script lang="ts">
+  import { Check, TriangleAlert, Sun, Moon } from '@lucide/svelte';
+</script>
+
+<!-- Basic -->
+<Check class="icon" />
+
+<!-- With size -->
+<Sun class="icon" data-size="lg" />
+
+<!-- With semantic color -->
+<TriangleAlert class="icon text-error" />
+```
+
+Browse all available icons at [lucide.dev/icons](https://lucide.dev/icons). Never create custom static SVG icon components — use Lucide instead.
+
+---
+
+#### Interactive Icons (Custom)
+
+Custom animated SVG components with state-driven CSS transitions, masks, and per-element animation. Located in `src/components/icons/`.
+
+| Icon | Trigger | State Attribute |
+| :--- | :--- | :--- |
+| `Burger` | Click toggle | `data-state="active"` (lines → X) |
+| `Copy` | Click (auto-reset) | `data-state="active"` (checkmark fade) |
+| `Eye` | Click toggle | `data-muted="true"` (mask slide) |
+| `Music` | Click toggle | `data-muted="true"` (mask slide) |
+| `Voice` | Click toggle | `data-muted="true"` (mask slide) |
+| `Search` | Hover | `data-state="active"` + `data-zoom="in\|out"` |
+| `Fullscreen` | Click + hover | `data-fullscreen` + `data-state="active"` |
+| `Play` | Hover | `data-state="active"` |
+| `Edit` | Hover | `data-state="active"` |
+| `Delete` | Hover | `data-state="active"` |
+| `Approve` | Hover | `data-state="active"` |
+| `DoorIn` | Hover | `data-state="active"` |
+| `DoorOut` | Hover | `data-state="active"` |
+| `Caret` | Hover | `data-state="active"` |
+| `Quit` | Hover | `data-state="active"` |
+| `Refresh` | Hover | `data-state="active"` |
+| `Undo` | Hover | `data-state="active"` |
+| `Restart` | Hover | `data-state="active"` |
+| `Switch` | Hover | `data-state="active"` |
+| `Sort` | Hover | `data-state="active"` |
+
+```svelte
+<Burger data-state={isOpen ? 'active' : ''} data-size="2xl" />
+<Eye data-muted={isMuted} data-size="lg" />
+```
+
+---
 
 #### Button Icons (`Btn*.svelte`)
 
@@ -743,72 +803,28 @@ Interactive wrappers with `onclick`, `state`, `text`, `disabled` props.
 | :--- | :--- | :--- |
 | `BtnDoor` | Sign in/out with label | `inside` / `outside` |
 
-**Usage:**
-
 ```svelte
 <BtnDoor state="outside" text="Sign In" onclick={handleAuth} />
 ```
 
 ---
 
-#### Pure Icons (`Name.svelte`)
+#### Special Icons
 
-SVG elements only. Use `HTMLAttributes<SVGElement>` spread pattern.
-
-**Status Icons:**
-
-| Icon | Description | Animated |
+| Icon | Type | Notes |
 | :--- | :--- | :--- |
-| `Checkmark` | Success indicator | — |
-| `XMark` | Error/close | — |
-| `Warning` | Alert triangle | — |
-| `Info` | Information circle | — |
-| `SpinLoader` | Loading spinner | Yes |
+| `SpinLoader` | Animated (custom) | CSS `@keyframes rotate`, retro: `steps(8)` |
+| `LogoDGRS` | Logo (custom) | Non-square viewBox, `data-render="logo"` |
+| `LogoCoNexus` | Logo (custom) | Non-square viewBox, `data-render="logo"` |
 
-**Navigation/UI Icons:**
+---
 
-| Icon | Description | Animated |
-| :--- | :--- | :--- |
-| `Home` | Home/dashboard | — |
-| `Burger` | Hamburger menu | Yes (transforms to X via `data-state="active"`) |
-| `Search` | Search/magnifier | Yes (rotates via `data-state="active"`) |
-
-**Theme Icons:**
-
-| Icon | Description | Animated |
-| :--- | :--- | :--- |
-| `Sun` | Light mode | — |
-| `Moon` | Dark mode | — |
-
-**Brand Icons:**
-
-| Icon | Description | Animated |
-| :--- | :--- | :--- |
-| `Logo` | CoNexus logo | — |
-| `Quill` | Writing/author | — |
-| `Dream` | Dream mode | — |
-
-**Usage:**
-
-```svelte
-<!-- Basic -->
-<Checkmark />
-
-<!-- With size -->
-<SpinLoader data-size="lg" />
-
-<!-- With custom class -->
-<Warning class="text-error" />
-
-<!-- All SVG attributes supported -->
-<Info aria-label="More information" onclick={showHelp} />
-```
-
-**Sizing via `data-size`:**
+#### Sizing via `data-size`
 
 | Value | Font Size |
 | :--- | :--- |
 | `sm` | `--font-size-caption` |
+| `md` | `--font-size-body` |
 | `lg` | `--font-size-h5` |
 | `xl` | `--font-size-h4` |
 | `2xl` | `--font-size-h3` |

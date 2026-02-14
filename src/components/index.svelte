@@ -14,8 +14,7 @@
   import Toggle from './ui/Toggle.svelte';
   import Selector from './ui/Selector.svelte';
 
-  import Moon from './icons/Moon.svelte';
-  import Sun from './icons/Sun.svelte';
+  import { Moon, Sun } from '@lucide/svelte';
 
   // Pull-to-refresh handlers
   async function handleRefresh(): Promise<void> {

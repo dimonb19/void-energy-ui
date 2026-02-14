@@ -1,8 +1,7 @@
 <script lang="ts">
   import { voidEngine } from '@adapters/void-engine.svelte';
   import { modal } from '@lib/modal-manager.svelte';
-  import Sun from '../icons/Sun.svelte';
-  import Moon from '../icons/Moon.svelte';
+  import { Sun, Moon } from '@lucide/svelte';
 
   let {
     icon = false,
@@ -15,9 +14,9 @@
 
 <button class={className} class:btn-icon={icon} onclick={() => modal.themes()}>
   {#if voidEngine.currentTheme.mode === 'dark'}
-    <Moon />
+    <Moon class="icon" />
   {:else}
-    <Sun />
+    <Sun class="icon" />
   {/if}
   {#if !icon}
     Theme:

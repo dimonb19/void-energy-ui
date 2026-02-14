@@ -7,6 +7,8 @@
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="-100 -100 200 200"
+  stroke="currentColor"
+  fill="currentColor"
   stroke-width="15"
   stroke-linecap="round"
   class="icon-voice icon {className ?? ''}"

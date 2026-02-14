@@ -108,7 +108,7 @@
               {option.icon}
             {:else}
               {@const Icon = option.icon}
-              <Icon />
+              <Icon class="icon" />
             {/if}
           </span>
         {/if}

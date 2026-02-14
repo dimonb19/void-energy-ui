@@ -13,8 +13,7 @@
   import Switcher from '../ui/Switcher.svelte';
   import Selector from '../ui/Selector.svelte';
   import SettingsRow from '../ui/SettingsRow.svelte';
-  import Sun from '../icons/Sun.svelte';
-  import Moon from '../icons/Moon.svelte';
+  import { Sun, Moon } from '@lucide/svelte';
   import Toggle from '../ui/Toggle.svelte';
 
   // Helper to capitalize strings (e.g., "void" → "Void")

@@ -41,6 +41,7 @@
 -->
 <script lang="ts">
   import type { Component } from 'svelte';
+  import { Circle } from '@lucide/svelte';
 
   interface ToggleProps {
     checked: boolean;
@@ -80,16 +81,7 @@
 
 <!-- Default OFF indicator (circle, no default ON icon) -->
 {#snippet DefaultOff()}
-  <svg
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="1.5"
-    stroke-linecap="round"
-    aria-hidden="true"
-  >
-    <circle cx="12" cy="12" r="5" />
-  </svg>
+  <Circle class="icon" aria-hidden="true" />
 {/snippet}
 
 <div class="toggle-wrapper inline-flex items-center gap-xs {className}">
@@ -119,7 +111,7 @@
               {iconOn}
             {:else}
               {@const IconOn = iconOn}
-              <IconOn />
+              <IconOn class="icon" />
             {/if}
           </span>
         {/if}
@@ -131,7 +123,7 @@
               {iconOff}
             {:else}
               {@const IconOff = iconOff}
-              <IconOff />
+              <IconOff class="icon" />
             {/if}
           {:else}
             {@render DefaultOff()}

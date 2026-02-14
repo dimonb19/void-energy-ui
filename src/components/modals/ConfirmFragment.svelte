@@ -1,7 +1,7 @@
 <script lang="ts">
   import { tooltip } from '@actions/tooltip';
 
-  import Warning from '../icons/Warning.svelte';
+  import { TriangleAlert } from '@lucide/svelte';
 
   let {
     title = 'Confirm Action',
@@ -27,7 +27,7 @@
       <div
         class="surface-sunk p-md flex flex-row gap-md items-center justify-center text-premium"
       >
-        <Warning />
+        <TriangleAlert class="icon" />
         <span>Consumes <strong>{cost} Credits</strong></span>
       </div>
     {/if}
