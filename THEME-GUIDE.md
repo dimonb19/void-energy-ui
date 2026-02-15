@@ -19,7 +19,7 @@
 
 ### Step 1: Define Your Theme
 
-Navigate to [src/config/design-tokens.ts](src/config/design-tokens.ts), and find the `VOID_TOKENS.themes` object (around line 512).
+Navigate to [src/config/design-tokens.ts](src/config/design-tokens.ts), and find the `VOID_TOKENS.themes` object (search for `themes:`).
 
 Copy an existing theme block (e.g., `void`) and rename it:
 
@@ -36,6 +36,7 @@ export const VOID_TOKENS = {
     'my-theme': {
       mode: 'dark',           // 'light' or 'dark'
       physics: 'glass',       // 'glass', 'flat', or 'retro'
+      tagline: 'My Theme / Custom',  // Short description for UI display
       palette: {
         // Semantic colors (auto-generated variants)
         ...SEMANTIC_DARK,  // or SEMANTIC_LIGHT for light mode
@@ -468,6 +469,7 @@ Here's a fully annotated theme to use as a template.
 'cyberpunk': {
   mode: 'dark',              // Required for glass physics
   physics: 'glass',          // Enables blur, shadows, glows
+  tagline: 'Neon / Cyberpunk',  // Short description for UI display
 
   palette: {
     // 1. SEMANTIC COLORS (Auto-generated variants)

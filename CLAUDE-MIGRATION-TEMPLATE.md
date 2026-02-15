@@ -1,8 +1,88 @@
-# Void Energy UI — Migration Context
+# [Your Project Name] — Void Energy Migration
+<!-- ADAPT: Replace [Your Project Name] with your actual project name -->
 
-This codebase is being migrated to the **Void Energy UI** system: a design system built on Svelte 5 (Runes), Astro, TypeScript, and a hybrid styling architecture where **SCSS owns visual physics** (surfaces, shadows, blur, animations, state) and **Tailwind owns geometry** (flex, grid, spacing, sizing). Every visual value flows through semantic tokens. Every component adapts to 3 physics presets (glass, flat, retro) and 2 color modes (light, dark). Migration is incremental — one task per session, preserving existing behavior.
+This codebase is being migrated to the **Void Energy UI** system. Migration is incremental — one component per session, preserving existing behavior. Both old and new patterns coexist during the transition.
+
+**Style system:** SCSS owns visual physics (surfaces, shadows, blur, animations, state). Tailwind owns geometry (flex, grid, spacing, sizing). Every value flows through semantic tokens. Components adapt to 3 physics presets (glass, flat, retro) and 2 color modes (light, dark).
 
 Token dictionary and SCSS toolkit references are loaded on-demand via `.claude/rules/` when editing relevant files.
+
+---
+
+## 0. LEGACY PATTERNS (Replace With Your Own)
+
+<!-- Fill in this section with YOUR repo's current patterns. -->
+<!-- The more specific you are, the better /migrate will work. -->
+<!-- Delete the placeholder examples and write your actual patterns. -->
+
+### Current Component Pattern
+```svelte
+<!-- REPLACE: Paste a representative example of how your components look today -->
+<script lang="ts">
+  export let value: string;        // or $props() if already Svelte 5
+  export let disabled = false;
+
+  import { onMount } from 'svelte';
+  import { myStore } from '../stores';
+
+  onMount(() => { /* setup */ });
+</script>
+
+<div class="my-component {disabled ? 'is-disabled' : ''}">
+  <!-- Your current markup pattern -->
+</div>
+
+<style>
+  .my-component {
+    /* scoped styles? global classes? utility classes? */
+  }
+</style>
+```
+
+### Current Styling Approach
+<!-- REPLACE: Describe how styling works in your repo -->
+```
+- Where do styles live? (scoped <style>, global CSS, SCSS files, CSS modules?)
+- What CSS framework? (Tailwind, Bootstrap, custom utilities, none?)
+- How are variables defined? (CSS custom properties, SCSS variables, none?)
+- Example variable names: --primary, --bg, $spacing-sm, etc.
+- How is responsiveness handled? (media queries, container queries, framework breakpoints?)
+```
+
+### Current State Management
+<!-- REPLACE: Describe how state works -->
+```
+- Svelte stores ($writable, $readable)?
+- Context API (getContext/setContext)?
+- Global state files?
+- How is theme/mode handled? (if at all)
+```
+
+### Patterns to Recognize as "Legacy" During Migration
+<!-- REPLACE: List the specific patterns Claude should find-and-replace -->
+```
+OLD PATTERN                          → NEW PATTERN
+export let prop                      → let { prop }: Props = $props()
+$: derived = expr                    → const derived = $derived(expr)
+onMount(() => ...)                   → $effect(() => ...)
+class="is-active"                    → data-state="active"
+class:disabled={cond}                → data-state={cond ? 'disabled' : ''}
+padding: 16px                        → padding: var(--space-sm)
+color: #ffffff                       → color: var(--text-main)
+<style> .component { ... } </style>  → External SCSS in src/styles/components/
+import { writable }                  → let value = $state(initial)
+```
+
+### File Structure
+<!-- REPLACE: Your repo's current structure -->
+```
+src/
+  components/     Where components live
+  styles/         Where styles live
+  stores/         Where stores live
+  lib/            Where utilities live
+  ...
+```
 
 ---
 
@@ -58,9 +138,10 @@ SCSS:     @include when-state('active') { ... }
 
 ## 2. COMMANDS
 
+<!-- ADAPT: Replace with your repo's actual npm scripts -->
 ```
-npm run dev            Start dev server (auto-generates tokens, watches changes)
-npm run build          Production build (runs build:tokens → astro build)
+npm run dev            Start dev server
+npm run build          Production build (runs build:tokens first)
 npm run build:tokens   Regenerate _generated-themes.scss from design-tokens.ts
 npm run check          Run svelte-check (TypeScript + Svelte type checking)
 npm run scan           Scan for magic pixel violations in SCSS/Svelte
@@ -72,20 +153,20 @@ npm run preview        Preview production build locally
 
 ## 3. FILE STRUCTURE
 
+<!-- ADAPT: Replace with your repo's actual structure after Void Energy is imported -->
 ```
 src/
   actions/          Svelte actions (morph, tooltip)
   adapters/         VoidEngine singleton (theme/physics runtime state)
   components/
-    core/           AtmosphereScope, ThemeScript (Astro scaffolding)
+    core/           AtmosphereScope, ThemeScript
     icons/          Interactive animated SVG icons (icon-[name] namespace)
-    modals/         Modal fragments (Confirm, Settings, Themes)
-    ui/             Reusable UI components (Button, Toggle, SearchField, Modal...)
-    ui-library/     Showcase/demo pages for the component library
-  config/           Design tokens (SSOT), modal registry, font registry, constants
-  layouts/          Astro layouts
-  lib/              Modal manager, transitions, tooltip logic, void-boot
-  pages/            Astro pages
+    modals/         Modal fragments
+    ui/             Reusable UI components
+  config/           Design tokens (SSOT), modal registry, constants
+  layouts/          Layouts
+  lib/              Modal manager, transitions, tooltip logic
+  pages/            Pages
   stores/           Reactive state (toast)
   styles/
     abstracts/      SCSS engine, mixins, functions, keyframes
@@ -235,6 +316,7 @@ import { tooltip } from '@actions/tooltip'      use:tooltip={{ content, placemen
 ```
 
 ### Path Aliases (tsconfig.json)
+<!-- ADAPT: Confirm these match your tsconfig after setup -->
 ```
 @actions/*  @adapters/*  @components/*  @config/*  @lib/*  @stores/*  @styles/*  @types/*
 ```
@@ -259,21 +341,38 @@ Physics constraint rules (auto-enforced):
 
 ## 7. MIGRATION PROTOCOL
 
-1. **SCOPE:** Do exactly what is asked. One component, one file, one feature at a time.
-2. **READ FIRST:** Before writing code, read the existing file and any related SCSS/types.
-3. **PRESERVE:** Keep existing behavior. Migration changes HOW code is written, not WHAT it does.
-4. **MATCH PATTERNS:** Find the nearest existing Void Energy component/style and replicate its patterns.
-5. **NO INVENTIONS:** Do not create new abstractions, mixins, utilities, or architecture. Use only what exists in the system.
-6. **INCREMENTAL:** If a task feels large, propose breaking it into steps. Ask before proceeding.
-7. **VERIFY:** After migration, the component must work correctly across all 3 physics presets (glass, flat, retro) and both modes (light, dark).
+This project uses a **strangler fig** migration pattern: Void Energy components have the clean names, old components are renamed with `-legacy` suffix.
+
+### Naming Convention
+```
+Modal.svelte              ← NEW (Void Energy version)
+Modal-legacy.svelte       ← OLD (original, read-only reference)
+/styles/                  ← NEW (Void Energy SCSS)
+/styles-legacy/           ← OLD (original utility classes, read-only)
+```
+
+### Rules
+
+1. **SCOPE:** One component at a time. Run `/migrate ComponentName` to migrate all consumers of a `-legacy` component.
+2. **READ BOTH:** Before migrating, read the NEW component (understand its API) and the `-legacy` component (understand what consumers expect).
+3. **CONSUMERS ONLY:** Migration means updating the files that *use* a component — never the component itself. The `-legacy` file is read-only. The Void Energy file is already correct.
+4. **PRESERVE BEHAVIOR:** Every consumer must work identically after migration — same UX, same interactions, same data flow.
+5. **MAP THE API:** Build an explicit old→new transformation map before touching any files (import paths, prop names, event handlers, slots).
+6. **NO INVENTIONS:** Do not create wrapper components, compatibility layers, or new abstractions. Direct migration only.
+7. **FLAG BREAKING CHANGES:** If the new component's API is fundamentally different (different semantics, missing props), report it and ask before proceeding.
+8. **COEXISTENCE:** Unmigrated consumers still use `-legacy` files. Do not remove `-legacy` files until zero consumers remain. Do not break unmigrated code.
+9. **INCREMENTAL:** If a component has 20+ consumers, propose batching (e.g., 5 per session). Ask before proceeding.
+10. **CLEANUP:** After migration, check for remaining `-legacy` references. Report which `-legacy` files are safe to delete.
+11. **VERIFY:** After migration, the consumer must work correctly across all 3 physics presets (glass, flat, retro) and both modes (light, dark).
 
 ---
 
 ## 8. GOTCHAS
 
-- **Generated files are read-only.** Never edit `src/styles/config/_generated-themes.scss`, `void-registry.json`, or `void-physics.json`. Edit `src/config/design-tokens.ts` and run `npm run build:tokens`.
+<!-- ADAPT: Update file paths if your repo structure differs -->
+- **Generated files are read-only.** Never edit `_generated-themes.scss`, `void-registry.json`, or `void-physics.json`. Edit `src/config/design-tokens.ts` and run `npm run build:tokens`.
 - **`npm run scan` enforces Token Law.** It exits non-zero if magic pixel values are found in SCSS/Svelte files.
 - **Glass and retro require dark mode.** VoidEngine auto-corrects invalid physics+mode combos. Do not manually set light mode with glass or retro physics.
 - **SCSS import path:** Always `@use '../abstracts' as *;` — never import individual partial files.
 - **Tailwind config is token-driven.** `tailwind.config.mjs` reads from `design-tokens.ts`. Add new values to design-tokens, not the Tailwind config.
-- **Existing docs:** `CHEAT-SHEET.md` (component catalog), `THEME-GUIDE.md` (theme creation), `CONTRIBUTING.md` (PR process).
+- **Old styles still work.** During migration, the old style system coexists with Void Energy. Do not remove old CSS variables or utility classes until all components using them are migrated.

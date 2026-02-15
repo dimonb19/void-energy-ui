@@ -7,6 +7,7 @@
  * ARCHITECTURE:
  * - Section 1: Base Button - Layout, typography, physics, interaction states
  * - Section 2: CTA (Gemini Laser) - Animated gradient border variant
+ * - Section 2b: Ghost - Text-only action button (no surface/border at rest)
  * - Section 3: Semantic Variants - Premium, system, signal, alert colors
  * - Section 4: Active State - Toggle/selection styling
  * - Section 5: Utilities - btn-void (reset), btn-icon (circular)
@@ -18,6 +19,7 @@
  * - .btn-system  : Purple semantic variant
  * - .btn-signal  : Green/success semantic variant
  * - .btn-alert   : Red/error semantic variant
+ * - .btn-ghost   : Text-only button (no surface/border at rest)
  * - .btn-void    : Reset class for unstyled buttons
  * - .btn-icon    : Circular icon-only button
  *
@@ -176,6 +178,40 @@
     transform: scale(0.96);
     border-color: blend($color-var, var(--energy-secondary), 12%);
     background: alpha($color-var, 25%);
+  }
+}
+
+// MIXIN: Ghost Button Variant
+// Creates semantic ghost variants — text color only, no surface at rest.
+// Usage: @include _btn-ghost-variant(var(--color-error));
+// --------------------------------------------------------------------------
+@mixin _btn-ghost-variant($color-var) {
+  color: $color-var;
+  background: transparent;
+  border-color: transparent;
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background: alpha($color-var, 8%);
+      color: $color-var;
+      border-color: transparent;
+      box-shadow: none;
+
+      @include when-retro {
+        background: transparent;
+        text-decoration: underline;
+        text-underline-offset: var(--space-xs);
+      }
+    }
+  }
+
+  &:active:not(:disabled) {
+    background: alpha($color-var, 12%);
+    border-color: transparent;
+
+    @include when-retro {
+      background: transparent;
+    }
   }
 }
 
@@ -342,6 +378,122 @@ button:not(.btn-void, .btn-icon),
         border-color: var(--energy-primary);
         outline-color: var(--energy-primary);
       }
+    }
+  }
+
+  // ========================================================================
+  // 2b. GHOST VARIANT (Text-Only Action Button)
+  // No background, no border at rest. Recognizable as a button via
+  // uppercase type treatment and hover feedback. Use for secondary/tertiary
+  // actions: Cancel, Dismiss, Skip, "Learn more."
+  //
+  // Composition: Works with semantic variants for colored ghosts:
+  //   <button class="btn-ghost btn-alert">Delete</button>
+  // ========================================================================
+  &.btn-ghost {
+    // --- A. Strip the Surface ---
+    background: transparent;
+    border-color: transparent;
+    box-shadow: none;
+    color: var(--text-dim);
+
+    @include when-light {
+      background: transparent;
+    }
+
+    // --- B. Hover: Reveal Subtle Surface ---
+    @media (hover: hover) {
+      &:hover:not(:disabled) {
+        background: alpha(var(--energy-secondary), 8%);
+        border-color: transparent;
+        color: var(--energy-primary);
+        box-shadow: none;
+        transform: none; // Ghost stays grounded (no lift)
+
+        @include when-light {
+          background: alpha(var(--energy-primary), 8%);
+        }
+
+        @include when-retro {
+          background: transparent;
+          color: var(--energy-primary);
+          text-decoration: underline;
+          text-underline-offset: var(--space-xs);
+        }
+      }
+    }
+
+    // --- C. Active Press ---
+    &:active:not(:disabled) {
+      transition-duration: 50ms;
+
+      @media (pointer: coarse) {
+        transition-duration: 0ms;
+      }
+
+      @include when-retro {
+        transition-duration: 0ms;
+      }
+
+      filter: brightness(0.85);
+      transform: scale(0.96);
+      background: alpha(var(--energy-secondary), 12%);
+
+      @include when-light {
+        background: alpha(var(--energy-primary), 12%);
+      }
+
+      @include when-retro {
+        background: transparent;
+        filter: none;
+        transform: none;
+        color: var(--text-main);
+      }
+    }
+
+    // --- D. Focus: Keep Ring, Hide Border ---
+    &:focus-visible {
+      border-color: transparent;
+    }
+
+    // --- E. Disabled ---
+    &:disabled {
+      background: transparent;
+      border-color: transparent;
+      color: var(--text-mute);
+      box-shadow: none;
+    }
+
+    // --- F. Toggle/Selected State ---
+    @include when-state('active') {
+      color: var(--energy-primary);
+      background: alpha(var(--energy-primary), 8%);
+      border-color: transparent;
+      box-shadow: none;
+
+      @include when-light {
+        background: alpha(var(--energy-primary), 6%);
+      }
+
+      @include when-retro {
+        background: transparent;
+        text-decoration: underline;
+        text-underline-offset: var(--space-xs);
+      }
+    }
+
+    // --- G. Semantic Ghost Variants ---
+    &.btn-premium:not(:disabled) {
+      @include _btn-ghost-variant(var(--color-premium));
+    }
+    &.btn-system:not(:disabled) {
+      @include _btn-ghost-variant(var(--color-system));
+    }
+    &.btn-signal:not(:disabled) {
+      @include _btn-ghost-variant(var(--color-success));
+    }
+    &.btn-alert:not(:disabled) {
+      @include _btn-ghost-variant(var(--color-error));
     }
   }
 

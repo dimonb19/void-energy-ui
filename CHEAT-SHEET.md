@@ -563,17 +563,78 @@ Base surface classes for applying physics.
 
 Preset components with built-in layout and physics.
 
-#### `.btn` / `.btn-cta`
+#### Buttons
 
-**Description:** Interactive buttons with physics states
-**`.btn`:** Standard button
-**`.btn-cta`:** Call-to-action with rotating gradient border (Gemini Laser)
+**Description:** Interactive buttons with physics-aware states, semantic variants, and composable modifiers.
+**Source:** [src/styles/components/\_buttons.scss](src/styles/components/_buttons.scss)
+
+**Variants:**
+
+| Class | Description | Use Case |
+| --- | --- | --- |
+| `.btn` | Standard surface button (auto-applied to `<button>`) | Default actions |
+| `.btn-cta` | Rotating gradient border (Gemini Laser), pill shape | Primary CTA |
+| `.btn-premium` | Gold/orange semantic | Paid features, upgrades |
+| `.btn-system` | Purple semantic | System/diagnostic actions |
+| `.btn-signal` | Green/success semantic | Confirmations, positive actions |
+| `.btn-alert` | Red/error semantic | Destructive actions, warnings |
+| `.btn-ghost` | Text-only, no surface/border at rest | Secondary/tertiary actions |
+| `.btn-void` | Complete style reset | Custom-styled buttons |
+| `.btn-icon` | Circular icon-only | Toolbar actions, inline controls |
 
 **Usage:**
 
 ```svelte
-<button class="btn">Standard Button</button>
+<!-- Standard -->
+<button>Default Button</button>
 <button class="btn-cta">Call to Action</button>
+
+<!-- Semantic -->
+<button class="btn-signal">Confirm</button>
+<button class="btn-alert">Delete</button>
+```
+
+---
+
+#### `.btn-ghost`
+
+**Description:** Text-only action button with no background or border at rest. Inherits button-family typography (uppercase, semibold, small) for visual kinship with other `.btn` variants while staying visually lightweight.
+**Use for:** Cancel, Dismiss, Skip, "Learn more", any secondary action paired with a primary button.
+
+**Resting state:** Transparent background, `--text-dim` color
+**Hover:** Subtle bg tint (`8%`) + `--energy-primary` color. No lift — ghost stays grounded.
+**Physics:**
+
+| Physics | Hover Treatment |
+| --- | --- |
+| Glass | Background tint only |
+| Flat | Background tint only |
+| Retro | Underline, no background |
+
+**Semantic composition:** Combine with semantic classes for colored ghosts — the ghost surface treatment overrides the semantic background/border while preserving the semantic color.
+
+**Usage:**
+
+```svelte
+<!-- Basic ghost -->
+<button class="btn-ghost">Cancel</button>
+
+<!-- Paired with primary (most common pattern) -->
+<div class="flex gap-md">
+  <button class="btn-ghost">Cancel</button>
+  <button class="btn-signal">Confirm</button>
+</div>
+
+<!-- Semantic ghost (destructive secondary) -->
+<button class="btn-ghost btn-alert">Delete Account</button>
+
+<!-- Toggle state -->
+<button class="btn-ghost" aria-pressed={showAdvanced}>
+  Advanced Settings
+</button>
+
+<!-- Disabled -->
+<button class="btn-ghost" disabled>Unavailable</button>
 ```
 
 ---
@@ -664,6 +725,299 @@ Preset components with built-in layout and physics.
 <span class="chip chip-premium">Premium</span>
 <span class="chip chip-system">System</span>
 <span class="chip chip-success">Active</span>
+```
+
+---
+
+#### `<Toggle>` (Switch)
+
+**Description:** Boolean on/off switch with optional icon indicators.
+**Location:** [src/components/ui/Toggle.svelte](src/components/ui/Toggle.svelte)
+**CSS Class:** `.toggle` ([src/styles/components/\_toggle.scss](src/styles/components/_toggle.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `checked` | `boolean` | `$bindable(false)` | Toggle state (bindable) |
+| `onchange` | `(checked?: boolean) => void` | — | Callback on state change |
+| `label` | `string` | — | Accessible label text |
+| `disabled` | `boolean` | `false` | Disables interaction |
+| `size` | `string` | — | Size via `data-size` attribute |
+| `iconOn` | `string \| Component` | — | ON state icon (optional) |
+| `iconOff` | `string \| Component` | `Circle` | OFF state icon (default circle) |
+| `hideIcons` | `boolean` | `false` | Hide icons entirely |
+
+**Usage:**
+
+```svelte
+<Toggle bind:checked={enabled} />
+<Toggle bind:checked={darkMode} iconOn={Moon} iconOff={Sun} label="Dark Mode" />
+```
+
+---
+
+#### `<SearchField>`
+
+**Description:** Input with animated search icon that rotates on focus.
+**Location:** [src/components/ui/SearchField.svelte](src/components/ui/SearchField.svelte)
+**CSS Class:** `.field` ([src/styles/components/\_fields.scss](src/styles/components/_fields.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` | `$bindable('')` | Search text (bindable) |
+| `placeholder` | `string` | `'Search...'` | Placeholder text |
+| `zoom` | `'in' \| 'out'` | — | Search icon lens variant |
+| `onsubmit` | `(value: string) => void` | — | Callback on Enter key |
+| `oninput` | `(value: string) => void` | — | Callback on keystroke |
+| `disabled` | `boolean` | `false` | Disables input |
+
+**Usage:**
+
+```svelte
+<SearchField bind:value={query} onsubmit={handleSearch} zoom="in" />
+```
+
+---
+
+#### `<Selector>` (Dropdown Select)
+
+**Description:** Native `<select>` wrapper with label and placeholder.
+**Location:** [src/components/ui/Selector.svelte](src/components/ui/Selector.svelte)
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `options` | `Array<{ value: string, label: string }>` | *required* | Selection options |
+| `value` | `string \| null` | `$bindable()` | Selected value (bindable) |
+| `onchange` | `(value: string) => void` | — | Callback on selection |
+| `label` | `string` | — | Label text above select |
+| `placeholder` | `string` | — | Hidden first option text |
+| `disabled` | `boolean` | `false` | Disables select |
+| `align` | `'start' \| 'center' \| 'end'` | `'center'` | Flex alignment |
+
+**Usage:**
+
+```svelte
+<Selector
+  label="Font"
+  options={[{ value: 'inter', label: 'Inter' }, { value: 'mono', label: 'Courier' }]}
+  bind:value={font}
+  placeholder="Select..."
+/>
+```
+
+---
+
+#### `<Switcher>` (Segmented Control)
+
+**Description:** Radio-style segmented control with keyboard navigation (arrows, Home/End).
+**Location:** [src/components/ui/Switcher.svelte](src/components/ui/Switcher.svelte)
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `options` | `Array<{ value: string, label: string, icon?: Component }>` | *required* | Options with optional icons |
+| `value` | `string` | `$bindable()` | Selected value (bindable) |
+| `onchange` | `(value: string) => void` | — | Callback on selection |
+| `label` | `string` | — | Label text |
+| `disabled` | `boolean` | `false` | Disables all options |
+
+**Usage:**
+
+```svelte
+<Switcher
+  options={[
+    { value: 'glass', label: 'Glass' },
+    { value: 'flat', label: 'Flat' },
+    { value: 'retro', label: 'Retro' }
+  ]}
+  bind:value={physics}
+/>
+```
+
+---
+
+#### `<EditField>`
+
+**Description:** Readonly input that unlocks for editing with confirm/reset actions.
+**Location:** [src/components/ui/EditField.svelte](src/components/ui/EditField.svelte)
+**CSS Class:** `.field`
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` | `$bindable('')` | Text value (bindable, updated on confirm) |
+| `placeholder` | `string` | `''` | Placeholder text |
+| `onconfirm` | `(value: string) => void` | — | Callback with new value on confirm |
+| `disabled` | `boolean` | `false` | Disables all interaction |
+
+**States:** idle (readonly + Edit icon) → editing (editable + Undo/Check icons). Enter confirms, Escape resets.
+
+**Usage:**
+
+```svelte
+<EditField bind:value={name} placeholder="Agent name..." onconfirm={saveName} />
+```
+
+---
+
+#### `<PasswordField>`
+
+**Description:** Password input with Eye toggle for show/hide visibility.
+**Location:** [src/components/ui/PasswordField.svelte](src/components/ui/PasswordField.svelte)
+**CSS Class:** `.field`
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` | `$bindable('')` | Password text (bindable) |
+| `placeholder` | `string` | `'Enter password...'` | Placeholder text |
+| `disabled` | `boolean` | `false` | Disables input |
+
+**Usage:**
+
+```svelte
+<PasswordField bind:value={password} />
+```
+
+---
+
+#### `<CopyField>`
+
+**Description:** Readonly text field with copy-to-clipboard button. Shows checkmark feedback on copy.
+**Location:** [src/components/ui/CopyField.svelte](src/components/ui/CopyField.svelte)
+**CSS Class:** `.field`
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` | *required* | Text to display and copy |
+
+**Usage:**
+
+```svelte
+<CopyField value="sk-1234-abcd-5678" />
+```
+
+---
+
+#### `<MediaSlider>`
+
+**Description:** Horizontal control bar with mute toggle, range slider, and optional replay button.
+**Location:** [src/components/ui/MediaSlider.svelte](src/components/ui/MediaSlider.svelte)
+**CSS Class:** `.media-slider` ([src/styles/components/\_fields.scss](src/styles/components/_fields.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `number` | `$bindable(50)` | Slider value 0–100 (bindable) |
+| `muted` | `boolean` | `$bindable(false)` | Mute state (bindable) |
+| `icon` | `'voice' \| 'music'` | `'voice'` | Mute toggle icon |
+| `replay` | `boolean` | `true` | Show replay button |
+| `onreplay` | `() => void` | — | Callback on replay click |
+| `disabled` | `boolean` | `false` | Disables all controls |
+
+**Usage:**
+
+```svelte
+<MediaSlider bind:value={volume} bind:muted icon="music" onreplay={replay} />
+```
+
+---
+
+#### `<SettingsRow>`
+
+**Description:** Layout wrapper pairing a label with controls. Responsive: stacked on mobile, side-by-side on desktop.
+**Location:** [src/components/ui/SettingsRow.svelte](src/components/ui/SettingsRow.svelte)
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | `string` | *required* | Row label text |
+| `children` | `Snippet` | *required* | Control elements |
+
+**Usage:**
+
+```svelte
+<SettingsRow label="Theme">
+  <Switcher options={themes} bind:value={selectedTheme} />
+</SettingsRow>
+```
+
+---
+
+#### `.tile` (Story Card)
+
+**Description:** Story card with image background, gradient overlay, and metadata. Interactive floating surface with hover zoom.
+**Source:** [src/styles/components/\_tiles.scss](src/styles/components/_tiles.scss)
+
+**Variants:**
+
+| Class | Description |
+| --- | --- |
+| `.tile` | Fixed-width story card with 2:3 aspect ratio, density-scaled |
+| `.tile-fluid` | Grid-responsive variant (fills column, min-width: 0) |
+| `.loading-tile` | Skeleton state with shimmer animation |
+| `.tiles-collection` | Horizontal scroll container for tiles |
+
+**Usage:**
+
+```svelte
+<!-- Horizontal scrolling tile strip -->
+<div class="tiles-collection">
+  <div class="tile">
+    <img src="cover.jpg" alt="" />
+    <h5>Story Title</h5>
+  </div>
+</div>
+
+<!-- Grid layout -->
+<div class="grid grid-cols-2 tablet:grid-cols-3 gap-md">
+  <div class="tile tile-fluid">...</div>
+</div>
+```
+
+---
+
+#### `.link` (Laser Underline)
+
+**Description:** Animated underline link with energy-primary color and hover-reveal laser line.
+**Source:** [src/styles/components/\_anchors.scss](src/styles/components/_anchors.scss)
+
+**Usage:**
+
+```svelte
+<a href="/docs" class="link">Read the docs</a>
+```
+
+---
+
+#### `.chip` Variants (Extended)
+
+The chip system includes additional semantic variants beyond the base:
+
+| Class | Color | Use Case |
+| --- | --- | --- |
+| `.chip` | Energy secondary | Default/neutral chips |
+| `.chip-premium` | Gold | Premium features |
+| `.chip-system` | Purple | System indicators |
+| `.chip-success` | Green | Positive states |
+| `.chip-error` | Red | Error/warning states |
+
+**Modifier:** `.chip-labeled` — Adds a floating label tab above the chip via `data-label` attribute.
+
+```svelte
+<span class="chip chip-premium chip-labeled" data-label="Tier">Gold</span>
 ```
 
 ---
@@ -835,7 +1189,7 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 | `Fullscreen` | Click + hover | `data-fullscreen` + `data-state="active"` |
 | `Play` | Hover | `data-state="active"` |
 | `Edit` | Hover | `data-state="active"` |
-| `Delete` | Hover | `data-state="active"` |
+| `Remove` | Hover | `data-state="active"` |
 | `Contract` | Hover | `data-state="active"` |
 | `DoorIn` | Hover | `data-state="active"` |
 | `DoorOut` | Hover | `data-state="active"` |
@@ -846,6 +1200,10 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 | `Restart` | Hover | `data-state="active"` |
 | `Switch` | Hover | `data-state="active"` |
 | `Sort` | Hover | `data-state="active"` |
+| `ArrowBack` | Static | — |
+| `Dream` | Static | — |
+| `Profile` | Static | — |
+| `Quill` | Static | — |
 
 ```svelte
 <Burger data-state={isOpen ? 'active' : ''} data-size="2xl" />
@@ -854,16 +1212,53 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 
 ---
 
-#### Button Icons (`Btn*.svelte`)
+#### `<ActionBtn>` (Icon + Text Button)
 
-Interactive wrappers with `onclick`, `state`, `text`, `disabled` props.
+**Description:** Generic button composing any interactive icon with optional text label. Button hover drives icon animation.
+**Location:** [src/components/ui/ActionBtn.svelte](src/components/ui/ActionBtn.svelte)
 
-| Icon | Description | States |
-| :--- | :--- | :--- |
-| `BtnDoor` | Sign in/out with label | `inside` / `outside` |
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `icon` | `Component` | *required* | Interactive icon from `@components/icons/` |
+| `text` | `string` | `''` | Button label (omit for icon-only) |
+| `size` | `string` | `'lg'` | Icon `data-size` |
+| `disabled` | `boolean` | `false` | Disables interaction |
+| `class` | `string` | `''` | Button class variants (`'btn-cta'`, `'btn-alert'`, etc.) |
+
+**Usage:**
 
 ```svelte
-<BtnDoor state="outside" text="Sign In" onclick={handleAuth} />
+<ActionBtn icon={Play} text="Play" onclick={handlePlay} />
+<ActionBtn icon={Remove} text="Delete" class="btn-alert" onclick={handleDelete} />
+<ActionBtn icon={DoorOut} text="Sign Out" onclick={handleSignOut} />
+```
+
+---
+
+#### `<IconBtn>` (Circular Icon Button)
+
+**Description:** Circular icon-only button for inline actions. Hover drives `data-state="active"` on the icon.
+**Location:** [src/components/ui/IconBtn.svelte](src/components/ui/IconBtn.svelte)
+**CSS Class:** `.btn-icon`
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `icon` | `Component` | *required* | Interactive icon component |
+| `size` | `string` | `'lg'` | Icon `data-size` |
+| `iconProps` | `Record<string, any>` | `{}` | Extra attributes forwarded to icon |
+| `disabled` | `boolean` | `false` | Disables interaction |
+| `class` | `string` | `''` | Additional CSS classes |
+
+**Usage:**
+
+```svelte
+<IconBtn icon={Undo} onclick={reset} aria-label="Reset" />
+<IconBtn icon={Eye} iconProps={{ 'data-muted': hidden }} onclick={toggleVisibility} />
+<IconBtn icon={Search} iconProps={{ 'data-zoom': 'in' }} />
 ```
 
 ---
@@ -946,22 +1341,54 @@ Interactive wrappers with `onclick`, `state`, `text`, `disabled` props.
 
 ---
 
-#### `@include gemini-laser`
+#### `@include glass-blur`
 
-**Purpose:** Rotating gradient border (CTA buttons)
-**Visual:** Creates animated rainbow border via `::before` pseudo-element
-
-**Features:**
-
-- Animated conic gradient
-- Rotation on hover
-- Works with transparent backgrounds
+**Purpose:** Backdrop blur effect (frosted glass) with progressive enhancement.
+**Context:** Falls back gracefully on unsupported browsers via `@supports`.
 
 **Usage:**
 
 ```scss
-.btn-cta {
-  @include gemini-laser;
+.my-frosted-panel {
+  @include glass-blur;
+}
+```
+
+---
+
+#### `@include shimmer`
+
+**Purpose:** Loading skeleton animation with atmospheric gradient. Physics & mode-aware.
+**Visual:** Animated horizontal gradient sweep. Retro mode uses a simplified scanning line pattern.
+
+**Usage:**
+
+```scss
+.skeleton-card {
+  @include shimmer;
+  height: 200px;
+  border-radius: var(--radius-md);
+}
+```
+
+---
+
+#### `@include entry-transition($duration, $delay)`
+
+**Purpose:** Slide-up fade-in entry animation using `@starting-style`. Respects `prefers-reduced-motion`.
+**Parameters:**
+- `$duration` — Animation duration (default: `var(--speed-base)`)
+- `$delay` — Animation delay (default: `0s`)
+
+**Usage:**
+
+```scss
+.my-panel {
+  @include entry-transition;
+}
+
+.my-staggered-item {
+  @include entry-transition(var(--speed-fast), var(--delay-cascade));
 }
 ```
 
@@ -984,10 +1411,21 @@ Interactive wrappers with `onclick`, `state`, `text`, `disabled` props.
 
 ### State Mixins
 
-#### `@include state-active { ... }`
+#### `@include when-state($state) { ... }`
 
-**Targets:** `[aria-pressed="true"]`, `[data-state="active"]`
-**Use for:** Toggle buttons, active tabs
+**Purpose:** Universal state selector mapping data attributes and ARIA states to CSS.
+
+**Parameter:** `$state` — One of: `'active'`, `'open'`, `'loading'`, `'disabled'`, `'error'`
+
+**Selectors by state:**
+
+| State | Matches |
+| --- | --- |
+| `'active'` | `[aria-pressed='true']`, `[aria-selected='true']`, `[aria-checked='true']`, `[data-state='active']` |
+| `'open'` | `[data-state='open']`, `[open]` |
+| `'loading'` | `[aria-busy='true']`, `[data-status='loading']` |
+| `'disabled'` | `:disabled`, `[aria-disabled='true']`, `[data-state='disabled']` |
+| `'error'` | `[aria-invalid='true']`, `[data-state='error']` |
 
 **Usage:**
 
@@ -995,27 +1433,16 @@ Interactive wrappers with `onclick`, `state`, `text`, `disabled` props.
 .my-toggle {
   background: var(--bg-surface);
 
-  @include state-active {
+  @include when-state('active') {
     background: var(--energy-primary);
   }
 }
-```
 
----
-
-#### `@include state-open { ... }`
-
-**Targets:** `[data-state="open"]`
-**Use for:** Dropdowns, accordions, expanded panels
-
-**Usage:**
-
-```scss
 .my-dropdown {
   opacity: 0;
   max-height: 0;
 
-  @include state-open {
+  @include when-state('open') {
     opacity: 1;
     max-height: 500px;
   }
@@ -1040,6 +1467,108 @@ h2 {
 
 .small-text {
   @include typography('caption');
+}
+```
+
+---
+
+### Utility Mixins
+
+#### `@include btn-reset`
+
+**Purpose:** Strip all native button styling while preserving accessibility. Use for custom-styled buttons.
+
+**Usage:**
+
+```scss
+.my-custom-button {
+  @include btn-reset;
+  // Custom styles here
+}
+```
+
+---
+
+#### `@include laser-scrollbar`
+
+**Purpose:** Themed scrollbar with energy colors. Cross-browser (WebKit + Firefox).
+
+**Usage:**
+
+```scss
+.scrollable-container {
+  @include laser-scrollbar;
+  overflow-y: auto;
+}
+```
+
+---
+
+#### `@include text-wrap-force`
+
+**Purpose:** Force word-break for hashes, API keys, and other long unbroken strings.
+
+**Usage:**
+
+```scss
+.api-key-display {
+  @include text-wrap-force;
+}
+```
+
+---
+
+### Physics & Mode Selectors
+
+#### `@include when-physics($physics)` / `@include when-mode($mode)`
+
+**Purpose:** Apply styles conditionally based on active physics preset or color mode.
+**Parameters:**
+- `$physics` — `'glass'`, `'flat'`, or `'retro'`
+- `$mode` — `'light'` or `'dark'`
+- Both accept optional `$low-specificity: true` for `:where()` wrapping
+
+**Usage:**
+
+```scss
+.my-card {
+  @include when-physics('retro') {
+    border-width: var(--physics-border-width);
+  }
+
+  @include when-mode('light') {
+    background: var(--bg-surface);
+  }
+}
+```
+
+---
+
+#### Convenience Aliases
+
+| Alias | Equivalent |
+| --- | --- |
+| `@include when-glass` | `@include when-physics('glass')` |
+| `@include when-flat` | `@include when-physics('flat')` |
+| `@include when-retro` | `@include when-physics('retro')` |
+| `@include when-light` | `@include when-mode('light')` |
+| `@include when-dark` | `@include when-mode('dark')` |
+
+All accept optional `$low-specificity: true`.
+
+---
+
+#### `@include when-physics-mode($physics, $mode)`
+
+**Purpose:** Combined physics + mode selector (use sparingly — prefer individual selectors).
+
+**Usage:**
+
+```scss
+.my-element {
+  @include when-physics-mode('glass', 'dark') {
+    box-shadow: var(--shadow-lift);
+  }
 }
 ```
 
@@ -1110,7 +1639,7 @@ h2 {
     <h2>Modal Title</h2>
     <p>Content here</p>
     <div class="flex gap-md">
-      <button class="btn">Cancel</button>
+      <button class="btn-ghost">Cancel</button>
       <button class="btn-cta">Confirm</button>
     </div>
   </div>
@@ -1210,6 +1739,94 @@ await toast.promise(saveItems(items), {
   <div class="surface-glass p-md">Item 2</div>
   <div class="surface-glass p-md">Item 3</div>
 </div>
+```
+
+---
+
+### K. ActionBtn / IconBtn Composites
+
+```svelte
+<script lang="ts">
+  import ActionBtn from '@components/ui/ActionBtn.svelte';
+  import IconBtn from '@components/ui/IconBtn.svelte';
+  import Play from '@components/icons/Play.svelte';
+  import Undo from '@components/icons/Undo.svelte';
+</script>
+
+<!-- Icon + text button -->
+<ActionBtn icon={Play} text="Play" onclick={handlePlay} />
+
+<!-- Circular icon-only button -->
+<IconBtn icon={Undo} onclick={reset} aria-label="Reset" />
+```
+
+---
+
+### L. Toggle Switch
+
+```svelte
+<script lang="ts">
+  import Toggle from '@components/ui/Toggle.svelte';
+  let enabled = $state(false);
+</script>
+
+<Toggle bind:checked={enabled} label="Enable feature" />
+```
+
+---
+
+### M. Selector Dropdown
+
+```svelte
+<script lang="ts">
+  import Selector from '@components/ui/Selector.svelte';
+  let font = $state<string | null>(null);
+</script>
+
+<Selector
+  label="Font"
+  options={[
+    { value: 'inter', label: 'Inter' },
+    { value: 'mono', label: 'Courier Prime' }
+  ]}
+  bind:value={font}
+  placeholder="Choose..."
+/>
+```
+
+---
+
+### N. Field Composites (Password, Copy, Edit)
+
+```svelte
+<script lang="ts">
+  import PasswordField from '@components/ui/PasswordField.svelte';
+  import CopyField from '@components/ui/CopyField.svelte';
+  import EditField from '@components/ui/EditField.svelte';
+</script>
+
+<PasswordField bind:value={password} />
+<CopyField value="sk-1234-abcd-5678" />
+<EditField bind:value={name} onconfirm={saveName} />
+```
+
+---
+
+### O. Switcher (Segmented Control)
+
+```svelte
+<script lang="ts">
+  import Switcher from '@components/ui/Switcher.svelte';
+  let view = $state('grid');
+</script>
+
+<Switcher
+  options={[
+    { value: 'grid', label: 'Grid' },
+    { value: 'list', label: 'List' }
+  ]}
+  bind:value={view}
+/>
 ```
 
 ---

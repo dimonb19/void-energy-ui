@@ -340,8 +340,9 @@
   {/if}
 
   <div class="flex justify-center gap-md">
-    <button class="btn-alert" onclick={() => modal.close()}> Close </button>
+    <button class="btn-ghost" onclick={() => modal.close()}> Close </button>
     <button
+      class="btn-ghost"
       aria-pressed={showAdvancedSettings}
       onclick={() => (showAdvancedSettings = !showAdvancedSettings)}
     >

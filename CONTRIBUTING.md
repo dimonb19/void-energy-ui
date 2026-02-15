@@ -56,7 +56,7 @@ Before you begin, ensure you have:
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/your-org/void-energy-ui.git
+git clone https://github.com/<org>/void-energy-ui.git
 cd void-energy-ui
 npm install
 ```
@@ -413,24 +413,30 @@ interface CardProps {
 <script lang="ts">
   interface Props {
     title: string;
+    checked?: boolean;
     count?: number;
   }
 
-  let { title, count = 0 }: Props = $props();
+  let {
+    title,
+    checked = $bindable(false), // Two-way binding via bind:checked
+    count = 0,
+  }: Props = $props();
+
   let internalCount = $state(count);
 
   const increment = () => {
     internalCount++;
   };
 
-  // Derived value
+  // Derived value (replaces legacy $: reactive statements)
   const isEven = $derived(internalCount % 2 === 0);
 </script>
 
 <div class="surface-glass p-md">
   <h3>{title}</h3>
   <p>Count: {internalCount} ({isEven ? 'even' : 'odd'})</p>
-  <button class="btn" onclick={increment}>Increment</button>
+  <button onclick={increment}>Increment</button>
 </div>
 ```
 
@@ -481,8 +487,8 @@ interface CardProps {
 ## Questions?
 
 - **Documentation:** [CHEAT-SHEET.md](./CHEAT-SHEET.md), [THEME-GUIDE.md](./THEME-GUIDE.md), [README.md](./README.md)
-- **Issues:** Open a [GitHub issue](https://github.com/your-org/void-energy-ui/issues)
-- **Discussions:** Join our [GitHub Discussions](https://github.com/your-org/void-energy-ui/discussions)
+- **Issues:** Open a [GitHub issue](https://github.com/<org>/void-energy-ui/issues)
+- **Discussions:** Join our [GitHub Discussions](https://github.com/<org>/void-energy-ui/discussions)
 
 ---
 

@@ -220,6 +220,22 @@
             Purge Cache
           </button>
           <button disabled>Offline</button>
+          <button
+            class="btn-ghost"
+            onclick={() => {
+              toast.show('Ghost Protocol Activated', 'info');
+            }}
+          >
+            Ghost Action
+          </button>
+          <button
+            class="btn-ghost btn-alert"
+            onclick={() => {
+              toast.show('Silent Purge Initiated', 'warning');
+            }}
+          >
+            Ghost Alert
+          </button>
         </div>
 
         <div class="flex flex-col gap-xs flex-1">

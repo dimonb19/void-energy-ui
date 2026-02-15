@@ -80,20 +80,27 @@ We separate **Layout** (Geometry) from **Materials** (Physics).
 /
 ├── scripts/
 │   ├── generate-tokens.ts        <-- 🧠 The Compiler (build:tokens)
+│   ├── scan-physics.ts           <-- Physics preset scanner
 │   └── local-dev.ts              <-- 🛠️ Dev Server Orchestrator
 ├── src/
 │   ├── actions/
-│   │   └── tooltip.ts            <-- Svelte Action for Tooltips
+│   │   ├── morph.ts              <-- FLIP size-morphing action
+│   │   └── tooltip.ts            <-- Floating UI tooltip action
 │   ├── adapters/
 │   │   └── void-engine.svelte.ts <-- ⚡ The Reactive Brain (State)
 │   ├── components/
 │   │   ├── core/
-│   │   │   └── ThemeScript.astro <-- 🚀 The Bootloader (Anti-FOUC)
+│   │   │   ├── ThemeScript.astro <-- 🚀 The Bootloader (Anti-FOUC)
+│   │   │   └── AtmosphereScope.svelte <-- Theme context provider
+│   │   ├── icons/                <-- 🎨 Interactive animated icons
+│   │   ├── modals/               <-- Modal dialog fragments
+│   │   ├── ui/                   <-- Reusable UI components
+│   │   └── ui-library/           <-- Showcase / documentation pages
 │   ├── config/
 │   │   ├── constants.ts          <-- Shared Keys (Storage/Attr)
 │   │   ├── design-tokens.ts      <-- 🧠 EDIT THIS (Single Source of Truth)
+│   │   ├── font-registry.ts      <-- 🤖 Generated (Font preload map)
 │   │   ├── modal-registry.ts     <-- Modal Component Map
-│   │   ├── void-dna.json         <-- Raw Values (Grid/Spacing)
 │   │   ├── void-physics.json     <-- 🤖 Generated (Physics per preset)
 │   │   └── void-registry.json    <-- 🤖 Generated (Theme metadata)
 │   ├── lib/
@@ -105,15 +112,15 @@ We separate **Layout** (Geometry) from **Materials** (Physics).
 │   │   └── toast.svelte.ts       <-- Notification State
 │   ├── styles/
 │   │   ├── abstracts/            <-- Tools (No CSS Output)
-│   │   ├── base/                 <-- Global Resets
+│   │   ├── base/                 <-- Global Resets & Typography
 │   │   ├── components/           <-- "Materials" (Classes)
 │   │   ├── config/
-│   │   │   └── _generated-themes.scss <-- 🤖 Generated (SCSS Maps)
+│   │   │   ├── _generated-themes.scss <-- 🤖 Generated (SCSS Maps)
+│   │   │   └── _fonts.scss       <-- 🤖 Generated (@font-face)
 │   │   └── global.scss           <-- Main CSS Entry Point
 │   └── types/
 │       └── void-ui.d.ts          <-- Type Definitions
 ├── tailwind.config.mjs           <-- The Bridge (Maps Tokens to Tailwind)
-\
 ```
 
 ## 🔌 API Integration (Future Proofing)
