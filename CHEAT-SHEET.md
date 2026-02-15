@@ -578,19 +578,78 @@ Preset components with built-in layout and physics.
 
 ---
 
-#### `.dropzone`
+#### `<DropZone>` (File Upload)
 
-**Description:** Dashed sunk surface for file inputs
-**Physics:** Dashed border, recessed appearance
-**Interactive:** Border brightens on hover
+**Description:** Drag-and-drop file upload with click-to-browse fallback
+**Location:** [src/components/ui/DropZone.svelte](src/components/ui/DropZone.svelte)
+**CSS Class:** `.dropzone` ([src/styles/components/\_inputs.scss](src/styles/components/_inputs.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `accept` | `string` | `''` | File type filter (`.json,.csv`, `image/*`, `application/pdf`) |
+| `maxSize` | `number` | `0` | Maximum file size in bytes (0 = no limit) |
+| `multiple` | `boolean` | `false` | Allow multiple file selection |
+| `disabled` | `boolean` | `false` | Disable all interaction |
+| `onfiles` | `(files: File[]) => void` | — | Callback with validated files |
+| `class` | `string` | `''` | Consumer classes on outer `.dropzone` div |
+
+**States:** `idle` → `drag-active` → `has-files`
+
+| State | Visual | Attribute |
+| --- | --- | --- |
+| **idle** | Dashed border, Upload icon, prompt text | — |
+| **drag-active** | Energy-highlighted border/bg, "Release to upload" | `data-state="active"` |
+| **has-files** | FileCheck icon, file count + names | — |
 
 **Usage:**
 
 ```svelte
-<div class="dropzone flex-center">
-  <p>Drop files here</p>
-</div>
+<script lang="ts">
+  import DropZone from '@components/ui/DropZone.svelte';
+  import { toast } from '@stores/toast.svelte';
+</script>
+
+<!-- Basic (any single file) -->
+<DropZone
+  onfiles={(files) => toast.show(`Uploaded: ${files[0].name}`, 'success')}
+/>
+
+<!-- Restricted (type + size) -->
+<DropZone
+  accept=".json,.csv"
+  maxSize={2 * 1024 * 1024}
+  onfiles={(files) => toast.show(`Valid: ${files[0].name}`, 'success')}
+/>
+
+<!-- Multiple files -->
+<DropZone
+  multiple
+  onfiles={(files) => toast.show(`${files.length} files received`, 'info')}
+/>
+
+<!-- Disabled -->
+<DropZone disabled />
 ```
+
+**Architecture Notes:**
+
+| Decision | Rationale |
+| --- | --- |
+| **Drag counter pattern** | `dragCounter` (number, not boolean) increments on `dragenter`, decrements on `dragleave`. Prevents flicker when dragging over child elements. `drop` resets to 0. |
+| **Validation on drop** | Browsers don't enforce `accept` on drag-and-drop (only on file dialog). `validateFiles()` manually checks type and size on drop, reporting failures via toast. |
+| **Input value reset** | `input.value = ''` after reading files so re-selecting the same file still triggers `onchange`. |
+| **Keyboard access** | Outer `div` has `role="button"` + `tabindex={0}`. Enter/Space programmatically clicks the hidden `<input type="file">`. |
+| **No new SCSS** | Reuses existing `.dropzone` physics from `_inputs.scss` — dashed `glass-sunk` border, spring transitions, energy-highlighted active state. |
+
+**Physics:**
+
+- **Glass:** Blur + glow border on drag-over, energy-primary glow
+- **Flat:** Subtle shadow, solid border brightens
+- **Retro:** Hard dashed border, instant state change
+
+**Icons:** `Upload` (idle) → `FileCheck` (files selected), both from `@lucide/svelte` with `class="icon" data-size="xl"`.
 
 ---
 
@@ -1115,7 +1174,33 @@ await toast.promise(saveItems(items), {
 
 ---
 
-### I. Grid Layout with Responsive Columns
+### I. File Drop Zone
+
+```svelte
+<script lang="ts">
+  import DropZone from '@components/ui/DropZone.svelte';
+  import { toast } from '@stores/toast.svelte';
+</script>
+
+<!-- Basic single-file upload -->
+<DropZone
+  onfiles={(files) => toast.show(`Uploaded: ${files[0].name}`, 'success')}
+/>
+
+<!-- Restricted: JSON/CSV only, max 2 MB -->
+<DropZone
+  accept=".json,.csv"
+  maxSize={2 * 1024 * 1024}
+  onfiles={(files) => handleUpload(files)}
+/>
+
+<!-- Multiple files -->
+<DropZone multiple onfiles={(files) => handleBatchUpload(files)} />
+```
+
+---
+
+### J. Grid Layout with Responsive Columns
 
 ```svelte
 <div

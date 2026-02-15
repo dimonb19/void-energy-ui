@@ -527,8 +527,8 @@ export const VOID_TOKENS = {
         'energy-secondary': '#3875fa', // Blue
         'border-color': 'rgba(56, 117, 250, 0.2)',
         'text-main': '#ffffff',
-        'text-dim': 'rgba(255, 255, 255, 0.85)',
-        'text-mute': 'rgba(255, 255, 255, 0.6)',
+        'text-dim': '#d9d9de',
+        'text-mute': '#9999a6',
       },
     },
 
@@ -550,7 +550,7 @@ export const VOID_TOKENS = {
         'border-color': 'rgba(255, 255, 255, 0.15)',
         'text-main': '#ffffff',
         'text-dim': '#a3a3a3',
-        'text-mute': 'rgba(163, 163, 163, 0.75)', // Increased from 0.6 for WCAG AA compliance (~4.1:1 contrast)
+        'text-mute': '#7a7a7a',
       },
     },
 
@@ -571,8 +571,8 @@ export const VOID_TOKENS = {
         'energy-secondary': '#f5c518',
         'border-color': 'rgba(245, 197, 24, 0.5)',
         'text-main': '#f5c518',
-        'text-dim': 'rgba(245, 197, 24, 0.7)',
-        'text-mute': 'rgba(245, 197, 24, 0.5)',
+        'text-dim': '#ad8b12',
+        'text-mute': '#7d650f',
         'color-premium': '#33e2e6',
       },
     },
@@ -594,8 +594,8 @@ export const VOID_TOKENS = {
         'energy-secondary': '#8b5cf6',
         'border-color': 'rgba(217, 70, 239, 0.2)',
         'text-main': '#fdf4ff',
-        'text-dim': 'rgba(230, 210, 255, 0.9)',
-        'text-mute': 'rgba(230, 210, 255, 0.6)',
+        'text-dim': '#d0bde8',
+        'text-mute': '#8e7ea1',
       },
     },
 
@@ -616,8 +616,8 @@ export const VOID_TOKENS = {
         'energy-secondary': '#b8860b',
         'border-color': 'rgba(255, 170, 0, 0.25)',
         'text-main': '#fffbea',
-        'text-dim': 'rgba(255, 248, 220, 0.85)',
-        'text-mute': 'rgba(255, 248, 220, 0.6)',
+        'text-dim': '#dbd4bb',
+        'text-mute': '#a09984',
       },
     },
 
@@ -638,8 +638,8 @@ export const VOID_TOKENS = {
         'energy-secondary': '#ffd700',
         'border-color': 'rgba(57, 255, 20, 0.2)',
         'text-main': '#f0fff4',
-        'text-dim': 'rgba(200, 255, 200, 0.8)',
-        'text-mute': 'rgba(200, 255, 200, 0.6)',
+        'text-dim': '#a1d1a2',
+        'text-mute': '#7aa37c',
       },
     },
 
@@ -660,8 +660,8 @@ export const VOID_TOKENS = {
         'energy-secondary': '#c71585',
         'border-color': 'rgba(255, 128, 160, 0.2)',
         'text-main': '#fff0f5',
-        'text-dim': 'rgba(255, 200, 220, 0.9)',
-        'text-mute': 'rgba(255, 180, 200, 0.7)',
+        'text-dim': '#e8b5c8',
+        'text-mute': '#ba8091',
       },
     },
 
@@ -682,8 +682,8 @@ export const VOID_TOKENS = {
         'energy-secondary': '#8a0000',
         'border-color': 'rgba(255, 107, 107, 0.2)',
         'text-main': '#ffe5e5',
-        'text-dim': 'rgba(255, 200, 200, 0.9)',
-        'text-mute': 'rgba(255, 180, 180, 0.7)',
+        'text-dim': '#e8b5b5',
+        'text-mute': '#ba8080',
       },
     },
 
