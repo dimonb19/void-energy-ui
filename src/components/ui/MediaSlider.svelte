@@ -29,6 +29,7 @@
   import Voice from '@components/icons/Voice.svelte';
   import Music from '@components/icons/Music.svelte';
   import Restart from '@components/icons/Restart.svelte';
+  import IconBtn from './IconBtn.svelte';
 
   interface MediaSliderProps {
     value: number;
@@ -50,8 +51,6 @@
     class: className = '',
   }: MediaSliderProps = $props();
 
-  let replayHover = $state(false);
-
   function toggleMute() {
     if (disabled) return;
     muted = !muted;
@@ -63,23 +62,17 @@
 </script>
 
 <div
-  class="media-slider flex items-center gap-sm {className}"
+  class="media-slider flex items-center gap-xs {className}"
   data-muted={muted}
 >
-  <button
-    class="btn-void"
-    type="button"
+  <IconBtn
+    icon={icon === 'music' ? Music : Voice}
+    iconProps={{ 'data-muted': muted }}
     onclick={toggleMute}
     {disabled}
     aria-label={muted ? 'Unmute' : 'Mute'}
     aria-pressed={muted}
-  >
-    {#if icon === 'music'}
-      <Music data-muted={muted} data-size="lg" />
-    {:else}
-      <Voice data-muted={muted} data-size="lg" />
-    {/if}
-  </button>
+  />
 
   <input
     type="range"
@@ -90,16 +83,11 @@
   />
 
   {#if replay}
-    <button
-      class="btn-void"
-      type="button"
-      onclick={handleReplay}
+    <IconBtn
+      icon={Restart}
       {disabled}
+      onclick={handleReplay}
       aria-label="Replay"
-      onpointerenter={() => (replayHover = true)}
-      onpointerleave={() => (replayHover = false)}
-    >
-      <Restart data-state={replayHover ? 'active' : ''} data-size="lg" />
-    </button>
+    />
   {/if}
 </div>

@@ -1,5 +1,6 @@
 <script lang="ts">
   import Selector from '../ui/Selector.svelte';
+  import IconBtn from '../ui/IconBtn.svelte';
 
   // Custom icons
   import ArrowBack from '@components/icons/ArrowBack.svelte';
@@ -73,25 +74,6 @@
   let fullscreenActive = $state(false);
   let musicActive = $state(false);
   let voiceActive = $state(false);
-
-  // Hover state (pointer enter/leave)
-  let contractFocus = $state(false);
-  let removeFocus = $state(false);
-  let doorInFocus = $state(false);
-  let doorOutFocus = $state(false);
-  let editFocus = $state(false);
-  let fullscreenFocus = $state(false);
-  let caretFocus = $state(false);
-  let playFocus = $state(false);
-  let quitFocus = $state(false);
-  let refreshFocus = $state(false);
-  let undoFocus = $state(false);
-  let restartFocus = $state(false);
-  let searchFocus = $state(false);
-  let searchZoomInFocus = $state(false);
-  let searchZoomOutFocus = $state(false);
-  let sortFocus = $state(false);
-  let switchFocus = $state(false);
 </script>
 
 <section class="flex flex-col gap-md mt-md">
@@ -116,60 +98,52 @@
         class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
       >
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
+          <IconBtn
+            icon={Burger}
+            size={iconSize}
+            iconProps={{ 'data-state': burgerActive ? 'active' : '' }}
             onclick={() => (burgerActive = !burgerActive)}
-          >
-            <Burger
-              data-state={burgerActive ? 'active' : ''}
-              data-size={iconSize}
-            />
-          </button>
+          />
           <span class="text-caption text-mute">Burger</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button class="btn-void" onclick={() => (eyeActive = !eyeActive)}>
-            <Eye id="eye-demo" data-size={iconSize} data-muted={eyeActive} />
-          </button>
+          <IconBtn
+            icon={Eye}
+            size={iconSize}
+            iconProps={{ id: 'eye-demo', 'data-muted': eyeActive }}
+            onclick={() => (eyeActive = !eyeActive)}
+          />
           <span class="text-caption text-mute">Eye</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button class="btn-void" onclick={() => (musicActive = !musicActive)}>
-            <Music
-              id="music-demo"
-              data-size={iconSize}
-              data-muted={musicActive}
-            />
-          </button>
+          <IconBtn
+            icon={Music}
+            size={iconSize}
+            iconProps={{ id: 'music-demo', 'data-muted': musicActive }}
+            onclick={() => (musicActive = !musicActive)}
+          />
           <span class="text-caption text-mute">Music</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button class="btn-void" onclick={() => (voiceActive = !voiceActive)}>
-            <Voice
-              id="voice-demo"
-              data-size={iconSize}
-              data-muted={voiceActive}
-            />
-          </button>
+          <IconBtn
+            icon={Voice}
+            size={iconSize}
+            iconProps={{ id: 'voice-demo', 'data-muted': voiceActive }}
+            onclick={() => (voiceActive = !voiceActive)}
+          />
           <span class="text-caption text-mute">Voice</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
+          <IconBtn
+            icon={Fullscreen}
+            size={iconSize}
+            iconProps={{ 'data-fullscreen': fullscreenActive }}
             onclick={() => (fullscreenActive = !fullscreenActive)}
-            onpointerenter={() => (fullscreenFocus = true)}
-            onpointerleave={() => (fullscreenFocus = false)}
-          >
-            <Fullscreen
-              data-state={fullscreenFocus ? 'active' : ''}
-              data-size={iconSize}
-              data-fullscreen={fullscreenActive}
-            />
-          </button>
+          />
           <span class="text-caption text-mute">Fullscreen</span>
         </div>
       </div>
@@ -192,46 +166,25 @@
         class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
       >
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
-            onpointerenter={() => (searchFocus = true)}
-            onpointerleave={() => (searchFocus = false)}
-          >
-            <Search
-              data-state={searchFocus ? 'active' : ''}
-              data-size={iconSize}
-            />
-          </button>
+          <IconBtn icon={Search} size={iconSize} />
           <span class="text-caption text-mute">Search</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
-            onpointerenter={() => (searchZoomInFocus = true)}
-            onpointerleave={() => (searchZoomInFocus = false)}
-          >
-            <Search
-              data-state={searchZoomInFocus ? 'active' : ''}
-              data-size={iconSize}
-              data-zoom="in"
-            />
-          </button>
+          <IconBtn
+            icon={Search}
+            size={iconSize}
+            iconProps={{ 'data-zoom': 'in' }}
+          />
           <span class="text-caption text-mute">Zoom-in</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
-            onpointerenter={() => (searchZoomOutFocus = true)}
-            onpointerleave={() => (searchZoomOutFocus = false)}
-          >
-            <Search
-              data-state={searchZoomOutFocus ? 'active' : ''}
-              data-size={iconSize}
-              data-zoom="out"
-            />
-          </button>
+          <IconBtn
+            icon={Search}
+            size={iconSize}
+            iconProps={{ 'data-zoom': 'out' }}
+          />
           <span class="text-caption text-mute">Zoom-out</span>
         </div>
       </div>
@@ -244,52 +197,22 @@
         class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
       >
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
-            onpointerenter={() => (playFocus = true)}
-            onpointerleave={() => (playFocus = false)}
-          >
-            <Play data-state={playFocus ? 'active' : ''} data-size={iconSize} />
-          </button>
+          <IconBtn icon={Play} size={iconSize} />
           <span class="text-caption text-mute">Play</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
-            onpointerenter={() => (restartFocus = true)}
-            onpointerleave={() => (restartFocus = false)}
-          >
-            <Restart
-              data-state={restartFocus ? 'active' : ''}
-              data-size={iconSize}
-            />
-          </button>
+          <IconBtn icon={Restart} size={iconSize} />
           <span class="text-caption text-mute">Restart</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
-            onpointerenter={() => (refreshFocus = true)}
-            onpointerleave={() => (refreshFocus = false)}
-          >
-            <Refresh
-              data-state={refreshFocus ? 'active' : ''}
-              data-size={iconSize}
-            />
-          </button>
+          <IconBtn icon={Refresh} size={iconSize} />
           <span class="text-caption text-mute">Refresh</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
-            onpointerenter={() => (undoFocus = true)}
-            onpointerleave={() => (undoFocus = false)}
-          >
-            <Undo data-state={undoFocus ? 'active' : ''} data-size={iconSize} />
-          </button>
+          <IconBtn icon={Undo} size={iconSize} />
           <span class="text-caption text-mute">Undo</span>
         </div>
       </div>
@@ -302,62 +225,38 @@
         class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
       >
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
-            onpointerenter={() => (doorInFocus = true)}
-            onpointerleave={() => (doorInFocus = false)}
-          >
-            <DoorIn
-              id="door-in-demo"
-              data-state={doorInFocus ? 'active' : ''}
-              data-size={iconSize}
-            />
-          </button>
+          <IconBtn
+            icon={DoorIn}
+            size={iconSize}
+            iconProps={{ id: 'door-in-demo' }}
+          />
           <span class="text-caption text-mute">DoorIn</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
-            onpointerenter={() => (doorOutFocus = true)}
-            onpointerleave={() => (doorOutFocus = false)}
-          >
-            <DoorOut
-              id="door-out-demo"
-              data-state={doorOutFocus ? 'active' : ''}
-              data-size={iconSize}
-            />
-          </button>
+          <IconBtn
+            icon={DoorOut}
+            size={iconSize}
+            iconProps={{ id: 'door-out-demo' }}
+          />
           <span class="text-caption text-mute">DoorOut</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
-            onpointerenter={() => (quitFocus = true)}
-            onpointerleave={() => (quitFocus = false)}
-          >
-            <Quit
-              id="quit-demo"
-              data-state={quitFocus ? 'active' : ''}
-              data-size={iconSize}
-            />
-          </button>
+          <IconBtn
+            icon={Quit}
+            size={iconSize}
+            iconProps={{ id: 'quit-demo' }}
+          />
           <span class="text-caption text-mute">Quit</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
-            onpointerenter={() => (switchFocus = true)}
-            onpointerleave={() => (switchFocus = false)}
-          >
-            <Switch
-              id="switch-demo"
-              data-state={switchFocus ? 'active' : ''}
-              data-size={iconSize}
-            />
-          </button>
+          <IconBtn
+            icon={Switch}
+            size={iconSize}
+            iconProps={{ id: 'switch-demo' }}
+          />
           <span class="text-caption text-mute">Switch</span>
         </div>
       </div>
@@ -370,84 +269,42 @@
         class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
       >
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
-            onpointerenter={() => (editFocus = true)}
-            onpointerleave={() => (editFocus = false)}
-          >
-            <Edit data-state={editFocus ? 'active' : ''} data-size={iconSize} />
-          </button>
+          <IconBtn icon={Edit} size={iconSize} />
           <span class="text-caption text-mute">Edit</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
+          <IconBtn
+            icon={Copy}
+            size={iconSize}
+            iconProps={{ 'data-state': copyActive ? 'active' : '' }}
             onclick={() => {
               copyActive = true;
               setTimeout(() => {
                 copyActive = false;
               }, 1000);
             }}
-          >
-            <Copy
-              data-state={copyActive ? 'active' : ''}
-              data-size={iconSize}
-            />
-          </button>
+          />
           <span class="text-caption text-mute">Copy</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
-            onpointerenter={() => (removeFocus = true)}
-            onpointerleave={() => (removeFocus = false)}
-          >
-            <Remove
-              data-state={removeFocus ? 'active' : ''}
-              data-size={iconSize}
-            />
-          </button>
+          <IconBtn icon={Remove} size={iconSize} />
           <span class="text-caption text-mute">Remove</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
-            onpointerenter={() => (contractFocus = true)}
-            onpointerleave={() => (contractFocus = false)}
-          >
-            <Contract
-              data-state={contractFocus ? 'active' : ''}
-              data-size={iconSize}
-            />
-          </button>
+          <IconBtn icon={Contract} size={iconSize} />
           <span class="text-caption text-mute">Contract</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
-            onpointerenter={() => (sortFocus = true)}
-            onpointerleave={() => (sortFocus = false)}
-          >
-            <Sort data-state={sortFocus ? 'active' : ''} data-size={iconSize} />
-          </button>
+          <IconBtn icon={Sort} size={iconSize} />
           <span class="text-caption text-mute">Sort</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <button
-            class="btn-void"
-            onpointerenter={() => (caretFocus = true)}
-            onpointerleave={() => (caretFocus = false)}
-          >
-            <Caret
-              data-state={caretFocus ? 'active' : ''}
-              data-size={iconSize}
-            />
-          </button>
+          <IconBtn icon={Caret} size={iconSize} />
           <span class="text-caption text-mute">Caret</span>
         </div>
       </div>

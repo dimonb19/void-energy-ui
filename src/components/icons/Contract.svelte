@@ -46,21 +46,11 @@
 </svg>
 
 <style lang="scss">
-  .icon-contract-paper {
-    transition: opacity var(--speed-base) var(--ease-spring-snappy);
-  }
-
   .icon-contract-hammer {
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  :global(.icon-contract[data-state='active']) {
-    .icon-contract-paper {
-      opacity: 0.75;
-    }
-
-    .icon-contract-hammer {
-      transform: scale(1.1) translate(-5%, -2.5%);
-    }
+  :global(.icon-contract[data-state='active'] .icon-contract-hammer) {
+    transform: scale(1.1) translate(-5%, -2.5%);
   }
 </style>

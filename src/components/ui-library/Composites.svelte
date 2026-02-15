@@ -8,6 +8,8 @@
   import MediaSlider from '../ui/MediaSlider.svelte';
   import type { Component } from 'svelte';
   import ActionBtn from '../ui/ActionBtn.svelte';
+  import IconBtn from '../ui/IconBtn.svelte';
+  import ThemesBtn from '../ui/ThemesBtn.svelte';
   import Selector from '../ui/Selector.svelte';
 
   import Play from '../icons/Play.svelte';
@@ -258,6 +260,71 @@
           class="flex-1"
         />
       </div>
+    </div>
+
+    <!-- ─── ICON BUTTON ────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-xs">
+      <h5>Icon Button</h5>
+      <p class="text-small text-mute">
+        <code>IconBtn</code> is a circular icon-only button (<code
+          >.btn-icon</code
+        >) that forwards hover state to the icon via <code>data-state</code>. It
+        encapsulates the hover tracking boilerplate — no manual
+        <code>onpointerenter</code>/<code>onpointerleave</code> needed. Compare
+        with <code>ActionBtn</code> which adds a text label and styled button variants.
+      </p>
+
+      <div class="surface-sunk p-md flex justify-center items-center gap-md">
+        <IconBtn
+          icon={Play}
+          onclick={() => toast.show('Play triggered', 'info')}
+        />
+        <IconBtn
+          icon={Refresh}
+          onclick={() => toast.show('Refresh triggered', 'info')}
+        />
+        <IconBtn
+          icon={Remove}
+          onclick={() => toast.show('Remove triggered', 'info')}
+        />
+        <IconBtn
+          icon={Undo}
+          onclick={() => toast.show('Undo triggered', 'info')}
+        />
+        <IconBtn
+          icon={Sort}
+          onclick={() => toast.show('Sort triggered', 'info')}
+        />
+      </div>
+
+      <p class="text-caption text-mute px-xs">
+        Props: <code>icon</code> (Component),
+        <code>size</code> (icon size scale, default <code>lg</code>),
+        <code>class</code> (additional classes). All native button attributes
+        pass through (<code>onclick</code>,
+        <code>disabled</code>, <code>aria-*</code>).
+      </p>
+    </div>
+
+    <!-- ─── THEME BUTTON ──────────────────────────────────────────── -->
+    <div class="flex flex-col gap-xs">
+      <h5>Theme Button</h5>
+      <p class="text-small text-mute">
+        <code>ThemesBtn</code> combines a Lucide Moon/Sun icon with a button
+        that opens the theme modal. The icon switches reactively based on the
+        current color mode. Supports a labeled variant (default) and an
+        icon-only variant via the <code>icon</code> prop.
+      </p>
+
+      <div class="surface-sunk p-md flex justify-center items-center gap-md">
+        <ThemesBtn />
+        <ThemesBtn icon size="xl" />
+      </div>
+
+      <p class="text-caption text-mute px-xs">
+        Props: <code>icon</code> (boolean — icon-only mode),
+        <code>size</code> (icon size scale), <code>class</code> (style variants).
+      </p>
     </div>
   </div>
 </section>

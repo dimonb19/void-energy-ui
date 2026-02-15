@@ -3,7 +3,7 @@
   import { materialize, dematerialize } from '@lib/transitions.svelte';
   import { morph } from '@actions/morph';
 
-  import ThemeSelector from './ui/Themes.svelte';
+  import ThemesBtn from './ui/ThemesBtn.svelte';
 
   import Burger from './icons/Burger.svelte';
   import LogoDGRS from './icons/LogoDGRS.svelte';
@@ -53,8 +53,8 @@
       ],
     },
     {
-      id: 'ThemeSelector',
-      component: ThemeSelector,
+      id: 'theme',
+      component: ThemesBtn,
       props: { class: 'btn-void subtab flex-row-reverse' },
     },
   ];

@@ -22,6 +22,7 @@
 -->
 <script lang="ts">
   import Eye from '@components/icons/Eye.svelte';
+  import IconBtn from './IconBtn.svelte';
 
   interface PasswordFieldProps {
     value: string;
@@ -52,14 +53,12 @@
     bind:value
   />
   <span class="field-slot-right">
-    <button
-      class="btn-void"
-      type="button"
+    <IconBtn
+      icon={Eye}
+      iconProps={{ 'data-muted': !visible }}
       onclick={toggleVisibility}
       aria-label={visible ? 'Hide password' : 'Show password'}
       aria-pressed={visible}
-    >
-      <Eye data-muted={!visible} data-size="lg" />
-    </button>
+    />
   </span>
 </div>

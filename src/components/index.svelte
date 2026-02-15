@@ -8,7 +8,7 @@
   import { voidEngine } from '@adapters/void-engine.svelte';
   import { morph } from '@actions/morph';
 
-  import ThemeSelector from './ui/Themes.svelte';
+  import ThemesBtn from './ui/ThemesBtn.svelte';
   import SettingsRow from './ui/SettingsRow.svelte';
   import PullRefresh from './ui/PullRefresh.svelte';
   import Toggle from './ui/Toggle.svelte';
@@ -118,7 +118,7 @@
         and contracting its geometry to match the density of the task at hand.
       </p>
       <span class="flex justify-center">
-        <ThemeSelector class="btn-cta" />
+        <ThemesBtn class="btn-cta" />
       </span>
       <div class="surface-sunk p-lg flex flex-col gap-sm">
         <h3>The Hybrid Protocol</h3>

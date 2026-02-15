@@ -32,6 +32,7 @@
     icon: Component;
     text?: string;
     class?: string;
+    size?: string;
   }
 
   let {
@@ -39,6 +40,7 @@
     text = '',
     class: className = '',
     disabled = false,
+    size = 'lg',
     ...rest
   }: ActionBtnProps = $props();
 
@@ -53,6 +55,6 @@
   onpointerleave={() => (hovered = false)}
   {...rest}
 >
-  <Icon data-state={hovered ? 'active' : ''} data-size="lg" />
+  <Icon data-state={hovered ? 'active' : ''} data-size={size} />
   {text}
 </button>

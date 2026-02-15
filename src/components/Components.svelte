@@ -11,7 +11,7 @@
   import Icons from './ui-library/Icons.svelte';
   import Composites from './ui-library/Composites.svelte';
 
-  import ThemeSelector from './ui/Themes.svelte';
+  import ThemesBtn from './ui/ThemesBtn.svelte';
   import SettingsRow from './ui/SettingsRow.svelte';
   import PullRefresh from './ui/PullRefresh.svelte';
   import Toggle from './ui/Toggle.svelte';
@@ -168,7 +168,7 @@
           >
             Initiate Sequence
           </button>
-          <ThemeSelector class="btn-cta" />
+          <ThemesBtn class="btn-cta" />
           <button
             class="btn-premium"
             onclick={() => {

@@ -96,6 +96,7 @@
 // =========================================
 
 html {
+  scrollbar-gutter: stable;
   scroll-behavior: smooth;
 
   // Disable native pull-to-refresh globally.
@@ -104,6 +105,10 @@ html {
   overscroll-behavior-y: none;
   padding-block: 0;
   overflow-x: hidden;
+
+  &:has(dialog[open]) {
+    overflow-y: hidden;
+  }
 
   // Keep fluid math stable on mobile rotation.
   -webkit-text-size-adjust: 100%;

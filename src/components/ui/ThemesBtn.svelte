@@ -4,19 +4,21 @@
   import { Sun, Moon } from '@lucide/svelte';
 
   let {
-    icon = false,
     class: className = '',
+    icon = false,
+    size = 'lg',
   }: {
-    icon?: boolean;
     class?: string;
+    icon?: boolean;
+    size?: string;
   } = $props();
 </script>
 
 <button class={className} class:btn-icon={icon} onclick={() => modal.themes()}>
   {#if voidEngine.currentTheme.mode === 'dark'}
-    <Moon class="icon" />
+    <Moon class="icon" data-size={size} />
   {:else}
-    <Sun class="icon" />
+    <Sun class="icon" data-size={size} />
   {/if}
   {#if !icon}
     Theme:

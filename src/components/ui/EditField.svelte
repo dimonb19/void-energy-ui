@@ -34,6 +34,7 @@
   import { Check } from '@lucide/svelte';
   import Edit from '@components/icons/Edit.svelte';
   import Undo from '@components/icons/Undo.svelte';
+  import IconBtn from './IconBtn.svelte';
 
   interface EditFieldProps {
     value: string;
@@ -55,9 +56,6 @@
   let draft = $state('');
   let inputEl: HTMLInputElement | undefined = $state();
   let unchanged = $derived(draft === value);
-
-  // Hover states for icon animations
-  let undoHover = $state(false);
 
   function startEdit() {
     if (disabled) return;
@@ -91,17 +89,12 @@
 <div class="field edit-field {className}">
   {#if editing}
     <span class="field-slot-left">
-      <button
-        class="btn-void"
-        type="button"
+      <IconBtn
+        icon={Undo}
         disabled={unchanged}
         onclick={reset}
         aria-label="Reset"
-        onpointerenter={() => (undoHover = true)}
-        onpointerleave={() => (undoHover = false)}
-      >
-        <Undo data-state={undoHover ? 'active' : ''} data-size="lg" />
-      </button>
+      />
     </span>
   {/if}
   <input
@@ -116,25 +109,20 @@
   />
   <span class="field-slot-right">
     {#if !editing}
-      <button
-        class="btn-void"
-        type="button"
+      <IconBtn
+        icon={Edit}
+        iconProps={{ 'data-state': 'active' }}
         onclick={startEdit}
         {disabled}
         aria-label="Edit"
-      >
-        <Edit data-state="active" data-size="lg" />
-      </button>
+      />
     {:else}
-      <button
-        class="btn-void"
-        type="button"
+      <IconBtn
+        icon={Check}
         disabled={unchanged}
         onclick={confirm}
         aria-label="Confirm"
-      >
-        <Check class="icon" data-size="lg" />
-      </button>
+      />
     {/if}
   </span>
 </div>

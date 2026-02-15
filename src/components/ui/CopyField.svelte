@@ -21,6 +21,7 @@
 -->
 <script lang="ts">
   import Copy from '@components/icons/Copy.svelte';
+  import IconBtn from './IconBtn.svelte';
   import { toast } from '@stores/toast.svelte';
 
   interface CopyFieldProps {
@@ -61,13 +62,11 @@
 <div class="field copy-field {className}">
   <input type="text" readonly {value} tabindex={-1} onfocus={selectAll} />
   <span class="field-slot-right">
-    <button
-      class="btn-void"
-      type="button"
+    <IconBtn
+      icon={Copy}
+      iconProps={{ 'data-state': copied ? 'active' : '' }}
       onclick={copyToClipboard}
       aria-label="Copy to clipboard"
-    >
-      <Copy data-state={copied ? 'active' : ''} data-size="lg" />
-    </button>
+    />
   </span>
 </div>

@@ -95,19 +95,18 @@ $_slot-width: var(--control-padding-x);
     pointer-events: auto;
     cursor: pointer;
 
-    @media (hover: hover) {
-      &:hover {
-        color: var(--energy-primary);
-      }
-    }
-
     &:disabled {
       color: var(--text-main);
       pointer-events: none;
       opacity: 0.5;
-      background: transparent;
-      border: none;
     }
+  }
+
+  // IconBtn inside slots: strip circle dimensions, stay inline
+  .btn-icon {
+    width: auto;
+    height: auto;
+    border-radius: 0;
   }
 }
 

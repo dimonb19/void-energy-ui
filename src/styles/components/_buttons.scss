@@ -407,4 +407,14 @@ button:not(.btn-void, .btn-icon),
   display: flex;
   align-items: center;
   justify-content: center;
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      filter: brightness(1.25);
+
+      @include when-light {
+        filter: brightness(0.75);
+      }
+    }
+  }
 }

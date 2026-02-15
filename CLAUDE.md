@@ -170,7 +170,8 @@ Icons inherit color from their parent via `currentColor`. Color is always decide
 
 - **Inside a button/container**: icon inherits parent color — no class needed
 - **Standalone semantic indicator**: apply Tailwind class — `<Check class="icon text-success" />`
-- **Hover color transitions**: set on parent — `<button class="text-mute hover:text-error"><X class="icon" /></button>`
+- **Icon button hover**: `.btn-icon` uses `filter: brightness()` — no `hover:text-*` needed
+- **Inline icon hover** (non-btn-icon): set on parent — `<button class="text-mute hover:text-error"><X class="icon" /></button>`
 - **Component-scoped color**: use SCSS on parent — `.toast-icon { color: var(--toast-accent); }`
 
 ### Icon Rules
