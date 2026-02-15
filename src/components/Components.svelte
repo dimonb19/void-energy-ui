@@ -10,6 +10,7 @@
 
   import Icons from './ui-library/Icons.svelte';
   import Composites from './ui-library/Composites.svelte';
+  import DataUpload from './ui-library/DataUpload.svelte';
 
   import ThemesBtn from './ui/ThemesBtn.svelte';
   import SettingsRow from './ui/SettingsRow.svelte';
@@ -492,18 +493,6 @@
 
     <Composites />
 
-    <section class="flex flex-col gap-md my-md">
-      <h2>05 // DATA UPLOAD</h2>
-
-      <div class="p-md surface-glass">
-        <div class="dropzone">
-          <input type="file" />
-          <div class="dropzone-content">
-            <span class="btn-icon">📂</span>
-            <p>Upload Neural Patterns</p>
-          </div>
-        </div>
-      </div>
-    </section>
+    <DataUpload />
   </div>
 </PullRefresh>
