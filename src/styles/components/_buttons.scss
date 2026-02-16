@@ -502,16 +502,16 @@ button:not(.btn-void, .btn-icon),
   // Uses _btn-variant mixin defined above
   // ========================================================================
 
-  &.btn-premium:not(:disabled) {
+  &.btn-premium:not(:disabled, .btn-ghost) {
     @include _btn-variant(var(--color-premium));
   }
-  &.btn-system:not(:disabled) {
+  &.btn-system:not(:disabled, .btn-ghost) {
     @include _btn-variant(var(--color-system));
   }
-  &.btn-signal:not(:disabled) {
+  &.btn-signal:not(:disabled, .btn-ghost) {
     @include _btn-variant(var(--color-success));
   }
-  &.btn-alert:not(:disabled) {
+  &.btn-alert:not(:disabled, .btn-ghost) {
     @include _btn-variant(var(--color-error));
   }
 

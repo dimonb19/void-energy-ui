@@ -3,14 +3,11 @@
   import { tooltip } from '@actions/tooltip';
   import { toast } from '@stores/toast.svelte';
   import { live, implode } from '@lib/transitions.svelte';
-
   import { FONTS } from '@config/design-tokens';
   import { voidEngine } from '@adapters/void-engine.svelte';
   import { morph } from '@actions/morph';
 
-  import Icons from './ui-library/Icons.svelte';
-  import Composites from './ui-library/Composites.svelte';
-  import DataUpload from './ui-library/DataUpload.svelte';
+  import { Moon, Sun } from '@lucide/svelte';
 
   import ThemesBtn from './ui/ThemesBtn.svelte';
   import SettingsRow from './ui/SettingsRow.svelte';
@@ -18,7 +15,10 @@
   import Toggle from './ui/Toggle.svelte';
   import Selector from './ui/Selector.svelte';
 
-  import { Moon, Sun } from '@lucide/svelte';
+  import Icons from './ui-library/Icons.svelte';
+  import Composites from './ui-library/Composites.svelte';
+  import DataUpload from './ui-library/DataUpload.svelte';
+  import FloatingUI from './ui-library/FloatingUI.svelte';
 
   // Pull-to-refresh handlers
   async function handleRefresh(): Promise<void> {
@@ -510,5 +510,7 @@
     <Composites />
 
     <DataUpload />
+
+    <FloatingUI />
   </div>
 </PullRefresh>

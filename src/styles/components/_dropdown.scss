@@ -1,0 +1,90 @@
+/* Dropdown floating panel styles for trigger + popover content. */
+
+@use '../abstracts' as *;
+
+// ==========================================================================
+// WRAPPER
+// ==========================================================================
+
+.dropdown {
+  position: relative;
+  display: inline-flex;
+}
+
+// ==========================================================================
+// TRIGGER
+// ==========================================================================
+
+.dropdown-trigger {
+  @include btn-reset;
+
+  &:focus-visible {
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-base);
+  }
+}
+
+// ==========================================================================
+// PANEL
+// ==========================================================================
+
+.dropdown-panel {
+  // Popover reset.
+  border: none;
+  background: transparent;
+  margin: 0;
+  inset: unset;
+
+  // Physics surface.
+  @include glass-float($interactive: false);
+  @include glass-blur;
+
+  // Elevation.
+  box-shadow: var(--shadow-lift);
+
+  // Scrollable content.
+  overflow-y: auto;
+  @include laser-scrollbar;
+
+  // Typography inheritance.
+  color: var(--text-main);
+
+  // Default (closed) state.
+  opacity: 0;
+  transform: translateY(4px) scale(0.95); // void-ignore (Motion Physics)
+  filter: blur(calc(var(--physics-blur) / 2));
+  pointer-events: none;
+
+  // Spring transitions.
+  transition:
+    opacity var(--speed-base) var(--ease-spring-gentle),
+    transform var(--speed-base) var(--ease-spring-gentle),
+    filter var(--speed-base) var(--ease-spring-gentle);
+
+  // Open state.
+  @include when-state('open') {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+    pointer-events: auto;
+  }
+
+  // Retro overrides.
+  @include when-retro {
+    border-radius: 0;
+    transition: none;
+    filter: none;
+    background: var(--bg-canvas);
+  }
+
+  // Light mode overrides.
+  @include when-light {
+    filter: none;
+    background: var(--bg-surface);
+    border: var(--physics-border-width) solid var(--border-color);
+
+    @include when-state('open') {
+      filter: none;
+    }
+  }
+}
