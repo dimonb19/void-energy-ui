@@ -274,6 +274,42 @@ See [CHEAT-SHEET.md → The State Protocol](./CHEAT-SHEET.md#the-state-protocol-
 
 ---
 
+### The Native-First Protocol
+
+**Build on native HTML elements, not around them.**
+
+Components are thin wrappers that add layout, labeling, and physics styling. The browser owns behavior and accessibility; SCSS owns the material.
+
+#### Always Native
+
+`<button>`, `<input>`, `<select>`, `<textarea>`, `<dialog>`, `<details>`, `<fieldset>`, `<label>`
+
+#### Custom Only When
+
+No native element exists for the interaction (e.g., combobox/autocomplete, multi-thumb slider, virtualized data table).
+
+#### ✅ Correct
+
+```svelte
+<select onchange={handleChange}>
+  <option value="a">Option A</option>
+</select>
+```
+
+#### ❌ Incorrect
+
+```svelte
+<div role="listbox" onkeydown={handleKeydown}>
+  <div role="option">Option A</div>
+</div>
+```
+
+**Why?** Native elements provide built-in keyboard navigation, screen reader semantics, form integration, and mobile behavior for free. Custom reimplementations carry thousands of lines of accessibility debt.
+
+See [CLAUDE.md → Native-First Protocol](./CLAUDE.md#5-native-first-protocol) for details.
+
+---
+
 ### The Single Source of Truth
 
 **DO NOT** edit these generated files:
@@ -300,6 +336,7 @@ Ensure your PR meets these criteria:
 - [ ] **Code follows the Hybrid Protocol** (Layout = Tailwind, Material = SCSS)
 - [ ] **All tokens are semantic** (No magic numbers or hardcoded colors)
 - [ ] **State uses attributes, not classes** (`[data-state="..."]`, not `.is-active`)
+- [ ] **Components use native elements** (no custom reimplementations of `<select>`, `<dialog>`, etc.)
 - [ ] **Comments explain WHY, not WHAT**
 - [ ] **Theme works across all physics modes** (if applicable)
 - [ ] **No console errors or warnings**
@@ -335,6 +372,7 @@ When you open a PR, use this template:
 ## Checklist
 
 - [ ] I have followed the Hybrid Protocol
+- [ ] I have used native HTML elements (Native-First Protocol)
 - [ ] I have used semantic tokens (no magic numbers)
 - [ ] I have tested across multiple themes
 - [ ] I have tested across multiple density settings

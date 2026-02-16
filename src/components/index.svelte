@@ -238,6 +238,19 @@
             Spacing relaxes to improve focus. Ideal for <b>Reading Modes</b>.
           </li>
         </ul>
+
+        <br />
+
+        <h3>The Native Protocol</h3>
+        <p>
+          We build <strong>on</strong> native HTML elements, not around them.
+          Buttons are <code>&lt;button&gt;</code>, selects are
+          <code>&lt;select&gt;</code>, dialogs are <code>&lt;dialog&gt;</code>.
+          The browser owns behavior and accessibility; SCSS owns the material
+          physics. Components are thin wrappers that add layout, labeling, and
+          atmosphere &mdash; never reimplementations of what the platform
+          already provides. Simplicity is the architecture.
+        </p>
       </div>
     </div>
 

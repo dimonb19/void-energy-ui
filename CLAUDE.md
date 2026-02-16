@@ -182,7 +182,28 @@ Icons inherit color from their parent via `currentColor`. Color is always decide
 
 ---
 
-## 5. STATE MANAGEMENT & SINGLETONS
+## 5. NATIVE-FIRST PROTOCOL
+
+Components are thin wrappers around **native HTML elements** — they add layout, labeling, and physics styling, never behavior reimplementations. The browser owns interaction, accessibility, and form integration; SCSS owns the material.
+
+### Always Native
+`<button>`, `<input>`, `<select>`, `<textarea>`, `<dialog>`, `<details>`, `<fieldset>`, `<label>`
+
+### Custom Only When
+No native element exists for the interaction (e.g., combobox/autocomplete, multi-thumb slider, virtualized data table).
+
+### Reference Pattern
+`Selector.svelte` — wraps a native `<select>` with label association and layout. Zero custom dropdown JS. SCSS handles all physics.
+
+```
+CORRECT:  <select onchange={handleChange}>           (native behavior)
+CORRECT:  .select { @include glass-float; }           (SCSS physics on native element)
+WRONG:    <div role="listbox" on:keydown={...}>       (reimplenting <select> from scratch)
+```
+
+---
+
+## 6. STATE MANAGEMENT & SINGLETONS
 
 Import and use — never re-instantiate.
 
@@ -241,7 +262,7 @@ import { tooltip } from '@actions/tooltip'      use:tooltip={{ content, placemen
 
 ---
 
-## 6. DOM CONTRACT
+## 7. DOM CONTRACT
 
 The `<html>` element carries the runtime state:
 ```
@@ -257,7 +278,7 @@ Physics constraint rules (auto-enforced):
 
 ---
 
-## 7. MIGRATION PROTOCOL
+## 8. MIGRATION PROTOCOL
 
 1. **SCOPE:** Do exactly what is asked. One component, one file, one feature at a time.
 2. **READ FIRST:** Before writing code, read the existing file and any related SCSS/types.
@@ -269,7 +290,7 @@ Physics constraint rules (auto-enforced):
 
 ---
 
-## 8. GOTCHAS
+## 9. GOTCHAS
 
 - **Generated files are read-only.** Never edit `src/styles/config/_generated-themes.scss`, `void-registry.json`, or `void-physics.json`. Edit `src/config/design-tokens.ts` and run `npm run build:tokens`.
 - **`npm run scan` enforces Token Law.** It exits non-zero if magic pixel values are found in SCSS/Svelte files.
