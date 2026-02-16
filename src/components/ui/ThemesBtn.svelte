@@ -14,7 +14,12 @@
   } = $props();
 </script>
 
-<button class={className} class:btn-icon={icon} onclick={() => modal.themes()}>
+<button
+  class={className}
+  class:btn-icon={icon}
+  aria-label={icon ? `Theme: ${voidEngine.atmosphere}` : undefined}
+  onclick={() => modal.themes()}
+>
   {#if voidEngine.currentTheme.mode === 'dark'}
     <Moon class="icon" data-size={size} />
   {:else}

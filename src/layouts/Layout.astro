@@ -32,9 +32,10 @@ const { title = 'Void Energy UI' } = Astro.props;
     <ThemeScript />
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <Navigation client:load />
 
-    <main class="min-h-screen">
+    <main id="main-content" class="min-h-screen">
       <slot />
     </main>
 

@@ -17,27 +17,31 @@
 
   STATES:
   - idle: Input is readonly, Edit icon shown on right
-  - editing: Input is editable, Undo on left + Check on right
-  - unchanged: Both Undo and Check are disabled when draft matches original value
+  - editing: Input is editable, Undo + Check on right
+  - unchanged: Check is disabled when draft matches original value
 
   BEHAVIOR:
-  - Click Edit → unlocks input, shows Undo (left) + Check (right)
+  - Click Edit → unlocks input, shows Undo + Check (right)
   - Click Check → confirms edit, calls onconfirm, returns to idle
-  - Click Undo → restores original value, returns to idle
-  - Undo + Check disabled when text hasn't changed
+  - Click Undo → cancels editing, restores original value, returns to idle
+  - Undo is always active (allows immediate cancel)
+  - Check disabled when text hasn't changed
   - Hovering Check/Undo triggers their icon animations
-  - Enter confirms, Escape resets
+  - Enter confirms, Escape cancels
 
   @see /_fields.scss for field overlay anatomy
 -->
 <script lang="ts">
   import { Check } from '@lucide/svelte';
+  import { materialize, dematerialize } from '@lib/transitions.svelte';
+
+  import IconBtn from './IconBtn.svelte';
   import Edit from '@components/icons/Edit.svelte';
   import Undo from '@components/icons/Undo.svelte';
-  import IconBtn from './IconBtn.svelte';
 
   interface EditFieldProps {
     value: string;
+    id?: string;
     placeholder?: string;
     disabled?: boolean;
     onconfirm?: (value: string) => void;
@@ -46,11 +50,14 @@
 
   let {
     value = $bindable(''),
+    id,
     placeholder = '',
     disabled = false,
     onconfirm,
     class: className = '',
   }: EditFieldProps = $props();
+
+  const inputId = id ?? `edit-${Math.random().toString(36).slice(2, 9)}`;
 
   let editing = $state(false);
   let draft = $state('');
@@ -87,18 +94,9 @@
 </script>
 
 <div class="field edit-field {className}">
-  {#if editing}
-    <span class="field-slot-left">
-      <IconBtn
-        icon={Undo}
-        disabled={unchanged}
-        onclick={reset}
-        aria-label="Reset"
-      />
-    </span>
-  {/if}
   <input
     bind:this={inputEl}
+    id={inputId}
     type="text"
     {placeholder}
     {disabled}
@@ -107,22 +105,29 @@
     oninput={(e) => (draft = (e.target as HTMLInputElement).value)}
     onkeydown={handleKeydown}
   />
-  <span class="field-slot-right">
-    {#if !editing}
-      <IconBtn
-        icon={Edit}
-        iconProps={{ 'data-state': 'active' }}
-        onclick={startEdit}
-        {disabled}
-        aria-label="Edit"
-      />
-    {:else}
-      <IconBtn
-        icon={Check}
-        disabled={unchanged}
-        onclick={confirm}
-        aria-label="Confirm"
-      />
-    {/if}
-  </span>
+  {#key editing}
+    <span
+      class="field-slot-right"
+      in:materialize={{ y: 0 }}
+      out:dematerialize={{ y: 0 }}
+    >
+      {#if !editing}
+        <IconBtn
+          icon={Edit}
+          iconProps={{ 'data-state': 'active' }}
+          onclick={startEdit}
+          {disabled}
+          aria-label="Edit"
+        />
+      {:else}
+        <IconBtn icon={Undo} onclick={reset} aria-label="Cancel" />
+        <IconBtn
+          icon={Check}
+          disabled={unchanged}
+          onclick={confirm}
+          aria-label="Confirm"
+        />
+      {/if}
+    </span>
+  {/key}
 </div>

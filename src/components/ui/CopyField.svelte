@@ -26,10 +26,13 @@
 
   interface CopyFieldProps {
     value: string;
+    id?: string;
     class?: string;
   }
 
-  let { value, class: className = '' }: CopyFieldProps = $props();
+  let { value, id, class: className = '' }: CopyFieldProps = $props();
+
+  const inputId = id ?? `copy-${Math.random().toString(36).slice(2, 9)}`;
 
   let copied = $state(false);
   let timeout: ReturnType<typeof setTimeout>;
@@ -60,7 +63,7 @@
 </script>
 
 <div class="field copy-field {className}">
-  <input type="text" readonly {value} tabindex={-1} onfocus={selectAll} />
+  <input id={inputId} type="text" readonly {value} onfocus={selectAll} />
   <span class="field-slot-right">
     <IconBtn
       icon={Copy}

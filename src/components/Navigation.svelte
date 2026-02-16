@@ -183,7 +183,13 @@
   };
 </script>
 
-<svelte:window {onscroll} {onmousemove} />
+<svelte:window
+  {onscroll}
+  {onmousemove}
+  onkeydown={(e) => {
+    if (e.key === 'Escape' && sidebarOpen) sidebarOpen = false;
+  }}
+/>
 
 <nav
   class="nav-bar flex flex-row items-center justify-between tablet:justify-normal gap-xs px-xs"
@@ -225,11 +231,15 @@
 </nav>
 
 <!-- Mobile Nav Links -->
-<nav class="bottom-nav flex flex-row items-center justify-center tablet:hidden">
+<nav
+  class="bottom-nav flex flex-row items-center justify-center tablet:hidden"
+  aria-label="Mobile navigation"
+>
   {#each navItems as tab}
     <a
       class="tab"
       href={tab.href}
+      aria-label={tab.label}
       data-state={activeTab === tab.id ? 'active' : ''}
       onclick={(e) => selectTab(e, tab.id)}
     >
@@ -242,6 +252,7 @@
 
 {#if sidebarOpen}
   <div
+    id="burger-menu"
     class="sidebar flex flex-col items-center gap-xs"
     role="menu"
     aria-label="Dropdown"

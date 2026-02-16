@@ -552,20 +552,25 @@ button:not(.btn-void, .btn-icon),
 
 // Icon Button
 .btn-icon {
-  padding: 0;
-  width: var(--control-height);
-  height: var(--control-height);
-  border-radius: 50%;
+  padding: var(--space-xs);
+  min-width: var(--control-height);
+  min-height: var(--control-height);
+  border-radius: var(--radius-base);
   display: flex;
   align-items: center;
   justify-content: center;
 
   @media (hover: hover) {
     &:hover:not(:disabled) {
-      filter: brightness(1.25);
+      background: alpha(var(--energy-secondary), 8%);
 
       @include when-light {
-        filter: brightness(0.75);
+        background: alpha(var(--energy-primary), 8%);
+      }
+
+      @include when-retro {
+        background: transparent;
+        filter: brightness(1.25);
       }
     }
   }

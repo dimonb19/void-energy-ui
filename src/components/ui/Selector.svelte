@@ -62,7 +62,9 @@
   {/if}
   <select id={inputId} {disabled} onchange={handleChange} class={selectClass}>
     {#if placeholder}
-      <option value="" hidden selected={isEmpty(value)}>{placeholder}</option>
+      <option value="" disabled hidden selected={isEmpty(value)}
+        >{placeholder}</option
+      >
     {/if}
     {#each options as option (option.value)}
       <option

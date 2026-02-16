@@ -28,6 +28,7 @@
 
   interface SearchFieldProps {
     value: string;
+    id?: string;
     placeholder?: string;
     disabled?: boolean;
     zoom?: 'in' | 'out';
@@ -38,6 +39,7 @@
 
   let {
     value = $bindable(''),
+    id,
     placeholder = 'Search...',
     disabled = false,
     zoom,
@@ -45,6 +47,8 @@
     oninput,
     class: className = '',
   }: SearchFieldProps = $props();
+
+  const inputId = id ?? `search-${Math.random().toString(36).slice(2, 9)}`;
 
   let focused = $state(false);
 
@@ -63,6 +67,7 @@
 
 <div class="field search-field {className}">
   <input
+    id={inputId}
     type="search"
     {placeholder}
     {disabled}

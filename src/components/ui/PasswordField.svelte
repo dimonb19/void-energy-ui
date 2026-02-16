@@ -26,6 +26,7 @@
 
   interface PasswordFieldProps {
     value: string;
+    id?: string;
     placeholder?: string;
     disabled?: boolean;
     class?: string;
@@ -33,10 +34,13 @@
 
   let {
     value = $bindable(''),
+    id,
     placeholder = 'Enter password...',
     disabled = false,
     class: className = '',
   }: PasswordFieldProps = $props();
+
+  const inputId = id ?? `password-${Math.random().toString(36).slice(2, 9)}`;
 
   let visible = $state(false);
 
@@ -47,6 +51,7 @@
 
 <div class="field password-field {className}">
   <input
+    id={inputId}
     type={visible ? 'text' : 'password'}
     {placeholder}
     {disabled}

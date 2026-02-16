@@ -22,7 +22,7 @@
  * COMPOSITES USING THIS PATTERN:
  * - SearchField   : Search icon (left) + text input
  * - PasswordField : Password input + Eye toggle (right)
- * - EditField     : Undo (left, editing) + text input + Edit/Check (right)
+ * - EditField     : text input + Edit (idle) or Undo/Check (editing) on right
  * - CopyField     : Readonly input + Copy button (right)
  *
  * NON-FIELD COMPOSITES:
@@ -99,14 +99,27 @@ $_slot-width: var(--control-padding-x);
       color: var(--text-main);
       pointer-events: none;
       opacity: 0.5;
+      background: transparent;
+      border: none;
+      cursor: default;
     }
   }
 
-  // IconBtn inside slots: strip circle dimensions, stay inline
+  // IconBtn inside slots: strip dimensions, color-only hover
   .btn-icon {
     width: auto;
     height: auto;
+    min-width: 0;
+    min-height: 0;
     border-radius: 0;
+    padding: 0;
+
+    @media (hover: hover) {
+      &:hover:not(:disabled) {
+        background: transparent;
+        color: var(--energy-primary);
+      }
+    }
   }
 }
 

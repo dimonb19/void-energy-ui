@@ -64,7 +64,7 @@
       onoutrostart={() => (animatingOut = true)}
       onoutroend={() => (animatingOut = false)}
     >
-      <span class="toast-icon">
+      <span class="toast-icon" aria-hidden="true">
         {#if item.type === 'loading'}
           <SpinLoader class="text-main" data-size="lg" />
         {:else}

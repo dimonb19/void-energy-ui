@@ -168,6 +168,9 @@
     ? `${files.length} file${files.length > 1 ? 's' : ''} selected. Click to change.`
     : 'Drop files here or click to browse'}
   aria-disabled={disabled || undefined}
+  onclick={() => {
+    if (!disabled) inputEl?.click();
+  }}
   ondragenter={handleDragEnter}
   ondragover={handleDragOver}
   ondragleave={handleDragLeave}

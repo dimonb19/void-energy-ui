@@ -57,6 +57,7 @@
 <button
   class="btn-icon {className}"
   type="button"
+  data-size={size}
   onpointerenter={() => (hovered = true)}
   onpointerleave={() => (hovered = false)}
   {...rest}

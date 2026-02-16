@@ -87,7 +87,29 @@
 }
 
 // ==========================================================================
-// 2. REDUCED MOTION (The Kill Switch)
+// 2. SKIP NAVIGATION LINK
+// ==========================================================================
+// Invisible until focused — lets keyboard users jump past navigation.
+// ==========================================================================
+
+.skip-link {
+  position: absolute;
+  top: calc(-1 * var(--space-3xl));
+  left: var(--space-sm);
+  background: var(--bg-surface);
+  color: var(--text-main);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  z-index: 1000;
+  text-decoration: none;
+
+  &:focus {
+    top: var(--space-sm);
+  }
+}
+
+// ==========================================================================
+// 3. REDUCED MOTION (The Kill Switch)
 // ==========================================================================
 // Forces all animations to be instant for vestibular disorder users.
 // This single block handles 95% of motion safety.

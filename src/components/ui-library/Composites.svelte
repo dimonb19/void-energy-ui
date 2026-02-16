@@ -123,6 +123,7 @@
         <div class="flex flex-col gap-xs">
           <label for="search-field" class="text-small px-xs">SearchField</label>
           <SearchField
+            id="search-field"
             bind:value={searchValue}
             placeholder="Search modules..."
             onsubmit={(v) => toast.show(`Search: "${v}"`, 'info')}
@@ -139,6 +140,7 @@
             >PasswordField</label
           >
           <PasswordField
+            id="password-field"
             bind:value={passwordValue}
             placeholder="Enter access key..."
           />
@@ -152,6 +154,7 @@
         <div class="flex flex-col gap-xs">
           <label for="edit-field" class="text-small px-xs">EditField</label>
           <EditField
+            id="edit-field"
             bind:value={editValue}
             placeholder="Agent identifier..."
             onconfirm={(v) => toast.show(`Saved: "${v}"`, 'success')}
@@ -166,7 +169,7 @@
         <!-- CopyField -->
         <div class="flex flex-col gap-xs">
           <label for="copy-field" class="text-small px-xs">CopyField</label>
-          <CopyField value={copyValue} />
+          <CopyField id="copy-field" value={copyValue} />
           <p class="text-caption text-mute px-xs">
             Always readonly. Copy icon shows checkmark feedback for 2 seconds
             after copying to clipboard.
@@ -278,22 +281,27 @@
         <IconBtn
           icon={Play}
           onclick={() => toast.show('Play triggered', 'info')}
+          aria-label="Play"
         />
         <IconBtn
           icon={Refresh}
           onclick={() => toast.show('Refresh triggered', 'info')}
+          aria-label="Refresh"
         />
         <IconBtn
           icon={Remove}
           onclick={() => toast.show('Remove triggered', 'info')}
+          aria-label="Remove"
         />
         <IconBtn
           icon={Undo}
           onclick={() => toast.show('Undo triggered', 'info')}
+          aria-label="Undo"
         />
         <IconBtn
           icon={Sort}
           onclick={() => toast.show('Sort triggered', 'info')}
+          aria-label="Sort"
         />
       </div>
 

@@ -25,6 +25,10 @@
   }
 
   :global(.icon-undo[data-state='active']) {
-    transform: rotate(300deg);
+    transform: rotate(360deg);
+  }
+
+  :global([data-physics='flat'] .icon-undo) {
+    transition-duration: var(--speed-slow);
   }
 </style>

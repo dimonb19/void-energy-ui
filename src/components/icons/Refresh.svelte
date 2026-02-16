@@ -30,4 +30,8 @@
   :global(.icon-refresh[data-state='active']) {
     transform: rotate(180deg);
   }
+
+  :global([data-physics='flat'] .icon-refresh) {
+    transition-duration: var(--speed-slow);
+  }
 </style>

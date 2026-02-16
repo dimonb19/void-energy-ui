@@ -45,7 +45,7 @@
   } from '@lucide/svelte';
 
   // Local state for icons
-  let iconSize = $state('4xl');
+  let iconSize = $state('2xl');
   let sizeList = $state([
     { value: 'sm', label: 'Small' },
     { value: 'md', label: 'Medium' },
@@ -103,6 +103,7 @@
             size={iconSize}
             iconProps={{ 'data-state': burgerActive ? 'active' : '' }}
             onclick={() => (burgerActive = !burgerActive)}
+            aria-label="Toggle menu"
           />
           <span class="text-caption text-mute">Burger</span>
         </div>
@@ -113,6 +114,7 @@
             size={iconSize}
             iconProps={{ id: 'eye-demo', 'data-muted': eyeActive }}
             onclick={() => (eyeActive = !eyeActive)}
+            aria-label="Toggle visibility"
           />
           <span class="text-caption text-mute">Eye</span>
         </div>
@@ -123,6 +125,7 @@
             size={iconSize}
             iconProps={{ id: 'music-demo', 'data-muted': musicActive }}
             onclick={() => (musicActive = !musicActive)}
+            aria-label="Toggle music"
           />
           <span class="text-caption text-mute">Music</span>
         </div>
@@ -133,6 +136,7 @@
             size={iconSize}
             iconProps={{ id: 'voice-demo', 'data-muted': voiceActive }}
             onclick={() => (voiceActive = !voiceActive)}
+            aria-label="Toggle voice"
           />
           <span class="text-caption text-mute">Voice</span>
         </div>
@@ -143,6 +147,7 @@
             size={iconSize}
             iconProps={{ 'data-fullscreen': fullscreenActive }}
             onclick={() => (fullscreenActive = !fullscreenActive)}
+            aria-label="Toggle fullscreen"
           />
           <span class="text-caption text-mute">Fullscreen</span>
         </div>
@@ -166,7 +171,7 @@
         class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
       >
         <div class="flex flex-col items-center gap-xs">
-          <IconBtn icon={Search} size={iconSize} />
+          <IconBtn icon={Search} size={iconSize} aria-label="Search" />
           <span class="text-caption text-mute">Search</span>
         </div>
 
@@ -175,6 +180,7 @@
             icon={Search}
             size={iconSize}
             iconProps={{ 'data-zoom': 'in' }}
+            aria-label="Zoom in"
           />
           <span class="text-caption text-mute">Zoom-in</span>
         </div>
@@ -184,6 +190,7 @@
             icon={Search}
             size={iconSize}
             iconProps={{ 'data-zoom': 'out' }}
+            aria-label="Zoom out"
           />
           <span class="text-caption text-mute">Zoom-out</span>
         </div>
@@ -197,22 +204,22 @@
         class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
       >
         <div class="flex flex-col items-center gap-xs">
-          <IconBtn icon={Play} size={iconSize} />
+          <IconBtn icon={Play} size={iconSize} aria-label="Play" />
           <span class="text-caption text-mute">Play</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <IconBtn icon={Restart} size={iconSize} />
+          <IconBtn icon={Restart} size={iconSize} aria-label="Restart" />
           <span class="text-caption text-mute">Restart</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <IconBtn icon={Refresh} size={iconSize} />
+          <IconBtn icon={Refresh} size={iconSize} aria-label="Refresh" />
           <span class="text-caption text-mute">Refresh</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <IconBtn icon={Undo} size={iconSize} />
+          <IconBtn icon={Undo} size={iconSize} aria-label="Undo" />
           <span class="text-caption text-mute">Undo</span>
         </div>
       </div>
@@ -229,6 +236,7 @@
             icon={DoorIn}
             size={iconSize}
             iconProps={{ id: 'door-in-demo' }}
+            aria-label="Sign in"
           />
           <span class="text-caption text-mute">DoorIn</span>
         </div>
@@ -238,6 +246,7 @@
             icon={DoorOut}
             size={iconSize}
             iconProps={{ id: 'door-out-demo' }}
+            aria-label="Sign out"
           />
           <span class="text-caption text-mute">DoorOut</span>
         </div>
@@ -247,6 +256,7 @@
             icon={Quit}
             size={iconSize}
             iconProps={{ id: 'quit-demo' }}
+            aria-label="Quit"
           />
           <span class="text-caption text-mute">Quit</span>
         </div>
@@ -256,6 +266,7 @@
             icon={Switch}
             size={iconSize}
             iconProps={{ id: 'switch-demo' }}
+            aria-label="Switch"
           />
           <span class="text-caption text-mute">Switch</span>
         </div>
@@ -269,7 +280,7 @@
         class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
       >
         <div class="flex flex-col items-center gap-xs">
-          <IconBtn icon={Edit} size={iconSize} />
+          <IconBtn icon={Edit} size={iconSize} aria-label="Edit" />
           <span class="text-caption text-mute">Edit</span>
         </div>
 
@@ -284,27 +295,28 @@
                 copyActive = false;
               }, 1000);
             }}
+            aria-label="Copy"
           />
           <span class="text-caption text-mute">Copy</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <IconBtn icon={Remove} size={iconSize} />
+          <IconBtn icon={Remove} size={iconSize} aria-label="Remove" />
           <span class="text-caption text-mute">Remove</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <IconBtn icon={Contract} size={iconSize} />
+          <IconBtn icon={Contract} size={iconSize} aria-label="Contract" />
           <span class="text-caption text-mute">Contract</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <IconBtn icon={Sort} size={iconSize} />
+          <IconBtn icon={Sort} size={iconSize} aria-label="Sort" />
           <span class="text-caption text-mute">Sort</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <IconBtn icon={Caret} size={iconSize} />
+          <IconBtn icon={Caret} size={iconSize} aria-label="Expand" />
           <span class="text-caption text-mute">Caret</span>
         </div>
       </div>
