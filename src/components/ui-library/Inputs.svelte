@@ -26,6 +26,9 @@
 
   // Switcher demo
   let physicsMode = $state<string | number | null>('glass');
+
+  // Details demo
+  let detailsRange = $state(75);
 </script>
 
 <section class="flex flex-col gap-md mt-md">
@@ -303,6 +306,105 @@
         Props: <code>options</code> (value, label, icon?),
         <code>value</code> (bindable), <code>label</code>,
         <code>disabled</code>.
+      </p>
+    </div>
+
+    <!-- ─── DETAILS & SUMMARY ────────────────────────────────────────── -->
+    <div class="flex flex-col gap-xs">
+      <h5>Details & Summary</h5>
+      <p class="text-small text-mute">
+        Native <code>&lt;details&gt;</code> disclosure element for collapsible
+        sections. Zero JS — the browser handles open/close, keyboard support
+        (Enter/Space), and accessibility. SCSS adds border, chevron indicator,
+        and smooth expand/collapse animation via
+        <code>::details-content</code>. Use the <code>name</code> attribute for exclusive
+        accordion groups.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <!-- Single disclosure -->
+        <details>
+          <summary>Energy Output Configuration</summary>
+          <div class="flex flex-col gap-xs p-md">
+            <label class="text-small px-xs" for="demo-details-range">
+              Output Level — {detailsRange}%
+            </label>
+            <input
+              id="demo-details-range"
+              type="range"
+              bind:value={detailsRange}
+              min="0"
+              max="100"
+            />
+          </div>
+        </details>
+
+        <!-- Accordion group (exclusive via name attribute) -->
+        <details name="demo-accordion" open>
+          <summary>Navigation Subsystem</summary>
+          <div class="flex flex-col gap-xs p-md">
+            <label class="flex flex-row items-center gap-xs">
+              <input type="checkbox" checked />
+              <span>Inertial Guidance</span>
+            </label>
+            <label class="flex flex-row items-center gap-xs">
+              <input type="checkbox" />
+              <span>Star Tracker</span>
+            </label>
+          </div>
+        </details>
+        <details name="demo-accordion">
+          <summary>Propulsion Subsystem</summary>
+          <div class="flex flex-col gap-xs p-md">
+            <label class="flex flex-row items-center gap-xs">
+              <input type="checkbox" checked />
+              <span>Main Engine</span>
+            </label>
+            <label class="flex flex-row items-center gap-xs">
+              <input type="checkbox" />
+              <span>Reaction Control</span>
+            </label>
+          </div>
+        </details>
+        <details name="demo-accordion">
+          <summary>Communications Subsystem</summary>
+          <div class="flex flex-col gap-xs p-md">
+            <label class="flex flex-row items-center gap-xs">
+              <input type="checkbox" checked />
+              <span>High-Gain Antenna</span>
+            </label>
+            <label class="flex flex-row items-center gap-xs">
+              <input type="checkbox" />
+              <span>Low-Gain Backup</span>
+            </label>
+          </div>
+        </details>
+
+        <!-- Nested with fieldset -->
+        <details>
+          <summary>Restricted Zone Settings</summary>
+          <fieldset class="m-md">
+            <legend>Core Permissions</legend>
+            <label class="flex flex-row items-center gap-xs">
+              <input type="checkbox" />
+              <span>Core Dump Access</span>
+            </label>
+            <label class="flex flex-row items-center gap-xs">
+              <input type="checkbox" />
+              <span>Emergency Override</span>
+            </label>
+            <label class="flex flex-row items-center gap-xs">
+              <input type="checkbox" disabled />
+              <span>Quantum Entanglement (locked)</span>
+            </label>
+          </fieldset>
+        </details>
+      </div>
+
+      <p class="text-caption text-mute px-xs">
+        Add <code>name="group"</code> to multiple <code>&lt;details&gt;</code>
+        elements for exclusive accordion behavior (only one open at a time). Nest
+        <code>&lt;fieldset&gt;</code> inside for semantic form grouping.
       </p>
     </div>
   </div>

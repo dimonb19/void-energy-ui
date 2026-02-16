@@ -179,6 +179,28 @@
     border-color: blend($color-var, var(--energy-secondary), 12%);
     background: alpha($color-var, 25%);
   }
+
+  @include when-state('active') {
+    border-color: $color-var;
+    background: alpha($color-var, 20%);
+    color: var(--text-main);
+    box-shadow: var(--shadow-lift);
+
+    @include when-glass {
+      box-shadow: 0 0 12px alpha($color-var, 35%); // void-ignore (Glow Physics)
+    }
+
+    @include when-light {
+      background: alpha($color-var, 15%);
+      color: $color-var;
+    }
+
+    @include when-retro {
+      background: alpha($color-var, 25%);
+      box-shadow: var(--shadow-offset) var(--shadow-offset) 0px
+        alpha($color-var, 40%);
+    }
+  }
 }
 
 // MIXIN: Ghost Button Variant

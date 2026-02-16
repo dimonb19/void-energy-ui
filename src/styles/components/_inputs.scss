@@ -285,3 +285,101 @@ legend {
   font-weight: var(--font-weight-medium);
   color: var(--text-dim);
 }
+
+// 10. DETAILS & SUMMARY (Native Disclosure)
+// --------------------------------------------------------------------------
+details {
+  margin: 0;
+  border: var(--physics-border-width) solid var(--border-color);
+  border-radius: var(--radius-base);
+
+  transition: border-color var(--speed-fast) var(--ease-spring-snappy);
+
+  // Content animation via ::details-content pseudo-element.
+  // Requires `interpolate-size: allow-keywords` on :root (see _reset.scss).
+  // Progressive enhancement: unsupported browsers get instant open/close.
+  &::details-content {
+    block-size: 0;
+    overflow: clip;
+    transition:
+      block-size var(--speed-base) var(--ease-spring-snappy),
+      content-visibility var(--speed-base) allow-discrete;
+  }
+
+  &[open] {
+    border-color: var(--energy-primary);
+
+    &::details-content {
+      block-size: auto;
+    }
+
+    > summary {
+      border-bottom: var(--physics-border-width) solid var(--border-color);
+
+      &::after {
+        transform: rotate(-135deg);
+      }
+    }
+  }
+
+  // Disabled pattern
+  &:has(> summary[aria-disabled='true']) {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  @include when-retro {
+    &::details-content {
+      transition: none;
+    }
+
+    summary::after {
+      transition: none;
+    }
+  }
+}
+
+summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+
+  padding: var(--space-sm) var(--space-md);
+  list-style: none;
+  cursor: pointer;
+
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-dim);
+
+  transition: color var(--speed-fast) var(--ease-spring-snappy);
+
+  // Remove native marker
+  &::-webkit-details-marker {
+    display: none;
+  }
+
+  // CSS chevron indicator
+  &::after {
+    content: '';
+    flex-shrink: 0;
+    width: 0.4em;
+    height: 0.4em;
+    border-right: var(--physics-border-width) solid currentColor;
+    border-bottom: var(--physics-border-width) solid currentColor;
+    transform: rotate(45deg);
+
+    transition: transform var(--speed-fast) var(--ease-spring-snappy);
+  }
+
+  &:hover {
+    color: var(--text-main);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-base) var(--radius-base) 0 0;
+  }
+}

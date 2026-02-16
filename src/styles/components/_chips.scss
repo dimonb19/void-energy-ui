@@ -302,19 +302,8 @@
     text-shadow: none;
     mix-blend-mode: normal;
 
-    // Retro label.
-    @include when-retro {
-      background: var(
-        --bg-canvas
-      ); // Opaque background to hide the parent border behind it
-
-      border: inherit;
-      border-bottom: none;
-    }
-
-    // Light mode label.
-    @include when-light {
-      font-weight: 700;
+    @include when-flat {
+      top: calc(var(--space-md) * -1 + 0.25px); // Remove bottom border overlay on hover
     }
   }
 }

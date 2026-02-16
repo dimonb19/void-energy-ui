@@ -10,6 +10,10 @@
 // =========================================
 
 :root {
+  // Allow CSS transitions between keyword sizes (0 ↔ auto).
+  // Required for ::details-content animation. Progressive enhancement.
+  interpolate-size: allow-keywords;
+
   // Base unit (4px).
   --unit: 0.25rem;
 
