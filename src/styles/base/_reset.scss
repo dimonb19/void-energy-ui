@@ -76,6 +76,13 @@
     )};
   --dialog-gutter: var(--space-xl);
   --dialog-gutter-lg: var(--space-2xl);
+
+  // Safe Area Insets (Edge-to-Edge Viewport)
+  // Browser-provided via env(). Wrapped in custom properties for consistent fallback.
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
 }
 
 // =========================================
@@ -144,8 +151,14 @@ html {
 }
 
 body {
-  min-height: 100vh;
-  padding-top: var(--nav-height); // Account for fixed nav bar
+  min-height: 100dvh;
+  padding-top: calc(
+    var(--nav-height) + var(--safe-top)
+  ); // Fixed nav + status bar
+  padding-bottom: var(
+    --bottom-nav-clearance,
+    0px
+  ); // Mobile bottom nav clearance
 }
 
 // =========================================

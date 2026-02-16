@@ -45,8 +45,8 @@
   @include glass-float;
   @include glass-blur;
 
-  height: calc(var(--nav-height) + var(--space-md)); // Accommodate padding
-  padding-top: var(--space-md);
+  height: calc(var(--nav-height) + var(--space-md) + var(--safe-top));
+  padding-top: calc(var(--space-md) + var(--safe-top));
   background: var(--bg-surface);
 
   position: fixed;
@@ -192,7 +192,12 @@
   right: 0;
   z-index: z('overlay');
   padding: var(--space-sm);
+  padding-right: max(var(--space-sm), var(--safe-right));
   min-width: 100%;
+
+  @include mobile-only {
+    padding-left: max(var(--space-sm), var(--safe-left));
+  }
   background-color: var(--bg-surface);
   transform: none !important; // Disable scale and translate from materialize
 
@@ -208,10 +213,7 @@
 
 .sidebar-scrim {
   position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 100vw;
+  inset: 0;
   background: alpha(var(--bg-canvas), 80%);
   z-index: z('dropdown');
   transform: none !important; // override scale and translate from materialize
@@ -309,18 +311,34 @@
 
   position: fixed;
   top: unset;
-  bottom: var(--space-xs);
+  bottom: calc(var(--space-xs) + var(--safe-bottom));
   left: 50%;
   transform: translateX(-50%);
   z-index: z('header');
   border-radius: var(--radius-full);
 
-  width: calc(100% - var(--space-lg) * 2);
+  // Landscape: safe area replaces margin when larger than design spacing.
+  // Portrait on non-notch: max(32px, 0px) = 32px each side (unchanged).
+  width: calc(
+    100% - max(var(--space-lg), var(--safe-left)) - max(
+        var(--space-lg),
+        var(--safe-right)
+      )
+  );
 
   .tab {
     width: 100%;
     white-space: nowrap;
     font-size: var(--font-size-h3);
     border-radius: var(--radius-full);
+  }
+}
+
+// Body clearance for mobile bottom nav (matches tablet:hidden in template).
+@include mobile-only {
+  :root {
+    --bottom-nav-clearance: calc(
+      var(--size-touch-min) + var(--space-sm) + var(--safe-bottom)
+    );
   }
 }

@@ -232,6 +232,19 @@ See [THEME-GUIDE.md](./THEME-GUIDE.md) for details.
 
 ---
 
+### Browser Chrome Integration — `<meta name="theme-color">`
+
+The browser's address bar and system chrome automatically tint to match the active atmosphere. Each theme's `canvas` color (its `bg-canvas` value) is stored in the auto-generated [void-registry.json](src/config/void-registry.json) and applied to `<meta name="theme-color">` on every theme switch.
+
+**How it works:**
+1. **SSR** — `Layout.astro` renders a static `<meta name="theme-color" content="#010020">` (the `void` default)
+2. **Hydration** — The bootloader (`void-boot.js`) immediately updates the meta tag to match the resolved theme
+3. **Runtime** — `VoidEngine.applyTheme()` updates the meta tag on every atmosphere switch
+
+No manual intervention needed. Custom runtime themes that include a `bg-canvas` palette entry also get theme-color support automatically.
+
+---
+
 ## 3. Responsive & Spacing (Density Engine)
 
 ### A. Breakpoints (Layout Only)
@@ -414,6 +427,52 @@ All spacing values **multiply by a density factor** to respect user preferences:
 - CSS variable `--density` updates globally
 - All components automatically reflow (no code changes needed)
 - Proportions remain consistent (ratio between xs/sm/md/lg stays identical)
+
+---
+
+### C. Safe Area Insets (Edge-to-Edge Viewport)
+
+Modern devices with notches, dynamic islands, and gesture navigation bars render content behind system UI. The layout uses `viewport-fit=cover` and exposes browser-provided safe area insets as CSS custom properties.
+
+**Source:** [src/styles/base/\_reset.scss](src/styles/base/_reset.scss) (`:root` block)
+
+#### Tokens
+
+| Token | Source | Fallback | Description |
+| --- | --- | --- | --- |
+| `--safe-top` | `env(safe-area-inset-top)` | `0px` | Status bar / Dynamic Island |
+| `--safe-bottom` | `env(safe-area-inset-bottom)` | `0px` | Home indicator / gesture bar |
+| `--safe-left` | `env(safe-area-inset-left)` | `0px` | Landscape notch (left) |
+| `--safe-right` | `env(safe-area-inset-right)` | `0px` | Landscape notch (right) |
+
+On non-notched devices, all values resolve to `0px` — zero visual impact.
+
+#### Built-in Integration
+
+These components already account for safe areas (no manual work needed):
+
+| Component | Safe Area Handling |
+| --- | --- |
+| **Nav bar** (`.nav-bar`) | Extends glass surface under status bar via `--safe-top` |
+| **Bottom nav** (`.bottom-nav`) | Offsets above home indicator via `--safe-bottom`; landscape-aware width via `--safe-left`/`--safe-right` |
+| **Sidebar** (`.sidebar`) | Padding respects `--safe-right` (and `--safe-left` on mobile) |
+| **Toasts** (`.toast-region`) | Top offset includes `--safe-top`; width avoids landscape notch |
+| **Full-size dialogs** (`dialog[data-size="full"]`) | Dimensions account for all four safe area insets |
+| **Body** | `padding-top` includes `--safe-top`; `padding-bottom` uses `--bottom-nav-clearance` on mobile |
+
+#### Usage in Custom Components
+
+Use the safe area tokens when positioning fixed/absolute elements near screen edges:
+
+```scss
+.my-fixed-footer {
+  position: fixed;
+  bottom: calc(var(--space-sm) + var(--safe-bottom));
+  // Use max() to pick the larger of design spacing vs safe area:
+  padding-left: max(var(--space-lg), var(--safe-left));
+  padding-right: max(var(--space-lg), var(--safe-right));
+}
+```
 
 ---
 
@@ -1063,8 +1122,10 @@ See [toast.svelte.ts](src/stores/toast.svelte.ts) for state management.
 #### `dialog[data-size="..."]`
 
 **Description:** Native modal with materialize animation
-**Sizes:** `sm`, `md`, `lg`, `xl`
+**Sizes:** `sm`, `md`, `lg`, `xl`, `full`
 **Physics:** Fade + scale animation
+
+**Safe area:** The `full` size automatically respects all four safe area insets on notched devices, using `max(gutter, safe-area)` so content never renders behind system UI.
 
 **Usage:**
 

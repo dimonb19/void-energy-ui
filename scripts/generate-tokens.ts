@@ -284,12 +284,16 @@ async function main() {
     console.log(`   └─ 📦 Font Registry: src/config/font-registry.ts`);
 
     // Generate theme registry JSON.
-    const registry: Record<string, { physics: string; mode: string; tagline?: string }> = {};
+    const registry: Record<
+      string,
+      { physics: string; mode: string; tagline?: string; canvas: string }
+    > = {};
     Object.entries(VOID_TOKENS.themes).forEach(([key, config]) => {
       registry[key] = {
         physics: config.physics,
         mode: config.mode,
         tagline: config.tagline,
+        canvas: config.palette['bg-canvas'],
       };
     });
     fs.writeFileSync(PATHS.registryJson, JSON.stringify(registry, null, 2));

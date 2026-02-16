@@ -41,6 +41,14 @@ export function applyTheme(root, theme, constants) {
       root.style.setProperty('--' + key, theme.palette[key]);
     }
   }
+
+  // Update <meta name="theme-color"> to match atmosphere canvas.
+  var meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) {
+    var color =
+      theme.canvas || (theme.palette && theme.palette['bg-canvas']) || null;
+    if (color) meta.setAttribute('content', color);
+  }
 }
 
 /**

@@ -45,8 +45,18 @@ dialog {
 
   // Full (immersive).
   &[data-size='full'] {
-    width: calc(100vw - var(--dialog-gutter));
-    height: calc(100dvh - var(--dialog-gutter));
+    width: calc(
+      100vw - max(var(--dialog-gutter), var(--safe-left)) - max(
+          var(--dialog-gutter),
+          var(--safe-right)
+        )
+    );
+    height: calc(
+      100dvh - max(var(--dialog-gutter), var(--safe-top)) - max(
+          var(--dialog-gutter),
+          var(--safe-bottom)
+        )
+    );
     max-height: none;
   }
 

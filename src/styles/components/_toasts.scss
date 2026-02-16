@@ -9,7 +9,7 @@
 
 .toast-region {
   position: fixed;
-  top: var(--space-lg);
+  top: calc(var(--space-lg) + var(--safe-top));
   left: 50%;
   transform: translateX(-50%);
 
@@ -20,7 +20,12 @@
   pointer-events: none;
 
   width: 100%;
-  max-width: calc(100vw - var(--space-lg));
+  max-width: calc(
+    100vw - max(var(--space-lg), var(--safe-left)) - max(
+        var(--space-lg),
+        var(--safe-right)
+      )
+  );
   z-index: z('overlay');
 
   /* Popover reset to avoid UA styles. */
