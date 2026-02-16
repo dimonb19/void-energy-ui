@@ -266,6 +266,7 @@
 // ==========================================================================
 
 .chip-labeled {
+  position: relative; // Positioning context for ::before label tab
   margin-top: var(--space-sm);
   border-top-left-radius: 0;
 
