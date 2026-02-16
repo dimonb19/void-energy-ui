@@ -262,19 +262,19 @@
             <div class="flex flex-row gap-sm flex-wrap">
               <div class="flex flex-col items-center gap-xs">
                 <span
-                  class="block w-2xl h-lg rounded-sm bg-canvas border-solid border-2 border-mute"
+                  class="block w-2xl h-lg rounded-sm bg-canvas border-solid border-border"
                 ></span>
                 <code class="text-caption">bg-canvas</code>
               </div>
               <div class="flex flex-col items-center gap-xs">
                 <span
-                  class="block w-2xl h-lg rounded-sm bg-sink border-solid border-2 border-mute"
+                  class="block w-2xl h-lg rounded-sm bg-sink border-solid border-border"
                 ></span>
                 <code class="text-caption">bg-sink</code>
               </div>
               <div class="flex flex-col items-center gap-xs">
                 <span
-                  class="block w-2xl h-lg rounded-sm bg-spotlight border-solid border-2 border-mute"
+                  class="block w-2xl h-lg rounded-sm bg-spotlight border-solid border-border"
                 ></span>
                 <code class="text-caption">bg-spotlight</code>
               </div>
@@ -290,7 +290,7 @@
             <div class="flex flex-row gap-sm">
               <div class="flex flex-col items-center gap-xs">
                 <span
-                  class="block w-2xl h-lg rounded-sm bg-surface border-solid border-2 border-mute"
+                  class="block w-2xl h-lg rounded-sm bg-surface border-solid border-border"
                 ></span>
                 <code class="text-caption">bg-surface</code>
               </div>
@@ -305,11 +305,15 @@
             </p>
             <div class="flex flex-row gap-sm">
               <div class="flex flex-col items-center gap-xs">
-                <span class="block w-2xl h-lg rounded-sm bg-primary"></span>
+                <span
+                  class="block w-2xl h-lg rounded-sm bg-primary border-solid border-border"
+                ></span>
                 <code class="text-caption">energy-primary</code>
               </div>
               <div class="flex flex-col items-center gap-xs">
-                <span class="block w-2xl h-lg rounded-sm bg-secondary"></span>
+                <span
+                  class="block w-2xl h-lg rounded-sm bg-secondary border-solid border-border"
+                ></span>
                 <code class="text-caption">energy-secondary</code>
               </div>
             </div>
@@ -321,7 +325,7 @@
             <div class="flex flex-row gap-sm">
               <div class="flex flex-col items-center gap-xs">
                 <span
-                  class="block w-2xl h-lg rounded-sm bg-surface border-solid border border-border"
+                  class="block w-2xl h-lg rounded-sm bg-border border-solid border-border"
                 ></span>
                 <code class="text-caption">border-color</code>
               </div>
