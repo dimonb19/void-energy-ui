@@ -101,11 +101,25 @@
   };
 
   // ─────────────────────────────────────────────────────────────────────────────
+  // Props
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  let { pathname = '' }: { pathname?: string } = $props();
+
+  function resolveTab(path: string): string {
+    const normalized = path.replace(/\/+$/, '') || '/';
+    return (
+      navItems.find((t) => t.href && t.href.replace(/\/+$/, '') === normalized)
+        ?.id ?? ''
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
   // State
   // ─────────────────────────────────────────────────────────────────────────────
 
   let sidebarOpen = $state<boolean>(false);
-  let activeTab = $state<string>('');
+  let activeTab = $state<string>(resolveTab(pathname));
 
   // Sidebar hover control (desktop dropdown behavior)
   let sidebarTimer: ReturnType<typeof setTimeout> | null = null;

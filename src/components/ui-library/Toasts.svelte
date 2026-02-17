@@ -49,18 +49,18 @@
         <code>--toast-accent</code> variable. Click to trigger each type.
       </p>
 
-      <div class="surface-sunk p-md flex flex-wrap justify-center gap-sm">
+      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
         <button onclick={() => toast.show('Telemetry sync active', 'info')}>
           Info
         </button>
         <button
-          class="btn-signal"
+          class="btn-success"
           onclick={() => toast.show('Module deployed successfully', 'success')}
         >
           Success
         </button>
         <button
-          class="btn-alert"
+          class="btn-error"
           onclick={() => toast.show('Core temperature critical', 'error')}
         >
           Error
@@ -85,7 +85,7 @@
         called.
       </p>
 
-      <div class="surface-sunk p-md flex flex-wrap justify-center gap-sm">
+      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
         <button onclick={triggerLoading}> Loading &rarr; Success </button>
         <button onclick={triggerLoadingError}> Loading &rarr; Error </button>
       </div>
@@ -105,7 +105,7 @@
         that receives the resolved value.
       </p>
 
-      <div class="surface-sunk p-md flex flex-wrap justify-center gap-sm">
+      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
         <button onclick={triggerPromise}> toast.promise() </button>
       </div>
     </div>

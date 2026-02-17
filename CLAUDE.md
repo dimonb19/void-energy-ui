@@ -6,7 +6,7 @@ Token dictionary and SCSS toolkit references are loaded on-demand via `.claude/r
 
 ---
 
-## 1. THE 4 LAWS (Hard Constraints)
+## 1. THE 5 LAWS (Hard Constraints)
 
 ### Law 1 — Hybrid Protocol
 Tailwind = layout/geometry. SCSS = visual physics/materials. Never mix.
@@ -52,6 +52,15 @@ CORRECT:  data-state="active"   aria-pressed="true"   aria-checked="true"
 WRONG:    class="is-active"     class="open"           class="selected"
 
 SCSS:     @include when-state('active') { ... }
+```
+
+### Law 5 — Spacing Gravity
+Default to generous spacing. When uncertain, go ONE size up, never down.
+
+```
+FLOOR:    Floating surface → p-lg gap-lg.    Sunk surface → p-md gap-md.
+NEVER:    gap-sm on a card.  gap-xs between groups.  p-sm on a floating surface.
+RULE:     Generous whitespace > cramped density. If it looks tight, go up a size.
 ```
 
 ---

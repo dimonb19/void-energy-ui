@@ -9,7 +9,7 @@ Review code for Void Energy design system compliance.
 
 ## Review Checklist
 
-For each file, check against the 4 Laws and report violations with `file:line` references.
+For each file, check against the 5 Laws and report violations with `file:line` references.
 
 ### Law 1 — Hybrid Protocol
 - **VIOLATION:** Layout properties in SCSS (`display`, `flex`, `grid`, `gap`, `padding`, `margin`, `width`, `height`, `align-items`, `justify-content`)
@@ -35,6 +35,13 @@ For each file, check against the 4 Laws and report violations with `file:line` r
 - **VIOLATION:** `class:active=`, `class:open=`, `class:selected=` for state
 - **VIOLATION:** `class="is-active"`, `class="open"`, `class="selected"`
 - **OK:** `data-state="active"`, `aria-checked="true"`, `aria-pressed="true"`, `aria-expanded="true"`
+
+### Law 5 — Spacing Gravity
+- **VIOLATION:** `p-sm` or `p-xs` on `.surface-glass` / `.surface-glass-action` (must be `p-lg`)
+- **VIOLATION:** `p-xs` on `.surface-sunk` (must be `p-md` minimum; `p-sm` only for justified dense pickers)
+- **VIOLATION:** `gap-sm` or `gap-xs` on button/action rows inside containers (must be `gap-md`)
+- **VIOLATION:** `gap-xs` between content groups (only valid for tight coupling: label→input, icon+text, title+subtitle)
+- **OK:** `p-lg gap-lg` on floating surfaces, `p-md gap-md` on sunk surfaces, `gap-xs` for tight coupling
 
 ### Physics Coverage (SCSS files)
 - **WARNING:** Component SCSS missing `when-glass` block

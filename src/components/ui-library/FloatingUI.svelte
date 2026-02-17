@@ -53,7 +53,7 @@
               Duplicate
             </button>
             <button
-              class="btn-ghost btn-alert"
+              class="btn-ghost btn-error"
               onclick={() => toast.show('Deleted', 'error')}
             >
               Delete
@@ -74,7 +74,7 @@
   &lt;div class="flex flex-col gap-xs p-md"&gt;
     &lt;button class="btn-ghost"&gt;Edit&lt;/button&gt;
     &lt;button class="btn-ghost"&gt;Duplicate&lt;/button&gt;
-    &lt;button class="btn-ghost btn-alert"&gt;Delete&lt;/button&gt;
+    &lt;button class="btn-ghost btn-error"&gt;Delete&lt;/button&gt;
   &lt;/div&gt;
 &lt;/Dropdown&gt;</code
           ></pre>

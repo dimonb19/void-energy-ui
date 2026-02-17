@@ -5,15 +5,15 @@
   USAGE
   -------------------------------------------------------------------------
   <ActionBtn icon={Play} text="Play" onclick={handlePlay} />
-  <ActionBtn icon={Remove} text="Delete" class="btn-alert" onclick={del} />
-  <ActionBtn icon={Contract} text="Approve" class="btn-signal" onclick={ok} />
+  <ActionBtn icon={Remove} text="Delete" class="btn-error" onclick={del} />
+  <ActionBtn icon={Contract} text="Approve" class="btn-success" onclick={ok} />
   <ActionBtn icon={Refresh} text="Retry" disabled={loading} onclick={retry} />
   -------------------------------------------------------------------------
 
   PROPS:
   - icon: Svelte component (interactive icon from src/components/icons/)
   - text: Button label (optional — omit for icon-only)
-  - class: Style variant ('btn-cta', 'btn-alert', 'btn-signal', etc.)
+  - class: Style variant ('btn-cta', 'btn-error', 'btn-success', etc.)
   - ...rest: All native button attributes (onclick, disabled, aria-*, etc.)
 
   BEHAVIOR:

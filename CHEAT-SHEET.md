@@ -635,8 +635,8 @@ Preset components with built-in layout and physics.
 | `.btn-cta` | Rotating gradient border (Gemini Laser), pill shape | Primary CTA |
 | `.btn-premium` | Gold/orange semantic | Paid features, upgrades |
 | `.btn-system` | Purple semantic | System/diagnostic actions |
-| `.btn-signal` | Green/success semantic | Confirmations, positive actions |
-| `.btn-alert` | Red/error semantic | Destructive actions, warnings |
+| `.btn-success` | Green/success semantic | Confirmations, positive actions |
+| `.btn-error` | Red/error semantic | Destructive actions, warnings |
 | `.btn-ghost` | Text-only, no surface/border at rest | Secondary/tertiary actions |
 | `.btn-void` | Complete style reset | Custom-styled buttons |
 | `.btn-icon` | Circular icon-only | Toolbar actions, inline controls |
@@ -649,8 +649,8 @@ Preset components with built-in layout and physics.
 <button class="btn-cta">Call to Action</button>
 
 <!-- Semantic -->
-<button class="btn-signal">Confirm</button>
-<button class="btn-alert">Delete</button>
+<button class="btn-success">Confirm</button>
+<button class="btn-error">Delete</button>
 ```
 
 ---
@@ -681,11 +681,11 @@ Preset components with built-in layout and physics.
 <!-- Paired with primary (most common pattern) -->
 <div class="flex gap-md">
   <button class="btn-ghost">Cancel</button>
-  <button class="btn-signal">Confirm</button>
+  <button class="btn-success">Confirm</button>
 </div>
 
 <!-- Semantic ghost (destructive secondary) -->
-<button class="btn-ghost btn-alert">Delete Account</button>
+<button class="btn-ghost btn-error">Delete Account</button>
 
 <!-- Toggle state -->
 <button class="btn-ghost" aria-pressed={showAdvanced}>
@@ -1286,13 +1286,13 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 | `text` | `string` | `''` | Button label (omit for icon-only) |
 | `size` | `string` | `'lg'` | Icon `data-size` |
 | `disabled` | `boolean` | `false` | Disables interaction |
-| `class` | `string` | `''` | Button class variants (`'btn-cta'`, `'btn-alert'`, etc.) |
+| `class` | `string` | `''` | Button class variants (`'btn-cta'`, `'btn-error'`, etc.) |
 
 **Usage:**
 
 ```svelte
 <ActionBtn icon={Play} text="Play" onclick={handlePlay} />
-<ActionBtn icon={Remove} text="Delete" class="btn-alert" onclick={handleDelete} />
+<ActionBtn icon={Remove} text="Delete" class="btn-error" onclick={handleDelete} />
 <ActionBtn icon={DoorOut} text="Sign Out" onclick={handleSignOut} />
 ```
 

@@ -38,7 +38,7 @@
       {cancelText}
     </button>
     <button
-      class="btn-signal"
+      class="btn-success"
       onclick={onConfirm}
       use:tooltip={'Click to execute'}
     >

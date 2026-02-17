@@ -3,7 +3,7 @@
 @use '../abstracts' as *;
 
 // Global reset.
-a {
+:where(a) {
   text-decoration: none;
   color: inherit; // Inherit from parent to respect surface tone
   cursor: pointer;

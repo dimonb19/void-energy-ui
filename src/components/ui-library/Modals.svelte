@@ -25,7 +25,7 @@
         to <code>sm</code>.
       </p>
 
-      <div class="surface-sunk p-md flex flex-wrap justify-center gap-sm">
+      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
         <button
           onclick={() =>
             modal.alert(
@@ -57,7 +57,7 @@
         <code>md</code>.
       </p>
 
-      <div class="surface-sunk p-md flex flex-wrap justify-center gap-sm">
+      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
         <button
           onclick={() =>
             modal.confirm(
@@ -72,7 +72,7 @@
           Confirm
         </button>
         <button
-          class="btn-alert"
+          class="btn-error"
           onclick={() =>
             modal.confirm(
               'Delete Module',
@@ -102,7 +102,7 @@
         opens the display preferences panel. Both use the <code>lg</code> size.
       </p>
 
-      <div class="surface-sunk p-md flex flex-wrap justify-center gap-sm">
+      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
         <button onclick={() => modal.themes()}> Themes </button>
         <button onclick={() => modal.settings()}> Settings </button>
       </div>

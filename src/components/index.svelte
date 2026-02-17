@@ -574,7 +574,7 @@
             System Alert
           </button>
           <button
-            class="btn-alert"
+            class="btn-error"
             use:tooltip={'Demonstrates error toast notification'}
             onclick={() => {
               toast.show('Connection timeout — retry in 30s', 'error');

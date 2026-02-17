@@ -17,7 +17,7 @@
     token-scan.sh            Scan for raw pixel values
 
   agents/                    Specialized AI reviewers (read-only)
-    design-reviewer.md       4 Laws compliance checker
+    design-reviewer.md       5 Laws compliance checker
     a11y-checker.md          Accessibility (WCAG 2.1 AA) checker
 
   rules/                     Context loaded on-demand by file type
@@ -63,7 +63,7 @@ How it works:
 
 ### `/review`
 
-Checks code for design system violations (the 4 Laws).
+Checks code for design system violations (the 5 Laws).
 
 ```
 /review                              (all recent changes)
@@ -120,7 +120,7 @@ Claude uses them automatically when relevant, or you can ask:
 
 | Agent | What it checks |
 |-------|---------------|
-| `design-reviewer` | 4 Laws compliance, token usage, physics coverage, SCSS imports |
+| `design-reviewer` | 5 Laws compliance, token usage, physics coverage, SCSS imports |
 | `a11y-checker` | ARIA attributes, keyboard nav, focus management, color contrast, motion |
 
 ---

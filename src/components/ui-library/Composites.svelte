@@ -73,8 +73,8 @@
     { value: 'btn-cta', label: 'CTA' },
     { value: 'btn-premium', label: 'Premium' },
     { value: 'btn-system', label: 'System' },
-    { value: 'btn-signal', label: 'Signal' },
-    { value: 'btn-alert', label: 'Alert' },
+    { value: 'btn-success', label: 'Success' },
+    { value: 'btn-error', label: 'Error' },
   ];
 
   const btnLabel: Record<string, string> = {

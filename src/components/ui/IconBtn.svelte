@@ -26,7 +26,7 @@
   - iconProps can add extra attributes (data-zoom, data-muted, id, etc.)
 
   COMPARISON WITH ActionBtn:
-  - ActionBtn: Styled buttons (btn-cta, btn-alert, etc.) with optional text labels
+  - ActionBtn: Styled buttons (btn-cta, btn-error, etc.) with optional text labels
   - IconBtn: Circular icon-only buttons (.btn-icon) for inline actions
 
   @see /src/styles/components/_buttons.scss (.btn-icon)

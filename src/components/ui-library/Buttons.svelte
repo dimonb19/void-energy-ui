@@ -90,16 +90,16 @@
             System
           </button>
           <button
-            class="btn-signal"
-            onclick={() => toast.show('Signal established', 'success')}
+            class="btn-success"
+            onclick={() => toast.show('Success confirmed', 'success')}
           >
-            Signal
+            Success
           </button>
           <button
-            class="btn-alert"
-            onclick={() => toast.show('Alert acknowledged', 'warning')}
+            class="btn-error"
+            onclick={() => toast.show('Error acknowledged', 'warning')}
           >
-            Alert
+            Error
           </button>
           <button disabled>Disabled</button>
         </div>
@@ -112,8 +112,8 @@
 &lt;button class="btn-cta"&gt;Call to Action&lt;/button&gt;
 &lt;button class="btn-premium"&gt;Premium&lt;/button&gt;
 &lt;button class="btn-system"&gt;System&lt;/button&gt;
-&lt;button class="btn-signal"&gt;Signal&lt;/button&gt;
-&lt;button class="btn-alert"&gt;Alert&lt;/button&gt;
+&lt;button class="btn-success"&gt;Success&lt;/button&gt;
+&lt;button class="btn-error"&gt;Error&lt;/button&gt;
 &lt;button disabled&gt;Disabled&lt;/button&gt;</code
           ></pre>
       </details>
@@ -131,7 +131,7 @@
         Ghost buttons have no background or border at rest — just uppercase
         text. Use them for secondary actions like Cancel, Dismiss, or Skip.
         Compose with semantic variants for colored ghosts:
-        <code>btn-ghost btn-alert</code>.
+        <code>btn-ghost btn-error</code>.
       </p>
 
       <div class="surface-sunk p-md">
@@ -157,16 +157,16 @@
             Ghost System
           </button>
           <button
-            class="btn-ghost btn-signal"
-            onclick={() => toast.show('Ghost Signal', 'success')}
+            class="btn-ghost btn-success"
+            onclick={() => toast.show('Ghost Success', 'success')}
           >
-            Ghost Signal
+            Ghost Success
           </button>
           <button
-            class="btn-ghost btn-alert"
-            onclick={() => toast.show('Ghost Alert', 'warning')}
+            class="btn-ghost btn-error"
+            onclick={() => toast.show('Ghost Error', 'warning')}
           >
-            Ghost Alert
+            Ghost Error
           </button>
           <button class="btn-ghost" disabled>Ghost Disabled</button>
         </div>
@@ -177,7 +177,7 @@
         <pre><code
             >&lt;button class="btn-ghost"&gt;Ghost&lt;/button&gt;
 &lt;button class="btn-ghost btn-premium"&gt;Ghost Premium&lt;/button&gt;
-&lt;button class="btn-ghost btn-alert"&gt;Ghost Alert&lt;/button&gt;</code
+&lt;button class="btn-ghost btn-error"&gt;Ghost Error&lt;/button&gt;</code
           ></pre>
       </details>
 

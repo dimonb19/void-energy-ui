@@ -299,7 +299,7 @@
       </p>
 
       <div
-        class="surface-sunk p-md flex flex-col flex-wrap justify-center items-center gap-sm tablet:flex-row"
+        class="surface-sunk p-md flex flex-col flex-wrap justify-center items-center gap-md tablet:flex-row"
       >
         <Toggle
           bind:checked={telemetry}
@@ -366,7 +366,7 @@
         (arrow keys, Home, End). Only the selected option is tabbable.
       </p>
 
-      <div class="surface-sunk p-md flex flex-col items-center gap-sm">
+      <div class="surface-sunk p-md flex flex-col items-center gap-md">
         <Switcher
           bind:value={physicsMode}
           label="Physics Preset"

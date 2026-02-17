@@ -270,7 +270,7 @@ palette: {
 | **Premium** (orange) | Credit cost indicators, upgrade prompts, paid feature badges, caution warnings, exclusive content markers |
 | **System** (purple) | System notifications, AI-generated content markers, informational alerts, settings categories, metadata |
 
-**Component mapping:** Buttons (`btn-signal`, `btn-alert`, `btn-premium`, `btn-system`), Chips (`chip`, `chip-system`, `chip-premium`), Toasts (all 4 types), Pull-to-refresh states, Input validation.
+**Component mapping:** Buttons (`btn-success`, `btn-error`, `btn-premium`, `btn-system`), Chips (`chip`, `chip-system`, `chip-premium`), Toasts (all 4 types), Pull-to-refresh states, Input validation.
 
 ---
 

@@ -17,8 +17,8 @@
  * - .btn-cta     : Call-to-action with animated laser border
  * - .btn-premium : Gold/orange semantic variant
  * - .btn-system  : Purple semantic variant
- * - .btn-signal  : Green/success semantic variant
- * - .btn-alert   : Red/error semantic variant
+ * - .btn-success  : Green/success semantic variant
+ * - .btn-error   : Red/error semantic variant
  * - .btn-ghost   : Text-only button (no surface/border at rest)
  * - .btn-void    : Reset class for unstyled buttons
  * - .btn-icon    : Circular icon-only button
@@ -410,7 +410,7 @@ button:not(.btn-void, .btn-icon),
   // actions: Cancel, Dismiss, Skip, "Learn more."
   //
   // Composition: Works with semantic variants for colored ghosts:
-  //   <button class="btn-ghost btn-alert">Delete</button>
+  //   <button class="btn-ghost btn-error">Delete</button>
   // ========================================================================
   &.btn-ghost {
     // --- A. Strip the Surface ---
@@ -511,10 +511,10 @@ button:not(.btn-void, .btn-icon),
     &.btn-system:not(:disabled) {
       @include _btn-ghost-variant(var(--color-system));
     }
-    &.btn-signal:not(:disabled) {
+    &.btn-success:not(:disabled) {
       @include _btn-ghost-variant(var(--color-success));
     }
-    &.btn-alert:not(:disabled) {
+    &.btn-error:not(:disabled) {
       @include _btn-ghost-variant(var(--color-error));
     }
   }
@@ -530,10 +530,10 @@ button:not(.btn-void, .btn-icon),
   &.btn-system:not(:disabled, .btn-ghost) {
     @include _btn-variant(var(--color-system));
   }
-  &.btn-signal:not(:disabled, .btn-ghost) {
+  &.btn-success:not(:disabled, .btn-ghost) {
     @include _btn-variant(var(--color-success));
   }
-  &.btn-alert:not(:disabled, .btn-ghost) {
+  &.btn-error:not(:disabled, .btn-ghost) {
     @include _btn-variant(var(--color-error));
   }
 

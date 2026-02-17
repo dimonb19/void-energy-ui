@@ -165,7 +165,7 @@
   </h2>
 
   <div
-    class="surface-sunk flex flex-col items-center justify-center gap-sm p-sm"
+    class="surface-sunk flex flex-col items-center justify-center gap-md p-md"
   >
     <p class="text-center">
       Tune how your interface looks, moves, and breathes.
@@ -182,7 +182,7 @@
   {#if voidEngine.hasTemporaryTheme}
     {@const info = voidEngine.temporaryThemeInfo}
     <div
-      class="surface-sunk flex flex-col items-center gap-sm p-sm"
+      class="surface-sunk flex flex-col items-center gap-md p-md"
       out:dematerialize
     >
       <h5>Story Override Active</h5>
@@ -197,7 +197,7 @@
           Return to {capitalize(info?.returnTo ?? '')}
         </button>
         <button
-          class="btn-alert"
+          class="btn-error"
           onclick={(event) => toggleAdaptAtmosphere(false)}
         >
           Don't adapt to stories
@@ -262,7 +262,7 @@
       <div in:materialize={{ delay: 0 }} out:dematerialize>
         <hr />
         <SettingsRow label="Text Scale">
-          <div class="surface-sunk p-sm">
+          <div class="surface-sunk p-md">
             <Switcher
               options={scaleLevels}
               value={activeScaleStep.value}
@@ -275,7 +275,7 @@
       <div in:materialize={{ delay: 50 }} out:dematerialize>
         <hr />
         <SettingsRow label="Spacing Density">
-          <div class="surface-sunk p-sm">
+          <div class="surface-sunk p-md">
             <Switcher
               options={densityOptions}
               value={voidEngine.userConfig.density}

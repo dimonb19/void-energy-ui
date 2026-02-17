@@ -34,7 +34,7 @@ const { title = 'Void Energy UI' } = Astro.props;
   </head>
   <body>
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    <Navigation client:load />
+    <Navigation client:load pathname={Astro.url.pathname} />
 
     <main id="main-content" class="min-h-screen">
       <slot />
