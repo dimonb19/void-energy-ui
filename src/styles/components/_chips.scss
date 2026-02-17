@@ -171,7 +171,6 @@
 
     &:hover {
       background: shade($color, 50%);
-      color: var(--bg-canvas);
     }
   }
 
@@ -303,7 +302,9 @@
     mix-blend-mode: normal;
 
     @include when-flat {
-      top: calc(var(--space-md) * -1 + 0.25px); // Remove bottom border overlay on hover
+      top: calc(
+        var(--space-md) * -1 + 0.25px
+      ); // Remove bottom border overlay on hover
     }
   }
 }

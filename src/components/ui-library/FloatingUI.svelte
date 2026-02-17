@@ -34,7 +34,7 @@
         the trigger to open, click outside or press <code>Escape</code> to close.
       </p>
 
-      <div class="surface-sunk p-md flex flex-row gap-md">
+      <div class="surface-sunk p-md flex flex-row gap-md justify-center">
         <Dropdown label="Options menu">
           {#snippet trigger()}
             <span class="flex items-center gap-xs">
@@ -73,7 +73,9 @@
         to the trigger. Floating UI automatically flips when there isn't enough space.
       </p>
 
-      <div class="surface-sunk p-md flex flex-row flex-wrap gap-md items-start">
+      <div
+        class="surface-sunk p-md flex flex-row flex-wrap gap-md justify-center"
+      >
         <Dropdown label="Bottom start" placement="bottom-start">
           {#snippet trigger()}
             <span class="flex items-center gap-xs">
@@ -118,7 +120,7 @@
       </p>
 
       <div
-        class="surface-sunk p-md flex flex-row flex-wrap gap-md items-center"
+        class="surface-sunk p-md flex flex-row flex-wrap gap-md justify-center items-center"
       >
         <Dropdown
           label="Controlled dropdown"
@@ -146,10 +148,11 @@
 
         <button
           onclick={() => {
-            controlledOpen = !controlledOpen;
+            controlledOpen = true;
           }}
+          disabled={controlledOpen}
         >
-          Toggle externally
+          Open externally
         </button>
 
         <p class="text-caption text-mute">
@@ -170,8 +173,10 @@
         for compact UI. Combine with <code>offset</code> to adjust spacing.
       </p>
 
-      <div class="surface-sunk p-md flex flex-row flex-wrap gap-lg items-start">
-        <Dropdown label="Settings" offset={4}>
+      <div
+        class="surface-sunk p-md flex flex-row flex-wrap gap-lg justify-center"
+      >
+        <Dropdown label="Settings" offset={8}>
           {#snippet trigger()}
             <Settings class="icon" />
           {/snippet}
@@ -180,7 +185,7 @@
           </div>
         </Dropdown>
 
-        <Dropdown label="Notifications" placement="bottom-end" offset={4}>
+        <Dropdown label="Notifications" placement="bottom-end" offset={8}>
           {#snippet trigger()}
             <Bell class="icon" />
           {/snippet}
@@ -189,7 +194,7 @@
           </div>
         </Dropdown>
 
-        <Dropdown label="Filters" offset={4}>
+        <Dropdown label="Filters" offset={8}>
           {#snippet trigger()}
             <Filter class="icon" />
           {/snippet}
@@ -249,14 +254,14 @@
       </p>
 
       <div
-        class="surface-sunk p-md flex flex-row flex-wrap gap-md items-center"
+        class="surface-sunk p-md flex flex-row flex-wrap gap-md justify-center items-center"
       >
         <button class="btn-cta" use:tooltip={'Tooltip on a CTA button'}>
           CTA Button
         </button>
         <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
         <span
-          class="text-dim underline cursor-help"
+          class="flex gap-xs items-center text-dim cursor-help underline decoration-dashed"
           tabindex="0"
           use:tooltip={'Tooltip on a text span (focusable via tabindex)'}
         >
