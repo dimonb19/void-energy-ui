@@ -8,7 +8,7 @@
 </script>
 
 <section class="flex flex-col gap-md mt-md">
-  <h2>06 // FLOATING UI</h2>
+  <h2>08 // FLOATING UI</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">

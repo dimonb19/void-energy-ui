@@ -99,7 +99,7 @@
       <p class="text-small text-mute">
         Convenience methods for built-in modals. <code>modal.themes()</code>
         opens the atmosphere/theme selector. <code>modal.settings()</code>
-        opens the play options panel. Both use the <code>lg</code> size.
+        opens the display preferences demo. Both use the <code>lg</code> size.
       </p>
 
       <div class="surface-sunk p-md flex flex-wrap justify-center gap-sm">

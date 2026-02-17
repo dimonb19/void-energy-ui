@@ -1,14 +1,19 @@
 <script lang="ts">
   import PullRefresh from './ui/PullRefresh.svelte';
 
-  import Buttons from './ui-library/Buttons.svelte';
-  import Inputs from './ui-library/Inputs.svelte';
-  import Icons from './ui-library/Icons.svelte';
-  import Composites from './ui-library/Composites.svelte';
-  import DataUpload from './ui-library/DataUpload.svelte';
-  import FloatingUI from './ui-library/FloatingUI.svelte';
+  // Foundations
   import Typography from './ui-library/Typography.svelte';
   import Surfaces from './ui-library/Surfaces.svelte';
+  // Primitives
+  import Icons from './ui-library/Icons.svelte';
+  import Buttons from './ui-library/Buttons.svelte';
+  // Form Controls
+  import Inputs from './ui-library/Inputs.svelte';
+  import DataUpload from './ui-library/DataUpload.svelte';
+  // Composites
+  import Composites from './ui-library/Composites.svelte';
+  // Overlays & Feedback
+  import FloatingUI from './ui-library/FloatingUI.svelte';
   import Toasts from './ui-library/Toasts.svelte';
   import Modals from './ui-library/Modals.svelte';
 
@@ -30,24 +35,24 @@
       scroll past the top) to see it in action.
     </p>
 
-    <Buttons />
-
-    <Inputs />
-
-    <Icons />
-
-    <Composites />
-
-    <DataUpload />
-
-    <FloatingUI />
-
+    <h3 class="text-mute">Foundations</h3>
     <Typography />
-
     <Surfaces />
 
-    <Toasts />
+    <h3 class="text-mute">Primitives</h3>
+    <Icons />
+    <Buttons />
 
+    <h3 class="text-mute">Form Controls</h3>
+    <Inputs />
+    <DataUpload />
+
+    <h3 class="text-mute">Composites</h3>
+    <Composites />
+
+    <h3 class="text-mute">Overlays & Feedback</h3>
+    <FloatingUI />
+    <Toasts />
     <Modals />
   </div>
 </PullRefresh>

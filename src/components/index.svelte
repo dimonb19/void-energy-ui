@@ -449,7 +449,7 @@
                     toast.promise(
                       new Promise((resolve) => setTimeout(resolve, 2000)),
                       {
-                        loading: `Applying ${prefs.settings} preferences...`,
+                        loading: `Applying ${prefs.layout} layout...`,
                         success: 'Preferences saved successfully',
                         error: 'Failed to save preferences',
                       },

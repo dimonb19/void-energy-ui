@@ -32,7 +32,7 @@
 </script>
 
 <section class="flex flex-col gap-md mt-md">
-  <h2>02 // INPUTS & CONTROLS</h2>
+  <h2>05 // INPUTS & CONTROLS</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">

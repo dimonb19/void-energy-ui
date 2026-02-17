@@ -1,5 +1,5 @@
 <section class="flex flex-col gap-md mt-md">
-  <h2>07 // TYPOGRAPHY & TEXT</h2>
+  <h2>01 // TYPOGRAPHY & TEXT</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">

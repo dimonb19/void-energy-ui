@@ -4,30 +4,28 @@
   import Selector from '../ui/Selector.svelte';
 
   let {
-    initialSettings = 'default',
-    initialPlayMode = 'play_unlimited',
-    initialDontShowAgain = false,
-    onSave = (data: SettingsPreferences) =>
-      console.log('Settings Saved:', data),
-    onDontShowAgainChange = (value: boolean) =>
-      console.log('Dont show again:', value),
+    initialLayout = 'comfortable',
+    initialNotifications = 'all',
+    initialRemember = false,
+    onSave = (data: DemoPreferences) => console.log('Settings saved:', data),
+    onRememberChange = (value: boolean) =>
+      console.log('Remember choice:', value),
   }: {
-    initialSettings?: SettingMode;
-    initialPlayMode?: PlayMode;
-    initialDontShowAgain?: boolean;
-    onSave?: (data: SettingsPreferences) => void;
-    onDontShowAgainChange?: (value: boolean) => void;
+    initialLayout?: DemoLayout;
+    initialNotifications?: DemoNotificationLevel;
+    initialRemember?: boolean;
+    onSave?: (data: DemoPreferences) => void;
+    onRememberChange?: (value: boolean) => void;
   } = $props();
 
-  // Local editing buffer.
-  let preferredSettings = $state<SettingMode>(initialSettings);
-  let playMode = $state<PlayMode>(initialPlayMode);
-  let dontShowAgain = $state(initialDontShowAgain);
+  let layout = $state<DemoLayout>(initialLayout);
+  let notifications = $state<DemoNotificationLevel>(initialNotifications);
+  let remember = $state(initialRemember);
 
   function handleSave() {
-    onSave({ settings: preferredSettings, play_mode: playMode });
-    if (dontShowAgain) {
-      onDontShowAgainChange(true);
+    onSave({ layout, notifications });
+    if (remember) {
+      onRememberChange(true);
     }
     modal.close();
   }
@@ -40,12 +38,8 @@
 >
   <div class="flex flex-col gap-md items-center">
     <div class="text-center flex flex-col gap-md">
-      <h2 id="modal-title" class="text-h3">Play options</h2>
-      <p>
-        These choices are also
-        <a class="link" href="/">in your profile.</a>
-        Changes apply immediately.
-      </p>
+      <h2 id="modal-title" class="text-h3">Display Preferences</h2>
+      <p>Adjust how content is presented. Changes apply on save.</p>
     </div>
 
     <div
@@ -53,14 +47,14 @@
     >
       <div class="flex flex-col items-center gap-md">
         <Selector
-          label="SETTINGS: {preferredSettings === 'personal'
-            ? 'Use your profile settings'
-            : "Use the author's settings"}"
+          label="LAYOUT: {layout === 'compact'
+            ? 'Reduced spacing, denser content'
+            : 'Standard spacing, relaxed reading'}"
           options={[
-            { value: 'personal', label: 'Personal' },
-            { value: 'default', label: "Author's Default" },
+            { value: 'compact', label: 'Compact' },
+            { value: 'comfortable', label: 'Comfortable' },
           ]}
-          bind:value={preferredSettings}
+          bind:value={layout}
         />
       </div>
 
@@ -68,28 +62,26 @@
 
       <div class="flex flex-col items-center gap-md">
         <Selector
-          label="PLAY MODE: {playMode === 'play_limited'
-            ? 'No images or audio'
-            : 'Images and audio on each step'}"
+          label="NOTIFICATIONS: {notifications === 'all'
+            ? 'Show all notifications'
+            : 'Only critical alerts'}"
           options={[
-            { value: 'play_limited', label: 'Text-only (1 credit)' },
-            { value: 'play_unlimited', label: 'With Media (3 credits)' },
+            { value: 'all', label: 'All Notifications' },
+            { value: 'critical', label: 'Critical Only' },
           ]}
-          bind:value={playMode}
+          bind:value={notifications}
         />
       </div>
     </div>
 
     <label class="flex flex-row items-center gap-xs">
-      <input type="checkbox" bind:checked={dontShowAgain} />
-      Don't show this again
+      <input type="checkbox" bind:checked={remember} />
+      Remember this choice
     </label>
   </div>
 
   <div class="flex flex-row justify-center gap-md">
-    <button class="btn-ghost" onclick={() => modal.close()}> Cancel </button>
-    <button class="btn-cta" onclick={handleSave}>
-      {playMode === 'play_limited' ? 'Play: 1 credit' : 'Play: 3 credits'}
-    </button>
+    <button class="btn-ghost" onclick={() => modal.close()}>Cancel</button>
+    <button class="btn-signal" onclick={handleSave}>Save</button>
   </div>
 </div>

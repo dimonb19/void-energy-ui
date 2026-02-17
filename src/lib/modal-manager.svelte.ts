@@ -88,12 +88,11 @@ class ModalManager {
   }
 
   /**
-   * Opens the play options settings modal.
+   * Opens the display preferences demo modal.
    */
   settings(options?: {
-    isGuest?: boolean;
-    onSave?: (prefs: SettingsPreferences) => void;
-    onDontShowAgainChange?: (value: boolean) => void;
+    onSave?: (prefs: DemoPreferences) => void;
+    onRememberChange?: (value: boolean) => void;
   }) {
     this.open(MODAL_KEYS.SETTINGS, { ...options }, 'lg');
   }

@@ -89,7 +89,7 @@
 </script>
 
 <section class="flex flex-col gap-md mt-md">
-  <h2>04 // COMPOSITES</h2>
+  <h2>07 // COMPOSITES</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">

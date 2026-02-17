@@ -26,42 +26,26 @@ type ModalContract = {
     onCancel?: () => void;
   };
 
-  /** Settings panel modal for play options */
+  /** Display preferences demo modal showcasing form controls */
   settings: {
-    /** Initial settings mode preference */
-    initialSettings?: SettingMode;
-    /** Initial play mode preference */
-    initialPlayMode?: PlayMode;
-    /** Initial "don't show again" state */
-    initialDontShowAgain?: boolean;
-    /** Whether the user is a guest (limits play mode options) */
-    isGuest?: boolean;
-    /** Callback fired when user saves preferences */
-    onSave?: (prefs: SettingsPreferences) => void;
-    /** Callback fired when "don't show again" changes */
-    onDontShowAgainChange?: (value: boolean) => void;
+    initialLayout?: DemoLayout;
+    initialNotifications?: DemoNotificationLevel;
+    initialRemember?: boolean;
+    onSave?: (prefs: DemoPreferences) => void;
+    onRememberChange?: (value: boolean) => void;
   };
 
   /** Atmospheres selector */
   themes: {};
 };
 
-/**
- * Settings mode: use personal profile settings or author's defaults.
- */
-type SettingMode = 'personal' | 'default';
+type DemoLayout = 'compact' | 'comfortable';
 
-/**
- * Play mode: text-only (limited) or with media (unlimited).
- */
-type PlayMode = 'play_limited' | 'play_unlimited';
+type DemoNotificationLevel = 'all' | 'critical';
 
-/**
- * User preferences saved from the settings modal.
- */
-interface SettingsPreferences {
-  settings: SettingMode;
-  play_mode: PlayMode;
+interface DemoPreferences {
+  layout: DemoLayout;
+  notifications: DemoNotificationLevel;
 }
 
 /**

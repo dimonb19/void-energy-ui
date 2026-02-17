@@ -42,7 +42,7 @@
 </script>
 
 <section class="flex flex-col gap-md mt-md">
-  <h2>01 // BUTTONS & CHIPS</h2>
+  <h2>04 // BUTTONS & CHIPS</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
