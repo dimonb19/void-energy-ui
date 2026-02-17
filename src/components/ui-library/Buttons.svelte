@@ -41,7 +41,7 @@
   let activeSystem = $state(false);
 </script>
 
-<section class="flex flex-col gap-md mt-md">
+<section id="buttons" class="flex flex-col gap-md">
   <h2>04 // BUTTONS & CHIPS</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
@@ -105,11 +105,22 @@
         </div>
       </div>
 
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;button&gt;Default&lt;/button&gt;
+&lt;button class="btn-cta"&gt;Call to Action&lt;/button&gt;
+&lt;button class="btn-premium"&gt;Premium&lt;/button&gt;
+&lt;button class="btn-system"&gt;System&lt;/button&gt;
+&lt;button class="btn-signal"&gt;Signal&lt;/button&gt;
+&lt;button class="btn-alert"&gt;Alert&lt;/button&gt;
+&lt;button disabled&gt;Disabled&lt;/button&gt;</code
+          ></pre>
+      </details>
+
       <p class="text-caption text-mute px-xs">
-        Classes: <code>btn-cta</code>, <code>btn-premium</code>,
-        <code>btn-system</code>, <code>btn-signal</code>,
-        <code>btn-alert</code>. CTA uses an animated gradient border (Gemini
-        Laser) in glass mode and a double border in retro mode.
+        CTA uses an animated gradient border (Gemini Laser) in glass mode and a
+        double border in retro mode.
       </p>
     </div>
 
@@ -161,6 +172,15 @@
         </div>
       </div>
 
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;button class="btn-ghost"&gt;Ghost&lt;/button&gt;
+&lt;button class="btn-ghost btn-premium"&gt;Ghost Premium&lt;/button&gt;
+&lt;button class="btn-ghost btn-alert"&gt;Ghost Alert&lt;/button&gt;</code
+          ></pre>
+      </details>
+
       <p class="text-caption text-mute px-xs">
         Hover reveals a subtle tinted surface. In retro mode, hover shows
         underline instead. Ghost stays grounded — no lift transform on hover.
@@ -204,6 +224,19 @@
         </button>
       </div>
 
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;button
+  aria-pressed=&#123;isActive&#125;
+  data-state=&#123;isActive ? 'active' : ''&#125;
+  onclick=&#123;() =&gt; (isActive = !isActive)&#125;
+&gt;
+  &#123;isActive ? 'Active' : 'Inactive'&#125;
+&lt;/button&gt;</code
+          ></pre>
+      </details>
+
       <p class="text-caption text-mute px-xs">
         State is exposed via <code>data-state="active"</code> and
         <code>aria-pressed="true"</code>. SCSS targets this with
@@ -242,7 +275,7 @@
                 aria-label="Remove {chip.name}"
                 onclick={() => {
                   chips = chips.filter((c) => c.id !== chip.id);
-                }}>✕</button
+                }}>&#10005;</button
               >
             </div>
           {/each}
@@ -277,10 +310,24 @@
         >
       </div>
 
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;div class="chip"&gt;
+  &lt;p class="chip-label"&gt;Tag Name&lt;/p&gt;
+  &lt;button class="btn-void chip-remove" aria-label="Remove"&gt;&amp;#10005;&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;!-- Semantic variants --&gt;
+&lt;div class="chip-system"&gt;...&lt;/div&gt;
+&lt;div class="chip-premium"&gt;...&lt;/div&gt;
+&lt;div class="chip-success"&gt;...&lt;/div&gt;
+&lt;div class="chip-error"&gt;...&lt;/div&gt;</code
+          ></pre>
+      </details>
+
       <p class="text-caption text-mute px-xs">
-        Classes: <code>.chip</code>, <code>.chip-system</code>,
-        <code>.chip-premium</code>, <code>.chip-success</code>,
-        <code>.chip-error</code>. Inner elements:
+        Inner elements:
         <code>.chip-label</code>, <code>.chip-remove</code>.
       </p>
     </div>
@@ -306,10 +353,23 @@
         <div class="chip-system chip-labeled" data-label="Status">
           <p class="chip-label">Processing</p>
           <button type="button" class="btn-void chip-remove" aria-label="Remove"
-            >✕</button
+            >&#10005;</button
           >
         </div>
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;div class="chip chip-labeled" data-label="Module"&gt;
+  &lt;p class="chip-label"&gt;Neural Net&lt;/p&gt;
+&lt;/div&gt;
+
+&lt;div class="chip-premium chip-labeled" data-label="Tier"&gt;
+  &lt;p class="chip-label"&gt;Quantum Core&lt;/p&gt;
+&lt;/div&gt;</code
+          ></pre>
+      </details>
 
       <p class="text-caption text-mute px-xs">
         Requires <code>chip-labeled</code> class and

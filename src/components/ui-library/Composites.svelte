@@ -88,20 +88,21 @@
   let activeLabel = $derived(btnLabel[selectedIcon] ?? selectedIcon);
 </script>
 
-<section class="flex flex-col gap-md mt-md">
+<section id="composites" class="flex flex-col gap-md">
   <h2>07 // COMPOSITES</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
-      Composite components combine animated icons with native inputs and
-      buttons. Input fields use the <code>.field</code> overlay pattern: icons
-      are <strong>absolutely positioned</strong> inside the native input, which
-      keeps its own <code>glass-sunk</code> styling untouched. Padding adjusts
-      automatically via <code>:has()</code> selectors. Icons provide visual
-      state feedback — rotation, checkmarks, cross-outs — driven by
-      <code>data-state</code>
-      and <code>data-muted</code>
-      attributes.
+      Composites are higher-order components that combine animated icons, native
+      inputs, and buttons into purpose-built UI patterns. Input fields use the <code
+        >.field</code
+      >
+      overlay pattern: icons are <strong>absolutely positioned</strong> inside
+      the native input, which keeps its own <code>glass-sunk</code>
+      styling untouched. Padding adjusts automatically via <code>:has()</code>
+      selectors. Icons provide visual state feedback — rotation, checkmarks, cross-outs
+      — driven by <code>data-state</code> and
+      <code>data-muted</code> attributes.
     </p>
 
     <!-- ─── INPUT FIELDS ─────────────────────────────────────────────── -->
@@ -176,6 +177,37 @@
           </p>
         </div>
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;script&gt;
+  import SearchField from './ui/SearchField.svelte';
+  import PasswordField from './ui/PasswordField.svelte';
+  import EditField from './ui/EditField.svelte';
+  import CopyField from './ui/CopyField.svelte';
+&lt;/script&gt;
+
+&lt;SearchField
+  bind:value=&#123;query&#125;
+  placeholder="Search..."
+  onsubmit=&#123;(v) =&gt; console.log(v)&#125;
+/&gt;
+
+&lt;PasswordField
+  bind:value=&#123;password&#125;
+  placeholder="Enter password..."
+/&gt;
+
+&lt;EditField
+  bind:value=&#123;name&#125;
+  placeholder="Identifier..."
+  onconfirm=&#123;(v) =&gt; save(v)&#125;
+/&gt;
+
+&lt;CopyField value="sk-secret-key-here" /&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <!-- ─── MEDIA CONTROLS ───────────────────────────────────────────── -->
@@ -263,6 +295,31 @@
           class="flex-1"
         />
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;script&gt;
+  import ActionBtn from './ui/ActionBtn.svelte';
+  import Play from './icons/Play.svelte';
+&lt;/script&gt;
+
+&lt;!-- Default --&gt;
+&lt;ActionBtn icon=&#123;Play&#125; text="Play" onclick=&#123;handler&#125; /&gt;
+
+&lt;!-- With variant --&gt;
+&lt;ActionBtn icon=&#123;Play&#125; text="Play" class="btn-cta" /&gt;
+
+&lt;!-- IconBtn (icon-only circular button) --&gt;
+&lt;script&gt;
+  import IconBtn from './ui/IconBtn.svelte';
+  import Refresh from './icons/Refresh.svelte';
+&lt;/script&gt;
+
+&lt;IconBtn icon=&#123;Refresh&#125; aria-label="Refresh" /&gt;
+&lt;IconBtn icon=&#123;Refresh&#125; size="xl" /&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <!-- ─── ICON BUTTON ────────────────────────────────────────────── -->

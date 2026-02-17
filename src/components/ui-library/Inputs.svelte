@@ -31,7 +31,7 @@
   let detailsRange = $state(75);
 </script>
 
-<section class="flex flex-col gap-md mt-md">
+<section id="inputs" class="flex flex-col gap-md">
   <h2>05 // INPUTS & CONTROLS</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
@@ -78,6 +78,21 @@
           />
         </div>
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;label for="my-input"&gt;Label&lt;/label&gt;
+&lt;input id="my-input" type="text" placeholder="Enter value..." bind:value /&gt;
+
+&lt;!-- Disabled --&gt;
+&lt;input type="text" value="Locked" disabled /&gt;
+
+&lt;!-- Validation error --&gt;
+&lt;input type="text" aria-invalid="true" /&gt;
+&lt;p class="text-caption text-error"&gt;Error message.&lt;/p&gt;</code
+          ></pre>
+      </details>
 
       <p class="text-caption text-mute px-xs">
         All text-like inputs (<code>text</code>, <code>email</code>,
@@ -319,6 +334,22 @@
         />
       </div>
 
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;script&gt;
+  import Toggle from './ui/Toggle.svelte';
+  import &#123; Sun, Moon &#125; from '@lucide/svelte';
+  let checked = $state(false);
+&lt;/script&gt;
+
+&lt;Toggle bind:checked label="Dark Mode" /&gt;
+&lt;Toggle bind:checked label="Theme" iconOn=&#123;Sun&#125; iconOff=&#123;Moon&#125; /&gt;
+&lt;Toggle bind:checked label="Minimal" hideIcons /&gt;
+&lt;Toggle checked=&#123;false&#125; label="Locked" disabled /&gt;</code
+          ></pre>
+      </details>
+
       <p class="text-caption text-mute px-xs">
         Props: <code>checked</code> (bindable), <code>label</code>,
         <code>iconOn</code>/<code>iconOff</code> (Component or string),
@@ -448,6 +479,27 @@
           </fieldset>
         </details>
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;!-- Single disclosure --&gt;
+&lt;details&gt;
+  &lt;summary&gt;Section Title&lt;/summary&gt;
+  &lt;div class="p-md"&gt;Content here&lt;/div&gt;
+&lt;/details&gt;
+
+&lt;!-- Exclusive accordion group --&gt;
+&lt;details name="my-group" open&gt;
+  &lt;summary&gt;Panel A&lt;/summary&gt;
+  &lt;div class="p-md"&gt;...&lt;/div&gt;
+&lt;/details&gt;
+&lt;details name="my-group"&gt;
+  &lt;summary&gt;Panel B&lt;/summary&gt;
+  &lt;div class="p-md"&gt;...&lt;/div&gt;
+&lt;/details&gt;</code
+          ></pre>
+      </details>
 
       <p class="text-caption text-mute px-xs">
         Add <code>name="group"</code> to multiple <code>&lt;details&gt;</code>

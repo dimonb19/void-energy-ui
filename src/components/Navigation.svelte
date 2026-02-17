@@ -46,10 +46,34 @@
   const sidebarItems: SidebarItem[] = [
     {
       id: 'library',
-      label: 'Library',
+      label: 'UI Library',
       children: [
-        { id: 'Buttons', label: 'Buttons', href: '/' },
-        { id: 'Icons', label: 'Icons', href: '/' },
+        {
+          id: 'typography',
+          label: 'Typography',
+          href: '/components#typography',
+        },
+        { id: 'surfaces', label: 'Surfaces', href: '/components#surfaces' },
+        { id: 'icons', label: 'Icons', href: '/components#icons' },
+        { id: 'buttons', label: 'Buttons', href: '/components#buttons' },
+        { id: 'inputs', label: 'Inputs', href: '/components#inputs' },
+        {
+          id: 'data-upload',
+          label: 'Data Upload',
+          href: '/components#data-upload',
+        },
+        {
+          id: 'composites',
+          label: 'Composites',
+          href: '/components#composites',
+        },
+        {
+          id: 'floating-ui',
+          label: 'Floating UI',
+          href: '/components#floating-ui',
+        },
+        { id: 'toasts', label: 'Toasts', href: '/components#toasts' },
+        { id: 'modals', label: 'Modals', href: '/components#modals' },
       ],
     },
     {

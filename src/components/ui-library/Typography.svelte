@@ -1,4 +1,4 @@
-<section class="flex flex-col gap-md mt-md">
+<section id="typography" class="flex flex-col gap-md">
   <h2>01 // TYPOGRAPHY & TEXT</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
@@ -19,8 +19,7 @@
         Five heading levels from <code>&lt;h1&gt;</code> through
         <code>&lt;h5&gt;</code>. H1-H4 use <code>--text-main</code> color; H5
         uses <code>--text-dim</code> as a subheading tier. Font family switches
-        to <code>--font-heading</code> with tighter tracking at larger sizes. H1-H4
-        have tablet-responsive size overrides.
+        to <code>--font-heading</code> with tighter tracking at larger sizes.
       </p>
 
       <div class="surface-sunk p-md flex flex-col gap-sm">
@@ -30,6 +29,20 @@
         <h4>h4 — Section Header</h4>
         <h5>h5 — Subheading Tier</h5>
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;h1&gt;Page Title&lt;/h1&gt;
+&lt;h2&gt;Section Heading&lt;/h2&gt;
+&lt;h3&gt;Subsection&lt;/h3&gt;
+&lt;h4&gt;Group Header&lt;/h4&gt;
+&lt;h5&gt;Subheading&lt;/h5&gt;
+
+&lt;!-- Override size inline via utility class --&gt;
+&lt;p class="text-h3"&gt;Body text at h3 size&lt;/p&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <!-- BODY & SECONDARY TEXT -->
@@ -76,7 +89,6 @@
       </p>
 
       <div class="surface-sunk p-md flex flex-col gap-md">
-        <!-- Inline code -->
         <div class="flex flex-col gap-xs">
           <p class="text-small text-main">
             Inline code: Use <code>voidEngine.setAtmosphere('nova')</code> to switch
@@ -84,7 +96,6 @@
           </p>
         </div>
 
-        <!-- Code block -->
         <div class="flex flex-col gap-xs">
           <p class="text-small px-xs">Code Block</p>
           <pre><code
@@ -97,7 +108,6 @@ engine.setPreferences(&#123;
             ></pre>
         </div>
 
-        <!-- Keyboard -->
         <div class="flex flex-col gap-xs">
           <p class="text-small">
             Keyboard: Press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>P</kbd>
@@ -105,7 +115,6 @@ engine.setPreferences(&#123;
           </p>
         </div>
 
-        <!-- Sample output -->
         <div class="flex flex-col gap-xs">
           <p class="text-small">
             Sample output: <samp
@@ -114,7 +123,6 @@ engine.setPreferences(&#123;
           </p>
         </div>
 
-        <!-- Variable -->
         <div class="flex flex-col gap-xs">
           <p class="text-small">
             Variable: The energy threshold is <var>E</var> = <var>mc</var><sup
@@ -123,6 +131,26 @@ engine.setPreferences(&#123;
           </p>
         </div>
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;!-- Inline code --&gt;
+&lt;p&gt;Use &lt;code&gt;functionName()&lt;/code&gt; to call it.&lt;/p&gt;
+
+&lt;!-- Code block --&gt;
+&lt;pre&gt;&lt;code&gt;const x = 42;&lt;/code&gt;&lt;/pre&gt;
+
+&lt;!-- Keyboard shortcut --&gt;
+&lt;kbd&gt;Ctrl&lt;/kbd&gt; + &lt;kbd&gt;S&lt;/kbd&gt;
+
+&lt;!-- Sample output --&gt;
+&lt;samp&gt;Build completed in 1.23s&lt;/samp&gt;
+
+&lt;!-- Variable --&gt;
+&lt;var&gt;E&lt;/var&gt; = &lt;var&gt;mc&lt;/var&gt;&lt;sup&gt;2&lt;/sup&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <!-- LINKS -->
@@ -178,7 +206,7 @@ engine.setPreferences(&#123;
       <div class="surface-sunk p-md flex flex-col gap-md">
         <div class="flex flex-col gap-xs">
           <p class="text-small px-xs">.text-truncate</p>
-          <p class="text-truncate surface-void p-sm" style="max-width: 20rem;">
+          <p class="text-truncate surface-void p-sm max-w-xl">
             This is a very long heading that should be truncated to a single
             line with an ellipsis indicator at the end of the visible text.
           </p>
@@ -186,7 +214,7 @@ engine.setPreferences(&#123;
 
         <div class="flex flex-col gap-xs">
           <p class="text-small px-xs">.text-clamp-2</p>
-          <p class="text-clamp-2 surface-void p-sm" style="max-width: 20rem;">
+          <p class="text-clamp-2 surface-void p-sm max-w-xl">
             This is a longer paragraph that should be clamped to exactly two
             lines. Any content beyond the second line will be hidden and
             replaced with an ellipsis to indicate truncation. This extra text
@@ -196,7 +224,7 @@ engine.setPreferences(&#123;
 
         <div class="flex flex-col gap-xs">
           <p class="text-small px-xs">.text-break</p>
-          <p class="text-break surface-void p-sm" style="max-width: 20rem;">
+          <p class="text-break surface-void p-sm max-w-xl">
             superlongstringwithnospaceslikeanapikieyorhashsk-void-4f8a9c2e7d1b3e6f0a5b8c4d2e1f7a9b
           </p>
         </div>
@@ -214,41 +242,41 @@ engine.setPreferences(&#123;
       </p>
 
       <div class="surface-sunk p-md legal-content">
-        <p><strong>Section 1 — System Requirements</strong></p>
+        <p><strong>Section 1 — Getting Started</strong></p>
         <ul>
-          <li>Minimum 8 GB RAM</li>
+          <li>Install the package via npm or pnpm</li>
           <li>
-            Compatible graphics processor
+            Configure your environment
             <ul>
-              <li>WebGL 2.0 support required</li>
-              <li>WebGPU recommended for glass physics</li>
+              <li>Tailwind for layout utilities</li>
+              <li>SCSS for physics and materials</li>
             </ul>
           </li>
-          <li>Network connectivity for telemetry sync</li>
+          <li>Import design tokens and begin building</li>
         </ul>
 
-        <p><strong>Section 2 — Operating Procedures</strong></p>
+        <p><strong>Section 2 — Core Principles</strong></p>
         <ol>
-          <li>Initialize the void engine</li>
-          <li>Select an atmosphere preset</li>
-          <li>Configure user preferences</li>
+          <li>Choose an atmosphere preset</li>
+          <li>Configure physics and color mode</li>
+          <li>Set density and typography preferences</li>
         </ol>
 
         <ol class="uppercase">
-          <li>Clearance Level Alpha</li>
-          <li>Clearance Level Beta</li>
-          <li>Clearance Level Gamma</li>
+          <li>Atmosphere Layer</li>
+          <li>Physics Layer</li>
+          <li>Mode Layer</li>
         </ol>
 
         <ol class="subordered">
           <li>
-            The Operator shall initialize all subsystems prior to engagement.
+            All components must use semantic tokens for color and spacing.
             <ol class="subordered">
-              <li>Navigation subsystem must report ready status.</li>
-              <li>Propulsion subsystem must pass diagnostics.</li>
+              <li>No raw pixel values in production code.</li>
+              <li>No hardcoded hex colors in component files.</li>
             </ol>
           </li>
-          <li>Emergency shutdown procedures override all standing orders.</li>
+          <li>State changes are always expressed via data attributes.</li>
         </ol>
       </div>
     </div>

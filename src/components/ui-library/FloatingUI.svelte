@@ -7,19 +7,17 @@
   let controlledOpen = $state(false);
 </script>
 
-<section class="flex flex-col gap-md mt-md">
+<section id="floating-ui" class="flex flex-col gap-md">
   <h2>08 // FLOATING UI</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Both <code>Dropdown</code> and <code>use:tooltip</code> share the same
       foundation: the <b>Popover API</b> for top-layer positioning and
-      <code>@floating-ui/dom</code> for smart placement with flip and shift.
-      Dropdown is a declarative Svelte component (click-triggered, arbitrary
-      content). Tooltip is an imperative Svelte action (hover/focus-triggered,
-      text-only). Physics come from
-      <code>_dropdown.scss</code> and <code>_tooltips.scss</code> respectively &mdash;
-      both use glass-float, glass-blur, and spring transitions.
+      <code>@floating-ui/dom</code> for smart placement with flip and shift. Dropdown
+      is a declarative Svelte component (click-triggered, arbitrary content). Tooltip
+      is an imperative Svelte action (hover/focus-triggered, text-only). Both use
+      glass-float, glass-blur, and spring transitions.
     </p>
 
     <hr />
@@ -63,6 +61,24 @@
           </div>
         </Dropdown>
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;Dropdown label="Options menu"&gt;
+  &#123;#snippet trigger()&#125;
+    &lt;span class="flex items-center gap-xs"&gt;
+      Options &lt;ChevronDown class="icon" data-size="sm" /&gt;
+    &lt;/span&gt;
+  &#123;/snippet&#125;
+  &lt;div class="flex flex-col gap-xs p-md"&gt;
+    &lt;button class="btn-ghost"&gt;Edit&lt;/button&gt;
+    &lt;button class="btn-ghost"&gt;Duplicate&lt;/button&gt;
+    &lt;button class="btn-ghost btn-alert"&gt;Delete&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/Dropdown&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <!-- ─── PLACEMENT VARIANTS ───────────────────────────────────────────── -->
@@ -106,8 +122,8 @@
 
       <p class="text-caption text-mute px-xs">
         Props: <code>placement="bottom-start"</code>,
-        <code>placement="bottom-end"</code>,
-        <code>placement="top-start"</code>
+        <code>"bottom-end"</code>,
+        <code>"top-start"</code>
       </p>
     </div>
 
@@ -203,10 +219,6 @@
           </div>
         </Dropdown>
       </div>
-
-      <p class="text-caption text-mute px-xs">
-        Props: <code>offset=&#123;4&#125;</code>
-      </p>
     </div>
 
     <hr />
@@ -238,10 +250,22 @@
         </button>
       </div>
 
-      <p class="text-caption text-mute px-xs">
-        Shorthand: <code>use:tooltip=&#123;'text'&#125;</code>. Options:
-        <code>use:tooltip=&#123;&#123; content, placement &#125;&#125;</code>
-      </p>
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;script&gt;
+  import &#123; tooltip &#125; from '@actions/tooltip';
+&lt;/script&gt;
+
+&lt;!-- String shorthand (placement: top) --&gt;
+&lt;button use:tooltip=&#123;'Tooltip text'&#125;&gt;Hover me&lt;/button&gt;
+
+&lt;!-- Options object --&gt;
+&lt;button use:tooltip=&#123;&#123; content: 'Below', placement: 'bottom' &#125;&#125;&gt;
+  Bottom
+&lt;/button&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <!-- ─── TOOLTIP ON ELEMENTS ──────────────────────────────────────────── -->
@@ -271,7 +295,7 @@
           type="text"
           placeholder="Focus me..."
           use:tooltip={{ content: 'Tooltip on an input', placement: 'bottom' }}
-          class="max-w-[12rem]"
+          class="w-xl"
         />
       </div>
 

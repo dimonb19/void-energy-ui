@@ -29,7 +29,7 @@
   }
 </script>
 
-<section class="flex flex-col gap-md mt-md">
+<section id="toasts" class="flex flex-col gap-md">
   <h2>09 // TOASTS</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
@@ -38,8 +38,7 @@
       feedback. Four semantic types map to accent colors:
       <code>info</code> (system), <code>success</code>, <code>error</code>, and
       <code>warning</code>. The <code>loading</code> type persists until explicitly
-      resolved. Toasts auto-dismiss after 4 seconds by default. The toast region
-      uses the Popover API and is positioned above all other layers.
+      resolved. Toasts auto-dismiss after 4 seconds by default.
     </p>
 
     <!-- BASIC TYPES -->
@@ -87,8 +86,8 @@
       </p>
 
       <div class="surface-sunk p-md flex flex-wrap justify-center gap-sm">
-        <button onclick={triggerLoading}> Loading → Success </button>
-        <button onclick={triggerLoadingError}> Loading → Error </button>
+        <button onclick={triggerLoading}> Loading &rarr; Success </button>
+        <button onclick={triggerLoadingError}> Loading &rarr; Error </button>
       </div>
 
       <p class="text-caption text-mute px-xs">
@@ -102,21 +101,41 @@
       <h5>Promise Wrapper</h5>
       <p class="text-small text-mute">
         <code>toast.promise()</code> wraps any <code>Promise</code> with automatic
-        loading → success/error transitions. The success message can be a function
+        loading &rarr; success/error transitions. The success message can be a function
         that receives the resolved value.
       </p>
 
       <div class="surface-sunk p-md flex flex-wrap justify-center gap-sm">
         <button onclick={triggerPromise}> toast.promise() </button>
       </div>
-
-      <p class="text-caption text-mute px-xs">
-        API: <code>toast.show(message, type?, duration?)</code>,
-        <code>toast.loading(message)</code>,
-        <code>toast.promise(promise, messages)</code>,
-        <code>toast.close(id)</code>,
-        <code>toast.clearAll()</code>.
-      </p>
     </div>
+
+    <details>
+      <summary>View Code</summary>
+      <pre><code
+          >import &#123; toast &#125; from '@stores/toast.svelte';
+
+// Basic toast
+toast.show('File saved', 'success');
+toast.show('Connection lost', 'error');
+
+// Loading with controller
+const loader = toast.loading('Uploading...');
+loader.update('Processing...');
+loader.success('Upload complete');
+// or: loader.error('Upload failed');
+
+// Promise wrapper (auto loading &rarr; result)
+toast.promise(fetchData(), &#123;
+  loading: 'Fetching data...',
+  success: (data) =&gt; `Loaded $&#123;data.length&#125; items`,
+  error: 'Failed to fetch',
+&#125;);
+
+// Utility
+toast.close(id);   // Remove specific toast
+toast.clearAll();  // Remove all toasts</code
+        ></pre>
+    </details>
   </div>
 </section>

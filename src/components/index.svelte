@@ -10,52 +10,45 @@
 
   import ThemesBtn from './ui/ThemesBtn.svelte';
   import SettingsRow from './ui/SettingsRow.svelte';
-  import PullRefresh from './ui/PullRefresh.svelte';
   import Toggle from './ui/Toggle.svelte';
   import Selector from './ui/Selector.svelte';
 
   import { Moon, Sun } from '@lucide/svelte';
 
-  // Pull-to-refresh handlers
-  async function handleRefresh(): Promise<void> {
-    // Simulate network request
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-  }
+  // Consolidated chip demo state
+  const chipVariants = [
+    { value: 'chip', label: 'Default' },
+    { value: 'chip-system', label: 'System' },
+    { value: 'chip-success', label: 'Success' },
+    { value: 'chip-premium', label: 'Premium' },
+    { value: 'chip-error', label: 'Error' },
+  ];
 
-  function handleRefreshError(error: unknown): void {
-    console.error('Refresh error:', error);
-  }
+  const chipOptions = [
+    { value: 'Spacing', label: 'Spacing' },
+    { value: 'Typography', label: 'Typography' },
+    { value: 'Color', label: 'Color' },
+    { value: 'Motion', label: 'Motion' },
+    { value: 'Elevation', label: 'Elevation' },
+    { value: 'Surfaces', label: 'Surfaces' },
+    { value: 'Components', label: 'Components' },
+  ];
 
-  // Local demo state with stable IDs for list animations.
-  let tokenIdCounter = $state(3);
-  let tokenTags = $state([
+  let chipVariant = $state('chip');
+  let chipIdCounter = $state(3);
+  let chipTags = $state([
     { id: 1, name: 'Spacing' },
     { id: 2, name: 'Typography' },
     { id: 3, name: 'Color' },
   ]);
-  let newTokenTag = $state('Motion');
+  let newChipTag = $state('Motion');
 
-  let layerIdCounter = $state(3);
-  let systemLayers = $state([
-    { id: 1, name: 'Surfaces' },
-    { id: 2, name: 'Components' },
-    { id: 3, name: 'Layouts' },
-  ]);
-  let newSystemLayer = $state('Inputs');
-
-  let featureIdCounter = $state(2);
-  let premiumFeatures = $state([
-    { id: 1, name: 'Runtime Theming' },
-    { id: 2, name: 'Density Engine' },
-  ]);
-  let newPremiumFeature = $state('Physics Presets');
-
-  // Local state for the showcase
+  // Local state for toggle showcase
   let animations = $state(true);
   let colorMode = $state(true);
   let reducedMotion = $state(false);
   let satisfaction = $state(true);
-  let adminOverride = $state(false); // Disabled state
+  let adminOverride = $state(false);
 
   // Temporary theme preview functions
   function previewCustomAtmosphere() {
@@ -101,606 +94,609 @@
   }
 </script>
 
-<PullRefresh onrefresh={handleRefresh} onerror={handleRefreshError}>
-  <div class="container flex flex-col gap-2xl py-2xl">
-    <h1 class="text-center text-primary">Void Energy</h1>
+<div class="container flex flex-col gap-2xl py-2xl">
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- HERO                                                              -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <header class="flex flex-col gap-lg items-center text-center">
+    <h1 class="text-primary">Void Energy</h1>
 
-    <div class="surface-glass p-lg flex flex-col gap-lg">
-      <p class="text-center">
-        We have discarded static pixels in favor of <strong
-          >reactive materials</strong
-        >. In this system, we do not paint screens; we simulate environments.
-        This is an engine where interfaces obey strict laws of light, motion,
-        and depth. Here, <strong>atmosphere is context</strong>. Content does
-        not float in a vacuum; it exists within a living environment that exerts
-        physical force on the user's experience. Every element is a living
-        object that instinctively adapts to the narrative of the user, expanding
-        and contracting its geometry to match the density of the task at hand.
-      </p>
-      <span class="flex justify-center">
-        <ThemesBtn class="btn-cta" />
-      </span>
-      <div class="surface-sunk p-lg flex flex-col gap-sm">
+    <p class="text-body text-dim max-w-3xl">
+      One UI system. 12 atmospheres. 3 physics engines. Instant theming at
+      runtime. Every element adapts to light, motion, and density &mdash; so you
+      build once and the interface shapes itself to the context.
+    </p>
+
+    <p class="text-small text-mute max-w-2xl">
+      We replaced static pixels with reactive materials. Interfaces don't float
+      in a vacuum &mdash; they exist within living environments that exert
+      physical force on the user's experience. Atmosphere is context. Content
+      adapts to narrative.
+    </p>
+
+    <span class="flex justify-center">
+      <ThemesBtn class="btn-cta" />
+    </span>
+    <p class="text-caption text-mute">
+      Try switching the atmosphere &mdash; every element on this page will
+      adapt.
+    </p>
+  </header>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- CORE CONCEPTS — 4 CARDS                                           -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <section class="flex flex-col gap-xl">
+    <h2 class="text-center">Core Concepts</h2>
+
+    <div class="grid grid-cols-1 tablet:grid-cols-2 gap-lg">
+      <!-- Card 1: Hybrid Protocol -->
+      <div class="surface-glass p-lg flex flex-col gap-md">
         <h3>The Hybrid Protocol</h3>
-        <p>
-          We separate <strong>Geometry</strong> (Layout) from
-          <strong>Physics</strong> (Material).
+        <p class="text-dim">
+          Geometry and physics are separate concerns. Layout (flex, grid,
+          spacing) lives in Tailwind. Material (surfaces, shadows, blur,
+          animation) lives in SCSS. They never cross.
         </p>
-        <ul class="list-disc list-inside">
-          <li>
-            <b>Layout:</b> Defined by rigid grids and fluid spacing (Tailwind).
-          </li>
-          <li>
-            <b>Material:</b> Defined by texture, motion, and light (SCSS).
-          </li>
-        </ul>
 
-        <br />
+        <div class="flex flex-row gap-md">
+          <div class="surface-sunk p-sm flex-1 flex flex-col gap-xs">
+            <b class="text-small">Geometry</b>
+            <code class="text-caption">flex gap-md p-lg</code>
+          </div>
+          <div class="surface-sunk p-sm flex-1 flex flex-col gap-xs">
+            <b class="text-small">Physics</b>
+            <code class="text-caption">glass-float, glass-blur</code>
+          </div>
+        </div>
 
+        <details>
+          <summary>Technical Details</summary>
+          <p class="surface-sunk p-md text-small text-dim">
+            Tailwind handles rigid grids and fluid spacing. SCSS handles
+            texture, motion, and light via mixins like
+            <code>glass-float</code>, <code>glass-sunk</code>, and
+            <code>glass-blur</code>. This separation means layout never breaks
+            when the physics preset changes, and visual materials never leak
+            into structural code.
+          </p>
+        </details>
+      </div>
+
+      <!-- Card 2: Triad Architecture -->
+      <div class="surface-glass p-lg flex flex-col gap-md">
         <h3>The Triad Architecture</h3>
-        <p>Every pixel is calculated by the intersection of three variables.</p>
-        <h4>1. Atmosphere (The Soul)</h4>
-        <p>Defines the mood, color palette, and typography.</p>
-        <ul class="list-disc list-inside">
-          <li>
-            <i>Examples:</i> Void (Sci-Fi), Onyx (Stealth), Terminal (Retro), Paper
-            (Light).
-          </li>
-        </ul>
-
-        <h4>2. Physics (The Laws)</h4>
-        <p>Defines how materials react to light and interaction.</p>
-        <ul class="list-disc list-inside">
-          <li>
-            <b>Glass:</b> Translucent, blurred backgrounds, glowing borders. High
-            GPU cost.
-          </li>
-          <li>
-            <b>Flat:</b> Opaque, sharp borders, efficient rendering, clean lines.
-          </li>
-          <li>
-            <b>Retro:</b> Hard pixels, no anti-aliasing, stepped animation (CRT style).
-          </li>
-        </ul>
-
-        <h4>3. Mode (The Polarity)</h4>
-        <p>Defines the contrast environment.</p>
-        <ul class="list-disc list-inside">
-          <li>
-            <b>Dark:</b> Low luminosity background, light text.
-          </li>
-          <li>
-            <b>Light:</b> High luminosity background, dark text.
-          </li>
-        </ul>
-
-        <br />
-
-        <p>
-          <b>Engineering Note:</b> The system automatically enforces the Physics
-          Compatibility Matrix. For example, Glass and Retro physics are physically
-          impossible in Light mode and will auto-resolve to Flat to preserve contrast.
-          Flat physics is the only universally compatible protocol that maintains
-          absolute optical integrity across all environments. Refractive blurs and
-          glow-emitters render as invisible noise against high-luminosity backgrounds,
-          while CRT phosphor simulations require a pure black substrate to maintain
-          scanline definition.
+        <p class="text-dim">
+          Every pixel is the intersection of three variables: Atmosphere (color,
+          typography, mood), Physics (glass, flat, or retro rendering), and Mode
+          (light or dark polarity).
         </p>
 
-        <br />
+        <div class="flex flex-row gap-md flex-wrap">
+          <span class="chip-premium">
+            <span class="chip-label">Atmosphere</span>
+          </span>
+          <span class="chip-system">
+            <span class="chip-label">Physics</span>
+          </span>
+          <span class="chip">
+            <span class="chip-label">Mode</span>
+          </span>
+        </div>
 
-        <h3>The Density Engine & T-Shirt Sizing</h3>
-        <p>
-          We do not manually reduce pixels for compact views. Instead, the
-          system uses <b>Fluid Spacing</b>, where every margin, padding, and gap
-          is calculated relative to a global density coefficient.
-        </p>
-        <h4>The T-Shirt Size Protocol</h4>
-        <p>
-          We have abolished raw pixel values in favor of a semantic <b
-            >T-Shirt Scale</b
-          >. Developers must describe the <i>intent of the space</i>, not the
-          measurement.
-        </p>
-        <ul class="list-disc list-inside">
-          <li>
-            <b>Micro (<code>xs</code>, <code>sm</code>)</b>: Atomic grouping.
-            Used for spacing inside buttons or between an icon and text.
-          </li>
-          <li>
-            <b>Structure (<code>md</code>, <code>lg</code>)</b>: Component
-            definition. Used for padding inside cards or gaps between form
-            elements.
-          </li>
-          <li>
-            <b>Macro (<code>xl</code>, <code>2xl</code>, <code>4xl</code>)</b>:
-            Layout geometry. Used for separating major sections or defining the
-            page grid.
-          </li>
-        </ul>
-        <h4>The Density Multipliers</h4>
-        <p>
-          Because we use tokens, the engine can mathematically scale the
-          interface to match the user's cognitive load.
-        </p>
-        <ul class="list-disc list-inside">
-          <li>
-            <b>Standard (1x):</b> The default target. Balanced for general readability
-            and touch targets.
-          </li>
-          <li>
-            <b>High Density (0.75x):</b> The system automatically tightens the
-            gravitational constant of the UI. All md and lg gaps contract. Ideal
-            for complex <b>Data Grids</b> and command centers.
-          </li>
-          <li>
-            <b>Low Density (1.25x):</b> The system expands the atmosphere.
-            Spacing relaxes to improve focus. Ideal for <b>Reading Modes</b>.
-          </li>
-        </ul>
+        <details>
+          <summary>Technical Details</summary>
+          <div
+            class="surface-sunk p-md flex flex-col gap-xs text-small text-dim"
+          >
+            <p class="text-small">
+              <b>Atmosphere</b> defines the mood, palette, and typography. Examples:
+              Void (Sci-Fi), Onyx (Stealth), Terminal (Retro), Paper (Light).
+            </p>
+            <p class="text-small">
+              <b>Physics</b> defines how materials react. Glass: translucent, blurred,
+              glowing. Flat: opaque, sharp, efficient. Retro: hard pixels, stepped
+              animation (CRT style).
+            </p>
+            <p class="text-small">
+              <b>Mode</b> defines contrast. Dark: low luminosity background. Light:
+              high luminosity background.
+            </p>
+            <p class="text-small">
+              <b>Compatibility Matrix:</b> Glass and Retro require dark mode (glows
+              need darkness, CRT phosphor needs a black substrate). Flat works in
+              both modes. The engine auto-enforces this.
+            </p>
+          </div>
+        </details>
+      </div>
 
-        <br />
+      <!-- Card 3: Density Engine -->
+      <div class="surface-glass p-lg flex flex-col gap-md">
+        <h3>The Density Engine</h3>
+        <p class="text-dim">
+          Every margin, padding, and gap scales from a global density
+          coefficient. Developers describe the <em>intent</em> of the space using
+          a semantic T-shirt scale &mdash; the engine calculates the rest.
+        </p>
 
+        <div
+          class="surface-sunk p-sm flex flex-row gap-md items-end justify-center flex-wrap"
+        >
+          <div class="flex flex-col items-center gap-xs">
+            <span class="block w-xs h-xs bg-primary rounded-xs"></span>
+            <code class="text-caption">xs</code>
+          </div>
+          <div class="flex flex-col items-center gap-xs">
+            <span class="block w-sm h-sm bg-primary rounded-xs"></span>
+            <code class="text-caption">sm</code>
+          </div>
+          <div class="flex flex-col items-center gap-xs">
+            <span class="block w-md h-md bg-primary rounded-sm"></span>
+            <code class="text-caption">md</code>
+          </div>
+          <div class="flex flex-col items-center gap-xs">
+            <span class="block w-lg h-lg bg-primary rounded-sm"></span>
+            <code class="text-caption">lg</code>
+          </div>
+          <div class="flex flex-col items-center gap-xs">
+            <span class="block w-xl h-xl bg-primary rounded-sm"></span>
+            <code class="text-caption">xl</code>
+          </div>
+          <div class="hidden tablet:flex flex-col items-center gap-xs">
+            <span class="block w-2xl h-2xl bg-primary rounded-md"></span>
+            <code class="text-caption">2xl</code>
+          </div>
+        </div>
+
+        <details>
+          <summary>Technical Details</summary>
+          <div
+            class="surface-sunk p-md flex flex-col gap-xs text-small text-dim"
+          >
+            <p class="text-small">
+              <b>Micro</b> (<code>xs</code>, <code>sm</code>): Atomic grouping.
+              Inside buttons, between icon and text.
+            </p>
+            <p class="text-small">
+              <b>Structure</b> (<code>md</code>, <code>lg</code>): Component
+              definition. Padding inside cards, gaps between form elements.
+            </p>
+            <p class="text-small">
+              <b>Macro</b> (<code>xl</code>, <code>2xl</code>,
+              <code>4xl</code>): Layout geometry. Section separation, page
+              grids.
+            </p>
+            <p class="text-small">
+              Density multipliers: Standard (1x), High Density (0.75x) for data
+              grids, Low Density (1.25x) for reading modes.
+            </p>
+          </div>
+        </details>
+      </div>
+
+      <!-- Card 4: Native Protocol -->
+      <div class="surface-glass p-lg flex flex-col gap-md">
         <h3>The Native Protocol</h3>
-        <p>
-          We build <strong>on</strong> native HTML elements, not around them.
-          Buttons are <code>&lt;button&gt;</code>, selects are
-          <code>&lt;select&gt;</code>, dialogs are <code>&lt;dialog&gt;</code>.
-          The browser owns behavior and accessibility; SCSS owns the material
-          physics. Components are thin wrappers that add layout, labeling, and
-          atmosphere &mdash; never reimplementations of what the platform
-          already provides. Simplicity is the architecture.
+        <p class="text-dim">
+          Components are thin wrappers around native HTML elements. The browser
+          owns behavior and accessibility; SCSS owns the material. No
+          reimplementations.
         </p>
+
+        <div class="flex flex-row gap-xs flex-wrap">
+          <code class="chip"
+            ><span class="chip-label">&lt;button&gt;</span></code
+          >
+          <code class="chip"
+            ><span class="chip-label">&lt;select&gt;</span></code
+          >
+          <code class="chip"
+            ><span class="chip-label">&lt;dialog&gt;</span></code
+          >
+          <code class="chip"
+            ><span class="chip-label">&lt;details&gt;</span></code
+          >
+          <code class="chip"><span class="chip-label">&lt;input&gt;</span></code
+          >
+          <code class="chip"
+            ><span class="chip-label">&lt;fieldset&gt;</span></code
+          >
+        </div>
+
+        <details>
+          <summary>Technical Details</summary>
+          <p class="surface-sunk p-md text-small text-dim">
+            Buttons are <code>&lt;button&gt;</code>, selects are
+            <code>&lt;select&gt;</code>, dialogs are
+            <code>&lt;dialog&gt;</code>. Custom components are only built when
+            no native element exists for the interaction (e.g., combobox,
+            multi-thumb slider). Simplicity is the architecture.
+          </p>
+        </details>
       </div>
     </div>
+  </section>
 
-    <section class="flex flex-col gap-md">
-      <h2>01 // THE PALETTE CONTRACT</h2>
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- PALETTE CONTRACT                                                  -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <section class="flex flex-col gap-md">
+    <h2>01 // THE PALETTE CONTRACT</h2>
 
-      <div class="surface-glass p-lg flex flex-col gap-lg">
-        <p class="text-center">
-          Colors are semantic, not absolute. Every palette is organized into a <strong
-            >5-Layer System</strong
-          > — from the deepest canvas to the highest text signal. Each layer has
-          a fixed role. Atmospheres change the values; the architecture never moves.
-        </p>
+    <div class="surface-glass p-lg flex flex-col gap-lg">
+      <p class="text-center text-dim">
+        Colors are semantic, not absolute. Every palette is organized into a
+        <strong>5-Layer System</strong> &mdash; from the deepest canvas to the highest
+        text signal. Each layer has a fixed role. Atmospheres change the values;
+        the architecture never moves.
+      </p>
 
-        <div class="surface-sunk p-lg flex flex-col gap-md">
-          <div class="flex flex-col gap-sm">
-            <h4>Layer 1: Canvas (Foundation)</h4>
-            <p>
-              The absolute floor. Recessed areas are carved into it; ambient
-              light radiates from above.
-            </p>
-            <div class="flex flex-row gap-sm flex-wrap">
-              <div class="flex flex-col items-center gap-xs">
-                <span
-                  class="block w-2xl h-lg rounded-sm bg-canvas border-solid border-border"
-                ></span>
-                <code class="text-caption">bg-canvas</code>
-              </div>
-              <div class="flex flex-col items-center gap-xs">
-                <span
-                  class="block w-2xl h-lg rounded-sm bg-sink border-solid border-border"
-                ></span>
-                <code class="text-caption">bg-sink</code>
-              </div>
-              <div class="flex flex-col items-center gap-xs">
-                <span
-                  class="block w-2xl h-lg rounded-sm bg-spotlight border-solid border-border"
-                ></span>
-                <code class="text-caption">bg-spotlight</code>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-sm">
-            <h4>Layer 2: Surface (Float)</h4>
-            <p>
-              Floating elements — cards, modals, headers. Rendered above the
-              canvas with depth.
-            </p>
-            <div class="flex flex-row gap-sm">
-              <div class="flex flex-col items-center gap-xs">
-                <span
-                  class="block w-2xl h-lg rounded-sm bg-surface border-solid border-border"
-                ></span>
-                <code class="text-caption">bg-surface</code>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-sm">
-            <h4>Layer 3: Energy (Interaction)</h4>
-            <p>
-              Brand and interaction colors. Drives buttons, focus states, and
-              emphasis.
-            </p>
-            <div class="flex flex-row gap-sm">
-              <div class="flex flex-col items-center gap-xs">
-                <span
-                  class="block w-2xl h-lg rounded-sm bg-primary border-solid border-border"
-                ></span>
-                <code class="text-caption">energy-primary</code>
-              </div>
-              <div class="flex flex-col items-center gap-xs">
-                <span
-                  class="block w-2xl h-lg rounded-sm bg-secondary border-solid border-border"
-                ></span>
-                <code class="text-caption">energy-secondary</code>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-sm">
-            <h4>Layer 4: Structure (Borders)</h4>
-            <p>Unified border system. 1px in Glass and Flat, 2px in Retro.</p>
-            <div class="flex flex-row gap-sm">
-              <div class="flex flex-col items-center gap-xs">
-                <span
-                  class="block w-2xl h-lg rounded-sm bg-border border-solid border-border"
-                ></span>
-                <code class="text-caption">border-color</code>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-sm">
-            <h4>Layer 5: Signal (Text Hierarchy)</h4>
-            <p>Three levels of emphasis for information hierarchy.</p>
-            <div class="flex flex-row gap-lg items-baseline">
-              <span class="text-main font-bold">Main</span>
-              <span class="text-dim">Dim</span>
-              <span class="text-mute">Mute</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="surface-sunk p-lg flex flex-col gap-md">
-          <h3>Semantic Colors</h3>
-          <p>
-            Four signal colors provide consistent meaning across all
-            atmospheres. Each generates light, dark, and subtle variants
-            automatically via OKLCH.
+      <div class="surface-sunk p-lg flex flex-col gap-md">
+        <div class="flex flex-col gap-sm">
+          <h4>Layer 1: Canvas (Foundation)</h4>
+          <p class="text-small text-dim">
+            The absolute floor. Recessed areas are carved into it; ambient light
+            radiates from above.
           </p>
-          <div class="grid grid-cols-2 tablet:grid-cols-4 gap-sm">
+          <div class="flex flex-row gap-sm flex-wrap">
             <div
-              class="flex flex-col items-center gap-xs p-sm rounded-sm bg-success-subtle"
+              class="flex flex-col items-center gap-xs"
+              use:tooltip={'var(--bg-canvas)'}
             >
-              <span class="block w-lg h-lg rounded-full bg-success"></span>
-              <b class="text-success">Success</b>
-              <p class="text-caption text-center">
-                Positive outcome, confirmation
-              </p>
+              <span
+                class="block w-3xl h-xl rounded-sm bg-canvas border-solid border-border"
+              ></span>
+              <code class="text-caption">bg-canvas</code>
             </div>
             <div
-              class="flex flex-col items-center gap-xs p-sm rounded-sm bg-error-subtle"
+              class="flex flex-col items-center gap-xs"
+              use:tooltip={'var(--bg-sink)'}
             >
-              <span class="block w-lg h-lg rounded-full bg-error"></span>
-              <b class="text-error">Error</b>
-              <p class="text-caption text-center">Destructive, failure</p>
+              <span
+                class="block w-3xl h-xl rounded-sm bg-sink border-solid border-border"
+              ></span>
+              <code class="text-caption">bg-sink</code>
             </div>
             <div
-              class="flex flex-col items-center gap-xs p-sm rounded-sm bg-premium-subtle"
+              class="flex flex-col items-center gap-xs"
+              use:tooltip={'var(--bg-spotlight)'}
             >
-              <span class="block w-lg h-lg rounded-full bg-premium"></span>
-              <b class="text-premium">Premium</b>
-              <p class="text-caption text-center">Attention, cost, exclusive</p>
-            </div>
-            <div
-              class="flex flex-col items-center gap-xs p-sm rounded-sm bg-system-subtle"
-            >
-              <span class="block w-lg h-lg rounded-full bg-system"></span>
-              <b class="text-system">System</b>
-              <p class="text-caption text-center">Informational, neutral</p>
+              <span
+                class="block w-3xl h-xl rounded-sm bg-spotlight border-solid border-border"
+              ></span>
+              <code class="text-caption">bg-spotlight</code>
             </div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <section class="flex flex-col gap-md">
-      <h2>02 // INTERACTIVE SANDBOX</h2>
-
-      <div class="surface-glass p-lg flex flex-col gap-md">
-        <SettingsRow label="Atmosphere Preview">
-          <div
-            class="surface-sunk flex flex-col justify-center tablet:flex-row gap-sm p-sm"
-          >
-            <button class="btn-premium" onclick={previewCustomAtmosphere}>
-              Apply Custom Palette
-            </button>
-            <button class="btn-system" onclick={previewBuiltInAtmosphere}>
-              Preview Built-in Atmosphere
-            </button>
-          </div>
-        </SettingsRow>
-
-        <hr />
-
-        <SettingsRow label="Feedback Patterns">
-          <div
-            class="surface-sunk p-lg flex flex-row flex-wrap gap-md justify-center"
-          >
-            <button
-              onclick={() => {
-                modal.confirm(
-                  'Confirm Deployment?',
-                  'You are about to push changes to the production environment. This action requires authorization.',
-                  {
-                    cost: 500,
-                    onConfirm: () => {
-                      toast.show('Deployment initiated', 'success');
-                    },
-                    onCancel: () => {
-                      toast.show('Deployment cancelled', 'info');
-                    },
-                  },
-                );
-              }}
+        <div class="flex flex-col gap-sm">
+          <h4>Layer 2: Surface (Float)</h4>
+          <p class="text-small text-dim">
+            Floating elements &mdash; cards, modals, headers. Rendered above the
+            canvas with depth.
+          </p>
+          <div class="flex flex-row gap-sm">
+            <div
+              class="flex flex-col items-center gap-xs"
+              use:tooltip={'var(--bg-surface)'}
             >
-              Confirm Action
-            </button>
-            <button
-              class="btn-premium"
-              onclick={() => {
-                modal.settings({
-                  onSave: (prefs) => {
-                    toast.promise(
-                      new Promise((resolve) => setTimeout(resolve, 2000)),
-                      {
-                        loading: `Applying ${prefs.layout} layout...`,
-                        success: 'Preferences saved successfully',
-                        error: 'Failed to save preferences',
-                      },
-                    );
-                    console.log('Selected preferences:', prefs);
+              <span
+                class="block w-3xl h-xl rounded-sm bg-surface border-solid border-border"
+              ></span>
+              <code class="text-caption">bg-surface</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-sm">
+          <h4>Layer 3: Energy (Interaction)</h4>
+          <p class="text-small text-dim">
+            Brand and interaction colors. Drives buttons, focus states, and
+            emphasis.
+          </p>
+          <div class="flex flex-row gap-sm">
+            <div
+              class="flex flex-col items-center gap-xs"
+              use:tooltip={'var(--energy-primary)'}
+            >
+              <span
+                class="block w-3xl h-xl rounded-sm bg-primary border-solid border-border"
+              ></span>
+              <code class="text-caption">energy-primary</code>
+            </div>
+            <div
+              class="flex flex-col items-center gap-xs"
+              use:tooltip={'var(--energy-secondary)'}
+            >
+              <span
+                class="block w-3xl h-xl rounded-sm bg-secondary border-solid border-border"
+              ></span>
+              <code class="text-caption">energy-secondary</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-sm">
+          <h4>Layer 4: Structure (Borders)</h4>
+          <p class="text-small text-dim">
+            Unified border system. 1px in Glass and Flat, 2px in Retro.
+          </p>
+          <div class="flex flex-row gap-sm">
+            <div
+              class="flex flex-col items-center gap-xs"
+              use:tooltip={'var(--border-color)'}
+            >
+              <span
+                class="block w-3xl h-xl rounded-sm bg-border border-solid border-border"
+              ></span>
+              <code class="text-caption">border-color</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-sm">
+          <h4>Layer 5: Signal (Text Hierarchy)</h4>
+          <p class="text-small text-dim">
+            Three levels of emphasis for information hierarchy.
+          </p>
+          <div class="flex flex-row gap-lg items-baseline">
+            <span class="text-main font-bold">Main</span>
+            <span class="text-dim">Dim</span>
+            <span class="text-mute">Mute</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="surface-sunk p-lg flex flex-col gap-md">
+        <h3>Semantic Colors</h3>
+        <p class="text-small text-dim">
+          Four signal colors provide consistent meaning across all atmospheres.
+          Each generates light, dark, and subtle variants automatically via
+          OKLCH.
+        </p>
+        <div class="grid grid-cols-2 tablet:grid-cols-4 gap-sm">
+          <div
+            class="flex flex-col items-center gap-xs p-sm rounded-sm bg-success-subtle"
+          >
+            <span class="block w-lg h-lg rounded-full bg-success"></span>
+            <b class="text-success">Success</b>
+            <p class="text-caption text-center">
+              Positive outcome, confirmation
+            </p>
+          </div>
+          <div
+            class="flex flex-col items-center gap-xs p-sm rounded-sm bg-error-subtle"
+          >
+            <span class="block w-lg h-lg rounded-full bg-error"></span>
+            <b class="text-error">Error</b>
+            <p class="text-caption text-center">Destructive, failure</p>
+          </div>
+          <div
+            class="flex flex-col items-center gap-xs p-sm rounded-sm bg-premium-subtle"
+          >
+            <span class="block w-lg h-lg rounded-full bg-premium"></span>
+            <b class="text-premium">Premium</b>
+            <p class="text-caption text-center">Attention, cost, exclusive</p>
+          </div>
+          <div
+            class="flex flex-col items-center gap-xs p-sm rounded-sm bg-system-subtle"
+          >
+            <span class="block w-lg h-lg rounded-full bg-system"></span>
+            <b class="text-system">System</b>
+            <p class="text-caption text-center">Informational, neutral</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- INTERACTIVE SANDBOX                                               -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <section class="flex flex-col gap-md">
+    <h2>02 // INTERACTIVE SANDBOX</h2>
+
+    <div class="surface-glass p-lg flex flex-col gap-md">
+      <p class="text-dim text-center">
+        Try the components below. Every element reacts to the active atmosphere,
+        physics preset, and density setting. Change the theme to see the entire
+        page adapt in real-time.
+      </p>
+
+      <SettingsRow label="Atmosphere Preview">
+        <div
+          class="surface-sunk flex flex-col justify-center tablet:flex-row gap-sm p-sm"
+        >
+          <button class="btn-premium" onclick={previewCustomAtmosphere}>
+            Apply Custom Palette
+          </button>
+          <button class="btn-system" onclick={previewBuiltInAtmosphere}>
+            Preview Built-in Atmosphere
+          </button>
+        </div>
+      </SettingsRow>
+
+      <hr />
+
+      <SettingsRow label="Feedback Patterns">
+        <div
+          class="surface-sunk p-lg flex flex-row flex-wrap gap-md justify-center"
+        >
+          <button
+            onclick={() => {
+              modal.confirm(
+                'Confirm Deployment?',
+                'You are about to push changes to the production environment. This action requires authorization.',
+                {
+                  cost: 500,
+                  onConfirm: () => {
+                    toast.show('Deployment initiated', 'success');
                   },
+                  onCancel: () => {
+                    toast.show('Deployment cancelled', 'info');
+                  },
+                },
+              );
+            }}
+          >
+            Confirm Action
+          </button>
+          <button
+            class="btn-premium"
+            onclick={() => {
+              modal.settings({
+                onSave: (prefs) => {
+                  toast.promise(
+                    new Promise((resolve) => setTimeout(resolve, 2000)),
+                    {
+                      loading: `Applying ${prefs.layout} layout...`,
+                      success: 'Preferences saved successfully',
+                      error: 'Failed to save preferences',
+                    },
+                  );
+                  console.log('Selected preferences:', prefs);
+                },
+              });
+            }}
+          >
+            Open Settings
+          </button>
+          <button
+            class="btn-system"
+            onclick={() => {
+              modal.alert(
+                'Maintenance Scheduled',
+                'A maintenance window is approaching. Review pending changes before the system enters read-only mode.',
+              );
+            }}
+          >
+            System Alert
+          </button>
+          <button
+            class="btn-alert"
+            use:tooltip={'Demonstrates error toast notification'}
+            onclick={() => {
+              toast.show('Connection timeout — retry in 30s', 'error');
+            }}
+          >
+            Show Error
+          </button>
+        </div>
+      </SettingsRow>
+
+      <hr />
+
+      <SettingsRow label="Chip Variants">
+        <div
+          class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center"
+          use:morph={{ height: true, width: false }}
+        >
+          {#if chipTags.length === 0}
+            <p
+              class="text-caption min-h-control flex items-center justify-center"
+            >
+              No tags selected
+            </p>
+          {:else}
+            {#each chipTags as tag (tag.id)}
+              <div class={chipVariant} animate:live out:implode>
+                <p class="chip-label">{tag.name}</p>
+                <button
+                  type="button"
+                  class="btn-void chip-remove"
+                  aria-label="Remove {tag.name}"
+                  onclick={() => {
+                    chipTags = chipTags.filter((t) => t.id !== tag.id);
+                  }}>&#10005;</button
+                >
+              </div>
+            {/each}
+          {/if}
+        </div>
+        <div class="flex flex-col gap-xs tablet:flex-row tablet:items-end">
+          <Selector
+            bind:value={chipVariant}
+            options={chipVariants}
+            id="chip-variant"
+            label="Style"
+            class="flex-1"
+          />
+          <Selector
+            bind:value={newChipTag}
+            options={chipOptions}
+            placeholder="Select tag..."
+            label="Tag"
+            class="flex-1"
+          />
+          <button
+            onclick={() => {
+              if (newChipTag) {
+                chipIdCounter++;
+                chipTags.push({
+                  id: chipIdCounter,
+                  name: newChipTag,
                 });
-              }}
-            >
-              Open Settings
-            </button>
-            <button
-              class="btn-system"
-              onclick={() => {
-                modal.alert(
-                  'Maintenance Scheduled',
-                  'A maintenance window is approaching. Review pending changes before the system enters read-only mode.',
-                );
-              }}
-            >
-              System Alert
-            </button>
-            <button
-              class="btn-alert"
-              use:tooltip={'Demonstrates error toast notification'}
-              onclick={() => {
-                toast.show('Connection timeout — retry in 30s', 'error');
-              }}
-            >
-              Show Error
-            </button>
-          </div>
-        </SettingsRow>
-
-        <hr />
-
-        <SettingsRow label="Token Tags">
-          <div
-            class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center"
-            use:morph={{ height: true, width: false }}
+              }
+            }}
+            disabled={!newChipTag}>Add Tag</button
           >
-            {#if tokenTags.length === 0}
-              <p
-                class="text-caption min-h-control flex items-center justify-center"
-              >
-                No tokens selected
-              </p>
-            {:else}
-              {#each tokenTags as tile (tile.id)}
-                <div class="chip" animate:live out:implode>
-                  <p class="chip-label">{tile.name}</p>
-                  <button
-                    type="button"
-                    class="btn-void chip-remove"
-                    aria-label="Remove {tile.name}"
-                    onclick={() => {
-                      tokenTags = tokenTags.filter((t) => t.id !== tile.id);
-                    }}>✕</button
-                  >
-                </div>
-              {/each}
-            {/if}
-          </div>
-          <div class="flex flex-row gap-xs">
-            <Selector
-              bind:value={newTokenTag}
-              placeholder="Select token..."
-              class="flex-1"
-              options={[
-                { value: 'Spacing', label: 'Spacing' },
-                { value: 'Typography', label: 'Typography' },
-                { value: 'Color', label: 'Color' },
-                { value: 'Motion', label: 'Motion' },
-                { value: 'Elevation', label: 'Elevation' },
-              ]}
-            />
-            <button
-              onclick={() => {
-                if (newTokenTag) {
-                  tokenIdCounter++;
-                  tokenTags.push({
-                    id: tokenIdCounter,
-                    name: newTokenTag,
-                  });
-                }
-              }}
-              disabled={!newTokenTag}>Add Tag</button
-            >
-          </div>
-        </SettingsRow>
+        </div>
+      </SettingsRow>
 
-        <hr />
+      <hr />
 
-        <SettingsRow label="System Layers">
-          <div
-            class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center"
-            use:morph={{ height: true, width: false }}
-          >
-            {#if systemLayers.length === 0}
-              <p
-                class="text-caption min-h-control flex items-center justify-center"
-              >
-                No layers selected
-              </p>
-            {:else}
-              {#each systemLayers as tile (tile.id)}
-                <div class="chip-system" animate:live out:implode>
-                  <p class="chip-label">{tile.name}</p>
-                  <button
-                    type="button"
-                    class="btn-void chip-remove"
-                    aria-label="Remove {tile.name}"
-                    onclick={() => {
-                      systemLayers = systemLayers.filter(
-                        (t) => t.id !== tile.id,
-                      );
-                    }}>✕</button
-                  >
-                </div>
-              {/each}
-            {/if}
-          </div>
-          <div class="flex flex-row gap-xs">
-            <Selector
-              bind:value={newSystemLayer}
-              placeholder="Select layer..."
-              class="flex-1"
-              options={[
-                { value: 'Surfaces', label: 'Surfaces' },
-                { value: 'Components', label: 'Components' },
-                { value: 'Layouts', label: 'Layouts' },
-                { value: 'Inputs', label: 'Inputs' },
-                { value: 'Navigation', label: 'Navigation' },
-              ]}
-            />
-            <button
-              class="btn-system"
-              onclick={() => {
-                if (newSystemLayer) {
-                  layerIdCounter++;
-                  systemLayers.push({
-                    id: layerIdCounter,
-                    name: newSystemLayer,
-                  });
-                }
-              }}
-              disabled={!newSystemLayer}>Add Layer</button
-            >
-          </div>
-        </SettingsRow>
+      <SettingsRow label="Toggle Variants">
+        <div
+          class="surface-sunk p-sm flex flex-col flex-wrap justify-center items-center gap-sm tablet:flex-row"
+        >
+          <Toggle
+            bind:checked={animations}
+            id="toggle-animations"
+            label="Animations"
+          />
+          <Toggle
+            bind:checked={colorMode}
+            id="toggle-color-mode"
+            label="Color Mode"
+            iconOn={Sun}
+            iconOff={Moon}
+          />
+          <Toggle
+            bind:checked={reducedMotion}
+            id="toggle-reduced-motion"
+            label="Reduced Motion"
+            hideIcons={true}
+          />
+          <Toggle
+            bind:checked={satisfaction}
+            id="toggle-satisfaction"
+            label="Satisfaction"
+            iconOn="😄"
+            iconOff="😡"
+          />
+          <Toggle
+            bind:checked={adminOverride}
+            id="toggle-admin"
+            label="Admin Override"
+            disabled={true}
+          />
+        </div>
+      </SettingsRow>
+    </div>
+  </section>
 
-        <hr />
-
-        <SettingsRow label="Premium Features">
-          <div
-            class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center"
-            use:morph={{ height: true, width: false }}
-          >
-            {#if premiumFeatures.length === 0}
-              <p
-                class="text-caption min-h-control flex items-center justify-center"
-              >
-                No features selected
-              </p>
-            {:else}
-              {#each premiumFeatures as tile (tile.id)}
-                <div class="chip-premium" animate:live out:implode>
-                  <p class="chip-label">{tile.name}</p>
-                  <button
-                    type="button"
-                    class="btn-void chip-remove"
-                    aria-label="Remove {tile.name}"
-                    onclick={() => {
-                      premiumFeatures = premiumFeatures.filter(
-                        (t) => t.id !== tile.id,
-                      );
-                    }}>✕</button
-                  >
-                </div>
-              {/each}
-            {/if}
-          </div>
-          <div class="flex flex-row gap-xs">
-            <Selector
-              bind:value={newPremiumFeature}
-              placeholder="Select feature..."
-              class="flex-1"
-              options={[
-                { value: 'Runtime Theming', label: 'Runtime Theming' },
-                { value: 'Density Engine', label: 'Density Engine' },
-                { value: 'Physics Presets', label: 'Physics Presets' },
-                { value: 'Adaptive Typography', label: 'Adaptive Typography' },
-                { value: 'Token Generation', label: 'Token Generation' },
-              ]}
-            />
-            <button
-              class="btn-premium"
-              onclick={() => {
-                if (newPremiumFeature) {
-                  featureIdCounter++;
-                  premiumFeatures.push({
-                    id: featureIdCounter,
-                    name: newPremiumFeature,
-                  });
-                }
-              }}
-              disabled={!newPremiumFeature}>Add Feature</button
-            >
-          </div>
-        </SettingsRow>
-
-        <hr />
-
-        <SettingsRow label="Toggle Variants">
-          <div
-            class="surface-sunk p-sm flex flex-col flex-wrap justify-center items-center gap-sm tablet:flex-row"
-          >
-            <Toggle
-              bind:checked={animations}
-              id="toggle-animations"
-              label="Animations"
-            />
-            <Toggle
-              bind:checked={colorMode}
-              id="toggle-color-mode"
-              label="Color Mode"
-              iconOn={Sun}
-              iconOff={Moon}
-            />
-            <Toggle
-              bind:checked={reducedMotion}
-              id="toggle-reduced-motion"
-              label="Reduced Motion"
-              hideIcons={true}
-            />
-            <Toggle
-              bind:checked={satisfaction}
-              id="toggle-satisfaction"
-              label="Satisfaction"
-              iconOn="😄"
-              iconOff="😡"
-            />
-            <Toggle
-              bind:checked={adminOverride}
-              id="toggle-admin"
-              label="Admin Override"
-              disabled={true}
-            />
-          </div>
-        </SettingsRow>
-      </div>
-    </section>
-  </div>
-</PullRefresh>
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- CONCLUSION                                                        -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <section class="flex flex-col gap-md items-center text-center">
+    <p class="text-dim max-w-2xl">
+      Everything you've seen adapts across 12 atmospheres, 3 physics presets,
+      and 2 color modes. The full component library covers typography, surfaces,
+      icons, buttons, inputs, composites, floating UI, toasts, and modals.
+    </p>
+    <a href="/components" class="btn btn-cta">
+      Explore the Component Library
+    </a>
+  </section>
+</div>

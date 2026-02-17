@@ -3,7 +3,7 @@
   import { toast } from '@stores/toast.svelte';
 </script>
 
-<section class="flex flex-col gap-md mt-md">
+<section id="modals" class="flex flex-col gap-md">
   <h2>10 // MODALS & DIALOGS</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
@@ -99,22 +99,44 @@
       <p class="text-small text-mute">
         Convenience methods for built-in modals. <code>modal.themes()</code>
         opens the atmosphere/theme selector. <code>modal.settings()</code>
-        opens the display preferences demo. Both use the <code>lg</code> size.
+        opens the display preferences panel. Both use the <code>lg</code> size.
       </p>
 
       <div class="surface-sunk p-md flex flex-wrap justify-center gap-sm">
         <button onclick={() => modal.themes()}> Themes </button>
         <button onclick={() => modal.settings()}> Settings </button>
       </div>
-
-      <p class="text-caption text-mute px-xs">
-        API: <code>modal.open(key, props, size?)</code>,
-        <code>modal.close()</code>,
-        <code>modal.alert(title, body)</code>,
-        <code>modal.confirm(title, body, actions)</code>,
-        <code>modal.themes()</code>,
-        <code>modal.settings(options?)</code>.
-      </p>
     </div>
+
+    <details>
+      <summary>View Code</summary>
+      <pre><code
+          >import &#123; modal &#125; from '@lib/modal-manager.svelte';
+
+// Alert (informational, sm size)
+modal.alert('Title', 'Body text supports &lt;strong&gt;HTML&lt;/strong&gt;.');
+
+// Confirm (with callbacks, md size)
+modal.confirm('Delete Item?', 'This cannot be undone.', &#123;
+  onConfirm: () =&gt; handleDelete(),
+  onCancel: () =&gt; console.log('Cancelled'),
+  cost: 500,  // optional badge on confirm button
+&#125;);
+
+// Built-in modals (lg size)
+modal.themes();
+modal.settings();
+
+// Custom modal via registry
+modal.open('my-fragment', &#123; prop: value &#125;, 'md');
+modal.close();</code
+        ></pre>
+    </details>
+
+    <p class="text-caption text-mute px-xs">
+      Custom modal fragments are registered in
+      <code>src/config/modal-registry.ts</code>. Add new fragments there to
+      extend the modal system with project-specific dialogs.
+    </p>
   </div>
 </section>

@@ -51,9 +51,9 @@
     { value: 'md', label: 'Medium' },
     { value: 'lg', label: 'Large' },
     { value: 'xl', label: 'Extra Large' },
-    { value: '2xl', label: 'Double Extra Large' },
-    { value: '3xl', label: 'Triple Extra Large' },
-    { value: '4xl', label: 'Quadra Extra Large' },
+    { value: '2xl', label: '2XL' },
+    { value: '3xl', label: '3XL' },
+    { value: '4xl', label: '4XL' },
   ]);
 
   let iconColor = $state('text-main');
@@ -76,13 +76,38 @@
   let voiceActive = $state(false);
 </script>
 
-<section class="flex flex-col gap-md mt-md">
+<section id="icons" class="flex flex-col gap-md">
   <h2>03 // ICONS</h2>
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Two-tier icon system: hand-crafted animated icons for interactive UI
       elements, and <strong>Lucide</strong> for generic static icons. All icons
       inherit <code>currentColor</code> from their parent and scale via
+      <code>data-size</code>. Use <b>custom icons</b> when the icon needs to
+      animate in response to state changes; use <b>Lucide</b> for everything else.
+    </p>
+
+    <!-- ─── SIZE & COLOR CONTROLS ────────────────────────────────────── -->
+    <div class="flex flex-col gap-md small-desktop:flex-row">
+      <Selector
+        bind:value={iconColor}
+        options={colorList}
+        id="icon-color"
+        label="Color"
+        class="flex-1"
+      />
+      <Selector
+        bind:value={iconSize}
+        options={sizeList}
+        id="icon-size"
+        label="Size"
+        class="flex-1"
+      />
+    </div>
+
+    <p class="text-caption text-mute px-xs">
+      All icons below respond to these controls. Icons inherit
+      <code>currentColor</code> from their parent and scale via
       <code>data-size</code>.
     </p>
 
@@ -365,8 +390,8 @@
           target="_blank"
           rel="noopener noreferrer">Lucide</a
         >
-        — an open-source library with 1500+ icons. Below are just a few examples;
-        browse the full set at
+        — an open-source library with 1500+ icons. Below are a few examples; browse
+        the full set at
         <a
           href="https://lucide.dev/icons"
           target="_blank"
@@ -438,36 +463,33 @@
           <span class="text-caption text-mute">X</span>
         </div>
       </div>
-      <p class="text-small text-mute">
-        <code>import &#123; IconName &#125; from '@lucide/svelte';</code><br />
-        <code>&lt;IconName class="icon" data-size="md" /&gt;</code>
-      </p>
     </div>
 
-    <hr />
+    <details>
+      <summary>View Code</summary>
+      <pre><code
+          >&lt;!-- Lucide static icon --&gt;
+&lt;script&gt;
+  import &#123; Heart, Check &#125; from '@lucide/svelte';
+&lt;/script&gt;
+&lt;Heart class="icon" data-size="lg" /&gt;
+&lt;Check class="icon text-success" data-size="md" /&gt;
 
-    <!-- ─── SELECTORS ──────────────────────────────────────────────── -->
-    <p class="text-small text-mute">
-      All icons inherit <code>currentColor</code> from their parent and scale
-      via <code>data-size</code>. Use these controls to test both behaviors
-      across every icon above.
-    </p>
+&lt;!-- Interactive icon via IconBtn (hover animates) --&gt;
+&lt;script&gt;
+  import IconBtn from './ui/IconBtn.svelte';
+  import Play from './icons/Play.svelte';
+&lt;/script&gt;
+&lt;IconBtn icon=&#123;Play&#125; aria-label="Play" /&gt;
 
-    <div class="flex flex-col gap-md small-desktop:flex-row">
-      <Selector
-        bind:value={iconColor}
-        options={colorList}
-        id="icon-color"
-        label="Color"
-        class="flex-1"
-      />
-      <Selector
-        bind:value={iconSize}
-        options={sizeList}
-        id="icon-size"
-        label="Size"
-        class="flex-1"
-      />
-    </div>
+&lt;!-- Toggle icon with state --&gt;
+&lt;IconBtn
+  icon=&#123;Eye&#125;
+  iconProps=&#123;&#123; 'data-muted': isMuted &#125;&#125;
+  onclick=&#123;() =&gt; (isMuted = !isMuted)&#125;
+  aria-label="Toggle visibility"
+/&gt;</code
+        ></pre>
+    </details>
   </div>
 </section>
