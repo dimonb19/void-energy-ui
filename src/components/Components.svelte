@@ -7,6 +7,10 @@
   import Composites from './ui-library/Composites.svelte';
   import DataUpload from './ui-library/DataUpload.svelte';
   import FloatingUI from './ui-library/FloatingUI.svelte';
+  import Typography from './ui-library/Typography.svelte';
+  import Surfaces from './ui-library/Surfaces.svelte';
+  import Toasts from './ui-library/Toasts.svelte';
+  import Modals from './ui-library/Modals.svelte';
 
   // Pull-to-refresh handlers
   async function handleRefresh(): Promise<void> {
@@ -21,6 +25,11 @@
 
 <PullRefresh onrefresh={handleRefresh} onerror={handleRefreshError}>
   <div class="container flex flex-col gap-xl py-md">
+    <p class="text-small text-mute">
+      This page is wrapped in a <code>PullRefresh</code> component — pull down (or
+      scroll past the top) to see it in action.
+    </p>
+
     <Buttons />
 
     <Inputs />
@@ -32,5 +41,13 @@
     <DataUpload />
 
     <FloatingUI />
+
+    <Typography />
+
+    <Surfaces />
+
+    <Toasts />
+
+    <Modals />
   </div>
 </PullRefresh>

@@ -105,6 +105,54 @@
       </div>
     </div>
 
+    <!-- ─── VALIDATION STATES ─────────────────────────────────────────── -->
+    <div class="flex flex-col gap-xs">
+      <h5>Validation States</h5>
+      <p class="text-small text-mute">
+        Error styling activates via <code>aria-invalid="true"</code> or the
+        native <code>:invalid</code> pseudo-class. The border and text color
+        shift to <code>--color-error</code>. No wrapper component needed — set
+        the attribute and the physics layer handles the rest.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <div class="flex flex-col gap-xs">
+          <label class="text-small px-xs" for="demo-invalid">
+            Invalid Input
+          </label>
+          <input
+            id="demo-invalid"
+            type="text"
+            value="MALFORMED-ID-!!!"
+            aria-invalid="true"
+          />
+          <p class="text-caption text-error px-xs">
+            Agent ID contains invalid characters.
+          </p>
+        </div>
+        <div class="flex flex-col gap-xs">
+          <label class="text-small px-xs" for="demo-invalid-textarea">
+            Invalid Textarea
+          </label>
+          <textarea id="demo-invalid-textarea" aria-invalid="true"
+            >SYNTAX ERROR: Unexpected token at line 3</textarea
+          >
+          <p class="text-caption text-error px-xs">
+            Mission brief contains syntax errors.
+          </p>
+        </div>
+      </div>
+
+      <p class="text-caption text-mute px-xs">
+        Use <code>aria-invalid="true"</code> for programmatic validation. The
+        <code>:invalid</code>
+        pseudo-class activates automatically for native constraints (<code
+          >required</code
+        >, <code>pattern</code>,
+        <code>type="email"</code>).
+      </p>
+    </div>
+
     <!-- ─── SELECT ─────────────────────────────────────────────────────── -->
     <div class="flex flex-col gap-xs">
       <h5>Select</h5>
