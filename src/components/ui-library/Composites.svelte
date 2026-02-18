@@ -7,6 +7,7 @@
   import EditTextarea from '../ui/EditTextarea.svelte';
   import CopyField from '../ui/CopyField.svelte';
   import MediaSlider from '../ui/MediaSlider.svelte';
+  import SliderField from '../ui/SliderField.svelte';
   import type { Component } from 'svelte';
   import ActionBtn from '../ui/ActionBtn.svelte';
   import IconBtn from '../ui/IconBtn.svelte';
@@ -36,6 +37,26 @@
     'Void energy reactor status: all subsystems nominal. Containment field stable at 99.7% integrity.',
   );
   let copyValue = 'sk-void-4f8a-9c2e-7d1b-3e6f';
+
+  // Demo state — Slider Fields
+  let renderQuality = $state(50);
+  const renderQualityPresets = [
+    { label: 'MIN', value: 1 },
+    { label: 'STANDARD', value: 2 },
+    { label: 'MAX', value: 3 },
+  ];
+
+  let playbackSpeed = $state(1.0);
+  const playbackSpeedPresets = [
+    { label: 'x0.25', value: 0.25 },
+    { label: 'x0.5', value: 0.5 },
+    { label: 'x0.75', value: 0.75 },
+    { label: 'x1', value: 1.0 },
+    { label: 'x1.25', value: 1.25 },
+    { label: 'x1.5', value: 1.5 },
+  ];
+
+  let plainValue = $state(42);
 
   // Demo state — Media Controls
   let volume = $state(65);
@@ -273,6 +294,91 @@
         <strong>CopyField</strong> &mdash; <code>value</code> (readonly string).
         All accept <code>id</code>, <code>disabled</code>, and
         <code>class</code>.
+      </p>
+    </div>
+
+    <!-- ─── SLIDER FIELD ─────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Slider Field</h5>
+      <p class="text-small text-mute">
+        A range slider with optional preset snap points. When presets are
+        provided, the slider locks to those values only &mdash; like a visual
+        <code>&lt;select&gt;</code>. Without presets it degrades to a plain
+        labeled range input. Works at any scale: 3 presets or 7.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <!-- 3 presets — classic small set -->
+        <div class="flex flex-col gap-xs">
+          <SliderField
+            bind:value={renderQuality}
+            label="Render Quality"
+            presets={renderQualityPresets}
+            onchange={(v) => toast.show(`Quality: ${v}`, 'info')}
+          />
+          <p class="text-caption text-mute px-xs">
+            Three presets. Active label highlights in
+            <code>--energy-primary</code>.
+          </p>
+        </div>
+
+        <!-- 6 presets — medium scale, non-integer values -->
+        <div class="flex flex-col gap-xs">
+          <SliderField
+            bind:value={playbackSpeed}
+            label="Playback Speed"
+            presets={playbackSpeedPresets}
+            onchange={(v) => toast.show(`Speed: ${v}×`, 'info')}
+          />
+          <p class="text-caption text-mute px-xs">
+            Six presets with non-integer values. Labels compress gracefully.
+          </p>
+        </div>
+
+        <!-- No presets — plain labeled slider -->
+        <div class="flex flex-col gap-xs">
+          <SliderField
+            bind:value={plainValue}
+            label="Plain Slider (no presets)"
+            min={0}
+            max={100}
+          />
+          <p class="text-caption text-mute px-xs">
+            Without presets, degrades to a labeled native
+            <code>&lt;input type="range"&gt;</code>.
+          </p>
+        </div>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;script&gt;
+  import SliderField from './ui/SliderField.svelte';
+
+  let quality = $state(50);
+  const presets = [
+    &#123; label: 'MIN', value: 0 &#125;,
+    &#123; label: 'STANDARD', value: 50 &#125;,
+    &#123; label: 'MAX', value: 100 &#125;,
+  ];
+&lt;/script&gt;
+
+&lt;!-- With presets: locks to preset values --&gt;
+&lt;SliderField bind:value=&#123;quality&#125; label="Quality" presets=&#123;presets&#125; /&gt;
+
+&lt;!-- Without presets: plain continuous range --&gt;
+&lt;SliderField bind:value=&#123;volume&#125; label="Volume" /&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        Props: <code>value</code> (bindable), <code>presets</code> (Preset[]
+        &mdash; label/value pairs; locks slider to preset values),
+        <code>min</code>, <code>max</code>, <code>step</code> (ignored when
+        presets are provided), <code>label</code>, <code>onchange</code>,
+        <code>disabled</code>, <code>class</code>. Presets should be sorted
+        ascending by value.
       </p>
     </div>
 

@@ -28,6 +28,7 @@
  *
  * NON-FIELD COMPOSITES:
  * - MediaSlider   : Mute toggle + range slider + replay (own anatomy)
+ * - SliderField   : Label + range slider + preset snap labels (own anatomy)
  *
  * @see /src/components/ui/SearchField.svelte
  * @see /src/components/ui/PasswordField.svelte
@@ -35,6 +36,7 @@
  * @see /src/components/ui/EditTextarea.svelte
  * @see /src/components/ui/CopyField.svelte
  * @see /src/components/ui/MediaSlider.svelte
+ * @see /src/components/ui/SliderField.svelte
  * ==========================================================================
  */
 
@@ -159,5 +161,78 @@ $_slot-width: var(--control-padding-x);
   &[data-muted='true'] input[type='range'] {
     opacity: 0.5;
     pointer-events: none;
+  }
+}
+
+// ==========================================================================
+// 4. SLIDER FIELD (non-field composite)
+// ==========================================================================
+//
+// ANATOMY:
+// ┌─ .slider-field (flex-col, gap-xs) ─────────────────────────────────────┐
+// │  <label>                          Optional field label                  │
+// │  <input type="range">             Native slider (accent-color primary)  │
+// │  ┌─ .slider-presets ─────────────────────────────────────────────────┐  │
+// │  │  .slider-preset  .slider-preset  .slider-preset                   │  │
+// │  │  [data-state="active"] when value matches                         │  │
+// │  └───────────────────────────────────────────────────────────────────┘  │
+// └─────────────────────────────────────────────────────────────────────────┘
+
+.slider-field {
+  &[data-disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+.slider-presets {
+  display: flex;
+  justify-content: space-between;
+}
+
+.slider-preset {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  padding: var(--space-xs) 0;
+  cursor: pointer;
+
+  transition: color var(--speed-fast) var(--ease-spring-snappy);
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      color: var(--text-main);
+    }
+  }
+
+  @include when-state('active') {
+    color: var(--energy-primary);
+
+    @include when-glass {
+      text-shadow: 0 0 8px alpha(var(--energy-primary), 50%); // void-ignore (Glow Physics)
+    }
+
+    @include when-retro {
+      text-decoration: underline;
+      text-underline-offset: var(--space-xs);
+    }
+  }
+
+  @include when-light {
+    color: var(--text-dim);
+
+    @media (hover: hover) {
+      &:hover:not(:disabled) {
+        color: var(--text-main);
+      }
+    }
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-base);
   }
 }

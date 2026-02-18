@@ -1019,6 +1019,57 @@ Preset components with built-in layout and physics.
 
 ---
 
+#### `<SliderField>`
+
+**Description:** Range slider with optional preset snap points. When presets are provided, the slider locks to those values — like a visual `<select>`. Without presets, degrades to a plain labeled range input.
+**Location:** [src/components/ui/SliderField.svelte](src/components/ui/SliderField.svelte)
+**CSS Class:** `.slider-field` ([src/styles/components/\_fields.scss](src/styles/components/_fields.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `number` | `$bindable(0)` | Slider value (bindable) |
+| `presets` | `Preset[]` | `[]` | Snap points (`{ label: string, value: number }`); locks slider to preset values |
+| `min` | `number` | `0` | Range minimum |
+| `max` | `number` | `100` | Range maximum |
+| `step` | `number` | `1` | Range step |
+| `label` | `string` | — | Optional label above slider |
+| `onchange` | `(value: number) => void` | — | Callback on value change |
+| `disabled` | `boolean` | `false` | Disables slider and presets |
+
+**States:**
+
+| State | Attribute | Visual |
+| --- | --- | --- |
+| Active preset | `data-state="active"` + `aria-pressed="true"` | `--energy-primary` color on label |
+| Disabled | `data-disabled` on wrapper | 50% opacity, no interaction |
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+  import SliderField from '@components/ui/SliderField.svelte';
+
+  let quality = $state(50);
+  const presets = [
+    { label: 'MIN', value: 0 },
+    { label: 'STANDARD', value: 50 },
+    { label: 'MAX', value: 100 },
+  ];
+</script>
+
+<SliderField bind:value={quality} label="Quality" presets={presets} />
+<SliderField bind:value={quality} label="Plain Slider" />
+```
+
+**Physics:**
+- **Glass:** Active preset text-shadow glow with `--energy-primary`
+- **Flat:** Color-only highlight on active preset
+- **Retro:** Underline on active preset label
+
+---
+
 #### `<SettingsRow>`
 
 **Description:** Layout wrapper pairing a label with controls. Responsive: stacked on mobile, side-by-side on desktop.
@@ -1957,7 +2008,25 @@ await toast.promise(saveItems(items), {
 
 ---
 
-### O. Switcher (Segmented Control)
+### O. Slider with Presets
+
+```svelte
+<script lang="ts">
+  import SliderField from '@components/ui/SliderField.svelte';
+  let quality = $state(50);
+  const presets = [
+    { label: 'MIN', value: 0 },
+    { label: 'STANDARD', value: 50 },
+    { label: 'MAX', value: 100 },
+  ];
+</script>
+
+<SliderField bind:value={quality} label="Quality" presets={presets} />
+```
+
+---
+
+### P. Switcher (Segmented Control)
 
 ```svelte
 <script lang="ts">
@@ -1976,7 +2045,7 @@ await toast.promise(saveItems(items), {
 
 ---
 
-### P. Details & Accordion
+### Q. Details & Accordion
 
 ```svelte
 <!-- Sunk by default — no class needed -->
