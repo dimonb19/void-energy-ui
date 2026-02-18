@@ -11,6 +11,8 @@
   import IconBtn from '../ui/IconBtn.svelte';
   import ThemesBtn from '../ui/ThemesBtn.svelte';
   import Selector from '../ui/Selector.svelte';
+  import SettingsRow from '../ui/SettingsRow.svelte';
+  import Toggle from '../ui/Toggle.svelte';
 
   import Play from '../icons/Play.svelte';
   import Refresh from '../icons/Refresh.svelte';
@@ -86,6 +88,15 @@
   let selectedVariant = $state('');
   let activeIcon = $derived(iconMap[selectedIcon]);
   let activeLabel = $derived(btnLabel[selectedIcon] ?? selectedIcon);
+
+  // SettingsRow demo state
+  let notificationsEnabled = $state(true);
+  let settingsLayout = $state('comfortable');
+  const layoutOptions = [
+    { value: 'compact', label: 'Compact' },
+    { value: 'comfortable', label: 'Comfortable' },
+    { value: 'spacious', label: 'Spacious' },
+  ];
 </script>
 
 <section id="composites" class="flex flex-col gap-md">
@@ -93,20 +104,27 @@
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
-      Composites are higher-order components that combine animated icons, native
-      inputs, and buttons into purpose-built UI patterns. Input fields use the <code
-        >.field</code
-      >
-      overlay pattern: icons are <strong>absolutely positioned</strong> inside
-      the native input, which keeps its own <code>glass-sunk</code>
-      styling untouched. Padding adjusts automatically via <code>:has()</code>
-      selectors. Icons provide visual state feedback — rotation, checkmarks, cross-outs
-      — driven by <code>data-state</code> and
-      <code>data-muted</code> attributes.
+      Higher-order components that combine icons, inputs, and buttons into
+      ready-to-use patterns. Search fields, password fields with visibility
+      toggles, editable fields with confirm/reset, copy-to-clipboard fields,
+      media volume controls, and action buttons with animated icons &mdash; all
+      pre-wired and accessible.
     </p>
 
+    <details>
+      <summary>Technical Details</summary>
+      <p class="p-md">
+        Input fields use the <code>.field</code> overlay pattern: icons are
+        <strong>absolutely positioned</strong> inside the native input, which
+        keeps its own <code>glass-sunk</code> styling untouched. Padding adjusts
+        automatically via <code>:has()</code> selectors. Icons provide visual
+        state feedback &mdash; rotation, checkmarks, cross-outs &mdash; driven
+        by <code>data-state</code> and <code>data-muted</code> attributes.
+      </p>
+    </details>
+
     <!-- ─── INPUT FIELDS ─────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Input Fields</h5>
       <p class="text-small text-mute">
         Each field wraps a native <code>&lt;input&gt;</code> inside a
@@ -208,10 +226,23 @@
 &lt;CopyField value="sk-secret-key-here" /&gt;</code
           ></pre>
       </details>
+
+      <p class="text-caption text-mute px-xs">
+        <strong>SearchField</strong> &mdash; <code>value</code> (bindable),
+        <code>placeholder</code>, <code>zoom</code> ("in" | "out"),
+        <code>onsubmit</code>, <code>oninput</code>.
+        <strong>PasswordField</strong> &mdash; <code>value</code> (bindable),
+        <code>placeholder</code>.
+        <strong>EditField</strong> &mdash; <code>value</code> (bindable),
+        <code>placeholder</code>, <code>onconfirm</code>.
+        <strong>CopyField</strong> &mdash; <code>value</code> (readonly string).
+        All accept <code>id</code>, <code>disabled</code>, and
+        <code>class</code>.
+      </p>
     </div>
 
     <!-- ─── MEDIA CONTROLS ───────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Media Controls</h5>
       <p class="text-small text-mute">
         Horizontal control bars for audio and media. The mute toggle uses
@@ -253,10 +284,30 @@
           </p>
         </div>
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;script&gt;
+  import MediaSlider from './ui/MediaSlider.svelte';
+  let volume = $state(65);
+  let muted = $state(false);
+&lt;/script&gt;
+
+&lt;MediaSlider bind:value=&#123;volume&#125; bind:muted icon="voice" /&gt;
+&lt;MediaSlider bind:value=&#123;volume&#125; bind:muted icon="music" replay=&#123;false&#125; /&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        Props: <code>value</code> (bindable), <code>muted</code> (bindable),
+        <code>icon</code> ("voice" | "music"), <code>replay</code> (boolean),
+        <code>onreplay</code> (callback).
+      </p>
     </div>
 
     <!-- ─── ACTION BUTTON ──────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Action Button</h5>
       <p class="text-small text-mute">
         <code>ActionBtn</code> composes any interactive icon with a text label.
@@ -308,22 +359,18 @@
 &lt;ActionBtn icon=&#123;Play&#125; text="Play" onclick=&#123;handler&#125; /&gt;
 
 &lt;!-- With variant --&gt;
-&lt;ActionBtn icon=&#123;Play&#125; text="Play" class="btn-cta" /&gt;
-
-&lt;!-- IconBtn (icon-only circular button) --&gt;
-&lt;script&gt;
-  import IconBtn from './ui/IconBtn.svelte';
-  import Refresh from './icons/Refresh.svelte';
-&lt;/script&gt;
-
-&lt;IconBtn icon=&#123;Refresh&#125; aria-label="Refresh" /&gt;
-&lt;IconBtn icon=&#123;Refresh&#125; size="xl" /&gt;</code
+&lt;ActionBtn icon=&#123;Play&#125; text="Play" class="btn-cta" /&gt;</code
           ></pre>
       </details>
+
+      <p class="text-caption text-mute px-xs">
+        Props: <code>icon</code> (Component), <code>text</code> (label),
+        <code>class</code> (btn-* variant). All native button attributes pass through.
+      </p>
     </div>
 
     <!-- ─── ICON BUTTON ────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Icon Button</h5>
       <p class="text-small text-mute">
         <code>IconBtn</code> is a circular icon-only button (<code
@@ -362,6 +409,19 @@
         />
       </div>
 
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;script&gt;
+  import IconBtn from './ui/IconBtn.svelte';
+  import Refresh from './icons/Refresh.svelte';
+&lt;/script&gt;
+
+&lt;IconBtn icon=&#123;Refresh&#125; aria-label="Refresh" /&gt;
+&lt;IconBtn icon=&#123;Refresh&#125; size="xl" onclick=&#123;handler&#125; /&gt;</code
+          ></pre>
+      </details>
+
       <p class="text-caption text-mute px-xs">
         Props: <code>icon</code> (Component),
         <code>size</code> (icon size scale, default <code>lg</code>),
@@ -372,7 +432,7 @@
     </div>
 
     <!-- ─── THEME BUTTON ──────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Theme Button</h5>
       <p class="text-small text-mute">
         <code>ThemesBtn</code> combines a Lucide Moon/Sun icon with a button
@@ -386,9 +446,104 @@
         <ThemesBtn icon size="xl" />
       </div>
 
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;script&gt;
+  import ThemesBtn from './ui/ThemesBtn.svelte';
+&lt;/script&gt;
+
+&lt;!-- Labeled button (default) --&gt;
+&lt;ThemesBtn /&gt;
+
+&lt;!-- Icon-only --&gt;
+&lt;ThemesBtn icon size="xl" /&gt;
+
+&lt;!-- With variant class --&gt;
+&lt;ThemesBtn class="btn-cta" /&gt;</code
+          ></pre>
+      </details>
+
       <p class="text-caption text-mute px-xs">
         Props: <code>icon</code> (boolean — icon-only mode),
         <code>size</code> (icon size scale), <code>class</code> (style variants).
+      </p>
+    </div>
+
+    <!-- ─── SETTINGS ROW ────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Settings Row</h5>
+      <p class="text-small text-mute">
+        <code>SettingsRow</code> is a label + content layout for settings panels.
+        On desktop it renders as a two-column grid (label left, controls right);
+        on mobile it stacks vertically. Used throughout the Settings modal and the
+        intro page sandbox.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <SettingsRow label="Notifications">
+          <Toggle
+            bind:checked={notificationsEnabled}
+            id="settings-notifications"
+            label={notificationsEnabled ? 'Enabled' : 'Disabled'}
+          />
+        </SettingsRow>
+
+        <hr />
+
+        <SettingsRow label="Density">
+          <Selector
+            bind:value={settingsLayout}
+            options={layoutOptions}
+            id="settings-layout"
+          />
+        </SettingsRow>
+
+        <hr />
+
+        <SettingsRow label="Actions">
+          <div class="flex flex-row gap-sm">
+            <button onclick={() => toast.show('Settings exported', 'success')}>
+              Export
+            </button>
+            <button
+              class="btn-error"
+              onclick={() => toast.show('Settings reset', 'warning')}
+            >
+              Reset
+            </button>
+          </div>
+        </SettingsRow>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;script&gt;
+  import SettingsRow from './ui/SettingsRow.svelte';
+  import Toggle from './ui/Toggle.svelte';
+  import Selector from './ui/Selector.svelte';
+&lt;/script&gt;
+
+&lt;SettingsRow label="Notifications"&gt;
+  &lt;Toggle bind:checked label="Enabled" /&gt;
+&lt;/SettingsRow&gt;
+
+&lt;SettingsRow label="Density"&gt;
+  &lt;Selector bind:value options=&#123;layoutOptions&#125; /&gt;
+&lt;/SettingsRow&gt;
+
+&lt;SettingsRow label="Actions"&gt;
+  &lt;button&gt;Export&lt;/button&gt;
+  &lt;button class="btn-error"&gt;Reset&lt;/button&gt;
+&lt;/SettingsRow&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        Props: <code>label</code> (string &mdash; left column heading). Content
+        is passed as a Svelte snippet (slot). The label column is
+        <code>12rem</code> wide on desktop.
       </p>
     </div>
   </div>

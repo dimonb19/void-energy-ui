@@ -12,20 +12,30 @@
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
-      Both <code>Dropdown</code> and <code>use:tooltip</code> share the same
-      foundation: the <b>Popover API</b> for top-layer positioning and
-      <code>@floating-ui/dom</code> for smart placement with flip and shift. Dropdown
-      is a declarative Svelte component (click-triggered, arbitrary content). Tooltip
-      is an imperative Svelte action (hover/focus-triggered, text-only). Both use
-      glass-float, glass-blur, and spring transitions.
+      Dropdown menus for actions and settings, plus tooltips for contextual
+      hints. Both position themselves intelligently &mdash; they flip and shift
+      to stay visible regardless of where the trigger sits on the page. Click to
+      open dropdowns, hover or focus to see tooltips.
     </p>
+
+    <details>
+      <summary>Technical Details</summary>
+      <p class="p-md">
+        Both <code>Dropdown</code> and <code>use:tooltip</code> share the same
+        foundation: the <b>Popover API</b> for top-layer positioning and
+        <code>@floating-ui/dom</code> for smart placement with flip and shift. Dropdown
+        is a declarative Svelte component (click-triggered, arbitrary content). Tooltip
+        is an imperative Svelte action (hover/focus-triggered, text-only). Both use
+        glass-float, glass-blur, and spring transitions.
+      </p>
+    </details>
 
     <hr />
 
     <h4>Dropdown</h4>
 
     <!-- ─── BASIC USAGE ──────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Basic Usage</h5>
       <p class="text-small text-mute">
         A simple dropdown with a text trigger and arbitrary panel content. Click
@@ -82,7 +92,7 @@
     </div>
 
     <!-- ─── PLACEMENT VARIANTS ───────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Placement</h5>
       <p class="text-small text-mute">
         The <code>placement</code> prop controls where the panel appears relative
@@ -128,7 +138,7 @@
     </div>
 
     <!-- ─── CONTROLLED STATE ─────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Controlled State</h5>
       <p class="text-small text-mute">
         Use <code>bind:open</code> to control the dropdown programmatically. The
@@ -176,13 +186,32 @@
         </p>
       </div>
 
-      <p class="text-caption text-mute px-xs">
-        Props: <code>bind:open</code>, <code>onchange</code>
-      </p>
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;script&gt;
+  let open = $state(false);
+&lt;/script&gt;
+
+&lt;Dropdown bind:open onchange=&#123;(isOpen) =&gt; console.log(isOpen)&#125;&gt;
+  &#123;#snippet trigger()&#125;
+    Controlled &lt;ChevronDown class="icon" data-size="sm" /&gt;
+  &#123;/snippet&#125;
+  &lt;div class="p-md"&gt;
+    &lt;button class="btn-ghost" onclick=&#123;() =&gt; (open = false)&#125;&gt;
+      Close from inside
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/Dropdown&gt;
+
+&lt;!-- Open externally --&gt;
+&lt;button onclick=&#123;() =&gt; (open = true)&#125;&gt;Open&lt;/button&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <!-- ─── ICON TRIGGERS ────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Icon Triggers</h5>
       <p class="text-small text-mute">
         The trigger snippet accepts any content. Icon-only triggers work well
@@ -219,6 +248,18 @@
           </div>
         </Dropdown>
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;Dropdown label="Settings" offset=&#123;8&#125;&gt;
+  &#123;#snippet trigger()&#125;
+    &lt;Settings class="icon" /&gt;
+  &#123;/snippet&#125;
+  &lt;div class="p-md"&gt;Panel content&lt;/div&gt;
+&lt;/Dropdown&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <hr />
@@ -226,7 +267,7 @@
     <h4>Tooltip</h4>
 
     <!-- ─── TOOLTIP PLACEMENT ────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Placement</h5>
       <p class="text-small text-mute">
         The <code>use:tooltip</code> action accepts a string shorthand or an
@@ -269,7 +310,7 @@
     </div>
 
     <!-- ─── TOOLTIP ON ELEMENTS ──────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>On Different Elements</h5>
       <p class="text-small text-mute">
         Tooltips work on any element. They show on <code>pointerenter</code> and

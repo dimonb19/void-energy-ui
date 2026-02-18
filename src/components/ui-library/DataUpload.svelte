@@ -8,20 +8,28 @@
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
-      The <code>DropZone</code> component wraps a native
-      <code>&lt;input type="file"&gt;</code> with full drag-and-drop support. It
-      reuses the <code>.dropzone</code> physics from
-      <code>_inputs.scss</code> — dashed sunk border, spring transitions, and
-      energy-highlighted drag-over state via
-      <code>data-state="active"</code>. Files are validated against
-      <code>accept</code> and <code>maxSize</code> constraints, with rejected
-      files reported through toast errors. Icons switch between
-      <code>Upload</code> (idle) and <code>FileCheck</code> (files selected) from
-      Lucide.
+      Drag-and-drop file upload with built-in validation. Drop files onto the
+      zone or click to browse. Supports type restrictions, size limits, and
+      multi-file selection. Invalid files are rejected with clear error
+      feedback.
     </p>
 
+    <details>
+      <summary>Technical Details</summary>
+      <p class="p-md">
+        The <code>DropZone</code> component wraps a native
+        <code>&lt;input type="file"&gt;</code> with full drag-and-drop support.
+        It reuses the <code>.dropzone</code> physics from
+        <code>_inputs.scss</code> &mdash; dashed sunk border, spring
+        transitions, and energy-highlighted drag-over state via
+        <code>data-state="active"</code>. Files are validated against
+        <code>accept</code> and <code>maxSize</code> constraints, with rejected files
+        reported through toast errors.
+      </p>
+    </details>
+
     <!-- ─── BASIC UPLOAD ───────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Basic Upload</h5>
       <p class="text-small text-mute">
         Single-file drop zone with no restrictions. Accepts any file type and
@@ -42,7 +50,7 @@
     </div>
 
     <!-- ─── RESTRICTED UPLOAD ──────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Restricted Upload</h5>
       <p class="text-small text-mute">
         Accepts only <code>.json</code> and <code>.csv</code> files up to
@@ -63,7 +71,7 @@
     </div>
 
     <!-- ─── MULTIPLE FILES ─────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Multiple Files</h5>
       <p class="text-small text-mute">
         Enables multi-file selection via the <code>multiple</code> prop. Drop several

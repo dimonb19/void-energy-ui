@@ -289,11 +289,13 @@ legend {
 // 10. DETAILS & SUMMARY (Native Disclosure)
 // --------------------------------------------------------------------------
 details {
+  @include glass-sunk;
   margin: 0;
-  border: var(--physics-border-width) solid var(--border-color);
-  border-radius: var(--radius-base);
+  font-size: var(--font-size-small);
 
-  transition: border-color var(--speed-fast) var(--ease-spring-snappy);
+  p {
+    font-size: inherit;
+  }
 
   // Content animation via ::details-content pseudo-element.
   // Requires `interpolate-size: allow-keywords` on :root (see _reset.scss).
@@ -326,6 +328,14 @@ details {
   &:has(> summary[aria-disabled='true']) {
     opacity: 0.5;
     pointer-events: none;
+  }
+
+  // Reset sunk-surface physics on <pre> — details already provides the surface.
+  pre {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
   }
 
   @include when-retro {

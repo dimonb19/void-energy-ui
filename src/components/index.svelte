@@ -51,14 +51,14 @@
   let adminOverride = $state(false);
 
   // Temporary theme preview functions
-  function previewCustomAtmosphere() {
+  function ensureAdaptAtmosphere() {
     if (!voidEngine.userConfig.adaptAtmosphere) {
-      toast.show(
-        'Enable "Adapt Atmosphere" to allow theme changes.',
-        'warning',
-      );
-      return;
+      voidEngine.setPreferences({ adaptAtmosphere: true });
     }
+  }
+
+  function previewCustomAtmosphere() {
+    ensureAdaptAtmosphere();
 
     voidEngine.registerTheme('cyberpunk', {
       mode: 'dark',
@@ -82,15 +82,9 @@
   }
 
   function previewBuiltInAtmosphere() {
-    const applied = voidEngine.applyTemporaryTheme('crimson', 'Blood Moon');
-    if (applied) {
-      toast.show('Crimson atmosphere active', 'success');
-    } else {
-      toast.show(
-        'Enable "Adapt Atmosphere" to allow theme changes.',
-        'warning',
-      );
-    }
+    ensureAdaptAtmosphere();
+    voidEngine.applyTemporaryTheme('crimson', 'Blood Moon');
+    toast.show('Crimson atmosphere active', 'success');
   }
 </script>
 
@@ -102,9 +96,17 @@
     <h1 class="text-primary">Void Energy</h1>
 
     <p class="text-body text-dim max-w-3xl">
-      One UI system. 12 atmospheres. 3 physics engines. Instant theming at
-      runtime. Every element adapts to light, motion, and density &mdash; so you
-      build once and the interface shapes itself to the context.
+      Design systems break when products need to support multiple brands,
+      themes, or visual contexts. Rebuilding components for every palette is
+      expensive; maintaining parallel style sheets is worse. Most teams settle
+      for one look and live with the rigidity.
+    </p>
+
+    <p class="text-body max-w-3xl">
+      Void Energy solves this. One UI system. 12 atmospheres. 3 physics engines.
+      Instant theming at runtime. Every element adapts to light, motion, and
+      density &mdash; build once, and the interface shapes itself to the
+      context.
     </p>
 
     <p class="text-small text-mute max-w-2xl">
@@ -152,7 +154,7 @@
 
         <details>
           <summary>Technical Details</summary>
-          <p class="surface-sunk p-md text-small text-dim">
+          <p class="p-md">
             Tailwind handles rigid grids and fluid spacing. SCSS handles
             texture, motion, and light via mixins like
             <code>glass-float</code>, <code>glass-sunk</code>, and
@@ -186,23 +188,21 @@
 
         <details>
           <summary>Technical Details</summary>
-          <div
-            class="surface-sunk p-md flex flex-col gap-xs text-small text-dim"
-          >
-            <p class="text-small">
+          <div class="p-md flex flex-col gap-xs">
+            <p>
               <b>Atmosphere</b> defines the mood, palette, and typography. Examples:
               Void (Sci-Fi), Onyx (Stealth), Terminal (Retro), Paper (Light).
             </p>
-            <p class="text-small">
+            <p>
               <b>Physics</b> defines how materials react. Glass: translucent, blurred,
               glowing. Flat: opaque, sharp, efficient. Retro: hard pixels, stepped
               animation (CRT style).
             </p>
-            <p class="text-small">
+            <p>
               <b>Mode</b> defines contrast. Dark: low luminosity background. Light:
               high luminosity background.
             </p>
-            <p class="text-small">
+            <p>
               <b>Compatibility Matrix:</b> Glass and Retro require dark mode (glows
               need darkness, CRT phosphor needs a black substrate). Flat works in
               both modes. The engine auto-enforces this.
@@ -251,23 +251,21 @@
 
         <details>
           <summary>Technical Details</summary>
-          <div
-            class="surface-sunk p-md flex flex-col gap-xs text-small text-dim"
-          >
-            <p class="text-small">
+          <div class="p-md flex flex-col gap-xs">
+            <p>
               <b>Micro</b> (<code>xs</code>, <code>sm</code>): Atomic grouping.
               Inside buttons, between icon and text.
             </p>
-            <p class="text-small">
+            <p>
               <b>Structure</b> (<code>md</code>, <code>lg</code>): Component
               definition. Padding inside cards, gaps between form elements.
             </p>
-            <p class="text-small">
+            <p>
               <b>Macro</b> (<code>xl</code>, <code>2xl</code>,
               <code>4xl</code>): Layout geometry. Section separation, page
               grids.
             </p>
-            <p class="text-small">
+            <p>
               Density multipliers: Standard (1x), High Density (0.75x) for data
               grids, Low Density (1.25x) for reading modes.
             </p>
@@ -306,7 +304,7 @@
 
         <details>
           <summary>Technical Details</summary>
-          <p class="surface-sunk p-md text-small text-dim">
+          <p class="p-md">
             Buttons are <code>&lt;button&gt;</code>, selects are
             <code>&lt;select&gt;</code>, dialogs are
             <code>&lt;dialog&gt;</code>. Custom components are only built when
@@ -322,7 +320,7 @@
   <!-- PALETTE CONTRACT                                                  -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="flex flex-col gap-md">
-    <h2>01 // THE PALETTE CONTRACT</h2>
+    <h2>The Palette Contract</h2>
 
     <div class="surface-glass p-lg flex flex-col gap-lg">
       <p class="text-center text-dim">
@@ -495,7 +493,7 @@
   <!-- INTERACTIVE SANDBOX                                               -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="flex flex-col gap-md">
-    <h2>02 // INTERACTIVE SANDBOX</h2>
+    <h2>Interactive Sandbox</h2>
 
     <div class="surface-glass p-lg flex flex-col gap-md">
       <p class="text-dim text-center">
@@ -647,38 +645,42 @@
       <hr />
 
       <SettingsRow label="Toggle Variants">
+        <p class="text-caption text-mute">
+          Demo toggles &mdash; these showcase visual variants, not functional
+          controls.
+        </p>
         <div
           class="surface-sunk p-sm flex flex-col flex-wrap justify-center items-center gap-sm tablet:flex-row"
         >
           <Toggle
             bind:checked={animations}
             id="toggle-animations"
-            label="Animations"
+            label="Default"
           />
           <Toggle
             bind:checked={colorMode}
             id="toggle-color-mode"
-            label="Color Mode"
+            label="Custom Icons"
             iconOn={Sun}
             iconOff={Moon}
           />
           <Toggle
             bind:checked={reducedMotion}
             id="toggle-reduced-motion"
-            label="Reduced Motion"
+            label="No Icons"
             hideIcons={true}
           />
           <Toggle
             bind:checked={satisfaction}
             id="toggle-satisfaction"
-            label="Satisfaction"
+            label="Emoji Icons"
             iconOn="😄"
             iconOff="😡"
           />
           <Toggle
             bind:checked={adminOverride}
             id="toggle-admin"
-            label="Admin Override"
+            label="Disabled"
             disabled={true}
           />
         </div>
@@ -691,9 +693,10 @@
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="flex flex-col gap-md items-center text-center">
     <p class="text-dim max-w-2xl">
-      Everything you've seen adapts across 12 atmospheres, 3 physics presets,
-      and 2 color modes. The full component library covers typography, surfaces,
-      icons, buttons, inputs, composites, floating UI, toasts, and modals.
+      One codebase. Zero rebuilds. Every component you've seen adapts across 12
+      atmospheres, 3 physics presets, and 2 color modes &mdash; without touching
+      a single line of component code. Ship a product, change the brand, and the
+      entire interface follows.
     </p>
     <a href="/components" class="btn btn-cta">
       Explore the Component Library

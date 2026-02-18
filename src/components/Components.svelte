@@ -49,27 +49,57 @@
         atmospheres, physics presets, and density settings. Interactive demos
         for everyone &mdash; expandable code examples for developers.
       </p>
+
+      <details class="surface-glass">
+        <summary>New here? Key concepts</summary>
+        <div class="p-md flex flex-col gap-md">
+          <p>
+            <strong>Atmosphere</strong> &mdash; the active color palette,
+            typography, and mood. 12 built-in presets (Void, Onyx, Terminal,
+            Nebula, and more).
+            <a href="/">Learn more on the intro page.</a>
+          </p>
+          <p>
+            <strong>Physics</strong> &mdash; how surfaces render: Glass (translucent,
+            blurred, glowing), Flat (opaque, sharp), or Retro (pixel-perfect, CRT-style).
+          </p>
+          <p>
+            <strong>Mode</strong> &mdash; light or dark contrast. Glass and Retro
+            require dark mode; Flat works in both.
+          </p>
+        </div>
+      </details>
+
       <p class="text-small text-mute">
-        This page is wrapped in a <code>PullRefresh</code> component &mdash; pull
-        down (or scroll past the top) to see it in action.
+        This page is wrapped in a <code>PullRefresh</code> component &mdash;
+        pull down (or scroll past the top) to trigger a refresh indicator.
+        Props: <code>onrefresh</code> (async callback),
+        <code>onerror</code> (error handler).
       </p>
 
-      <nav
-        class="flex flex-row flex-wrap gap-xs justify-center"
-        aria-label="Section navigation"
-      >
-        {#each sections as s}
-          <a href="#{s.id}" class="chip">
-            <span class="chip-label">{s.label}</span>
-          </a>
-        {/each}
-      </nav>
+      <p class="text-small text-mute">
+        Responsive breakpoints: <code>tablet:</code> and
+        <code>small-desktop:</code>. Used throughout as Tailwind prefixes (e.g.,
+        <code>tablet:grid-cols-2</code>,
+        <code>small-desktop:flex-row</code>).
+      </p>
     </div>
+
+    <nav
+      class="flex flex-row flex-wrap gap-md justify-center surface-void py-md"
+      aria-label="Section navigation"
+    >
+      {#each sections as s}
+        <a href="#{s.id}" class="chip">
+          <span class="chip-label">{s.label}</span>
+        </a>
+      {/each}
+    </nav>
 
     <hr />
 
-    <div class="flex flex-col gap-xs">
-      <h3 class="text-mute">Foundations</h3>
+    <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+      <h3 class="text-dim">Foundations</h3>
       <p class="text-small text-mute">
         Typography, color, and surface primitives that everything else is built
         on.
@@ -80,8 +110,8 @@
 
     <hr />
 
-    <div class="flex flex-col gap-xs">
-      <h3 class="text-mute">Primitives</h3>
+    <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+      <h3 class="text-dim">Primitives</h3>
       <p class="text-small text-mute">
         The atomic building blocks &mdash; icons and interactive elements.
       </p>
@@ -91,8 +121,8 @@
 
     <hr />
 
-    <div class="flex flex-col gap-xs">
-      <h3 class="text-mute">Form Controls</h3>
+    <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+      <h3 class="text-dim">Form Controls</h3>
       <p class="text-small text-mute">
         Native HTML form elements with physics-aware styling.
       </p>
@@ -102,8 +132,8 @@
 
     <hr />
 
-    <div class="flex flex-col gap-xs">
-      <h3 class="text-mute">Composites</h3>
+    <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+      <h3 class="text-dim">Composites</h3>
       <p class="text-small text-mute">
         Higher-order components that combine primitives into purpose-built UI
         patterns.
@@ -113,8 +143,8 @@
 
     <hr />
 
-    <div class="flex flex-col gap-xs">
-      <h3 class="text-mute">Overlays & Feedback</h3>
+    <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+      <h3 class="text-dim">Overlays & Feedback</h3>
       <p class="text-small text-mute">
         Floating panels, notifications, and dialogs for user communication.
       </p>

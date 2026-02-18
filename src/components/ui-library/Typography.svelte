@@ -3,17 +3,28 @@
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
-      The type system uses semantic tokens for size, weight, line-height, and
-      letter-spacing. Headings use <code>--font-heading</code>, body text uses
-      <code>--font-body</code>, and code elements use
-      <code>--font-code</code>. All sizes scale with the
-      <code>--text-scale</code> preference. Three opacity layers create visual
-      hierarchy: <strong>main</strong> (headings),
-      <strong>dim</strong> (body), and <strong>mute</strong> (metadata).
+      A complete type system with headings, body text, code elements, and
+      utility classes. Every size scales with user preferences &mdash; change
+      the text scale or switch the atmosphere and all typography adapts
+      instantly. Three emphasis layers (main, dim, mute) create clear visual
+      hierarchy across any theme.
     </p>
 
+    <details>
+      <summary>Technical Details</summary>
+      <p class="p-md">
+        The type system uses semantic tokens for size, weight, line-height, and
+        letter-spacing. Headings use <code>--font-heading</code>, body text uses
+        <code>--font-body</code>, and code elements use
+        <code>--font-code</code>. All sizes scale with the
+        <code>--text-scale</code> preference. Three opacity layers create visual
+        hierarchy: <strong>main</strong> (headings),
+        <strong>dim</strong> (body), and <strong>mute</strong> (metadata).
+      </p>
+    </details>
+
     <!-- HEADING SCALE -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Heading Scale</h5>
       <p class="text-small text-mute">
         Five heading levels from <code>&lt;h1&gt;</code> through
@@ -22,7 +33,7 @@
         to <code>--font-heading</code> with tighter tracking at larger sizes.
       </p>
 
-      <div class="surface-sunk p-md flex flex-col gap-sm">
+      <div class="surface-sunk p-md flex flex-col gap-md">
         <h1>h1 — Void Energy</h1>
         <h2>h2 — System Core</h2>
         <h3>h3 — Subsystem Module</h3>
@@ -46,16 +57,17 @@
     </div>
 
     <!-- BODY & SECONDARY TEXT -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Body & Secondary Text</h5>
       <p class="text-small text-mute">
         Three text layers: <code>&lt;p&gt;</code> at body size with
         <code>--text-dim</code>, <code>&lt;small&gt;</code> at small size with
         <code>--text-mute</code>, and utility classes for overriding the level
-        inline.
+        inline. Use <code>.text-primary</code> for accent-colored text that matches
+        the active atmosphere's energy color.
       </p>
 
-      <div class="surface-sunk p-md flex flex-col gap-sm">
+      <div class="surface-sunk p-md flex flex-col gap-md">
         <p>
           Paragraph — body typography, dim color. Standard readable text for
           descriptions and content.
@@ -66,17 +78,29 @@
         <p class="text-caption text-mute">
           .text-caption — caption level utility class.
         </p>
+        <p class="text-primary">
+          .text-primary — accent color, matches <code>--energy-primary</code>.
+        </p>
       </div>
 
-      <p class="text-caption text-mute px-xs">
-        Utility classes: <code>.text-h1</code> through <code>.text-h5</code>,
-        <code>.text-body</code>, <code>.text-small</code>,
-        <code>.text-caption</code>.
-      </p>
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;p&gt;Body text — default readable paragraph.&lt;/p&gt;
+&lt;small&gt;Caption or metadata text.&lt;/small&gt;
+&lt;p class="text-caption text-mute"&gt;Utility class override.&lt;/p&gt;
+
+&lt;!-- Size utility classes --&gt;
+&lt;p class="text-h1"&gt;...&lt;/p&gt; through &lt;p class="text-h5"&gt;...&lt;/p&gt;
+&lt;p class="text-body"&gt;...&lt;/p&gt;
+&lt;p class="text-small"&gt;...&lt;/p&gt;
+&lt;p class="text-caption"&gt;...&lt;/p&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <!-- CODE FAMILY -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Code Family</h5>
       <p class="text-small text-mute">
         Five semantic elements for code-related content, all using
@@ -154,7 +178,7 @@ engine.setPreferences(&#123;
     </div>
 
     <!-- LINKS -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Links</h5>
       <p class="text-small text-mute">
         Default <code>&lt;a&gt;</code> inherits parent color and shows
@@ -163,7 +187,7 @@ engine.setPreferences(&#123;
         <code>::after</code> line that scales in from the right on hover.
       </p>
 
-      <div class="surface-sunk p-md flex flex-col gap-sm">
+      <div class="surface-sunk p-md flex flex-col gap-md">
         <p>
           Default link: <a href="#void">Hover to see color shift</a> — inherits parent
           text color.
@@ -175,10 +199,21 @@ engine.setPreferences(&#123;
           — uses <code>.link</code> class.
         </p>
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;!-- Default link (color shift on hover) --&gt;
+&lt;a href="/page"&gt;Standard link&lt;/a&gt;
+
+&lt;!-- Laser underline link --&gt;
+&lt;a href="/page" class="link"&gt;Animated underline&lt;/a&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <!-- HORIZONTAL RULE -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Horizontal Rule</h5>
       <p class="text-small text-mute">
         Native <code>&lt;hr&gt;</code> styled with
@@ -186,15 +221,20 @@ engine.setPreferences(&#123;
         physics preset.
       </p>
 
-      <div class="surface-sunk p-md flex flex-col gap-sm">
+      <div class="surface-sunk p-md flex flex-col gap-md">
         <p>Content above the divider.</p>
         <hr />
         <p>Content below the divider.</p>
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code>&lt;hr /&gt;</code></pre>
+      </details>
     </div>
 
     <!-- TEXT UTILITIES -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Text Utilities</h5>
       <p class="text-small text-mute">
         Utility classes for overflow control. <code>.text-truncate</code>
@@ -229,10 +269,25 @@ engine.setPreferences(&#123;
           </p>
         </div>
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;!-- Single-line truncation --&gt;
+&lt;p class="text-truncate"&gt;Very long text...&lt;/p&gt;
+
+&lt;!-- Multi-line clamping --&gt;
+&lt;p class="text-clamp-2"&gt;Clamps to 2 lines...&lt;/p&gt;
+&lt;p class="text-clamp-3"&gt;Clamps to 3 lines...&lt;/p&gt;
+
+&lt;!-- Force word breaks --&gt;
+&lt;p class="text-break"&gt;superlongstring...&lt;/p&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <!-- LEGAL / LONG-FORM CONTENT -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Long-Form Content</h5>
       <p class="text-small text-mute">
         Wrap text in <code>.legal-content</code> to re-enable list styles
@@ -279,6 +334,28 @@ engine.setPreferences(&#123;
           <li>State changes are always expressed via data attributes.</li>
         </ol>
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;div class="legal-content"&gt;
+  &lt;ul&gt;
+    &lt;li&gt;Unordered list item&lt;/li&gt;
+    &lt;li&gt;Nested:
+      &lt;ul&gt;&lt;li&gt;Sub-item&lt;/li&gt;&lt;/ul&gt;
+    &lt;/li&gt;
+  &lt;/ul&gt;
+
+  &lt;ol&gt;&lt;li&gt;Ordered list&lt;/li&gt;&lt;/ol&gt;
+  &lt;ol class="uppercase"&gt;&lt;li&gt;A, B, C...&lt;/li&gt;&lt;/ol&gt;
+  &lt;ol class="subordered"&gt;
+    &lt;li&gt;1.
+      &lt;ol class="subordered"&gt;&lt;li&gt;1.1&lt;/li&gt;&lt;/ol&gt;
+    &lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/div&gt;</code
+          ></pre>
+      </details>
     </div>
   </div>
 </section>

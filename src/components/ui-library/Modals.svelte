@@ -8,16 +8,27 @@
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
-      Modals use the native <code>&lt;dialog&gt;</code> element managed by the
-      <code>modal</code> singleton. Opening captures the trigger element's
-      focus; closing restores it. The dialog scales with
-      <code>glass-float</code> + <code>glass-blur</code> physics and transitions
-      via CSS <code>@starting-style</code>. Three sizes:
-      <code>sm</code>, <code>md</code>, <code>lg</code>.
+      Dialogs for confirmations, alerts, and complex interactions. Focus is
+      trapped inside the modal and restored on close. Three sizes (small,
+      medium, large) adapt to content complexity. Built-in convenience methods
+      handle the most common patterns &mdash; alerts, confirms with cost badges,
+      theme selection, and settings panels.
     </p>
 
+    <details>
+      <summary>Technical Details</summary>
+      <p class="p-md">
+        Modals use the native <code>&lt;dialog&gt;</code> element managed by the
+        <code>modal</code> singleton. Opening captures the trigger element's
+        focus; closing restores it. The dialog uses
+        <code>glass-float</code> + <code>glass-blur</code> physics and
+        transitions via CSS <code>@starting-style</code>. Three sizes:
+        <code>sm</code>, <code>md</code>, <code>lg</code>.
+      </p>
+    </details>
+
     <!-- ALERT -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Alert</h5>
       <p class="text-small text-mute">
         <code>modal.alert(title, body)</code> opens a small informational dialog
@@ -48,7 +59,7 @@
     </div>
 
     <!-- CONFIRM -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Confirm</h5>
       <p class="text-small text-mute">
         <code>modal.confirm(title, body, actions)</code> opens a dialog with
@@ -94,7 +105,7 @@
     </div>
 
     <!-- THEMES & SETTINGS -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Themes & Settings</h5>
       <p class="text-small text-mute">
         Convenience methods for built-in modals. <code>modal.themes()</code>

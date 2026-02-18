@@ -80,12 +80,23 @@
   <h2>03 // ICONS</h2>
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
-      Two-tier icon system: hand-crafted animated icons for interactive UI
-      elements, and <strong>Lucide</strong> for generic static icons. All icons
-      inherit <code>currentColor</code> from their parent and scale via
-      <code>data-size</code>. Use <b>custom icons</b> when the icon needs to
-      animate in response to state changes; use <b>Lucide</b> for everything else.
+      Two-tier icon system: hand-crafted animated icons for interactive
+      elements, and <strong>Lucide</strong> (1500+ open-source icons) for everything
+      else. Icons automatically inherit their parent's color and scale to any size
+      &mdash; toggle, hover, and click states are all built in.
     </p>
+
+    <details>
+      <summary>Technical Details</summary>
+      <p class="p-md">
+        All icons inherit <code>currentColor</code> from their parent and scale
+        via <code>data-size</code>. Use <b>custom icons</b> when the icon needs
+        to animate in response to state changes; use <b>Lucide</b> for static
+        display. Custom icons live in
+        <code>src/components/icons/</code> and use the
+        <code>icon-[name]</code> class namespace.
+      </p>
+    </details>
 
     <!-- ─── SIZE & COLOR CONTROLS ────────────────────────────────────── -->
     <div class="flex flex-col gap-md small-desktop:flex-row">
@@ -112,7 +123,7 @@
     </p>
 
     <!-- ─── TOGGLE ICONS ─────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Toggle</h5>
       <p class="text-small text-mute">
         Click to switch between two persistent states. Uses
@@ -180,7 +191,7 @@
     </div>
 
     <!-- ─── HOVER ICONS ──────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Hover</h5>
       <p class="text-small text-mute">
         Animate on pointer enter via <code>data-state="active"</code>. Grouped
@@ -300,6 +311,9 @@
       <!-- Actions -->
       <p class="text-small text-dim">
         <strong>Actions</strong> — content operations and data manipulation.
+        Most use hover animations; Copy uses a click-triggered state toggle (<code
+          >data-state="active"</code
+        >) with auto-reset.
       </p>
       <div
         class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
@@ -348,7 +362,7 @@
     </div>
 
     <!-- ─── STATIC ICONS ─────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Static</h5>
       <p class="text-small text-mute">
         Display-only icons with no interactive state. Accept only
@@ -381,7 +395,7 @@
     </div>
 
     <!-- ─── LUCIDE INTEGRATION ───────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Lucide (Static Library)</h5>
       <p class="text-small text-mute">
         For generic static icons, use

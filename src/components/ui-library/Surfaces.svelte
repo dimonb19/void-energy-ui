@@ -3,15 +3,26 @@
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
-      Surfaces are atomic texture classes that apply Void Physics to any element
-      without enforcing layout or spacing. Two families: floating surfaces rise
-      above the page (cards, panels) and sunk surfaces recess into it (input
-      areas, groupings). Solid surfaces provide opaque backgrounds. All adapt to
-      the active physics preset and color mode.
+      Surfaces define the physical depth of an element. Floating surfaces rise
+      above the page for cards and panels. Sunk surfaces recess into it for
+      input areas. Solid surfaces sit flush for backgrounds. Apply a single
+      class and the physics engine handles shadow, blur, and border treatment
+      across all presets automatically.
     </p>
 
+    <details>
+      <summary>Technical Details</summary>
+      <p class="p-md">
+        Surfaces are atomic texture classes that apply Void Physics without
+        enforcing layout or spacing. Two families: floating (<code
+          >glass-float</code
+        >) and sunk (<code>glass-sunk</code>). Solid surfaces provide opaque
+        backgrounds. All adapt to the active physics preset and color mode.
+      </p>
+    </details>
+
     <!-- FLOATING SURFACES -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Floating Surfaces</h5>
       <p class="text-small text-mute">
         <code>.surface-glass</code> applies <code>glass-float</code> physics:
@@ -22,7 +33,7 @@
       </p>
 
       <div class="surface-sunk p-md flex flex-col gap-md tablet:flex-row">
-        <div class="surface-glass p-lg flex-1 flex flex-col gap-xs">
+        <div class="surface-glass p-lg flex-1 flex flex-col gap-lg">
           <h5>.surface-glass</h5>
           <p class="text-small text-mute">
             Static floating card. No hover interaction. Use for decorative
@@ -30,7 +41,7 @@
           </p>
         </div>
 
-        <div class="surface-glass-action p-lg flex-1 flex flex-col gap-xs">
+        <div class="surface-glass-action p-lg flex-1 flex flex-col gap-lg">
           <h5>.surface-glass-action</h5>
           <p class="text-small text-mute">
             Interactive floating card. Hover lifts with glow and shadow. Cursor
@@ -41,7 +52,7 @@
     </div>
 
     <!-- SUNK SURFACE -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Sunk Surface</h5>
       <p class="text-small text-mute">
         <code>.surface-sunk</code> applies <code>glass-sunk</code> physics: inset
@@ -49,7 +60,7 @@
         containers like the ones on this page.
       </p>
 
-      <div class="surface-sunk p-lg flex flex-col gap-xs">
+      <div class="surface-sunk p-lg flex flex-col gap-md">
         <h5>.surface-sunk</h5>
         <p class="text-small text-mute">
           Recessed container. Inset shadow creates depth. Background uses
@@ -59,7 +70,7 @@
     </div>
 
     <!-- SOLID SURFACES -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Solid Surfaces</h5>
       <p class="text-small text-mute">
         Opaque backgrounds with a thin physics border. No blur or shadow.
@@ -70,14 +81,14 @@
       </p>
 
       <div class="surface-sunk p-md flex flex-col gap-md tablet:flex-row">
-        <div class="surface-void p-lg flex-1 flex flex-col gap-xs">
+        <div class="surface-void p-lg flex-1 flex flex-col gap-md">
           <h5>.surface-void</h5>
           <p class="text-small text-mute">
             Solid canvas background. Matches the page base.
           </p>
         </div>
 
-        <div class="surface-spotlight p-lg flex-1 flex flex-col gap-xs">
+        <div class="surface-spotlight p-lg flex-1 flex flex-col gap-md">
           <h5>.surface-spotlight</h5>
           <p class="text-small text-mute">
             Slightly lighter solid background. For active sections and callouts.

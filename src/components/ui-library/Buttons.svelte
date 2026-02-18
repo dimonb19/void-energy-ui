@@ -46,15 +46,28 @@
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
-      Buttons are physics-aware interactive elements that adapt to all 3 physics
-      presets. Glass mode uses glowing hover states and blur. Flat mode uses
-      subtle shadows. Retro mode uses hard borders and instant transitions. All
-      buttons use semantic color tokens and spring-based transitions. Chips
-      share the same variant system for tags, filters, and selections.
+      Interactive elements for actions and selections. Six semantic variants
+      communicate intent at a glance: Default for standard actions, CTA for the
+      primary action on a page, and semantic colors (Premium, System, Success,
+      Error) for contextual meaning. Ghost variants provide secondary actions.
+      Chips use the same color system for tags, filters, and removable
+      selections.
     </p>
 
+    <details>
+      <summary>Technical Details</summary>
+      <p class="p-md">
+        Buttons adapt to all 3 physics presets. Glass mode uses glowing hover
+        states and blur. Flat mode uses subtle shadows. Retro mode uses hard
+        borders and instant transitions. All buttons use semantic color tokens
+        and spring-based transitions. State is exposed via
+        <code>data-state</code> and <code>aria-pressed</code>, targeted in SCSS
+        with <code>@include when-state('active')</code>.
+      </p>
+    </details>
+
     <!-- ─── BUTTON VARIANTS ────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Button Variants</h5>
       <p class="text-small text-mute">
         The base <code>&lt;button&gt;</code> gets full physics styling
@@ -122,10 +135,17 @@
         CTA uses an animated gradient border (Gemini Laser) in glass mode and a
         double border in retro mode.
       </p>
+
+      <p class="text-caption text-mute px-xs">
+        <strong>When to use:</strong> Default for most actions. CTA for the single
+        most important action on a page (one per view). Premium/System/Success/Error
+        for semantically meaningful actions. Ghost for secondary or dismissive actions
+        (Cancel, Skip, Close).
+      </p>
     </div>
 
     <!-- ─── GHOST BUTTONS ──────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Ghost Buttons</h5>
       <p class="text-small text-mute">
         Ghost buttons have no background or border at rest — just uppercase
@@ -188,7 +208,7 @@
     </div>
 
     <!-- ─── ACTIVE / TOGGLE STATE ──────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Active State</h5>
       <p class="text-small text-mute">
         Buttons can act as toggles using <code>aria-pressed</code> and
@@ -245,7 +265,7 @@
     </div>
 
     <!-- ─── CHIP VARIANTS ──────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Chips</h5>
       <p class="text-small text-mute">
         Interactive data chips for tags, filters, and selections. Each chip has
@@ -256,7 +276,7 @@
       </p>
 
       <div
-        class="surface-sunk p-md flex flex-row gap-xs flex-wrap justify-center"
+        class="surface-sunk p-md flex flex-row gap-md flex-wrap justify-center"
         use:morph={{ height: true, width: false }}
       >
         {#if chips.length === 0}
@@ -328,12 +348,14 @@
 
       <p class="text-caption text-mute px-xs">
         Inner elements:
-        <code>.chip-label</code>, <code>.chip-remove</code>.
+        <code>.chip-label</code>, <code>.chip-remove</code>. Use chips for
+        removable tags and filter selections. For persistent on/off states, use
+        toggle buttons (<code>data-state="active"</code>) instead.
       </p>
     </div>
 
     <!-- ─── LABELED CHIPS ──────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Labeled Chips</h5>
       <p class="text-small text-mute">
         Add <code>chip-labeled</code> with a <code>data-label</code> attribute to
@@ -379,7 +401,7 @@
     </div>
 
     <!-- ─── DISABLED STATES ────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Disabled States</h5>
       <p class="text-small text-mute">
         Both buttons and chips support the native <code>disabled</code>
@@ -394,6 +416,37 @@
         <button class="btn-premium" disabled>Disabled Premium</button>
         <button class="btn-ghost" disabled>Disabled Ghost</button>
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;button disabled&gt;Disabled&lt;/button&gt;
+&lt;button class="btn-premium" disabled&gt;Disabled Premium&lt;/button&gt;
+&lt;button class="btn-ghost" disabled&gt;Disabled Ghost&lt;/button&gt;</code
+          ></pre>
+      </details>
+    </div>
+
+    <!-- ─── VOID BUTTON ──────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Void Button</h5>
+      <p class="text-small text-mute">
+        <code>btn-void</code> strips all button styling &mdash; no background,
+        border, padding, or text-transform. Use it for inline interactive
+        elements inside other components (e.g., chip remove buttons, field slot
+        icons). It still inherits <code>cursor: pointer</code> and focus styles.
+      </p>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;!-- Used inside chips for the remove ✕ --&gt;
+&lt;button class="btn-void chip-remove" aria-label="Remove"&gt;&amp;#10005;&lt;/button&gt;
+
+&lt;!-- Used inside field overlays --&gt;
+&lt;button class="btn-void field-slot-right"&gt;...&lt;/button&gt;</code
+          ></pre>
+      </details>
     </div>
   </div>
 </section>

@@ -70,10 +70,12 @@
 .surface-void {
   background: var(--bg-canvas);
   border: var(--physics-border-width) solid var(--border-color);
+  border-radius: var(--radius-base);
 }
 
 // Spotlight Background (Slightly lighter, useful for active sections)
 .surface-spotlight {
   background: var(--bg-spotlight);
   border: var(--physics-border-width) solid var(--border-color);
+  border-radius: var(--radius-base);
 }

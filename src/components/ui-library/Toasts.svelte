@@ -34,15 +34,25 @@
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
-      Toast notifications use the <code>toast</code> singleton for ephemeral
-      feedback. Four semantic types map to accent colors:
-      <code>info</code> (system), <code>success</code>, <code>error</code>, and
-      <code>warning</code>. The <code>loading</code> type persists until explicitly
-      resolved. Toasts auto-dismiss after 4 seconds by default.
+      Non-blocking notifications for success, error, warning, and informational
+      feedback. Toasts appear, deliver the message, and auto-dismiss. A loading
+      variant tracks async operations with real-time status updates and
+      automatic success/error resolution.
     </p>
 
+    <details>
+      <summary>Technical Details</summary>
+      <p class="p-md">
+        Toast notifications use the <code>toast</code> singleton for ephemeral
+        feedback. Four semantic types map to accent colors:
+        <code>info</code> (system), <code>success</code>, <code>error</code>,
+        and <code>warning</code>. The <code>loading</code> type persists until explicitly
+        resolved. Toasts auto-dismiss after 4 seconds by default.
+      </p>
+    </details>
+
     <!-- BASIC TYPES -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Semantic Types</h5>
       <p class="text-small text-mute">
         Each type sets the border, background blend, and icon color via the
@@ -72,10 +82,15 @@
           Warning
         </button>
       </div>
+
+      <p class="text-caption text-mute px-xs">
+        Warning toasts use the Premium accent color &mdash; both signal
+        &ldquo;pay attention&rdquo; and share the same visual weight.
+      </p>
     </div>
 
     <!-- LOADING CONTROLLER -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Loading Controller</h5>
       <p class="text-small text-mute">
         <code>toast.loading()</code> returns a controller with
@@ -97,7 +112,7 @@
     </div>
 
     <!-- PROMISE WRAPPER -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Promise Wrapper</h5>
       <p class="text-small text-mute">
         <code>toast.promise()</code> wraps any <code>Promise</code> with automatic

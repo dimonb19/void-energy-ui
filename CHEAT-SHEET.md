@@ -1081,6 +1081,62 @@ The chip system includes additional semantic variants beyond the base:
 
 ---
 
+#### `<details>` / `<summary>` (Native Disclosure)
+
+**Description:** Collapsible disclosure widget. Uses the native `<details>` element with animated expand/collapse via `::details-content`. Sunk surface by default (`glass-sunk`); override with `.surface-glass` for standalone use.
+**Source:** [src/styles/components/\_inputs.scss](src/styles/components/_inputs.scss) (section 10)
+
+**Surface behavior:**
+
+| Context | Class | Result |
+| --- | --- | --- |
+| Inside a container (default) | *(none)* | Sunk surface (`glass-sunk` baked in) |
+| Standalone on page | `.surface-glass` | Floating glass surface (overrides sunk) |
+
+**Typography:** `font-size: var(--font-size-small)` on `<details>`. `<p>` elements inside inherit this size automatically — no `text-small` class needed.
+
+**States:**
+
+| State | Attribute | Visual |
+| --- | --- | --- |
+| Open | `[open]` | Border turns `--energy-primary`, summary gets bottom divider, chevron rotates |
+| Disabled | `summary[aria-disabled="true"]` | 50% opacity, pointer-events disabled |
+
+**Accordion:** Use the native `name` attribute to create exclusive groups (only one open at a time).
+
+**Usage:**
+
+```svelte
+<!-- Basic disclosure (sunk by default) -->
+<details>
+  <summary>Section Title</summary>
+  <div class="p-md">Content here</div>
+</details>
+
+<!-- Standalone (glass override) -->
+<details class="surface-glass">
+  <summary>Expand</summary>
+  <p class="p-md">Floating glass container</p>
+</details>
+
+<!-- Accordion group (exclusive) -->
+<details name="my-group" open>
+  <summary>Panel A</summary>
+  <div class="p-md">...</div>
+</details>
+<details name="my-group">
+  <summary>Panel B</summary>
+  <div class="p-md">...</div>
+</details>
+```
+
+**Physics:**
+- **Glass:** Smooth `block-size` animation (0 → auto), spring easing, blur/glow on surface
+- **Flat:** Same animation, opaque background, subtle shadow
+- **Retro:** Instant open/close (transitions disabled), hard borders
+
+---
+
 ### C. Overlays (The Ether)
 
 Floating UI elements with special positioning.
@@ -1888,6 +1944,36 @@ await toast.promise(saveItems(items), {
   ]}
   bind:value={view}
 />
+```
+
+---
+
+### P. Details & Accordion
+
+```svelte
+<!-- Sunk by default — no class needed -->
+<details>
+  <summary>Configuration</summary>
+  <div class="p-md flex flex-col gap-sm">
+    <p>Content inherits small font size automatically.</p>
+  </div>
+</details>
+
+<!-- Standalone: glass override -->
+<details class="surface-glass">
+  <summary>Key Concepts</summary>
+  <div class="p-md">...</div>
+</details>
+
+<!-- Exclusive accordion -->
+<details name="settings" open>
+  <summary>General</summary>
+  <div class="p-md">...</div>
+</details>
+<details name="settings">
+  <summary>Advanced</summary>
+  <div class="p-md">...</div>
+</details>
 ```
 
 ---

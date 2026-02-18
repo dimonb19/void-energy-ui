@@ -36,16 +36,27 @@
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
-      Form elements follow the native-first protocol — thin wrappers around
-      browser controls with <code>glass-sunk</code> physics applied via SCSS.
-      The browser owns interaction, accessibility, and form integration. Accent
-      colors, focus rings, and error states are token-driven.
-      <code>Toggle</code> and <code>Switcher</code> are the only custom controls
-      here — they exist because no native element provides the same interaction.
+      Standard form elements &mdash; text inputs, selects, checkboxes, radios,
+      range sliders, and toggles &mdash; all styled to match the active
+      atmosphere. Validation states, disabled states, and keyboard navigation
+      work out of the box because these are native HTML elements, not
+      reimplementations.
     </p>
 
+    <details>
+      <summary>Technical Details</summary>
+      <p class="p-md">
+        Form elements follow the native-first protocol &mdash; thin wrappers
+        around browser controls with <code>glass-sunk</code> physics applied via
+        SCSS. The browser owns interaction, accessibility, and form integration.
+        Accent colors, focus rings, and error states are token-driven.
+        <code>Toggle</code> and <code>Switcher</code> are the only custom controls
+        &mdash; they exist because no native element provides the same interaction.
+      </p>
+    </details>
+
     <!-- ─── TEXT INPUT ─────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Text Input</h5>
       <p class="text-small text-mute">
         Native <code>&lt;input type="text"&gt;</code> with
@@ -56,24 +67,22 @@
 
       <div class="surface-sunk p-md flex flex-col gap-md">
         <div class="flex flex-col gap-xs">
-          <label class="text-small px-xs" for="demo-text"
-            >System Identifier</label
-          >
+          <label class="text-small px-xs" for="demo-text">Full Name</label>
           <input
             id="demo-text"
             type="text"
-            placeholder="Enter Agent ID..."
+            placeholder="Enter your name..."
             bind:value={textValue}
           />
         </div>
         <div class="flex flex-col gap-xs">
           <label class="text-small px-xs" for="demo-text-disabled"
-            >Locked Field</label
+            >Account ID (locked)</label
           >
           <input
             id="demo-text-disabled"
             type="text"
-            value="VOID-CORE-9X"
+            value="USR-4F8A-9C2E"
             disabled
           />
         </div>
@@ -102,26 +111,33 @@
     </div>
 
     <!-- ─── TEXTAREA ───────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Textarea</h5>
       <p class="text-small text-mute">
         Native <code>&lt;textarea&gt;</code> with vertical resize. Same sunk physics
         as text inputs. Min-height scales with the density token.
       </p>
 
-      <div class="surface-sunk p-md flex flex-col gap-xs">
-        <label class="text-small px-xs" for="demo-textarea">Mission Brief</label
-        >
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <label class="text-small px-xs" for="demo-textarea">Description</label>
         <textarea
           id="demo-textarea"
-          placeholder="Enter mission parameters..."
+          placeholder="Enter project details..."
           bind:value={textareaValue}
         ></textarea>
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;label for="notes"&gt;Description&lt;/label&gt;
+&lt;textarea id="notes" placeholder="Enter details..." bind:value&gt;&lt;/textarea&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <!-- ─── VALIDATION STATES ─────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Validation States</h5>
       <p class="text-small text-mute">
         Error styling activates via <code>aria-invalid="true"</code> or the
@@ -138,11 +154,11 @@
           <input
             id="demo-invalid"
             type="text"
-            value="MALFORMED-ID-!!!"
+            value="not-a-valid-email"
             aria-invalid="true"
           />
           <p class="text-caption text-error px-xs">
-            Agent ID contains invalid characters.
+            Please enter a valid email address.
           </p>
         </div>
         <div class="flex flex-col gap-xs">
@@ -150,10 +166,10 @@
             Invalid Textarea
           </label>
           <textarea id="demo-invalid-textarea" aria-invalid="true"
-            >SYNTAX ERROR: Unexpected token at line 3</textarea
+            >This description exceeds the maximum character limit.</textarea
           >
           <p class="text-caption text-error px-xs">
-            Mission brief contains syntax errors.
+            Description must be under 500 characters.
           </p>
         </div>
       </div>
@@ -166,10 +182,22 @@
         >, <code>pattern</code>,
         <code>type="email"</code>).
       </p>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;!-- Programmatic validation --&gt;
+&lt;input type="text" aria-invalid="true" /&gt;
+&lt;p class="text-caption text-error"&gt;Error message.&lt;/p&gt;
+
+&lt;!-- Native validation (auto-triggers :invalid) --&gt;
+&lt;input type="email" required /&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <!-- ─── SELECT ─────────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Select</h5>
       <p class="text-small text-mute">
         The <code>Selector</code> component wraps a native
@@ -182,19 +210,19 @@
           <Selector
             bind:value={selectorValue}
             id="demo-selector"
-            label="Security Clearance"
+            label="Role"
             options={[
-              { value: 'observer', label: 'Level 1 — Observer' },
-              { value: 'operator', label: 'Level 2 — Operator' },
-              { value: 'admin', label: 'Level 3 — Administrator' },
+              { value: 'viewer', label: 'Viewer' },
+              { value: 'editor', label: 'Editor' },
+              { value: 'admin', label: 'Administrator' },
             ]}
             class="flex-1"
           />
           <Selector
             id="demo-selector-disabled"
             label="Region (locked)"
-            options={[{ value: 'sector-7g', label: 'Sector 7-G' }]}
-            value="sector-7g"
+            options={[{ value: 'us-east', label: 'US East' }]}
+            value="us-east"
             disabled={true}
             class="flex-1"
           />
@@ -206,10 +234,29 @@
         <code>label</code>, <code>placeholder</code>, <code>disabled</code>.
         Supports <code>align="start"</code> for left-aligned labels.
       </p>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;script&gt;
+  import Selector from './ui/Selector.svelte';
+&lt;/script&gt;
+
+&lt;Selector
+  bind:value
+  label="Role"
+  options=&#123;[
+    &#123; value: 'viewer', label: 'Viewer' &#125;,
+    &#123; value: 'editor', label: 'Editor' &#125;,
+    &#123; value: 'admin', label: 'Admin' &#125;,
+  ]&#125;
+/&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <!-- ─── RANGE SLIDER ───────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Range Slider</h5>
       <p class="text-small text-mute">
         Native <code>&lt;input type="range"&gt;</code> with
@@ -217,9 +264,9 @@
         the track and thumb natively.
       </p>
 
-      <div class="surface-sunk p-md flex flex-col gap-xs">
+      <div class="surface-sunk p-md flex flex-col gap-md">
         <label class="text-small px-xs" for="demo-range">
-          Energy Output — {rangeValue}%
+          Volume — {rangeValue}%
         </label>
         <input
           id="demo-range"
@@ -229,10 +276,18 @@
           max="100"
         />
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;label for="volume"&gt;Volume — &#123;value&#125;%&lt;/label&gt;
+&lt;input id="volume" type="range" bind:value min="0" max="100" /&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <!-- ─── CHECKBOX & RADIO ───────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Checkbox & Radio</h5>
       <p class="text-small text-mute">
         Native <code>&lt;input type="checkbox"&gt;</code> and
@@ -243,53 +298,82 @@
 
       <div class="surface-sunk p-md flex flex-row flex-wrap gap-lg">
         <fieldset>
-          <legend>Subsystems</legend>
+          <legend>Notifications</legend>
           <label class="flex flex-row items-center gap-xs">
             <input type="checkbox" checked />
-            <span>Enable Telemetry</span>
+            <span>Email alerts</span>
           </label>
           <label class="flex flex-row items-center gap-xs">
             <input type="checkbox" />
-            <span>Allow External Connections</span>
+            <span>Push notifications</span>
           </label>
           <label class="flex flex-row items-center gap-xs">
             <input type="checkbox" disabled />
-            <span>Root Access (locked)</span>
+            <span>SMS (plan upgrade required)</span>
           </label>
         </fieldset>
 
         <fieldset>
-          <legend>Operating Mode</legend>
+          <legend>Display</legend>
           <label class="flex flex-row items-center gap-xs">
             <input type="radio" name="demo-mode" checked />
-            <span>Manual Override</span>
+            <span>Grid view</span>
           </label>
           <label class="flex flex-row items-center gap-xs">
             <input type="radio" name="demo-mode" />
-            <span>Auto-Pilot</span>
+            <span>List view</span>
           </label>
           <label class="flex flex-row items-center gap-xs">
             <input type="radio" name="demo-mode" disabled />
-            <span>Quantum Mode (locked)</span>
+            <span>Table view (locked)</span>
           </label>
         </fieldset>
 
         <fieldset disabled>
-          <legend>Restricted Zone</legend>
+          <legend>Admin Only</legend>
           <label class="flex flex-row items-center gap-xs">
             <input type="checkbox" checked />
-            <span>Core Dump</span>
+            <span>Audit logging</span>
           </label>
           <label class="flex flex-row items-center gap-xs">
             <input type="radio" name="demo-restricted" />
-            <span>Emergency Shutdown</span>
+            <span>Force logout</span>
           </label>
         </fieldset>
       </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;fieldset&gt;
+  &lt;legend&gt;Notifications&lt;/legend&gt;
+  &lt;label class="flex flex-row items-center gap-xs"&gt;
+    &lt;input type="checkbox" checked /&gt;
+    &lt;span&gt;Email alerts&lt;/span&gt;
+  &lt;/label&gt;
+  &lt;label class="flex flex-row items-center gap-xs"&gt;
+    &lt;input type="checkbox" /&gt;
+    &lt;span&gt;Push notifications&lt;/span&gt;
+  &lt;/label&gt;
+&lt;/fieldset&gt;
+
+&lt;fieldset&gt;
+  &lt;legend&gt;Layout&lt;/legend&gt;
+  &lt;label class="flex flex-row items-center gap-xs"&gt;
+    &lt;input type="radio" name="layout" checked /&gt;
+    &lt;span&gt;Grid&lt;/span&gt;
+  &lt;/label&gt;
+  &lt;label class="flex flex-row items-center gap-xs"&gt;
+    &lt;input type="radio" name="layout" /&gt;
+    &lt;span&gt;List&lt;/span&gt;
+  &lt;/label&gt;
+&lt;/fieldset&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <!-- ─── TOGGLE ─────────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Toggle</h5>
       <p class="text-small text-mute">
         Physics-aware switch for boolean states. Supports custom Lucide icons,
@@ -358,7 +442,7 @@
     </div>
 
     <!-- ─── SWITCHER ───────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Switcher</h5>
       <p class="text-small text-mute">
         Segmented control for selecting between N options. Uses
@@ -386,10 +470,30 @@
         <code>value</code> (bindable), <code>label</code>,
         <code>disabled</code>.
       </p>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;script&gt;
+  import Switcher from './ui/Switcher.svelte';
+  let value = $state('option-a');
+&lt;/script&gt;
+
+&lt;Switcher
+  bind:value
+  label="View Mode"
+  options=&#123;[
+    &#123; value: 'grid', label: 'Grid' &#125;,
+    &#123; value: 'list', label: 'List' &#125;,
+    &#123; value: 'table', label: 'Table' &#125;,
+  ]&#125;
+/&gt;</code
+          ></pre>
+      </details>
     </div>
 
     <!-- ─── DETAILS & SUMMARY ────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-sm">
       <h5>Details & Summary</h5>
       <p class="text-small text-mute">
         Native <code>&lt;details&gt;</code> disclosure element for collapsible
