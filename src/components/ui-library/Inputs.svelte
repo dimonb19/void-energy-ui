@@ -119,12 +119,15 @@
       </p>
 
       <div class="surface-sunk p-md flex flex-col gap-md">
-        <label class="text-small px-xs" for="demo-textarea">Description</label>
-        <textarea
-          id="demo-textarea"
-          placeholder="Enter project details..."
-          bind:value={textareaValue}
-        ></textarea>
+        <div class="flex flex-col gap-xs">
+          <label class="text-small px-xs" for="demo-textarea">Description</label
+          >
+          <textarea
+            id="demo-textarea"
+            placeholder="Enter project details..."
+            bind:value={textareaValue}
+          ></textarea>
+        </div>
       </div>
 
       <details>
@@ -265,16 +268,18 @@
       </p>
 
       <div class="surface-sunk p-md flex flex-col gap-md">
-        <label class="text-small px-xs" for="demo-range">
-          Volume — {rangeValue}%
-        </label>
-        <input
-          id="demo-range"
-          type="range"
-          bind:value={rangeValue}
-          min="0"
-          max="100"
-        />
+        <div class="flex flex-col gap-xs">
+          <label class="text-small px-xs" for="demo-range">
+            Volume — {rangeValue}%
+          </label>
+          <input
+            id="demo-range"
+            type="range"
+            bind:value={rangeValue}
+            min="0"
+            max="100"
+          />
+        </div>
       </div>
 
       <details>

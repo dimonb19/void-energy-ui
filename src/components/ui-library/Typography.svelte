@@ -246,27 +246,33 @@ engine.setPreferences(&#123;
       <div class="surface-sunk p-md flex flex-col gap-md">
         <div class="flex flex-col gap-xs">
           <p class="text-small px-xs">.text-truncate</p>
-          <p class="text-truncate surface-void p-sm max-w-xl">
-            This is a very long heading that should be truncated to a single
-            line with an ellipsis indicator at the end of the visible text.
-          </p>
+          <div class="surface-void p-sm max-w-xl">
+            <p class="text-truncate">
+              This is a very long heading that should be truncated to a single
+              line with an ellipsis indicator at the end of the visible text.
+            </p>
+          </div>
         </div>
 
         <div class="flex flex-col gap-xs">
           <p class="text-small px-xs">.text-clamp-2</p>
-          <p class="text-clamp-2 surface-void p-sm max-w-xl">
-            This is a longer paragraph that should be clamped to exactly two
-            lines. Any content beyond the second line will be hidden and
-            replaced with an ellipsis to indicate truncation. This extra text
-            ensures we exceed two lines.
-          </p>
+          <div class="surface-void p-sm max-w-xl">
+            <p class="text-clamp-2">
+              This is a longer paragraph that should be clamped to exactly two
+              lines. Any content beyond the second line will be hidden and
+              replaced with an ellipsis to indicate truncation. This extra text
+              ensures we exceed two lines.
+            </p>
+          </div>
         </div>
 
         <div class="flex flex-col gap-xs">
           <p class="text-small px-xs">.text-break</p>
-          <p class="text-break surface-void p-sm max-w-xl">
-            superlongstringwithnospaceslikeanapikieyorhashsk-void-4f8a9c2e7d1b3e6f0a5b8c4d2e1f7a9b
-          </p>
+          <div class="surface-void p-sm max-w-xl">
+            <p class="text-break">
+              superlongstringwithnospaceslikeanapikieyorhashsk-void-4f8a9c2e7d1b3e6f0a5b8c4d2e1f7a9b
+            </p>
+          </div>
         </div>
       </div>
 
@@ -304,7 +310,13 @@ engine.setPreferences(&#123;
             Configure your environment
             <ul>
               <li>Tailwind for layout utilities</li>
-              <li>SCSS for physics and materials</li>
+              <li>
+                SCSS for physics and materials
+                <ul>
+                  <li>Mixins for glass, flat, retro</li>
+                  <li>State selectors via data attributes</li>
+                </ul>
+              </li>
             </ul>
           </li>
           <li>Import design tokens and begin building</li>
@@ -323,6 +335,12 @@ engine.setPreferences(&#123;
           <li>Mode Layer</li>
         </ol>
 
+        <ol class="lowercase">
+          <li>Glass preset</li>
+          <li>Flat preset</li>
+          <li>Retro preset</li>
+        </ol>
+
         <ol class="subordered">
           <li>
             All components must use semantic tokens for color and spacing.
@@ -333,26 +351,44 @@ engine.setPreferences(&#123;
           </li>
           <li>State changes are always expressed via data attributes.</li>
         </ol>
+
+        <p>
+          For full token documentation, see the
+          <a href="#void">design token reference</a>. Links inside legal content
+          automatically inherit laser-underline styling.
+        </p>
       </div>
 
       <details>
         <summary>View Code</summary>
         <pre><code
             >&lt;div class="legal-content"&gt;
+  &lt;!-- Unordered: 3 levels (disc → circle → square) --&gt;
   &lt;ul&gt;
     &lt;li&gt;Unordered list item&lt;/li&gt;
     &lt;li&gt;Nested:
-      &lt;ul&gt;&lt;li&gt;Sub-item&lt;/li&gt;&lt;/ul&gt;
+      &lt;ul&gt;
+        &lt;li&gt;Sub-item
+          &lt;ul&gt;&lt;li&gt;Third level&lt;/li&gt;&lt;/ul&gt;
+        &lt;/li&gt;
+      &lt;/ul&gt;
     &lt;/li&gt;
   &lt;/ul&gt;
 
-  &lt;ol&gt;&lt;li&gt;Ordered list&lt;/li&gt;&lt;/ol&gt;
-  &lt;ol class="uppercase"&gt;&lt;li&gt;A, B, C...&lt;/li&gt;&lt;/ol&gt;
+  &lt;!-- Ordered variants --&gt;
+  &lt;ol&gt;&lt;li&gt;Decimal: 1, 2, 3&lt;/li&gt;&lt;/ol&gt;
+  &lt;ol class="uppercase"&gt;&lt;li&gt;Upper-alpha: A, B, C&lt;/li&gt;&lt;/ol&gt;
+  &lt;ol class="lowercase"&gt;&lt;li&gt;Lower-alpha: a, b, c&lt;/li&gt;&lt;/ol&gt;
+
+  &lt;!-- Contract-style sub-numbering --&gt;
   &lt;ol class="subordered"&gt;
     &lt;li&gt;1.
       &lt;ol class="subordered"&gt;&lt;li&gt;1.1&lt;/li&gt;&lt;/ol&gt;
     &lt;/li&gt;
   &lt;/ol&gt;
+
+  &lt;!-- Links auto-inherit laser-underline --&gt;
+  &lt;p&gt;See the &lt;a href="/docs"&gt;documentation&lt;/a&gt;.&lt;/p&gt;
 &lt;/div&gt;</code
           ></pre>
       </details>

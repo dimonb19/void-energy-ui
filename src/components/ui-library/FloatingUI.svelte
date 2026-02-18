@@ -221,7 +221,7 @@
       <div
         class="surface-sunk p-md flex flex-row flex-wrap gap-lg justify-center"
       >
-        <Dropdown label="Settings" offset={8}>
+        <Dropdown label="Settings" triggerClass="btn-icon" offset={8}>
           {#snippet trigger()}
             <Settings class="icon" />
           {/snippet}
@@ -230,7 +230,12 @@
           </div>
         </Dropdown>
 
-        <Dropdown label="Notifications" placement="bottom-end" offset={8}>
+        <Dropdown
+          label="Notifications"
+          triggerClass="btn-icon"
+          placement="bottom-end"
+          offset={8}
+        >
           {#snippet trigger()}
             <Bell class="icon" />
           {/snippet}
@@ -239,7 +244,7 @@
           </div>
         </Dropdown>
 
-        <Dropdown label="Filters" offset={8}>
+        <Dropdown label="Filters" triggerClass="btn-icon" offset={8}>
           {#snippet trigger()}
             <Filter class="icon" />
           {/snippet}
@@ -336,7 +341,7 @@
           type="text"
           placeholder="Focus me..."
           use:tooltip={{ content: 'Tooltip on an input', placement: 'bottom' }}
-          class="w-xl"
+          class="w-5xl"
         />
       </div>
 

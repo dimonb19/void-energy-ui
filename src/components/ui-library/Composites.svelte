@@ -307,7 +307,7 @@
     </div>
 
     <!-- ─── ACTION BUTTON ──────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-xs">
       <h5>Action Button</h5>
       <p class="text-small text-mute">
         <code>ActionBtn</code> composes any interactive icon with a text label.
@@ -370,7 +370,7 @@
     </div>
 
     <!-- ─── ICON BUTTON ────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-xs">
       <h5>Icon Button</h5>
       <p class="text-small text-mute">
         <code>IconBtn</code> is a circular icon-only button (<code
@@ -432,7 +432,7 @@
     </div>
 
     <!-- ─── THEME BUTTON ──────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-xs">
       <h5>Theme Button</h5>
       <p class="text-small text-mute">
         <code>ThemesBtn</code> combines a Lucide Moon/Sun icon with a button
@@ -471,7 +471,7 @@
     </div>
 
     <!-- ─── SETTINGS ROW ────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-xs">
       <h5>Settings Row</h5>
       <p class="text-small text-mute">
         <code>SettingsRow</code> is a label + content layout for settings panels.
@@ -480,7 +480,9 @@
         intro page sandbox.
       </p>
 
-      <div class="surface-sunk p-md flex flex-col gap-md">
+      <div class="p-md flex flex-col gap-md">
+        <hr />
+
         <SettingsRow label="Notifications">
           <Toggle
             bind:checked={notificationsEnabled}
@@ -514,6 +516,8 @@
             </button>
           </div>
         </SettingsRow>
+
+        <hr />
       </div>
 
       <details>

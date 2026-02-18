@@ -415,6 +415,7 @@
         <button disabled>Disabled Button</button>
         <button class="btn-premium" disabled>Disabled Premium</button>
         <button class="btn-ghost" disabled>Disabled Ghost</button>
+        <button class="chip" disabled>Disabled Chip</button>
       </div>
 
       <details>
@@ -422,7 +423,8 @@
         <pre><code
             >&lt;button disabled&gt;Disabled&lt;/button&gt;
 &lt;button class="btn-premium" disabled&gt;Disabled Premium&lt;/button&gt;
-&lt;button class="btn-ghost" disabled&gt;Disabled Ghost&lt;/button&gt;</code
+&lt;button class="btn-ghost" disabled&gt;Disabled Ghost&lt;/button&gt;
+&lt;button class="chip" disabled&gt;Disabled Chip&lt;/button&gt;</code
           ></pre>
       </details>
     </div>

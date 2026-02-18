@@ -99,7 +99,6 @@ select {
 input[type='range'] {
   appearance: auto; // Let the browser draw the track.
   width: 100%;
-  min-height: var(--control-height);
   padding: 0;
   border: none;
   background: transparent;

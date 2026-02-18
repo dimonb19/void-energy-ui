@@ -252,10 +252,10 @@
 // Usage: @include text-truncate(1) for single line
 // Usage: @include text-truncate(3) for multi-line narrative
 @mixin text-truncate($lines: 1) {
-  overflow: hidden;
   text-overflow: ellipsis;
 
   @if $lines == 1 {
+    overflow: hidden;
     white-space: nowrap;
   } @else {
     display: -webkit-box;
@@ -263,6 +263,9 @@
     line-clamp: $lines;
     -webkit-box-orient: vertical;
     white-space: normal;
+    overflow: hidden;
+    overflow: clip;
+    overflow-clip-margin: content-box;
   }
 }
 

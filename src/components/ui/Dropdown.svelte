@@ -22,6 +22,7 @@
   - onchange: Callback fired when open state changes
   - label: Accessible label for the trigger button
   - class: Additional CSS classes on wrapper
+  - triggerClass: Additional CSS classes on the trigger button (e.g. 'btn-icon')
 
   ACCESSIBILITY:
   - Trigger: button with aria-expanded, aria-haspopup="true", aria-controls
@@ -48,6 +49,7 @@
     placement?: Placement;
     offset?: number;
     class?: string;
+    triggerClass?: string;
     open?: boolean;
     onchange?: (open: boolean) => void;
     label?: string;
@@ -59,6 +61,7 @@
     placement = 'bottom-start',
     offset: offsetPx = 8,
     class: className = '',
+    triggerClass = '',
     open = $bindable(false),
     onchange,
     label = 'Toggle dropdown',
@@ -181,7 +184,7 @@
   <button
     bind:this={triggerEl}
     type="button"
-    class="dropdown-trigger"
+    class="dropdown-trigger {triggerClass}"
     aria-expanded={open}
     aria-haspopup="true"
     aria-controls={panelId}
