@@ -23,6 +23,7 @@
  * - SearchField   : Search icon (left) + text input
  * - PasswordField : Password input + Eye toggle (right)
  * - EditField     : text input + Edit (idle) or Undo/Check (editing) on right
+ * - EditTextarea  : textarea + Edit (idle) or Undo/Check (editing) on right (top-aligned)
  * - CopyField     : Readonly input + Copy button (right)
  *
  * NON-FIELD COMPOSITES:
@@ -31,6 +32,7 @@
  * @see /src/components/ui/SearchField.svelte
  * @see /src/components/ui/PasswordField.svelte
  * @see /src/components/ui/EditField.svelte
+ * @see /src/components/ui/EditTextarea.svelte
  * @see /src/components/ui/CopyField.svelte
  * @see /src/components/ui/MediaSlider.svelte
  * ==========================================================================
@@ -58,19 +60,32 @@ $_slot-width: var(--control-padding-x);
   }
 
   // --- Padding adjustments via :has() ---
-  // Left slot present → pad input-left to make room for icon
-  &:has(.field-slot-left) input {
+  // Left slot present → pad input/textarea-left to make room for icon
+  &:has(.field-slot-left) input,
+  &:has(.field-slot-left) textarea {
     padding-left: calc(#{$_slot-width} + var(--space-lg));
   }
 
-  // Right slot present → pad input-right for icon(s)
-  &:has(.field-slot-right) input {
+  // Right slot present → pad input/textarea-right for icon(s)
+  &:has(.field-slot-right) input,
+  &:has(.field-slot-right) textarea {
     padding-right: calc(#{$_slot-width} + var(--space-lg));
   }
 
-  // Two buttons in right slot (EditField editing state) → double the space
-  &:has(.field-slot-right > :nth-child(2)) input {
-    padding-right: calc((#{$_slot-width} + var(--space-lg)) * 2);
+  // Two buttons in right slot (editing state) → add room for second icon
+  &:has(.field-slot-right > :nth-child(2)) input,
+  &:has(.field-slot-right > :nth-child(2)) textarea {
+    padding-right: calc(#{$_slot-width} + var(--space-lg) * 2);
+  }
+
+  // Textarea fields: align slot icons to the top (not vertically centered)
+  // Pad top to match textarea's own vertical padding for first-line alignment
+  &:has(textarea) {
+    .field-slot-left,
+    .field-slot-right {
+      align-items: flex-start;
+      padding-top: var(--control-padding-y);
+    }
   }
 }
 

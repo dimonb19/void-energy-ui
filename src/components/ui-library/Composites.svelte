@@ -4,6 +4,7 @@
   import SearchField from '../ui/SearchField.svelte';
   import PasswordField from '../ui/PasswordField.svelte';
   import EditField from '../ui/EditField.svelte';
+  import EditTextarea from '../ui/EditTextarea.svelte';
   import CopyField from '../ui/CopyField.svelte';
   import MediaSlider from '../ui/MediaSlider.svelte';
   import type { Component } from 'svelte';
@@ -31,6 +32,9 @@
   let searchValue = $state('');
   let passwordValue = $state('');
   let editValue = $state('VOID-7G-NEXUS');
+  let editTextareaValue = $state(
+    'Void energy reactor status: all subsystems nominal. Containment field stable at 99.7% integrity.',
+  );
   let copyValue = 'sk-void-4f8a-9c2e-7d1b-3e6f';
 
   // Demo state — Media Controls
@@ -185,6 +189,26 @@
           </p>
         </div>
 
+        <!-- EditTextarea -->
+        <div class="flex flex-col gap-xs">
+          <label for="edit-textarea" class="text-small px-xs"
+            >EditTextarea</label
+          >
+          <EditTextarea
+            id="edit-textarea"
+            bind:value={editTextareaValue}
+            placeholder="System notes..."
+            rows={3}
+            onconfirm={(v) =>
+              toast.show(`Saved: "${v.slice(0, 40)}..."`, 'success')}
+          />
+          <p class="text-caption text-mute px-xs">
+            Same edit/confirm/cancel pattern as EditField, adapted for
+            multi-line text. Icons anchor to top-right.
+            <code>Ctrl/Cmd+Enter</code> confirms, <code>Escape</code> resets.
+          </p>
+        </div>
+
         <!-- CopyField -->
         <div class="flex flex-col gap-xs">
           <label for="copy-field" class="text-small px-xs">CopyField</label>
@@ -203,6 +227,7 @@
   import SearchField from './ui/SearchField.svelte';
   import PasswordField from './ui/PasswordField.svelte';
   import EditField from './ui/EditField.svelte';
+  import EditTextarea from './ui/EditTextarea.svelte';
   import CopyField from './ui/CopyField.svelte';
 &lt;/script&gt;
 
@@ -223,6 +248,13 @@
   onconfirm=&#123;(v) =&gt; save(v)&#125;
 /&gt;
 
+&lt;EditTextarea
+  bind:value=&#123;notes&#125;
+  placeholder="Notes..."
+  rows=&#123;4&#125;
+  onconfirm=&#123;(v) =&gt; save(v)&#125;
+/&gt;
+
 &lt;CopyField value="sk-secret-key-here" /&gt;</code
           ></pre>
       </details>
@@ -235,6 +267,9 @@
         <code>placeholder</code>.
         <strong>EditField</strong> &mdash; <code>value</code> (bindable),
         <code>placeholder</code>, <code>onconfirm</code>.
+        <strong>EditTextarea</strong> &mdash; <code>value</code> (bindable),
+        <code>placeholder</code>, <code>rows</code> (number),
+        <code>onconfirm</code>. Ctrl/Cmd+Enter confirms.
         <strong>CopyField</strong> &mdash; <code>value</code> (readonly string).
         All accept <code>id</code>, <code>disabled</code>, and
         <code>class</code>.

@@ -926,6 +926,32 @@ Preset components with built-in layout and physics.
 
 ---
 
+#### `<EditTextarea>`
+
+**Description:** Readonly textarea that unlocks for editing with confirm/reset actions. Multi-line variant of EditField.
+**Location:** [src/components/ui/EditTextarea.svelte](src/components/ui/EditTextarea.svelte)
+**CSS Class:** `.field`
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` | `$bindable('')` | Text content (bindable, updated on confirm) |
+| `placeholder` | `string` | `''` | Placeholder text |
+| `rows` | `number` | `3` | Visible text rows |
+| `onconfirm` | `(value: string) => void` | — | Callback with new value on confirm |
+| `disabled` | `boolean` | `false` | Disables all interaction |
+
+**States:** idle (readonly + Edit icon at top-right) → editing (editable + Undo/Check at top-right). Ctrl/Cmd+Enter confirms, Escape resets.
+
+**Usage:**
+
+```svelte
+<EditTextarea bind:value={notes} placeholder="Notes..." rows={4} onconfirm={save} />
+```
+
+---
+
 #### `<PasswordField>`
 
 **Description:** Password input with Eye toggle for show/hide visibility.
@@ -1913,18 +1939,20 @@ await toast.promise(saveItems(items), {
 
 ---
 
-### N. Field Composites (Password, Copy, Edit)
+### N. Field Composites (Password, Copy, Edit, EditTextarea)
 
 ```svelte
 <script lang="ts">
   import PasswordField from '@components/ui/PasswordField.svelte';
   import CopyField from '@components/ui/CopyField.svelte';
   import EditField from '@components/ui/EditField.svelte';
+  import EditTextarea from '@components/ui/EditTextarea.svelte';
 </script>
 
 <PasswordField bind:value={password} />
 <CopyField value="sk-1234-abcd-5678" />
 <EditField bind:value={name} onconfirm={saveName} />
+<EditTextarea bind:value={notes} rows={4} onconfirm={saveNotes} />
 ```
 
 ---
