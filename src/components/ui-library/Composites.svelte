@@ -16,7 +16,7 @@
   import SettingsRow from '../ui/SettingsRow.svelte';
   import Toggle from '../ui/Toggle.svelte';
 
-  import Play from '../icons/Play.svelte';
+  import PlayPause from '../icons/PlayPause.svelte';
   import Refresh from '../icons/Refresh.svelte';
   import Remove from '../icons/Remove.svelte';
   import Contract from '../icons/Contract.svelte';
@@ -58,15 +58,20 @@
 
   let plainValue = $state(42);
 
+  // Demo state — Icon Buttons
+  let playing = $state(true);
+
   // Demo state — Media Controls
   let volume = $state(65);
   let voiceMuted = $state(false);
+  let voicePaused = $state(false);
   let musicVolume = $state(40);
   let musicMuted = $state(false);
+  let musicPaused = $state(false);
 
   // ActionBtn interactive demo
   const iconMap: Record<string, Component> = {
-    Play,
+    PlayPause,
     Refresh,
     Restart,
     Contract,
@@ -81,7 +86,7 @@
   };
 
   const iconList = [
-    { value: 'Play', label: 'Play' },
+    { value: 'PlayPause', label: 'PlayPause' },
     { value: 'Refresh', label: 'Refresh' },
     { value: 'Restart', label: 'Restart' },
     { value: 'Contract', label: 'Contract' },
@@ -109,7 +114,7 @@
     DoorOut: 'Sign Out',
   };
 
-  let selectedIcon = $state('Play');
+  let selectedIcon = $state('DoorIn');
   let selectedVariant = $state('');
   let activeIcon = $derived(iconMap[selectedIcon]);
   let activeLabel = $derived(btnLabel[selectedIcon] ?? selectedIcon);
@@ -388,7 +393,7 @@
       <p class="text-small text-mute">
         Horizontal control bars for audio and media. The mute toggle uses
         <code>data-muted</code> to cross out the icon and dim the slider. The
-        replay button animates on hover via <code>data-state</code>.
+        play/pause icon cross-fades smoothly via <code>data-paused</code>.
       </p>
 
       <div class="surface-sunk p-md flex flex-col gap-md">
@@ -398,13 +403,17 @@
             >MediaSlider — Voice</label
           >
           <MediaSlider
-            bind:value={volume}
+            bind:volume
             bind:muted={voiceMuted}
+            bind:paused={voicePaused}
             icon="voice"
+            playback
+            replay
             onreplay={() => toast.show('Voice replay triggered', 'info')}
           />
           <p class="text-caption text-mute px-xs">
-            Voice icon with mute toggle, range slider, and replay button.
+            Voice icon with mute toggle, range slider, pause/play toggle, and
+            replay button.
           </p>
         </div>
 
@@ -414,14 +423,14 @@
             >MediaSlider — Music</label
           >
           <MediaSlider
-            bind:value={musicVolume}
+            bind:volume={musicVolume}
             bind:muted={musicMuted}
+            bind:paused={musicPaused}
             icon="music"
-            replay={false}
+            playback
           />
           <p class="text-caption text-mute px-xs">
-            Music icon variant with <code>replay=false</code> to hide the replay
-            button.
+            Music icon variant with <code>playback</code> enabled, no replay.
           </p>
         </div>
       </div>
@@ -433,17 +442,20 @@
   import MediaSlider from './ui/MediaSlider.svelte';
   let volume = $state(65);
   let muted = $state(false);
+  let paused = $state(false);
 &lt;/script&gt;
 
-&lt;MediaSlider bind:value=&#123;volume&#125; bind:muted icon="voice" /&gt;
-&lt;MediaSlider bind:value=&#123;volume&#125; bind:muted icon="music" replay=&#123;false&#125; /&gt;</code
+&lt;MediaSlider bind:volume bind:muted bind:paused icon="voice" playback replay /&gt;
+&lt;MediaSlider bind:volume bind:muted bind:paused icon="music" playback /&gt;</code
           ></pre>
       </details>
 
       <p class="text-caption text-mute px-xs">
-        Props: <code>value</code> (bindable), <code>muted</code> (bindable),
-        <code>icon</code> ("voice" | "music"), <code>replay</code> (boolean),
-        <code>onreplay</code> (callback).
+        Props: <code>volume</code> (bindable), <code>muted</code> (bindable),
+        <code>icon</code> ("voice" | "music"), <code>playback</code> (boolean),
+        <code>paused</code> (bindable), <code>replay</code> (boolean),
+        <code>onchange</code>, <code>onmute</code>, <code>onpause</code>,
+        <code>onreplay</code> (callbacks).
       </p>
     </div>
 
@@ -493,14 +505,14 @@
         <pre><code
             >&lt;script&gt;
   import ActionBtn from './ui/ActionBtn.svelte';
-  import Play from './icons/Play.svelte';
+  import PlayPause from './icons/PlayPause.svelte';
 &lt;/script&gt;
 
 &lt;!-- Default --&gt;
-&lt;ActionBtn icon=&#123;Play&#125; text="Play" onclick=&#123;handler&#125; /&gt;
+&lt;ActionBtn icon=&#123;PlayPause&#125; text="Play" onclick=&#123;handler&#125; /&gt;
 
 &lt;!-- With variant --&gt;
-&lt;ActionBtn icon=&#123;Play&#125; text="Play" class="btn-cta" /&gt;</code
+&lt;ActionBtn icon=&#123;PlayPause&#125; text="Play" class="btn-cta" /&gt;</code
           ></pre>
       </details>
 
@@ -524,9 +536,13 @@
 
       <div class="surface-sunk p-md flex justify-center items-center gap-md">
         <IconBtn
-          icon={Play}
-          onclick={() => toast.show('Play triggered', 'info')}
-          aria-label="Play"
+          icon={PlayPause}
+          iconProps={{ 'data-paused': !playing }}
+          onclick={() => {
+            playing = !playing;
+            toast.show(playing ? 'Playing' : 'Paused', 'info');
+          }}
+          aria-label={playing ? 'Pause' : 'Play'}
         />
         <IconBtn
           icon={Refresh}
@@ -621,7 +637,7 @@
         intro page sandbox.
       </p>
 
-      <div class="p-md flex flex-col gap-md">
+      <div class="flex flex-col gap-md">
         <hr />
 
         <SettingsRow label="Notifications">
@@ -645,7 +661,7 @@
         <hr />
 
         <SettingsRow label="Actions">
-          <div class="flex flex-row gap-sm">
+          <div class="flex flex-row gap-md">
             <button onclick={() => toast.show('Settings exported', 'success')}>
               Export
             </button>

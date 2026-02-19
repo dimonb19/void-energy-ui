@@ -50,7 +50,7 @@
         for everyone &mdash; expandable code examples for developers.
       </p>
 
-      <details class="surface-glass">
+      <details class="surface-glass text-left">
         <summary>New here? Key concepts</summary>
         <div class="p-md flex flex-col gap-md">
           <p>
@@ -86,7 +86,7 @@
     </div>
 
     <nav
-      class="flex flex-row flex-wrap gap-md justify-center surface-void py-md"
+      class="flex flex-row flex-wrap gap-md justify-center surface-glass py-md"
       aria-label="Section navigation"
     >
       {#each sections as s}

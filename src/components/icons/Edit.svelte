@@ -22,12 +22,12 @@
   />
 </svg>
 
-<style>
+<style lang="scss">
   .pencil {
     transition: transform var(--speed-base) var(--ease-spring-snappy);
   }
 
   :global(.icon-edit[data-state='active'] .pencil) {
-    transform: translate(-10px, 10px);
+    transform: translate(-10px, 10px); // void-ignore
   }
 </style>

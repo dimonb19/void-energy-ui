@@ -15,8 +15,8 @@
   import Eye from '@components/icons/Eye.svelte';
   import Fullscreen from '@components/icons/Fullscreen.svelte';
   import Music from '@components/icons/Music.svelte';
+  import PlayPause from '@components/icons/PlayPause.svelte';
   import Caret from '@components/icons/Caret.svelte';
-  import Play from '@components/icons/Play.svelte';
   import Profile from '@components/icons/Profile.svelte';
   import Quit from '@components/icons/Quit.svelte';
   import Refresh from '@components/icons/Refresh.svelte';
@@ -240,8 +240,20 @@
         class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
       >
         <div class="flex flex-col items-center gap-xs">
-          <IconBtn icon={Play} size={iconSize} aria-label="Play" />
-          <span class="text-caption text-mute">Play</span>
+          <IconBtn icon={PlayPause} size={iconSize} aria-label="Play" />
+          <span class="text-caption text-mute">PlayPause</span>
+        </div>
+
+        <div class="flex flex-col items-center gap-xs">
+          <IconBtn
+            icon={PlayPause}
+            size={iconSize}
+            iconProps={{ 'data-paused': true }}
+            aria-label="Pause"
+          />
+          <span class="text-caption text-mute"
+            >PlayPause <span class="text-xs">(paused)</span></span
+          >
         </div>
 
         <div class="flex flex-col items-center gap-xs">
@@ -492,9 +504,9 @@
 &lt;!-- Interactive icon via IconBtn (hover animates) --&gt;
 &lt;script&gt;
   import IconBtn from './ui/IconBtn.svelte';
-  import Play from './icons/Play.svelte';
+  import PlayPause from './icons/PlayPause.svelte';
 &lt;/script&gt;
-&lt;IconBtn icon=&#123;Play&#125; aria-label="Play" /&gt;
+&lt;IconBtn icon=&#123;PlayPause&#125; aria-label="Play" /&gt;
 
 &lt;!-- Toggle icon with state --&gt;
 &lt;IconBtn

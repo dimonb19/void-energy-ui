@@ -18,6 +18,7 @@
   // Physics inheritance.
   @include glass-float($interactive: false);
   @include glass-blur;
+  background: var(--bg-surface);
 
   // Typography.
   @include typography('caption');
@@ -51,7 +52,7 @@
     border-radius: 0;
     transition: none; // Law: Instant motion
     filter: none; // Law: No blur
-    background: var(--bg-canvas); // Opaque
+    background: var(--bg-spotlight); // Opaque
   }
 
   // Light mode overrides.

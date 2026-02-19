@@ -996,7 +996,7 @@ Preset components with built-in layout and physics.
 
 #### `<MediaSlider>`
 
-**Description:** Horizontal control bar with mute toggle, range slider, and optional replay button.
+**Description:** Horizontal control bar with mute toggle, volume slider, optional playback (pause/play) toggle, and optional replay button.
 **Location:** [src/components/ui/MediaSlider.svelte](src/components/ui/MediaSlider.svelte)
 **CSS Class:** `.media-slider` ([src/styles/components/\_fields.scss](src/styles/components/_fields.scss))
 
@@ -1004,17 +1004,23 @@ Preset components with built-in layout and physics.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `value` | `number` | `$bindable(50)` | Slider value 0–100 (bindable) |
+| `volume` | `number` | `$bindable(50)` | Volume level 0–100 (bindable) |
 | `muted` | `boolean` | `$bindable(false)` | Mute state (bindable) |
 | `icon` | `'voice' \| 'music'` | `'voice'` | Mute toggle icon |
-| `replay` | `boolean` | `true` | Show replay button |
+| `playback` | `boolean` | `false` | Show pause/play toggle |
+| `paused` | `boolean` | `$bindable(false)` | Pause state (bindable) |
+| `replay` | `boolean` | `false` | Show replay button |
+| `onchange` | `(volume: number) => void` | — | Callback on volume change |
+| `onmute` | `(muted: boolean) => void` | — | Callback on mute toggle |
+| `onpause` | `(paused: boolean) => void` | — | Callback on pause toggle |
 | `onreplay` | `() => void` | — | Callback on replay click |
 | `disabled` | `boolean` | `false` | Disables all controls |
 
 **Usage:**
 
 ```svelte
-<MediaSlider bind:value={volume} bind:muted icon="music" onreplay={replay} />
+<MediaSlider bind:volume bind:muted bind:paused icon="voice" playback replay onreplay={replay} />
+<MediaSlider bind:volume bind:muted bind:paused icon="music" playback />
 ```
 
 ---
@@ -1381,7 +1387,7 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 | `Voice` | Click toggle | `data-muted="true"` (mask slide) |
 | `Search` | Hover | `data-state="active"` + `data-zoom="in\|out"` |
 | `Fullscreen` | Click + hover | `data-fullscreen` + `data-state="active"` |
-| `Play` | Hover | `data-state="active"` |
+| `PlayPause` | Click toggle + hover | `data-paused="true"` + `data-state="active"` |
 | `Edit` | Hover | `data-state="active"` |
 | `Remove` | Hover | `data-state="active"` |
 | `Contract` | Hover | `data-state="active"` |
@@ -1943,12 +1949,12 @@ await toast.promise(saveItems(items), {
 <script lang="ts">
   import ActionBtn from '@components/ui/ActionBtn.svelte';
   import IconBtn from '@components/ui/IconBtn.svelte';
-  import Play from '@components/icons/Play.svelte';
+  import PlayPause from '@components/icons/PlayPause.svelte';
   import Undo from '@components/icons/Undo.svelte';
 </script>
 
 <!-- Icon + text button -->
-<ActionBtn icon={Play} text="Play" onclick={handlePlay} />
+<ActionBtn icon={PlayPause} text="Play" onclick={handlePlay} />
 
 <!-- Circular icon-only button -->
 <IconBtn icon={Undo} onclick={reset} aria-label="Reset" />

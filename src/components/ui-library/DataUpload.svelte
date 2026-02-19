@@ -37,16 +37,14 @@
         open the file browser.
       </p>
 
-      <div class="surface-sunk p-md">
-        <DropZone
-          onfiles={(files) => {
-            toast.show(
-              `Uploaded: ${files.map((f) => f.name).join(', ')}`,
-              'success',
-            );
-          }}
-        />
-      </div>
+      <DropZone
+        onfiles={(files) => {
+          toast.show(
+            `Uploaded: ${files.map((f) => f.name).join(', ')}`,
+            'success',
+          );
+        }}
+      />
     </div>
 
     <!-- ─── RESTRICTED UPLOAD ──────────────────────────────────────────── -->
@@ -59,15 +57,13 @@
         oversized files with an error toast.
       </p>
 
-      <div class="surface-sunk p-md">
-        <DropZone
-          accept=".json,.csv"
-          maxSize={2 * 1024 * 1024}
-          onfiles={(files) => {
-            toast.show(`Valid upload: ${files[0].name}`, 'success');
-          }}
-        />
-      </div>
+      <DropZone
+        accept=".json,.csv"
+        maxSize={2 * 1024 * 1024}
+        onfiles={(files) => {
+          toast.show(`Valid upload: ${files[0].name}`, 'success');
+        }}
+      />
     </div>
 
     <!-- ─── MULTIPLE FILES ─────────────────────────────────────────────── -->
@@ -78,17 +74,15 @@
         files at once or select multiple in the file browser.
       </p>
 
-      <div class="surface-sunk p-md">
-        <DropZone
-          multiple
-          onfiles={(files) => {
-            toast.show(
-              `${files.length} file${files.length > 1 ? 's' : ''} received`,
-              'info',
-            );
-          }}
-        />
-      </div>
+      <DropZone
+        multiple
+        onfiles={(files) => {
+          toast.show(
+            `${files.length} file${files.length > 1 ? 's' : ''} received`,
+            'info',
+          );
+        }}
+      />
     </div>
 
     <details>

@@ -16,8 +16,6 @@
 // ==========================================================================
 
 .dropdown-trigger {
-  @include btn-reset;
-
   &:focus-visible {
     box-shadow: var(--focus-ring);
     border-radius: var(--radius-base);
@@ -38,6 +36,7 @@
   // Physics surface.
   @include glass-float($interactive: false);
   @include glass-blur;
+  background: var(--bg-surface);
 
   // Elevation.
   box-shadow: var(--shadow-lift);
@@ -74,13 +73,13 @@
     border-radius: 0;
     transition: none;
     filter: none;
-    background: var(--bg-canvas);
+    background: var(--bg-spotlight);
   }
 
   // Light mode overrides.
   @include when-light {
     filter: none;
-    background: var(--bg-surface);
+    background: var(--bg-spotlight);
     border: var(--physics-border-width) solid var(--border-color);
 
     @include when-state('open') {

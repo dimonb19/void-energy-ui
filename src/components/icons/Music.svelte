@@ -89,6 +89,6 @@
   }
 
   :global(.icon-music[data-muted='true'] .mask-rect) {
-    transform: translateX(-200px);
+    transform: translateX(-200px); // void-ignore
   }
 </style>
