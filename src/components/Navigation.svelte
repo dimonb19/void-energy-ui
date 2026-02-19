@@ -1,14 +1,11 @@
 <script lang="ts">
   import type { Component } from 'svelte';
-  import { materialize, dematerialize } from '@lib/transitions.svelte';
-  import { morph } from '@actions/morph';
 
   import ThemesBtn from './ui/ThemesBtn.svelte';
 
-  import Burger from './icons/Burger.svelte';
   import LogoDGRS from './icons/LogoDGRS.svelte';
   import Quill from './icons/Quill.svelte';
-  import { LayoutGrid, ChevronRight } from '@lucide/svelte';
+  import { LayoutGrid } from '@lucide/svelte';
 
   // ─────────────────────────────────────────────────────────────────────────────
   // Navigation Data Structure
@@ -22,15 +19,6 @@
     children?: NavItem[];
   };
 
-  type SidebarItem =
-    | NavItem
-    | {
-        id: string;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        component: Component;
-        props?: Record<string, unknown>;
-      };
-
   // Main navigation tabs (desktop header + mobile bottom nav)
   const navItems: NavItem[] = [
     { id: 'conexus', label: 'CoNexus', href: '/conexus', icon: Quill },
@@ -41,64 +29,6 @@
       icon: LayoutGrid,
     },
   ];
-
-  // Sidebar/dropdown menu items
-  const sidebarItems: SidebarItem[] = [
-    {
-      id: 'library',
-      label: 'UI Library',
-      children: [
-        {
-          id: 'typography',
-          label: 'Typography',
-          href: '/components#typography',
-        },
-        { id: 'surfaces', label: 'Surfaces', href: '/components#surfaces' },
-        { id: 'icons', label: 'Icons', href: '/components#icons' },
-        { id: 'buttons', label: 'Buttons', href: '/components#buttons' },
-        { id: 'inputs', label: 'Inputs', href: '/components#inputs' },
-        {
-          id: 'data-upload',
-          label: 'Data Upload',
-          href: '/components#data-upload',
-        },
-        {
-          id: 'composites',
-          label: 'Composites',
-          href: '/components#composites',
-        },
-        {
-          id: 'floating-ui',
-          label: 'Floating UI',
-          href: '/components#floating-ui',
-        },
-        { id: 'toasts', label: 'Toasts', href: '/components#toasts' },
-        { id: 'modals', label: 'Modals', href: '/components#modals' },
-      ],
-    },
-    {
-      id: 'theme',
-      component: ThemesBtn,
-      props: { class: 'btn-void subtab flex-row-reverse' },
-    },
-  ];
-
-  // Helper to check if item is a component slot (not a link)
-  const isComponentItem = (
-    item: SidebarItem,
-  ): item is {
-    id: string;
-    component: Component;
-    props?: Record<string, unknown>;
-  } => 'component' in item;
-
-  // Helper to check if an expandable item should be open
-  const isExpanded = (item: NavItem): boolean => {
-    if (!item.children) return false;
-    return (
-      activeTab === item.id || item.children.some((c) => activeTab === c.id)
-    );
-  };
 
   // ─────────────────────────────────────────────────────────────────────────────
   // Props
@@ -118,27 +48,7 @@
   // State
   // ─────────────────────────────────────────────────────────────────────────────
 
-  let sidebarOpen = $state<boolean>(false);
   let activeTab = $state<string>(resolveTab(pathname));
-
-  // Sidebar hover control (desktop dropdown behavior)
-  let sidebarTimer: ReturnType<typeof setTimeout> | null = null;
-
-  function openSidebar(event: PointerEvent) {
-    if (event.pointerType === 'touch') return;
-    if (sidebarTimer) clearTimeout(sidebarTimer);
-    sidebarOpen = true;
-  }
-
-  function closeSidebarDelayed(event: PointerEvent) {
-    // Don't auto-close on touch - let the user tap links without the menu disappearing
-    if (event.pointerType === 'touch') return;
-
-    sidebarTimer = setTimeout(() => {
-      sidebarOpen = false;
-    }, 300);
-  }
-
   let navHidden = $state<boolean>(false);
   const clamp = 64; // px after which hiding can kick in
   let lastY = 0;
@@ -187,47 +97,202 @@
     }
   };
 
-  const onscroll = (event: Event) => {
+  const onscroll = () => {
     const y = window.scrollY;
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(() => {
       if (y > lastY && y > clamp) {
         navHidden = true;
-        sidebarOpen = false;
+        // menuOpen = false; // ← uncomment when nav menu is enabled
       } else if (y < lastY) navHidden = false;
       lastY = y;
       ticking = false;
     });
   };
 
-  const selectTab = (
-    event: Event,
-    tabName: string,
-    hasChildren: boolean = false,
-  ) => {
-    if (hasChildren) {
-      // Expandable parent: toggle open/closed, prevent navigation
-      event.preventDefault();
-      if (tabName === activeTab) {
-        activeTab = '';
-        return;
-      }
-    } else {
-      // Leaf item: let the browser navigate, close sidebar
-      sidebarOpen = false;
-    }
+  const selectTab = (event: Event, tabName: string) => {
     activeTab = tabName;
   };
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // NAV MENU PATTERN
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Burger-triggered dropdown menu with scrim, hover control, expandable
+  // sections, stagger animation, and Escape-to-close. Disabled for this
+  // showcase (only 2 pages). To enable in another app:
+  //
+  // 1. ADD IMPORTS:
+  //
+  //   import { materialize, dematerialize } from '@lib/transitions.svelte';
+  //   import { morph } from '@actions/morph';
+  //   import Burger from './icons/Burger.svelte';
+  //   import { ChevronRight } from '@lucide/svelte';
+  //
+  // 2. ADD TYPES (after NavItem):
+  //
+  //   type MenuItem =
+  //     | NavItem
+  //     | {
+  //         id: string;
+  //         component: Component;
+  //         props?: Record<string, unknown>;
+  //       };
+  //
+  // 3. CONFIGURE MENU ITEMS (replace with your routes):
+  //
+  //   const menuItems: MenuItem[] = [
+  //     {
+  //       id: 'section',
+  //       label: 'Section Name',
+  //       children: [
+  //         { id: 'page-a', label: 'Page A', href: '/page-a' },
+  //         { id: 'page-b', label: 'Page B', href: '/page-b' },
+  //       ],
+  //     },
+  //     // Embed a component directly (e.g., ThemesBtn):
+  //     {
+  //       id: 'theme',
+  //       component: ThemesBtn,
+  //       props: { class: 'btn-void subtab flex-row-reverse' },
+  //     },
+  //   ];
+  //
+  // 4. ADD HELPERS:
+  //
+  //   const isComponentItem = (
+  //     item: MenuItem,
+  //   ): item is { id: string; component: Component; props?: Record<string, unknown> } =>
+  //     'component' in item;
+  //
+  //   const isExpanded = (item: NavItem): boolean => {
+  //     if (!item.children) return false;
+  //     return activeTab === item.id || item.children.some((c) => activeTab === c.id);
+  //   };
+  //
+  // 5. ADD STATE & FUNCTIONS:
+  //
+  //   let menuOpen = $state<boolean>(false);
+  //   let menuTimer: ReturnType<typeof setTimeout> | null = null;
+  //
+  //   function openMenu(event: PointerEvent) {
+  //     if (event.pointerType === 'touch') return;
+  //     if (menuTimer) clearTimeout(menuTimer);
+  //     menuOpen = true;
+  //   }
+  //
+  //   function closeMenuDelayed(event: PointerEvent) {
+  //     if (event.pointerType === 'touch') return;
+  //     menuTimer = setTimeout(() => { menuOpen = false; }, 300);
+  //   }
+  //
+  // 6. UPGRADE selectTab (replace the simplified version):
+  //
+  //   const selectTab = (event: Event, tabName: string, hasChildren: boolean = false) => {
+  //     if (hasChildren) {
+  //       event.preventDefault();
+  //       if (tabName === activeTab) { activeTab = ''; return; }
+  //     } else {
+  //       menuOpen = false;
+  //     }
+  //     activeTab = tabName;
+  //   };
+  //
+  // 7. ADD TO <svelte:window>:
+  //
+  //   onkeydown={(e) => { if (e.key === 'Escape' && menuOpen) menuOpen = false; }}
+  //
+  // 8. REPLACE <ThemesBtn> IN NAV BAR with burger button:
+  //
+  //   <button
+  //     class="btn-void text-primary tab ml-auto"
+  //     onclick={() => (menuOpen = !menuOpen)}
+  //     aria-expanded={menuOpen}
+  //     aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+  //     aria-controls="burger-menu"
+  //     onpointerenter={openMenu}
+  //     onpointerleave={closeMenuDelayed}
+  //   >
+  //     <Burger data-size="2xl" data-state={menuOpen ? 'active' : ''} />
+  //   </button>
+  //
+  // 9. ADD MENU DROPDOWN + SCRIM (after bottom-nav):
+  //
+  //   {#if menuOpen}
+  //     <div
+  //       id="burger-menu"
+  //       class="nav-menu flex flex-col items-center gap-xs"
+  //       role="menu"
+  //       aria-label="Menu"
+  //       onpointerenter={openMenu}
+  //       onpointerleave={closeMenuDelayed}
+  //       in:materialize
+  //       out:dematerialize={{ y: 0 }}
+  //       use:morph={{ height: true, width: false }}
+  //     >
+  //       {#each menuItems as item, i (item.id)}
+  //         {#if isComponentItem(item)}
+  //           <span class="w-full" style="--item-index: {i}">
+  //             <item.component {...item.props} />
+  //           </span>
+  //         {:else if item.children}
+  //           <button
+  //             class="btn-void subtab expandable"
+  //             type="button"
+  //             style="--item-index: {i}"
+  //             data-state={activeTab === item.id ? 'active' : ''}
+  //             aria-expanded={isExpanded(item)}
+  //             onclick={(e) => selectTab(e, item.id, true)}
+  //           >
+  //             {item.label}
+  //             <ChevronRight class="icon" data-expanded={isExpanded(item)} />
+  //           </button>
+  //           {#if isExpanded(item)}
+  //             <ul class="submenu" out:dematerialize>
+  //               {#each item.children as child, j (child.id)}
+  //                 <li style="--item-index: {j}">
+  //                   <a
+  //                     class="subtab"
+  //                     href={child.href}
+  //                     data-state={activeTab === child.id ? 'active' : ''}
+  //                     onclick={(e) => selectTab(e, child.id)}
+  //                   >
+  //                     {child.label}
+  //                   </a>
+  //                 </li>
+  //               {/each}
+  //             </ul>
+  //           {/if}
+  //         {:else}
+  //           <a
+  //             class="subtab"
+  //             href={item.href}
+  //             style="--item-index: {i}"
+  //             data-state={activeTab === item.id ? 'active' : ''}
+  //             onclick={(e) => selectTab(e, item.id)}
+  //           >
+  //             {item.label}
+  //           </a>
+  //         {/if}
+  //       {/each}
+  //     </div>
+  //
+  //     <div
+  //       class="nav-menu-scrim"
+  //       role="presentation"
+  //       aria-hidden="true"
+  //       onclick={() => (menuOpen = false)}
+  //       in:materialize
+  //       out:dematerialize
+  //     ></div>
+  //   {/if}
+  //
+  // SCSS: .nav-menu, .nav-menu-scrim, .submenu, .subtab, stagger animation
+  //       already exist in src/styles/components/_navigation.scss
+  // ─────────────────────────────────────────────────────────────────────────────
 </script>
 
-<svelte:window
-  {onscroll}
-  {onmousemove}
-  onkeydown={(e) => {
-    if (e.key === 'Escape' && sidebarOpen) sidebarOpen = false;
-  }}
-/>
+<svelte:window {onscroll} {onmousemove} />
 
 <nav
   class="nav-bar flex flex-row items-center justify-between tablet:justify-normal gap-xs px-xs"
@@ -254,18 +319,7 @@
     {/each}
   </ul>
 
-  <!-- Burger Button -->
-  <button
-    class="btn-void text-primary tab ml-auto"
-    onclick={() => (sidebarOpen = !sidebarOpen)}
-    aria-expanded={sidebarOpen}
-    aria-label={sidebarOpen ? 'Close menu' : 'Open menu'}
-    aria-controls="burger-menu"
-    onpointerenter={openSidebar}
-    onpointerleave={closeSidebarDelayed}
-  >
-    <Burger data-size="2xl" data-state={sidebarOpen ? 'active' : ''} />
-  </button>
+  <ThemesBtn icon class="tab ml-auto" />
 </nav>
 
 <!-- Mobile Nav Links -->
@@ -287,72 +341,3 @@
     </a>
   {/each}
 </nav>
-
-{#if sidebarOpen}
-  <div
-    id="burger-menu"
-    class="sidebar flex flex-col items-center gap-xs"
-    role="menu"
-    aria-label="Dropdown"
-    onpointerenter={openSidebar}
-    onpointerleave={closeSidebarDelayed}
-    in:materialize
-    out:dematerialize={{ y: 0 }}
-    use:morph={{ height: true, width: false }}
-  >
-    {#each sidebarItems as item, i (item.id)}
-      {#if isComponentItem(item)}
-        <span class="w-full" style="--item-index: {i}">
-          <item.component {...item.props} />
-        </span>
-      {:else if item.children}
-        <button
-          class="btn-void subtab expandable"
-          type="button"
-          style="--item-index: {i}"
-          data-state={activeTab === item.id ? 'active' : ''}
-          aria-expanded={isExpanded(item)}
-          onclick={(e) => selectTab(e, item.id, true)}
-        >
-          {item.label}
-          <ChevronRight class="icon" data-expanded={isExpanded(item)} />
-        </button>
-        {#if isExpanded(item)}
-          <ul class="submenu" out:dematerialize>
-            {#each item.children as child, j (child.id)}
-              <li style="--item-index: {j}">
-                <a
-                  class="subtab"
-                  href={child.href}
-                  data-state={activeTab === child.id ? 'active' : ''}
-                  onclick={(e) => selectTab(e, child.id)}
-                >
-                  {child.label}
-                </a>
-              </li>
-            {/each}
-          </ul>
-        {/if}
-      {:else}
-        <a
-          class="subtab"
-          href={item.href}
-          style="--item-index: {i}"
-          data-state={activeTab === item.id ? 'active' : ''}
-          onclick={(e) => selectTab(e, item.id)}
-        >
-          {item.label}
-        </a>
-      {/if}
-    {/each}
-  </div>
-
-  <div
-    class="sidebar-scrim"
-    role="presentation"
-    aria-hidden="true"
-    onclick={() => (sidebarOpen = false)}
-    in:materialize
-    out:dematerialize
-  ></div>
-{/if}

@@ -7,13 +7,13 @@
  * ARCHITECTURE:
  * - Section 1: Navigation Bar
  *   - .nav-bar : Top navigation container (use with .surface-glass)
- *   - .sidebar  : Slide-out sidebar menu
- *   - .bottom-bar  : Nested submenu within sidebar
+ *   - .nav-menu : Slide-out navigation menu
+ *   - .bottom-bar  : Nested submenu within nav menu
  *
  * - Section 2: Tab System
  *   - .tab          : Base tab link/button
  *   - .submenu      : Container for nested subtab links
- *   - .subtab       : Nested tab within sidebar
+ *   - .subtab       : Nested tab within nav menu
  *
  * PHYSICS BEHAVIOR:
  * - Glass: Subtle color transitions, border glow on active
@@ -181,12 +181,12 @@
 }
 
 // ==========================================================================
-// 3. SIDEBAR
+// 3. NAV MENU
 // ==========================================================================
 // Used for both mobile slide-in menu and desktop hover dropdown.
 // CSS capability queries handle the behavioral difference.
 
-.sidebar {
+.nav-menu {
   position: fixed;
   top: var(--nav-height);
   right: 0;
@@ -211,7 +211,7 @@
   }
 }
 
-.sidebar-scrim {
+.nav-menu-scrim {
   position: fixed;
   inset: 0;
   background: alpha(var(--bg-canvas), 80%);
@@ -275,14 +275,14 @@
 // ==========================================================================
 // 5. STAGGERED ENTRY ANIMATION
 // ==========================================================================
-// CSS-based stagger animation for sidebar items.
+// CSS-based stagger animation for nav-menu items.
 // Replaces Svelte in:materialize which doesn't work inside {#each} blocks.
 //
 // Usage: Set --item-index on each element via style attribute.
 // Example: <a style="--item-index: {i}">
 
-.sidebar > *,
-.sidebar > span > * {
+.nav-menu > *,
+.nav-menu > span > * {
   animation: stagger-enter var(--speed-base) var(--ease-spring-snappy) backwards;
   animation-delay: calc(var(--item-index, 0) * 50ms);
 

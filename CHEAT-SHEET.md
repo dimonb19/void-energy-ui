@@ -455,7 +455,7 @@ These components already account for safe areas (no manual work needed):
 | --- | --- |
 | **Nav bar** (`.nav-bar`) | Extends glass surface under status bar via `--safe-top` |
 | **Bottom nav** (`.bottom-nav`) | Offsets above home indicator via `--safe-bottom`; landscape-aware width via `--safe-left`/`--safe-right` |
-| **Sidebar** (`.sidebar`) | Padding respects `--safe-right` (and `--safe-left` on mobile) |
+| **Nav menu** (`.nav-menu`) | Padding respects `--safe-right` (and `--safe-left` on mobile) |
 | **Toasts** (`.toast-region`) | Top offset includes `--safe-top`; width avoids landscape notch |
 | **Full-size dialogs** (`dialog[data-size="full"]`) | Dimensions account for all four safe area insets |
 | **Body** | `padding-top` includes `--safe-top`; `padding-bottom` uses `--bottom-nav-clearance` on mobile |
@@ -1141,6 +1141,45 @@ Preset components with built-in layout and physics.
 ```svelte
 <a href="/docs" class="link">Read the docs</a>
 ```
+
+---
+
+#### Nav Menu Pattern (Burger Dropdown)
+
+**Description:** Burger-triggered dropdown menu with scrim overlay, hover control, expandable sections, stagger animation, and Escape-to-close. Disabled in this showcase (only 2 pages) but fully documented inside `Navigation.svelte` as a 9-step recipe ready to uncomment.
+**Location:** [src/components/Navigation.svelte](src/components/Navigation.svelte) (commented pattern block)
+**CSS:** `.nav-menu`, `.nav-menu-scrim`, `.submenu`, `.subtab` ([src/styles/components/\_navigation.scss](src/styles/components/_navigation.scss))
+
+**Architecture:**
+
+| Class | Purpose |
+| --- | --- |
+| `.nav-menu` | Fixed overlay panel below navbar, full-width on mobile, min-width on tablet+ |
+| `.nav-menu-scrim` | Full-viewport backdrop overlay (canvas-tinted dark, text-tinted light) |
+| `.submenu` | Nested flex column for expandable groups, border-left accent |
+| `.subtab` | Individual menu item — link or expandable parent |
+
+**Features:**
+- **Hover control** — Desktop: hover-open with 300ms close delay. Touch: tap-only (no hover interference)
+- **Expandable sections** — Parent items toggle child groups; ChevronRight rotates on expand
+- **Component slots** — `MenuItem` union type supports embedding arbitrary components (e.g., ThemesBtn)
+- **Stagger animation** — CSS-based entry via `--item-index` custom property (50ms per item)
+- **Keyboard** — Escape closes menu, focus returns to burger button
+
+**States:**
+
+| State | Attribute | Element | Visual |
+| --- | --- | --- | --- |
+| Menu open | `aria-expanded="true"` | Burger button | Burger → X animation |
+| Active item | `data-state="active"` | `.subtab` | Energy-primary bg (leaf) or color (expandable) |
+| Expanded group | `aria-expanded="true"` | `.subtab.expandable` | ChevronRight rotates 90deg |
+
+**Physics:**
+- **Glass:** Backdrop blur on `.nav-menu` panel
+- **Flat:** Opaque surface, solid borders
+- **Retro:** Same as flat (instant transitions, hard edges)
+
+**How to enable:** Follow the 9-step recipe in `Navigation.svelte` (bottom of `<script>` block). Steps cover imports, types, data, state, functions, burger button markup, and the full dropdown template. All SCSS already exists — no style changes needed.
 
 ---
 
@@ -2078,6 +2117,30 @@ await toast.promise(saveItems(items), {
   <div class="p-md">...</div>
 </details>
 ```
+
+---
+
+### R. Nav Menu (Burger Dropdown)
+
+The full nav menu pattern is disabled in this showcase but documented as a commented recipe in `Navigation.svelte`. To enable, follow the 9-step guide at the bottom of the `<script>` block. Minimal example of the data structure:
+
+```typescript
+// Menu items support links, expandable groups, and embedded components
+const menuItems: MenuItem[] = [
+  {
+    id: 'docs',
+    label: 'Documentation',
+    children: [
+      { id: 'getting-started', label: 'Getting Started', href: '/docs/start' },
+      { id: 'api', label: 'API Reference', href: '/docs/api' },
+    ],
+  },
+  { id: 'about', label: 'About', href: '/about' },
+  { id: 'theme', component: ThemesBtn, props: { class: 'btn-void subtab flex-row-reverse' } },
+];
+```
+
+SCSS classes (`.nav-menu`, `.nav-menu-scrim`, `.submenu`, `.subtab`) are already in `_navigation.scss` — no style changes needed.
 
 ---
 
