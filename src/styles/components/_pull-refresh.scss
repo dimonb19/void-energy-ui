@@ -13,7 +13,7 @@
 
 .pull-refresh {
   position: relative;
-  overflow: hidden; // Clip indicator when fully hidden
+  overflow: clip; // Clip indicator without creating scroll container (preserves position: sticky)
   min-height: 100%;
 
   // CSS Custom Properties (set via JS, defaults here for fallback)
@@ -174,7 +174,7 @@
 
 // Refreshing: spinner animation, scroll locked
 .pull-refresh[data-state='refreshing'] {
-  overflow: hidden;
+  overflow: clip;
 
   .pull-indicator {
     opacity: 1;

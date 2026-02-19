@@ -165,6 +165,13 @@ body {
   ); // Mobile bottom nav clearance
 }
 
+// Anchor scroll offset — prevents fixed navbar from covering section targets
+section[id] {
+  scroll-margin-top: calc(
+    var(--nav-height) + var(--safe-top) + var(--space-lg)
+  );
+}
+
 // =========================================
 // 3. GLOBAL INTERACTION
 // =========================================

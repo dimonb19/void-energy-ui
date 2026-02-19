@@ -1,0 +1,250 @@
+/* ==========================================================================
+ * PAGE SIDEBAR (Table of Contents)
+ * ==========================================================================
+ *
+ * Sticky navigation sidebar for long-form pages (documentation, library).
+ * Groups items under optional section headers with scroll-tracking.
+ *
+ * ARCHITECTURE:
+ * - .docs-layout             : Block (mobile) / CSS grid (desktop) wrapper
+ * - .docs-main               : Content column (holds .container, PullRefresh, etc.)
+ * - .page-sidebar-header     : Sticky wrapper (toggle bar + sidebar), grid col 1 on desktop
+ * - .page-sidebar-toggle-bar : Mobile bar container (< large-desktop only)
+ * - .page-sidebar-toggle     : Mobile dropdown trigger button
+ * - .page-sidebar            : Dropdown (< large-desktop) / Sticky nav (large-desktop+)
+ * - .page-sidebar-label      : Non-clickable group header (uppercase, muted)
+ * - .page-sidebar-item       : Clickable text link with active left-border accent
+ *
+ * RESPONSIVE TIERS:
+ * - Below large-desktop (< 1440px): Inline dropdown via toggle bar
+ * - Large-desktop (1440px+):        Sticky left column, always visible
+ *
+ * LAYOUT:
+ * .docs-layout is a CSS grid on desktop (15rem sidebar + 1fr content) and
+ * display: block on mobile. On mobile the sidebar collapses via max-height: 0
+ * and expands inline below the toggle bar. On desktop the sidebar uses
+ * position: sticky to stay in view within the grid.
+ *
+ * STATE:
+ * - data-state="active" on .page-sidebar-item for current section
+ * - data-open on .page-sidebar for dropdown visibility (< large-desktop)
+ * - data-open on .page-sidebar-toggle for chevron rotation
+ *
+ * @see /src/components/ui/Sidebar.svelte
+ * ========================================================================== */
+
+@use '../abstracts' as *;
+
+// ==========================================================================
+// 1. DOCS LAYOUT (Grid wrapper — sidebar + content)
+// ==========================================================================
+
+.docs-layout {
+  display: block; // Mobile: vertical flow (dropdown + content stack)
+
+  @include respond-up('large-desktop') {
+    display: grid;
+    grid-template-columns: 15rem 1fr;
+  }
+}
+
+.docs-main {
+  min-width: 0; // Prevent grid blowout from wide content
+}
+
+// ==========================================================================
+// 2. SIDEBAR CONTAINER (Dropdown + Sticky)
+// ==========================================================================
+
+.page-sidebar {
+  // --- Shared ---
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  @include laser-scrollbar;
+
+  // --- Dropdown mode (default, below large-desktop) ---
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--speed-base) var(--ease-spring-gentle);
+
+  background: var(--bg-surface);
+  border-bottom: var(--physics-border-width) solid var(--border-color);
+
+  @include when-glass {
+    @include glass-blur;
+  }
+
+  @include when-light {
+    box-shadow: var(--shadow-float);
+  }
+
+  &[data-open='true'] {
+    max-height: 70vh;
+    overflow-y: auto;
+  }
+
+  // --- Sticky column (large-desktop+) ---
+  @include respond-up('large-desktop') {
+    position: sticky;
+    top: calc(var(--nav-height) + var(--safe-top));
+    height: calc(100dvh - var(--nav-height) - var(--safe-top));
+    width: 15rem;
+    min-width: 15rem;
+    max-height: none;
+    overflow-y: auto;
+    transition: none;
+    background: transparent;
+    border-bottom: none;
+    border-right: none;
+    box-shadow: none;
+
+    // Cancel mobile dropdown behavior at this breakpoint
+    &[data-open='true'] {
+      max-height: none;
+    }
+
+    // Auto-hide scrollbar — appears on hover only
+    scrollbar-color: transparent transparent;
+
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+      transition: background var(--speed-fast) ease;
+    }
+
+    &:hover {
+      scrollbar-color: var(--energy-secondary) transparent;
+
+      &::-webkit-scrollbar-thumb {
+        background: var(--energy-secondary);
+      }
+    }
+
+    @include when-glass {
+      backdrop-filter: none;
+    }
+  }
+
+  @include when-retro {
+    transition-duration: 0s;
+  }
+}
+
+// ==========================================================================
+// 3. SECTION GROUPS
+// ==========================================================================
+
+.page-sidebar-label {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  line-height: var(--line-height-caption);
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+
+// ==========================================================================
+// 4. SIDEBAR ITEMS (Clickable links)
+// ==========================================================================
+
+.page-sidebar-item {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--line-height-small);
+  text-decoration: none;
+  color: var(--text-dim);
+  border-left: calc(var(--physics-border-width) * 2) solid transparent;
+
+  transition:
+    color var(--speed-fast) var(--ease-spring-snappy),
+    border-color var(--speed-fast) var(--ease-spring-snappy);
+
+  &:hover {
+    color: var(--energy-primary);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-sm);
+  }
+
+  // Active state — left border accent + primary color + subtle tint
+  @include when-state('active') {
+    color: var(--energy-primary);
+    border-left-color: var(--energy-primary);
+    font-weight: var(--font-weight-semibold);
+    background: alpha(var(--energy-primary), 8%);
+    border-radius: var(--radius-sm);
+  }
+
+  @include when-retro {
+    transition-duration: 0s;
+  }
+}
+
+// ==========================================================================
+// 5. SIDEBAR HEADER (Sticky wrapper: toggle bar + dropdown)
+// ==========================================================================
+
+.page-sidebar-header {
+  // Mobile: sticky container for toggle + dropdown
+  position: sticky;
+  top: calc((var(--nav-height) + var(--safe-top)) * (1 - var(--nav-hidden, 0)));
+  z-index: z('sticky');
+  transition: top var(--speed-base) var(--ease-spring-bounce);
+
+  // Desktop: transparent wrapper, no sticky behavior
+  // (the sidebar inside handles its own sticky positioning)
+  @include respond-up('large-desktop') {
+    position: static;
+    z-index: auto;
+    transition: none;
+  }
+
+  @include when-retro {
+    transition-duration: 0s;
+  }
+}
+
+// ==========================================================================
+// 6. MOBILE TOGGLE BAR (< large-desktop)
+// ==========================================================================
+
+.page-sidebar-toggle-bar {
+  display: flex;
+  align-items: center;
+  z-index: z('sticky');
+  background: var(--bg-surface);
+  border-bottom: var(--physics-border-width) solid var(--border-color);
+
+  @include when-glass {
+    @include glass-blur;
+  }
+
+  @include when-light {
+    box-shadow: var(--shadow-float);
+  }
+
+  // Hidden at large-desktop (sidebar is always visible in grid)
+  @include respond-up('large-desktop') {
+    display: none;
+  }
+
+  @include when-retro {
+    transition-duration: 0s;
+  }
+}
+
+// ==========================================================================
+// 7. MOBILE TOGGLE BUTTON
+// ==========================================================================
+
+.page-sidebar-toggle {
+  // Chevron rotation
+  .icon {
+    transition: transform var(--speed-fast) var(--ease-spring-snappy);
+  }
+
+  &[data-open='true'] .icon {
+    transform: rotate(180deg);
+  }
+}

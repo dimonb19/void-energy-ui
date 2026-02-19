@@ -1,5 +1,7 @@
 <script lang="ts">
+  import { ChevronDown } from '@lucide/svelte';
   import PullRefresh from './ui/PullRefresh.svelte';
+  import Sidebar from './ui/Sidebar.svelte';
 
   // Foundations
   import Typography from './ui-library/Typography.svelte';
@@ -17,18 +19,55 @@
   import Toasts from './ui-library/Toasts.svelte';
   import Modals from './ui-library/Modals.svelte';
 
-  const sections = [
-    { id: 'typography', label: 'Typography', number: '01' },
-    { id: 'surfaces', label: 'Surfaces', number: '02' },
-    { id: 'icons', label: 'Icons', number: '03' },
-    { id: 'buttons', label: 'Buttons', number: '04' },
-    { id: 'inputs', label: 'Inputs', number: '05' },
-    { id: 'data-upload', label: 'Data Upload', number: '06' },
-    { id: 'composites', label: 'Composites', number: '07' },
-    { id: 'floating-ui', label: 'Floating UI', number: '08' },
-    { id: 'toasts', label: 'Toasts', number: '09' },
-    { id: 'modals', label: 'Modals', number: '10' },
+  const sidebarSections = [
+    {
+      label: 'Foundations',
+      items: [
+        { id: 'typography', label: 'Typography' },
+        { id: 'surfaces', label: 'Surfaces' },
+      ],
+    },
+    {
+      label: 'Primitives',
+      items: [
+        { id: 'icons', label: 'Icons' },
+        { id: 'buttons', label: 'Buttons' },
+      ],
+    },
+    {
+      label: 'Form Controls',
+      items: [
+        { id: 'inputs', label: 'Inputs' },
+        { id: 'data-upload', label: 'Data Upload' },
+      ],
+    },
+    {
+      label: 'Composites',
+      items: [{ id: 'composites', label: 'Composites' }],
+    },
+    {
+      label: 'Overlays & Feedback',
+      items: [
+        { id: 'floating-ui', label: 'Floating UI' },
+        { id: 'toasts', label: 'Toasts' },
+        { id: 'modals', label: 'Modals' },
+      ],
+    },
   ];
+
+  let activeId = $state('');
+  let sidebarOpen = $state(false);
+  let toggleBtnRef: HTMLButtonElement | undefined = $state();
+
+  const activeLabel = $derived(
+    sidebarSections.flatMap((s) => s.items).find((item) => item.id === activeId)
+      ?.label ?? 'Sections',
+  );
+
+  function closeSidebar() {
+    sidebarOpen = false;
+    toggleBtnRef?.focus();
+  }
 
   // Pull-to-refresh handlers
   async function handleRefresh(): Promise<void> {
@@ -40,117 +79,146 @@
   }
 </script>
 
-<PullRefresh onrefresh={handleRefresh} onerror={handleRefreshError}>
-  <div class="container flex flex-col gap-2xl py-2xl">
-    <div class="flex flex-col gap-lg text-center">
-      <h1>Component Library</h1>
-      <p class="text-dim">
-        The complete Void Energy toolkit. Every element adapts to all
-        atmospheres, physics presets, and density settings. Interactive demos
-        for everyone &mdash; expandable code examples for developers.
-      </p>
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<!-- Grid Layout (sidebar + content)                                        -->
+<!-- ─────────────────────────────────────────────────────────────────────── -->
+<div class="docs-layout">
+  <!-- Sticky group: toggle bar + dropdown expand together -->
+  <div class="page-sidebar-header">
+    <div class="page-sidebar-toggle-bar">
+      <button
+        bind:this={toggleBtnRef}
+        class="page-sidebar-toggle flex flex-row items-center justify-between flex-1 px-md py-xs"
+        type="button"
+        aria-expanded={sidebarOpen}
+        aria-controls="page-sidebar-nav"
+        data-open={sidebarOpen}
+        onclick={() => (sidebarOpen = !sidebarOpen)}
+      >
+        <span class="text-small font-semibold">
+          {activeLabel}
+        </span>
+        <ChevronDown class="icon" data-size="sm" />
+      </button>
+    </div>
 
-      <details class="surface-glass text-left">
-        <summary>New here? Key concepts</summary>
-        <div class="p-md flex flex-col gap-md">
-          <p>
-            <strong>Atmosphere</strong> &mdash; the active color palette,
-            typography, and mood. 12 built-in presets (Void, Onyx, Terminal,
-            Nebula, and more).
-            <a href="/">Learn more on the intro page.</a>
+    <Sidebar
+      sections={sidebarSections}
+      bind:activeId
+      bind:open={sidebarOpen}
+      onclose={closeSidebar}
+    />
+  </div>
+
+  <!-- Main content -->
+  <div class="docs-main">
+    <PullRefresh onrefresh={handleRefresh} onerror={handleRefreshError}>
+      <div class="container py-2xl">
+        <div class="flex flex-col gap-lg text-center mb-2xl">
+          <h1>Component Library</h1>
+          <p class="text-dim">
+            The complete Void Energy toolkit. Every element adapts to all
+            atmospheres, physics presets, and density settings. Interactive
+            demos for everyone &mdash; expandable code examples for developers.
           </p>
-          <p>
-            <strong>Physics</strong> &mdash; how surfaces render: Glass (translucent,
-            blurred, glowing), Flat (opaque, sharp), or Retro (pixel-perfect, CRT-style).
+
+          <details class="surface-glass text-left">
+            <summary>New here? Key concepts</summary>
+            <div class="p-md flex flex-col gap-md">
+              <p>
+                <strong>Atmosphere</strong> &mdash; the active color palette,
+                typography, and mood. 12 built-in presets (Void, Onyx, Terminal,
+                Nebula, and more).
+                <a href="/">Learn more on the intro page.</a>
+              </p>
+              <p>
+                <strong>Physics</strong> &mdash; how surfaces render: Glass (translucent,
+                blurred, glowing), Flat (opaque, sharp), or Retro (pixel-perfect,
+                CRT-style).
+              </p>
+              <p>
+                <strong>Mode</strong> &mdash; light or dark contrast. Glass and Retro
+                require dark mode; Flat works in both.
+              </p>
+            </div>
+          </details>
+
+          <p class="text-small text-mute">
+            This page is wrapped in a <code>PullRefresh</code> component &mdash;
+            pull down (or scroll past the top) to trigger a refresh indicator.
+            Props: <code>onrefresh</code> (async callback),
+            <code>onerror</code> (error handler).
           </p>
-          <p>
-            <strong>Mode</strong> &mdash; light or dark contrast. Glass and Retro
-            require dark mode; Flat works in both.
+
+          <p class="text-small text-mute">
+            Responsive breakpoints: <code>tablet:</code> and
+            <code>small-desktop:</code>. Used throughout as Tailwind prefixes
+            (e.g.,
+            <code>tablet:grid-cols-2</code>,
+            <code>small-desktop:flex-row</code>).
           </p>
         </div>
-      </details>
 
-      <p class="text-small text-mute">
-        This page is wrapped in a <code>PullRefresh</code> component &mdash;
-        pull down (or scroll past the top) to trigger a refresh indicator.
-        Props: <code>onrefresh</code> (async callback),
-        <code>onerror</code> (error handler).
-      </p>
+        <div class="flex flex-col gap-2xl">
+          <hr />
 
-      <p class="text-small text-mute">
-        Responsive breakpoints: <code>tablet:</code> and
-        <code>small-desktop:</code>. Used throughout as Tailwind prefixes (e.g.,
-        <code>tablet:grid-cols-2</code>,
-        <code>small-desktop:flex-row</code>).
-      </p>
-    </div>
+          <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+            <h3 class="text-dim">Foundations</h3>
+            <p class="text-small text-mute">
+              Typography, color, and surface primitives that everything else is
+              built on.
+            </p>
+          </div>
+          <Typography />
+          <Surfaces />
 
-    <nav
-      class="flex flex-row flex-wrap gap-md justify-center surface-glass py-md"
-      aria-label="Section navigation"
-    >
-      {#each sections as s}
-        <a href="#{s.id}" class="chip">
-          <span class="chip-label">{s.label}</span>
-        </a>
-      {/each}
-    </nav>
+          <hr />
 
-    <hr />
+          <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+            <h3 class="text-dim">Primitives</h3>
+            <p class="text-small text-mute">
+              The atomic building blocks &mdash; icons and interactive elements.
+            </p>
+          </div>
+          <Icons />
+          <Buttons />
 
-    <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
-      <h3 class="text-dim">Foundations</h3>
-      <p class="text-small text-mute">
-        Typography, color, and surface primitives that everything else is built
-        on.
-      </p>
-    </div>
-    <Typography />
-    <Surfaces />
+          <hr />
 
-    <hr />
+          <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+            <h3 class="text-dim">Form Controls</h3>
+            <p class="text-small text-mute">
+              Native HTML form elements with physics-aware styling.
+            </p>
+          </div>
+          <Inputs />
+          <DataUpload />
 
-    <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
-      <h3 class="text-dim">Primitives</h3>
-      <p class="text-small text-mute">
-        The atomic building blocks &mdash; icons and interactive elements.
-      </p>
-    </div>
-    <Icons />
-    <Buttons />
+          <hr />
 
-    <hr />
+          <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+            <h3 class="text-dim">Composites</h3>
+            <p class="text-small text-mute">
+              Higher-order components that combine primitives into purpose-built
+              UI patterns.
+            </p>
+          </div>
+          <Composites />
 
-    <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
-      <h3 class="text-dim">Form Controls</h3>
-      <p class="text-small text-mute">
-        Native HTML form elements with physics-aware styling.
-      </p>
-    </div>
-    <Inputs />
-    <DataUpload />
+          <hr />
 
-    <hr />
-
-    <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
-      <h3 class="text-dim">Composites</h3>
-      <p class="text-small text-mute">
-        Higher-order components that combine primitives into purpose-built UI
-        patterns.
-      </p>
-    </div>
-    <Composites />
-
-    <hr />
-
-    <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
-      <h3 class="text-dim">Overlays & Feedback</h3>
-      <p class="text-small text-mute">
-        Floating panels, notifications, and dialogs for user communication.
-      </p>
-    </div>
-    <FloatingUI />
-    <Toasts />
-    <Modals />
+          <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+            <h3 class="text-dim">Overlays & Feedback</h3>
+            <p class="text-small text-mute">
+              Floating panels, notifications, and dialogs for user
+              communication.
+            </p>
+          </div>
+          <FloatingUI />
+          <Toasts />
+          <Modals />
+        </div>
+      </div>
+    </PullRefresh>
   </div>
-</PullRefresh>
+</div>
