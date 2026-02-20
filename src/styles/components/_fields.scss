@@ -26,6 +26,9 @@
  * - EditTextarea  : textarea + Edit (idle) or Undo/Check (editing) on right (top-aligned)
  * - CopyField     : Readonly input + Copy button (right)
  *
+ * FORM FIELD WRAPPER:
+ * - FormField     : Label + input (slot) + hint + error with ARIA wiring
+ *
  * NON-FIELD COMPOSITES:
  * - MediaSlider   : Mute toggle + range slider + replay (own anatomy)
  * - SliderField   : Label + range slider + preset snap labels (own anatomy)
@@ -234,5 +237,77 @@ $_slot-width: var(--control-padding-x);
     outline: none;
     box-shadow: var(--focus-ring);
     border-radius: var(--radius-base);
+  }
+}
+
+// ==========================================================================
+// 5. FORM FIELD WRAPPER (Label + Input + Hint/Error)
+// ==========================================================================
+//
+// ANATOMY:
+// ┌─ .form-field (flex-col, gap-xs) ────────────────────────────────────────┐
+// │  <label class="form-field-label">     Optional label with for= wiring   │
+// │  ┌─ input area (children snippet) ──────────────────────────────────┐   │
+// │  │  Consumer-provided input element                                  │   │
+// │  └──────────────────────────────────────────────────────────────────┘   │
+// │  <p class="form-field-hint">          Optional help text                │
+// │  <p class="form-field-error">         Optional error with icon          │
+// │    └ aria-live="polite" role="alert"                                    │
+// └─────────────────────────────────────────────────────────────────────────┘
+
+.form-field-label {
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-dim);
+  padding-inline: var(--space-xs);
+  cursor: pointer;
+}
+
+.form-field-required {
+  color: var(--color-error);
+  margin-left: calc(var(--space-xs) / 2);
+}
+
+.form-field-hint {
+  font-size: var(--font-size-caption);
+  color: var(--text-mute);
+  padding-inline: var(--space-xs);
+}
+
+.form-field-error {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-error);
+  padding-inline: var(--space-xs);
+
+  .icon {
+    flex-shrink: 0;
+  }
+
+  @include when-glass {
+    text-shadow: 0 0 8px alpha(var(--color-error), 40%); // void-ignore (Glow Physics)
+  }
+
+  @include when-retro {
+    text-shadow: none;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: field-error-in var(--speed-fast) var(--ease-spring-snappy);
+
+    @include when-retro {
+      animation: none;
+    }
+  }
+}
+
+@keyframes field-error-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--space-xs) * -1));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -1,7 +1,6 @@
 /* Input and form styling with sunk physics and native controls. */
 
 @use '../abstracts' as *;
-@use 'buttons';
 
 // ==========================================================================
 // INPUTS & FORMS (Native-First)
@@ -64,7 +63,7 @@ select {
 
   // Error state (use aria-invalid for accessibility).
   &[aria-invalid='true'],
-  &:invalid:not(:placeholder-shown) {
+  &:user-invalid {
     border-color: var(--color-error);
   }
 
@@ -197,8 +196,10 @@ input[type='radio'] {
     }
 
     .btn-fake {
-      @extend .btn; // Inherit your button styles
-      @extend .btn-void; // Or use a void button look
+      @include btn-base;
+      appearance: none;
+      background: transparent;
+      border: none;
       color: var(--energy-primary);
       pointer-events: none;
     }

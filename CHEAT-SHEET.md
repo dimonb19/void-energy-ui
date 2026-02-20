@@ -1099,6 +1099,62 @@ Preset components with built-in layout and physics.
 
 ---
 
+#### `<FormField>` (Label + Input + Error/Hint)
+
+**Description:** Wrapper component providing consistent label, error message, and hint text wiring around any form input. Manages ARIA associations (`for`, `aria-describedby`, `aria-invalid`) automatically via snippet props. Error messages include an icon and `aria-live="polite"` for screen reader announcements.
+**Location:** [src/components/ui/FormField.svelte](src/components/ui/FormField.svelte)
+**CSS:** `.form-field-label`, `.form-field-required`, `.form-field-hint`, `.form-field-error` ([src/styles/components/\_fields.scss](src/styles/components/_fields.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | `string?` | — | Label text (if absent, consumer must provide `aria-label` on input) |
+| `error` | `string?` | — | Error message (triggers error state when non-empty) |
+| `hint` | `string?` | — | Help text shown below input |
+| `required` | `boolean` | `false` | Shows `*` indicator on label |
+| `fieldId` | `string?` | auto-generated | Explicit ID override for the input |
+| `children` | `Snippet<[{ fieldId, descriptionId, invalid }]>` | *required* | Input element(s) receiving ARIA wiring props |
+| `class` | `string` | `''` | Additional CSS classes |
+
+**Snippet Props (passed to children):**
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `fieldId` | `string` | Use as `id` on the input element |
+| `descriptionId` | `string \| undefined` | Use as `aria-describedby` (combines hint + error IDs) |
+| `invalid` | `boolean` | Use as `aria-invalid` |
+
+**States:**
+
+| State | Attribute | Visual |
+| --- | --- | --- |
+| Error | `data-state="error"` | Red error text with CircleAlert icon, slide-in animation |
+| Default | `data-state=""` | Standard label + optional hint text |
+
+**Usage:**
+
+```svelte
+<FormField label="Email" error={emailError} required fieldId="email">
+  {#snippet children({ fieldId, descriptionId, invalid })}
+    <input
+      type="email"
+      id={fieldId}
+      required
+      aria-invalid={invalid}
+      aria-describedby={descriptionId}
+    />
+  {/snippet}
+</FormField>
+```
+
+**Physics:**
+- **Glass:** Error text gets a subtle red glow (`text-shadow`)
+- **Flat:** Standard error text, no glow
+- **Retro:** No glow, no entry animation (instant)
+
+---
+
 #### `.tile` (Story Card)
 
 **Description:** Story card with image background, gradient overlay, and metadata. Interactive floating surface with hover zoom.
@@ -1973,6 +2029,28 @@ h2 {
 
 ---
 
+#### `@include btn-base`
+
+**Purpose:** Structural button base — sizing, typography, and layout without physics, interaction states, or semantic variants. Use for CSS-only elements that need to look like a button but have no Svelte template for Tailwind classes. *(void-exception: layout properties in SCSS because consumers are CSS-only classes.)*
+
+**Includes:** `inline-flex` layout, `--control-height` min-height, button padding, uppercase semibold typography, `--radius-base` border-radius, `cursor: pointer`, `user-select: none`.
+
+**Does NOT include:** Background, border, color, transitions, hover/focus/active states, physics variants, semantic color variants.
+
+**Usage:**
+
+```scss
+.btn-fake {
+  @include btn-base;
+  appearance: none;
+  background: transparent;
+  border: none;
+  color: var(--energy-primary);
+}
+```
+
+---
+
 #### `@include laser-scrollbar`
 
 **Purpose:** Themed scrollbar with energy colors. Cross-browser (WebKit + Firefox).
@@ -2294,6 +2372,44 @@ await toast.promise(saveItems(items), {
 <CopyField value="sk-1234-abcd-5678" />
 <EditField bind:value={name} onconfirm={saveName} />
 <EditTextarea bind:value={notes} rows={4} onconfirm={saveNotes} />
+```
+
+---
+
+### N1. FormField (Label + Error + Hint Wrapper)
+
+```svelte
+<script lang="ts">
+  import FormField from '@components/ui/FormField.svelte';
+  let email = $state('');
+  let emailError = $state('');
+
+  function validate() {
+    emailError = email.includes('@') ? '' : 'Please enter a valid email.';
+  }
+</script>
+
+<!-- Basic with error -->
+<FormField label="Email" error={emailError} required fieldId="signup-email">
+  {#snippet children({ fieldId, descriptionId, invalid })}
+    <input
+      type="email"
+      id={fieldId}
+      required
+      bind:value={email}
+      onblur={validate}
+      aria-invalid={invalid}
+      aria-describedby={descriptionId}
+    />
+  {/snippet}
+</FormField>
+
+<!-- With hint text -->
+<FormField label="API Key" hint="Found in your dashboard settings.">
+  {#snippet children({ fieldId, descriptionId })}
+    <input type="text" id={fieldId} aria-describedby={descriptionId} />
+  {/snippet}
+</FormField>
 ```
 
 ---

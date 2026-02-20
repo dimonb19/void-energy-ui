@@ -381,7 +381,7 @@
 }
 
 // ==========================================================================
-// 8. BUTTON RESET
+// 8. BUTTON RESET & BASE
 // ==========================================================================
 
 /// Naked button reset for unstyled buttons.
@@ -406,4 +406,44 @@
   min-width: unset;
   min-height: unset;
   display: inline-flex;
+}
+
+/// Structural button base — sizing, typography, and layout without any
+/// physics, interaction states, or semantic color variants.
+/// Use for CSS-only elements (e.g., .btn-fake) that need to look like
+/// a button but have no Svelte template to receive Tailwind classes.
+///
+/// void-exception: Layout properties (display, gap, padding) live in this
+/// mixin because consumers are CSS-only classes without template access.
+/// Mirrors the .btn class which uses the same pattern.
+///
+/// @example scss
+///   .btn-fake {
+///     @include btn-base;
+///     background: transparent;
+///     border: none;
+///     color: var(--energy-primary);
+///   }
+///
+@mixin btn-base {
+  // void-exception: CSS-only structural base (no Tailwind template access)
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--space-sm) - var(--space-xs) / 2);
+  min-height: var(--control-height);
+  padding-block: 0;
+  padding-inline: calc(var(--space-sm) + var(--space-xs) / 2);
+
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-small);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1;
+  text-decoration: none;
+
+  border-radius: var(--radius-base);
+  cursor: pointer;
+  user-select: none;
 }

@@ -4,6 +4,7 @@
   import Toggle from '../ui/Toggle.svelte';
   import Switcher from '../ui/Switcher.svelte';
   import Selector from '../ui/Selector.svelte';
+  import FormField from '../ui/FormField.svelte';
 
   // Text input demo
   let textValue = $state('');
@@ -26,6 +27,28 @@
 
   // Switcher demo
   let physicsMode = $state<string | number | null>('glass');
+
+  // FormField validation demos
+  let emailValue = $state('');
+  let emailError = $state('');
+
+  const BIO_MAX = 100;
+  let bioValue = $state('');
+  let bioError = $derived(
+    bioValue.length > BIO_MAX
+      ? `${bioValue.length - BIO_MAX} characters over the limit.`
+      : '',
+  );
+
+  function validateEmail() {
+    if (!emailValue) {
+      emailError = 'Email is required.';
+    } else if (!emailValue.includes('@')) {
+      emailError = 'Please enter a valid email address.';
+    } else {
+      emailError = '';
+    }
+  }
 
   // Details demo
   let detailsRange = $state(75);
@@ -139,62 +162,108 @@
       </details>
     </div>
 
-    <!-- ─── VALIDATION STATES ─────────────────────────────────────────── -->
+    <!-- ─── VALIDATION & FORMFIELD ────────────────────────────────────── -->
     <div class="flex flex-col gap-sm">
-      <h5>Validation States</h5>
+      <h5>Validation & FormField</h5>
       <p class="text-small text-mute">
-        Error styling activates via <code>aria-invalid="true"</code> or the
-        native <code>:invalid</code> pseudo-class. The border and text color
-        shift to <code>--color-error</code>. No wrapper component needed — set
-        the attribute and the physics layer handles the rest.
+        The <code>FormField</code> wrapper handles label association, error
+        messages with icons, hint text, and full ARIA wiring (<code>for</code>,
+        <code>aria-describedby</code>, <code>aria-invalid</code>) automatically.
+        Error borders also activate via the native <code>:user-invalid</code>
+        pseudo-class after user interaction.
       </p>
 
-      <div class="surface-sunk p-md flex flex-col gap-md">
+      <div class="surface-sunk p-md flex flex-col gap-lg">
+        <!-- Demo 1: Interactive email validation -->
+        <FormField
+          label="Email Address"
+          error={emailError}
+          required
+          hint="We'll never share your email."
+          fieldId="demo-email"
+        >
+          {#snippet children({ fieldId, descriptionId, invalid })}
+            <input
+              type="email"
+              id={fieldId}
+              required
+              placeholder="you@example.com"
+              bind:value={emailValue}
+              onblur={validateEmail}
+              aria-invalid={invalid}
+              aria-describedby={descriptionId}
+            />
+          {/snippet}
+        </FormField>
+
+        <!-- Demo 2: Textarea with character limit -->
+        <FormField
+          label="Bio"
+          error={bioError}
+          hint="Max {BIO_MAX} characters."
+          fieldId="demo-bio"
+        >
+          {#snippet children({ fieldId, descriptionId, invalid })}
+            <textarea
+              id={fieldId}
+              placeholder="Tell us about yourself..."
+              bind:value={bioValue}
+              aria-invalid={invalid}
+              aria-describedby={descriptionId}
+            ></textarea>
+          {/snippet}
+        </FormField>
+
+        <!-- Demo 3: Static aria-invalid (low-level approach) -->
         <div class="flex flex-col gap-xs">
-          <label class="text-small px-xs" for="demo-invalid">
-            Invalid Input
+          <label class="text-small px-xs" for="demo-raw-invalid">
+            Raw Validation (no wrapper)
           </label>
           <input
-            id="demo-invalid"
+            id="demo-raw-invalid"
             type="text"
             value="not-a-valid-email"
             aria-invalid="true"
           />
-          <p class="text-caption text-error px-xs">
-            Please enter a valid email address.
-          </p>
-        </div>
-        <div class="flex flex-col gap-xs">
-          <label class="text-small px-xs" for="demo-invalid-textarea">
-            Invalid Textarea
-          </label>
-          <textarea id="demo-invalid-textarea" aria-invalid="true"
-            >This description exceeds the maximum character limit.</textarea
-          >
-          <p class="text-caption text-error px-xs">
-            Description must be under 500 characters.
+          <p class="text-caption text-mute px-xs">
+            For simple cases, <code>aria-invalid="true"</code> alone activates
+            the error border without needing <code>FormField</code>.
           </p>
         </div>
       </div>
 
       <p class="text-caption text-mute px-xs">
-        Use <code>aria-invalid="true"</code> for programmatic validation. The
-        <code>:invalid</code>
-        pseudo-class activates automatically for native constraints (<code
-          >required</code
-        >, <code>pattern</code>,
-        <code>type="email"</code>).
+        Use <code>FormField</code> when you need label + error + hint + ARIA
+        wiring. Use raw <code>aria-invalid</code> for standalone inputs that
+        only need a red border. The <code>:user-invalid</code> pseudo-class
+        fires automatically for native constraints (<code>required</code>,
+        <code>pattern</code>, <code>type="email"</code>) after interaction.
       </p>
 
       <details>
         <summary>View Code</summary>
         <pre><code
-            >&lt;!-- Programmatic validation --&gt;
-&lt;input type="text" aria-invalid="true" /&gt;
-&lt;p class="text-caption text-error"&gt;Error message.&lt;/p&gt;
+            >&lt;script&gt;
+  import FormField from './ui/FormField.svelte';
+  let email = $state('');
+  let error = $state('');
+&lt;/script&gt;
 
-&lt;!-- Native validation (auto-triggers :invalid) --&gt;
-&lt;input type="email" required /&gt;</code
+&lt;!-- FormField with label, error, hint, and ARIA wiring --&gt;
+&lt;FormField label="Email" error=&#123;error&#125; required hint="We won't share it."&gt;
+  &#123;#snippet children(&#123; fieldId, descriptionId, invalid &#125;)&#125;
+    &lt;input
+      type="email"
+      id=&#123;fieldId&#125;
+      required
+      aria-invalid=&#123;invalid&#125;
+      aria-describedby=&#123;descriptionId&#125;
+    /&gt;
+  &#123;/snippet&#125;
+&lt;/FormField&gt;
+
+&lt;!-- Low-level: border-only error (no wrapper needed) --&gt;
+&lt;input type="text" aria-invalid="true" /&gt;</code
           ></pre>
       </details>
     </div>
