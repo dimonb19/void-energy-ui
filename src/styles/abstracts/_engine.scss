@@ -50,8 +50,9 @@ $focus-ring:
 // ├───────────────────┼───────┼─────────────────────────────────────────────┤
 // │ surface-accent    │ 10%   │ Subtle energy tint on glass surfaces        │
 // │ shadow-sunk       │ 60%   │ High contrast inset for depth perception    │
-// │ shadow-float      │ 25%   │ Standard drop shadow (Material Design spec) │
-// │ glow-lift         │ 50%   │ Visible but not overwhelming hover glow     │
+// │ shadow-float      │25/35% │ Edge + ambient pool (theme-derived depth)   │
+// │ shadow-lift-depth │ 35%   │ Deep ambient pool (risen surface depth)     │
+// │ shadow-lift-glow  │ 50%   │ Visible but not overwhelming hover glow     │
 // │ shadow-flat-*     │ 5-10% │ Minimal shadows for flat/paper aesthetics   │
 // │ retro-offset      │ 50%   │ Pixel shadow visibility on CRT-style        │
 // └───────────────────┴───────┴─────────────────────────────────────────────┘
@@ -72,10 +73,16 @@ $physics-presets: (
           ),
         'shadow-sunk': inset 0 2px 4px alpha(var(--bg-canvas), 60%),
         // 60% = strong depth
-        'shadow-float': 0 2px 8px rgba(0, 0, 0, 0.25),
-        // 25% = Material standard
-        'shadow-lift': 0 0 10px alpha(var(--energy-primary), 50%),
-        // 50% = visible glow
+        'shadow-float': (
+            0 1px 3px alpha(var(--bg-canvas), 25%),
+            0 6px 20px -4px alpha(var(--bg-canvas), 35%),
+          ),
+        // 25/35% = edge + ambient pool (theme-derived depth)
+        'shadow-lift': (
+            0 8px 28px -4px alpha(var(--bg-canvas), 35%),
+            0 0 12px alpha(var(--energy-primary), 50%),
+          ),
+        // 35% = deep ambient, 50% = visible glow
       )
     ),
   // Flat: external light casts shadows (paper, clinical, minimal).
