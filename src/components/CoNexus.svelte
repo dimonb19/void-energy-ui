@@ -21,16 +21,12 @@
           a portal.
         </li>
         <li>
-          <strong>Story categories</strong> — browsable tile grid that organizes
-          stories by topic.
-        </li>
-        <li>
-          <strong>Text shine</strong> — subtle light shimmer across muted text during
-          loading states.
-        </li>
-        <li>
           <strong>Kinetic typography</strong> — motion-driven text animations that
           adds narrative rhythm to content.
+        </li>
+        <li>
+          <strong>Story categories</strong> — browsable tile grid that organizes
+          stories by topic.
         </li>
         <li>
           <strong>Drag & drop</strong> — direct manipulation for reordering or organizing
