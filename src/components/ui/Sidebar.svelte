@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { materialize, dematerialize } from '@lib/transitions.svelte';
+
   // ─────────────────────────────────────────────────────────────────────────
   // Types
   // ─────────────────────────────────────────────────────────────────────────
@@ -121,6 +123,9 @@
   // Click Handling
   // ─────────────────────────────────────────────────────────────────────────
 
+  let scrollController: AbortController | undefined;
+  let scrollTimeout: ReturnType<typeof setTimeout> | undefined;
+
   function scrollToSection(event: Event, id: string) {
     event.preventDefault();
     const target = document.getElementById(id);
@@ -129,27 +134,37 @@
     // Optimistic update — set active immediately to avoid observer flicker
     activeId = id;
 
-    // Close dropdown on navigation
-    if (open) open = false;
+    // Close dropdown on navigation (+ restore focus via onclose)
+    if (open) {
+      open = false;
+      onclose?.();
+    }
+
+    // Cancel any in-flight scroll tracking before starting new
+    scrollController?.abort();
+    if (scrollTimeout) clearTimeout(scrollTimeout);
 
     // Temporarily suppress observer updates during programmatic scroll
     isScrolling = true;
     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
     // Use scrollend when available, with timeout fallback for Safari < 18
-    const controller = new AbortController();
-    const fallback = setTimeout(() => {
+    scrollController = new AbortController();
+    scrollTimeout = setTimeout(() => {
       isScrolling = false;
-      controller.abort();
+      scrollController = undefined;
+      scrollTimeout = undefined;
     }, 1200);
 
     window.addEventListener(
       'scrollend',
       () => {
         isScrolling = false;
-        clearTimeout(fallback);
+        if (scrollTimeout) clearTimeout(scrollTimeout);
+        scrollController = undefined;
+        scrollTimeout = undefined;
       },
-      { once: true, signal: controller.signal },
+      { once: true, signal: scrollController.signal },
     );
   }
 </script>
@@ -166,7 +181,7 @@
           class="page-sidebar-item py-xs px-sm"
           href="#{item.id}"
           data-state={activeId === item.id ? 'active' : ''}
-          aria-current={activeId === item.id ? 'true' : undefined}
+          aria-current={activeId === item.id ? 'location' : undefined}
           onclick={(e) => scrollToSection(e, item.id)}
         >
           {item.label}
@@ -176,10 +191,24 @@
   {/each}
 {/snippet}
 
+{#if open}
+  <div
+    class="page-sidebar-scrim"
+    role="presentation"
+    aria-hidden="true"
+    onclick={() => {
+      open = false;
+      onclose?.();
+    }}
+    in:materialize
+    out:dematerialize
+  ></div>
+{/if}
+
 <nav
   id="page-sidebar-nav"
-  class="page-sidebar flex flex-col gap-lg py-md px-md {className}"
-  data-open={open}
+  class="page-sidebar flex flex-col gap-lg px-md {className}"
+  data-state={open ? 'open' : undefined}
   aria-label="Page sections"
 >
   {@render sidebarItems()}

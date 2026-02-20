@@ -1183,6 +1183,169 @@ Preset components with built-in layout and physics.
 
 ---
 
+#### `<Sidebar>` (Page Navigation / Table of Contents)
+
+**Description:** Scroll-tracking table-of-contents navigation with grouped sections, IntersectionObserver-based active state, hash URL deep linking, scrim overlay, and a responsive layout (fixed dropdown below 1440px, fixed column at 1440px+). Keyboard-accessible (Escape closes mobile dropdown).
+**Location:** [src/components/ui/Sidebar.svelte](src/components/ui/Sidebar.svelte)
+**CSS:** `.docs-layout`, `.docs-main`, `.page-sidebar-header`, `.page-sidebar-toggle-bar`, `.page-sidebar`, `.page-sidebar-scrim`, `.page-sidebar-label`, `.page-sidebar-item` ([src/styles/components/\_page-sidebar.scss](src/styles/components/_page-sidebar.scss))
+
+**Types:**
+
+```typescript
+interface SidebarItem {
+  id: string;    // Matches the `id` attribute of the target section element
+  label: string; // Display text in the nav
+}
+
+interface SidebarSection {
+  label?: string;       // Optional uppercase group header
+  items: SidebarItem[];
+}
+```
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `sections` | `SidebarSection[]` | *required* | Navigation tree (grouped items) |
+| `activeId` | `string` | `$bindable('')` | Currently active section ID (two-way bindable) |
+| `open` | `boolean` | `$bindable(false)` | Mobile dropdown visibility (two-way bindable) |
+| `trackScroll` | `boolean` | `true` | Enable IntersectionObserver scroll tracking |
+| `onclose` | `() => void` | — | Called on Escape — use to return focus to toggle button |
+| `class` | `string` | `''` | CSS passthrough to `.page-sidebar` nav element |
+
+**States:**
+
+| State | Attribute | Element | Visual |
+| --- | --- | --- | --- |
+| Active section | `data-state="active"` + `aria-current="location"` | `.page-sidebar-item` | Energy-primary left border + color + 8% tint bg |
+| Dropdown open | `data-state="open"` | `.page-sidebar` | Slides down from toggle bar (mobile only) |
+| Toggle open | `data-state="open"` + `aria-expanded="true"` | Toggle `<button>` | ChevronDown rotates 180deg |
+
+**Architecture:**
+
+| Class | Purpose |
+| --- | --- |
+| `.docs-layout` | `display: block` on mobile / `grid (15rem 1fr)` at `large-desktop+` |
+| `.docs-main` | Content column — `min-width: 0` prevents grid blowout |
+| `.page-sidebar-header` | Sticky wrapper grouping toggle bar + dropdown so they scroll together |
+| `.page-sidebar-toggle-bar` | Mobile-only bar (hidden at `large-desktop+`) containing the toggle button |
+| `.page-sidebar-scrim` | Full-viewport backdrop overlay (canvas-tinted dark, text-tinted light); hidden at `large-desktop+` |
+| `.page-sidebar` | The `<nav>` — fixed dropdown on mobile, fixed column on desktop |
+| `.page-sidebar-label` | Non-clickable section group header (uppercase, muted, caption size) |
+| `.page-sidebar-item` | Clickable `<a>` — left border accent on active, energy-primary on hover |
+
+**Use Cases:**
+- Documentation pages with long-form content and section anchors (current usage: Component Library)
+- API reference pages with endpoint or method sections
+- Settings panels with multiple categories
+- Tutorial or guide pages with step-by-step sections
+- Any page where `scrollIntoView` navigation between `id`-anchored headings improves orientation
+
+**Physics:**
+- **Glass:** Mobile dropdown gets `glass-blur` when open; sunk background at rest; desktop scrollbar auto-hides (visible on hover with `--energy-secondary`). Scrim: 80% canvas overlay with `materialize`/`dematerialize` transitions
+- **Flat/Light:** Mobile dropdown gets `box-shadow: var(--shadow-float)` in light mode; solid borders. Scrim: 50% text-main overlay
+- **Retro:** `steps(8)` timing on transform transitions; hard borders
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+  import { ChevronDown } from '@lucide/svelte';
+  import Sidebar from '@components/ui/Sidebar.svelte';
+
+  const sections = [
+    {
+      label: 'Getting Started',
+      items: [
+        { id: 'installation', label: 'Installation' },
+        { id: 'configuration', label: 'Configuration' },
+      ],
+    },
+    {
+      label: 'Components',
+      items: [
+        { id: 'buttons', label: 'Buttons' },
+        { id: 'inputs', label: 'Inputs' },
+      ],
+    },
+  ];
+
+  let activeId = $state('');
+  let sidebarOpen = $state(false);
+  let toggleBtnRef: HTMLButtonElement | undefined = $state();
+
+  const activeLabel = $derived(
+    sections
+      .flatMap((s) => s.items)
+      .find((item) => item.id === activeId)?.label ?? 'Sections',
+  );
+
+  function closeSidebar() {
+    sidebarOpen = false;
+    toggleBtnRef?.focus(); // Return focus to toggle on Escape
+  }
+</script>
+
+<div class="docs-layout">
+  <div class="page-sidebar-header">
+    <!-- Mobile toggle bar (hidden on large-desktop) -->
+    <div class="page-sidebar-toggle-bar">
+      <button
+        bind:this={toggleBtnRef}
+        class="btn-ghost w-full"
+        type="button"
+        aria-expanded={sidebarOpen}
+        aria-controls="page-sidebar-nav"
+        aria-label={`Page sections: ${activeLabel}`}
+        data-state={sidebarOpen ? 'open' : undefined}
+        onclick={() => (sidebarOpen = !sidebarOpen)}
+      >
+        <span class="text-small font-semibold">{activeLabel}</span>
+        <ChevronDown class="icon" data-size="sm" />
+      </button>
+    </div>
+
+    <Sidebar
+      {sections}
+      bind:activeId
+      bind:open={sidebarOpen}
+      onclose={closeSidebar}
+    />
+  </div>
+
+  <!-- Main content — section headings must have matching IDs -->
+  <div class="docs-main">
+    <div class="container py-2xl flex flex-col gap-2xl">
+      <section id="installation">
+        <h2>Installation</h2>
+        <p>...</p>
+      </section>
+      <section id="configuration">
+        <h2>Configuration</h2>
+        <p>...</p>
+      </section>
+    </div>
+  </div>
+</div>
+```
+
+**Implementation Notes:**
+
+| Decision | Rationale |
+| --- | --- |
+| Optimistic active state | `activeId` set immediately on click, before scroll completes, to prevent observer flicker |
+| `isScrolling` guard | IntersectionObserver updates suppressed during programmatic scroll to avoid incorrect jumps |
+| `scrollend` + timeout fallback | `scrollend` event clears the guard; 1200ms `setTimeout` covers Safari < 18 (no `scrollend` support) |
+| Scroll abort controller | `scrollController` + `scrollTimeout` cancel any in-flight scroll tracking before starting a new navigation, preventing race conditions on rapid clicks |
+| `rootMargin: '-20% 0px -70% 0px'` | Narrow viewport band — a section becomes active when it crosses ~20% from the top |
+| Hash URL sync | `hashchange` listener keeps `activeId` in sync with browser back/forward navigation |
+| `onclose` callback | Parent returns focus to toggle button after Escape or click — required for keyboard accessibility |
+| Scrim overlay | `page-sidebar-scrim` covers viewport below mobile dropdown; click-to-dismiss; uses `materialize`/`dematerialize` transitions; hidden at `large-desktop+` |
+| Shared `{#snippet}` | `sidebarItems()` snippet renders the item list once — no duplication between mobile/desktop |
+
+---
+
 #### `.chip` Variants (Extended)
 
 The chip system includes additional semantic variants beyond the base:
@@ -2141,6 +2304,76 @@ const menuItems: MenuItem[] = [
 ```
 
 SCSS classes (`.nav-menu`, `.nav-menu-scrim`, `.submenu`, `.subtab`) are already in `_navigation.scss` — no style changes needed.
+
+---
+
+### S. Page Sidebar (Table of Contents)
+
+Minimal integration — define sections, bind state, wrap in layout. Section heading `id` attributes must match `item.id` values exactly.
+
+```svelte
+<script lang="ts">
+  import { ChevronDown } from '@lucide/svelte';
+  import Sidebar from '@components/ui/Sidebar.svelte';
+
+  const sections = [
+    {
+      label: 'Group A',
+      items: [
+        { id: 'section-one', label: 'Section One' },
+        { id: 'section-two', label: 'Section Two' },
+      ],
+    },
+    {
+      // label is optional — omit for ungrouped items
+      items: [{ id: 'section-three', label: 'Section Three' }],
+    },
+  ];
+
+  let activeId = $state('');
+  let sidebarOpen = $state(false);
+  let toggleBtnRef: HTMLButtonElement | undefined = $state();
+
+  const activeLabel = $derived(
+    sections.flatMap((s) => s.items).find((i) => i.id === activeId)?.label ?? 'Sections',
+  );
+</script>
+
+<div class="docs-layout">
+  <div class="page-sidebar-header">
+    <div class="page-sidebar-toggle-bar">
+      <button
+        bind:this={toggleBtnRef}
+        class="btn-ghost w-full"
+        type="button"
+        aria-expanded={sidebarOpen}
+        aria-controls="page-sidebar-nav"
+        aria-label={`Page sections: ${activeLabel}`}
+        data-state={sidebarOpen ? 'open' : undefined}
+        onclick={() => (sidebarOpen = !sidebarOpen)}
+      >
+        <span class="text-small font-semibold">{activeLabel}</span>
+        <ChevronDown class="icon" data-size="sm" />
+      </button>
+    </div>
+    <Sidebar
+      {sections}
+      bind:activeId
+      bind:open={sidebarOpen}
+      onclose={() => { sidebarOpen = false; toggleBtnRef?.focus(); }}
+    />
+  </div>
+  <div class="docs-main">
+    <div class="container py-2xl flex flex-col gap-2xl">
+      <section id="section-one"><h2>Section One</h2></section>
+      <section id="section-two"><h2>Section Two</h2></section>
+      <section id="section-three"><h2>Section Three</h2></section>
+    </div>
+  </div>
+</div>
+```
+
+All SCSS (`.docs-layout`, `.page-sidebar`, `.page-sidebar-header`, `.page-sidebar-toggle-bar`, `.page-sidebar-scrim`, `.page-sidebar-item`, `.page-sidebar-label`) is already in `_page-sidebar.scss` — no style changes needed.
 
 ---
 

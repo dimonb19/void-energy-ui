@@ -27,13 +27,15 @@
  *
  * STATE:
  * - data-state="active" on .page-sidebar-item for current section
- * - data-open on .page-sidebar for dropdown visibility (< large-desktop)
- * - data-open on .page-sidebar-toggle for chevron rotation
+ * - data-state="open" on .page-sidebar for dropdown visibility (< large-desktop)
+ * - data-state="open" on .page-sidebar-toggle for chevron rotation
  *
  * @see /src/components/ui/Sidebar.svelte
  * ========================================================================== */
 
 @use '../abstracts' as *;
+
+$sidebar-width: 15rem; // 240px
 
 // ==========================================================================
 // 1. DOCS LAYOUT (Grid wrapper — sidebar + content)
@@ -44,7 +46,7 @@
 
   @include respond-up('large-desktop') {
     display: grid;
-    grid-template-columns: 15rem 1fr;
+    grid-template-columns: $sidebar-width 1fr;
   }
 }
 
@@ -58,50 +60,73 @@
 
 .page-sidebar {
   // --- Shared ---
+  position: fixed;
+  inset: 0;
   overflow-y: auto;
   overscroll-behavior: contain;
   @include laser-scrollbar;
 
   // --- Dropdown mode (default, below large-desktop) ---
-  max-height: 0;
+  max-height: 70vh;
   overflow: hidden;
-  transition: max-height var(--speed-base) var(--ease-spring-gentle);
+  visibility: hidden;
+  padding-top: calc(
+    (var(--nav-height) + var(--safe-top)) +
+      (var(--nav-height) + var(--safe-top)) * (1 - var(--nav-hidden, 0))
+  );
+  padding-bottom: var(--space-md);
+  transform: translateY(-100%);
+  transition:
+    padding-top var(--speed-base) var(--ease-spring-bounce),
+    visibility var(--speed-base) var(--ease-spring-snappy),
+    transform var(--speed-base) var(--ease-spring-snappy);
 
   background: var(--bg-surface);
-  border-bottom: var(--physics-border-width) solid var(--border-color);
+  border-bottom: var(--physics-border-width) solid transparent;
+  box-shadow: none;
 
   @include when-glass {
-    @include glass-blur;
+    background: var(--bg-sunk);
   }
 
-  @include when-light {
-    box-shadow: var(--shadow-float);
+  @include when-retro {
+    transition-timing-function: steps(8);
   }
 
-  &[data-open='true'] {
-    max-height: 70vh;
+  @include when-state('open') {
+    visibility: visible;
+    transform: translateY(0);
     overflow-y: auto;
+    border-bottom-color: var(--border-color);
+
+    @include when-glass {
+      @include glass-blur;
+    }
+
+    @include when-light {
+      box-shadow: var(--shadow-float);
+    }
   }
 
   // --- Sticky column (large-desktop+) ---
   @include respond-up('large-desktop') {
-    position: sticky;
-    top: calc(var(--nav-height) + var(--safe-top));
-    height: calc(100dvh - var(--nav-height) - var(--safe-top));
-    width: 15rem;
-    min-width: 15rem;
+    height: 100dvh;
+    width: $sidebar-width;
+    min-width: $sidebar-width;
+    padding-top: calc(
+      (var(--nav-height) + var(--safe-top)) * (1 - var(--nav-hidden, 0)) +
+        var(--space-md)
+    );
+    padding-bottom: var(--space-md);
+    visibility: visible;
     max-height: none;
+    transform: none;
     overflow-y: auto;
-    transition: none;
+    transition: padding-top var(--speed-base) var(--ease-spring-bounce);
     background: transparent;
     border-bottom: none;
     border-right: none;
     box-shadow: none;
-
-    // Cancel mobile dropdown behavior at this breakpoint
-    &[data-open='true'] {
-      max-height: none;
-    }
 
     // Auto-hide scrollbar — appears on hover only
     scrollbar-color: transparent transparent;
@@ -125,12 +150,32 @@
   }
 
   @include when-retro {
-    transition-duration: 0s;
+    transition-duration: 0.3s; // Stepped transition
   }
 }
 
 // ==========================================================================
-// 3. SECTION GROUPS
+// 3. SCRIM (Backdrop overlay for mobile dropdown)
+// ==========================================================================
+
+.page-sidebar-scrim {
+  position: fixed;
+  inset: 0;
+  background: alpha(var(--bg-canvas), 80%);
+  transform: none !important; // override scale and translate from materialize
+
+  @include when-light {
+    background: alpha(var(--text-main), 50%);
+  }
+
+  // Not needed on large-desktop (sidebar is always visible)
+  @include respond-up('large-desktop') {
+    display: none;
+  }
+}
+
+// ==========================================================================
+// 4. SECTION GROUPS
 // ==========================================================================
 
 .page-sidebar-label {
@@ -142,7 +187,7 @@
 }
 
 // ==========================================================================
-// 4. SIDEBAR ITEMS (Clickable links)
+// 5. SIDEBAR ITEMS (Clickable links)
 // ==========================================================================
 
 .page-sidebar-item {
@@ -152,10 +197,11 @@
   text-decoration: none;
   color: var(--text-dim);
   border-left: calc(var(--physics-border-width) * 2) solid transparent;
+  border-radius: var(--radius-base);
 
   transition:
-    color var(--speed-fast) var(--ease-spring-snappy),
-    border-color var(--speed-fast) var(--ease-spring-snappy);
+    color var(--speed-base) var(--ease-spring-snappy),
+    border-color var(--speed-base) var(--ease-spring-snappy);
 
   &:hover {
     color: var(--energy-primary);
@@ -164,7 +210,6 @@
   &:focus-visible {
     outline: none;
     box-shadow: var(--focus-ring);
-    border-radius: var(--radius-sm);
   }
 
   // Active state — left border accent + primary color + subtle tint
@@ -173,16 +218,11 @@
     border-left-color: var(--energy-primary);
     font-weight: var(--font-weight-semibold);
     background: alpha(var(--energy-primary), 8%);
-    border-radius: var(--radius-sm);
-  }
-
-  @include when-retro {
-    transition-duration: 0s;
   }
 }
 
 // ==========================================================================
-// 5. SIDEBAR HEADER (Sticky wrapper: toggle bar + dropdown)
+// 6. SIDEBAR HEADER (Sticky wrapper: toggle bar + dropdown)
 // ==========================================================================
 
 .page-sidebar-header {
@@ -201,23 +241,34 @@
   }
 
   @include when-retro {
-    transition-duration: 0s;
+    transition-duration: 0.3s; // Stepped transition
   }
 }
 
 // ==========================================================================
-// 6. MOBILE TOGGLE BAR (< large-desktop)
+// 7. MOBILE TOGGLE BAR (< large-desktop)
 // ==========================================================================
 
 .page-sidebar-toggle-bar {
+  position: relative;
   display: flex;
   align-items: center;
-  z-index: z('sticky');
+  z-index: z('header');
   background: var(--bg-surface);
   border-bottom: var(--physics-border-width) solid var(--border-color);
 
+  button {
+    transform: none !important; // override scale
+    border-radius: 0;
+
+    &[data-state='open'] .icon {
+      transform: rotate(180deg);
+    }
+  }
+
   @include when-glass {
     @include glass-blur;
+    background: var(--bg-sunk);
   }
 
   @include when-light {
@@ -231,20 +282,5 @@
 
   @include when-retro {
     transition-duration: 0s;
-  }
-}
-
-// ==========================================================================
-// 7. MOBILE TOGGLE BUTTON
-// ==========================================================================
-
-.page-sidebar-toggle {
-  // Chevron rotation
-  .icon {
-    transition: transform var(--speed-fast) var(--ease-spring-snappy);
-  }
-
-  &[data-open='true'] .icon {
-    transform: rotate(180deg);
   }
 }

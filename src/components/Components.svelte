@@ -88,11 +88,12 @@
     <div class="page-sidebar-toggle-bar">
       <button
         bind:this={toggleBtnRef}
-        class="page-sidebar-toggle flex flex-row items-center justify-between flex-1 px-md py-xs"
+        class="btn-ghost w-full"
         type="button"
         aria-expanded={sidebarOpen}
         aria-controls="page-sidebar-nav"
-        data-open={sidebarOpen}
+        aria-label={`Page sections: ${activeLabel}`}
+        data-state={sidebarOpen ? 'open' : undefined}
         onclick={() => (sidebarOpen = !sidebarOpen)}
       >
         <span class="text-small font-semibold">
