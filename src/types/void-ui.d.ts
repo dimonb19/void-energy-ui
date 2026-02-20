@@ -369,3 +369,40 @@ interface MorphOptions {
   /** Callback fired when morph animation completes */
   onComplete?: () => void;
 }
+
+// ==========================================================================
+// 7. COMPONENT: BREADCRUMBS
+// ==========================================================================
+
+/**
+ * Single breadcrumb trail item.
+ * Used by the Breadcrumbs component to render navigational context.
+ *
+ * Two modes based on the `active` flag:
+ * - Hierarchical (default): Home › Section › Page
+ * - Peer mode (any item has active): Users / Stories / Web3
+ *
+ * @example Hierarchical trail
+ * const items: BreadcrumbItem[] = [
+ *   { label: 'Home', href: '/' },
+ *   { label: 'Components', href: '/components' },
+ *   { label: 'Buttons' },
+ * ];
+ *
+ * @example Peer mode (active item triggers `/` separator)
+ * const items: BreadcrumbItem[] = [
+ *   { label: 'Users', href: '/admin/users' },
+ *   { label: 'Stories', href: '/admin/stories', active: true },
+ *   { label: 'Web3', href: '/admin/web3' },
+ * ];
+ */
+interface BreadcrumbItem {
+  /** Display text for this breadcrumb segment */
+  label: string;
+
+  /** Navigation URL (omit for current/terminal page) */
+  href?: string;
+
+  /** Marks this item as the active peer (switches separator to `/`) */
+  active?: boolean;
+}

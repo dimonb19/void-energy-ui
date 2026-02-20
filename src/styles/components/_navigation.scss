@@ -342,3 +342,114 @@
     );
   }
 }
+
+// ==========================================================================
+// 6. BREADCRUMBS
+// ==========================================================================
+// Fixed breadcrumb trail positioned directly below the nav-bar.
+// Visually unified with nav-bar: same background, blur, no gap.
+// Hides in sync with nav-bar via data-hidden attribute.
+//
+// ARCHITECTURE:
+// - .breadcrumbs           : Fixed container, full-width mobile, auto-width desktop
+// - .breadcrumbs-separator : `/` or `›` character between items
+// - .breadcrumbs-link      : Clickable ancestor/peer segments
+// - .breadcrumbs-current   : Terminal/active segment (non-clickable)
+//
+// STATE:
+// - data-hidden="true" : Slides off-screen in sync with nav-bar
+//
+// USAGE:
+// ```html
+// <nav class="breadcrumbs flex items-center px-sm" aria-label="Breadcrumb">
+//   <ol>...</ol>
+// </nav>
+// ```
+// ==========================================================================
+
+.breadcrumbs {
+  // --- A. Positioning ---
+  position: fixed;
+  top: calc(var(--nav-height) + var(--safe-top));
+  left: 0;
+  z-index: z('overlay');
+
+  // --- B. Sizing ---
+  width: 100%;
+  height: var(--breadcrumbs-height);
+
+  // --- C. Visual union with nav-bar ---
+  background: var(--bg-surface);
+
+  // --- D. Hide-on-scroll transition (synced with nav-bar) ---
+  transition: transform var(--speed-base) var(--ease-spring-bounce);
+
+  &[data-hidden='true'] {
+    transform: translateY(
+      calc(-1 * var(--nav-height) - var(--safe-top) - 100%)
+    );
+  }
+
+  // --- E. Desktop: auto-width with rounded corner ---
+  @include respond-up(tablet) {
+    width: auto;
+    border-bottom-right-radius: var(--radius-base);
+  }
+
+  // --- F. Physics overrides ---
+  @include when-glass {
+    @include glass-blur;
+  }
+
+  @include when-retro {
+    transition-duration: 0.3s; // Stepped transition
+  }
+
+  @include when-light {
+    box-shadow: var(--shadow-float);
+  }
+
+  // --- G. List reset ---
+  ol {
+    list-style: none;
+  }
+}
+
+// --- Separator character ---
+.breadcrumbs-separator {
+  color: var(--text-mute);
+  font-size: var(--font-size-small);
+  line-height: 1;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+// --- Clickable ancestor/peer link ---
+.breadcrumbs-link {
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+  color: var(--text-dim);
+  text-decoration: none;
+  @include text-truncate(1);
+  max-width: var(--space-5xl);
+
+  &:hover {
+    color: var(--energy-primary);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-base);
+  }
+}
+
+// --- Terminal / active segment ---
+.breadcrumbs-current {
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+  color: var(--text-main);
+  font-weight: var(--font-weight-semibold);
+  @include text-truncate(1);
+  max-width: var(--space-5xl);
+}

@@ -8,9 +8,10 @@ import Toast from '@components/Toast.svelte';
 
 interface Props {
   title?: string;
+  breadcrumbs?: BreadcrumbItem[];
 }
 
-const { title = 'Void Energy UI' } = Astro.props;
+const { title = 'Void Energy UI', breadcrumbs } = Astro.props;
 ---
 
 <!doctype html>
@@ -32,9 +33,9 @@ const { title = 'Void Energy UI' } = Astro.props;
     <title>{title}</title>
     <ThemeScript />
   </head>
-  <body>
+  <body data-has-breadcrumbs={breadcrumbs && breadcrumbs.length > 0 ? '' : undefined}>
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    <Navigation client:load pathname={Astro.url.pathname} />
+    <Navigation client:load pathname={Astro.url.pathname} breadcrumbs={breadcrumbs} />
 
     <main id="main-content" class="min-h-screen">
       <slot />

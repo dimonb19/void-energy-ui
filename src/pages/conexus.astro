@@ -3,6 +3,13 @@ import Layout from '../layouts/Layout.astro';
 import CoNexus from '@components/CoNexus.svelte';
 ---
 
-<Layout>
+<Layout
+  breadcrumbs={[
+    { label: 'Menu', href: '/conexus' },
+    { label: 'Section', href: '/conexus' },
+    { label: 'Category', href: '/conexus' },
+    { label: 'Story' },
+  ]}
+>
   <CoNexus client:load />
 </Layout>

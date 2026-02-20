@@ -2,6 +2,7 @@
   import type { Component } from 'svelte';
 
   import ThemesBtn from './ui/ThemesBtn.svelte';
+  import Breadcrumbs from './ui/Breadcrumbs.svelte';
 
   import LogoDGRS from './icons/LogoDGRS.svelte';
   import Quill from './icons/Quill.svelte';
@@ -34,7 +35,13 @@
   // Props
   // ─────────────────────────────────────────────────────────────────────────────
 
-  let { pathname = '' }: { pathname?: string } = $props();
+  let {
+    pathname = '',
+    breadcrumbs,
+  }: {
+    pathname?: string;
+    breadcrumbs?: BreadcrumbItem[];
+  } = $props();
 
   function resolveTab(path: string): string {
     const normalized = path.replace(/\/+$/, '') || '/';
@@ -341,3 +348,8 @@
     </a>
   {/each}
 </nav>
+
+<!-- Breadcrumbs -->
+{#if breadcrumbs && breadcrumbs.length > 0}
+  <Breadcrumbs items={breadcrumbs} hidden={navHidden} />
+{/if}

@@ -458,7 +458,8 @@ These components already account for safe areas (no manual work needed):
 | **Nav menu** (`.nav-menu`) | Padding respects `--safe-right` (and `--safe-left` on mobile) |
 | **Toasts** (`.toast-region`) | Top offset includes `--safe-top`; width avoids landscape notch |
 | **Full-size dialogs** (`dialog[data-size="full"]`) | Dimensions account for all four safe area insets |
-| **Body** | `padding-top` includes `--safe-top`; `padding-bottom` uses `--bottom-nav-clearance` on mobile |
+| **Breadcrumbs** (`.breadcrumbs`) | Fixed below nav-bar; `top` includes `--safe-top`; hidden offset includes `--nav-height + --safe-top` |
+| **Body** | `padding-top` includes `--safe-top` (+ `--breadcrumbs-height` when breadcrumbs present); `padding-bottom` uses `--bottom-nav-clearance` on mobile |
 
 #### Usage in Custom Components
 
@@ -1180,6 +1181,87 @@ Preset components with built-in layout and physics.
 - **Retro:** Same as flat (instant transitions, hard edges)
 
 **How to enable:** Follow the 9-step recipe in `Navigation.svelte` (bottom of `<script>` block). Steps cover imports, types, data, state, functions, burger button markup, and the full dropdown template. All SCSS already exists — no style changes needed.
+
+---
+
+#### `<Breadcrumbs>` — Navigational breadcrumb trail
+
+**Location:** [src/components/ui/Breadcrumbs.svelte](src/components/ui/Breadcrumbs.svelte)
+**CSS:** `.breadcrumbs`, `.breadcrumbs-separator`, `.breadcrumbs-link`, `.breadcrumbs-current` ([src/styles/components/\_navigation.scss](src/styles/components/_navigation.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `items` | `BreadcrumbItem[]` | *required* | Trail segments (see `BreadcrumbItem` in `void-ui.d.ts`) |
+| `hidden` | `boolean` | `false` | Syncs with nav-bar hide-on-scroll via `data-hidden` |
+| `class` | `string` | `''` | Consumer CSS classes |
+
+**Types:**
+
+```typescript
+interface BreadcrumbItem {
+  label: string;       // Display text
+  href?: string;       // Navigation URL (omit for terminal page)
+  active?: boolean;    // Marks active peer (switches separator to `/`)
+}
+```
+
+**Modes:**
+
+| Mode | Separator | Use Case |
+| --- | --- | --- |
+| Hierarchical (default) | `›` | Home › Section › Page |
+| Peer (any item has `active`) | `/` | Users / Stories / Web3 |
+
+**States:**
+
+| State | Attribute | Visual |
+| --- | --- | --- |
+| Hidden (scroll) | `data-hidden="true"` | Slides off-screen in sync with nav-bar |
+
+**Architecture:**
+
+| Decision | Rationale |
+| --- | --- |
+| Fixed below nav-bar | `position: fixed; top: calc(--nav-height + --safe-top)` — visually unified with nav-bar |
+| Body clearance via SSR | `Layout.astro` sets `data-has-breadcrumbs` on `<body>` at SSR time; CSS adds extra `padding-top` |
+| `--breadcrumbs-height` token | Defined in `_reset.scss` as `calc(--space-md + --space-xs * 2)` — shared by body padding and scroll offsets |
+| Auto-width on desktop | Full-width mobile, `width: auto` with rounded corner at `tablet+` |
+
+**Usage:**
+
+```svelte
+<!-- Pass via Layout.astro (SSR breadcrumbs) -->
+<Layout
+  breadcrumbs={[
+    { label: 'Home', href: '/' },
+    { label: 'Components', href: '/components' },
+    { label: 'Buttons' },
+  ]}
+>
+  <slot />
+</Layout>
+```
+
+```svelte
+<!-- Peer mode (active item highlighted, `/` separators) -->
+<Layout
+  breadcrumbs={[
+    { label: 'Users', href: '/admin/users' },
+    { label: 'Stories', href: '/admin/stories', active: true },
+    { label: 'Web3', href: '/admin/web3' },
+  ]}
+>
+  <slot />
+</Layout>
+```
+
+**Physics:**
+- **Glass:** Backdrop blur via `glass-blur` mixin
+- **Flat:** Opaque surface, solid bottom border
+- **Retro:** Hard border, stepped transition (0.3s)
+- **Light:** Floating shadow (`--shadow-float`)
 
 ---
 
@@ -2374,6 +2456,44 @@ Minimal integration — define sections, bind state, wrap in layout. Section hea
 ```
 
 All SCSS (`.docs-layout`, `.page-sidebar`, `.page-sidebar-header`, `.page-sidebar-toggle-bar`, `.page-sidebar-scrim`, `.page-sidebar-item`, `.page-sidebar-label`) is already in `_page-sidebar.scss` — no style changes needed.
+
+---
+
+### T. Breadcrumbs (Hierarchical + Peer)
+
+Pass `breadcrumbs` to `Layout.astro` — the layout handles body clearance, nav coordination, and SSR.
+
+```svelte
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<!-- Hierarchical: Home › Docs › API -->
+<Layout
+  breadcrumbs={[
+    { label: 'Home', href: '/' },
+    { label: 'Docs', href: '/docs' },
+    { label: 'API' },
+  ]}
+>
+  <main>...</main>
+</Layout>
+```
+
+```svelte
+<!-- Peer: Users / Stories / Web3 (active highlights current) -->
+<Layout
+  breadcrumbs={[
+    { label: 'Users', href: '/admin/users' },
+    { label: 'Stories', href: '/admin/stories', active: true },
+    { label: 'Web3', href: '/admin/web3' },
+  ]}
+>
+  <main>...</main>
+</Layout>
+```
+
+No manual body padding or scroll offset adjustments needed — `data-has-breadcrumbs` on `<body>` handles clearance automatically.
 
 ---
 

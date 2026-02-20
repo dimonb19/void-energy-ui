@@ -17,10 +17,6 @@
     <div class="surface-glass p-lg flex flex-col gap-lg">
       <ul class="flex flex-col gap-md">
         <li>
-          <strong>Breadcrumb navigation</strong> — contextual path trail in the top
-          bar.
-        </li>
-        <li>
           <strong>Portal loader</strong> — transition sequence that plays when entering
           a portal.
         </li>

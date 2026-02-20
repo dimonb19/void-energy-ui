@@ -53,6 +53,9 @@
   --text-scale: 1;
   --scrollbar-width: 6px;
 
+  // Breadcrumbs height (single-line trail with vertical padding).
+  --breadcrumbs-height: calc(var(--space-md) + var(--space-xs) * 2);
+
   // Structural constants (component layout constraints).
   --modal-width-xs: #{map.get(
       generated.$structural-constants,
@@ -163,6 +166,13 @@ body {
     --bottom-nav-clearance,
     0px
   ); // Mobile bottom nav clearance
+
+  // Extra clearance when breadcrumbs are present (set by Astro Layout at SSR)
+  &[data-has-breadcrumbs] {
+    padding-top: calc(
+      var(--nav-height) + var(--safe-top) + var(--breadcrumbs-height)
+    );
+  }
 }
 
 // Anchor scroll offset — prevents fixed navbar from covering section targets
@@ -170,6 +180,14 @@ section[id] {
   scroll-margin-top: calc(
     var(--nav-height) + var(--safe-top) + var(--space-lg)
   );
+
+  // Extra offset when breadcrumbs are present
+  body[data-has-breadcrumbs] & {
+    scroll-margin-top: calc(
+      var(--nav-height) + var(--safe-top) + var(--breadcrumbs-height) +
+        var(--space-lg)
+    );
+  }
 }
 
 // =========================================
