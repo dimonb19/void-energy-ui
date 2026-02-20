@@ -87,7 +87,7 @@ All values must use semantic tokens from [design-tokens.ts](src/config/design-to
 .custom-component {
   padding: var(--space-lg);
   color: var(--text-main);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-base);
 }
 ```
 
@@ -1769,7 +1769,7 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 .skeleton-card {
   @include shimmer;
   height: 200px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-base);
 }
 ```
 

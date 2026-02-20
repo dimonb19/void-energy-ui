@@ -118,8 +118,14 @@ $physics-presets: (
     }
   }
 
-  // Force square borders in retro physics by overriding Tailwind utilities
+  // Force square borders in retro physics.
+  // Override radius scale tokens (defined in :root) so any usage is square.
   [data-physics='retro'] {
+    --radius-sm: 0;
+    --radius-md: 0;
+    --radius-lg: 0;
+    --radius-xl: 0;
+
     .rounded,
     .rounded-xs,
     .rounded-sm,

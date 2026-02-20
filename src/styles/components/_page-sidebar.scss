@@ -35,7 +35,7 @@
 
 @use '../abstracts' as *;
 
-$sidebar-width: 15rem; // 240px
+$sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
 
 // ==========================================================================
 // 1. DOCS LAYOUT (Grid wrapper — sidebar + content)

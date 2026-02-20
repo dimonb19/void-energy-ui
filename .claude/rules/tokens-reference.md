@@ -47,5 +47,7 @@ sink(-1)  floor(0)  base(1)  decorate(2)  float(10)  sticky(20)  header(40)  dro
 Scales:   text-caption  text-small  text-body  text-h5  text-h4  text-h3  text-h2  text-h1
 Weights:  --font-weight-regular(400)  --font-weight-medium(500)  --font-weight-semibold(600)  --font-weight-bold(700)
 Families: --font-heading  --font-body  --font-code
-Radius:   --radius-sm(4px)  --radius-md(8px)  --radius-lg(16px)  --radius-xl(24px)  --radius-full(pill)
+Radius:   --radius-base(default, physics-adaptive)  --radius-full(pill, 0 in retro)
+Scale:    --radius-sm(4px)  --radius-md(8px)  --radius-lg(16px)  --radius-xl(24px)  (all 0 in retro)
+Default to --radius-base unless you need a specific size.
 ```

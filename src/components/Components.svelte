@@ -150,14 +150,6 @@
             Props: <code>onrefresh</code> (async callback),
             <code>onerror</code> (error handler).
           </p>
-
-          <p class="text-small text-mute">
-            Responsive breakpoints: <code>tablet:</code> and
-            <code>small-desktop:</code>. Used throughout as Tailwind prefixes
-            (e.g.,
-            <code>tablet:grid-cols-2</code>,
-            <code>small-desktop:flex-row</code>).
-          </p>
         </div>
 
         <div class="flex flex-col gap-2xl">
