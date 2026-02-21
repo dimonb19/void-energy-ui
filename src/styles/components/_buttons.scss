@@ -342,6 +342,8 @@ button:not(.btn-void, .btn-icon),
     box-shadow: none;
   }
 
+  @include navlink-loading;
+
   // ========================================================================
   // 2. THE GEMINI LASER (CTA)
   // Nested to override Base Styles properly

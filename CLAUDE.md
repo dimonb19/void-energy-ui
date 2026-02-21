@@ -282,6 +282,7 @@ animate:live       FLIP list reflow animation.
 ```
 import { morph } from '@actions/morph'          use:morph={{ width, height, threshold }}
 import { tooltip } from '@actions/tooltip'      use:tooltip={{ content, placement }}
+import { navlink } from '@actions/navlink'      use:navlink (no options — click sets loading state)
 ```
 
 ### Path Aliases (tsconfig.json)

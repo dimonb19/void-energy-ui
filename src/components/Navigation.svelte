@@ -4,6 +4,7 @@
   import ThemesBtn from './ui/ThemesBtn.svelte';
   import Breadcrumbs from './ui/Breadcrumbs.svelte';
 
+  import { navlink } from '@actions/navlink';
   import LogoDGRS from './icons/LogoDGRS.svelte';
   import Quill from './icons/Quill.svelte';
   import { LayoutGrid } from '@lucide/svelte';
@@ -319,6 +320,7 @@
           href={tab.href}
           data-state={activeTab === tab.id ? 'active' : ''}
           onclick={(e) => selectTab(e, tab.id)}
+          use:navlink
         >
           {tab.label}
         </a>
@@ -341,6 +343,7 @@
       aria-label={tab.label}
       data-state={activeTab === tab.id ? 'active' : ''}
       onclick={(e) => selectTab(e, tab.id)}
+      use:navlink
     >
       {#if tab.icon}
         <tab.icon />

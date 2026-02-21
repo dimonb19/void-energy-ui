@@ -136,6 +136,41 @@
   @include shimmer;
 }
 
+// MIXIN: Navlink Loading
+// Usage: Include on any interactive element that navigates (buttons, anchors,
+// tabs, surfaces). Paired with the `use:navlink` Svelte action which sets
+// `data-status="loading"` + `aria-busy="true"` on click.
+// 150ms animation-delay avoids flicker on fast navigations.
+//
+// Modes:
+//   @include navlink-loading;          → Surface shimmer (::after overlay).
+//                                        Element MUST have position: relative + overflow: hidden.
+//   @include navlink-loading(text);    → Text shimmer (background-clip: text).
+//                                        Safe for elements that use ::after (e.g. .link laser line).
+@mixin navlink-loading($mode: surface) {
+  @include when-state('loading') {
+    pointer-events: none;
+
+    @if $mode == text {
+      @include text-shimmer;
+      animation-delay: 150ms;
+      animation-fill-mode: backwards;
+    } @else {
+      color: var(--text-mute);
+
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        @include shimmer;
+        animation-delay: 150ms;
+        animation-fill-mode: backwards;
+      }
+    }
+  }
+}
+
 // Standard Entry Transition (The "Cyber Slide")
 // Usage: @include entry-transition;
 //

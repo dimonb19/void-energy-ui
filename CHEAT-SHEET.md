@@ -2065,6 +2065,34 @@ Physics-aware visual effects for loading states and skeleton loaders.
 
 ---
 
+#### `@include navlink-loading($mode)`
+
+**Purpose:** Navigation loading feedback for any interactive element that navigates. Paired with the `use:navlink` Svelte action. Shows shimmer effect after 150ms delay (avoids flicker on fast navigations). Physics & mode-aware.
+**Parameters:**
+- `$mode` — `surface` (default) or `text`
+  - `surface` — Shimmer overlay via `::after`. Element must have `position: relative` + `overflow: hidden`.
+  - `text` — Text shimmer via `background-clip: text`. Safe for elements already using `::after` (e.g. `.link` laser line).
+
+**Source:** [src/styles/abstracts/\_mixins.scss](src/styles/abstracts/_mixins.scss)
+
+**Already applied to:** `.btn` (surface), `.tab` (surface), `.link` (text)
+
+```scss
+// Surface mode (buttons, tabs, cards)
+.card-link {
+  position: relative;
+  overflow: hidden;
+  @include navlink-loading;
+}
+
+// Text mode (inline links that use ::after)
+.link {
+  @include navlink-loading(text);
+}
+```
+
+---
+
 #### `@include entry-transition($duration, $delay)`
 
 **Purpose:** Slide-up fade-in entry animation using `@starting-style`. Respects `prefers-reduced-motion`.
@@ -2874,6 +2902,57 @@ When used inside a `<dialog>` element, morph automatically:
 ```
 
 See [tooltip.ts](src/actions/tooltip.ts) for full API.
+
+---
+
+### C. Navigation Loading (`use:navlink`)
+
+**Purpose:** Mark any navigating element as loading on click
+**Location:** [src/actions/navlink.ts](src/actions/navlink.ts)
+
+Sets `data-status="loading"` + `aria-busy="true"` on click. MPA navigation clears the state naturally (DOM replacement). Skips modified clicks (Ctrl/Cmd+click for new tab, Shift, middle button).
+
+Pair with the `@include navlink-loading` SCSS mixin on the target element for visual feedback. Two modes:
+- **Surface** (default) — shimmer overlay via `::after` (buttons, tabs, cards)
+- **Text** — text shimmer via `background-clip: text` (inline links using `::after`)
+
+**Usage:**
+
+```svelte
+<script>
+  import { navlink } from '@actions/navlink';
+</script>
+
+<!-- Navigation tab -->
+<a class="tab" href="/components" use:navlink>Components</a>
+
+<!-- CTA button -->
+<a class="btn btn-cta" href="/components" use:navlink>Explore</a>
+
+<!-- Card surface -->
+<a class="card" href="/story/123" use:navlink>Story Title</a>
+
+<!-- Inline link (uses text-shimmer mode in SCSS) -->
+<a class="link" href="/docs" use:navlink>Documentation</a>
+```
+
+**Already wired:** Navigation tabs (desktop + mobile), CTA button on index page.
+
+**SCSS setup** for new elements:
+
+```scss
+// Surface shimmer (needs position: relative + overflow: hidden)
+.my-card {
+  position: relative;
+  overflow: hidden;
+  @include navlink-loading;
+}
+
+// Text shimmer (safe when ::after is taken)
+.my-link {
+  @include navlink-loading(text);
+}
+```
 
 ---
 

@@ -28,6 +28,8 @@
   border-bottom: var(--physics-border-width) solid
     alpha(var(--energy-primary), 20%);
 
+  @include navlink-loading(text);
+
   // Laser line.
   &::after {
     content: '';

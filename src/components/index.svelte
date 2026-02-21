@@ -7,6 +7,7 @@
   import { FONTS } from '@config/design-tokens';
   import { voidEngine } from '@adapters/void-engine.svelte';
   import { morph } from '@actions/morph';
+  import { navlink } from '@actions/navlink';
 
   import ThemesBtn from './ui/ThemesBtn.svelte';
   import SettingsRow from './ui/SettingsRow.svelte';
@@ -720,7 +721,7 @@
       a single line of component code. Ship a product, change the brand, and the
       entire interface follows.
     </p>
-    <a href="/components" class="btn btn-cta">
+    <a href="/components" class="btn" use:navlink>
       Explore the Component Library
     </a>
   </section>
