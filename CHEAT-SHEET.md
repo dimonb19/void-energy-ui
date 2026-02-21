@@ -635,10 +635,10 @@ Preset components with built-in layout and physics.
 | --- | --- | --- |
 | `.btn` | Standard surface button (auto-applied to `<button>`) | Default actions |
 | `.btn-cta` | Rotating gradient border (Gemini Laser), pill shape | Primary CTA |
-| `.btn-premium` | Gold/orange semantic | Paid features, upgrades |
+| `.btn-premium` | Gold/orange semantic | Premium features, upgrades, warnings/caution |
 | `.btn-system` | Purple semantic | System/diagnostic actions |
 | `.btn-success` | Green/success semantic | Confirmations, positive actions |
-| `.btn-error` | Red/error semantic | Destructive actions, warnings |
+| `.btn-error` | Red/error semantic | Destructive actions (delete, remove, revoke) |
 | `.btn-ghost` | Text-only, no surface/border at rest | Secondary/tertiary actions |
 | `.btn-void` | Complete style reset | Custom-styled buttons |
 | `.btn-icon` | Circular icon-only | Toolbar actions, inline controls |
@@ -1556,10 +1556,10 @@ The chip system includes additional semantic variants beyond the base:
 | Class | Color | Use Case |
 | --- | --- | --- |
 | `.chip` | Energy secondary | Default/neutral chips |
-| `.chip-premium` | Gold | Premium features |
+| `.chip-premium` | Gold | Premium features, warnings |
 | `.chip-system` | Purple | System indicators |
 | `.chip-success` | Green | Positive states |
-| `.chip-error` | Red | Error/warning states |
+| `.chip-error` | Red | Error states |
 
 **Modifier:** `.chip-labeled` — Adds a floating label tab above the chip via `data-label` attribute.
 

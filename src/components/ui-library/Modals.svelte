@@ -83,7 +83,7 @@
           Confirm
         </button>
         <button
-          class="btn-error"
+          class="btn-premium"
           onclick={() =>
             modal.confirm(
               'Delete Module',

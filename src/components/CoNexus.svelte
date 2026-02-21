@@ -37,7 +37,7 @@
         </li>
 
         <hr />
-        
+
         <li>
           <strong>Ambient layers</strong> — atmospheric background visuals that shift
           with theme and context.
