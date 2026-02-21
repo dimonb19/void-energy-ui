@@ -24,6 +24,9 @@
           <strong>Kinetic typography</strong> — motion-driven text animations that
           adds narrative rhythm to content.
         </li>
+
+        <hr />
+
         <li>
           <strong>Story categories</strong> — browsable tile grid that organizes
           stories by topic.
@@ -32,6 +35,9 @@
           <strong>Drag & drop</strong> — direct manipulation for reordering or organizing
           content by dragging elements into place.
         </li>
+
+        <hr />
+        
         <li>
           <strong>Ambient layers</strong> — atmospheric background visuals that shift
           with theme and context.
