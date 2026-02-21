@@ -995,6 +995,70 @@ Preset components with built-in layout and physics.
 
 ---
 
+#### `<GenerateField>`
+
+**Description:** Always-editable text input with a Sparkle icon button for AI text generation. Click Sparkle to trigger an async generation handler; input shows shimmer loading state during generation.
+**Location:** [src/components/ui/GenerateField.svelte](src/components/ui/GenerateField.svelte)
+**CSS Class:** `.field .generate-field` ([src/styles/components/\_fields.scss](src/styles/components/_fields.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` | `$bindable('')` | Text value (bindable — updated on successful generation) |
+| `placeholder` | `string` | `''` | Placeholder text |
+| `disabled` | `boolean` | `false` | Disables input and sparkle button |
+| `instructions` | `string` | — | Developer-provided prompt context for this field's AI generation |
+| `ongenerate` | `(ctx: GenerateContext) => Promise<string>` | *required* | Async handler receiving `{ currentValue, instructions, signal }` |
+
+**States:** idle (editable + Sparkle icon) → generating (disabled + shimmer + SpinLoader). Escape aborts generation.
+
+**Usage:**
+
+```svelte
+<GenerateField
+  bind:value={title}
+  placeholder="Project title..."
+  instructions="Generate a catchy project title"
+  ongenerate={generateText}
+/>
+```
+
+---
+
+#### `<GenerateTextarea>`
+
+**Description:** Always-editable textarea with a Sparkle icon button for AI text generation. Multi-line variant of GenerateField.
+**Location:** [src/components/ui/GenerateTextarea.svelte](src/components/ui/GenerateTextarea.svelte)
+**CSS Class:** `.field .generate-textarea` ([src/styles/components/\_fields.scss](src/styles/components/_fields.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` | `$bindable('')` | Text content (bindable — updated on successful generation) |
+| `placeholder` | `string` | `''` | Placeholder text |
+| `rows` | `number` | `3` | Visible text rows |
+| `disabled` | `boolean` | `false` | Disables textarea and sparkle button |
+| `instructions` | `string` | — | Developer-provided prompt context for this field's AI generation |
+| `ongenerate` | `(ctx: GenerateContext) => Promise<string>` | *required* | Async handler receiving `{ currentValue, instructions, signal }` |
+
+**States:** idle (editable + Sparkle icon at top-right) → generating (disabled + shimmer + SpinLoader). Escape aborts generation.
+
+**Usage:**
+
+```svelte
+<GenerateTextarea
+  bind:value={bio}
+  placeholder="Tell us about yourself..."
+  instructions="Generate a professional bio"
+  ongenerate={generateText}
+  rows={5}
+/>
+```
+
+---
+
 #### `<MediaSlider>`
 
 **Description:** Horizontal control bar with mute toggle, volume slider, optional playback (pause/play) toggle, and optional replay button.
@@ -1740,6 +1804,7 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 | `Restart` | Hover | `data-state="active"` |
 | `Switch` | Hover | `data-state="active"` |
 | `Sort` | Hover | `data-state="active"` |
+| `Sparkle` | Hover | `data-state="active"` (rotate + scale, accent fade-in) |
 | `ArrowBack` | Static | — |
 | `Dream` | Static | — |
 | `Profile` | Static | — |
@@ -2358,7 +2423,7 @@ await toast.promise(saveItems(items), {
 
 ---
 
-### N. Field Composites (Password, Copy, Edit, EditTextarea)
+### N. Field Composites (Password, Copy, Edit, EditTextarea, Generate)
 
 ```svelte
 <script lang="ts">
@@ -2366,12 +2431,29 @@ await toast.promise(saveItems(items), {
   import CopyField from '@components/ui/CopyField.svelte';
   import EditField from '@components/ui/EditField.svelte';
   import EditTextarea from '@components/ui/EditTextarea.svelte';
+  import GenerateField from '@components/ui/GenerateField.svelte';
+  import GenerateTextarea from '@components/ui/GenerateTextarea.svelte';
 </script>
 
 <PasswordField bind:value={password} />
 <CopyField value="sk-1234-abcd-5678" />
 <EditField bind:value={name} onconfirm={saveName} />
 <EditTextarea bind:value={notes} rows={4} onconfirm={saveNotes} />
+
+<!-- AI generation fields — ongenerate receives { currentValue, instructions, signal } -->
+<GenerateField
+  bind:value={title}
+  placeholder="Project title..."
+  instructions="Generate a catchy project title"
+  ongenerate={generateText}
+/>
+<GenerateTextarea
+  bind:value={bio}
+  placeholder="About..."
+  instructions="Generate a professional bio"
+  ongenerate={generateText}
+  rows={4}
+/>
 ```
 
 ---

@@ -6,6 +6,8 @@
   import EditField from '../ui/EditField.svelte';
   import EditTextarea from '../ui/EditTextarea.svelte';
   import CopyField from '../ui/CopyField.svelte';
+  import GenerateField from '../ui/GenerateField.svelte';
+  import GenerateTextarea from '../ui/GenerateTextarea.svelte';
   import MediaSlider from '../ui/MediaSlider.svelte';
   import SliderField from '../ui/SliderField.svelte';
   import type { Component } from 'svelte';
@@ -37,6 +39,31 @@
     'Void energy reactor status: all subsystems nominal. Containment field stable at 99.7% integrity.',
   );
   let copyValue = 'sk-void-4f8a-9c2e-7d1b-3e6f';
+  let generateValue = $state('');
+  let generateTextareaValue = $state('');
+
+  // Mock AI generation handler (simulates async generation)
+  async function mockGenerate({
+    currentValue,
+    instructions,
+    signal,
+  }: {
+    currentValue: string;
+    instructions?: string;
+    signal: AbortSignal;
+  }): Promise<string> {
+    await new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(resolve, 2000);
+      signal.addEventListener('abort', () => {
+        clearTimeout(timer);
+        reject(new DOMException('Aborted', 'AbortError'));
+      });
+    });
+    if (currentValue) {
+      return `${currentValue} — enhanced by AI`;
+    }
+    return instructions ?? 'AI-generated content';
+  }
 
   // Demo state — Slider Fields
   let renderQuality = $state(50);
@@ -244,6 +271,43 @@
             after copying to clipboard.
           </p>
         </div>
+
+        <!-- GenerateField -->
+        <div class="flex flex-col gap-xs">
+          <label for="generate-field" class="text-small px-xs"
+            >GenerateField</label
+          >
+          <GenerateField
+            id="generate-field"
+            bind:value={generateValue}
+            placeholder="Project title..."
+            instructions="Generate a catchy project title for a SaaS product"
+            ongenerate={mockGenerate}
+          />
+          <p class="text-caption text-mute px-xs">
+            Always editable. Click Sparkle to trigger AI generation. Input shows
+            shimmer during loading. <code>Escape</code> aborts.
+          </p>
+        </div>
+
+        <!-- GenerateTextarea -->
+        <div class="flex flex-col gap-xs">
+          <label for="generate-textarea" class="text-small px-xs"
+            >GenerateTextarea</label
+          >
+          <GenerateTextarea
+            id="generate-textarea"
+            bind:value={generateTextareaValue}
+            placeholder="Describe your project..."
+            instructions="Generate a professional project description"
+            ongenerate={mockGenerate}
+            rows={4}
+          />
+          <p class="text-caption text-mute px-xs">
+            Textarea variant. Same sparkle/shimmer/abort behavior, icons
+            anchored to top-right.
+          </p>
+        </div>
       </div>
 
       <details>
@@ -255,6 +319,8 @@
   import EditField from './ui/EditField.svelte';
   import EditTextarea from './ui/EditTextarea.svelte';
   import CopyField from './ui/CopyField.svelte';
+  import GenerateField from './ui/GenerateField.svelte';
+  import GenerateTextarea from './ui/GenerateTextarea.svelte';
 &lt;/script&gt;
 
 &lt;SearchField
@@ -281,7 +347,22 @@
   onconfirm=&#123;(v) =&gt; save(v)&#125;
 /&gt;
 
-&lt;CopyField value="sk-secret-key-here" /&gt;</code
+&lt;CopyField value="sk-secret-key-here" /&gt;
+
+&lt;GenerateField
+  bind:value=&#123;title&#125;
+  placeholder="Project title..."
+  instructions="Generate a catchy title"
+  ongenerate=&#123;generateText&#125;
+/&gt;
+
+&lt;GenerateTextarea
+  bind:value=&#123;bio&#125;
+  placeholder="About..."
+  instructions="Generate a professional bio"
+  ongenerate=&#123;generateText&#125;
+  rows=&#123;4&#125;
+/&gt;</code
           ></pre>
       </details>
 
@@ -297,7 +378,12 @@
         <code>placeholder</code>, <code>rows</code> (number),
         <code>onconfirm</code>. Ctrl/Cmd+Enter confirms.
         <strong>CopyField</strong> &mdash; <code>value</code> (readonly string).
-        All accept <code>id</code>, <code>disabled</code>, and
+        <strong>GenerateField</strong> &mdash; <code>value</code> (bindable),
+        <code>placeholder</code>, <code>instructions</code> (AI prompt context),
+        <code>ongenerate</code> (async handler).
+        <strong>GenerateTextarea</strong> &mdash; same as GenerateField plus
+        <code>rows</code> (number). All accept <code>id</code>,
+        <code>disabled</code>, and
         <code>class</code>.
       </p>
     </div>

@@ -20,11 +20,13 @@
  * - .field-slot-right : Absolutely positioned right icon container
  *
  * COMPOSITES USING THIS PATTERN:
- * - SearchField   : Search icon (left) + text input
- * - PasswordField : Password input + Eye toggle (right)
- * - EditField     : text input + Edit (idle) or Undo/Check (editing) on right
- * - EditTextarea  : textarea + Edit (idle) or Undo/Check (editing) on right (top-aligned)
- * - CopyField     : Readonly input + Copy button (right)
+ * - SearchField      : Search icon (left) + text input
+ * - PasswordField    : Password input + Eye toggle (right)
+ * - EditField        : text input + Edit (idle) or Undo/Check (editing) on right
+ * - EditTextarea     : textarea + Edit (idle) or Undo/Check (editing) on right (top-aligned)
+ * - CopyField        : Readonly input + Copy button (right)
+ * - GenerateField    : text input + Sparkle (idle) or SpinLoader (generating) on right
+ * - GenerateTextarea : textarea + Sparkle (idle) or SpinLoader (generating) on right
  *
  * FORM FIELD WRAPPER:
  * - FormField     : Label + input (slot) + hint + error with ARIA wiring
@@ -38,6 +40,8 @@
  * @see /src/components/ui/EditField.svelte
  * @see /src/components/ui/EditTextarea.svelte
  * @see /src/components/ui/CopyField.svelte
+ * @see /src/components/ui/GenerateField.svelte
+ * @see /src/components/ui/GenerateTextarea.svelte
  * @see /src/components/ui/MediaSlider.svelte
  * @see /src/components/ui/SliderField.svelte
  * ==========================================================================
@@ -152,7 +156,21 @@ $_slot-width: var(--control-padding-x);
 }
 
 // ==========================================================================
-// 3. MEDIA SLIDER (non-field composite)
+// 3. GENERATE FIELD (AI generation shimmer during loading)
+// ==========================================================================
+
+.generate-field,
+.generate-textarea {
+  &[data-status='loading'] {
+    input,
+    textarea {
+      @include shimmer;
+    }
+  }
+}
+
+// ==========================================================================
+// 4. MEDIA SLIDER (non-field composite)
 // ==========================================================================
 
 .media-slider {
@@ -168,7 +186,7 @@ $_slot-width: var(--control-padding-x);
 }
 
 // ==========================================================================
-// 4. SLIDER FIELD (non-field composite)
+// 5. SLIDER FIELD (non-field composite)
 // ==========================================================================
 //
 // ANATOMY:
@@ -241,7 +259,7 @@ $_slot-width: var(--control-padding-x);
 }
 
 // ==========================================================================
-// 5. FORM FIELD WRAPPER (Label + Input + Hint/Error)
+// 6. FORM FIELD WRAPPER (Label + Input + Hint/Error)
 // ==========================================================================
 //
 // ANATOMY:
