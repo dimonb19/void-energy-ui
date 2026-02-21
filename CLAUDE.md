@@ -1,3 +1,23 @@
+## 0. MANDATORY PRE-FLIGHT (Do This Before Every Task)
+
+Before writing a single line of code, you MUST complete this audit and report findings:
+
+1. **Read the task-relevant component directory** (`src/components/ui/`, `src/components/icons/`, etc.) — list every existing component that could relate to this task.
+2. **Read the relevant SCSS file** in `src/styles/components/` for the component you're touching or creating.
+3. **Find the nearest existing analog** — the component whose patterns you will replicate. Name it explicitly.
+4. **Check `src/config/design-tokens.ts`** for any tokens relevant to this task.
+5. **Read `.claude/rules/`** for any domain-specific rules loaded for this file type.
+
+**Format your pre-flight report as:**
+> Analog: [component name + file path]
+> Related SCSS: [file path]  
+> Relevant tokens: [list]
+> Plan: [what you will do, where, and why it fits the system]
+
+**Do NOT proceed to implementation until I respond with "go" or "looks good".**
+
+---
+
 # Void Energy UI — Migration Context
 
 This codebase is being migrated to the **Void Energy UI** system: a design system built on Svelte 5 (Runes), Astro, TypeScript, and a hybrid styling architecture where **SCSS owns visual physics** (surfaces, shadows, blur, animations, state) and **Tailwind owns geometry** (flex, grid, spacing, sizing). Every visual value flows through semantic tokens. Every component adapts to 3 physics presets (glass, flat, retro) and 2 color modes (light, dark). Migration is incremental — one task per session, preserving existing behavior.
@@ -290,7 +310,12 @@ Physics constraint rules (auto-enforced):
 ## 8. MIGRATION PROTOCOL
 
 1. **SCOPE:** Do exactly what is asked. One component, one file, one feature at a time.
-2. **READ FIRST:** Before writing code, read the existing file and any related SCSS/types.
+2. **READ FIRST:** Before writing code, read:
+   - The target file
+   - All files in the same directory
+   - The corresponding SCSS file in `src/styles/components/`
+   - At least 2 existing components as pattern references
+   Report what you found before proceeding.
 3. **PRESERVE:** Keep existing behavior. Migration changes HOW code is written, not WHAT it does.
 4. **MATCH PATTERNS:** Find the nearest existing Void Energy component/style and replicate its patterns.
 5. **NO INVENTIONS:** Do not create new abstractions, mixins, utilities, or architecture. Use only what exists in the system.
@@ -308,3 +333,4 @@ Physics constraint rules (auto-enforced):
 - **Tailwind config is token-driven.** `tailwind.config.mjs` reads from `design-tokens.ts`. Add new values to design-tokens, not the Tailwind config.
 - **Radius tokens in SCSS:** Default to `var(--radius-base)` for border-radius — it adapts per physics (8px glass, 4px flat, 0 retro). Use `var(--radius-full)` for pills. The scale tokens (`--radius-sm/md/lg/xl`) are available when you deliberately need a specific size, but all radius tokens are force-zeroed in retro physics.
 - **Existing docs:** `CHEAT-SHEET.md` (component catalog), `THEME-GUIDE.md` (theme creation), `CONTRIBUTING.md` (PR process).
+- **Never guess patterns.** If you haven't read the analog component and its SCSS, stop and read them first. Inventing patterns that "seem right" is the most common source of system inconsistency.

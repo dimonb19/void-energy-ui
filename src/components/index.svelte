@@ -13,7 +13,7 @@
   import Toggle from './ui/Toggle.svelte';
   import Selector from './ui/Selector.svelte';
 
-  import { Moon, Sun } from '@lucide/svelte';
+  import { Moon, Sun, Sparkles, Palette, Undo2 } from '@lucide/svelte';
 
   // Consolidated chip demo state
   const chipVariants = [
@@ -506,12 +506,34 @@
         <div
           class="surface-sunk flex flex-col justify-center tablet:flex-row gap-sm p-sm"
         >
-          <button class="btn-premium" onclick={previewCustomAtmosphere}>
-            Apply Custom Palette
-          </button>
-          <button class="btn-system" onclick={previewBuiltInAtmosphere}>
-            Preview Built-in Atmosphere
-          </button>
+          {#if voidEngine.temporaryThemeInfo?.id === 'cyberpunk'}
+            <button
+              class="btn-error"
+              onclick={() => voidEngine.restoreUserTheme()}
+            >
+              <Undo2 class="icon" />
+              Disable Custom Palette
+            </button>
+          {:else}
+            <button class="btn-premium" onclick={previewCustomAtmosphere}>
+              <Sparkles class="icon" />
+              Apply Custom Palette
+            </button>
+          {/if}
+          {#if voidEngine.temporaryThemeInfo?.id === 'crimson'}
+            <button
+              class="btn-error"
+              onclick={() => voidEngine.restoreUserTheme()}
+            >
+              <Undo2 class="icon" />
+              Disable Built-in Atmosphere
+            </button>
+          {:else}
+            <button class="btn-system" onclick={previewBuiltInAtmosphere}>
+              <Palette class="icon" />
+              Preview Built-in Atmosphere
+            </button>
+          {/if}
         </div>
       </SettingsRow>
 
