@@ -86,8 +86,7 @@
 // Usage: Include in any element that acts as a loading skeleton.
 @mixin shimmer {
   background-size: 400% 100%;
-
-  animation: shimmer 3s infinite linear;
+  animation: shimmer 4s infinite linear;
 
   // Default Void gradient.
   background-image: linear-gradient(
@@ -104,26 +103,37 @@
     background-image: linear-gradient(
       90deg,
       transparent 0%,
-      transparent 30%,
-      rgba(255, 255, 255, 0.6) 50%,
-      transparent 70%,
+      transparent 35%,
+      rgb(255, 255, 255) 50%,
+      transparent 65%,
       transparent 100%
     );
   }
 
   // Retro override.
   @include when-retro($low-specificity: true) {
-    opacity: 0.5;
     background-image: linear-gradient(
       90deg,
       transparent 0%,
-      transparent 43%,
-      var(--energy-primary) 43%,
-      var(--energy-primary) 47%,
-      transparent 47%,
+      transparent 44%,
+      var(--border-color) 44%,
+      var(--border-color) 46%,
+      transparent 46%,
       transparent 100%
     );
   }
+}
+
+// MIXIN: Text Shimmer
+// Usage: Include on any text element to create a text-clipped loading shimmer.
+// The shimmer sweeps across text glyphs (not the background).
+// Reuses the same `shimmer` keyframe as the container shimmer.
+@mixin text-shimmer {
+  color: alpha(var(--text-main), 0.3);
+  -webkit-background-clip: text;
+  background-clip: text;
+
+  @include shimmer;
 }
 
 // Standard Entry Transition (The "Cyber Slide")

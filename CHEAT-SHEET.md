@@ -15,6 +15,7 @@
    - [Overlays](#c-overlays-the-ether)
    - [Gestures](#d-gestures)
    - [Icons](#e-icons)
+   - [Effects](#f-effects)
 5. [Mixin Reference](#5-mixin-reference)
 6. [Quick Patterns (Copy-Paste)](#6-quick-patterns-copy-paste)
 7. [Svelte Actions](#7-svelte-actions)
@@ -1892,6 +1893,56 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 
 ---
 
+### F. Effects
+
+Physics-aware visual effects for loading states and skeleton loaders.
+**Source:** [src/styles/components/\_effects.scss](src/styles/components/_effects.scss)
+
+#### `.text-shimmer`
+
+**Description:** Animated gradient clipped to text glyphs. Composes `@include shimmer` with `background-clip: text`. Text renders at 30% opacity (`alpha(--text-main, 0.3)`) with the shimmer band sweeping across glyphs. Same gradient and physics as container shimmer.
+**Mixin:** `@include text-shimmer` ([src/styles/abstracts/\_mixins.scss](src/styles/abstracts/_mixins.scss))
+
+| Physics | Visual |
+| --- | --- |
+| **Glass/Flat dark** | 30% text-main base, `--energy-primary` at 15% sweep |
+| **Light** | 30% text-main base, full white sweep |
+| **Retro** | 30% text-main base, `--border-color` scan line |
+
+**Usage:**
+
+```svelte
+<h3 class="text-shimmer">Generating response...</h3>
+<p class="text-shimmer">Processing your request...</p>
+```
+
+---
+
+#### `.shimmer-surface`
+
+**Description:** Container shimmer overlay via `::before` pseudo-element. Use for skeleton loaders. The shimmer clips to the container's `border-radius`.
+**Mixin:** `@include shimmer` ([src/styles/abstracts/\_mixins.scss](src/styles/abstracts/_mixins.scss))
+
+| Physics | Visual |
+| --- | --- |
+| **Glass/Flat dark** | `--energy-primary` at 15% sweep |
+| **Light** | Full white sweep |
+| **Retro** | Hard-edged 2% scan line, `--border-color` |
+
+**Usage:**
+
+```svelte
+<!-- Skeleton card -->
+<div class="shimmer-surface surface-glass" style="height: 8rem"></div>
+
+<!-- Skeleton pill -->
+<div class="shimmer-surface surface-glass rounded-full" style="height: 2.5rem; width: 10rem"></div>
+```
+
+**Showcase:** [/components → Effects](src/components/ui-library/Effects.svelte)
+
+---
+
 ## 5. Mixin Reference
 
 ### Surface Mixins
@@ -1963,17 +2014,53 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 
 #### `@include shimmer`
 
-**Purpose:** Loading skeleton animation with atmospheric gradient. Physics & mode-aware.
-**Visual:** Animated horizontal gradient sweep. Retro mode uses a simplified scanning line pattern.
+**Purpose:** Loading skeleton animation with atmospheric gradient. Physics & mode-aware. Sweeps a light band across the element's background.
+**Visual:** Animated horizontal gradient sweep (4s infinite linear). Glass/flat dark: `--energy-primary` at 15%. Light: full white. Retro: hard-edged 2% scan line, `--border-color`.
+**Source:** [src/styles/abstracts/\_mixins.scss](src/styles/abstracts/_mixins.scss)
 
 **Usage:**
 
 ```scss
-.skeleton-card {
+// Direct application (e.g., input during loading)
+.generate-field[data-status='loading'] input {
   @include shimmer;
-  height: 200px;
-  border-radius: var(--radius-base);
 }
+
+// Via ::before overlay (skeleton loader)
+.skeleton-card {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    @include shimmer;
+  }
+}
+```
+
+---
+
+#### `@include text-shimmer`
+
+**Purpose:** Text-clipped loading shimmer. Composes `@include shimmer` with `background-clip: text` to sweep the gradient across text glyphs instead of the background. Physics & mode-aware (inherits all variants from `shimmer`).
+**Visual:** Text at 30% opacity (`alpha(--text-main, 0.3)`) with the shimmer band sweeping across glyphs. Same gradient and physics behavior as container shimmer.
+**Source:** [src/styles/abstracts/\_mixins.scss](src/styles/abstracts/_mixins.scss)
+
+**Usage:**
+
+```scss
+.loading-label {
+  @include text-shimmer;
+}
+```
+
+**Utility class:** `.text-shimmer` ([src/styles/components/\_effects.scss](src/styles/components/_effects.scss)) — applies `@include text-shimmer` directly.
+
+```svelte
+<p class="text-shimmer">Generating response...</p>
 ```
 
 ---

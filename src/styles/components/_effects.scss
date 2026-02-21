@@ -1,0 +1,25 @@
+@use '../abstracts' as *;
+
+// ==========================================================================
+// EFFECTS — Shimmer utility classes
+// ==========================================================================
+
+// Text shimmer — applies directly to text elements.
+.text-shimmer {
+  @include text-shimmer;
+}
+
+// Container shimmer — overlays shimmer via ::before pseudo-element.
+// The container must have position: relative and overflow: hidden.
+.shimmer-surface {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    @include shimmer;
+  }
+}

@@ -18,6 +18,8 @@
   import FloatingUI from './ui-library/FloatingUI.svelte';
   import Toasts from './ui-library/Toasts.svelte';
   import Modals from './ui-library/Modals.svelte';
+  // Effects
+  import Effects from './ui-library/Effects.svelte';
 
   const sidebarSections = [
     {
@@ -52,6 +54,10 @@
         { id: 'toasts', label: 'Toasts' },
         { id: 'modals', label: 'Modals' },
       ],
+    },
+    {
+      label: 'Effects',
+      items: [{ id: 'effects', label: 'Effects' }],
     },
   ];
 
@@ -210,6 +216,16 @@
           <FloatingUI />
           <Toasts />
           <Modals />
+
+          <hr />
+
+          <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+            <h3 class="text-dim">Effects</h3>
+            <p class="text-small text-mute">
+              Physics-aware visual effects and loading state animations.
+            </p>
+          </div>
+          <Effects />
         </div>
       </div>
     </PullRefresh>
