@@ -408,3 +408,27 @@ interface BreadcrumbItem {
   /** Marks this item as the active peer (switches separator to `/`) */
   active?: boolean;
 }
+
+// ==========================================================================
+// 8. USER HYDRATION
+// ==========================================================================
+
+/**
+ * User role name as returned from the server.
+ * Used to derive boolean role flags on UserStore.
+ */
+type VoidUserRoleName = 'Admin' | 'Creator' | 'Player' | 'Guest';
+
+/**
+ * User object for hydration from localStorage.
+ * Showcase type — real applications should extend or replace
+ * this with their own user model.
+ */
+interface VoidUser {
+  id: string;
+  name: string;
+  email: string;
+  avatar: string | null;
+  role_name: VoidUserRoleName;
+  approved_tester: boolean;
+}

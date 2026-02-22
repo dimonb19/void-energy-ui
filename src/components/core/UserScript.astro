@@ -1,0 +1,19 @@
+---
+/*
+  User auth bootloader.
+  Reads void_user from localStorage and sets data-auth on <html>
+  before first paint — prevents FOUC for auth-dependent content.
+  Mirrors ThemeScript pattern.
+*/
+---
+
+<script is:inline>
+  (function() {
+    try {
+      var u = localStorage.getItem('void_user');
+      if (u && JSON.parse(u)) {
+        document.documentElement.setAttribute('data-auth', '');
+      }
+    } catch(e) {}
+  })();
+</script>

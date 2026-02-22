@@ -115,7 +115,7 @@ src/
   layouts/          Astro layouts
   lib/              Modal manager, transitions, tooltip logic, void-boot
   pages/            Astro pages
-  stores/           Reactive state (toast)
+  stores/           Reactive state (toast, user)
   styles/
     abstracts/      SCSS engine, mixins, functions, keyframes
     base/           Reset, typography, themes, accessibility
@@ -270,6 +270,21 @@ Registry: src/config/modal-registry.ts (add new fragments here)
 .promise(promise, { loading, success, error })
 ```
 
+### User (`import { user } from '@stores/user.svelte'`)
+```
+.current                            Current VoidUser object or null (reactive)
+.loading                            True during async refresh ($state)
+.isAuthenticated                    Derived: user !== null
+.isAdmin / .isCreator / .isPlayer / .isGuest    Derived role flags
+.approvedTester                     Derived from user.approved_tester
+.developerMode                      Local preference toggle ($state)
+.login(userData)                    Set user + persist to localStorage
+.logout()                           Clear user + storage + reset flags
+.update(partial)                    Partial user update + persist
+.refresh(fetcher)                   Two-phase: async verify cached user via API
+.toggleDeveloperMode()              Toggle dev mode flag
+```
+
 ### Transitions (`import { materialize, dematerialize, implode, live } from '@lib/transitions.svelte'`)
 ```
 in:materialize     Physics-aware entry (blur + scale + Y). Retro: instant.
@@ -299,12 +314,17 @@ The `<html>` element carries the runtime state:
 data-atmosphere="void"      Active theme ID
 data-physics="glass"        Active physics preset (glass | flat | retro)
 data-mode="dark"            Active color mode (light | dark)
+data-auth                   Present when user is authenticated (set by UserScript)
 ```
 
 Physics constraint rules (auto-enforced):
 - `glass` requires `dark` mode (glows need darkness)
 - `retro` requires `dark` mode (CRT phosphor effect)
 - `flat` works with both modes
+
+Auth visibility utilities (FOUC-safe, set before first paint):
+- `.auth-only` — visible only when `data-auth` is present
+- `.guest-only` — visible only when `data-auth` is absent
 
 ---
 

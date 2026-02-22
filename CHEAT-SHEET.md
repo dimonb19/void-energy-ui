@@ -16,6 +16,7 @@
    - [Gestures](#d-gestures)
    - [Icons](#e-icons)
    - [Effects](#f-effects)
+   - [State Patterns](#g-state-patterns)
 5. [Mixin Reference](#5-mixin-reference)
 6. [Quick Patterns (Copy-Paste)](#6-quick-patterns-copy-paste)
 7. [Svelte Actions](#7-svelte-actions)
@@ -1945,6 +1946,74 @@ Physics-aware visual effects for loading states and skeleton loaders.
 
 ---
 
+### G. State Patterns
+
+Reactive singletons for app-wide state. Each store uses `$state` + `$derived` and hydrates from localStorage synchronously before first render.
+
+#### `UserStore` — Reactive user hydration with FOUC prevention
+
+**Location:** [src/stores/user.svelte.ts](src/stores/user.svelte.ts)
+**Boot script:** [src/components/core/UserScript.astro](src/components/core/UserScript.astro)
+**CSS:** `.auth-only`, `.guest-only` ([src/styles/base/\_accessibility.scss](src/styles/base/_accessibility.scss))
+
+**Reactive State:**
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `current` | `VoidUser \| null` | Active user object (null = guest) |
+| `developerMode` | `boolean` | Local preference toggle, resets on logout |
+| `loading` | `boolean` | True during async `refresh()` |
+
+**Derived Flags:**
+
+| Flag | Derivation |
+| --- | --- |
+| `isAuthenticated` | `current !== null` |
+| `isAdmin` | `role_name === 'Admin'` |
+| `isCreator` | `role_name === 'Creator'` |
+| `isPlayer` | `role_name === 'Creator' \|\| 'Player'` |
+| `isGuest` | `!current \|\| role_name === 'Guest'` |
+| `approvedTester` | `current?.approved_tester ?? false` |
+
+**Methods:**
+
+| Method | Description |
+| --- | --- |
+| `login(user)` | Set user, persist to localStorage, sync DOM |
+| `logout()` | Clear user + dev mode, remove from localStorage |
+| `update(partial)` | Merge partial fields into current user |
+| `refresh(fetcher)` | Two-phase hydration: async API verify (sets `loading`) |
+| `toggleDeveloperMode()` | Toggle local dev mode flag |
+
+**FOUC Prevention (3 layers):**
+
+1. **`UserScript.astro`** — Inline `<head>` script reads `void_user` from localStorage, sets `data-auth` on `<html>` before first paint
+2. **CSS utilities** — `.auth-only` hidden when no `data-auth`; `.guest-only` hidden when `data-auth` present. Both use `!important` to override component display values
+3. **`syncAuthDOM()`** — UserStore method keeps `data-auth` in sync during login/logout at runtime
+
+**DOM attribute:** `data-auth` on `<html>` (same contract pattern as `data-atmosphere`, `data-physics`, `data-mode`)
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+  import { user } from '@stores/user.svelte';
+</script>
+
+<!-- Reactive flags -->
+{#if user.isAdmin}
+  <AdminPanel />
+{/if}
+
+<!-- FOUC-safe visibility (works before Svelte hydrates) -->
+<div class="auth-only">Authenticated content</div>
+<div class="guest-only">Guest content</div>
+```
+
+**Showcase:** [/components → User State](src/components/ui-library/UserState.svelte)
+
+---
+
 ## 5. Mixin Reference
 
 ### Surface Mixins
@@ -2809,6 +2878,42 @@ import Layout from '../layouts/Layout.astro';
 ```
 
 No manual body padding or scroll offset adjustments needed — `data-has-breadcrumbs` on `<body>` handles clearance automatically.
+
+---
+
+### U. User State Hydration
+
+Import the singleton — all flags are derived reactively. No manual role checking needed.
+
+```svelte
+<script lang="ts">
+  import { user } from '@stores/user.svelte';
+</script>
+
+<!-- Role-gated UI -->
+{#if user.isAdmin}
+  <button class="btn-error" onclick={deleteAll}>Delete All</button>
+{/if}
+
+<!-- Two-phase hydration: sync cache + async API verify -->
+{#if user.loading}
+  <p class="text-shimmer">Verifying session...</p>
+{/if}
+
+<!-- FOUC-safe auth visibility (CSS-only, works before Svelte hydrates) -->
+<nav class="auth-only">Dashboard | Settings | Logout</nav>
+<nav class="guest-only">Login | Register</nav>
+
+<!-- Login / Logout -->
+<button onclick={() => user.login({ id: '1', name: 'Voss', email: 'v@void.energy', avatar: null, role_name: 'Admin', approved_tester: true })}>
+  Login
+</button>
+<button class="btn-ghost btn-error" onclick={() => user.logout()} disabled={!user.isAuthenticated}>
+  Logout
+</button>
+```
+
+`UserScript.astro` is already in `Layout.astro` `<head>` — no setup needed. `.auth-only` / `.guest-only` classes work globally.
 
 ---
 

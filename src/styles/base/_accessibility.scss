@@ -130,3 +130,19 @@
     animation: none !important;
   }
 }
+
+// ==========================================================================
+// 4. AUTH VISIBILITY (FOUC Prevention)
+// ==========================================================================
+// Works with UserScript inline bootloader (src/components/core/UserScript.astro).
+// data-auth is set on <html> before first paint; CSS hides/shows immediately.
+// !important: must override component display values (same rationale as HCM).
+// ==========================================================================
+
+html:not([data-auth]) .auth-only {
+  display: none !important;
+}
+
+html[data-auth] .guest-only {
+  display: none !important;
+}

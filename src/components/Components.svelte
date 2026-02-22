@@ -20,6 +20,8 @@
   import Modals from './ui-library/Modals.svelte';
   // Effects
   import Effects from './ui-library/Effects.svelte';
+  // State Patterns
+  import UserState from './ui-library/UserState.svelte';
 
   const sidebarSections = [
     {
@@ -58,6 +60,10 @@
     {
       label: 'Effects',
       items: [{ id: 'effects', label: 'Effects' }],
+    },
+    {
+      label: 'State Patterns',
+      items: [{ id: 'user-state', label: 'User State' }],
     },
   ];
 
@@ -226,6 +232,16 @@
             </p>
           </div>
           <Effects />
+
+          <hr />
+
+          <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+            <h3 class="text-dim">State Patterns</h3>
+            <p class="text-small text-mute">
+              Reactive state singletons for application-level concerns.
+            </p>
+          </div>
+          <UserState />
         </div>
       </div>
     </PullRefresh>
