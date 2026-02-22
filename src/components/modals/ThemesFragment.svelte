@@ -347,7 +347,9 @@
   </SettingsRow>
 
   <div class="flex justify-center gap-md">
-    <button class="btn-ghost" onclick={() => modal.close()}> Close </button>
+    <button class="btn-ghost btn-error" onclick={() => modal.close()}>
+      Close
+    </button>
   </div>
 </div>
 

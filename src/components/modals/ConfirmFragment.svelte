@@ -34,7 +34,7 @@
   </div>
 
   <div class="flex flex-row justify-center gap-md">
-    <button class="btn-ghost" onclick={() => onCancel()}>
+    <button class="btn-ghost btn-error" onclick={() => onCancel()}>
       {cancelText}
     </button>
     <button

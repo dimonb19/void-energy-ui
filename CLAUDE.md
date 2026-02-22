@@ -333,5 +333,6 @@ Physics constraint rules (auto-enforced):
 - **SCSS import path:** Always `@use '../abstracts' as *;` — never import individual partial files.
 - **Tailwind config is token-driven.** `tailwind.config.mjs` reads from `design-tokens.ts`. Add new values to design-tokens, not the Tailwind config.
 - **Radius tokens in SCSS:** Default to `var(--radius-base)` for border-radius — it adapts per physics (8px glass, 4px flat, 0 retro). Use `var(--radius-full)` for pills. The scale tokens (`--radius-sm/md/lg/xl`) are available when you deliberately need a specific size, but all radius tokens are force-zeroed in retro physics.
+- **Modal dismiss buttons use `btn-ghost btn-error`** — not plain `btn-ghost`. Closing/canceling is a mildly destructive action; red ghost provides subtle signaling without the weight of a solid `btn-error`.
 - **Existing docs:** `CHEAT-SHEET.md` (component catalog), `THEME-GUIDE.md` (theme creation), `CONTRIBUTING.md` (PR process).
 - **Never guess patterns.** If you haven't read the analog component and its SCSS, stop and read them first. Inventing patterns that "seem right" is the most common source of system inconsistency.

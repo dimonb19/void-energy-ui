@@ -81,7 +81,9 @@
   </div>
 
   <div class="flex flex-row justify-center gap-md">
-    <button class="btn-ghost" onclick={() => modal.close()}>Cancel</button>
+    <button class="btn-ghost btn-error" onclick={() => modal.close()}
+      >Cancel</button
+    >
     <button class="btn-success" onclick={handleSave}>Save</button>
   </div>
 </div>

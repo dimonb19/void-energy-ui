@@ -674,6 +674,8 @@ Preset components with built-in layout and physics.
 
 **Semantic composition:** Combine with semantic classes for colored ghosts — the ghost surface treatment overrides the semantic background/border while preserving the semantic color.
 
+**Convention:** Modal dismiss buttons (Close, Cancel) always use `btn-ghost btn-error` — dismissing is a mildly destructive action that warrants subtle red signaling without the weight of a solid `btn-error`.
+
 **Usage:**
 
 ```svelte
@@ -682,7 +684,7 @@ Preset components with built-in layout and physics.
 
 <!-- Paired with primary (most common pattern) -->
 <div class="flex gap-md">
-  <button class="btn-ghost">Cancel</button>
+  <button class="btn-ghost btn-error">Cancel</button>
   <button class="btn-success">Confirm</button>
 </div>
 
@@ -2381,7 +2383,7 @@ All accept optional `$low-specificity: true`.
     <h2>Modal Title</h2>
     <p>Content here</p>
     <div class="flex gap-md">
-      <button class="btn-ghost">Cancel</button>
+      <button class="btn-ghost btn-error">Cancel</button>
       <button class="btn-cta">Confirm</button>
     </div>
   </div>
