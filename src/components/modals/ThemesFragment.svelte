@@ -115,9 +115,6 @@
     ),
   );
 
-  // Advanced settings toggle.
-  let showAdvancedSettings = $state<boolean>(false);
-
   // Toggle adaptive atmosphere (persisted via voidEngine.userConfig)
   function toggleAdaptAtmosphere(value?: boolean) {
     const newValue = value ?? !voidEngine.userConfig.adaptAtmosphere;
@@ -151,6 +148,17 @@
   function setDensity(d: 'high' | 'standard' | 'low') {
     voidEngine.setPreferences({ density: d });
     toast.show(`${d.toUpperCase()} density applied`);
+  }
+
+  function toggleFixedNav(value?: boolean) {
+    const newValue = value ?? !voidEngine.userConfig.fixedNav;
+    voidEngine.setPreferences({ fixedNav: newValue });
+
+    if (newValue) {
+      toast.show('Navigation bar will stay visible while scrolling', 'success');
+    } else {
+      toast.show('Navigation bar will hide on scroll');
+    }
   }
 </script>
 
@@ -246,108 +254,100 @@
     {/each}
   </div>
 
-  <div class="flex flex-col items-center gap-xs">
-    <Toggle
-      bind:checked={voidEngine.userConfig.adaptAtmosphere}
-      label="Adapt to story mood"
-      onchange={toggleAdaptAtmosphere}
-    />
-    <p class="text-caption text-mute">
-      (Stories can temporarily override your theme)
-    </p>
+  <!-- Display Settings -->
+  <hr />
+  <div class="flex flex-col justify-center gap-md">
+    <SettingsRow label="Text Scale">
+      <div class="surface-sunk p-md">
+        <Switcher
+          options={scaleLevels}
+          value={activeScaleStep.value}
+          onchange={(value) => setScale(Number(value))}
+        />
+      </div>
+    </SettingsRow>
+
+    <SettingsRow label="Spacing Density">
+      <div class="surface-sunk p-md">
+        <Switcher
+          options={densityOptions}
+          value={voidEngine.userConfig.density}
+          onchange={(value) => setDensity(value as 'high' | 'standard' | 'low')}
+        />
+      </div>
+    </SettingsRow>
   </div>
 
-  {#if showAdvancedSettings}
-    <div class="flex flex-col justify-center gap-md">
-      <div in:materialize={{ delay: 0 }} out:dematerialize>
-        <hr />
-        <SettingsRow label="Text Scale">
-          <div class="surface-sunk p-md">
-            <Switcher
-              options={scaleLevels}
-              value={activeScaleStep.value}
-              onchange={(value) => setScale(Number(value))}
-            />
-          </div>
-        </SettingsRow>
-      </div>
-
-      <div in:materialize={{ delay: 50 }} out:dematerialize>
-        <hr />
-        <SettingsRow label="Spacing Density">
-          <div class="surface-sunk p-md">
-            <Switcher
-              options={densityOptions}
-              value={voidEngine.userConfig.density}
-              onchange={(value) =>
-                setDensity(value as 'high' | 'standard' | 'low')}
-            />
-          </div>
-        </SettingsRow>
-      </div>
-
-      <div in:materialize={{ delay: 100 }} out:dematerialize>
-        <hr />
-        <SettingsRow label="Typography">
-          <div
-            class="flex flex-col small-desktop:flex-row justify-center gap-sm"
-          >
-            <Selector
-              label="Heading Font"
-              options={headingFontOptions}
-              value={voidEngine.userConfig.fontHeading}
-              onchange={(v) => {
-                voidEngine.setPreferences({ fontHeading: v || null });
-                if (!v)
-                  toast.show(
-                    'Custom font cleared. Reverted to Atmosphere recommendation.',
-                    'success',
-                  );
-                else
-                  toast.show(
-                    `Headings updated to ${extractFontName(v)}`,
-                    'info',
-                  );
-              }}
-            />
-            <Selector
-              label="Body Font"
-              options={bodyFontOptions}
-              value={voidEngine.userConfig.fontBody}
-              onchange={(v) => {
-                voidEngine.setPreferences({ fontBody: v || null });
-                if (!v)
-                  toast.show(
-                    'Custom font cleared. Reverted to Atmosphere recommendation.',
-                    'success',
-                  );
-                else
-                  toast.show(
-                    `Reading font updated to ${extractFontName(v)}`,
-                    'info',
-                  );
-              }}
-            />
-          </div>
-          <p class="text-center text-caption text-mute">
-            Note: Changing fonts may affect the intended atmosphere of the
-            selected theme.
-          </p>
-        </SettingsRow>
-        <hr />
-      </div>
+  <hr />
+  <SettingsRow label="Typography">
+    <div class="flex flex-col small-desktop:flex-row justify-center gap-sm">
+      <Selector
+        label="Heading Font"
+        options={headingFontOptions}
+        value={voidEngine.userConfig.fontHeading}
+        onchange={(v) => {
+          voidEngine.setPreferences({ fontHeading: v || null });
+          if (!v)
+            toast.show(
+              'Custom font cleared. Reverted to Atmosphere recommendation.',
+              'success',
+            );
+          else toast.show(`Headings updated to ${extractFontName(v)}`, 'info');
+        }}
+      />
+      <Selector
+        label="Body Font"
+        options={bodyFontOptions}
+        value={voidEngine.userConfig.fontBody}
+        onchange={(v) => {
+          voidEngine.setPreferences({ fontBody: v || null });
+          if (!v)
+            toast.show(
+              'Custom font cleared. Reverted to Atmosphere recommendation.',
+              'success',
+            );
+          else
+            toast.show(`Reading font updated to ${extractFontName(v)}`, 'info');
+        }}
+      />
     </div>
-  {/if}
+    <p class="text-center text-caption text-mute">
+      Note: Changing fonts may affect the intended atmosphere of the selected
+      theme.
+    </p>
+  </SettingsRow>
+
+  <!-- Preferences -->
+  <hr />
+  <SettingsRow label="Preferences">
+    <div
+      class="surface-sunk p-md flex flex-col items-center justify-center gap-md large-desktop:flex-row"
+    >
+      <span class="flex flex-col items-center gap-xs">
+        <Toggle
+          bind:checked={voidEngine.userConfig.fixedNav}
+          label="Fixed navigation"
+          onchange={toggleFixedNav}
+        />
+        <p class="text-caption text-mute">
+          (Navigation bar won't hide on scroll)
+        </p>
+      </span>
+      <span class="flex flex-col items-center gap-xs">
+        <Toggle
+          bind:checked={voidEngine.userConfig.adaptAtmosphere}
+          label="Adapt to story mood"
+          onchange={toggleAdaptAtmosphere}
+        />
+        <p class="text-caption text-mute">
+          (Stories can temporarily override your theme)
+        </p>
+      </span>
+    </div>
+  </SettingsRow>
 
   <div class="flex justify-center gap-md">
     <button class="btn-ghost" onclick={() => modal.close()}> Close </button>
-    <button
-      class="btn-ghost"
-      aria-pressed={showAdvancedSettings}
-      onclick={() => (showAdvancedSettings = !showAdvancedSettings)}
-    >
-      Advanced Settings
-    </button>
   </div>
 </div>
 

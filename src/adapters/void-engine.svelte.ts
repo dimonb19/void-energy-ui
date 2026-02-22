@@ -101,6 +101,7 @@ export class VoidEngine {
     scale: 1,
     density: 'standard',
     adaptAtmosphere: true,
+    fixedNav: false,
   });
 
   // Temporary theme context (for story themes, previews, or forced contexts).

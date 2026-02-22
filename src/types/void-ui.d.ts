@@ -213,6 +213,8 @@ interface UserConfig {
   density: VoidDensity;
   /** Allow themes to adapt to story mood */
   adaptAtmosphere: boolean;
+  /** Keep navigation bar visible while scrolling */
+  fixedNav: boolean;
 }
 
 // ==========================================================================

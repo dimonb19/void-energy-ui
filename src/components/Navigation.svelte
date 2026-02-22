@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Component } from 'svelte';
 
+  import { voidEngine } from '@adapters/void-engine.svelte';
   import ThemesBtn from './ui/ThemesBtn.svelte';
   import Breadcrumbs from './ui/Breadcrumbs.svelte';
 
@@ -70,6 +71,13 @@
     );
   });
 
+  // Force-reveal navbar when fixedNav preference is enabled
+  $effect(() => {
+    if (voidEngine.userConfig.fixedNav) {
+      navHidden = false;
+    }
+  });
+
   // Resolve active tab from current URL on mount
   $effect(() => {
     const path = window.location.pathname.replace(/\/+$/, '') || '/';
@@ -106,6 +114,8 @@
   };
 
   const onscroll = () => {
+    if (voidEngine.userConfig.fixedNav) return;
+
     const y = window.scrollY;
     if (ticking) return;
     ticking = true;
@@ -328,7 +338,7 @@
     {/each}
   </ul>
 
-  <ThemesBtn icon class="tab ml-auto" />
+  <ThemesBtn class="btn-void tab ml-auto flex-row-reverse gap-sm" />
 </nav>
 
 <!-- Mobile Nav Links -->
