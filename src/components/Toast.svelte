@@ -2,7 +2,7 @@
   import { toast } from '@stores/toast.svelte';
   import { dematerialize, materialize } from '@lib/transitions.svelte';
   import { Info, Check, TriangleAlert, X } from '@lucide/svelte';
-  import SpinLoader from './icons/SpinLoader.svelte';
+  import LoadingSpin from './icons/LoadingSpin.svelte';
 
   const icons: Record<string, typeof Info> = {
     info: Info,
@@ -66,7 +66,7 @@
     >
       <span class="toast-icon" aria-hidden="true">
         {#if item.type === 'loading'}
-          <SpinLoader class="text-main" data-size="lg" />
+          <LoadingSpin class="text-main" data-size="lg" />
         {:else}
           {@const Icon = icons[item.type] ?? icons.info}
           <Icon class="icon" />

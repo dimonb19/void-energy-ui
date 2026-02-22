@@ -1015,7 +1015,7 @@ Preset components with built-in layout and physics.
 | `instructions` | `string` | — | Developer-provided prompt context for this field's AI generation |
 | `ongenerate` | `(ctx: GenerateContext) => Promise<string>` | *required* | Async handler receiving `{ currentValue, instructions, signal }` |
 
-**States:** idle (editable + Sparkle icon) → generating (disabled + shimmer + SpinLoader). Escape aborts generation.
+**States:** idle (editable + Sparkle icon) → generating (disabled + shimmer + LoadingQuill). Escape aborts generation.
 
 **Usage:**
 
@@ -1047,7 +1047,7 @@ Preset components with built-in layout and physics.
 | `instructions` | `string` | — | Developer-provided prompt context for this field's AI generation |
 | `ongenerate` | `(ctx: GenerateContext) => Promise<string>` | *required* | Async handler receiving `{ currentValue, instructions, signal }` |
 
-**States:** idle (editable + Sparkle icon at top-right) → generating (disabled + shimmer + SpinLoader). Escape aborts generation.
+**States:** idle (editable + Sparkle icon at top-right) → generating (disabled + shimmer + LoadingQuill). Escape aborts generation.
 
 **Usage:**
 
@@ -1876,7 +1876,8 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 
 | Icon | Type | Notes |
 | :--- | :--- | :--- |
-| `SpinLoader` | Animated (custom) | CSS `@keyframes rotate`, retro: `steps(8)` |
+| `LoadingSpin` | Animated (custom) | Data fetching, backend requests, async operations. CSS `@keyframes rotate`, retro: `steps(8)` |
+| `LoadingQuill` | Animated (custom) | AI content generation, story game launching, creative AI processes. Multi-layer trace/fill/dot animation, retro: `steps(4-8)` |
 | `LogoDGRS` | Logo (custom) | Non-square viewBox, `data-render="logo"` |
 | `LogoCoNexus` | Logo (custom) | Non-square viewBox, `data-render="logo"` |
 
@@ -2982,7 +2983,7 @@ When used inside a `<dialog>` element, morph automatically:
 
 ```svelte
 <button class="toast-message" use:morph={{ height: false }}>
-  {#if loading}<SpinLoader />{:else}<Checkmark />{/if}
+  {#if loading}<LoadingSpin />{:else}<Checkmark />{/if}
   <span>{message}</span>
 </button>
 ```

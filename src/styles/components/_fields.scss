@@ -25,8 +25,8 @@
  * - EditField        : text input + Edit (idle) or Undo/Check (editing) on right
  * - EditTextarea     : textarea + Edit (idle) or Undo/Check (editing) on right (top-aligned)
  * - CopyField        : Readonly input + Copy button (right)
- * - GenerateField    : text input + Sparkle (idle) or SpinLoader (generating) on right
- * - GenerateTextarea : textarea + Sparkle (idle) or SpinLoader (generating) on right
+ * - GenerateField    : text input + Sparkle (idle) or LoadingQuill (generating) on right
+ * - GenerateTextarea : textarea + Sparkle (idle) or LoadingQuill (generating) on right
  *
  * FORM FIELD WRAPPER:
  * - FormField     : Label + input (slot) + hint + error with ARIA wiring

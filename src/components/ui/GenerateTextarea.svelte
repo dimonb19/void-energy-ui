@@ -24,12 +24,12 @@
 
   STATES:
   - idle: Textarea is editable, Sparkle icon shown at top-right
-  - generating: Textarea disabled with shimmer, SpinLoader replaces Sparkle
+  - generating: Textarea disabled with shimmer, LoadingQuill replaces Sparkle
 
   BEHAVIOR:
   - Textarea is always editable — user can type freely
   - Click Sparkle → calls ongenerate with current value + instructions
-  - Loading state: textarea disabled, shimmer overlay, SpinLoader in slot
+  - Loading state: textarea disabled, shimmer overlay, LoadingQuill in slot
   - On resolve → value updated with generated text
   - On error → toast notification, value unchanged
   - Escape during generation → aborts the request
@@ -42,7 +42,7 @@
 
   import IconBtn from './IconBtn.svelte';
   import Sparkle from '@components/icons/Sparkle.svelte';
-  import SpinLoader from '@components/icons/SpinLoader.svelte';
+  import LoadingQuill from '@components/icons/LoadingQuill.svelte';
 
   interface GenerateContext {
     currentValue: string;
@@ -139,7 +139,7 @@
           aria-label="Generate"
         />
       {:else}
-        <SpinLoader data-size="lg" aria-hidden="true" />
+        <LoadingQuill data-size="lg" aria-hidden="true" />
       {/if}
     </span>
   {/key}

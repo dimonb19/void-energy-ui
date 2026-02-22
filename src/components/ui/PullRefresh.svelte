@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { Check, X, ArrowDown } from '@lucide/svelte';
-  import SpinLoader from '../icons/SpinLoader.svelte';
+  import LoadingSpin from '../icons/LoadingSpin.svelte';
   import { morph } from '@actions/morph';
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -410,7 +410,7 @@
       <X class="icon pull-error" />
     {:else}
       {#if pullState === 'refreshing'}
-        <SpinLoader class="text-main" data-size="lg" />
+        <LoadingSpin class="text-main" data-size="lg" />
       {:else}
         <!-- Progress ring -->
         <svg class="icon progress-ring" data-size="lg" viewBox="0 0 24 24">

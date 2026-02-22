@@ -24,14 +24,10 @@
   import Restart from '@components/icons/Restart.svelte';
   import Search from '@components/icons/Search.svelte';
   import Sort from '@components/icons/Sort.svelte';
-  import SpinLoader from '@components/icons/SpinLoader.svelte';
+  import LoadingSpin from '@components/icons/LoadingSpin.svelte';
   import Switch from '@components/icons/Switch.svelte';
   import Voice from '@components/icons/Voice.svelte';
-  import LoadingQuill1 from '@components/icons/LoadingQuill1.svelte';
-  import LoadingQuill2 from '@components/icons/LoadingQuill2.svelte';
-  import LoadingQuill3 from '@components/icons/LoadingQuill3.svelte';
-  import LoadingQuill4 from '@components/icons/LoadingQuill4.svelte';
-  import LoadingQuill5 from '@components/icons/LoadingQuill5.svelte';
+  import LoadingQuill from '@components/icons/LoadingQuill.svelte';
 
   // Lucide icons (static library examples)
   import {
@@ -378,13 +374,50 @@
       </div>
     </div>
 
+    <!-- ─── LOADING ICONS ──────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Loading</h5>
+      <p class="text-small text-mute">
+        Physics-aware loading indicators: smooth animation in glass/flat,
+        stepped in retro. Each serves a distinct semantic purpose.
+      </p>
+
+      <!-- LoadingSpin -->
+      <p class="text-small text-dim">
+        <strong>LoadingSpin</strong> — data fetching, backend requests, and asynchronous
+        operations. The universal spinner for any non-AI loading state.
+      </p>
+      <div
+        class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
+      >
+        <div class="flex flex-col items-center gap-xs">
+          <LoadingSpin data-size={iconSize} />
+          <span class="text-caption text-mute">LoadingSpin</span>
+        </div>
+      </div>
+
+      <!-- LoadingQuill -->
+      <p class="text-small text-dim">
+        <strong>LoadingQuill</strong> — AI content generation, story game launching,
+        and creative AI processes. The animated quill signals that an AI is actively
+        authoring content.
+      </p>
+      <div
+        class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
+      >
+        <div class="flex flex-col items-center gap-xs">
+          <LoadingQuill data-size={iconSize} />
+          <span class="text-caption text-mute">LoadingQuill</span>
+        </div>
+      </div>
+    </div>
+
     <!-- ─── STATIC ICONS ─────────────────────────────────────────────── -->
     <div class="flex flex-col gap-sm">
       <h5>Static</h5>
       <p class="text-small text-mute">
         Display-only icons with no interactive state. Accept only
-        <code>data-size</code>. SpinLoader and LoadingQuill are physics-aware:
-        smooth animation in glass/flat, stepped in retro.
+        <code>data-size</code>.
       </p>
       <div
         class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
@@ -403,36 +436,6 @@
           <Profile data-size={iconSize} />
           <span class="text-caption text-mute">Profile</span>
         </div>
-
-        <div class="flex flex-col items-center gap-xs">
-          <SpinLoader data-size={iconSize} />
-          <span class="text-caption text-mute">SpinLoader</span>
-        </div>
-
-        <!-- <div class="flex flex-col items-center gap-xs">
-          <LoadingQuill1 data-size={iconSize} />
-          <span class="text-caption text-mute">LoadingQuill1</span>
-        </div> -->
-
-        <!-- <div class="flex flex-col items-center gap-xs">
-          <LoadingQuill2 data-size={iconSize} />
-          <span class="text-caption text-mute">LoadingQuill2</span>
-        </div> -->
-
-        <!-- <div class="flex flex-col items-center gap-xs">
-          <LoadingQuill3 data-size={iconSize} />
-          <span class="text-caption text-mute">LoadingQuill3</span>
-        </div> -->
-
-        <div class="flex flex-col items-center gap-xs">
-          <LoadingQuill4 data-size={iconSize} />
-          <span class="text-caption text-mute">LoadingQuill4</span>
-        </div>
-
-        <!-- <div class="flex flex-col items-center gap-xs">
-          <LoadingQuill5 data-size={iconSize} />
-          <span class="text-caption text-mute">LoadingQuill5</span>
-        </div> -->
       </div>
     </div>
 

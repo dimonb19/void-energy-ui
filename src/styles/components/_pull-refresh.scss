@@ -267,7 +267,7 @@
 // PHYSICS OVERRIDES
 // ==========================================================================
 
-// Retro: No blur (spin-loader retro handled via @include when-retro)
+// Retro: No blur (loading-spin retro handled via @include when-retro)
 [data-physics='retro'] {
   .pull-indicator {
     backdrop-filter: none;
