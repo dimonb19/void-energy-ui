@@ -11,6 +11,7 @@
   } from '@config/design-tokens';
 
   import Switcher from '../ui/Switcher.svelte';
+  import SliderField from '../ui/SliderField.svelte';
   import Selector from '../ui/Selector.svelte';
   import SettingsRow from '../ui/SettingsRow.svelte';
   import { Sun, Moon } from '@lucide/svelte';
@@ -99,11 +100,12 @@
     { label: 'XL', value: 1.25, name: 'Extra' },
   ];
 
-  const densityOptions = [
-    { value: 'high', label: 'Compact', icon: '|||' },
-    { value: 'standard', label: 'Standard', icon: '||' },
-    { value: 'low', label: 'Relaxed', icon: '|' },
+  const densityPresets = [
+    { label: 'Compact', value: 0 },
+    { label: 'Standard', value: 1 },
+    { label: 'Relaxed', value: 2 },
   ];
+  const densityMap = ['high', 'standard', 'low'] as const;
 
   // Derived selection based on engine scale.
   let activeScaleStep = $derived(
@@ -113,6 +115,10 @@
         ? curr
         : prev,
     ),
+  );
+
+  let activeDensityIndex = $derived(
+    densityMap.indexOf(voidEngine.userConfig.density),
   );
 
   // Toggle adaptive atmosphere (persisted via voidEngine.userConfig)
@@ -258,23 +264,24 @@
   <hr />
   <div class="flex flex-col justify-center gap-md">
     <SettingsRow label="Text Scale">
-      <div class="surface-sunk p-md">
-        <Switcher
-          options={scaleLevels}
+      <span class="surface-sunk p-md">
+        <SliderField
+          presets={scaleLevels}
           value={activeScaleStep.value}
-          onchange={(value) => setScale(Number(value))}
+          onchange={(value) => setScale(value)}
         />
-      </div>
+      </span>
     </SettingsRow>
 
     <SettingsRow label="Spacing Density">
-      <div class="surface-sunk p-md">
-        <Switcher
-          options={densityOptions}
-          value={voidEngine.userConfig.density}
-          onchange={(value) => setDensity(value as 'high' | 'standard' | 'low')}
+      <span class="surface-sunk p-md">
+        <SliderField
+          presets={densityPresets}
+          value={activeDensityIndex}
+          onchange={(value) =>
+            setDensity(densityMap[value] as 'high' | 'standard' | 'low')}
         />
-      </div>
+      </span>
     </SettingsRow>
   </div>
 
