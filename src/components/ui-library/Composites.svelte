@@ -53,7 +53,7 @@
     signal: AbortSignal;
   }): Promise<string> {
     await new Promise<void>((resolve, reject) => {
-      const timer = setTimeout(resolve, 2000);
+      const timer = setTimeout(resolve, 6000);
       signal.addEventListener('abort', () => {
         clearTimeout(timer);
         reject(new DOMException('Aborted', 'AbortError'));
