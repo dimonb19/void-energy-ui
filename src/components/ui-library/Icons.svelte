@@ -27,6 +27,11 @@
   import SpinLoader from '@components/icons/SpinLoader.svelte';
   import Switch from '@components/icons/Switch.svelte';
   import Voice from '@components/icons/Voice.svelte';
+  import LoadingQuill1 from '@components/icons/LoadingQuill1.svelte';
+  import LoadingQuill2 from '@components/icons/LoadingQuill2.svelte';
+  import LoadingQuill3 from '@components/icons/LoadingQuill3.svelte';
+  import LoadingQuill4 from '@components/icons/LoadingQuill4.svelte';
+  import LoadingQuill5 from '@components/icons/LoadingQuill5.svelte';
 
   // Lucide icons (static library examples)
   import {
@@ -45,7 +50,7 @@
   } from '@lucide/svelte';
 
   // Local state for icons
-  let iconSize = $state('2xl');
+  let iconSize = $state('4xl');
   let sizeList = $state([
     { value: 'sm', label: 'Small' },
     { value: 'md', label: 'Medium' },
@@ -378,8 +383,8 @@
       <h5>Static</h5>
       <p class="text-small text-mute">
         Display-only icons with no interactive state. Accept only
-        <code>data-size</code>. SpinLoader is physics-aware: smooth rotation in
-        glass/flat, stepped in retro.
+        <code>data-size</code>. SpinLoader and LoadingQuill are physics-aware:
+        smooth animation in glass/flat, stepped in retro.
       </p>
       <div
         class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
@@ -403,6 +408,31 @@
           <SpinLoader data-size={iconSize} />
           <span class="text-caption text-mute">SpinLoader</span>
         </div>
+
+        <!-- <div class="flex flex-col items-center gap-xs">
+          <LoadingQuill1 data-size={iconSize} />
+          <span class="text-caption text-mute">LoadingQuill1</span>
+        </div> -->
+
+        <!-- <div class="flex flex-col items-center gap-xs">
+          <LoadingQuill2 data-size={iconSize} />
+          <span class="text-caption text-mute">LoadingQuill2</span>
+        </div> -->
+
+        <!-- <div class="flex flex-col items-center gap-xs">
+          <LoadingQuill3 data-size={iconSize} />
+          <span class="text-caption text-mute">LoadingQuill3</span>
+        </div> -->
+
+        <div class="flex flex-col items-center gap-xs">
+          <LoadingQuill4 data-size={iconSize} />
+          <span class="text-caption text-mute">LoadingQuill4</span>
+        </div>
+
+        <!-- <div class="flex flex-col items-center gap-xs">
+          <LoadingQuill5 data-size={iconSize} />
+          <span class="text-caption text-mute">LoadingQuill5</span>
+        </div> -->
       </div>
     </div>
 
