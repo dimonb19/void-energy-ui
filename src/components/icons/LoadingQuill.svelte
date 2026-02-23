@@ -167,13 +167,33 @@
     20% {
       opacity: 1;
     }
+    45% {
+      stroke-dashoffset: 0;
+      opacity: 0.4;
+    }
+    50% {
+      stroke-dashoffset: 0;
+      opacity: 0;
+    }
+    // Exit — trace re-appears and un-draws (reverse stroke)
     55% {
       stroke-dashoffset: 0;
-      opacity: 0.3;
+      opacity: 0;
     }
-    70%,
-    100% {
+    60% {
       stroke-dashoffset: 0;
+      opacity: 0.8;
+    }
+    80% {
+      stroke-dashoffset: 0.6; // void-ignore
+      opacity: 0.5;
+    }
+    92% {
+      stroke-dashoffset: 0.9; // void-ignore
+      opacity: 0.15;
+    }
+    100% {
+      stroke-dashoffset: 1;
       opacity: 0;
     }
   }
@@ -191,7 +211,16 @@
       opacity: 1;
       scale: 1;
     }
-    80%,
+    // Exit — dissolves earlier so reverse-drawing trace is visible
+    60% {
+      opacity: 0.7;
+      scale: 1;
+    }
+    72% {
+      opacity: 0.2;
+      scale: 0.98; // void-ignore
+    }
+    82%,
     100% {
       opacity: 0;
       scale: 0.96; // void-ignore
@@ -210,10 +239,26 @@
       translate: 0 -14px; // void-ignore
       opacity: 1;
     }
-    80%,
+    // Exit — dot descends back, overshoots past origin (ink absorption)
+    60% {
+      scale: 1; // void-ignore
+      translate: 0 -8px; // void-ignore
+      opacity: 0.8;
+    }
+    72% {
+      scale: 0.6; // void-ignore
+      translate: 0 -2px; // void-ignore
+      opacity: 0.5;
+    }
+    82% {
+      scale: 0.3; // void-ignore
+      translate: 0 4px; // void-ignore
+      opacity: 0.15;
+    }
+    90%,
     100% {
-      scale: 0.8; // void-ignore
-      translate: 0 0;
+      scale: 0; // void-ignore
+      translate: 0 6px; // void-ignore
       opacity: 0;
     }
   }
