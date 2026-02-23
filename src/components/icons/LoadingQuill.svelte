@@ -50,7 +50,7 @@
   @use '/src/styles/abstracts' as *;
 
   .icon-loading-quill {
-    --loop-duration: 2.2s;
+    --loop-duration: 3s;
     --ease-trace: cubic-bezier(0.76, 0, 0.24, 1);
     --ease-pulse: cubic-bezier(0.33, 1, 0.68, 1);
 
@@ -79,7 +79,7 @@
       fill: currentColor;
       transform-box: fill-box;
       transform-origin: center;
-      opacity: 0.3;
+      opacity: 0;
     }
 
     // ── Idle state: quill at rest ──
@@ -200,15 +200,21 @@
 
   @keyframes dot-levitate {
     0%,
-    100% {
+    15% {
       scale: 0.8; // void-ignore
       translate: 0 0;
-      opacity: 0.3;
+      opacity: 0;
     }
     50% {
       scale: 1.15; // void-ignore
       translate: 0 -14px; // void-ignore
       opacity: 1;
+    }
+    80%,
+    100% {
+      scale: 0.8; // void-ignore
+      translate: 0 0;
+      opacity: 0;
     }
   }
 
