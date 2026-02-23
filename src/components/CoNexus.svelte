@@ -1,5 +1,6 @@
 <script lang="ts">
   import PullRefresh from '@components/ui/PullRefresh.svelte';
+  import PortalLoader from '@components/ui/PortalLoader.svelte';
 
   async function handleRefresh(): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -43,6 +44,10 @@
           with theme and context.
         </li>
       </ul>
+    </div>
+
+    <div class="surface-glass flex justify-center p-lg">
+      <PortalLoader />
     </div>
   </div>
 </PullRefresh>
