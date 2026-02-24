@@ -1628,6 +1628,49 @@ The chip system includes additional semantic variants beyond the base:
 
 ---
 
+#### `<PortalLoader>` — Animated portal loading scene
+
+**Description:** Layered loading composition with circuit textures, animated SVG circuitry (`LoadingPortal`), and a centered quill icon (`LoadingQuill`). Fixed 2048×1228 aspect ratio, max-width 768px. Uses `role="status"` with visually-hidden text for screen reader announcements.
+**Location:** [src/components/ui/PortalLoader.svelte](src/components/ui/PortalLoader.svelte)
+**CSS:** `.portal-loader`, `.portal-layer`, `.portal-circuits`, `.shadow-vignette`, `.portal-svg`, `.portal-quill` (scoped)
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `status` | `'idle' \| 'loading'` | `'loading'` | Controls animation state of inner icons |
+| `class` | `string` | `''` | CSS passthrough to root element |
+
+**Layers** (bottom to top):
+
+| Layer | Class | z-index | Content |
+| --- | --- | --- | --- |
+| Circuit texture | `.portal-circuits` | `z('floor')` | Static `circuits.webp` at 5% opacity |
+| Vignette | `.shadow-vignette` | `z('floor')` | Dark vignette overlay at 50% opacity |
+| SVG circuitry | `.portal-svg` | `z('decorate')` | `<LoadingPortal>` animated draw-on paths |
+| Quill icon | `.portal-quill` | `z('float')` | `<LoadingQuill>` centered, `data-size="4xl"` |
+
+**Accessibility:** Container uses `role="status"` with a `<span class="sr-only">Loading</span>` that appears when `status === 'loading'`.
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+  import PortalLoader from '@components/ui/PortalLoader.svelte';
+</script>
+
+<PortalLoader />
+<PortalLoader status="idle" />
+```
+
+**Physics:**
+- **Glass:** Quill bloom glow via `drop-shadow`, tinted `--energy-primary`
+- **Flat:** Clean circuits, no glow, standard opacity
+- **Retro:** Atmosphere layers use `mix-blend-mode: normal`, no glow, zero border-radius
+- **Light:** Vignette hidden, atmosphere layers normalized
+
+---
+
 ### C. Overlays (The Ether)
 
 Floating UI elements with special positioning.
@@ -1878,6 +1921,7 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 | :--- | :--- | :--- |
 | `LoadingSpin` | Animated (custom) | Data fetching, backend requests, async operations. CSS `@keyframes rotate`, retro: `steps(8)` |
 | `LoadingQuill` | Animated (custom) | AI content generation, story game launching, creative AI processes. Multi-layer trace/fill/dot animation, retro: `steps(4-8)` |
+| `LoadingPortal` | Animated (custom) | Portal loading scene circuitry. Non-square viewBox (2048×1228), staggered draw-on/draw-off path animation, `data-status="idle\|loading"`. Glass: bloom glow. Retro: stepped timing. Light: flat `--energy-primary` fill |
 | `LogoDGRS` | Logo (custom) | Non-square viewBox, `data-render="logo"` |
 | `LogoCoNexus` | Logo (custom) | Non-square viewBox, `data-render="logo"` |
 
