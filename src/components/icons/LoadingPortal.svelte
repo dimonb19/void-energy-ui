@@ -226,7 +226,7 @@
     }
   }
 
-  // ── Retro physics: fast stepped timing ──
+  // ── Retro physics: pre-drawn circuits, stepped spin only ──
   :global([data-physics='retro'] .icon-loading-portal[data-status='loading']) {
     :global(.outer-circuitry) {
       animation-timing-function: steps(4);
@@ -235,11 +235,14 @@
 
     .inner-circuitry {
       animation-timing-function: steps(60);
+      animation-duration: 30s;
     }
 
     .inner-circuitry path {
-      animation-timing-function: steps(8);
+      animation-name: circuit-draw-retro;
+      animation-timing-function: steps(6);
       animation-duration: 8s;
+      animation-delay: 0s;
     }
   }
 
@@ -303,6 +306,33 @@
   @keyframes circuit-spin {
     to {
       transform: rotate(360deg);
+    }
+  }
+
+  @keyframes circuit-draw-retro {
+    0% {
+      stroke-dashoffset: 0;
+      opacity: 0.8;
+    }
+    30% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+    50% {
+      stroke-dashoffset: 0;
+      opacity: 0.6;
+    }
+    70% {
+      stroke-dashoffset: 0.2; // void-ignore
+      opacity: 0.8;
+    }
+    85% {
+      stroke-dashoffset: 0.3; // void-ignore
+      opacity: 0.4;
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0.8;
     }
   }
 
