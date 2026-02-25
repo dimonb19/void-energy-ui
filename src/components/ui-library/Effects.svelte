@@ -1,5 +1,13 @@
 <script lang="ts">
+  import { RotateCcw } from '@lucide/svelte';
+  import KineticText from '@components/ui/KineticText.svelte';
   import LoadingTextCycler from '@components/ui/LoadingTextCycler.svelte';
+
+  let replayChar = $state(0);
+  let replayWord = $state(0);
+  let replayDecode = $state(0);
+  let replaySpeed = $state(0);
+  let replayCursor = $state(0);
 </script>
 
 <section id="effects" class="flex flex-col gap-md">
@@ -118,6 +126,159 @@
       </p>
     </div>
 
+    <!-- ─── KINETIC TEXT ──────────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Kinetic Text</h5>
+      <p class="text-small text-mute">
+        Physics-aware kinetic typography engine with four animation modes.
+        Adapts to all physics presets: glass gets smooth glow cursors, flat gets
+        clean stepped blinks, retro gets jittery timing and hard block cursors.
+        Speed is configurable per instance.
+      </p>
+
+      <!-- Typewriter (char mode) -->
+      <div class="flex flex-col gap-xs">
+        <div class="flex items-center justify-between">
+          <h6 class="text-small text-dim">Typewriter</h6>
+          <button class="btn-ghost" onclick={() => replayChar++}>
+            <RotateCcw class="icon" data-size="sm" />
+          </button>
+        </div>
+        <div class="surface-sunk p-lg flex flex-col gap-lg">
+          {#key replayChar}
+            <KineticText
+              text="System initializing... all modules online."
+              mode="char"
+              speed={65}
+              cursor
+            />
+          {/key}
+        </div>
+        <p class="text-caption text-mute px-xs">
+          Character-by-character reveal. Speed: 65ms per character. Retro
+          physics adds per-tick timing jitter for a terminal feel.
+        </p>
+      </div>
+
+      <!-- Paragraph (word mode) -->
+      <div class="flex flex-col gap-xs">
+        <div class="flex items-center justify-between">
+          <h6 class="text-small text-dim">Paragraph</h6>
+          <button class="btn-ghost" onclick={() => replayWord++}>
+            <RotateCcw class="icon" data-size="sm" />
+          </button>
+        </div>
+        <div class="surface-sunk p-lg flex flex-col gap-lg">
+          {#key replayWord}
+            <KineticText
+              tag="p"
+              text="The void engine processes your request through multiple layers of semantic analysis, pattern matching, and contextual synthesis before materializing the final response. Each layer refines the signal, discarding noise and amplifying intent until the output crystallizes."
+              mode="word"
+              speed={80}
+              cursor
+            />
+          {/key}
+        </div>
+        <p class="text-caption text-mute px-xs">
+          Word-by-word reveal for longer content. Renders as a
+          <code>&lt;p&gt;</code> tag. Faster than char mode for paragraphs while
+          maintaining readability.
+        </p>
+      </div>
+
+      <!-- Decode reveal -->
+      <div class="flex flex-col gap-xs">
+        <div class="flex items-center justify-between">
+          <h6 class="text-small text-dim">Decode</h6>
+          <button class="btn-ghost" onclick={() => replayDecode++}>
+            <RotateCcw class="icon" data-size="sm" />
+          </button>
+        </div>
+        <div class="surface-sunk p-lg flex flex-col gap-lg">
+          {#key replayDecode}
+            <KineticText text="ACCESS GRANTED" mode="decode" speed={30} />
+          {/key}
+        </div>
+        <p class="text-caption text-mute px-xs">
+          Scramble-to-resolve effect. Characters resolve progressively from
+          random noise. Retro physics uses an uppercase-only character set.
+        </p>
+      </div>
+
+      <!-- Speed comparison -->
+      <div class="flex flex-col gap-xs">
+        <div class="flex items-center justify-between">
+          <h6 class="text-small text-dim">Speed Comparison</h6>
+          <button class="btn-ghost" onclick={() => replaySpeed++}>
+            <RotateCcw class="icon" data-size="sm" />
+          </button>
+        </div>
+        <div class="surface-sunk p-lg flex flex-col gap-md">
+          {#key replaySpeed}
+            <div class="flex items-center gap-md">
+              <span class="text-caption text-mute" style="min-width: 3.5rem;"
+                >30ms</span
+              >
+              <KineticText text="Fast streaming feel" mode="char" speed={30} />
+            </div>
+            <div class="flex items-center gap-md">
+              <span class="text-caption text-mute" style="min-width: 3.5rem;"
+                >65ms</span
+              >
+              <KineticText text="Deliberate typing" mode="char" speed={65} />
+            </div>
+            <div class="flex items-center gap-md">
+              <span class="text-caption text-mute" style="min-width: 3.5rem;"
+                >120ms</span
+              >
+              <KineticText text="Dramatic pacing" mode="char" speed={120} />
+            </div>
+          {/key}
+        </div>
+        <p class="text-caption text-mute px-xs">
+          Speed is configurable per instance via the <code>speed</code> prop (milliseconds
+          per character). Physics multipliers apply on top: flat runs at 0.8x, retro
+          adds &plusmn;30% jitter.
+        </p>
+      </div>
+
+      <!-- Cursor toggle -->
+      <div class="flex flex-col gap-xs">
+        <div class="flex items-center justify-between">
+          <h6 class="text-small text-dim">Cursor</h6>
+          <button class="btn-ghost" onclick={() => replayCursor++}>
+            <RotateCcw class="icon" data-size="sm" />
+          </button>
+        </div>
+        <div class="surface-sunk p-lg flex flex-col gap-md">
+          {#key replayCursor}
+            <div class="flex items-center gap-md">
+              <span class="text-caption text-mute" style="min-width: 5rem;"
+                >With cursor</span
+              >
+              <KineticText
+                text="Cursor enabled"
+                mode="char"
+                speed={65}
+                cursor
+              />
+            </div>
+            <div class="flex items-center gap-md">
+              <span class="text-caption text-mute" style="min-width: 5rem;"
+                >No cursor</span
+              >
+              <KineticText text="Cursor disabled" mode="char" speed={65} />
+            </div>
+          {/key}
+        </div>
+        <p class="text-caption text-mute px-xs">
+          Cursor is optional via the <code>cursor</code> prop. Glass physics adds
+          a glow effect to the cursor; retro uses a hard block blink. Cursor is removed
+          automatically after animation completes.
+        </p>
+      </div>
+    </div>
+
     <!-- ─── LOADING TEXT CYCLER ──────────────────────────────────── -->
     <div class="flex flex-col gap-sm">
       <h5>Loading Text Cycler</h5>
@@ -172,7 +333,25 @@
 
 &lt;!-- Loading text cycler --&gt;
 &lt;LoadingTextCycler /&gt;
-&lt;LoadingTextCycler interval=&#123;1500&#125; /&gt;</code
+&lt;LoadingTextCycler interval=&#123;1500&#125; /&gt;
+
+&lt;!-- Kinetic text: typewriter --&gt;
+&lt;KineticText text="Hello world" mode="char" speed=&#123;65&#125; cursor /&gt;
+
+&lt;!-- Kinetic text: word-by-word paragraph --&gt;
+&lt;KineticText tag="p" text="Long paragraph..." mode="word" speed=&#123;80&#125; cursor /&gt;
+
+&lt;!-- Kinetic text: decode reveal --&gt;
+&lt;KineticText text="ACCESS GRANTED" mode="decode" speed=&#123;30&#125; cursor /&gt;
+
+&lt;!-- Kinetic text: cycle through words --&gt;
+&lt;KineticText
+  words=&#123;['Synthesizing...', 'Calibrating...']&#125;
+  mode="cycle"
+  cycleTransition="type"
+  speed=&#123;65&#125;
+  cursor
+/&gt;</code
         ></pre>
     </details>
 

@@ -1,24 +1,14 @@
 <script lang="ts">
-  import { materialize, dematerialize } from '@lib/transitions.svelte';
+  import { kinetic } from '@actions/kinetic';
+  import { LOADING_WORDS } from '@config/constants';
 
   interface LoadingTextCyclerProps {
     words?: string[];
     interval?: number;
+    cursor?: boolean;
+    speed?: number;
     class?: string;
   }
-
-  const DEFAULT_WORDS = [
-    'Synthesizing…',
-    'Calibrating…',
-    'Mapping…',
-    'Resolving…',
-    'Aligning…',
-    'Rendering…',
-    'Connecting…',
-    'Traversing…',
-    'Tuning…',
-    'Assembling…',
-  ];
 
   function shuffleTail(list: string[]): string[] {
     const [head, ...tail] = list;
@@ -30,46 +20,34 @@
   }
 
   let {
-    words = DEFAULT_WORDS,
+    words = [...LOADING_WORDS],
     interval = 2000,
+    cursor = true,
+    speed = 65,
     class: className = '',
   }: LoadingTextCyclerProps = $props();
 
   const shuffledWords = shuffleTail(words);
-  let index = $state(0);
-
-  $effect(() => {
-    const id = setInterval(() => {
-      index = (index + 1) % shuffledWords.length;
-    }, interval);
-    return () => clearInterval(id);
-  });
-
-  const currentWord = $derived(shuffledWords[index]);
 </script>
 
-<span class="loading-text-cycler {className}">
-  {#key currentWord}
-    <span class="cycler-word" in:materialize out:dematerialize>
-      {currentWord}
-    </span>
-  {/key}
-</span>
+<span
+  class="loading-text-cycler kinetic-text flex items-center justify-center {className}"
+  use:kinetic={{
+    words: shuffledWords,
+    mode: 'cycle',
+    cycleTransition: 'type',
+    speed,
+    pauseDuration: interval,
+    cursor,
+    loop: true,
+  }}
+></span>
 
 <style lang="scss">
   @use '/src/styles/abstracts' as *;
 
   .loading-text-cycler {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     min-height: 1.4em; // void-ignore
-    overflow: hidden;
-  }
-
-  .cycler-word {
-    display: block;
     white-space: nowrap;
   }
 </style>

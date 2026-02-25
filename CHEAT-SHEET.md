@@ -1630,7 +1630,7 @@ The chip system includes additional semantic variants beyond the base:
 
 #### `<PortalLoader>` — Animated portal loading scene
 
-**Description:** Layered loading composition with circuit textures, animated SVG circuitry (`LoadingPortal`), a centered quill icon (`LoadingQuill`), and a "Synthesizing…" label. Fixed 2048×1228 aspect ratio with responsive max-width (640px tablet → 768px small-desktop → 900px large-desktop → 1024px full-HD). Uses `role="status"` with visually-hidden text for screen reader announcements. Quill icon and label are conditionally rendered — only visible during `loading` state.
+**Description:** Layered loading composition with circuit textures, animated SVG circuitry (`LoadingPortal`), and a centered quill icon (`LoadingQuill`). Fixed 2048×1228 aspect ratio with responsive max-width (640px tablet → 768px small-desktop → 900px large-desktop → 1024px full-HD). Uses `role="status"` with visually-hidden text for screen reader announcements. Quill icon is conditionally rendered — only visible during `loading` state. Label slot is prepared for `LoadingTextCycler` integration (currently commented out).
 **Location:** [src/components/ui/PortalLoader.svelte](src/components/ui/PortalLoader.svelte)
 **CSS:** `.portal-loader`, `.portal-layer`, `.portal-circuits`, `.shadow-vignette`, `.portal-svg`, `.portal-quill`, `.portal-label` (scoped)
 
@@ -1648,11 +1648,11 @@ The chip system includes additional semantic variants beyond the base:
 | Circuit texture | `.portal-circuits` | `z('floor')` | Static `circuits.webp` at 5% opacity |
 | Vignette | `.shadow-vignette` | `z('floor')` | Dark vignette overlay at 50% opacity |
 | SVG circuitry | `.portal-svg` | `z('decorate')` | `<LoadingPortal>` animated draw-on paths |
-| Quill + label | `.portal-quill` | `z('float')` | `<LoadingQuill>` + "Synthesizing…" label, conditionally rendered during `loading` |
+| Quill + label | `.portal-quill` | `z('float')` | `<LoadingQuill>` centered, conditionally rendered during `loading`. Label slot prepared for `LoadingTextCycler` |
 
 **Accessibility:** Container uses `role="status"` with a `<span class="sr-only">Loading</span>` that appears when `status === 'loading'`.
 
-**Label animation:** `.portal-label` pulses opacity on a 3s loop (`label-pulse` keyframes) synced with the quill's `--loop-duration`. Glass: tinted via `tint(--energy-primary, 50%)`. Retro: `steps(4)`. Reduced motion: static at `opacity: 0.5`.
+**Label animation:** `.portal-label` pulses opacity (0.6 → 1) on a 4s loop (`portal-label-pulse` keyframe). Glass: tinted via `tint(--energy-primary, 50%)`. Retro: `steps(4)` at 2s duration. Reduced motion: animation disabled. Label is currently commented out pending `LoadingTextCycler` integration.
 
 **Usage:**
 
@@ -1988,6 +1988,111 @@ Physics-aware visual effects for loading states and skeleton loaders.
 <!-- Skeleton pill -->
 <div class="shimmer-surface surface-glass rounded-full" style="height: 2.5rem; width: 10rem"></div>
 ```
+
+**Showcase:** [/components → Effects](src/components/ui-library/Effects.svelte)
+
+---
+
+#### `<KineticText>` — Physics-aware kinetic typography
+
+**Description:** Thin wrapper around the `use:kinetic` action with four animation modes: typewriter (char), word-by-word (word), scramble-to-resolve (decode), and rotating word list (cycle). Animation logic lives in the action; SCSS owns cursor appearance. Adapts cursor glow and timing to all physics presets. Supports reduced motion (instant reveal).
+**Location:** [src/components/ui/KineticText.svelte](src/components/ui/KineticText.svelte)
+**Action:** [src/actions/kinetic.ts](src/actions/kinetic.ts)
+**CSS:** `.kinetic-text`, `.kinetic-cursor` ([src/styles/components/\_kinetic.scss](src/styles/components/_kinetic.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `text` | `string` | — | Single text to animate (char, word, decode modes) |
+| `words` | `string[]` | — | Word list to cycle through (cycle mode) |
+| `mode` | `'char' \| 'word' \| 'cycle' \| 'decode'` | `'char'` | Animation mode |
+| `speed` | `number` | `40` | Ms per animation unit (per-char, per-word, or per-scramble tick) |
+| `pauseDuration` | `number` | `1800` | Pause between cycled words (ms) |
+| `cycleTransition` | `'type' \| 'fade' \| 'decode'` | `'type'` | Transition style for cycle mode |
+| `cursor` | `boolean` | `false` | Show blinking cursor during animation |
+| `loop` | `boolean` | `true` | Loop cycle mode indefinitely |
+| `tag` | `string` | `'span'` | HTML tag to render |
+| `onComplete` | `() => void` | — | Completion callback |
+| `class` | `string` | `''` | CSS passthrough (layout/geometry only) |
+
+**States:**
+
+| State | Attribute | Visual |
+| --- | --- | --- |
+| Animating | `data-state="animating"` | Text progressively revealed |
+| Complete | (no attribute) | Full text visible, cursor removed |
+
+**Modes:**
+
+| Mode | Behavior |
+| --- | --- |
+| `char` | Classic typewriter, character by character |
+| `word` | Word-by-word reveal, ideal for long paragraphs |
+| `decode` | Scramble → resolve effect (sci-fi terminal feel) |
+| `cycle` | Rotates through a word list with configurable transitions |
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+  import KineticText from '@components/ui/KineticText.svelte';
+</script>
+
+<!-- Typewriter -->
+<KineticText text="Hello world" mode="char" cursor />
+
+<!-- Word-by-word paragraph -->
+<KineticText tag="p" text="Long paragraph..." mode="word" speed={80} cursor />
+
+<!-- Decode reveal -->
+<KineticText text="ACCESS GRANTED" mode="decode" speed={30} />
+
+<!-- Loading word cycler -->
+<KineticText words={['Synthesizing…', 'Calibrating…']} mode="cycle" cycleTransition="decode" />
+```
+
+**Physics:**
+- **Glass:** Smooth cursor glow via `--energy-primary`, `ease-in-out` blink timing
+- **Flat:** Clean `steps(2)` blink, `--text-main` cursor, 0.8x speed multiplier
+- **Retro:** Hard `steps(1)` block blink, `--energy-primary` cursor, ±30% per-tick timing jitter, uppercase-only scramble charset
+- **Light:** Neutral `--text-main` cursor, `steps(2)` blink
+
+**Showcase:** [/components → Effects](src/components/ui-library/Effects.svelte)
+
+---
+
+#### `<LoadingTextCycler>` — Cycling loading status label
+
+**Description:** Pre-configured `use:kinetic` wrapper for loading states. Cycles through a shuffled list of loading words ("Synthesizing…", "Calibrating…", etc.). First word is always "Synthesizing…"; remaining words shuffle randomly per mount. Internally uses `kinetic` action in `cycle` mode with `type` transition.
+**Location:** [src/components/ui/LoadingTextCycler.svelte](src/components/ui/LoadingTextCycler.svelte)
+**CSS:** `.loading-text-cycler` (scoped), inherits `.kinetic-text` and `.kinetic-cursor` from [src/styles/components/\_kinetic.scss](src/styles/components/_kinetic.scss)
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `words` | `string[]` | `LOADING_WORDS` | Word list (from `@config/constants`) |
+| `interval` | `number` | `2000` | Pause duration per word (ms) |
+| `cursor` | `boolean` | `true` | Show blinking cursor |
+| `speed` | `number` | `65` | Ms per character in type transition |
+| `class` | `string` | `''` | CSS passthrough |
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+  import LoadingTextCycler from '@components/ui/LoadingTextCycler.svelte';
+</script>
+
+<!-- Default loading cycler -->
+<LoadingTextCycler />
+
+<!-- Faster cycle with shorter pauses -->
+<LoadingTextCycler interval={1500} speed={40} />
+```
+
+**Physics:** Inherits all physics behavior from the `kinetic` action — glass glow cursor, flat stepped blink, retro jitter + block cursor.
 
 **Showcase:** [/components → Effects](src/components/ui-library/Effects.svelte)
 
@@ -2928,6 +3033,37 @@ No manual body padding or scroll offset adjustments needed — `data-has-breadcr
 
 ---
 
+### V. Kinetic Text (Typewriter / Decode / Cycle)
+
+```svelte
+<script lang="ts">
+  import KineticText from '@components/ui/KineticText.svelte';
+  import LoadingTextCycler from '@components/ui/LoadingTextCycler.svelte';
+</script>
+
+<!-- Typewriter with cursor -->
+<KineticText text="System online." mode="char" speed={65} cursor />
+
+<!-- Word-by-word paragraph -->
+<KineticText tag="p" text="Long paragraph content here..." mode="word" speed={80} cursor />
+
+<!-- Decode reveal (sci-fi cipher) -->
+<KineticText text="ACCESS GRANTED" mode="decode" speed={30} />
+
+<!-- Cycle through words with decode transition -->
+<KineticText
+  words={['Synthesizing…', 'Calibrating…', 'Traversing…']}
+  mode="cycle"
+  cycleTransition="decode"
+  speed={30}
+/>
+
+<!-- Pre-configured loading cycler -->
+<LoadingTextCycler />
+```
+
+---
+
 ### U. User State Hydration
 
 Import the singleton — all flags are derived reactively. No manual role checking needed.
@@ -3107,6 +3243,77 @@ Pair with the `@include navlink-loading` SCSS mixin on the target element for vi
   @include navlink-loading(text);
 }
 ```
+
+---
+
+### D. Kinetic Typography (`use:kinetic`)
+
+**Purpose:** Physics-aware text animation engine with four modes (char, word, cycle, decode)
+**Location:** [src/actions/kinetic.ts](src/actions/kinetic.ts)
+
+Provides both a Svelte action (`use:kinetic`) and a standalone class (`KineticEngine`) for programmatic use. The action auto-starts animation on mount, re-triggers on config change, and aborts on destroy. Physics profile is read from `document.documentElement.dataset.physics` at construction time.
+
+#### Config
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `text` | `string` | — | Text to animate (char, word, decode modes) |
+| `words` | `string[]` | — | Word list (cycle mode) |
+| `mode` | `'char' \| 'word' \| 'cycle' \| 'decode'` | `'char'` | Animation mode |
+| `speed` | `number` | `40` | Ms per animation unit |
+| `delay` | `number` | `0` | Initial delay before animation starts (ms) |
+| `cursor` | `boolean` | `false` | Show blinking cursor |
+| `cursorChar` | `string` | `'▍'` | Cursor character |
+| `cursorRemoveOnComplete` | `boolean` | `true` | Remove cursor after completion |
+| `pauseDuration` | `number` | `1800` | Pause per word in cycle mode (ms) |
+| `loop` | `boolean` | `true` | Loop cycle mode indefinitely |
+| `cycleTransition` | `'type' \| 'fade' \| 'decode'` | `'type'` | Transition between cycled words |
+| `fadeDuration` | `number` | `200` | Fade duration for `cycleTransition: 'fade'` (ms) |
+| `scrambleChars` | `string` | `A-Z a-z 0-9 !@#$%&*` | Characters used for scramble noise |
+| `scramblePasses` | `number` | `4` | Scramble iterations before resolving each character |
+| `onComplete` | `() => void` | — | Fires when animation ends |
+| `onCycle` | `(index, word) => void` | — | Fires on each word transition in cycle mode |
+
+#### Physics Profiles
+
+| Physics | Speed | Scramble | Timing | Cycle |
+| --- | --- | --- | --- | --- |
+| **Glass** | 1x | Default charset | Steady | Normal |
+| **Flat** | 0.8x | Default charset, -1 pass | Steady | Normal |
+| **Retro** | 1x | Uppercase-only (`A-Z 0-9 @#$%`) | ±30% jitter per tick | Normal |
+
+#### Usage (Action)
+
+```svelte
+<!-- Typewriter -->
+<span use:kinetic={{ text: 'Hello world', mode: 'char', speed: 40, cursor: true }} />
+
+<!-- Cycling loading text -->
+<span use:kinetic={{
+  words: ['Synthesizing…', 'Calibrating…', 'Traversing…'],
+  mode: 'cycle',
+  cycleTransition: 'decode',
+  speed: 30,
+  pauseDuration: 1800
+}} />
+```
+
+#### Usage (Standalone)
+
+```ts
+import { KineticEngine, typewrite } from '@actions/kinetic';
+
+// Class-based
+const engine = new KineticEngine(el, { text: 'Hello', mode: 'decode' });
+await engine.start();
+engine.abort();
+
+// Promise helper
+const handle = typewrite(el, 'Hello world', { speed: 30 });
+await handle; // or handle.abort();
+```
+
+**Accessibility:** Respects `prefers-reduced-motion` — immediately shows final text with no animation.
 
 ---
 

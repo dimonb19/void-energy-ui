@@ -32,11 +32,11 @@
     <LoadingPortal {status} />
   </div>
   <div
-    class="portal-layer portal-quill flex flex-col items-center justify-center gap-sm"
+    class="portal-layer portal-quill flex flex-col items-center justify-center gap-md"
   >
     {#if status === 'loading'}
       <LoadingQuill {status} data-size="4xl" />
-      <LoadingTextCycler class="portal-label hidden tablet:block" />
+      <LoadingTextCycler class="portal-label hidden tablet:block" cursor={false} />
     {/if}
   </div>
   {#if status === 'loading'}
@@ -110,6 +110,7 @@
   .portal-label {
     color: var(--energy-primary);
     font-size: var(--font-size-caption);
+    animation: portal-label-pulse 4s cubic-bezier(0.33, 1, 0.68, 1) infinite;
   }
 
   // ── Glass physics: quill bloom ──
@@ -121,6 +122,14 @@
 
     .portal-label {
       color: tint(var(--energy-primary), 50%);
+    }
+  }
+
+  // ── Retro: stepped label pulse ──
+  :global([data-physics='retro']) {
+    .portal-label {
+      animation-timing-function: steps(4);
+      animation-duration: 2s;
     }
   }
 
@@ -137,6 +146,24 @@
   :global([data-mode='light']) {
     .shadow-vignette {
       opacity: 0;
+    }
+  }
+
+  // ── Reduced motion: static label ──
+  @media (prefers-reduced-motion: reduce) {
+    .portal-label {
+      animation: none;
+    }
+  }
+
+  // ── Label pulse keyframe ──
+  @keyframes portal-label-pulse {
+    0%,
+    100% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
     }
   }
 </style>

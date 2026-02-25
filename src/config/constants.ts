@@ -31,3 +31,16 @@ export const UI_TOASTS = {
   ERROR: 'error',
   LOADING: 'loading',
 } as const;
+
+export const LOADING_WORDS = [
+  'Synthesizing…',
+  'Calibrating…',
+  'Mapping…',
+  'Resolving…',
+  'Aligning…',
+  'Rendering…',
+  'Connecting…',
+  'Traversing…',
+  'Tuning…',
+  'Assembling…',
+] as const;

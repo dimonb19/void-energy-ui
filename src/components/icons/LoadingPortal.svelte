@@ -216,8 +216,8 @@
   // ── Glass physics: bloom ──
   :global([data-physics='glass'] .icon-loading-portal[data-status='loading']) {
     :global(.outer-circuitry) {
-      filter: drop-shadow(0 0 6px var(--energy-primary)) // void-ignore
-        drop-shadow(0 0 18px var(--energy-primary)); // void-ignore
+      filter: drop-shadow(0 0 4px var(--energy-primary)) // void-ignore
+        drop-shadow(0 0 12px var(--energy-primary)); // void-ignore
     }
 
     .inner-circuitry {
