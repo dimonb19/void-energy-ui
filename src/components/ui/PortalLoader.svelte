@@ -30,8 +30,13 @@
   <div class="portal-layer portal-svg">
     <LoadingPortal {status} />
   </div>
-  <div class="portal-layer portal-quill flex items-center justify-center">
-    <LoadingQuill {status} data-size="4xl" />
+  <div
+    class="portal-layer portal-quill flex flex-col items-center justify-center gap-sm"
+  >
+    {#if status === 'loading'}
+      <LoadingQuill {status} data-size="4xl" />
+      <span class="portal-label hidden tablet:block">Synthesizing…</span>
+    {/if}
   </div>
   {#if status === 'loading'}
     <span class="sr-only">Loading</span>
@@ -49,7 +54,21 @@
     background-color: var(--bg-surface);
     border: var(--physics-border-width) solid var(--border-color);
     border-radius: var(--radius-base);
-    max-width: 768px; // void-ignore
+    @include respond-up('tablet') {
+      max-width: 640px; // void-ignore
+    }
+
+    @include respond-up('small-desktop') {
+      max-width: 768px; // void-ignore
+    }
+
+    @include respond-up('large-desktop') {
+      max-width: 900px; // void-ignore
+    }
+
+    @include respond-up('full-hd') {
+      max-width: 1024px; // void-ignore
+    }
   }
 
   // ── Shared absolute fill ──
@@ -87,10 +106,21 @@
     color: var(--energy-primary);
   }
 
+  .portal-label {
+    color: var(--energy-primary);
+    font-size: var(--font-size-caption);
+    opacity: 0;
+    animation: label-pulse 3s cubic-bezier(0.33, 1, 0.68, 1) infinite;
+  }
+
   // ── Glass physics: quill bloom ──
   :global([data-physics='glass']) {
     .portal-quill {
       filter: drop-shadow(0 0 6px var(--energy-primary)); // void-ignore
+      color: tint(var(--energy-primary), 50%);
+    }
+
+    .portal-label {
       color: tint(var(--energy-primary), 50%);
     }
   }
@@ -104,9 +134,44 @@
     }
   }
 
+  // ── Retro: stepped label pulse ──
+  :global([data-physics='retro']) {
+    .portal-label {
+      animation-timing-function: steps(4);
+    }
+  }
+
   // ── Light-specific: dim textures ──
   :global([data-mode='light']) {
     .shadow-vignette {
+      opacity: 0;
+    }
+  }
+
+  // ── Reduced motion: static label ──
+  @media (prefers-reduced-motion: reduce) {
+    .portal-label {
+      animation: none;
+      opacity: 0.5;
+    }
+  }
+
+  @keyframes label-pulse {
+    0%,
+    15% {
+      opacity: 0;
+    }
+    30% {
+      opacity: 0.4;
+    }
+    50% {
+      opacity: 0.7;
+    }
+    60% {
+      opacity: 0.5;
+    }
+    82%,
+    100% {
       opacity: 0;
     }
   }

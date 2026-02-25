@@ -1630,9 +1630,9 @@ The chip system includes additional semantic variants beyond the base:
 
 #### `<PortalLoader>` — Animated portal loading scene
 
-**Description:** Layered loading composition with circuit textures, animated SVG circuitry (`LoadingPortal`), and a centered quill icon (`LoadingQuill`). Fixed 2048×1228 aspect ratio, max-width 768px. Uses `role="status"` with visually-hidden text for screen reader announcements.
+**Description:** Layered loading composition with circuit textures, animated SVG circuitry (`LoadingPortal`), a centered quill icon (`LoadingQuill`), and a "Synthesizing…" label. Fixed 2048×1228 aspect ratio with responsive max-width (640px tablet → 768px small-desktop → 900px large-desktop → 1024px full-HD). Uses `role="status"` with visually-hidden text for screen reader announcements. Quill icon and label are conditionally rendered — only visible during `loading` state.
 **Location:** [src/components/ui/PortalLoader.svelte](src/components/ui/PortalLoader.svelte)
-**CSS:** `.portal-loader`, `.portal-layer`, `.portal-circuits`, `.shadow-vignette`, `.portal-svg`, `.portal-quill` (scoped)
+**CSS:** `.portal-loader`, `.portal-layer`, `.portal-circuits`, `.shadow-vignette`, `.portal-svg`, `.portal-quill`, `.portal-label` (scoped)
 
 **Props:**
 
@@ -1648,9 +1648,11 @@ The chip system includes additional semantic variants beyond the base:
 | Circuit texture | `.portal-circuits` | `z('floor')` | Static `circuits.webp` at 5% opacity |
 | Vignette | `.shadow-vignette` | `z('floor')` | Dark vignette overlay at 50% opacity |
 | SVG circuitry | `.portal-svg` | `z('decorate')` | `<LoadingPortal>` animated draw-on paths |
-| Quill icon | `.portal-quill` | `z('float')` | `<LoadingQuill>` centered, `data-size="4xl"` |
+| Quill + label | `.portal-quill` | `z('float')` | `<LoadingQuill>` + "Synthesizing…" label, conditionally rendered during `loading` |
 
 **Accessibility:** Container uses `role="status"` with a `<span class="sr-only">Loading</span>` that appears when `status === 'loading'`.
+
+**Label animation:** `.portal-label` pulses opacity on a 3s loop (`label-pulse` keyframes) synced with the quill's `--loop-duration`. Glass: tinted via `tint(--energy-primary, 50%)`. Retro: `steps(4)`. Reduced motion: static at `opacity: 0.5`.
 
 **Usage:**
 
@@ -1664,9 +1666,9 @@ The chip system includes additional semantic variants beyond the base:
 ```
 
 **Physics:**
-- **Glass:** Quill bloom glow via `drop-shadow`, tinted `--energy-primary`
+- **Glass:** Quill bloom glow via `drop-shadow`, tinted `--energy-primary`. Label tinted to match
 - **Flat:** Clean circuits, no glow, standard opacity
-- **Retro:** Atmosphere layers use `mix-blend-mode: normal`, no glow, zero border-radius
+- **Retro:** Atmosphere layers use `mix-blend-mode: normal`, no glow, zero border-radius. Label pulses with `steps(4)`
 - **Light:** Vignette hidden, atmosphere layers normalized
 
 ---
@@ -1920,7 +1922,7 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 | Icon | Type | Notes |
 | :--- | :--- | :--- |
 | `LoadingSpin` | Animated (custom) | Data fetching, backend requests, async operations. CSS `@keyframes rotate`, retro: `steps(8)` |
-| `LoadingQuill` | Animated (custom) | AI content generation, story game launching, creative AI processes. Multi-layer trace/fill/dot animation, retro: `steps(4-8)` |
+| `LoadingQuill` | Animated (custom) | AI content generation, story game launching, creative AI processes. Multi-layer trace/fill/dot animation, `data-status="idle\|loading"`, retro: `steps(4-8)` |
 | `LoadingPortal` | Animated (custom) | Portal loading scene circuitry. Non-square viewBox (2048×1228), staggered draw-on/draw-off path animation, `data-status="idle\|loading"`. Glass: bloom glow. Retro: stepped timing. Light: flat `--energy-primary` fill |
 | `LogoDGRS` | Logo (custom) | Non-square viewBox, `data-render="logo"` |
 | `LogoCoNexus` | Logo (custom) | Non-square viewBox, `data-render="logo"` |

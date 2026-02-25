@@ -177,8 +177,8 @@
       }
 
       .inner-circuitry path {
+        visibility: hidden;
         stroke-dashoffset: 0;
-        opacity: 0.5;
       }
     }
 
