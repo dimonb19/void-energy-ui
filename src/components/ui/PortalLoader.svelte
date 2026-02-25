@@ -1,6 +1,7 @@
 <script lang="ts">
   import LoadingPortal from '@components/icons/LoadingPortal.svelte';
   import LoadingQuill from '@components/icons/LoadingQuill.svelte';
+  import LoadingTextCycler from '@components/ui/LoadingTextCycler.svelte';
 
   interface Props {
     status?: 'idle' | 'loading';
@@ -35,7 +36,7 @@
   >
     {#if status === 'loading'}
       <LoadingQuill {status} data-size="4xl" />
-      <span class="portal-label hidden tablet:block">Synthesizing…</span>
+      <LoadingTextCycler class="portal-label hidden tablet:block" />
     {/if}
   </div>
   {#if status === 'loading'}
@@ -109,8 +110,6 @@
   .portal-label {
     color: var(--energy-primary);
     font-size: var(--font-size-caption);
-    opacity: 0;
-    animation: label-pulse 3s cubic-bezier(0.33, 1, 0.68, 1) infinite;
   }
 
   // ── Glass physics: quill bloom ──
@@ -134,44 +133,9 @@
     }
   }
 
-  // ── Retro: stepped label pulse ──
-  :global([data-physics='retro']) {
-    .portal-label {
-      animation-timing-function: steps(4);
-    }
-  }
-
   // ── Light-specific: dim textures ──
   :global([data-mode='light']) {
     .shadow-vignette {
-      opacity: 0;
-    }
-  }
-
-  // ── Reduced motion: static label ──
-  @media (prefers-reduced-motion: reduce) {
-    .portal-label {
-      animation: none;
-      opacity: 0.5;
-    }
-  }
-
-  @keyframes label-pulse {
-    0%,
-    15% {
-      opacity: 0;
-    }
-    30% {
-      opacity: 0.4;
-    }
-    50% {
-      opacity: 0.7;
-    }
-    60% {
-      opacity: 0.5;
-    }
-    82%,
-    100% {
       opacity: 0;
     }
   }

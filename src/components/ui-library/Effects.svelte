@@ -1,3 +1,7 @@
+<script lang="ts">
+  import LoadingTextCycler from '@components/ui/LoadingTextCycler.svelte';
+</script>
+
 <section id="effects" class="flex flex-col gap-md">
   <h2>11 // EFFECTS</h2>
 
@@ -114,6 +118,30 @@
       </p>
     </div>
 
+    <!-- ─── LOADING TEXT CYCLER ──────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Loading Text Cycler</h5>
+      <p class="text-small text-mute">
+        Cycles through a set of loading status words with physics-aware
+        enter/exit transitions. &ldquo;Synthesizing&hellip;&rdquo; always
+        appears first; remaining words shuffle randomly per mount. Each word
+        holds for ~2s before transitioning out.
+      </p>
+
+      <div
+        class="surface-sunk p-lg flex flex-col items-center justify-center gap-lg"
+      >
+        <LoadingTextCycler />
+      </div>
+
+      <p class="text-caption text-mute px-xs">
+        Transitions use <code>in:materialize</code> /
+        <code>out:dematerialize</code> &mdash; automatically adapting to glass blur,
+        flat sharp, and retro instant physics. Reduced motion: words switch instantly
+        with no animation.
+      </p>
+    </div>
+
     <details>
       <summary>View Code</summary>
       <pre><code
@@ -140,7 +168,11 @@
     border-radius: inherit;
     @include shimmer;
   &#125;
-&#125;</code
+&#125;
+
+&lt;!-- Loading text cycler --&gt;
+&lt;LoadingTextCycler /&gt;
+&lt;LoadingTextCycler interval=&#123;1500&#125; /&gt;</code
         ></pre>
     </details>
 
