@@ -2,6 +2,8 @@
   import PullRefresh from '@components/ui/PullRefresh.svelte';
   import PortalLoader from '@components/ui/PortalLoader.svelte';
 
+  let portalStatus = $state<'idle' | 'loading'>('loading');
+
   async function handleRefresh(): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 2000));
   }
@@ -16,16 +18,18 @@
     <h1 class="text-center">Coming soon...</h1>
 
     <div class="surface-glass p-lg flex flex-col gap-lg">
-      <ul class="flex flex-col gap-md">
-        <li>
-          <strong>Portal loader</strong> — transition sequence that plays when entering
-          a portal.
-        </li>
-        <li>
-          <strong>Kinetic typography</strong> — motion-driven text animations that
-          adds narrative rhythm to content.
-        </li>
+      <span class="flex flex-col gap-md items-center">
+        <PortalLoader status={portalStatus} />
+        <button
+          class="btn-ghost"
+          onclick={() =>
+            (portalStatus = portalStatus === 'loading' ? 'idle' : 'loading')}
+        >
+          {portalStatus === 'loading' ? 'Stop' : 'Start'}
+        </button>
+      </span>
 
+      <ul class="flex flex-col gap-md">
         <hr />
 
         <li>
@@ -46,8 +50,8 @@
       </ul>
     </div>
 
-    <div class="surface-glass flex justify-center p-lg">
-      <PortalLoader />
+    <div class="surface-glass flex flex-col items-center gap-lg p-lg">
+      
     </div>
   </div>
 </PullRefresh>

@@ -85,11 +85,11 @@
     // ── Idle state: quill at rest ──
     &[data-status='idle'] {
       .quill-fill {
-        opacity: 1;
+        opacity: 0;
       }
 
       .quill-dot {
-        opacity: 1;
+        opacity: 0;
       }
     }
 
