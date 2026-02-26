@@ -37,10 +37,12 @@
     <button class="btn-ghost btn-error" onclick={() => onCancel()}>
       {cancelText}
     </button>
+    <!-- svelte-ignore a11y_autofocus -- Dialog primary action; focus is already trapped by showModal() -->
     <button
       class="btn-success"
       onclick={onConfirm}
       use:tooltip={'Click to execute'}
+      autofocus
     >
       {confirmText}
     </button>

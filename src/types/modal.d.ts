@@ -37,6 +37,9 @@ type ModalContract = {
 
   /** Atmospheres selector */
   themes: {};
+
+  /** Keyboard shortcuts reference */
+  shortcuts: {};
 };
 
 type DemoLayout = 'compact' | 'comfortable';

@@ -1733,6 +1733,22 @@ See [toast.svelte.ts](src/stores/toast.svelte.ts) for state management.
 
 See [modal-manager.svelte.ts](src/lib/modal-manager.svelte.ts) for programmatic control.
 
+**Programmatic API:**
+
+```typescript
+import { modal } from '@lib/modal-manager.svelte';
+
+modal.alert('Title', 'Body text');
+modal.confirm('Delete?', 'Are you sure?', { onConfirm: () => deleteItem() });
+modal.settings();
+modal.themes();
+modal.shortcuts();       // Keyboard shortcuts reference
+```
+
+**Native Escape handling:** The `<dialog>` element's native `cancel` event (fired on Escape) is intercepted via `oncancel` and routed through `modal.close()` to keep modal manager state in sync.
+
+**Enter-to-confirm:** `ConfirmFragment` and `AlertFragment` use `autofocus` on the primary action button. Since `showModal()` auto-focuses the first `autofocus` element, Enter activates it natively — no custom keydown handler needed. Fragments without a primary action (Themes, Settings, Shortcuts) don't use autofocus.
+
 ---
 
 ### D. Gestures
@@ -2218,6 +2234,26 @@ Reactive singletons for app-wide state. Each store uses `$state` + `$derived` an
 ```
 
 **Showcase:** [/components → User State](src/components/ui-library/UserState.svelte)
+
+---
+
+#### Global Keyboard Shortcuts
+
+**Handler:** [src/components/Navigation.svelte](src/components/Navigation.svelte) (always-mounted, `<svelte:window onkeydown>`)
+**Help modal:** [src/components/modals/ShortcutsFragment.svelte](src/components/modals/ShortcutsFragment.svelte)
+
+| Key | Action | API |
+| --- | --- | --- |
+| `F` | Toggle browser fullscreen | `document.documentElement.requestFullscreen()` / `document.exitFullscreen()` |
+| `T` | Open Themes/Atmospheres modal | `modal.themes()` |
+| `?` | Show keyboard shortcuts help | `modal.shortcuts()` |
+
+**Safety guards:**
+- Suppressed inside `<input>`, `<textarea>`, and `contentEditable` elements (WCAG 2.1.4)
+- Suppressed when any modifier key is held (`Ctrl`, `Cmd`, `Alt`) — no browser conflicts
+- Suppressed when a modal is already open
+
+**Adding a new shortcut:** Add a `case` to the `switch` block in `Navigation.svelte`'s `onkeydown` handler. If the shortcut opens a modal, add the corresponding entry to `ShortcutsFragment.svelte`.
 
 ---
 

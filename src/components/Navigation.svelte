@@ -2,6 +2,7 @@
   import type { Component } from 'svelte';
 
   import { voidEngine } from '@adapters/void-engine.svelte';
+  import { modal } from '@lib/modal-manager.svelte';
   import ThemesBtn from './ui/ThemesBtn.svelte';
   import Breadcrumbs from './ui/Breadcrumbs.svelte';
 
@@ -117,6 +118,50 @@
 
   const selectTab = (event: Event, tabName: string) => {
     activeTab = tabName;
+  };
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Global Keyboard Shortcuts
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  function toggleFullscreen() {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      document.documentElement.requestFullscreen();
+    }
+  }
+
+  const onkeydown = (e: KeyboardEvent) => {
+    // Skip when focus is inside editable elements
+    const tag = (e.target as HTMLElement)?.tagName;
+    if (
+      tag === 'INPUT' ||
+      tag === 'TEXTAREA' ||
+      (e.target as HTMLElement)?.isContentEditable
+    )
+      return;
+
+    // Skip when any modifier is held (don't conflict with browser shortcuts)
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+    // Skip when a modal is open (modal has its own keyboard handling)
+    if (modal.state.key) return;
+
+    switch (e.key) {
+      case 'f':
+        e.preventDefault();
+        toggleFullscreen();
+        break;
+      case 't':
+        e.preventDefault();
+        modal.themes();
+        break;
+      case '?':
+        e.preventDefault();
+        modal.shortcuts();
+        break;
+    }
   };
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -296,7 +341,7 @@
   // ─────────────────────────────────────────────────────────────────────────────
 </script>
 
-<svelte:window {onscroll} {onmousemove} />
+<svelte:window {onscroll} {onmousemove} {onkeydown} />
 
 <nav
   class="nav-bar flex flex-row items-center justify-between tablet:justify-normal gap-xs px-xs"

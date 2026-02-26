@@ -15,7 +15,8 @@
   </div>
 
   <div class="flex flex-row justify-center">
-    <button class="btn-system" onclick={() => modal.close()}>
+    <!-- svelte-ignore a11y_autofocus -- Dialog primary action; focus is already trapped by showModal() -->
+    <button class="btn-system" onclick={() => modal.close()} autofocus>
       Acknowledge
     </button>
   </div>

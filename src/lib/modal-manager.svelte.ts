@@ -103,6 +103,13 @@ class ModalManager {
   themes() {
     this.open(MODAL_KEYS.THEMES, {}, 'lg');
   }
+
+  /**
+   * Opens the Keyboard Shortcuts reference modal.
+   */
+  shortcuts() {
+    this.open(MODAL_KEYS.SHORTCUTS, {}, 'sm');
+  }
 }
 
 export const modal = new ModalManager();

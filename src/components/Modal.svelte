@@ -59,6 +59,7 @@
   aria-labelledby="modal-title"
   aria-modal="true"
   onclick={handleBackdrop}
+  oncancel={() => modal.close()}
   ontransitionend={handleTransitionEnd}
 >
   {#if ActiveComponent}
