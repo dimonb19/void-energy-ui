@@ -1917,6 +1917,39 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 
 ---
 
+#### `<ProfileBtn>` — Role-aware profile trigger
+
+**Description:** Auth-aware avatar button for navbar use. Renders three states: guest (silhouette icon), Admin/Creator (role initial badge), Player (avatar image). Uses `.auth-only` / `.guest-only` for FOUC-safe switching.
+**Location:** [src/components/ui/ProfileBtn.svelte](src/components/ui/ProfileBtn.svelte)
+**CSS:** `.profile-avatar` ([src/styles/components/\_navigation.scss](src/styles/components/_navigation.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `size` | `string` | `'lg'` | Icon `data-size` for guest silhouette |
+| `class` | `string` | `''` | Additional CSS classes on the `<button>` |
+| `...rest` | `HTMLButtonAttributes` | — | All native button attributes (`onclick`, `disabled`, `aria-*`, etc.) |
+
+**Rendered States:**
+
+| Role | Visual | Element |
+| --- | --- | --- |
+| Guest | `Profile` silhouette icon | `.guest-only` |
+| Admin / Creator | Role initial letter badge (e.g. "A") | `.profile-avatar.auth-only` |
+| Player (with avatar) | Circular avatar image | `.profile-avatar.auth-only` |
+
+**Usage:**
+
+```svelte
+<ProfileBtn />
+<ProfileBtn size="xl" onclick={toggleMenu} aria-expanded={menuOpen} />
+```
+
+**Physics:** `.profile-avatar` inherits `--physics-border-width` for border, uses `--radius-full` for circle. Energy-colored background/border with alpha transparency.
+
+---
+
 #### Special Icons
 
 | Icon | Type | Notes |
@@ -3097,6 +3130,26 @@ Import the singleton — all flags are derived reactively. No manual role checki
 ```
 
 `UserScript.astro` is already in `Layout.astro` `<head>` — no setup needed. `.auth-only` / `.guest-only` classes work globally.
+
+---
+
+### V. Profile Button (Auth-Aware Avatar)
+
+```svelte
+<script lang="ts">
+  import ProfileBtn from '@components/ui/ProfileBtn.svelte';
+
+  let menuOpen = $state(false);
+</script>
+
+<!-- Navbar trigger -->
+<ProfileBtn onclick={() => (menuOpen = !menuOpen)} aria-expanded={menuOpen} />
+
+<!-- Custom size -->
+<ProfileBtn size="xl" />
+```
+
+Renders silhouette (guest), initial badge (Admin/Creator), or avatar (Player). FOUC-safe via `.auth-only` / `.guest-only` CSS. See `Navigation.svelte` for the full nav menu integration blueprint.
 
 ---
 

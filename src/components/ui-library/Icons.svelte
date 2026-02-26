@@ -24,6 +24,7 @@
   import Restart from '@components/icons/Restart.svelte';
   import Search from '@components/icons/Search.svelte';
   import Sort from '@components/icons/Sort.svelte';
+  import Sparkle from '@components/icons/Sparkle.svelte';
   import LoadingSpin from '@components/icons/LoadingSpin.svelte';
   import Switch from '@components/icons/Switch.svelte';
   import Voice from '@components/icons/Voice.svelte';
@@ -370,6 +371,11 @@
         <div class="flex flex-col items-center gap-xs">
           <IconBtn icon={Caret} size={iconSize} aria-label="Expand" />
           <span class="text-caption text-mute">Caret</span>
+        </div>
+
+        <div class="flex flex-col items-center gap-xs">
+          <IconBtn icon={Sparkle} size={iconSize} aria-label="Sparkle" />
+          <span class="text-caption text-mute">Sparkle</span>
         </div>
       </div>
     </div>
