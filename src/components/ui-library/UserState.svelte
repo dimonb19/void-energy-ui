@@ -2,6 +2,7 @@
   import { user } from '@stores/user.svelte';
   import { toast } from '@stores/toast.svelte';
   import Toggle from '../ui/Toggle.svelte';
+  import ProfileBtn from '../ui/ProfileBtn.svelte';
 
   const demoUsers: Record<string, VoidUser> = {
     admin: {
@@ -24,7 +25,7 @@
       id: 'usr_003',
       name: 'Agent Drift',
       email: 'drift@void.energy',
-      avatar: null,
+      avatar: 'https://api.dicebear.com/9.x/adventurer/svg?seed=drift',
       role_name: 'Player',
       approved_tester: false,
     },
@@ -77,7 +78,7 @@
     </details>
 
     <!-- CURRENT STATE -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Current State</h5>
       <div class="surface-sunk p-md flex flex-col gap-md">
         <p class="text-small">
@@ -107,7 +108,7 @@
     </div>
 
     <!-- LOGIN / LOGOUT -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Login / Logout</h5>
       <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
         <button class="btn-system" onclick={() => loginAs('admin')}>
@@ -128,7 +129,7 @@
     </div>
 
     <!-- ASYNC REFRESH (Two-Phase Hydration) -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Two-Phase Hydration</h5>
       <p class="text-small text-mute">
         Phase 1: synchronous cache read (constructor). Phase 2:
@@ -143,14 +144,37 @@
           {user.loading ? 'Verifying...' : 'Simulate Async Refresh'}
         </button>
       </div>
-      <p class="text-caption text-mute px-xs">
+      <p class="text-caption text-mute px-sm">
         Login first, then click to simulate a 1.5s API verification. The user
         name updates to confirm the refresh completed.
       </p>
     </div>
 
+    <!-- PROFILE BUTTON -->
+    <div class="flex flex-col gap-md">
+      <h5>Profile Button</h5>
+      <p class="text-small text-mute">
+        Role-aware avatar with tab styling for navbar use. Players show their
+        profile picture, Admins and Creators show a role initial badge, and
+        guests see a silhouette icon. The chevron signals a dropdown menu that
+        works for both auth states. Use the login buttons above to switch
+        between roles.
+      </p>
+      <div
+        class="surface-sunk p-md flex flex-wrap items-center justify-center gap-lg"
+      >
+        <ProfileBtn />
+      </div>
+      <p class="text-caption text-mute px-sm">
+        <strong>Player</strong> (avatar image) &middot;
+        <strong>Admin / Creator</strong> (initial badge) &middot;
+        <strong>Guest</strong> (silhouette icon). Login as each role to see the difference.
+        Hard-refresh (Cmd+Shift+R) to verify no avatar flash.
+      </p>
+    </div>
+
     <!-- FOUC PREVENTION -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>FOUC Prevention</h5>
       <p class="text-small text-mute">
         <code>UserScript.astro</code> sets <code>data-auth</code> on
@@ -174,8 +198,86 @@
       </div>
     </div>
 
+    <!-- NAV INTEGRATION -->
+    <div class="flex flex-col gap-md">
+      <h5>Nav Integration</h5>
+      <p class="text-small text-mute">
+        ProfileBtn is designed for navbar use with the built-in Nav Menu
+        Pattern. <code>Navigation.svelte</code> contains a step-by-step blueprint
+        for a burger-triggered dropdown menu with ProfileBtn as the trigger. The
+        pattern includes scrim, hover control, expandable sections, stagger animation,
+        and Escape-to-close.
+      </p>
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <p class="text-small">
+          <strong>How it works:</strong> The Nav Menu already supports embedding
+          custom components as menu items. ProfileBtn replaces the burger trigger
+          or sits alongside it. The dropdown renders different content per auth state
+          &mdash; full profile menu for signed-in users, limited options for guests.
+        </p>
+
+        <p class="text-small text-dim">
+          <strong>Key integration points:</strong>
+        </p>
+        <ul class="text-small text-dim flex flex-col gap-sm px-md">
+          <li>
+            Wrap the menu trigger in <code>.auth-only</code> /
+            <code>.guest-only</code> if the trigger itself should change per auth
+            state, or conditionally render menu items inside.
+          </li>
+          <li>
+            The <code>.subtab</code> class from the navigation SCSS provides correct
+            hover and active states for dropdown links.
+          </li>
+          <li>
+            Use <code>.submenu</code> for nested sections with stagger animation
+            via <code>--item-index</code>.
+          </li>
+          <li>
+            See <code>Navigation.svelte</code> for the full commented blueprint with
+            imports, state, and markup.
+          </li>
+        </ul>
+
+        <details>
+          <summary>View Pattern</summary>
+          <pre><code
+              >&lt;!-- In Navigation.svelte, replace ThemesBtn with ProfileBtn trigger --&gt;
+&lt;button
+  class="btn-void text-primary tab ml-auto"
+  onclick=&#123;() =&gt; (menuOpen = !menuOpen)&#125;
+  aria-expanded=&#123;menuOpen&#125;
+  aria-controls="profile-menu"
+&gt;
+  &lt;ProfileBtn /&gt;
+&lt;/button&gt;
+
+&lt;!-- Menu items adapt to auth state --&gt;
+&#123;#if menuOpen&#125;
+  &lt;div id="profile-menu" class="nav-menu" role="menu"&gt;
+    &#123;#if user.isAuthenticated&#125;
+      &lt;a class="subtab" href="/profile"&gt;My Profile&lt;/a&gt;
+      &lt;a class="subtab" href="/settings"&gt;Settings&lt;/a&gt;
+      &lt;hr /&gt;
+      &lt;button class="btn-ghost btn-error"&gt;Sign Out&lt;/button&gt;
+    &#123;:else&#125;
+      &lt;a class="subtab" href="/login"&gt;Sign In&lt;/a&gt;
+      &lt;a class="subtab" href="/register"&gt;Create Account&lt;/a&gt;
+    &#123;/if&#125;
+  &lt;/div&gt;
+&#123;/if&#125;</code
+            ></pre>
+        </details>
+      </div>
+      <p class="text-caption text-mute px-sm">
+        This demo app only has 2 pages, so the profile menu is not wired into
+        the actual navbar. The pattern is production-ready &mdash; uncomment and
+        adapt the blueprint in Navigation.svelte.
+      </p>
+    </div>
+
     <!-- DEVELOPER MODE -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Developer Mode</h5>
       <div class="surface-sunk p-md flex justify-center">
         <Toggle
@@ -184,7 +286,7 @@
           id="dev-mode-toggle"
         />
       </div>
-      <p class="text-caption text-mute px-xs">
+      <p class="text-caption text-mute px-sm">
         Local preference, not a server role. Resets on logout.
       </p>
     </div>

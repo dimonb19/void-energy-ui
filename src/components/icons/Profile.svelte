@@ -7,7 +7,7 @@
   xmlns="http://www.w3.org/2000/svg"
   viewBox="-75 -75 150 150"
   fill="currentColor"
-  class="icon {className ?? ''}"
+  class="icon-profile icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >

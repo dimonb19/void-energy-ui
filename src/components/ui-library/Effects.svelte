@@ -142,7 +142,7 @@
       <div class="flex flex-col gap-xs">
         <div class="flex items-center justify-between">
           <h6 class="text-small text-dim">Typewriter</h6>
-          <button class="btn-ghost" onclick={() => replayChar++}>
+          <button class="btn-icon" onclick={() => replayChar++}>
             <RotateCcw class="icon" data-size="sm" />
           </button>
         </div>
@@ -166,7 +166,7 @@
       <div class="flex flex-col gap-xs">
         <div class="flex items-center justify-between">
           <h6 class="text-small text-dim">Paragraph</h6>
-          <button class="btn-ghost" onclick={() => replayWord++}>
+          <button class="btn-icon" onclick={() => replayWord++}>
             <RotateCcw class="icon" data-size="sm" />
           </button>
         </div>
@@ -192,7 +192,7 @@
       <div class="flex flex-col gap-xs">
         <div class="flex items-center justify-between">
           <h6 class="text-small text-dim">Decode</h6>
-          <button class="btn-ghost" onclick={() => replayDecode++}>
+          <button class="btn-icon" onclick={() => replayDecode++}>
             <RotateCcw class="icon" data-size="sm" />
           </button>
         </div>
@@ -203,7 +203,8 @@
         </div>
         <p class="text-caption text-mute px-xs">
           Scramble-to-resolve effect. Characters resolve progressively from
-          random noise. Retro physics uses an uppercase-only character set.
+          random noise. Retro physics uses an uppercase-only character set with
+          reduced symbols for an authentic CRT look.
         </p>
       </div>
 
@@ -211,7 +212,7 @@
       <div class="flex flex-col gap-xs">
         <div class="flex items-center justify-between">
           <h6 class="text-small text-dim">Speed Comparison</h6>
-          <button class="btn-ghost" onclick={() => replaySpeed++}>
+          <button class="btn-icon" onclick={() => replaySpeed++}>
             <RotateCcw class="icon" data-size="sm" />
           </button>
         </div>
@@ -239,8 +240,8 @@
         </div>
         <p class="text-caption text-mute px-xs">
           Speed is configurable per instance via the <code>speed</code> prop (milliseconds
-          per character). Physics multipliers apply on top: flat runs at 0.8x, retro
-          adds &plusmn;30% jitter.
+          per unit). Physics multipliers apply on top: flat slows to 0.8&times; speed,
+          retro keeps normal speed but adds &plusmn;30% per-tick jitter.
         </p>
       </div>
 
@@ -248,7 +249,7 @@
       <div class="flex flex-col gap-xs">
         <div class="flex items-center justify-between">
           <h6 class="text-small text-dim">Cursor</h6>
-          <button class="btn-ghost" onclick={() => replayCursor++}>
+          <button class="btn-icon" onclick={() => replayCursor++}>
             <RotateCcw class="icon" data-size="sm" />
           </button>
         </div>
@@ -285,10 +286,10 @@
     <div class="flex flex-col gap-sm">
       <h5>Loading Text Cycler</h5>
       <p class="text-small text-mute">
-        Cycles through a set of loading status words with physics-aware
-        enter/exit transitions. &ldquo;Synthesizing&hellip;&rdquo; always
-        appears first; remaining words shuffle randomly per mount. Each word
-        holds for ~2s before transitioning out.
+        Cycles through a set of loading status words using the kinetic
+        action&rsquo;s type transition (character-by-character type and erase).
+        &ldquo;Synthesizing&hellip;&rdquo; always appears first; remaining words
+        shuffle randomly per mount. Each word holds for ~2s before cycling.
       </p>
 
       <div
@@ -298,9 +299,10 @@
       </div>
 
       <p class="text-caption text-mute px-xs">
-        Transitions use <code>in:materialize</code> /
-        <code>out:dematerialize</code> &mdash; automatically adapting to glass blur,
-        flat sharp, and retro instant physics. Reduced motion: words switch instantly
+        Uses the kinetic action&rsquo;s <code>cycleTransition="type"</code>
+        &mdash; each word is typed in character-by-character, then erased before
+        the next. Timing adapts to physics: glass runs smooth, flat slows to 0.8x,
+        retro adds &plusmn;30% per-tick jitter. Reduced motion: words switch instantly
         with no animation.
       </p>
     </div>
@@ -359,10 +361,13 @@
 
     <p class="text-caption text-mute px-xs">
       Both mixins are defined in
-      <code>src/styles/abstracts/_mixins.scss</code>. They reuse the
-      <code>shimmer</code> keyframe (4s infinite linear). Reduced motion:
-      animation stops globally via <code>_accessibility.scss</code>, text falls
-      back to static 30% <code>--text-main</code>.
+      <code>src/styles/abstracts/_mixins.scss</code>. Container shimmer uses the
+      <code>shimmer</code>
+      keyframe (4s infinite linear); text shimmer uses a separate
+      <code>shimmer-beam</code>
+      keyframe (2s infinite linear). Reduced motion: animation stops globally via
+      <code>_accessibility.scss</code>, text falls back to static 30%
+      <code>--text-main</code>.
     </p>
   </div>
 </section>

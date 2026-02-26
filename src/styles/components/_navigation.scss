@@ -461,3 +461,59 @@
   @include text-truncate(1);
   max-width: var(--space-5xl);
 }
+
+// ==========================================================================
+// 7. PROFILE AVATAR
+// ==========================================================================
+// Circular avatar badge showing the user's role initial letter or avatar image.
+// Lives inside ProfileBtn, rendered only when signed in.
+// Geometry (flex, shrink, overflow) lives on the element via Tailwind.
+// Width/height use token vars (no Tailwind mapping exists for w-md/h-md).
+//
+// USAGE:
+// <span class="profile-avatar flex items-center justify-center shrink-0 overflow-hidden">C</span>
+// <span class="profile-avatar flex items-center justify-center shrink-0 overflow-hidden">
+//   <img class="w-full h-full" src="..." />
+// </span>
+// ==========================================================================
+
+.profile-avatar {
+  // --- A. Sizing (token-requiring, no Tailwind mapping) ---
+  width: var(--space-md);
+  height: var(--space-md);
+  border-radius: var(--radius-full);
+
+  // --- B. Typography ---
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  text-transform: uppercase;
+
+  // --- C. Surface ---
+  background: alpha(var(--energy-primary), 15%);
+  color: var(--energy-primary);
+  border: var(--physics-border-width) solid alpha(var(--energy-primary), 30%);
+
+  // --- D. Transitions ---
+  transition:
+    background-color var(--speed-fast) var(--ease-spring-snappy),
+    border-color var(--speed-fast) var(--ease-spring-snappy),
+    color var(--speed-fast) var(--ease-spring-snappy);
+
+  // --- E. Avatar Image ---
+  img {
+    object-fit: cover;
+    border-radius: var(--radius-full);
+  }
+
+  // --- F. Physics Overrides ---
+  @include when-retro {
+    background: var(--bg-canvas);
+    border-color: var(--energy-primary);
+  }
+
+  @include when-light {
+    background: alpha(var(--energy-primary), 10%);
+    border-color: alpha(var(--energy-primary), 40%);
+  }
+}
