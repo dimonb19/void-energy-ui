@@ -478,6 +478,7 @@ button:not(.btn-void, .btn-icon),
     // --- D. Focus: Keep Ring, Hide Border ---
     &:focus-visible {
       border-color: transparent;
+      box-shadow: var(--focus-ring);
     }
 
     // --- E. Disabled ---
