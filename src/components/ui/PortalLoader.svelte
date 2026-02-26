@@ -36,7 +36,9 @@
   >
     {#if status === 'loading'}
       <LoadingQuill {status} data-size="4xl" />
-      <LoadingTextCycler class="portal-label hidden tablet:block" cursor={false} />
+      <span class="portal-label hidden tablet:block">
+        <LoadingTextCycler cursor={false} />
+      </span>
     {/if}
   </div>
   {#if status === 'loading'}
@@ -110,7 +112,7 @@
   .portal-label {
     color: var(--energy-primary);
     font-size: var(--font-size-caption);
-    animation: portal-label-pulse 4s cubic-bezier(0.33, 1, 0.68, 1) infinite;
+    animation: portal-label-pulse 3s var(--ease-spring-snappy) infinite;
   }
 
   // ── Glass physics: quill bloom ──
@@ -129,7 +131,7 @@
   :global([data-physics='retro']) {
     .portal-label {
       animation-timing-function: steps(4);
-      animation-duration: 2s;
+      animation-duration: 3s;
     }
   }
 
@@ -163,7 +165,7 @@
       opacity: 0.6;
     }
     50% {
-      opacity: 1;
+      opacity: 0.9;
     }
   }
 </style>

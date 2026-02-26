@@ -25,21 +25,23 @@
       <summary>Technical Details</summary>
       <div class="p-md flex flex-col gap-md">
         <p>
-          Both shimmer variants use a <code>background-image</code> gradient
+          Container shimmer uses a <code>background-image</code> gradient
           animated via <code>background-position</code> (400% width, 4s infinite
-          linear). Container shimmer applies to a
-          <code>::before</code> pseudo-element with
-          <code>position: absolute; inset: 0</code>. Text shimmer composes
-          <code>@include shimmer</code> with
-          <code>background-clip: text</code> to clip the same gradient to text glyphs,
-          with text at 30% opacity as the base.
+          linear), applied to a <code>::before</code> pseudo-element with
+          <code>position: absolute; inset: 0</code>. Text shimmer uses a
+          focused-beam technique: two-layer <code>background-clip: text</code>
+          with a solid muted base and a narrow bright beam that sweeps across (250%
+          width, 3s).
         </p>
         <p>
-          <strong>Glass/Flat dark:</strong> energy-primary at 15%.
+          <strong>Container &mdash; Glass/Flat dark:</strong> energy-primary at
+          15%.
           <strong>Light:</strong> full white.
-          <strong>Retro:</strong> 2% scan line using border-color. Text shimmer inherits
-          the same physics variants &mdash; it just clips the gradient to glyphs
-          instead of the surface.
+          <strong>Retro:</strong> 2% scan line.
+          <strong>Text &mdash; Dark:</strong> energy-primary beam over muted
+          base.
+          <strong>Light:</strong> text-main beam.
+          <strong>Retro:</strong> sharp scan-line beam.
         </p>
       </div>
     </details>
@@ -48,10 +50,10 @@
     <div class="flex flex-col gap-sm">
       <h5>Text Shimmer</h5>
       <p class="text-small text-mute">
-        <code>@include text-shimmer</code> composes
-        <code>@include shimmer</code> with <code>background-clip: text</code>
-        to clip the gradient to text glyphs. Text renders at 30% opacity with the
-        shimmer band sweeping across. Use on any text element during loading states.
+        <code>@include text-shimmer</code> uses a focused-beam technique: a
+        solid muted base layer with a narrow bright beam that sweeps across text
+        glyphs via <code>background-clip: text</code>. Use on any text element
+        during loading states.
       </p>
 
       <div class="surface-sunk p-lg flex flex-col gap-lg">
@@ -67,8 +69,8 @@
 
       <p class="text-caption text-mute px-xs">
         Apply <code>.text-shimmer</code> class or
-        <code>@include text-shimmer</code> in SCSS. Inherits all physics
-        variants from <code>@include shimmer</code> automatically.
+        <code>@include text-shimmer</code> in SCSS. Physics-aware: energy beam in
+        dark/glass, text-main beam in light, sharp scan-line in retro.
       </p>
     </div>
 

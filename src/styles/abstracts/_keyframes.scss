@@ -17,7 +17,19 @@
   }
 }
 
-// B. CYBER PULSE (Active States)
+// B. SHIMMER BEAM (Text Shimmer)
+// Used by: @include text-shimmer in _mixins.scss
+// Narrower sweep for focused-beam text effect (250% vs shimmer's 400%)
+@keyframes shimmer-beam {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -50% 0;
+  }
+}
+
+// C. CYBER PULSE (Active States)
 // Used by: glowing elements
 @keyframes cyber-pulse {
   0%,
@@ -31,7 +43,7 @@
   }
 }
 
-// C. ROTATE LASER (Gemini Button)
+// D. ROTATE LASER (Gemini Button)
 // Used by: .btn-cta via @include gemini-laser
 @keyframes rotate-laser {
   from {
@@ -42,7 +54,7 @@
   }
 }
 
-// D. ROTATE (Generic)
+// E. ROTATE (Generic)
 // Used by: loading spinners
 @keyframes rotate {
   from {
@@ -53,7 +65,7 @@
   }
 }
 
-// E. PROGRESS FILL
+// F. PROGRESS FILL
 // Used by: progress bars
 @keyframes progress-fill {
   from {
@@ -64,7 +76,7 @@
   }
 }
 
-// F. LOGO ENTRY (Holographic Materialization)
+// G. LOGO ENTRY (Holographic Materialization)
 // Used by: loading screens
 @keyframes logo-enter {
   0% {
@@ -79,7 +91,7 @@
   }
 }
 
-// G. STAGGER ENTRY (List item materialization)
+// H. STAGGER ENTRY (List item materialization)
 // Used by: Sidebar items, submenu items via --item-index CSS custom property
 // Svelte equivalent: in:materialize{{ delay: i * 50 }} (doesn't work in {#each}{#if} blocks)
 

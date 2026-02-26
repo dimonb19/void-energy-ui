@@ -104,7 +104,7 @@
       90deg,
       transparent 0%,
       transparent 35%,
-      rgb(255, 255, 255) 50%,
+      rgba(255, 255, 255, 0.6) 50%,
       transparent 65%,
       transparent 100%
     );
@@ -124,16 +124,57 @@
   }
 }
 
-// MIXIN: Text Shimmer
+// MIXIN: Text Shimmer (Focused Beam)
 // Usage: Include on any text element to create a text-clipped loading shimmer.
-// The shimmer sweeps across text glyphs (not the background).
-// Reuses the same `shimmer` keyframe as the container shimmer.
+// Two-layer technique: solid muted base + narrow bright beam sweep.
+// The base layer keeps text readable; the beam creates the "shine" effect.
 @mixin text-shimmer {
-  color: alpha(var(--text-main), 0.3);
   -webkit-background-clip: text;
   background-clip: text;
+  color: transparent;
+  background-size: 250% 100%;
+  animation: shimmer-beam 2s linear infinite;
 
-  @include shimmer;
+  // Dark mode default: muted text base + bright energy beam.
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      transparent 45%,
+      var(--energy-primary) 50%,
+      transparent 55%,
+      transparent 100%
+    ),
+    linear-gradient(var(--text-mute), var(--text-mute));
+
+  // Light mode: main-color beam over muted base.
+  @include when-light($low-specificity: true) {
+    background-image:
+      linear-gradient(
+        90deg,
+        transparent 0%,
+        transparent 45%,
+        var(--text-main) 50%,
+        transparent 55%,
+        transparent 100%
+      ),
+      linear-gradient(var(--text-mute), var(--text-mute));
+  }
+
+  // Retro: sharp scan-line beam over muted base.
+  @include when-retro($low-specificity: true) {
+    background-image:
+      linear-gradient(
+        90deg,
+        transparent 0%,
+        transparent 48%,
+        var(--energy-primary) 48%,
+        var(--energy-primary) 52%,
+        transparent 52%,
+        transparent 100%
+      ),
+      linear-gradient(var(--text-mute), var(--text-mute));
+  }
 }
 
 // MIXIN: Navlink Loading
