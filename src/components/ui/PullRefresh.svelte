@@ -120,6 +120,14 @@
 
   const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
+  /** Normalize wheel delta to pixels (Firefox reports line-mode deltas). */
+  function normalizeWheelDelta(e: WheelEvent): number {
+    const raw = Math.abs(e.deltaY);
+    if (e.deltaMode === 1) return raw * 16; // DOM_DELTA_LINE → ~16px per line
+    if (e.deltaMode === 2) return raw * window.innerHeight; // DOM_DELTA_PAGE
+    return raw; // DOM_DELTA_PIXEL (default in most browsers)
+  }
+
   /**
    * Walks up the DOM tree to find the nearest scrollable ancestor.
    * Returns window if no scrollable container is found.
@@ -342,8 +350,8 @@
 
     e.preventDefault();
 
-    // Accumulate wheel delta
-    wheelAccumulator += Math.abs(e.deltaY) * WHEEL_FACTOR;
+    // Accumulate wheel delta (normalized for Firefox line-mode)
+    wheelAccumulator += normalizeWheelDelta(e) * WHEEL_FACTOR;
     pullDistance = Math.min(maxPull, wheelAccumulator / RESISTANCE);
     pullState = pullDistance >= threshold ? 'threshold' : 'pulling';
 
@@ -400,20 +408,29 @@
   style:--pull-distance="{pullDistance}px"
   style:--pull-progress={progress}
   style:--pull-threshold="{threshold}px"
+  style:--circle-circumference={CIRCLE_CIRCUMFERENCE}
   bind:this={containerEl}
 >
   <!-- Indicator: Floats above content, revealed on pull -->
-  <div class="pull-indicator" use:morph={{ height: false, width: true }}>
+  <div
+    class="pull-indicator flex items-center gap-xs"
+    use:morph={{ height: false, width: true }}
+  >
     {#if pullState === 'done'}
-      <Check class="icon pull-checkmark" />
+      <Check class="icon pull-checkmark" aria-hidden="true" />
     {:else if pullState === 'error'}
-      <X class="icon pull-error" />
+      <X class="icon pull-error" aria-hidden="true" />
+    {:else if pullState === 'refreshing'}
+      <LoadingSpin class="text-main" data-size="lg" aria-hidden="true" />
     {:else}
-      {#if pullState === 'refreshing'}
-        <LoadingSpin class="text-main" data-size="lg" />
-      {:else}
-        <!-- Progress ring -->
-        <svg class="icon progress-ring" data-size="lg" viewBox="0 0 24 24">
+      <!-- Progress ring + arrow overlay -->
+      <div class="pull-ring-wrapper relative grid place-items-center">
+        <svg
+          class="icon progress-ring"
+          data-size="lg"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+        >
           <circle
             class="track"
             cx="12"
@@ -433,15 +450,15 @@
             stroke-dashoffset={strokeDashoffset}
           />
         </svg>
-      {/if}
-
-      <!-- Arrow icon (inside ring area) -->
-      {#if pullState !== 'refreshing'}
-        <ArrowDown class="icon pull-arrow" data-size="sm" />
-      {/if}
+        <ArrowDown class="icon pull-arrow" data-size="sm" aria-hidden="true" />
+      </div>
     {/if}
 
-    <p class="pull-message" role="status" aria-live="polite">{message}</p>
+    <!-- Screen reader announcement (always present, visually hidden on mobile) -->
+    <span class="sr-only" role="status">{message}</span>
+    <p class="pull-message hidden tablet:block">
+      {message}
+    </p>
   </div>
 
   <!-- Content: Translates down to reveal indicator -->

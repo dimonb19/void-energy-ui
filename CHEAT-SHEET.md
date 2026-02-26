@@ -1786,10 +1786,32 @@ async function handleRefresh() {
 **Interaction Model:**
 
 - **Touch:** Pull down → release at threshold → triggers refresh
-- **Wheel:** Scroll up at top → instant trigger when threshold crossed
+- **Wheel:** Scroll up at top → instant trigger when threshold crossed (normalized for Firefox line-mode deltas)
 - **Haptic:** Vibration pulse at threshold crossing (touch only)
 
+**Indicator Positioning:**
+
+The indicator emerges from behind the navbar using fixed positioning + transform. Accounts for:
+- Navbar visibility (`--nav-hidden`)
+- Breadcrumbs presence (`body[data-has-breadcrumbs]` sets `--breadcrumbs-offset`)
+- Pull distance (`--pull-distance`)
+
+On mobile, the indicator renders as an icon-only circular pill (equal padding). On tablet+, the status message is visible beside the icon.
+
+**Accessibility:**
+
+- All decorative icons carry `aria-hidden="true"` (status announced via `role="status"` span)
+- Screen reader text via `.sr-only` span; visible message on tablet+ only
+- Reduced motion: all transitions and draw animations disabled, icons render in final state
+
 **Physics:**
+
+- **Glass:** Default `glass-float` + `glass-blur` capsule surface
+- **Flat:** Standard surface with token-driven border/shadow
+- **Retro:** No blur, binary visibility (pops like terminal UI)
+- **Light:** Uses `--bg-surface` background
+
+**Tuning Constants:**
 
 - Rubber-band resistance: `2.0` (pull distance / resistance)
 - Activation threshold: `6px` (prevents accidental triggers)
@@ -3226,7 +3248,9 @@ When used inside a `<dialog>` element, morph automatically:
 **PullRefresh Indicator:**
 
 ```svelte
-<p class="pull-message" use:morph={{ height: false }}>{stateMessage}</p>
+<div class="pull-indicator flex items-center gap-xs" use:morph={{ height: false, width: true }}>
+  <!-- Icon swaps between states; morph animates width changes -->
+</div>
 ```
 
 ---

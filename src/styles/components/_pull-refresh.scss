@@ -34,11 +34,15 @@
   // Emerge from behind navbar, end up at same position as before (nav-height + space-md)
   // At idle: positioned within navbar zone (hidden by navbar's z-index)
   // At threshold+: emerges below navbar at the familiar position
+  //
+  // Y = [nav bottom] + [gap] + [breadcrumbs] − [start hidden] + [pull reveals] + [nav-hide adjust]
   --nav-offset: calc(var(--nav-hidden, 0) * var(--nav-height) * -1);
+  --breadcrumbs-offset: 0px;
   transform: translateX(-50%)
     translateY(
       calc(
-        var(--nav-height) + var(--space-md) - var(--pull-threshold) +
+        var(--nav-height) + var(--space-md) +
+          var(--breadcrumbs-offset) - var(--pull-threshold) +
           var(--pull-distance) + var(--nav-offset)
       )
     );
@@ -53,10 +57,10 @@
   padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-full);
 
-  // Layout
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
+  // Icon-only pill on mobile: equal padding for circular capsule
+  @include mobile-only {
+    padding: var(--space-xs);
+  }
 
   // Visibility based on pull progress
   opacity: var(--pull-progress);
@@ -90,7 +94,6 @@
   .pull-arrow {
     position: absolute;
     fill: none;
-    left: calc(var(--space-sm) + 0.25em); // Center on ring
     color: var(--text-main);
     transition: transform var(--speed-fast) var(--ease-spring-snappy);
     transform: scale(0.75);
@@ -165,6 +168,7 @@
 
   .pull-arrow {
     color: var(--energy-primary);
+    transform: scale(0.75) rotate(180deg);
   }
 
   .progress-ring .value {
@@ -198,7 +202,7 @@
 
   .progress-ring .value {
     stroke: var(--color-success);
-    stroke-dasharray: 62.83; // Full circle (2πr, r=10)
+    stroke-dasharray: var(--circle-circumference);
     stroke-dashoffset: 0;
   }
 
@@ -216,7 +220,7 @@
 
   .progress-ring .value {
     stroke: var(--color-error);
-    stroke-dasharray: 62.83; // Full circle (2πr, r=10)
+    stroke-dasharray: var(--circle-circumference);
     stroke-dashoffset: 0;
   }
 
@@ -244,11 +248,9 @@
   touch-action: pan-y;
 
   // Disable transition during active pull for immediate response
-  // Lock touch-action to prevent browser scroll interference
   [data-state='pulling'] > &,
   [data-state='threshold'] > & {
     transition: none;
-    touch-action: none;
     will-change: transform; // Compositor hint for layer promotion
   }
 }
@@ -264,18 +266,47 @@
 }
 
 // ==========================================================================
+// BREADCRUMBS OFFSET
+// ==========================================================================
+// When breadcrumbs are present, shift indicator below them.
+// Zeroes out when nav is hidden (breadcrumbs hide in sync).
+
+body[data-has-breadcrumbs] {
+  .pull-indicator {
+    --breadcrumbs-offset: calc(
+      var(--breadcrumbs-height) * (1 - var(--nav-hidden, 0))
+    );
+  }
+}
+
+// ==========================================================================
 // PHYSICS OVERRIDES
 // ==========================================================================
 
-// Retro: No blur (loading-spin retro handled via @include when-retro)
-[data-physics='retro'] {
-  .pull-indicator {
+// Glass: default glass-float + glass-blur applied on .pull-indicator — no overrides needed
+.pull-indicator {
+  @include when-glass {
+    // Inherits glass-float + glass-blur defaults
+  }
+}
+
+// Light: soften surface for light mode
+.pull-indicator {
+  @include when-light {
+    background: var(--bg-surface);
+  }
+}
+
+// Retro: No blur, binary visibility ("pops" like terminal UI)
+.pull-indicator {
+  @include when-retro {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
+}
 
-  // Binary visibility - no smooth fade, "pops" like terminal UI
-  .pull-refresh:not([data-state='idle']) .pull-indicator {
+.pull-refresh:not([data-state='idle']) .pull-indicator {
+  @include when-retro {
     opacity: 1;
   }
 }
