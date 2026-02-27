@@ -78,6 +78,11 @@
   let pendingPointerId: number | null = null;
   let pendingStartY = 0;
 
+  // Touch state (separate from pointer — touch events handle mobile)
+  let touchId: number | null = null;
+  let touchStartY = 0;
+  let touchPending = true;
+
   // Wheel state
   let wheelAccumulator = 0;
   let wheelTimeout: ReturnType<typeof setTimeout> | undefined;
@@ -87,6 +92,7 @@
 
   // DOM references
   let containerEl: HTMLDivElement | undefined = $state();
+  let pullContentEl: HTMLDivElement | undefined = $state();
   let scrollTarget: HTMLElement | Window | null = null;
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -158,6 +164,22 @@
     return (scrollTarget as HTMLElement).scrollTop;
   };
 
+  /** Find our tracked touch in a TouchList. */
+  function findTrackedTouch(touches: TouchList): Touch | null {
+    if (touchId === null) return null;
+    for (let i = 0; i < touches.length; i++) {
+      if (touches[i].identifier === touchId) return touches[i];
+    }
+    return null;
+  }
+
+  /** Release touch pull gesture and reset touch state. */
+  function releaseTouchPull() {
+    touchId = null;
+    touchPending = true;
+    releasePull();
+  }
+
   const canStartPull = (): boolean => {
     if (typeof window === 'undefined') return false;
     if (disabled) return false;
@@ -228,10 +250,14 @@
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
-  // Pointer Events (Touch + Mouse)
+  // Pointer Events (Mouse/Pen only — touch is handled by Touch Events below)
   // ─────────────────────────────────────────────────────────────────────────────
 
   function handlePointerDown(e: PointerEvent) {
+    // Touch input handled by touch events — skip to avoid double-handling.
+    // Pointer events don't fire reliably for touch when touch-action: pan-y
+    // gives the browser control of the vertical gesture.
+    if (e.pointerType === 'touch') return;
     if (!canStartPull() || !e.isPrimary) return;
 
     // Record intent only — don't activate until user drags down past threshold.
@@ -335,6 +361,118 @@
   }
 
   // ─────────────────────────────────────────────────────────────────────────────
+  // Touch Events (Mobile)
+  // Touch events fire BEFORE the browser claims the gesture via touch-action.
+  // By calling preventDefault() on touchmove when PTR conditions are met,
+  // we prevent the browser from swallowing the pull-down gesture.
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  function handleTouchStart(e: TouchEvent) {
+    if (!canStartPull()) return;
+    // Already tracking a finger — ignore additional touches
+    if (touchId !== null) return;
+
+    const touch = e.changedTouches[0];
+    touchId = touch.identifier;
+    touchStartY = touch.clientY;
+    touchPending = true;
+  }
+
+  function handleTouchMove(e: TouchEvent) {
+    const touch = findTrackedTouch(e.changedTouches);
+    if (!touch) return;
+
+    const deltaY = touch.clientY - touchStartY;
+
+    // Handle pending activation (before threshold crossed)
+    if (touchPending) {
+      // Moving up or scrolled away? Cancel pending gesture
+      if (deltaY < 0 || getScrollTop() > 0) {
+        touchId = null;
+        return;
+      }
+
+      // Activation threshold crossed — commit to pull gesture
+      if (deltaY >= ACTIVATION_THRESHOLD) {
+        if (!canStartPull()) {
+          touchId = null;
+          return;
+        }
+
+        touchPending = false;
+        isPulling = true;
+        startY = touchStartY;
+        pullState = 'pulling';
+
+        // Prevent browser from taking over this gesture
+        e.preventDefault();
+
+        pullDistance = Math.min(
+          maxPull,
+          (deltaY - ACTIVATION_THRESHOLD) / RESISTANCE,
+        );
+      }
+      return;
+    }
+
+    // Active pull gesture
+    if (!isPulling) return;
+
+    // Prevent scroll during active pull
+    e.preventDefault();
+
+    if (deltaY < 0) {
+      releaseTouchPull();
+      return;
+    }
+
+    if (getScrollTop() > 0) {
+      releaseTouchPull();
+      return;
+    }
+
+    // Apply resistance for rubber-band feel
+    pullDistance = Math.min(maxPull, deltaY / RESISTANCE);
+
+    // Update state with haptic feedback at threshold crossing
+    const newState: PullState =
+      pullDistance >= threshold ? 'threshold' : 'pulling';
+    if (newState === 'threshold' && pullState === 'pulling') {
+      navigator.vibrate?.(10);
+    }
+    pullState = newState;
+  }
+
+  function handleTouchEnd(e: TouchEvent) {
+    const touch = findTrackedTouch(e.changedTouches);
+    if (!touch) return;
+
+    // Clear pending gesture (tap propagates normally)
+    if (touchPending) {
+      touchId = null;
+      return;
+    }
+
+    if (!isPulling) {
+      touchId = null;
+      return;
+    }
+
+    touchId = null;
+    if (pullDistance >= threshold) {
+      triggerRefresh();
+    } else {
+      releasePull();
+    }
+  }
+
+  function handleTouchCancel(e: TouchEvent) {
+    if (findTrackedTouch(e.changedTouches)) {
+      releaseTouchPull();
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────────
   // Mouse Wheel (Desktop)
   // ─────────────────────────────────────────────────────────────────────────────
 
@@ -387,6 +525,26 @@
 
     el.addEventListener('wheel', handleWheel, { passive: false });
     return () => el.removeEventListener('wheel', handleWheel);
+  });
+
+  // Attach touch listeners with { passive: false } on touchmove to allow preventDefault.
+  // Svelte's ontouchmove attribute creates passive listeners by default in most browsers,
+  // which would throw when calling preventDefault(). Must use addEventListener instead.
+  $effect(() => {
+    const el = pullContentEl;
+    if (!el) return;
+
+    el.addEventListener('touchstart', handleTouchStart, { passive: true });
+    el.addEventListener('touchmove', handleTouchMove, { passive: false });
+    el.addEventListener('touchend', handleTouchEnd, { passive: true });
+    el.addEventListener('touchcancel', handleTouchCancel, { passive: true });
+
+    return () => {
+      el.removeEventListener('touchstart', handleTouchStart);
+      el.removeEventListener('touchmove', handleTouchMove);
+      el.removeEventListener('touchend', handleTouchEnd);
+      el.removeEventListener('touchcancel', handleTouchCancel);
+    };
   });
 
   // ─────────────────────────────────────────────────────────────────────────────
@@ -464,6 +622,7 @@
   <!-- Content: Translates down to reveal indicator -->
   <div
     class="pull-content"
+    bind:this={pullContentEl}
     onpointerdown={handlePointerDown}
     onpointermove={handlePointerMove}
     onpointerup={handlePointerUp}
