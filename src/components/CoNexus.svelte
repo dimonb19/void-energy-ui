@@ -86,10 +86,10 @@
         </div>
       </div>
 
-      <hr />
+      <!-- <hr /> -->
 
       <!-- ─── WHAT'S COMING ─────────────────────────────────────────── -->
-      <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+      <!-- <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
         <h3 class="text-dim">Coming Soon</h3>
         <p class="text-small text-mute">Features on the roadmap for CoNexus.</p>
       </div>
@@ -112,7 +112,7 @@
             that shift with theme and context.
           </li>
         </ul>
-      </div>
+      </div> -->
     </div>
   </div>
 </PullRefresh>
