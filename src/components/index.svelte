@@ -142,7 +142,7 @@
           animation) lives in SCSS. They never cross.
         </p>
 
-        <div class="flex flex-row gap-md">
+        <div class="flex flex-row flex-wrap gap-md">
           <div class="surface-sunk p-sm flex-1 flex flex-col gap-xs">
             <b class="text-small">Geometry</b>
             <code class="text-caption">flex gap-md p-lg</code>
