@@ -81,6 +81,10 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
     visibility var(--speed-base) var(--ease-spring-snappy),
     transform var(--speed-base) var(--ease-spring-snappy);
 
+  @include mobile-only {
+    transition-timing-function: var(--ease-flow);
+  }
+
   background: var(--bg-surface);
   border-bottom: var(--physics-border-width) solid transparent;
   box-shadow: none;
@@ -231,6 +235,10 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
   top: calc((var(--nav-height) + var(--safe-top)) * (1 - var(--nav-hidden, 0)));
   z-index: z('sticky');
   transition: top var(--speed-base) var(--ease-spring-bounce);
+
+  @include mobile-only {
+    transition-timing-function: var(--ease-flow);
+  }
 
   // Desktop: transparent wrapper, no sticky behavior
   // (the sidebar inside handles its own sticky positioning)

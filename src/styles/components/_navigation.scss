@@ -63,6 +63,10 @@
   transition: transform var(--speed-base) var(--ease-spring-bounce);
   transform: translateY(calc(-1 * var(--space-md)));
 
+  @include mobile-only {
+    transition-timing-function: var(--ease-flow);
+  }
+
   &[data-hidden='true'] {
     transform: translateY(-100%);
   }
@@ -391,6 +395,10 @@
 
   // --- D. Hide-on-scroll transition (synced with nav-bar) ---
   transition: transform var(--speed-base) var(--ease-spring-bounce);
+
+  @include mobile-only {
+    transition-timing-function: var(--ease-flow);
+  }
 
   &[data-hidden='true'] {
     transform: translateY(
