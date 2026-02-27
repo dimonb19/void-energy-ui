@@ -246,6 +246,10 @@ export class VoidEngine {
       return;
     }
 
+    // Update theme-color meta BEFORE the view transition so Safari picks up
+    // the new status bar color before capturing the old-state snapshot.
+    this.updateThemeColorMeta(name);
+
     // Use View Transitions API for smooth theme transitions
     document.startViewTransition(() => {
       this.atmosphere = name;
@@ -292,6 +296,19 @@ export class VoidEngine {
     }
 
     // Note: do not call syncDOM() here; ThemeScript already painted the DOM.
+  }
+
+  /**
+   * Update <meta name="theme-color"> eagerly (before View Transition snapshot).
+   * Mirrors the resolution logic in void-boot.js applyTheme().
+   */
+  private updateThemeColorMeta(name: string) {
+    const meta = document.querySelector('meta[name="theme-color"]');
+    if (!meta) return;
+    const entry = this.registry[name];
+    if (!entry) return;
+    const color = (entry as any).canvas || entry.palette?.['bg-canvas'] || null;
+    if (color) meta.setAttribute('content', color);
   }
 
   private syncDOM() {
