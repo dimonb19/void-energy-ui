@@ -79,7 +79,7 @@
 </script>
 
 <section id="icons" class="flex flex-col gap-md">
-  <h2>04 // ICONS</h2>
+  <h2>05 // ICONS</h2>
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Two-tier icon system: hand-crafted animated icons for interactive

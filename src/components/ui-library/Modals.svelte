@@ -4,7 +4,7 @@
 </script>
 
 <section id="modals" class="flex flex-col gap-md">
-  <h2>11 // MODALS & DIALOGS</h2>
+  <h2>12 // MODALS & DIALOGS</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">

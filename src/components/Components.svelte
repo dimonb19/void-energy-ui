@@ -7,6 +7,7 @@
   import Typography from './ui-library/Typography.svelte';
   import Surfaces from './ui-library/Surfaces.svelte';
   import Prose from './ui-library/Prose.svelte';
+  import Globals from './ui-library/Globals.svelte';
   // Primitives
   import Icons from './ui-library/Icons.svelte';
   import Buttons from './ui-library/Buttons.svelte';
@@ -31,6 +32,7 @@
         { id: 'typography', label: 'Typography' },
         { id: 'surfaces', label: 'Surfaces' },
         { id: 'prose', label: 'Prose & Content' },
+        { id: 'globals', label: 'Global Treatments' },
       ],
     },
     {
@@ -179,6 +181,7 @@
           <Typography />
           <Surfaces />
           <Prose />
+          <Globals />
 
           <hr />
 
