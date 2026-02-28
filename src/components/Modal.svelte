@@ -1,8 +1,10 @@
 <script lang="ts">
   import { modal } from '@lib/modal-manager.svelte';
   import { modalRegistry } from '@config/modal-registry';
+  import { layerStack } from '@lib/layer-stack.svelte';
 
   let dialog = $state<HTMLDialogElement | null>(null);
+  let layerId: number | null = null;
 
   // Visual buffers to avoid flicker during close animation.
   // Problem: If we immediately null the component on close, the exit transition
@@ -29,9 +31,18 @@
         dialog.showModal();
         document.dispatchEvent(new CustomEvent('void:modal-opened'));
       }
+
+      if (layerId !== null) {
+        layerStack.remove(layerId);
+      }
+      layerId = layerStack.push(() => modal.close());
     } else if (!modal.state.key && dialog?.open) {
+      if (layerId !== null) {
+        layerStack.remove(layerId);
+        layerId = null;
+      }
+
       dialog.close();
-      // Keep renderedProps to preserve the fading element.
     }
   });
 
@@ -59,7 +70,7 @@
   aria-labelledby="modal-title"
   aria-modal="true"
   onclick={handleBackdrop}
-  oncancel={() => modal.close()}
+  oncancel={(e) => e.preventDefault()}
   ontransitionend={handleTransitionEnd}
 >
   {#if ActiveComponent}

@@ -42,6 +42,7 @@
     flip,
     shift,
   } from '@floating-ui/dom';
+  import { layerStack } from '@lib/layer-stack.svelte';
 
   interface DropdownProps {
     trigger: Snippet;
@@ -74,6 +75,7 @@
 
   let cleanupAutoUpdate: (() => void) | null = null;
   let generation = 0;
+  let layerId: number | null = null;
 
   function toggle() {
     open = !open;
@@ -94,6 +96,11 @@
     try {
       panelEl.showPopover();
     } catch {}
+
+    layerId = layerStack.push(() => {
+      close();
+      triggerEl?.focus();
+    });
 
     cleanupAutoUpdate = autoUpdate(triggerEl, panelEl, () => {
       if (!panelEl || !triggerEl) return;
@@ -117,6 +124,11 @@
     });
 
     return () => {
+      if (layerId !== null) {
+        layerStack.remove(layerId);
+        layerId = null;
+      }
+
       if (cleanupAutoUpdate) {
         cleanupAutoUpdate();
         cleanupAutoUpdate = null;
@@ -161,22 +173,6 @@
 
     document.addEventListener('click', handleClick, true);
     return () => document.removeEventListener('click', handleClick, true);
-  });
-
-  // Escape key (registered only while open)
-  $effect(() => {
-    if (!open) return;
-
-    function handleKeydown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        close();
-        triggerEl?.focus();
-      }
-    }
-
-    document.addEventListener('keydown', handleKeydown);
-    return () => document.removeEventListener('keydown', handleKeydown);
   });
 </script>
 

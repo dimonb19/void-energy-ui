@@ -2152,7 +2152,7 @@ modal.themes();
 modal.shortcuts();       // Keyboard shortcuts reference
 ```
 
-**Native Escape handling:** The `<dialog>` element's native `cancel` event (fired on Escape) is intercepted via `oncancel` and routed through `modal.close()` to keep modal manager state in sync.
+**Escape handling:** Managed by the centralized [layer-stack.svelte.ts](src/lib/layer-stack.svelte.ts). The native `<dialog>` cancel event is suppressed (`e.preventDefault()`); the layer stack's global `keydown` listener pops the modal via `modal.close()`. This ensures correct precedence when a dropdown or sidebar is open above a modal — Escape dismisses the topmost layer first (LIFO).
 
 **Enter-to-confirm:** `ConfirmFragment` and `AlertFragment` use `autofocus` on the primary action button. Since `showModal()` auto-focuses the first `autofocus` element, Enter activates it natively — no custom keydown handler needed. Fragments without a primary action (Themes, Settings, Shortcuts) don't use autofocus.
 
@@ -2659,7 +2659,7 @@ Reactive singletons for app-wide state. Each store uses `$state` + `$derived` an
 **Safety guards** (enforced by registry's `handle()` method):
 - Suppressed inside `<input>`, `<textarea>`, and `contentEditable` elements (WCAG 2.1.4)
 - Suppressed when any modifier key is held (`Ctrl`, `Cmd`, `Alt`) — no browser conflicts
-- Suppressed when a modal is already open
+- Suppressed when any dismissible layer is open (modal, dropdown, sidebar) — via `layerStack.hasLayers`
 - Conflict detection: `console.warn` on duplicate key, last-write-wins
 
 **Adding a new shortcut:** Call `shortcutRegistry.register({ key, label, group, action })` from any always-mounted component. The entry automatically appears in the Shortcuts modal.
@@ -2671,6 +2671,28 @@ shortcutRegistry.register({ key: 'f', label: 'Toggle fullscreen', group: 'Genera
 shortcutRegistry.unregister('f');
 shortcutRegistry.entries;    // VoidShortcutEntry[] (reactive)
 shortcutRegistry.grouped;    // { group: string, items: VoidShortcutEntry[] }[]
+```
+
+#### Escape Layer Stack
+
+**Singleton:** [src/lib/layer-stack.svelte.ts](src/lib/layer-stack.svelte.ts)
+
+Centralized LIFO stack for Escape key dismissal. Each dismissible surface (modal, dropdown, sidebar) pushes a layer when it opens and removes it when it closes. A single global `keydown` listener pops the topmost layer on Escape.
+
+| Surface | Push site | Dismiss callback |
+| --- | --- | --- |
+| Modal | `Modal.svelte` `$effect` on `modal.state.key` | `modal.close()` |
+| Dropdown | `Dropdown.svelte` positioning `$effect` | `close()` + `triggerEl.focus()` |
+| Sidebar | `Sidebar.svelte` open `$effect` | `open = false` + `onclose?.()` |
+
+**Element-scoped handlers** (EditField, EditTextarea, GenerateField, GenerateTextarea) are NOT registered. They call `e.preventDefault()` on the `<input>`/`<textarea>` keydown, which the layer stack respects via its `defaultPrevented` guard.
+
+```ts
+import { layerStack } from '@lib/layer-stack.svelte';
+
+const id = layerStack.push(() => { /* dismiss logic */ });
+layerStack.remove(id);       // On non-Escape close (click-outside, programmatic)
+layerStack.hasLayers;         // true if any layers are on the stack
 ```
 
 ---

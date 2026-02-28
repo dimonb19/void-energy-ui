@@ -20,7 +20,9 @@
       <p class="p-md">
         Modals use the native <code>&lt;dialog&gt;</code> element managed by the
         <code>modal</code> singleton. Opening captures the trigger element's
-        focus; closing restores it. The dialog uses
+        focus; closing restores it. Escape dismissal is handled by the
+        <code>layerStack</code> &mdash; if a dropdown is open above a modal,
+        Escape closes the dropdown first. The dialog uses
         <code>glass-float</code> + <code>glass-blur</code> physics and
         transitions via CSS <code>@starting-style</code>. Three sizes:
         <code>sm</code>, <code>md</code>, <code>lg</code>.

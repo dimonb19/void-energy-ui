@@ -1,5 +1,6 @@
 <script lang="ts">
   import { materialize, dematerialize } from '@lib/transitions.svelte';
+  import { layerStack } from '@lib/layer-stack.svelte';
 
   // ─────────────────────────────────────────────────────────────────────────
   // Types
@@ -102,21 +103,18 @@
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // Keyboard — Escape closes dropdown
+  // Keyboard — Escape closes sidebar (via layer stack)
   // ─────────────────────────────────────────────────────────────────────────
 
   $effect(() => {
     if (!open) return;
 
-    function onKeydown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        open = false;
-        onclose?.();
-      }
-    }
+    const id = layerStack.push(() => {
+      open = false;
+      onclose?.();
+    });
 
-    window.addEventListener('keydown', onKeydown);
-    return () => window.removeEventListener('keydown', onKeydown);
+    return () => layerStack.remove(id);
   });
 
   // ─────────────────────────────────────────────────────────────────────────

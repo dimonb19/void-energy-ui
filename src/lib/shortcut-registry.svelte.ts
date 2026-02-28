@@ -1,6 +1,6 @@
 /* Keyboard shortcut registry. Document-level keydown handler with input guards. */
 
-import { modal } from '@lib/modal-manager.svelte';
+import { layerStack } from '@lib/layer-stack.svelte';
 
 class ShortcutRegistry {
   /** Reactive list of all registered shortcuts (consumed by ShortcutsFragment). */
@@ -56,8 +56,8 @@ class ShortcutRegistry {
     // Guard: skip when any modifier is held (don't conflict with browser shortcuts)
     if (e.ctrlKey || e.metaKey || e.altKey) return;
 
-    // Guard: skip when a modal is open (modal has its own keyboard handling)
-    if (modal.state.key) return;
+    // Guard: skip when any dismissible layer is open (modal, dropdown, sidebar)
+    if (layerStack.hasLayers) return;
 
     // Dispatch
     const entry = this.map.get(e.key);

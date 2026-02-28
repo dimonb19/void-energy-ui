@@ -113,7 +113,7 @@ src/
     ui-library/     Showcase/demo pages for the component library
   config/           Design tokens (SSOT), modal registry, font registry, constants
   layouts/          Astro layouts
-  lib/              Modal manager, transitions, tooltip logic, void-boot
+  lib/              Modal manager, layer stack, transitions, tooltip logic, void-boot
   pages/            Astro pages
   stores/           Reactive state (toast, user)
   styles/
@@ -270,6 +270,16 @@ Registry: src/config/modal-registry.ts (add new fragments here)
 .loading(message)                          Returns controller: { update, success, error, warning, close }
 .promise(promise, { loading, success, error })
 ```
+
+### Layer Stack (`import { layerStack } from '@lib/layer-stack.svelte'`)
+```
+.push(dismiss)                      Push a dismissible layer. Returns layer ID.
+.remove(id)                         Remove a layer by ID (safe for stale IDs).
+.hasLayers                          Whether any layers are on the stack (getter).
+```
+Escape pops the topmost layer (LIFO). Registered layers: Modal, Dropdown, Sidebar.
+Element-scoped handlers (EditField, EditTextarea, GenerateField) use `e.preventDefault()`
+which the stack respects via `defaultPrevented` check — no double-dismissal.
 
 ### Shortcut Registry (`import { shortcutRegistry } from '@lib/shortcut-registry.svelte'`)
 ```
