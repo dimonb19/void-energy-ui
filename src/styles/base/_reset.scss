@@ -258,6 +258,43 @@ video {
   background-color: var(--bg-sink);
 }
 
+// Alt text styling — shown when image fails to load.
+img {
+  font-style: italic;
+  font-size: var(--font-size-small);
+  color: var(--text-mute);
+}
+
+audio {
+  display: block;
+  width: 100%;
+  accent-color: var(--energy-primary);
+}
+
+iframe {
+  display: block;
+  max-width: 100%;
+  border: var(--physics-border-width) solid var(--border-color);
+  border-radius: var(--radius-base);
+  background-color: var(--bg-sink);
+}
+
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+// Bare popover reset — establishes sane defaults for all [popover] elements.
+// Class-based popovers (.dropdown-panel, .toast-region) add further overrides.
+[popover] {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  inset: unset;
+}
+
 ul,
 ol {
   list-style: none;

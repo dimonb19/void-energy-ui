@@ -1,0 +1,151 @@
+/* Base table element styling with physics-aware variants. */
+
+@use '../abstracts' as *;
+
+// ==========================================================================
+// TABLES
+// ==========================================================================
+//
+// Base styling for native <table> and related elements.
+// Physics variants via when-glass / when-retro / when-light mixins.
+//
+// OPT-IN CLASSES:
+//   .table-responsive  — horizontal scroll wrapper for narrow viewports
+//   .table-striped     — alternating row backgrounds on tbody
+// ==========================================================================
+
+// 1. TABLE ELEMENT
+// --------------------------------------------------------------------------
+// void-hybrid-exception: border-collapse, border-spacing, and table-layout
+// are table-specific structural properties with no Tailwind equivalent.
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  text-align: start;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--font-size-small);
+  color: var(--text-dim);
+
+  @include when-retro($low-specificity: true) {
+    border: var(--physics-border-width) solid var(--border-color);
+  }
+}
+
+// 2. CAPTION
+// --------------------------------------------------------------------------
+// Mirrors figcaption pattern in _prose.scss.
+
+caption {
+  caption-side: bottom;
+  padding-block: var(--space-xs);
+  font-size: var(--font-size-caption);
+  color: var(--text-mute);
+  text-align: start;
+  font-style: italic;
+}
+
+// 3. CELLS (th, td)
+// --------------------------------------------------------------------------
+
+th,
+td {
+  padding-block: calc(var(--space-xs) * 0.75);
+  padding-inline: var(--space-sm);
+  text-align: start;
+  vertical-align: middle;
+  border-bottom: var(--physics-border-width) solid var(--border-color);
+
+  transition:
+    background-color var(--speed-fast) var(--ease-spring-snappy),
+    border-color var(--speed-fast) var(--ease-spring-snappy);
+
+  @include when-retro($low-specificity: true) {
+    border: var(--physics-border-width) solid var(--border-color);
+  }
+}
+
+// 4. COLUMN HEADERS
+// --------------------------------------------------------------------------
+
+thead th {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-mute);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  border-bottom-width: calc(var(--physics-border-width) * 2);
+  border-bottom-color: var(--energy-secondary);
+
+  @include when-retro($low-specificity: true) {
+    border-bottom-width: var(--physics-border-width);
+    border-bottom-color: var(--border-color);
+    background: alpha(var(--energy-secondary), 10%);
+  }
+}
+
+// 5. FOOTER
+// --------------------------------------------------------------------------
+
+tfoot td,
+tfoot th {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-dim);
+  border-top: calc(var(--physics-border-width) * 2) solid var(--border-color);
+  border-bottom: none;
+}
+
+// 6. ROW HOVER
+// --------------------------------------------------------------------------
+
+tbody tr {
+  @media (hover: hover) {
+    &:hover {
+      background-color: alpha(var(--energy-primary), 5%);
+
+      @include when-glass($low-specificity: true) {
+        background-color: alpha(var(--energy-primary), 8%);
+      }
+
+      @include when-light($low-specificity: true) {
+        background-color: alpha(var(--energy-primary), 5%);
+      }
+
+      @include when-retro($low-specificity: true) {
+        background-color: alpha(var(--energy-primary), 15%);
+      }
+    }
+  }
+}
+
+// 7. STRIPED ROWS (opt-in)
+// --------------------------------------------------------------------------
+
+.table-striped tbody tr:nth-child(even) {
+  background-color: alpha(var(--bg-sink), 50%);
+
+  @include when-glass($low-specificity: true) {
+    background-color: alpha(var(--bg-sink), 30%);
+  }
+
+  @include when-retro($low-specificity: true) {
+    background-color: alpha(var(--energy-secondary), 8%);
+  }
+
+  @include when-light($low-specificity: true) {
+    background-color: alpha(var(--bg-sink), 60%);
+  }
+}
+
+// 8. RESPONSIVE WRAPPER
+// --------------------------------------------------------------------------
+
+.table-responsive {
+  // void-hybrid-exception: overflow-x: auto is structural wrapper behavior
+  // for table horizontal scrolling, not arbitrary layout.
+  width: 100%;
+  overflow-x: auto;
+  @include laser-scrollbar;
+}

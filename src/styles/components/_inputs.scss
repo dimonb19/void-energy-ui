@@ -135,6 +135,27 @@ input[type='radio'] {
     cursor: not-allowed;
     filter: none;
   }
+
+  // Glass: glow on checked state.
+  @include when-glass {
+    &:checked {
+      filter: drop-shadow(0 0 3px var(--energy-primary));
+    }
+  }
+
+  // Retro: chunkier controls.
+  @include when-retro {
+    transform: scale(1.15);
+  }
+
+  // Hover enhancement (hover-capable devices only).
+  @media (hover: hover) {
+    &:hover {
+      @include when-glass {
+        filter: drop-shadow(0 0 2px var(--energy-primary));
+      }
+    }
+  }
 }
 
 // 6. FILE DROPZONE (Native Overlay Strategy)
@@ -270,11 +291,28 @@ fieldset {
   border: var(--physics-border-width) solid var(--border-color);
   border-radius: var(--radius-base);
 
-  transition: border-color var(--speed-fast) var(--ease-spring-snappy);
+  transition:
+    border-color var(--speed-fast) var(--ease-spring-snappy),
+    box-shadow var(--speed-fast) var(--ease-spring-snappy);
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+  }
+
+  // Focus-within: highlight when any child input is focused.
+  &:focus-within {
+    border-color: var(--energy-primary);
+
+    @include when-glass {
+      box-shadow: 0 0 0 var(--physics-border-width)
+        alpha(var(--energy-primary), 20%);
+    }
+  }
+
+  // Retro: double-width border for grouping emphasis.
+  @include when-retro {
+    border-width: calc(var(--physics-border-width) * 2);
   }
 }
 
@@ -283,6 +321,13 @@ legend {
   font-size: var(--font-size-small);
   font-weight: var(--font-weight-medium);
   color: var(--text-dim);
+
+  transition: color var(--speed-fast) var(--ease-spring-snappy);
+
+  // Legend highlights when fieldset has focus.
+  fieldset:focus-within > & {
+    color: var(--energy-primary);
+  }
 }
 
 // 10. DETAILS & SUMMARY (Native Disclosure)
@@ -390,5 +435,227 @@ summary {
     outline: none;
     box-shadow: var(--focus-ring);
     border-radius: var(--radius-base) var(--radius-base) 0 0;
+  }
+}
+
+// 11. PROGRESS BAR
+// --------------------------------------------------------------------------
+// void-hybrid-exception: progress height is a physics-dependent visual
+// property (retro uses taller bars, glass uses thinner). display: block on
+// a replaced element has no Tailwind equivalent targeting the element type.
+
+progress {
+  appearance: none;
+  -webkit-appearance: none;
+
+  display: block;
+  width: 100%;
+  height: calc(var(--space-xs) * 0.5);
+  border: none;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+
+  // Track.
+  background: var(--bg-sink);
+
+  // Firefox: fill color via color property.
+  color: var(--energy-primary);
+
+  transition: background-color var(--speed-fast) var(--ease-spring-snappy);
+
+  // WebKit/Blink track.
+  &::-webkit-progress-bar {
+    background: var(--bg-sink);
+    border-radius: var(--radius-full);
+  }
+
+  // WebKit/Blink fill.
+  &::-webkit-progress-value {
+    background: var(--energy-primary);
+    border-radius: var(--radius-full);
+    transition: width var(--speed-base) var(--ease-spring-snappy);
+  }
+
+  // Firefox fill.
+  &::-moz-progress-bar {
+    background: var(--energy-primary);
+    border-radius: var(--radius-full);
+  }
+
+  // Indeterminate state (no value attribute).
+  &:not([value]) {
+    background-size: 400% 100%;
+    animation: shimmer 2s infinite linear;
+    background-image: linear-gradient(
+      90deg,
+      var(--bg-sink) 0%,
+      var(--bg-sink) 20%,
+      alpha(var(--energy-primary), 40%) 50%,
+      var(--bg-sink) 80%,
+      var(--bg-sink) 100%
+    );
+
+    &::-webkit-progress-value {
+      background: transparent;
+    }
+
+    @include when-retro {
+      animation: shimmer 4s infinite steps(4);
+      background-image: linear-gradient(
+        90deg,
+        var(--bg-sink) 0%,
+        var(--bg-sink) 44%,
+        var(--border-color) 44%,
+        var(--border-color) 46%,
+        var(--bg-sink) 46%,
+        var(--bg-sink) 100%
+      );
+    }
+  }
+
+  // Glass: glowing fill.
+  @include when-glass {
+    &::-webkit-progress-value {
+      box-shadow: 0 0 var(--space-xs) alpha(var(--energy-primary), 60%);
+    }
+  }
+
+  // Retro: squared, slightly taller.
+  @include when-retro {
+    border-radius: 0;
+    height: calc(var(--space-xs) * 0.75);
+
+    &::-webkit-progress-bar {
+      border-radius: 0;
+    }
+
+    &::-webkit-progress-value {
+      border-radius: 0;
+    }
+
+    &::-moz-progress-bar {
+      border-radius: 0;
+    }
+  }
+
+  // Light: darker track for visibility.
+  @include when-light {
+    background: alpha(var(--border-color), 30%);
+
+    &::-webkit-progress-bar {
+      background: alpha(var(--border-color), 30%);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// 12. METER
+// --------------------------------------------------------------------------
+// Same dimensions as progress for visual consistency.
+// Three semantic ranges: optimum (success), sub-optimum (premium/amber),
+// danger (error).
+
+meter {
+  appearance: none;
+  -webkit-appearance: none;
+
+  display: block;
+  width: 100%;
+  height: calc(var(--space-xs) * 0.5);
+  border: none;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+
+  // Track.
+  background: var(--bg-sink);
+
+  // WebKit track.
+  &::-webkit-meter-bar {
+    background: var(--bg-sink);
+    border: none;
+    border-radius: var(--radius-full);
+  }
+
+  // Optimum range (green).
+  &::-webkit-meter-optimum-value {
+    background: var(--color-success);
+    border-radius: var(--radius-full);
+  }
+
+  // Sub-optimum range (amber/gold).
+  &::-webkit-meter-suboptimum-value {
+    background: var(--color-premium);
+    border-radius: var(--radius-full);
+  }
+
+  // Danger range (red).
+  &::-webkit-meter-even-less-good-value {
+    background: var(--color-error);
+    border-radius: var(--radius-full);
+  }
+
+  // Firefox: color property controls fill. Defaults to optimum.
+  color: var(--color-success);
+
+  // Glass: glow on optimum value.
+  @include when-glass {
+    &::-webkit-meter-optimum-value {
+      box-shadow: 0 0 var(--space-xs) alpha(var(--color-success), 50%);
+    }
+  }
+
+  // Retro: squared, slightly taller.
+  @include when-retro {
+    border-radius: 0;
+    height: calc(var(--space-xs) * 0.75);
+
+    &::-webkit-meter-bar,
+    &::-webkit-meter-optimum-value,
+    &::-webkit-meter-suboptimum-value,
+    &::-webkit-meter-even-less-good-value {
+      border-radius: 0;
+    }
+  }
+
+  // Light: darker track for visibility.
+  @include when-light {
+    background: alpha(var(--border-color), 30%);
+
+    &::-webkit-meter-bar {
+      background: alpha(var(--border-color), 30%);
+    }
+  }
+}
+
+// 13. OUTPUT
+// --------------------------------------------------------------------------
+// Computed value display element. Styled as a data pill — monospace font,
+// subtle energy-tinted background, pill shape.
+
+output {
+  display: inline-block;
+  font-family: var(--font-code);
+  font-size: var(--font-size-small);
+  font-weight: var(--font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  color: var(--energy-primary);
+  padding-inline: var(--space-xs);
+
+  background: alpha(var(--energy-primary), 10%);
+  border-radius: var(--radius-full);
+
+  @include when-light {
+    background: alpha(var(--energy-primary), 8%);
+    color: var(--text-main);
+  }
+
+  @include when-retro {
+    border-radius: 0;
+    border: var(--physics-border-width) solid var(--energy-primary);
+    background: transparent;
   }
 }

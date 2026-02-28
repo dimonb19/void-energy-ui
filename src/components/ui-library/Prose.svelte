@@ -603,5 +603,258 @@ E = mc&lt;sup&gt;2&lt;/sup&gt;
         >.prose</code
       > class is the recommended scope for user-generated or markdown-rendered content.
     </p>
+
+    <!-- ─── TABLES ───────────────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Tables</h5>
+      <p class="text-small text-mute">
+        Raw <code>&lt;table&gt;</code> elements are styled automatically &mdash;
+        no classes needed. Numbers align with <code>tabular-nums</code>, cell
+        padding scales with density, and borders adapt per physics preset. Hover
+        any row to see the highlight. Opt-in classes:
+        <code>.table-striped</code> for alternating rows,
+        <code>.table-responsive</code> for horizontal scrolling.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-col gap-lg">
+        <!-- Default table -->
+        <table>
+          <caption>Subsystem Power Allocation</caption>
+          <thead>
+            <tr>
+              <th>Module</th>
+              <th>Status</th>
+              <th>Power (kW)</th>
+              <th>Uptime</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Navigation</td>
+              <td>Online</td>
+              <td>12.4</td>
+              <td>99.97%</td>
+            </tr>
+            <tr>
+              <td>Propulsion</td>
+              <td>Standby</td>
+              <td>4.8</td>
+              <td>98.20%</td>
+            </tr>
+            <tr>
+              <td>Communications</td>
+              <td>Online</td>
+              <td>8.1</td>
+              <td>99.99%</td>
+            </tr>
+            <tr>
+              <td>Life Support</td>
+              <td>Online</td>
+              <td>22.6</td>
+              <td>100.00%</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td>Total</td>
+              <td></td>
+              <td>47.9</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+
+        <!-- Striped table -->
+        <p class="text-small text-dim">
+          With <code>.table-striped</code>:
+        </p>
+        <table class="table-striped">
+          <thead>
+            <tr>
+              <th>Region</th>
+              <th>Q1</th>
+              <th>Q2</th>
+              <th>Q3</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              ><td>North</td><td>$12,400</td><td>$15,200</td><td>$14,800</td
+              ></tr
+            >
+            <tr
+              ><td>South</td><td>$9,800</td><td>$11,100</td><td>$10,500</td></tr
+            >
+            <tr
+              ><td>East</td><td>$14,200</td><td>$16,800</td><td>$15,900</td></tr
+            >
+            <tr
+              ><td>West</td><td>$11,600</td><td>$13,400</td><td>$12,700</td></tr
+            >
+            <tr
+              ><td>Central</td><td>$8,300</td><td>$9,700</td><td>$9,100</td></tr
+            >
+          </tbody>
+        </table>
+
+        <!-- Responsive table -->
+        <p class="text-small text-dim">
+          With <code>.table-responsive</code> (scroll horizontally on narrow viewports):
+        </p>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Operator</th>
+                <th>Mission</th>
+                <th>Launch</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th>Fuel %</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>VE-001</td>
+                <td>Chen, A.</td>
+                <td>Proxima Survey</td>
+                <td>2186-03-14</td>
+                <td>847d</td>
+                <td>Active</td>
+                <td>62.4%</td>
+              </tr>
+              <tr>
+                <td>VE-002</td>
+                <td>Okafor, N.</td>
+                <td>Belt Extraction</td>
+                <td>2186-07-01</td>
+                <td>234d</td>
+                <td>Return</td>
+                <td>31.8%</td>
+              </tr>
+              <tr>
+                <td>VE-003</td>
+                <td>Volkov, D.</td>
+                <td>Titan Relay</td>
+                <td>2187-01-20</td>
+                <td>1,204d</td>
+                <td>Active</td>
+                <td>84.1%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;!-- Default table (no classes needed) --&gt;
+&lt;table&gt;
+  &lt;caption&gt;Subsystem Power Allocation&lt;/caption&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;&lt;th&gt;Module&lt;/th&gt;&lt;th&gt;Status&lt;/th&gt;&lt;th&gt;Power (kW)&lt;/th&gt;&lt;th&gt;Uptime&lt;/th&gt;&lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;&lt;td&gt;Navigation&lt;/td&gt;&lt;td&gt;Online&lt;/td&gt;&lt;td&gt;12.4&lt;/td&gt;&lt;td&gt;99.97%&lt;/td&gt;&lt;/tr&gt;
+    &lt;tr&gt;&lt;td&gt;Propulsion&lt;/td&gt;&lt;td&gt;Standby&lt;/td&gt;&lt;td&gt;4.8&lt;/td&gt;&lt;td&gt;98.20%&lt;/td&gt;&lt;/tr&gt;
+  &lt;/tbody&gt;
+  &lt;tfoot&gt;
+    &lt;tr&gt;&lt;td&gt;Total&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;td&gt;47.9&lt;/td&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;
+  &lt;/tfoot&gt;
+&lt;/table&gt;
+
+&lt;!-- Striped rows (opt-in) --&gt;
+&lt;table class="table-striped"&gt;...&lt;/table&gt;
+
+&lt;!-- Responsive scroll wrapper --&gt;
+&lt;div class="table-responsive"&gt;
+  &lt;table&gt;...wide table...&lt;/table&gt;
+&lt;/div&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        Switch atmospheres to see table borders, hover effects, and header
+        treatments change across glass, flat, and retro. Retro shows full grid
+        borders on every cell. Numbers align in columns via
+        <code>tabular-nums</code>.
+      </p>
+    </div>
+
+    <!-- ─── MEDIA DEFAULTS ───────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Media Defaults</h5>
+      <p class="text-small text-mute">
+        Base responsive defaults for media elements. All media is
+        <code>display: block; max-width: 100%</code> by default.
+        <code>&lt;img&gt;</code> alt text renders in italic muted style when the
+        image fails to load. <code>&lt;iframe&gt;</code> gets a physics border
+        and radius. <code>&lt;audio&gt;</code> inherits
+        <code>accent-color</code> from the energy-primary token.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <p class="text-small text-dim">
+          Broken image &mdash; alt text fallback (italic, muted, small):
+        </p>
+        <!-- svelte-ignore a11y_missing_attribute a11y_img_redundant_alt -->
+        <img
+          src="/this-image-does-not-exist.webp"
+          alt="This alt text is displayed when the image fails to load — notice the italic styling and muted color"
+        />
+
+        <p class="text-small text-dim">
+          <code>&lt;audio&gt;</code> with native controls &mdash;
+          <code>accent-color</code> matches the active atmosphere:
+        </p>
+        <audio controls>
+          <source src="" type="audio/mpeg" />
+          Your browser does not support the audio element.
+        </audio>
+
+        <p class="text-small text-dim">
+          <code>&lt;iframe&gt;</code> &mdash; physics border, radius, and sink background:
+        </p>
+        <iframe
+          src="about:blank"
+          title="Empty iframe demonstrating base styling"
+          style="height: 5rem;"
+        ></iframe>
+
+        <p class="text-small text-dim">
+          <code>&lt;canvas&gt;</code> &mdash; block display, responsive:
+        </p>
+        <canvas width="400" height="60" style="background: var(--bg-sink);"
+        ></canvas>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;!-- Responsive image (block, max-width: 100%, height: auto) --&gt;
+&lt;img src="photo.webp" alt="Description" /&gt;
+
+&lt;!-- Audio with accent-color --&gt;
+&lt;audio controls&gt;
+  &lt;source src="track.mp3" type="audio/mpeg" /&gt;
+&lt;/audio&gt;
+
+&lt;!-- Iframe with physics border --&gt;
+&lt;iframe src="https://example.com" title="Embedded content"&gt;&lt;/iframe&gt;
+
+&lt;!-- Canvas (block, responsive) --&gt;
+&lt;canvas width="400" height="200"&gt;&lt;/canvas&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        Aspect ratios use Tailwind utilities:
+        <code>aspect-video</code> (16/9), <code>aspect-square</code> (1/1). The
+        <code>[popover]</code> attribute has a global UA reset (margin, padding,
+        border, inset cleared) so custom popovers start from a clean slate.
+      </p>
+    </div>
   </div>
 </section>

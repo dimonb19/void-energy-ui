@@ -11,6 +11,9 @@
 3. [Responsive & Spacing (Density Engine)](#3-responsive--spacing-density-engine)
    - [Base Inline Text Semantics](#d-base-inline-text-semantics)
    - [Base Prose & Lists](#e-base-prose--lists)
+   - [Base Tables](#f-base-tables)
+   - [Form Element Enhancements](#g-form-element-enhancements)
+   - [Media & Interactive Elements](#h-media--interactive-elements)
 4. [Component Catalog](#4-component-catalog)
    - [Surfaces](#a-surfaces-the-skin)
    - [Composites](#b-composites-skin--bone)
@@ -671,6 +674,170 @@ Enables list markers and definition list formatting inside a scoped wrapper. Req
 ```
 
 **HCM (High Contrast Mode):** `<mark>` maps to `Highlight`/`HighlightText`, `<blockquote>` border maps to `ButtonText`.
+
+---
+
+### F. Base Tables
+
+Base styling for native `<table>` elements. No classes required — a raw table looks designed out of the box.
+
+**Source:** [src/styles/base/\_tables.scss](src/styles/base/_tables.scss)
+
+| Element | Visual Treatment |
+| --- | --- |
+| `<table>` | Full-width, collapsed borders, `tabular-nums`, small font |
+| `<caption>` | Bottom-aligned, italic, muted caption (mirrors `<figcaption>`) |
+| `<thead> <th>` | Uppercase label convention (caption size, semibold, letter-spaced), double-weight energy-secondary bottom border |
+| `<th>`, `<td>` | Density-aware padding, start-aligned, bottom border |
+| `<tfoot>` | Medium weight, double-weight top border, no bottom border |
+| `<tbody> <tr>` | Hover highlight (gated behind `@media (hover: hover)`) |
+
+**Physics:**
+
+| Physics | Visual |
+| --- | --- |
+| **Glass** | 8% energy-primary hover glow on rows |
+| **Flat** | 5% energy-primary hover tint, clean borders |
+| **Retro** | Full grid borders (all four sides on every cell), 15% hover highlight, energy-secondary header background |
+
+**Opt-in classes:**
+
+| Class | Purpose |
+| --- | --- |
+| `.table-striped` | Alternating even-row backgrounds on `<tbody>` |
+| `.table-responsive` | Horizontal scroll wrapper with styled scrollbar |
+
+**Usage:**
+
+```html
+<div class="table-responsive">
+  <table>
+    <caption>Monthly revenue by region</caption>
+    <thead>
+      <tr><th>Region</th><th>Q1</th><th>Q2</th><th>Q3</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>North</td><td>$12,400</td><td>$15,200</td><td>$14,800</td></tr>
+      <tr><td>South</td><td>$9,800</td><td>$11,100</td><td>$10,500</td></tr>
+    </tbody>
+    <tfoot>
+      <tr><td>Total</td><td>$22,200</td><td>$26,300</td><td>$25,300</td></tr>
+    </tfoot>
+  </table>
+</div>
+```
+
+---
+
+### G. Form Element Enhancements
+
+Physics-aware enhancements for native form elements. These build on top of the existing input/checkbox/radio styling in [\_inputs.scss](src/styles/components/_inputs.scss).
+
+#### Checkbox & Radio — Physics Enhancement
+
+Native `appearance: auto` is preserved. Physics adds subtle differentiation on top of `accent-color`.
+
+| Physics | Visual |
+| --- | --- |
+| **Glass** | `drop-shadow` glow on `:checked` state, subtle glow on hover |
+| **Flat** | `accent-color` only (no additional treatment) |
+| **Retro** | `scale(1.15)` — chunkier controls |
+
+#### Fieldset & Legend — Focus Enhancement
+
+| State | Visual |
+| --- | --- |
+| Default | Physics border, density-aware padding |
+| `:focus-within` | Border turns `--energy-primary`, legend text turns `--energy-primary` |
+| `:focus-within` (glass) | Adds outer glow ring |
+| Retro | Double-width border for grouping emphasis |
+
+#### `<progress>` — Custom Styled Progress Bar
+
+**Source:** [src/styles/components/\_inputs.scss](src/styles/components/_inputs.scss) (section 11)
+
+Fully custom-styled via `::-webkit-progress-bar`, `::-webkit-progress-value`, `::-moz-progress-bar`. Pill-shaped with `--radius-full`, density-scaled height.
+
+| State | Visual |
+| --- | --- |
+| Determinate | Energy-primary fill bar, smooth width transition |
+| Indeterminate (`<progress>` without `value`) | Shimmer animation across track |
+
+| Physics | Visual |
+| --- | --- |
+| **Glass** | Glowing fill bar (`box-shadow`) |
+| **Flat** | Solid fill, clean edges |
+| **Retro** | Squared (no radius), taller, stepped shimmer animation |
+| **Light** | Darker track for visibility |
+
+```html
+<!-- Determinate -->
+<progress value="65" max="100"></progress>
+
+<!-- Indeterminate -->
+<progress></progress>
+```
+
+#### `<meter>` — Value Meter with Semantic Ranges
+
+**Source:** [src/styles/components/\_inputs.scss](src/styles/components/_inputs.scss) (section 12)
+
+Same dimensions as `<progress>` for consistency. Three semantic color ranges driven by the browser's `low`/`high`/`optimum` attribute logic:
+
+| Range | Color Token |
+| --- | --- |
+| Optimum | `--color-success` (green) |
+| Sub-optimum | `--color-premium` (amber/gold) |
+| Danger | `--color-error` (red) |
+
+Physics differentiation matches `<progress>` (glass glow, retro squared, light darker track).
+
+```html
+<meter min="0" max="100" low="25" high="75" optimum="80" value="90"></meter>
+<meter min="0" max="100" low="25" high="75" optimum="80" value="50"></meter>
+<meter min="0" max="100" low="25" high="75" optimum="80" value="10"></meter>
+```
+
+#### `<output>` — Computed Value Display
+
+**Source:** [src/styles/components/\_inputs.scss](src/styles/components/_inputs.scss) (section 13)
+
+Styled as a data pill — monospace font, `tabular-nums`, energy-tinted background, pill shape.
+
+| Physics | Visual |
+| --- | --- |
+| **Glass/Flat** | Energy-primary text, alpha'd energy background pill |
+| **Light** | Softer tint, main text color |
+| **Retro** | Squared border, transparent background |
+
+```html
+<form oninput="result.value = parseInt(a.value) + parseInt(b.value)">
+  <input type="range" id="a" value="50"> +
+  <input type="number" id="b" value="25"> =
+  <output name="result" for="a b">75</output>
+</form>
+```
+
+---
+
+### H. Media & Interactive Elements
+
+Base defaults for media and interactive HTML elements.
+
+**Source:** [src/styles/base/\_reset.scss](src/styles/base/_reset.scss)
+
+| Element | Treatment |
+| --- | --- |
+| `<img>` | Block, responsive (`max-width: 100%; height: auto`), sink background, italic alt text fallback |
+| `<picture>`, `<video>` | Block, responsive, sink background |
+| `<audio>` | Block, full-width, `accent-color` matches energy-primary |
+| `<iframe>` | Block, responsive, physics border + radius, sink background |
+| `<canvas>` | Block, responsive |
+| `[popover]` | UA reset (margin, padding, border, inset cleared). Class-based popovers add their own physics on top. |
+
+**The `<img>` alt text trick:** When an image fails to load, `font-style: italic` + `font-size: var(--font-size-small)` + `color: var(--text-mute)` makes the alt text visually distinct from surrounding content.
+
+**Aspect ratios:** Use Tailwind's built-in `aspect-video` (16/9) and `aspect-square` (1/1) utilities. No SCSS duplicates.
 
 ---
 

@@ -52,6 +52,14 @@
 
   // Details demo
   let detailsRange = $state(75);
+
+  // Progress demo
+  let progressValue = $state(65);
+
+  // Output demo
+  let outputA = $state(50);
+  let outputB = $state(25);
+  const outputSum = $derived(outputA + outputB);
 </script>
 
 <section id="inputs" class="flex flex-col gap-md">
@@ -444,6 +452,14 @@
 &lt;/fieldset&gt;</code
           ></pre>
       </details>
+
+      <p class="text-caption text-mute px-xs">
+        Checkboxes and radios have physics-aware enhancements: glass mode adds a
+        glow on <code>:checked</code>, retro mode scales controls up by 15%.
+        Fieldsets highlight with energy-primary border and legend color on
+        <code>:focus-within</code>. Switch to glass or retro atmospheres and
+        interact with the controls above to see the effects.
+      </p>
     </div>
 
     <!-- ─── TOGGLE ─────────────────────────────────────────────────────── -->
@@ -683,6 +699,163 @@
         Add <code>name="group"</code> to multiple <code>&lt;details&gt;</code>
         elements for exclusive accordion behavior (only one open at a time). Nest
         <code>&lt;fieldset&gt;</code> inside for semantic form grouping.
+      </p>
+    </div>
+
+    <!-- ─── PROGRESS BAR ─────────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Progress Bar</h5>
+      <p class="text-small text-mute">
+        Fully custom-styled <code>&lt;progress&gt;</code> element. Pill-shaped fill
+        bar with energy-primary color, density-scaled height. Glass mode adds a glow
+        to the fill. Retro squares the bar and uses a stepped shimmer for indeterminate
+        state.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <div class="flex flex-col gap-xs">
+          <label class="text-small px-xs" for="demo-progress">
+            Determinate &mdash; {progressValue}%
+          </label>
+          <input
+            id="demo-progress"
+            type="range"
+            bind:value={progressValue}
+            min="0"
+            max="100"
+          />
+          <progress value={progressValue} max="100"></progress>
+        </div>
+
+        <div class="flex flex-col gap-xs">
+          <p class="text-small px-xs text-dim">
+            Indeterminate (no value attribute):
+          </p>
+          <progress></progress>
+        </div>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;!-- Determinate --&gt;
+&lt;progress value="65" max="100"&gt;&lt;/progress&gt;
+
+&lt;!-- Indeterminate --&gt;
+&lt;progress&gt;&lt;/progress&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        The indeterminate state activates when the <code>value</code> attribute is
+        absent. Glass adds a glowing fill; retro uses a stepped scan-line shimmer.
+      </p>
+    </div>
+
+    <!-- ─── METER ────────────────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Meter</h5>
+      <p class="text-small text-mute">
+        Native <code>&lt;meter&gt;</code> element for scalar measurements. Three
+        semantic color ranges &mdash; optimum (success green), sub-optimum
+        (premium amber), and danger (error red). The browser selects the color
+        based on <code>low</code>/<code>high</code>/<code>optimum</code>
+        attributes.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <div class="flex flex-col gap-xs">
+          <p class="text-small px-xs text-dim">
+            Optimum range (value=90, optimum=80):
+          </p>
+          <meter min="0" max="100" low="25" high="75" optimum="80" value="90"
+          ></meter>
+        </div>
+        <div class="flex flex-col gap-xs">
+          <p class="text-small px-xs text-dim">Sub-optimum range (value=50):</p>
+          <meter min="0" max="100" low="25" high="75" optimum="80" value="50"
+          ></meter>
+        </div>
+        <div class="flex flex-col gap-xs">
+          <p class="text-small px-xs text-dim">Danger range (value=10):</p>
+          <meter min="0" max="100" low="25" high="75" optimum="80" value="10"
+          ></meter>
+        </div>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;!-- Optimum (green) --&gt;
+&lt;meter min="0" max="100" low="25" high="75" optimum="80" value="90"&gt;&lt;/meter&gt;
+
+&lt;!-- Sub-optimum (amber) --&gt;
+&lt;meter min="0" max="100" low="25" high="75" optimum="80" value="50"&gt;&lt;/meter&gt;
+
+&lt;!-- Danger (red) --&gt;
+&lt;meter min="0" max="100" low="25" high="75" optimum="80" value="10"&gt;&lt;/meter&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        Same dimensions as <code>&lt;progress&gt;</code> for visual consistency.
+        Glass mode adds a glow on the optimum value. No classes needed &mdash; the
+        browser determines the color zone from the attributes.
+      </p>
+    </div>
+
+    <!-- ─── OUTPUT ───────────────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Output</h5>
+      <p class="text-small text-mute">
+        The <code>&lt;output&gt;</code> element for computed/calculated values.
+        Styled as a data pill &mdash; monospace font with
+        <code>tabular-nums</code>, energy-primary tinted background, pill shape.
+        Retro mode shows a bordered box.
+      </p>
+
+      <div class="surface-sunk p-md">
+        <div class="flex flex-row items-center gap-sm">
+          <input
+            id="demo-output-a"
+            type="number"
+            bind:value={outputA}
+            min="0"
+            max="100"
+            aria-label="Value A"
+          />
+          <span class="text-dim">+</span>
+          <input
+            id="demo-output-b"
+            type="number"
+            bind:value={outputB}
+            min="0"
+            max="100"
+            aria-label="Value B"
+          />
+          <span class="text-dim">=</span>
+          <output>{outputSum}</output>
+        </div>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;output&gt;&#123;computedValue&#125;&lt;/output&gt;
+
+&lt;!-- With form association --&gt;
+&lt;form oninput="result.value = parseInt(a.value) + parseInt(b.value)"&gt;
+  &lt;input type="range" id="a" value="50"&gt; +
+  &lt;input type="number" id="b" value="25"&gt; =
+  &lt;output name="result" for="a b"&gt;75&lt;/output&gt;
+&lt;/form&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        Monospace font with <code>tabular-nums</code> ensures numbers align
+        consistently. The pill background uses
+        <code>alpha(energy-primary, 10%)</code>.
       </p>
     </div>
   </div>
