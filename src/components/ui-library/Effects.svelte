@@ -11,7 +11,7 @@
 </script>
 
 <section id="effects" class="flex flex-col gap-md">
-  <h2>11 // EFFECTS</h2>
+  <h2>12 // EFFECTS</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">

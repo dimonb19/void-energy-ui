@@ -79,6 +79,17 @@
     text-decoration: underline; // Enforce for safety
   }
 
+  // Highlighted text.
+  mark {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  // Blockquote border.
+  blockquote {
+    border-inline-start-color: ButtonText;
+  }
+
   // Selection.
   ::selection {
     background: Highlight;

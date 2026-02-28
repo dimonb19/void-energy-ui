@@ -4,7 +4,7 @@
 </script>
 
 <section id="data-upload" class="flex flex-col gap-md">
-  <h2>06 // DATA UPLOAD</h2>
+  <h2>07 // DATA UPLOAD</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">

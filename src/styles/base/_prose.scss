@@ -1,0 +1,212 @@
+/* ==========================================================================
+ * BLOCK-LEVEL PROSE ELEMENTS
+ * ==========================================================================
+ *
+ * Base styling for block content (blockquote, figure, address) and an opt-in
+ * .prose scope class that re-enables list markers for long-form content.
+ *
+ * List markers are globally stripped in _reset.scss (list-style: none) to
+ * protect navigation menus and component lists. The .prose class safely
+ * re-enables them for prose contexts (blogs, markdown, user content).
+ *
+ * .legal-content (in _typography.scss) remains the specialized wrapper
+ * for legal documents with subordered counters and alpha variants.
+ * ========================================================================== */
+
+@use '../abstracts' as *;
+
+// ---------------------------------------------------------------------------
+// 1. BLOCKQUOTE
+// ---------------------------------------------------------------------------
+// Statement-level quotation with physics-specific left border treatment.
+// Supports nested blockquotes and footer/cite attribution.
+
+blockquote {
+  margin-block: var(--space-md);
+  padding-block: var(--space-sm);
+  padding-inline-start: var(--space-md);
+  padding-inline-end: var(--space-sm);
+  border-inline-start: calc(var(--physics-border-width) * 3) solid
+    var(--energy-primary);
+  color: var(--text-dim);
+
+  // Glass: inset glow on the left border
+  @include when-glass($low-specificity: true) {
+    box-shadow: inset calc(var(--physics-border-width) * 3) 0 var(--space-xs)
+      calc(var(--physics-border-width) * -2) alpha(var(--energy-primary), 20%);
+  }
+
+  // Retro: double border, thicker
+  @include when-retro($low-specificity: true) {
+    border-inline-start-style: double;
+    border-inline-start-width: calc(var(--physics-border-width) * 4);
+  }
+
+  // Light mode: faint primary tint background
+  @include when-light($low-specificity: true) {
+    background: alpha(var(--energy-primary), 5%);
+  }
+
+  // Nested blockquotes: drop to secondary accent
+  blockquote {
+    border-inline-start-color: var(--energy-secondary);
+    margin-block: var(--space-sm);
+
+    @include when-glass($low-specificity: true) {
+      box-shadow: inset calc(var(--physics-border-width) * 3) 0 var(--space-xs)
+        calc(var(--physics-border-width) * -2)
+        alpha(var(--energy-secondary), 15%);
+    }
+  }
+
+  // Attribution line (footer or cite inside blockquote)
+  > footer,
+  > cite {
+    display: block;
+    margin-top: var(--space-sm);
+    font-size: var(--font-size-small);
+    color: var(--text-mute);
+    font-style: normal;
+
+    &::before {
+      content: '\2014\00A0'; // em dash + non-breaking space
+      color: var(--energy-secondary);
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 2. FIGURE & FIGCAPTION
+// ---------------------------------------------------------------------------
+
+figure {
+  margin-block: var(--space-md);
+  margin-inline: 0;
+}
+
+figcaption {
+  margin-top: var(--space-xs);
+  font-size: var(--font-size-small);
+  line-height: var(--line-height-small);
+  color: var(--text-mute);
+  font-style: italic;
+}
+
+// ---------------------------------------------------------------------------
+// 3. ADDRESS
+// ---------------------------------------------------------------------------
+
+address {
+  font-style: normal;
+  color: var(--text-dim);
+}
+
+// ---------------------------------------------------------------------------
+// 4. PROSE SCOPE (opt-in rich-text container)
+// ---------------------------------------------------------------------------
+// Usage: <div class="prose">...</div>
+// Enables list markers, item spacing, and definition list formatting.
+// Complements .legal-content (legal-specific) — this is general-purpose.
+
+.prose {
+  // ---- Paragraph spacing ----
+  > p + p {
+    margin-top: var(--space-sm);
+  }
+
+  // ---- Unordered lists ----
+  ul {
+    list-style-type: disc;
+    margin-block: var(--space-sm);
+    padding-inline-start: var(--space-md);
+
+    li {
+      margin-block: calc(var(--space-xs) * 0.5);
+    }
+
+    ::marker {
+      color: var(--energy-primary);
+    }
+
+    // Nested: circle
+    ul {
+      list-style-type: circle;
+      margin-block: calc(var(--space-xs) * 0.5);
+
+      // Double-nested: square
+      ul {
+        list-style-type: square;
+      }
+    }
+
+    // Retro: text markers
+    @include when-retro($low-specificity: true) {
+      list-style-type: '- ';
+
+      ul {
+        list-style-type: '> ';
+
+        ul {
+          list-style-type: '* ';
+        }
+      }
+    }
+  }
+
+  // ---- Ordered lists ----
+  ol {
+    list-style-type: decimal;
+    margin-block: var(--space-sm);
+    padding-inline-start: var(--space-md);
+
+    li {
+      margin-block: calc(var(--space-xs) * 0.5);
+    }
+
+    ::marker {
+      color: var(--energy-primary);
+      font-weight: var(--font-weight-semibold);
+    }
+
+    // Nested: lower-alpha
+    ol {
+      list-style-type: lower-alpha;
+      margin-block: calc(var(--space-xs) * 0.5);
+
+      // Double-nested: lower-roman
+      ol {
+        list-style-type: lower-roman;
+      }
+    }
+  }
+
+  // ---- Cross-type nesting ----
+  ul ol {
+    list-style-type: decimal;
+  }
+
+  ol ul {
+    list-style-type: disc;
+  }
+
+  // ---- Definition lists ----
+  dl {
+    margin-block: var(--space-sm);
+  }
+
+  dt {
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-main);
+    margin-top: var(--space-sm);
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  dd {
+    margin-inline-start: var(--space-md);
+    color: var(--text-dim);
+    margin-top: calc(var(--space-xs) * 0.5);
+  }
+}

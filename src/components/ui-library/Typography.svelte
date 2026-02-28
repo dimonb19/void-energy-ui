@@ -292,106 +292,16 @@ engine.setPreferences(&#123;
       </details>
     </div>
 
-    <!-- LEGAL / LONG-FORM CONTENT -->
+    <!-- LIST SCOPES (cross-reference) -->
     <div class="flex flex-col gap-sm">
-      <h5>Long-Form Content</h5>
+      <h5>List Scopes</h5>
       <p class="text-small text-mute">
-        Wrap text in <code>.legal-content</code> to re-enable list styles
-        (stripped globally by reset). Supports nested lists, uppercase/lowercase
-        variants, and contract-style sub-numbering via
-        <code>.subordered</code>.
+        List markers are stripped globally by the reset. Two scope classes
+        re-enable them: <code>.prose</code> (general content) and
+        <code>.legal-content</code> (formal documents). See the
+        <a href="#prose" class="link">Prose &amp; Content</a> section for demos and
+        comparison.
       </p>
-
-      <div class="surface-sunk p-md legal-content">
-        <p><strong>Section 1 — Getting Started</strong></p>
-        <ul>
-          <li>Install the package via npm or pnpm</li>
-          <li>
-            Configure your environment
-            <ul>
-              <li>Tailwind for layout utilities</li>
-              <li>
-                SCSS for physics and materials
-                <ul>
-                  <li>Mixins for glass, flat, retro</li>
-                  <li>State selectors via data attributes</li>
-                </ul>
-              </li>
-            </ul>
-          </li>
-          <li>Import design tokens and begin building</li>
-        </ul>
-
-        <p><strong>Section 2 — Core Principles</strong></p>
-        <ol>
-          <li>Choose an atmosphere preset</li>
-          <li>Configure physics and color mode</li>
-          <li>Set density and typography preferences</li>
-        </ol>
-
-        <ol class="uppercase">
-          <li>Atmosphere Layer</li>
-          <li>Physics Layer</li>
-          <li>Mode Layer</li>
-        </ol>
-
-        <ol class="lowercase">
-          <li>Glass preset</li>
-          <li>Flat preset</li>
-          <li>Retro preset</li>
-        </ol>
-
-        <ol class="subordered">
-          <li>
-            All components must use semantic tokens for color and spacing.
-            <ol class="subordered">
-              <li>No raw pixel values in production code.</li>
-              <li>No hardcoded hex colors in component files.</li>
-            </ol>
-          </li>
-          <li>State changes are always expressed via data attributes.</li>
-        </ol>
-
-        <p>
-          For full token documentation, see the
-          <a href="#void">design token reference</a>. Links inside legal content
-          automatically inherit laser-underline styling.
-        </p>
-      </div>
-
-      <details>
-        <summary>View Code</summary>
-        <pre><code
-            >&lt;div class="legal-content"&gt;
-  &lt;!-- Unordered: 3 levels (disc → circle → square) --&gt;
-  &lt;ul&gt;
-    &lt;li&gt;Unordered list item&lt;/li&gt;
-    &lt;li&gt;Nested:
-      &lt;ul&gt;
-        &lt;li&gt;Sub-item
-          &lt;ul&gt;&lt;li&gt;Third level&lt;/li&gt;&lt;/ul&gt;
-        &lt;/li&gt;
-      &lt;/ul&gt;
-    &lt;/li&gt;
-  &lt;/ul&gt;
-
-  &lt;!-- Ordered variants --&gt;
-  &lt;ol&gt;&lt;li&gt;Decimal: 1, 2, 3&lt;/li&gt;&lt;/ol&gt;
-  &lt;ol class="uppercase"&gt;&lt;li&gt;Upper-alpha: A, B, C&lt;/li&gt;&lt;/ol&gt;
-  &lt;ol class="lowercase"&gt;&lt;li&gt;Lower-alpha: a, b, c&lt;/li&gt;&lt;/ol&gt;
-
-  &lt;!-- Contract-style sub-numbering --&gt;
-  &lt;ol class="subordered"&gt;
-    &lt;li&gt;1.
-      &lt;ol class="subordered"&gt;&lt;li&gt;1.1&lt;/li&gt;&lt;/ol&gt;
-    &lt;/li&gt;
-  &lt;/ol&gt;
-
-  &lt;!-- Links auto-inherit laser-underline --&gt;
-  &lt;p&gt;See the &lt;a href="/docs"&gt;documentation&lt;/a&gt;.&lt;/p&gt;
-&lt;/div&gt;</code
-          ></pre>
-      </details>
     </div>
   </div>
 </section>

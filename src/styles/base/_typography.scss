@@ -269,7 +269,7 @@ textarea {
         display: table-cell;
         padding-right: var(--space-sm);
         color: var(--text-main); // Bright numbering distinguishes hierarchy
-        font-weight: 600;
+        font-weight: var(--font-weight-semibold);
         white-space: nowrap;
       }
     }
@@ -321,7 +321,7 @@ code {
 
   // Light mode: bg-sink can be too subtle (3-5% opacity).
   @include when-light($low-specificity: true) {
-    background: rgba(0, 0, 0, 0.07);
+    background: alpha(#000, 7%);
   }
 }
 
@@ -408,4 +408,125 @@ var {
   font-style: italic;
   line-height: inherit;
   color: var(--energy-primary);
+}
+
+/* =========================================
+   7. INLINE PROSE ELEMENTS (mark, del, ins, sub, sup, abbr, q, cite, dfn)
+   ========================================= */
+
+// ---------------------------------------------------------------------------
+// 7a. HIGHLIGHTED TEXT
+// ---------------------------------------------------------------------------
+// Physics-differentiated highlight: glass gets energy glow, retro gets inverted.
+
+mark {
+  color: var(--text-main);
+  padding: 0.0625em 0.25em;
+  border-radius: calc(var(--radius-base) * 0.25);
+  background: alpha(var(--energy-primary), 25%);
+  box-decoration-break: clone;
+
+  @include when-light($low-specificity: true) {
+    background: alpha(var(--energy-primary), 15%);
+    color: inherit;
+  }
+
+  @include when-retro($low-specificity: true) {
+    background: var(--energy-primary);
+    color: var(--bg-canvas);
+    border-radius: 0;
+    padding: 0 0.25em;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 7b. DELETED / STRUCK TEXT
+// ---------------------------------------------------------------------------
+
+del,
+s {
+  text-decoration: line-through;
+  text-decoration-color: var(--text-mute);
+  color: var(--text-mute);
+}
+
+// ---------------------------------------------------------------------------
+// 7c. INSERTED TEXT
+// ---------------------------------------------------------------------------
+
+ins {
+  text-decoration: underline;
+  text-decoration-color: var(--color-success);
+  text-decoration-thickness: var(--physics-border-width);
+  text-underline-offset: 0.15em;
+  color: var(--text-dim);
+}
+
+// ---------------------------------------------------------------------------
+// 7d. SUBSCRIPT / SUPERSCRIPT
+// ---------------------------------------------------------------------------
+// Prevents sub/sup from disrupting parent line-height rhythm.
+
+sub,
+sup {
+  font-size: 0.75em;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+sup {
+  top: -0.5em;
+}
+
+// ---------------------------------------------------------------------------
+// 7e. ABBREVIATION
+// ---------------------------------------------------------------------------
+
+abbr[title] {
+  text-decoration: underline dotted var(--text-mute);
+  text-underline-offset: 0.15em;
+  cursor: help;
+}
+
+// ---------------------------------------------------------------------------
+// 7f. INLINE QUOTATION
+// ---------------------------------------------------------------------------
+
+q {
+  font-style: italic;
+  color: var(--text-dim);
+
+  &::before {
+    content: open-quote;
+    color: var(--energy-secondary);
+  }
+
+  &::after {
+    content: close-quote;
+    color: var(--energy-secondary);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 7g. CITATION
+// ---------------------------------------------------------------------------
+
+cite {
+  font-style: italic;
+  color: var(--text-mute);
+}
+
+// ---------------------------------------------------------------------------
+// 7h. DEFINITION TERM
+// ---------------------------------------------------------------------------
+
+dfn {
+  font-style: italic;
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-main);
 }

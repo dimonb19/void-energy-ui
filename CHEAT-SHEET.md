@@ -9,6 +9,8 @@
 1. [Architectural Constitution](#1-architectural-constitution)
 2. [The Triad (Context Engine)](#2-the-triad-context-engine)
 3. [Responsive & Spacing (Density Engine)](#3-responsive--spacing-density-engine)
+   - [Base Inline Text Semantics](#d-base-inline-text-semantics)
+   - [Base Prose & Lists](#e-base-prose--lists)
 4. [Component Catalog](#4-component-catalog)
    - [Surfaces](#a-surfaces-the-skin)
    - [Composites](#b-composites-skin--bone)
@@ -550,6 +552,125 @@ Our spacing scale is **100% compatible** with Tailwind CSS:
 - **Implementation**: [/src/styles/base/\_reset.scss:9-79](../src/styles/base/_reset.scss) (Density Engine)
 - **Token Definitions**: [/src/config/design-tokens.ts:20-66](../src/config/design-tokens.ts) (Spacing scale)
 - **Tailwind Integration**: [/tailwind.config.mjs](../tailwind.config.mjs) (Spacing utilities)
+
+---
+
+### D. Base Inline Text Semantics
+
+Base styling for native HTML inline elements. These render correctly anywhere — inside `<p>`, `<li>`, `<td>`, `<blockquote>`, etc. — with zero classes required.
+
+**Source:** [src/styles/base/\_typography.scss](src/styles/base/_typography.scss) (section 7)
+
+| Element | Visual Treatment | Physics Differentiation |
+| --- | --- | --- |
+| `<mark>` | Energy-colored highlight, tight inline padding | Glass: alpha'd glow. Light: softer tint. Retro: inverted (energy bg + canvas text) |
+| `<del>`, `<s>` | Line-through, muted color | None |
+| `<ins>` | Success-colored underline, dim text | Underline thickness scales with `--physics-border-width` |
+| `<sub>`, `<sup>` | 0.75em, positioned relative — does NOT disrupt parent line-height | None |
+| `<abbr title="...">` | Dotted underline, `cursor: help` | None |
+| `<q>` | Italic, energy-secondary quote marks via `::before`/`::after` | None |
+| `<cite>` | Italic, muted color | None |
+| `<dfn>` | Italic, semibold, main color | None |
+| `<code>` | Monospace, recessed surface (`--bg-sink`), tight padding | Light: darker bg fallback |
+| `<kbd>` | Monospace, raised key cap surface, 3D bottom border | Retro: flat uniform border |
+| `<samp>` | Monospace, dim color, no surface | None |
+| `<var>` | Monospace, italic, energy-primary color | None |
+
+**Usage:** Just write semantic HTML — no classes needed.
+
+```html
+<p>This is <mark>highlighted</mark> and <del>deleted</del> and <ins>inserted</ins>
+and H<sub>2</sub>O and E=mc<sup>2</sup> and <abbr title="Cascading Style Sheets">CSS</abbr>
+and <q>quoted</q> and <cite>Moby Dick</cite> and the <dfn>definition</dfn>.</p>
+```
+
+---
+
+### E. Base Prose & Lists
+
+Block-level prose elements and an opt-in `.prose` scope class for list markers.
+
+**Source:** [src/styles/base/\_prose.scss](src/styles/base/_prose.scss)
+
+#### `<blockquote>` — Statement Quotation
+
+Physics-differentiated left border treatment. Uses logical properties (`border-inline-start`) for RTL support.
+
+| Physics | Visual |
+| --- | --- |
+| **Glass** | Energy-primary left border + inset glow box-shadow |
+| **Flat** | Solid energy-primary left border |
+| **Retro** | Double border, thicker width |
+| **Light mode** | Adds faint energy-primary background tint |
+
+**Nesting:** Nested blockquotes drop to `--energy-secondary` border color.
+**Attribution:** `<footer>` or `<cite>` direct children render as em-dash-prefixed muted attribution lines.
+
+```html
+<blockquote>
+  <p>Design is not just what it looks like. Design is how it works.</p>
+  <footer>Steve Jobs</footer>
+</blockquote>
+```
+
+#### `<figure>` / `<figcaption>` — Media Wrapper
+
+`<figure>` resets browser margin. `<figcaption>` renders as small, muted, italic caption text.
+
+```html
+<figure>
+  <img src="diagram.png" alt="System architecture" />
+  <figcaption>Figure 1: High-level system overview</figcaption>
+</figure>
+```
+
+#### `<address>` — Contact Information
+
+Removes browser italic default. Uses `--text-dim` color.
+
+#### `.prose` — Opt-in Rich Text Container
+
+Enables list markers and definition list formatting inside a scoped wrapper. Required because the global reset strips `list-style: none` from all `<ul>`/`<ol>` (protecting nav menus and component lists).
+
+**Complements `.legal-content`** (legal-specific counters) — `.prose` is general-purpose for blogs, markdown, and user content.
+
+**List marker progression:**
+
+| List Type | Level 1 | Level 2 | Level 3 | Retro Override |
+| --- | --- | --- | --- | --- |
+| `<ul>` | disc | circle | square | `- ` → `> ` → `* ` |
+| `<ol>` | decimal | lower-alpha | lower-roman | *(same)* |
+
+**Marker color:** `--energy-primary` for all list types. `<ol>` markers also get `--font-weight-semibold`.
+
+**Definition lists** (`<dl>`/`<dt>`/`<dd>`): `<dt>` renders semibold in `--text-main`, `<dd>` indented in `--text-dim`.
+
+**Usage:**
+
+```html
+<div class="prose">
+  <ul>
+    <li>First item</li>
+    <li>Second item
+      <ul>
+        <li>Nested item</li>
+      </ul>
+    </li>
+  </ul>
+
+  <ol>
+    <li>Step one</li>
+    <li>Step two</li>
+  </ol>
+
+  <dl>
+    <dt>Term</dt>
+    <dd>Definition of the term</dd>
+  </dl>
+</div>
+```
+
+**HCM (High Contrast Mode):** `<mark>` maps to `Highlight`/`HighlightText`, `<blockquote>` border maps to `ButtonText`.
 
 ---
 

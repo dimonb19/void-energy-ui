@@ -3,5 +3,6 @@
 @forward 'reset';
 @forward '../config/fonts'; // [AUTO-GENERATED] from design-tokens.ts
 @forward 'typography';
+@forward 'prose'; // Block-level prose elements (blockquote, figure, lists)
 @forward 'themes';
 @forward 'accessibility'; // High Contrast Mode + Reduced Motion overrides
