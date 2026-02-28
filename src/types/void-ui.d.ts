@@ -441,3 +441,24 @@ interface VoidUser {
   role_name: VoidUserRoleName;
   approved_tester: boolean;
 }
+
+// ==========================================================================
+// 9. COMPONENT: KEYBOARD SHORTCUTS
+// ==========================================================================
+
+/**
+ * A registered keyboard shortcut entry.
+ */
+interface VoidShortcutEntry {
+  /** The keyboard key to match against KeyboardEvent.key (e.g., 'f', '?', 't') */
+  key: string;
+
+  /** Human-readable label describing the action (e.g., "Toggle fullscreen") */
+  label: string;
+
+  /** Grouping category for the shortcuts modal (e.g., "General") */
+  group: string;
+
+  /** Callback executed when the shortcut is triggered */
+  action: () => void;
+}

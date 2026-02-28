@@ -2646,21 +2646,32 @@ Reactive singletons for app-wide state. Each store uses `$state` + `$derived` an
 
 #### Global Keyboard Shortcuts
 
-**Handler:** [src/components/Navigation.svelte](src/components/Navigation.svelte) (always-mounted, `<svelte:window onkeydown>`)
-**Help modal:** [src/components/modals/ShortcutsFragment.svelte](src/components/modals/ShortcutsFragment.svelte)
+**Registry:** [src/lib/shortcut-registry.svelte.ts](src/lib/shortcut-registry.svelte.ts) (singleton, document-level listener)
+**Registration site:** [src/components/Navigation.svelte](src/components/Navigation.svelte) (always-mounted)
+**Help modal:** [src/components/modals/ShortcutsFragment.svelte](src/components/modals/ShortcutsFragment.svelte) (renders dynamically from registry)
 
-| Key | Action | API |
+| Key | Action | Group |
 | --- | --- | --- |
-| `F` | Toggle browser fullscreen | `document.documentElement.requestFullscreen()` / `document.exitFullscreen()` |
-| `T` | Open Themes/Atmospheres modal | `modal.themes()` |
-| `?` | Show keyboard shortcuts help | `modal.shortcuts()` |
+| `F` | Toggle browser fullscreen | General |
+| `T` | Open Themes/Atmospheres modal | General |
+| `?` | Show keyboard shortcuts help | General |
 
-**Safety guards:**
+**Safety guards** (enforced by registry's `handle()` method):
 - Suppressed inside `<input>`, `<textarea>`, and `contentEditable` elements (WCAG 2.1.4)
 - Suppressed when any modifier key is held (`Ctrl`, `Cmd`, `Alt`) — no browser conflicts
 - Suppressed when a modal is already open
+- Conflict detection: `console.warn` on duplicate key, last-write-wins
 
-**Adding a new shortcut:** Add a `case` to the `switch` block in `Navigation.svelte`'s `onkeydown` handler. If the shortcut opens a modal, add the corresponding entry to `ShortcutsFragment.svelte`.
+**Adding a new shortcut:** Call `shortcutRegistry.register({ key, label, group, action })` from any always-mounted component. The entry automatically appears in the Shortcuts modal.
+
+```ts
+import { shortcutRegistry } from '@lib/shortcut-registry.svelte';
+
+shortcutRegistry.register({ key: 'f', label: 'Toggle fullscreen', group: 'General', action: toggleFullscreen });
+shortcutRegistry.unregister('f');
+shortcutRegistry.entries;    // VoidShortcutEntry[] (reactive)
+shortcutRegistry.grouped;    // { group: string, items: VoidShortcutEntry[] }[]
+```
 
 ---
 

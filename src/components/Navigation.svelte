@@ -3,6 +3,7 @@
 
   import { voidEngine } from '@adapters/void-engine.svelte';
   import { modal } from '@lib/modal-manager.svelte';
+  import { shortcutRegistry } from '@lib/shortcut-registry.svelte';
   import ThemesBtn from './ui/ThemesBtn.svelte';
   import Breadcrumbs from './ui/Breadcrumbs.svelte';
 
@@ -133,37 +134,26 @@
     }
   }
 
-  const onkeydown = (e: KeyboardEvent) => {
-    // Skip when focus is inside editable elements
-    const tag = (e.target as HTMLElement)?.tagName;
-    if (
-      tag === 'INPUT' ||
-      tag === 'TEXTAREA' ||
-      (e.target as HTMLElement)?.isContentEditable
-    )
-      return;
+  shortcutRegistry.register({
+    key: 'f',
+    label: 'Toggle fullscreen',
+    group: 'General',
+    action: toggleFullscreen,
+  });
 
-    // Skip when any modifier is held (don't conflict with browser shortcuts)
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
+  shortcutRegistry.register({
+    key: 't',
+    label: 'Open atmospheres',
+    group: 'General',
+    action: () => modal.themes(),
+  });
 
-    // Skip when a modal is open (modal has its own keyboard handling)
-    if (modal.state.key) return;
-
-    switch (e.key) {
-      case 'f':
-        e.preventDefault();
-        toggleFullscreen();
-        break;
-      case 't':
-        e.preventDefault();
-        modal.themes();
-        break;
-      case '?':
-        e.preventDefault();
-        modal.shortcuts();
-        break;
-    }
-  };
+  shortcutRegistry.register({
+    key: '?',
+    label: 'Show keyboard shortcuts',
+    group: 'General',
+    action: () => modal.shortcuts(),
+  });
 
   // ─────────────────────────────────────────────────────────────────────────────
   // NAV MENU PATTERN
@@ -342,7 +332,7 @@
   // ─────────────────────────────────────────────────────────────────────────────
 </script>
 
-<svelte:window {onscroll} {onmousemove} {onkeydown} />
+<svelte:window {onscroll} {onmousemove} />
 
 <nav
   class="nav-bar flex flex-row items-center justify-between tablet:justify-normal gap-xs px-xs"

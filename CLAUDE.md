@@ -271,6 +271,15 @@ Registry: src/config/modal-registry.ts (add new fragments here)
 .promise(promise, { loading, success, error })
 ```
 
+### Shortcut Registry (`import { shortcutRegistry } from '@lib/shortcut-registry.svelte'`)
+```
+.register(entry)                    Register { key, label, group, action }
+.unregister(key)                    Remove by key string
+.entries                            All registered shortcuts ($state array)
+.grouped                            Entries grouped by group field (getter)
+.handle(event)                      Process KeyboardEvent (internal, document listener)
+```
+
 ### User (`import { user } from '@stores/user.svelte'`)
 ```
 .current                            Current VoidUser object or null (reactive)
