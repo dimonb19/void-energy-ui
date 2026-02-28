@@ -18,8 +18,11 @@
     onRememberChange?: (value: boolean) => void;
   } = $props();
 
+  // svelte-ignore state_referenced_locally
   let layout = $state<DemoLayout>(initialLayout);
+  // svelte-ignore state_referenced_locally
   let notifications = $state<DemoNotificationLevel>(initialNotifications);
+  // svelte-ignore state_referenced_locally
   let remember = $state(initialRemember);
 
   function handleSave() {

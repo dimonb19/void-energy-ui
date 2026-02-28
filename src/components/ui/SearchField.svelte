@@ -48,6 +48,7 @@
     class: className = '',
   }: SearchFieldProps = $props();
 
+  // svelte-ignore state_referenced_locally
   const inputId = id ?? `search-${Math.random().toString(36).slice(2, 9)}`;
 
   let focused = $state(false);

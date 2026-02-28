@@ -61,6 +61,7 @@
     class: className = '',
   }: FormFieldProps = $props();
 
+  // svelte-ignore state_referenced_locally
   const id = fieldId ?? `field-${Math.random().toString(36).slice(2, 9)}`;
   const errorId = `${id}-error`;
   const hintId = `${id}-hint`;

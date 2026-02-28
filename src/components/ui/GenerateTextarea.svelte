@@ -72,6 +72,7 @@
     class: className = '',
   }: GenerateTextareaProps = $props();
 
+  // svelte-ignore state_referenced_locally
   const textareaId =
     id ?? `generate-textarea-${Math.random().toString(36).slice(2, 9)}`;
 

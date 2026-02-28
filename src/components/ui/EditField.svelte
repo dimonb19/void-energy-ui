@@ -57,6 +57,7 @@
     class: className = '',
   }: EditFieldProps = $props();
 
+  // svelte-ignore state_referenced_locally
   const inputId = id ?? `edit-${Math.random().toString(36).slice(2, 9)}`;
 
   let editing = $state(false);

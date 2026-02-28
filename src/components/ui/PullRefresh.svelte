@@ -622,6 +622,7 @@
   <!-- Content: Translates down to reveal indicator -->
   <div
     class="pull-content"
+    role="presentation"
     bind:this={pullContentEl}
     onpointerdown={handlePointerDown}
     onpointermove={handlePointerMove}

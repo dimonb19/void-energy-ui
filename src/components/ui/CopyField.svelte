@@ -32,6 +32,7 @@
 
   let { value, id, class: className = '' }: CopyFieldProps = $props();
 
+  // svelte-ignore state_referenced_locally
   const inputId = id ?? `copy-${Math.random().toString(36).slice(2, 9)}`;
 
   let copied = $state(false);

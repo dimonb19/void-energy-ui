@@ -40,6 +40,7 @@
     class: className = '',
   }: PasswordFieldProps = $props();
 
+  // svelte-ignore state_referenced_locally
   const inputId = id ?? `password-${Math.random().toString(36).slice(2, 9)}`;
 
   let visible = $state(false);

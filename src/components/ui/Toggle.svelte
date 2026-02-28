@@ -70,6 +70,7 @@
   }: ToggleProps = $props();
 
   // Auto-generate ID for label association if not provided
+  // svelte-ignore state_referenced_locally
   const inputId = id ?? `toggle-${Math.random().toString(36).slice(2, 9)}`;
 
   function toggle() {

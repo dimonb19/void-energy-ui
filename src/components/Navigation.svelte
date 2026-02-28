@@ -58,6 +58,7 @@
   // State
   // ─────────────────────────────────────────────────────────────────────────────
 
+  // svelte-ignore state_referenced_locally
   let activeTab = $state<string>(resolveTab(pathname));
   let navHidden = $state<boolean>(false);
   const clamp = 64; // px after which hiding can kick in

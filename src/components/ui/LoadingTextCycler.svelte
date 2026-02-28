@@ -27,6 +27,7 @@
     class: className = '',
   }: LoadingTextCyclerProps = $props();
 
+  // svelte-ignore state_referenced_locally
   const shuffledWords = shuffleTail(words);
 </script>
 

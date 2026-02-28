@@ -40,6 +40,7 @@
   }: SwitcherProps = $props();
 
   // Auto-generate ID for label association if not provided
+  // svelte-ignore state_referenced_locally
   const inputId = id ?? `switcher-${Math.random().toString(36).slice(2, 9)}`;
 
   // Track references for focus management
