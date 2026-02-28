@@ -181,7 +181,9 @@ input[type='radio'] {
   // Unified spring transitions for drag state changes
   transition:
     background-color var(--speed-fast) var(--ease-spring-snappy),
-    border-color var(--speed-fast) var(--ease-spring-snappy);
+    border-color var(--speed-fast) var(--ease-spring-snappy),
+    box-shadow var(--speed-fast) var(--ease-spring-snappy),
+    transform var(--speed-fast) var(--ease-spring-snappy);
 
   // Invisible input overlay for click/drop capture.
   input[type='file'] {
@@ -233,6 +235,8 @@ input[type='radio'] {
   &:focus-within {
     border-color: var(--energy-primary);
     background-color: blend(var(--bg-sink), var(--energy-primary), 5%);
+    box-shadow: var(--shadow-lift);
+    transform: scale(1.005);
 
     .dropzone-content {
       svg,
@@ -250,6 +254,11 @@ input[type='radio'] {
       .dropzone-content svg {
         filter: none;
       }
+    }
+
+    @include when-retro {
+      transform: none;
+      border-width: calc(var(--physics-border-width) * 2);
     }
   }
 }

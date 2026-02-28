@@ -332,6 +332,7 @@
 &lt;PasswordField
   bind:value=&#123;password&#125;
   placeholder="Enter password..."
+  autocomplete="new-password"
 /&gt;
 
 &lt;EditField
@@ -369,11 +370,14 @@
       <p class="text-caption text-mute px-xs">
         <strong>SearchField</strong> &mdash; <code>value</code> (bindable),
         <code>placeholder</code>, <code>zoom</code> ("in" | "out"),
+        <code>autocomplete</code> (default "off"),
         <code>onsubmit</code>, <code>oninput</code>.
         <strong>PasswordField</strong> &mdash; <code>value</code> (bindable),
-        <code>placeholder</code>.
+        <code>placeholder</code>,
+        <code>autocomplete</code> (default "current-password").
         <strong>EditField</strong> &mdash; <code>value</code> (bindable),
-        <code>placeholder</code>, <code>onconfirm</code>.
+        <code>placeholder</code>, <code>autocomplete</code>,
+        <code>onconfirm</code>.
         <strong>EditTextarea</strong> &mdash; <code>value</code> (bindable),
         <code>placeholder</code>, <code>rows</code> (number),
         <code>onconfirm</code>. Ctrl/Cmd+Enter confirms.

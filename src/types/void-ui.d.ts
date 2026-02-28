@@ -296,6 +296,9 @@ interface VoidTooltipOptions {
    * See: @floating-ui/dom documentation for valid placements.
    */
   placement?: import('@floating-ui/dom').Placement;
+
+  /** Delay in ms before showing the tooltip. Default: 0 (instant). */
+  delay?: number;
 }
 
 // ==========================================================================

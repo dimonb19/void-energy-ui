@@ -350,5 +350,58 @@
         <code>pointerleave</code> / <code>blur</code> (hide)
       </p>
     </div>
+
+    <!-- ─── TOOLTIP DELAY ──────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Hover Delay</h5>
+      <p class="text-small text-mute">
+        In dense UI (toolbars, icon rows), instant tooltips can feel jarring.
+        The
+        <code>delay</code> option adds a pause before showing &mdash; hover away
+        before the delay elapses and nothing appears. Compare the three buttons below.
+      </p>
+
+      <div
+        class="surface-sunk p-md flex flex-row flex-wrap gap-md justify-center"
+      >
+        <button use:tooltip={'Instant (default)'}>No delay</button>
+        <button
+          use:tooltip={{
+            content: '200 ms delay',
+            placement: 'bottom',
+            delay: 200,
+          }}
+        >
+          200 ms
+        </button>
+        <button
+          use:tooltip={{
+            content: '500 ms delay',
+            placement: 'bottom',
+            delay: 500,
+          }}
+        >
+          500 ms
+        </button>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;!-- Instant (default) --&gt;
+&lt;button use:tooltip=&#123;'No delay'&#125;&gt;Hover me&lt;/button&gt;
+
+&lt;!-- 200ms delay --&gt;
+&lt;button use:tooltip=&#123;&#123; content: 'Delayed', delay: 200 &#125;&#125;&gt;
+  Hover me
+&lt;/button&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        Default: <code>0</code> (instant). Delay is in milliseconds. Moving away
+        before the timer elapses cancels the tooltip entirely.
+      </p>
+    </div>
   </div>
 </section>

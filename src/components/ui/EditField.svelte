@@ -45,6 +45,7 @@
     placeholder?: string;
     disabled?: boolean;
     onconfirm?: (value: string) => void;
+    autocomplete?: HTMLInputElement['autocomplete'];
     class?: string;
   }
 
@@ -54,6 +55,7 @@
     placeholder = '',
     disabled = false,
     onconfirm,
+    autocomplete,
     class: className = '',
   }: EditFieldProps = $props();
 
@@ -101,6 +103,7 @@
     type="text"
     {placeholder}
     {disabled}
+    {autocomplete}
     readonly={!editing}
     value={editing ? draft : value}
     oninput={(e) => (draft = (e.target as HTMLInputElement).value)}

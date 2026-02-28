@@ -31,6 +31,7 @@
     id?: string;
     placeholder?: string;
     disabled?: boolean;
+    autocomplete?: HTMLInputElement['autocomplete'];
     zoom?: 'in' | 'out';
     onsubmit?: (value: string) => void;
     oninput?: (value: string) => void;
@@ -42,6 +43,7 @@
     id,
     placeholder = 'Search...',
     disabled = false,
+    autocomplete = 'off',
     zoom,
     onsubmit,
     oninput,
@@ -72,6 +74,7 @@
     type="search"
     {placeholder}
     {disabled}
+    {autocomplete}
     {value}
     onfocus={() => (focused = true)}
     onblur={() => (focused = false)}

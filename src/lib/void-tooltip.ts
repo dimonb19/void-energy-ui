@@ -19,6 +19,8 @@ export class VoidTooltip {
   private cleanupPositioning: (() => void) | null = null;
   private options: VoidTooltipOptions;
 
+  private showTimer: ReturnType<typeof setTimeout> | null = null;
+
   // Bound handlers for proper cleanup
   private boundShow: () => void;
   private boundHide: () => void;
@@ -47,6 +49,20 @@ export class VoidTooltip {
   }
 
   private show() {
+    this.clearShowTimer();
+    const delay = this.options.delay ?? 0;
+
+    if (delay > 0) {
+      this.showTimer = setTimeout(() => {
+        this.showTimer = null;
+        this.showImmediate();
+      }, delay);
+    } else {
+      this.showImmediate();
+    }
+  }
+
+  private showImmediate() {
     if (this.tooltip) return;
 
     // Create the popover element and content.
@@ -88,7 +104,15 @@ export class VoidTooltip {
     });
   }
 
+  private clearShowTimer() {
+    if (this.showTimer !== null) {
+      clearTimeout(this.showTimer);
+      this.showTimer = null;
+    }
+  }
+
   private hide() {
+    this.clearShowTimer();
     if (!this.tooltip) return;
     const el = this.tooltip;
 
@@ -126,6 +150,7 @@ export class VoidTooltip {
   }
 
   public destroy() {
+    this.clearShowTimer();
     // Remove event listeners to prevent memory leaks
     const showEvents = ['pointerenter', 'focus'];
     const hideEvents = ['pointerleave', 'blur'];

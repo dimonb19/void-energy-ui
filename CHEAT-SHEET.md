@@ -1113,7 +1113,7 @@ Preset components with built-in layout and physics.
 | State | Visual | Attribute |
 | --- | --- | --- |
 | **idle** | Dashed border, Upload icon, prompt text | — |
-| **drag-active** | Energy-highlighted border/bg, "Release to upload" | `data-state="active"` |
+| **drag-active** | Energy-highlighted border/bg, shadow elevation, subtle scale, "Release to upload" | `data-state="active"` |
 | **has-files** | FileCheck icon, file count + names | — |
 
 **Usage:**
@@ -1222,6 +1222,7 @@ Preset components with built-in layout and physics.
 | `value` | `string` | `$bindable('')` | Search text (bindable) |
 | `placeholder` | `string` | `'Search...'` | Placeholder text |
 | `zoom` | `'in' \| 'out'` | — | Search icon lens variant |
+| `autocomplete` | `string` | `'off'` | HTML autocomplete hint |
 | `onsubmit` | `(value: string) => void` | — | Callback on Enter key |
 | `oninput` | `(value: string) => void` | — | Callback on keystroke |
 | `disabled` | `boolean` | `false` | Disables input |
@@ -1306,6 +1307,7 @@ Preset components with built-in layout and physics.
 | --- | --- | --- | --- |
 | `value` | `string` | `$bindable('')` | Text value (bindable, updated on confirm) |
 | `placeholder` | `string` | `''` | Placeholder text |
+| `autocomplete` | `string` | — | HTML autocomplete hint |
 | `onconfirm` | `(value: string) => void` | — | Callback with new value on confirm |
 | `disabled` | `boolean` | `false` | Disables all interaction |
 
@@ -1357,6 +1359,7 @@ Preset components with built-in layout and physics.
 | --- | --- | --- | --- |
 | `value` | `string` | `$bindable('')` | Password text (bindable) |
 | `placeholder` | `string` | `'Enter password...'` | Placeholder text |
+| `autocomplete` | `string` | `'current-password'` | HTML autocomplete hint |
 | `disabled` | `boolean` | `false` | Disables input |
 
 **Usage:**
@@ -3706,17 +3709,27 @@ When used inside a `<dialog>` element, morph automatically:
 ### B. Tooltip (`use:tooltip`)
 
 **Purpose:** Floating tooltip positioning via Floating UI
-**Location:** [src/actions/tooltip.ts](src/actions/tooltip.ts)
+**Location:** [src/actions/tooltip.ts](src/actions/tooltip.ts), [src/lib/void-tooltip.ts](src/lib/void-tooltip.ts)
+
+**Options:**
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `content` | `string` | — | Tooltip text (plain text only, no HTML) |
+| `placement` | `Placement` | `'top'` | Floating UI placement |
+| `delay` | `number` | `0` | Delay in ms before showing (0 = instant) |
 
 **Usage:**
 
 ```svelte
-<button use:tooltip={{ content: 'Click to save', placement: 'top' }}>
-  Save
+<!-- String shorthand (instant, top placement) -->
+<button use:tooltip="Click to save">Save</button>
+
+<!-- Full options with delay -->
+<button use:tooltip={{ content: 'Settings', placement: 'bottom', delay: 200 }}>
+  Settings
 </button>
 ```
-
-See [tooltip.ts](src/actions/tooltip.ts) for full API.
 
 ---
 

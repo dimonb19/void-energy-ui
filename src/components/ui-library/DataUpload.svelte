@@ -22,7 +22,10 @@
         It reuses the <code>.dropzone</code> physics from
         <code>_inputs.scss</code> &mdash; dashed sunk border, spring
         transitions, and energy-highlighted drag-over state via
-        <code>data-state="active"</code>. Files are validated against
+        <code>data-state="active"</code>. Dragging a file over the zone triggers
+        shadow elevation (<code>--shadow-lift</code>) and a subtle scale-up; in
+        retro physics, scale is replaced by a thicker border. Files are
+        validated against
         <code>accept</code> and <code>maxSize</code> constraints, with rejected files
         reported through toast errors.
       </p>

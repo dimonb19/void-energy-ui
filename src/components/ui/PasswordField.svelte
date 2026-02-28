@@ -29,6 +29,7 @@
     id?: string;
     placeholder?: string;
     disabled?: boolean;
+    autocomplete?: HTMLInputElement['autocomplete'];
     class?: string;
   }
 
@@ -37,6 +38,7 @@
     id,
     placeholder = 'Enter password...',
     disabled = false,
+    autocomplete = 'current-password',
     class: className = '',
   }: PasswordFieldProps = $props();
 
@@ -56,6 +58,7 @@
     type={visible ? 'text' : 'password'}
     {placeholder}
     {disabled}
+    {autocomplete}
     bind:value
   />
   <span class="field-slot-right">
