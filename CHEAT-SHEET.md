@@ -2471,6 +2471,63 @@ Physics-aware visual effects for loading states and skeleton loaders.
 
 ---
 
+#### `<Skeleton>` — Placeholder shimmer shapes
+
+**Description:** Thin wrapper around `.shimmer-surface` for skeleton loading states. Provides four shape variants with sensible defaults. Uses `data-variant` for shape selection and inherits all shimmer physics from the existing mixin. Accessible by default (`aria-hidden="true"`, `role="presentation"`).
+**Location:** [src/components/ui/Skeleton.svelte](src/components/ui/Skeleton.svelte)
+**CSS:** `.skeleton` ([src/styles/components/\_effects.scss](src/styles/components/_effects.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `variant` | `'text' \| 'avatar' \| 'card' \| 'paragraph'` | `'text'` | Shape variant |
+| `width` | `string` | — | Override width (CSS value or token) |
+| `height` | `string` | — | Override height (CSS value or token) |
+| `lines` | `number` | `3` | Number of text lines (paragraph variant only) |
+| `class` | `string` | `''` | CSS passthrough |
+
+**Variant Defaults:**
+
+| Variant | Width | Height | Shape |
+| --- | --- | --- | --- |
+| `text` | `100%` | `1em` | Rounded (`--radius-base`) |
+| `avatar` | `--space-xl` | `--space-xl` | Circle (`--radius-full`) |
+| `card` | `100%` | `--space-4xl` | Rounded (`--radius-base`) |
+| `paragraph` | `100%` | auto | 3 text lines, last at 60% width |
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+  import Skeleton from '@components/ui/Skeleton.svelte';
+</script>
+
+<!-- Single text line -->
+<Skeleton variant="text" />
+
+<!-- Avatar with text lines -->
+<div class="flex flex-row items-center gap-md">
+  <Skeleton variant="avatar" />
+  <div class="flex flex-col gap-sm flex-1">
+    <Skeleton variant="text" width="40%" />
+    <Skeleton variant="text" width="60%" />
+  </div>
+</div>
+
+<!-- Card placeholder -->
+<Skeleton variant="card" />
+
+<!-- Paragraph (4 lines) -->
+<Skeleton variant="paragraph" lines={4} />
+```
+
+**Physics:** Inherits all physics behavior from the `shimmer` mixin — energy-primary glow in glass/flat dark, white sweep in light, scan-line in retro.
+
+**Showcase:** [/components → Effects](src/components/ui-library/Effects.svelte)
+
+---
+
 #### `<KineticText>` — Physics-aware kinetic typography
 
 **Description:** Thin wrapper around the `use:kinetic` action with four animation modes: typewriter (char), word-by-word (word), scramble-to-resolve (decode), and rotating word list (cycle). Animation logic lives in the action; SCSS owns cursor appearance. Adapts cursor glow and timing to all physics presets. Supports reduced motion (instant reveal).

@@ -23,3 +23,24 @@
     @include shimmer;
   }
 }
+
+// Skeleton — shape variants for shimmer-surface placeholder elements.
+.skeleton {
+  &[data-variant='text'] {
+    width: 100%;
+    height: 1em;
+    border-radius: var(--radius-base);
+  }
+
+  &[data-variant='avatar'] {
+    width: var(--space-xl);
+    height: var(--space-xl);
+    border-radius: var(--radius-full);
+  }
+
+  &[data-variant='card'] {
+    width: 100%;
+    height: var(--space-4xl);
+    border-radius: var(--radius-base);
+  }
+}

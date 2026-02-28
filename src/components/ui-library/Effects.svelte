@@ -2,6 +2,7 @@
   import { RotateCcw } from '@lucide/svelte';
   import KineticText from '@components/ui/KineticText.svelte';
   import LoadingTextCycler from '@components/ui/LoadingTextCycler.svelte';
+  import Skeleton from '@components/ui/Skeleton.svelte';
 
   let replayChar = $state(0);
   let replayWord = $state(0);
@@ -307,6 +308,42 @@
       </p>
     </div>
 
+    <!-- ─── SKELETON LOADING ──────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Skeleton Loading</h5>
+      <p class="text-small text-mute">
+        Placeholder shapes that shimmer while content loads. Built on the same
+        shimmer infrastructure as other loading effects. Four variants: text
+        lines, avatars, cards, and paragraphs.
+      </p>
+
+      <div class="surface-sunk p-lg flex flex-col gap-lg">
+        <!-- Single text line -->
+        <Skeleton variant="text" />
+
+        <!-- Avatar + text combo -->
+        <div class="flex flex-row items-center gap-md">
+          <Skeleton variant="avatar" />
+          <div class="flex flex-col gap-sm flex-1">
+            <Skeleton variant="text" width="40%" />
+            <Skeleton variant="text" width="60%" />
+          </div>
+        </div>
+
+        <!-- Card -->
+        <Skeleton variant="card" />
+
+        <!-- Paragraph -->
+        <Skeleton variant="paragraph" lines={4} />
+      </div>
+
+      <p class="text-caption text-mute px-xs">
+        Use <code>&lt;Skeleton variant="text|avatar|card|paragraph" /&gt;</code
+        >. Override dimensions with <code>width</code> and <code>height</code>
+        props. Paragraph variant accepts a <code>lines</code> prop (default 3).
+      </p>
+    </div>
+
     <details>
       <summary>View Code</summary>
       <pre><code
@@ -334,6 +371,13 @@
     @include shimmer;
   &#125;
 &#125;
+
+&lt;!-- Skeleton loading --&gt;
+&lt;Skeleton variant="text" /&gt;
+&lt;Skeleton variant="avatar" /&gt;
+&lt;Skeleton variant="card" /&gt;
+&lt;Skeleton variant="paragraph" lines=&#123;4&#125; /&gt;
+&lt;Skeleton variant="text" width="60%" /&gt;
 
 &lt;!-- Loading text cycler --&gt;
 &lt;LoadingTextCycler /&gt;
