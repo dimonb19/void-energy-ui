@@ -2086,17 +2086,33 @@ See [tooltip.ts](src/actions/tooltip.ts) for Svelte action.
 
 #### `.toast-message`
 
-**Description:** Notification capsule (Success, Error, Info)
-**Variants:** `.toast-success`, `.toast-error`, `.toast-info`
-**Physics:** Slides in from edge, auto-dismisses
+**Description:** Notification capsule rendered by `Toast.svelte`. Not used directly — call `toast.show()` / `toast.undo()` instead.
 
-**Usage:**
+**Location:** `src/components/Toast.svelte`
+**CSS:** `.toast-message` (`src/styles/components/_toasts.scss`)
 
-```svelte
-<div class="toast-message toast-success">
-  <p>Success!</p>
-</div>
-```
+**States:**
+
+| State | Attribute | Visual |
+| --- | --- | --- |
+| Info | `data-type="info"` | System accent border/bg |
+| Success | `data-type="success"` | Green accent |
+| Error | `data-type="error"` | Red accent |
+| Warning | `data-type="warning"` | Premium/gold accent |
+| Loading | `data-type="loading"` | Muted accent, spinner icon |
+
+**Sub-elements:**
+
+| Class | Description |
+| --- | --- |
+| `.toast-icon` | Type-driven icon, colored by `--toast-accent` |
+| `.toast-text` | Message content |
+| `.toast-action` | Optional inline action button (e.g., Undo). Accent-colored, underlined; retro: solid border |
+
+**Physics:**
+- **Glass:** `glass-float` + `glass-blur`, glow on hover
+- **Flat/Light:** Reduced blend (5%), subtle lift on hover
+- **Retro:** Canvas blend (10%), solid border, stepped spinner
 
 See [toast.svelte.ts](src/stores/toast.svelte.ts) for state management.
 
@@ -3169,6 +3185,15 @@ await toast.promise(saveItems(items), {
   loading: 'Saving...',
   success: (result) => `Saved ${result.count} items`,
   error: (err) => `Error: ${err.message}`,
+});
+
+// Undo pattern (success toast + action button, 6s default)
+toast.undo('Item deleted', () => restoreItem(backup));
+
+// Generic action button on any toast
+toast.show('File uploaded', 'success', 5000, {
+  label: 'View',
+  onclick: () => navigateTo('/files'),
 });
 ```
 

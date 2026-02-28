@@ -163,3 +163,56 @@
   z-index: 1;
   color: var(--text-main);
 }
+
+// ==========================================================================
+// 5. ACTION BUTTON
+// ==========================================================================
+
+.toast-action {
+  @include btn-reset;
+
+  color: var(--toast-accent);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-small);
+  white-space: nowrap;
+
+  border-radius: var(--radius-base);
+  border: var(--physics-border-width) solid transparent;
+  transition:
+    background-color var(--speed-fast) var(--ease-spring-snappy),
+    border-color var(--speed-fast) var(--ease-spring-snappy);
+
+  &:hover {
+    background: alpha(var(--toast-accent), 12%);
+    border-color: alpha(var(--toast-accent), 25%);
+  }
+
+  &:active {
+    filter: brightness(0.85);
+    transform: scale(0.96);
+  }
+
+  &:focus-visible {
+    box-shadow: var(--focus-ring);
+  }
+
+  @include when-retro {
+    border-color: var(--toast-accent);
+
+    &:hover {
+      background: alpha(var(--toast-accent), 20%);
+    }
+
+    &:active {
+      filter: none;
+      transform: none;
+      color: var(--text-main);
+    }
+  }
+
+  @include when-light {
+    &:hover {
+      background: alpha(var(--toast-accent), 10%);
+    }
+  }
+}

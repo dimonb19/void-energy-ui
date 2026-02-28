@@ -263,10 +263,11 @@ Registry: src/config/modal-registry.ts (add new fragments here)
 
 ### Toast (`import { toast } from '@stores/toast.svelte'`)
 ```
-.show(message, type?, duration?)    Types: 'info' | 'success' | 'error' | 'warning'
-.close(id)                          Remove specific toast
-.clearAll()                         Remove all toasts
-.loading(message)                   Returns controller: { update, success, error, warning, close }
+.show(message, type?, duration?, action?)  Types: 'info' | 'success' | 'error' | 'warning'
+.undo(message, callback, duration?)        Success toast with Undo action button (6s default)
+.close(id)                                 Remove specific toast
+.clearAll()                                Remove all toasts
+.loading(message)                          Returns controller: { update, success, error, warning, close }
 .promise(promise, { loading, success, error })
 ```
 

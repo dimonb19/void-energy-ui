@@ -3,6 +3,7 @@
   import { dematerialize, materialize } from '@lib/transitions.svelte';
   import { Info, Check, TriangleAlert, X } from '@lucide/svelte';
   import LoadingSpin from './icons/LoadingSpin.svelte';
+  import Undo from './icons/Undo.svelte';
 
   const icons: Record<string, typeof Info> = {
     info: Info,
@@ -74,6 +75,29 @@
       </span>
 
       <span class="toast-text">{item.message}</span>
+
+      {#if item.action}
+        <span
+          class="toast-action inline-flex items-center gap-xs py-xs px-sm"
+          role="button"
+          tabindex="0"
+          onclick={(e) => {
+            e.stopPropagation();
+            item.action!.onclick();
+          }}
+          onkeydown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.stopPropagation();
+              item.action!.onclick();
+            }
+          }}
+        >
+          {#if item.action.label === 'Undo'}
+            <Undo data-size="sm" />
+          {/if}
+          {item.action.label}
+        </span>
+      {/if}
     </button>
   {/each}
 </div>

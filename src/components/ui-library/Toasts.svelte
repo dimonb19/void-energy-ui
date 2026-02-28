@@ -37,7 +37,8 @@
       Non-blocking notifications for success, error, warning, and informational
       feedback. Toasts appear, deliver the message, and auto-dismiss. A loading
       variant tracks async operations with real-time status updates and
-      automatic success/error resolution.
+      automatic success/error resolution. Toasts can also carry inline action
+      buttons for "undo over confirmation" workflows.
     </p>
 
     <details>
@@ -46,8 +47,11 @@
         Toast notifications use the <code>toast</code> singleton for ephemeral
         feedback. Four semantic types map to accent colors:
         <code>info</code> (system), <code>success</code>, <code>error</code>,
-        and <code>warning</code>. The <code>loading</code> type persists until explicitly
-        resolved. Toasts auto-dismiss after 4 seconds by default.
+        and <code>warning</code>. The <code>loading</code> type persists until
+        explicitly resolved. Toasts auto-dismiss after 4 seconds by default. Any
+        toast can carry an optional <code>action</code> button; the
+        <code>toast.undo()</code> convenience method wraps this pattern with a 6-second
+        window.
       </p>
     </details>
 
@@ -86,6 +90,42 @@
       <p class="text-caption text-mute px-xs">
         Warning toasts use the Premium accent color &mdash; both signal
         &ldquo;pay attention&rdquo; and share the same visual weight.
+      </p>
+    </div>
+
+    <!-- ACTION BUTTONS -->
+    <div class="flex flex-col gap-md">
+      <h5>Action Buttons</h5>
+      <p class="text-small text-mute">
+        Toasts can include an inline action button for "undo over confirmation"
+        patterns. The <code>toast.undo()</code> convenience method shows a success
+        toast with an Undo button that fires a callback when clicked.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
+        <button
+          class="btn-success"
+          onclick={() =>
+            toast.undo('Item deleted', () =>
+              toast.show('Item restored', 'success'),
+            )}
+        >
+          Undo Toast
+        </button>
+        <button
+          onclick={() =>
+            toast.show('File uploaded', 'success', 5000, {
+              label: 'View',
+              onclick: () => toast.show('Navigating to files...', 'info'),
+            })}
+        >
+          Action Toast
+        </button>
+      </div>
+
+      <p class="text-caption text-mute px-xs">
+        Click the action button inside the toast to trigger the callback.
+        Clicking the toast body (outside the action) dismisses it normally.
       </p>
     </div>
 
@@ -145,6 +185,15 @@ toast.promise(fetchData(), &#123;
   loading: 'Fetching data...',
   success: (data) =&gt; `Loaded $&#123;data.length&#125; items`,
   error: 'Failed to fetch',
+&#125;);
+
+// Undo pattern
+toast.undo('Item deleted', () =&gt; restoreItem(backup));
+
+// Generic action button
+toast.show('File uploaded', 'success', 5000, &#123;
+  label: 'View',
+  onclick: () =&gt; navigateTo('/files'),
 &#125;);
 
 // Utility

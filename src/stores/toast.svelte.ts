@@ -15,11 +15,16 @@ class ToastStore {
    * @param message - Trusted internal string (supports HTML). ⚠️ NO USER INPUT.
    * @param type - 'info' | 'success' | 'error' | 'warning' | 'loading'
    */
-  show(message: string, type: VoidToastType = 'info', duration = 4000) {
+  show(
+    message: string,
+    type: VoidToastType = 'info',
+    duration = 4000,
+    action?: VoidToastItem['action'],
+  ) {
     const id = Date.now() * 1000 + (this.counter++ % 1000);
 
     // Queue immediately, then schedule auto-dismiss unless it's a manual state.
-    this.items.push({ id, message, type });
+    this.items.push({ id, message, type, action });
 
     if (type !== 'loading') {
       const timer = setTimeout(() => {
@@ -28,6 +33,21 @@ class ToastStore {
       this.timers.set(id, timer);
     }
 
+    return id;
+  }
+
+  /**
+   * Shows a success toast with an Undo action button.
+   * If the user clicks Undo within the duration, the callback fires.
+   */
+  undo(message: string, callback: () => void, duration = 6000) {
+    const id = this.show(message, 'success', duration, {
+      label: 'Undo',
+      onclick: () => {
+        callback();
+        this.close(id);
+      },
+    });
     return id;
   }
 

@@ -238,6 +238,12 @@ interface VoidToastItem {
 
   /** Visual type determining color and icon */
   type: VoidToastType;
+
+  /** Optional inline action button (e.g., Undo) */
+  action?: {
+    label: string;
+    onclick: () => void;
+  };
 }
 
 /**
