@@ -1,0 +1,231 @@
+/* ==========================================================================
+ * PRINT STYLESHEET
+ * ==========================================================================
+ *
+ * Optimizes page rendering for physical print output.
+ * All rules are scoped inside @media print to avoid affecting screen display.
+ *
+ * RATIONALE FOR !important:
+ * Print rules must override the full cascade (component styles, Tailwind
+ * utilities, inline styles). Same justification as forced-colors overrides
+ * in _accessibility.scss.
+ *
+ * RATIONALE FOR PT UNITS:
+ * Physical print media uses point units, not px. 1pt = 1/72 inch.
+ * These are not magic numbers — they are the correct units for the medium.
+ * ========================================================================== */
+
+@use '../abstracts' as *;
+
+@media print {
+  // ==========================================================================
+  // 1. PAGE SETUP
+  // ==========================================================================
+
+  @page {
+    margin: 2cm;
+  }
+
+  // ==========================================================================
+  // 2. CANVAS RESET — White paper, black ink
+  // ==========================================================================
+
+  html,
+  body {
+    background: white !important;
+    background-image: none !important;
+    background-attachment: initial !important;
+    color: black !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    overflow: visible !important;
+    height: auto !important;
+    min-height: auto !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+    backdrop-filter: none !important;
+  }
+
+  // Preserve meaningful backgrounds
+  mark {
+    background: #ff0 !important; // void-ignore
+    color: #000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  code,
+  pre,
+  kbd,
+  samp {
+    background: #f5f5f5 !important; // void-ignore
+    border: 1pt solid #999 !important;
+    color: black !important;
+  }
+
+  // ==========================================================================
+  // 3. HIDE INTERACTIVE / CHROME ELEMENTS
+  // ==========================================================================
+
+  .nav-bar,
+  .bottom-nav,
+  .breadcrumbs,
+  .nav-menu,
+  .nav-menu-scrim,
+  .toast-region,
+  dialog,
+  .page-sidebar,
+  .page-sidebar-toggle-bar,
+  .page-sidebar-scrim,
+  .pull-indicator,
+  .skip-link,
+  [popover] {
+    display: none !important;
+  }
+
+  // ==========================================================================
+  // 4. LAYOUT NORMALIZATION
+  // ==========================================================================
+
+  .page-sidebar-header {
+    position: static !important;
+  }
+
+  .docs-layout {
+    display: block !important;
+  }
+
+  .container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  // ==========================================================================
+  // 5. TYPOGRAPHY
+  // ==========================================================================
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: black !important;
+    break-after: avoid;
+  }
+
+  p,
+  li,
+  td,
+  th,
+  caption,
+  figcaption,
+  dd,
+  dt {
+    color: black !important;
+    orphans: 3;
+    widows: 3;
+  }
+
+  pre {
+    white-space: pre-wrap !important;
+    word-break: break-word !important;
+  }
+
+  // ==========================================================================
+  // 6. LINKS — Show href values
+  // ==========================================================================
+
+  a[href] {
+    color: black !important;
+    text-decoration: underline;
+  }
+
+  a[href^='http']::after,
+  a[href^='https']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.8em;
+    color: #555 !important; // void-ignore
+    font-style: italic;
+    word-break: break-all;
+  }
+
+  // Don't expand internal anchor or javascript links
+  a[href^='#']::after,
+  a[href^='javascript:']::after {
+    content: none;
+  }
+
+  // ==========================================================================
+  // 7. IMAGES & MEDIA
+  // ==========================================================================
+
+  img,
+  picture {
+    max-width: 100% !important;
+    break-inside: avoid;
+  }
+
+  video,
+  audio,
+  iframe,
+  canvas {
+    display: none !important;
+  }
+
+  // ==========================================================================
+  // 8. TABLES
+  // ==========================================================================
+
+  table {
+    border-collapse: collapse !important;
+  }
+
+  thead {
+    display: table-header-group;
+  }
+
+  tr {
+    break-inside: avoid;
+  }
+
+  th,
+  td {
+    border: 1pt solid #999 !important;
+    color: black !important;
+  }
+
+  // ==========================================================================
+  // 9. PAGE BREAKS
+  // ==========================================================================
+
+  img,
+  figure,
+  blockquote,
+  pre,
+  table {
+    break-inside: avoid;
+  }
+
+  h1,
+  h2,
+  h3 {
+    orphans: 3;
+    widows: 3;
+  }
+
+  // ==========================================================================
+  // 10. SCROLLBAR RESET
+  // ==========================================================================
+
+  ::-webkit-scrollbar {
+    display: none !important;
+  }
+}

@@ -307,8 +307,9 @@
 // ==========================================================================
 
 @mixin laser-scrollbar() {
+  // Glass (default): translucent thumb, transparent track, glow on hover
   scrollbar-width: thin;
-  scrollbar-color: var(--energy-secondary) var(--bg-sink);
+  scrollbar-color: alpha(var(--energy-secondary), 50%) transparent;
 
   &::-webkit-scrollbar {
     width: var(--scrollbar-width);
@@ -316,16 +317,81 @@
   }
 
   &::-webkit-scrollbar-track {
-    background: var(--bg-sink);
-    border-radius: var(--radius-full);
+    background: transparent;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: var(--energy-secondary);
+    background: alpha(var(--energy-secondary), 50%);
     border-radius: var(--radius-full);
 
     &:hover {
+      background: alpha(var(--energy-primary), 75%);
+      box-shadow: 0 0 6px alpha(var(--energy-primary), 40%);
+    }
+  }
+
+  // Flat: solid minimal thumb, subtle track, no glow
+  @include when-flat {
+    scrollbar-color: var(--energy-secondary) var(--bg-sink);
+
+    &::-webkit-scrollbar-track {
+      background: var(--bg-sink);
+      border-radius: var(--radius-full);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--energy-secondary);
+      border-radius: var(--radius-full);
+
+      &:hover {
+        background: var(--energy-primary);
+        box-shadow: none;
+      }
+    }
+  }
+
+  // Retro: chunky thumb, visible track border, hard edges
+  @include when-retro {
+    scrollbar-width: auto;
+    scrollbar-color: var(--energy-primary) var(--bg-sink);
+
+    &::-webkit-scrollbar {
+      width: calc(var(--scrollbar-width) * 2);
+      height: calc(var(--scrollbar-width) * 2);
+    }
+
+    &::-webkit-scrollbar-track {
+      background: var(--bg-sink);
+      border-radius: 0;
+      border: var(--physics-border-width) solid var(--border-color);
+    }
+
+    &::-webkit-scrollbar-thumb {
       background: var(--energy-primary);
+      border-radius: 0;
+
+      &:hover {
+        background: var(--energy-secondary);
+        box-shadow: none;
+      }
+    }
+  }
+
+  // Forced Colors (HCM): defer to system scrollbar colors
+  @media (forced-colors: active) {
+    scrollbar-color: ButtonText Canvas;
+
+    &::-webkit-scrollbar-track {
+      background: Canvas;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: ButtonText;
+      box-shadow: none;
+
+      &:hover {
+        background: Highlight;
+      }
     }
   }
 }
@@ -380,6 +446,55 @@
 @mixin mobile-only {
   @media (max-width: map.get($breakpoints, 'tablet')) {
     @content;
+  }
+}
+
+// ==========================================================================
+// 6b. CONTAINER QUERIES
+// ==========================================================================
+//
+// CSS @container query mixin for component-scoped responsive styles.
+// Requires container-type on a parent ancestor.
+//
+// PREREQUISITE:
+//   SCSS:     container-type: inline-size;
+//   Tailwind: class="@container"
+//
+// BREAKPOINTS (smaller than viewport — components resize before the page does):
+//   sm  → 320px  Component minimum (icon grids, narrow chips)
+//   md  → 480px  Small component (basic card layouts)
+//   lg  → 640px  Medium component (two-column form grids)
+//   xl  → 800px  Large component (complex multi-column layouts)
+//
+// USAGE IN SCSS:
+//   .my-card {
+//     flex-direction: column;
+//     @include container-up('md') {
+//       flex-direction: row; // void-hybrid-exception: container layout
+//     }
+//   }
+//
+// USAGE IN TAILWIND:
+//   <div class="@container">
+//     <div class="flex flex-col @md:flex-row gap-md">...</div>
+//   </div>
+//
+// NOTE: This is infrastructure only — no components use container queries yet.
+
+$container-breakpoints: (
+  'sm': 320px,
+  'md': 480px,
+  'lg': 640px,
+  'xl': 800px,
+);
+
+@mixin container-up($breakpoint) {
+  @if map.has-key($container-breakpoints, $breakpoint) {
+    @container (min-width: #{map.get($container-breakpoints, $breakpoint)}) {
+      @content;
+    }
+  } @else {
+    @warn "Container breakpoint `#{$breakpoint}` not found. Available: #{map.keys($container-breakpoints)}";
   }
 }
 

@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 import plugin from 'tailwindcss/plugin';
+import containerQueries from '@tailwindcss/container-queries';
 import {
   VOID_SPACING,
   VOID_RESPONSIVE,
@@ -33,6 +34,14 @@ export default {
       // Min-height utilities
       minHeight: {
         control: 'var(--control-height)', // Matches chip height for layout stability
+      },
+      // Container query breakpoints (smaller than viewport — components resize before the page does).
+      // Usage: class="@container" on parent, then @sm:, @md:, @lg:, @xl: on children.
+      containers: {
+        sm: '320px', // Component minimum (icon grids, narrow chips)
+        md: '480px', // Small component (basic card layouts)
+        lg: '640px', // Medium component (two-column form grids)
+        xl: '800px', // Large component (complex multi-column layouts)
       },
     },
 
@@ -181,5 +190,8 @@ export default {
         },
       });
     }),
+    // Container Queries: enables @container responsive styles.
+    // Usage: class="@container" on parent, @sm:flex-row @lg:grid-cols-2 on children.
+    containerQueries,
   ],
 };

@@ -14,6 +14,8 @@
    - [Base Tables](#f-base-tables)
    - [Form Element Enhancements](#g-form-element-enhancements)
    - [Media & Interactive Elements](#h-media--interactive-elements)
+   - [Global Treatments](#i-global-treatments)
+   - [Container Queries](#j-container-queries)
 4. [Component Catalog](#4-component-catalog)
    - [Surfaces](#a-surfaces-the-skin)
    - [Composites](#b-composites-skin--bone)
@@ -838,6 +840,104 @@ Base defaults for media and interactive HTML elements.
 **The `<img>` alt text trick:** When an image fails to load, `font-style: italic` + `font-size: var(--font-size-small)` + `color: var(--text-mute)` makes the alt text visually distinct from surrounding content.
 
 **Aspect ratios:** Use Tailwind's built-in `aspect-video` (16/9) and `aspect-square` (1/1) utilities. No SCSS duplicates.
+
+---
+
+### I. Global Treatments
+
+System-wide visual treatments applied at the base layer. These are not components — they're global CSS rules that affect all content.
+
+**Source:** [src/styles/base/\_reset.scss](src/styles/base/_reset.scss), [src/styles/base/\_print.scss](src/styles/base/_print.scss), [src/styles/abstracts/\_mixins.scss](src/styles/abstracts/_mixins.scss)
+
+#### `::selection` — Text Selection Highlight
+
+Highlighted text uses the theme's energy-primary color at 25% opacity with `--text-main` for contrast. Adapts across all 12 themes automatically via `color-mix()`.
+
+```scss
+::selection {
+  background: alpha(var(--energy-primary), 25%);
+  color: var(--text-main);
+}
+```
+
+- **Forced colors:** Overridden to `Highlight` / `HighlightText` in `_accessibility.scss`.
+- **Works in both modes:** Dark themes get tinted selection over dark canvas; light themes get tinted selection over light canvas.
+
+#### Scrollbars — Physics-Differentiated (`@include laser-scrollbar`)
+
+Custom scrollbar styling adapts per physics preset. Applied to `html` and reusable via `@include laser-scrollbar` on any scroll container.
+
+| Physics | Thumb | Track | Hover | Edges |
+| --- | --- | --- | --- | --- |
+| **Glass** | `--energy-secondary` at 50% opacity | Transparent | `--energy-primary` at 75% + glow | Rounded (`--radius-full`) |
+| **Flat** | `--energy-secondary` solid | `--bg-sink` | `--energy-primary` solid | Rounded (`--radius-full`) |
+| **Retro** | `--energy-primary` solid | `--bg-sink` with border | `--energy-secondary` solid | Square (0 radius), double-width |
+
+- **Forced colors:** Defers to `ButtonText` / `Canvas` system colors.
+- **Firefox:** `scrollbar-width: thin` (glass/flat) or `auto` (retro); `scrollbar-color` for thumb/track.
+
+#### `@media print` — Print Stylesheet
+
+Comprehensive print optimization. All rules scoped inside `@media print` — zero screen impact.
+
+**Source:** [src/styles/base/\_print.scss](src/styles/base/_print.scss)
+
+| Section | What it does |
+| --- | --- |
+| Canvas reset | White background, black text, removes all shadows/filters/backdrop-filters |
+| Hide chrome | Hides nav, breadcrumbs, sidebar, toasts, dialogs, popovers, pull-indicator, skip-link |
+| Typography | Black headings, orphans/widows control, `break-after: avoid` on headings |
+| Code blocks | Light gray background (#f5f5f5), 1pt border, pre-wrap |
+| Links | External links show href in parentheses via `::after`; internal `#` links don't |
+| Media | Hides video/audio/iframe/canvas; images max-width 100% |
+| Tables | Collapse borders, repeat `thead` on each page, avoid row breaks |
+| Page breaks | Prevents breaks inside images, figures, blockquotes, pre, tables |
+| Preserved elements | `<mark>` keeps yellow highlight; `<code>/<kbd>` keeps gray background |
+
+**Testing:** Cmd+P / Ctrl+P → Print Preview. Verify: no nav/sidebar/toast visible, links show URLs, text is black on white.
+
+---
+
+### J. Container Queries
+
+Component-scoped responsive styles based on container width (not viewport width). Infrastructure is ready — no components use container queries yet.
+
+**Source:** [tailwind.config.mjs](tailwind.config.mjs) (`@tailwindcss/container-queries` plugin), [src/styles/abstracts/\_mixins.scss](src/styles/abstracts/_mixins.scss) (`container-up` mixin)
+
+#### Container Breakpoints
+
+Smaller than viewport breakpoints by design — components resize before the page does.
+
+| Name | Width | Use Case |
+| --- | --- | --- |
+| `sm` | 320px | Component minimum (icon grids, narrow chips) |
+| `md` | 480px | Small component (basic card layouts) |
+| `lg` | 640px | Medium component (two-column form grids) |
+| `xl` | 800px | Large component (complex multi-column layouts) |
+
+#### Usage in Tailwind
+
+```svelte
+<div class="@container">
+  <div class="flex flex-col @md:flex-row gap-md">
+    <!-- Switches to row layout when container ≥ 480px -->
+  </div>
+</div>
+```
+
+#### Usage in SCSS
+
+```scss
+.my-card {
+  container-type: inline-size; // Make this element a container
+
+  .my-card-body {
+    @include container-up('md') {
+      // Styles applied when .my-card ≥ 480px
+    }
+  }
+}
+```
 
 ---
 
@@ -2835,7 +2935,7 @@ h2 {
 
 #### `@include laser-scrollbar`
 
-**Purpose:** Themed scrollbar with energy colors. Cross-browser (WebKit + Firefox).
+**Purpose:** Physics-differentiated themed scrollbar. Cross-browser (WebKit + Firefox). Auto-adapts per physics preset: glass (translucent + glow), flat (solid + minimal), retro (chunky + hard edges). Includes forced-colors fallback.
 
 **Usage:**
 
@@ -2845,6 +2945,30 @@ h2 {
   overflow-y: auto;
 }
 ```
+
+**Physics:** See [Global Treatments → Scrollbars](#scrollbars--physics-differentiated-include-laser-scrollbar) for the full breakdown.
+
+---
+
+#### `@include container-up($breakpoint)`
+
+**Purpose:** Container query mixin for component-scoped responsive styles. Emits `@container (min-width: ...)` rules.
+
+**Prerequisite:** Parent must declare `container-type: inline-size` (SCSS) or `class="@container"` (Tailwind).
+
+**Breakpoints:** `sm` (320px), `md` (480px), `lg` (640px), `xl` (800px)
+
+**Usage:**
+
+```scss
+.card-body {
+  @include container-up('lg') {
+    // Applied when container ≥ 640px
+  }
+}
+```
+
+**See also:** [Container Queries](#j-container-queries) for Tailwind usage and breakpoint rationale.
 
 ---
 

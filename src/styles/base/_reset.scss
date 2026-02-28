@@ -195,8 +195,8 @@ section[id] {
 // =========================================
 
 ::selection {
-  background: var(--energy-primary);
-  color: var(--bg-canvas);
+  background: alpha(var(--energy-primary), 25%);
+  color: var(--text-main);
   text-shadow: none;
 }
 
