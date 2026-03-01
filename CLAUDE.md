@@ -311,10 +311,12 @@ which the stack respects via `defaultPrevented` check — no double-dismissal.
 .toggleDeveloperMode()              Toggle dev mode flag
 ```
 
-### Transitions (`import { materialize, dematerialize, implode, live } from '@lib/transitions.svelte'`)
+### Transitions (`import { emerge, dissolve, materialize, dematerialize, implode, live } from '@lib/transitions.svelte'`)
 ```
-in:materialize     Physics-aware entry (blur + scale + Y). Retro: instant.
-out:dematerialize  Physics-aware exit (upward float + blur). Retro: stepped dissolve.
+in:emerge          Layout-aware entry (height + blur + scale + Y). For elements in document flow.
+out:dissolve       Layout-aware exit (height collapse + blur). For elements in document flow.
+in:materialize     Visual-only entry (blur + scale + Y). For positioned/overlaid elements.
+out:dematerialize  Visual-only exit (upward float + blur). For positioned/overlaid elements.
 out:implode        Horizontal collapse with dissolution.
 animate:live       FLIP list reflow animation.
 ```

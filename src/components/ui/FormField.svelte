@@ -38,7 +38,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
   import { CircleAlert } from '@lucide/svelte';
-  import { materialize, dematerialize } from '@lib/transitions.svelte';
+  import { emerge, dissolve } from '@lib/transitions.svelte';
 
   interface FormFieldProps {
     label?: string;
@@ -102,8 +102,8 @@
       class="form-field-error flex items-center gap-xs"
       aria-live="polite"
       role="alert"
-      in:materialize={{ y: -8 }}
-      out:dematerialize={{ y: -8 }}
+      in:emerge={{ y: -8 }}
+      out:dissolve={{ y: -8 }}
     >
       <CircleAlert class="icon" />
       {error}

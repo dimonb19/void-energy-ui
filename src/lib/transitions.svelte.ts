@@ -226,6 +226,148 @@ export function dematerialize(
 }
 
 /**
+ * Layout-aware entry transition for elements in document flow.
+ * Animates visual properties AND layout space (height, padding, margin).
+ * Usage: <div in:emerge>
+ *
+ * Physics behavior:
+ * - Glass: Blur fade-in with Y-axis translation + height growth
+ * - Flat: Sharp fade-in with scale + height growth (no blur)
+ * - Retro: Instant (0ms duration)
+ *
+ * Note: Reads computed styles once at start (height, padding, margin).
+ * This causes a single layout reflow at animation start.
+ *
+ * Related:
+ * - Pairs with dissolve() for exit
+ * - For positioned/overlaid elements (no layout flow), use materialize() instead
+ * - Vertical counterpart to implode()
+ */
+export function emerge(
+  node: HTMLElement,
+  { delay = 0, duration = null, y = 15 } = {},
+) {
+  const { speedBase, blurInt, isRetro, isFlat, reducedMotion } =
+    getSystemConfig();
+
+  const style = getComputedStyle(node);
+  const height = parseFloat(style.height);
+  const paddingTop = parseFloat(style.paddingTop);
+  const paddingBottom = parseFloat(style.paddingBottom);
+  const marginTop = parseFloat(style.marginTop);
+  const marginBottom = parseFloat(style.marginBottom);
+
+  if (reducedMotion || isRetro) {
+    return {
+      delay,
+      duration: isRetro ? 0 : speedBase,
+      css: (t: number) => `opacity: ${t};`,
+    };
+  }
+
+  return {
+    delay,
+    duration: duration ?? speedBase,
+    easing: cubicOut,
+    css: (t: number, u: number) => {
+      const activeBlur = isFlat ? 0 : Math.max(0, blurInt * (u * 2 - 1));
+
+      return `
+        height: ${t * height}px;
+        padding-top: ${t * paddingTop}px;
+        padding-bottom: ${t * paddingBottom}px;
+        margin-top: ${t * marginTop}px;
+        margin-bottom: ${t * marginBottom}px;
+        overflow: clip;
+        transform: translateY(${u * y}px) scale(${0.96 + 0.04 * t});
+        opacity: ${t};
+        filter: blur(${activeBlur}px);
+      `;
+    },
+  };
+}
+
+/**
+ * Layout-aware exit transition for elements in document flow.
+ * Animates visual properties AND layout space (height, padding, margin).
+ * Usage: <div out:dissolve>
+ *
+ * Physics behavior:
+ * - Glass: Blur + upward float fade-out + height collapse
+ * - Flat: Sharp upward float fade-out + height collapse (no blur)
+ * - Retro: Stepped dissolve with grayscale + height collapse
+ *
+ * Note: Reads computed styles once at start (height, padding, margin).
+ * This causes a single layout reflow at animation start.
+ *
+ * Related:
+ * - Pairs with emerge() for entry
+ * - For positioned/overlaid elements (no layout flow), use dematerialize() instead
+ * - Vertical counterpart to implode()
+ */
+export function dissolve(
+  node: HTMLElement,
+  { delay = 0, duration = null, y = -20 } = {},
+) {
+  const { speedBase, blurInt, isRetro, isFlat, reducedMotion } =
+    getSystemConfig();
+
+  const style = getComputedStyle(node);
+  const height = parseFloat(style.height);
+  const paddingTop = parseFloat(style.paddingTop);
+  const paddingBottom = parseFloat(style.paddingBottom);
+  const marginTop = parseFloat(style.marginTop);
+  const marginBottom = parseFloat(style.marginBottom);
+
+  if (reducedMotion) {
+    return { duration: 0, css: () => 'opacity: 0; height: 0; overflow: clip;' };
+  }
+
+  if (isRetro) {
+    return {
+      delay,
+      duration: duration ?? speedBase,
+      css: (t: number) => {
+        const steppedOpacity = Math.floor(t * 4) / 4;
+        const steppedScale = 0.9 + Math.floor(t * 2) * 0.05;
+        return `
+          height: ${t * height}px;
+          padding-top: ${t * paddingTop}px;
+          padding-bottom: ${t * paddingBottom}px;
+          margin-top: ${t * marginTop}px;
+          margin-bottom: ${t * marginBottom}px;
+          overflow: clip;
+          opacity: ${steppedOpacity};
+          transform: scale(${steppedScale});
+          filter: grayscale(100%) contrast(200%);
+        `;
+      },
+    };
+  }
+
+  return {
+    delay,
+    duration: duration ?? speedBase,
+    easing: cubicIn,
+    css: (t: number, u: number) => {
+      const currentBlur = isFlat ? 0 : blurInt * u;
+
+      return `
+        height: ${t * height}px;
+        padding-top: ${t * paddingTop}px;
+        padding-bottom: ${t * paddingBottom}px;
+        margin-top: ${t * marginTop}px;
+        margin-bottom: ${t * marginBottom}px;
+        overflow: clip;
+        transform: translateY(${u * y}px) scale(${1 - u * 0.05});
+        opacity: ${t};
+        filter: blur(${currentBlur}px);
+      `;
+    },
+  };
+}
+
+/**
  * Collapse animation based on computed dimensions.
  * Horizontally collapses element while maintaining vertical space.
  * Usage: <div out:implode>

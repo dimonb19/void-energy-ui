@@ -1,6 +1,6 @@
 <script lang="ts">
   import { toast } from '@stores/toast.svelte';
-  import { dematerialize, materialize } from '@lib/transitions.svelte';
+  import { emerge, dissolve } from '@lib/transitions.svelte';
   import { Info, Check, TriangleAlert, X } from '@lucide/svelte';
   import LoadingSpin from './icons/LoadingSpin.svelte';
   import Undo from './icons/Undo.svelte';
@@ -60,8 +60,8 @@
       type="button"
       data-type={item.type}
       onclick={() => toast.close(item.id)}
-      in:materialize
-      out:dematerialize={{ y: 0 }}
+      in:emerge
+      out:dissolve={{ y: 0 }}
       onoutrostart={() => (animatingOut = true)}
       onoutroend={() => (animatingOut = false)}
     >

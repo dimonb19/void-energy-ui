@@ -28,6 +28,7 @@
 6. [Quick Patterns (Copy-Paste)](#6-quick-patterns-copy-paste)
 7. [Svelte Actions](#7-svelte-actions)
 8. [Timing Utilities](#8-timing-utilities)
+9. [Svelte Transitions](#9-svelte-transitions)
 
 ---
 
@@ -1677,7 +1678,7 @@ const pv = createPasswordValidation(() => password);
 
 | State | Attribute | Visual |
 | --- | --- | --- |
-| Error | `data-state="error"` | Red error text with CircleAlert icon, materialize/dematerialize transition |
+| Error | `data-state="error"` | Red error text with CircleAlert icon, emerge/dissolve transition |
 | Default | `data-state=""` | Standard label + optional hint text |
 
 **Usage:**
@@ -1929,7 +1930,7 @@ interface SidebarSection {
 - Any page where `scrollIntoView` navigation between `id`-anchored headings improves orientation
 
 **Physics:**
-- **Glass:** Mobile dropdown gets `glass-blur` when open; sunk background at rest; desktop scrollbar auto-hides (translucent `--energy-secondary` thumb on hover, `--energy-primary` glow on thumb-hover). Scrim: 80% canvas overlay with `materialize`/`dematerialize` transitions
+- **Glass:** Mobile dropdown gets `glass-blur` when open; sunk background at rest; desktop scrollbar auto-hides (translucent `--energy-secondary` thumb on hover, `--energy-primary` glow on thumb-hover). Scrim: 80% canvas overlay with materialize/dematerialize transitions
 - **Flat/Light:** Mobile dropdown gets `box-shadow: var(--shadow-float)` in light mode; solid borders. Desktop scrollbar: solid `--energy-secondary` thumb with `--bg-sink` track, rounded edges. Scrim: 50% text-main overlay
 - **Retro:** `steps(8)` timing on transform transitions; hard borders. Desktop scrollbar: chunky `--energy-primary` thumb, `--bg-sink` track with border, square edges, double-width (`scrollbar-width: auto`)
 
@@ -2027,7 +2028,7 @@ interface SidebarSection {
 | `rootMargin: '-20% 0px -70% 0px'` | Narrow viewport band — a section becomes active when it crosses ~20% from the top |
 | Hash URL sync | `hashchange` listener keeps `activeId` in sync with browser back/forward navigation |
 | `onclose` callback | Parent returns focus to toggle button after Escape or click — required for keyboard accessibility |
-| Scrim overlay | `page-sidebar-scrim` covers viewport below mobile dropdown; click-to-dismiss; uses `materialize`/`dematerialize` transitions; hidden at `large-desktop+` |
+| Scrim overlay | `page-sidebar-scrim` covers viewport below mobile dropdown; click-to-dismiss; uses materialize/dematerialize transitions; hidden at `large-desktop+` |
 | Shared `{#snippet}` | `sidebarItems()` snippet renders the item list once — no duplication between mobile/desktop |
 
 ---
@@ -4275,6 +4276,121 @@ Both return `T & { cancel(): void }` — the original function signature plus a 
 
 ---
 
+## 9. Svelte Transitions
+
+Physics-aware transition functions for conditional element rendering.
+**Location:** [src/lib/transitions.svelte.ts](src/lib/transitions.svelte.ts)
+
+All transitions read physics timing from `void-physics.json` and adapt to the active atmosphere. Retro physics = instant (0ms). Reduced motion = opacity-only or instant.
+
+### Choosing the Right Transition
+
+| Scenario | In | Out |
+| --- | --- | --- |
+| **Element in document flow** (pushes siblings) | `in:emerge` | `out:dissolve` |
+| **Positioned/overlaid element** (no layout impact) | `in:materialize` | `out:dematerialize` |
+| **Horizontal removal** (chips, tags) | — | `out:implode` |
+| **List reflow** (keyed `{#each}`) | — | `animate:live` |
+
+### A. Layout-Aware: `emerge` / `dissolve`
+
+Animate both visual properties (opacity, blur, scale, translateY) AND layout space (height, padding, margin). Prevents the "content jump" when elements enter/leave document flow.
+
+**When to use:** Any `{#if}` block where the element participates in flex/grid layout and its appearance/disappearance shifts siblings. Error messages, validation indicators, toast notifications.
+
+**Params:**
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| `delay` | `number` | `0` | Delay in ms |
+| `duration` | `number \| null` | physics default | Override duration (ms) |
+| `y` | `number` | `15` (emerge) / `-20` (dissolve) | Y-axis offset in px |
+
+**Physics:**
+
+| Preset | Behavior |
+| --- | --- |
+| **Glass** | Blur fade + Y translation + scale + height growth/collapse (300ms) |
+| **Flat** | Sharp fade + scale + height growth/collapse, no blur (280ms) |
+| **Retro** | Instant (0ms) |
+
+**Usage:**
+
+```svelte
+<script>
+  import { emerge, dissolve } from '@lib/transitions.svelte';
+</script>
+
+{#if hasError}
+  <p in:emerge={{ y: -8 }} out:dissolve={{ y: -8 }}>Error message</p>
+{/if}
+
+{#if password}
+  <div in:emerge out:dissolve>
+    <!-- Meter, checklist, etc. -->
+  </div>
+{/if}
+```
+
+**Used in:** FormField (error), PasswordMeter, PasswordChecklist, Toast
+
+---
+
+### B. Visual-Only: `materialize` / `dematerialize`
+
+Animate only visual properties (opacity, blur, scale, translateY). Element layout space is allocated/freed instantly. Lighter than emerge/dissolve — no `getComputedStyle` call.
+
+**When to use:** Positioned/overlaid elements that don't affect document flow. Modal scrims, sidebar overlays, tooltip content, floating panels.
+
+**Params:** Same as emerge/dissolve.
+
+**Usage:**
+
+```svelte
+{#if open}
+  <div class="scrim" in:materialize out:dematerialize></div>
+{/if}
+```
+
+**Used in:** Sidebar (scrim), ThemesFragment, EditField/GenerateField (field-slot-right)
+
+---
+
+### C. Horizontal Collapse: `implode`
+
+Collapses element width, padding, and margin to zero with blur/grayscale dissolve. Exit-only.
+
+**Params:**
+
+| Param | Type | Default | Description |
+| --- | --- | --- | --- |
+| `delay` | `number` | `0` | Delay in ms |
+| `duration` | `number \| null` | `speedFast` | Override duration (ms) |
+
+**Usage:**
+
+```svelte
+{#each chips as chip (chip.id)}
+  <button animate:live out:implode>{chip.label}</button>
+{/each}
+```
+
+---
+
+### D. List Reflow: `live`
+
+FLIP animation for keyed `{#each}` blocks. Smoothly repositions siblings when list items are added, removed, or reordered.
+
+**Usage:**
+
+```svelte
+{#each items as item (item.id)}
+  <div animate:live in:emerge out:dissolve>{item.text}</div>
+{/each}
+```
+
+---
+
 ## 📚 Related Documentation
 
 - **[THEME-GUIDE.md](./THEME-GUIDE.md)** — How to create custom themes
@@ -4290,4 +4406,5 @@ Both return `T & { cancel(): void }` — the original function signature plus a 
 - **Mixins:** [src/styles/abstracts/\_mixins.scss](src/styles/abstracts/_mixins.scss)
 - **Components:** [src/styles/components/](src/styles/components/)
 - **Actions:** [src/actions/](src/actions/)
+- **Transitions:** [src/lib/transitions.svelte.ts](src/lib/transitions.svelte.ts)
 - **Timing:** [src/lib/timing.ts](src/lib/timing.ts)

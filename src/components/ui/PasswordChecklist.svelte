@@ -23,7 +23,7 @@
 -->
 <script lang="ts">
   import { Check, X } from '@lucide/svelte';
-  import { dematerialize, materialize } from '@lib/transitions.svelte';
+  import { emerge, dissolve } from '@lib/transitions.svelte';
 
   interface PasswordChecklistProps {
     password: string;
@@ -43,8 +43,8 @@
     class="password-checklist flex flex-col gap-xs {className}"
     role="list"
     aria-label="Password requirements"
-    in:materialize
-    out:dematerialize
+    in:emerge
+    out:dissolve
   >
     {#each validation.rules as rule (rule.label)}
       <li

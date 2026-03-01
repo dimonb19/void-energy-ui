@@ -24,7 +24,7 @@
   @see /_fields.scss for .password-meter wrapper styles
 -->
 <script lang="ts">
-  import { dematerialize, materialize } from '@lib/transitions.svelte';
+  import { emerge, dissolve } from '@lib/transitions.svelte';
 
   interface PasswordMeterProps {
     password: string;
@@ -57,8 +57,8 @@
   <div
     class="password-meter flex flex-col gap-xs {className}"
     data-strength={level}
-    in:materialize
-    out:dematerialize
+    in:emerge
+    out:dissolve
   >
     <meter
       min={0}
