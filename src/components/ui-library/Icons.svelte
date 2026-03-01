@@ -47,7 +47,7 @@
   } from '@lucide/svelte';
 
   // Local state for icons
-  let iconSize = $state('4xl');
+  let iconSize = $state('2xl');
   let sizeList = $state([
     { value: 'sm', label: 'Small' },
     { value: 'md', label: 'Medium' },

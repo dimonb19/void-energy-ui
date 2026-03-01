@@ -13,17 +13,15 @@
   import Buttons from './ui-library/Buttons.svelte';
   // Form Controls
   import Inputs from './ui-library/Inputs.svelte';
-  import DataUpload from './ui-library/DataUpload.svelte';
   // Composites
   import Composites from './ui-library/Composites.svelte';
+  import UserState from './ui-library/UserState.svelte';
   // Overlays & Feedback
   import FloatingUI from './ui-library/FloatingUI.svelte';
   import Toasts from './ui-library/Toasts.svelte';
   import Modals from './ui-library/Modals.svelte';
   // Effects
   import Effects from './ui-library/Effects.svelte';
-  // State Patterns
-  import UserState from './ui-library/UserState.svelte';
 
   const sidebarSections = [
     {
@@ -44,14 +42,14 @@
     },
     {
       label: 'Form Controls',
-      items: [
-        { id: 'inputs', label: 'Inputs' },
-        { id: 'data-upload', label: 'Data Upload' },
-      ],
+      items: [{ id: 'inputs', label: 'Inputs' }],
     },
     {
       label: 'Composites',
-      items: [{ id: 'composites', label: 'Composites' }],
+      items: [
+        { id: 'composites', label: 'Composites' },
+        { id: 'user-state', label: 'User State' },
+      ],
     },
     {
       label: 'Overlays & Feedback',
@@ -64,10 +62,6 @@
     {
       label: 'Effects',
       items: [{ id: 'effects', label: 'Effects' }],
-    },
-    {
-      label: 'State Patterns',
-      items: [{ id: 'user-state', label: 'User State' }],
     },
   ];
 
@@ -203,7 +197,6 @@
             </p>
           </div>
           <Inputs />
-          <DataUpload />
 
           <hr />
 
@@ -215,6 +208,7 @@
             </p>
           </div>
           <Composites />
+          <UserState />
 
           <hr />
 
@@ -238,16 +232,6 @@
             </p>
           </div>
           <Effects />
-
-          <hr />
-
-          <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
-            <h3 class="text-dim">State Patterns</h3>
-            <p class="text-small text-mute">
-              Reactive state singletons for application-level concerns.
-            </p>
-          </div>
-          <UserState />
         </div>
       </div>
     </PullRefresh>

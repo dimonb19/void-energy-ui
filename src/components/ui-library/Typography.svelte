@@ -99,6 +99,72 @@
       </details>
     </div>
 
+    <!-- SEMANTIC COLORS -->
+    <div class="flex flex-col gap-sm">
+      <h5>Semantic Colors</h5>
+      <p class="text-small text-mute">
+        Tailwind text color utilities for emphasis layers and semantic meaning.
+        Emphasis layers (<code>.text-main</code>, <code>.text-dim</code>,
+        <code>.text-mute</code>) control visual hierarchy. Semantic colors
+        communicate intent: accent, premium, system, success, error. All adapt
+        to the active atmosphere.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <p class="text-main">
+          <code>.text-main</code> &mdash; headings, primary labels, maximum emphasis
+        </p>
+        <p class="text-dim">
+          <code>.text-dim</code> &mdash; body text, descriptions (default paragraph
+          color)
+        </p>
+        <p class="text-mute">
+          <code>.text-mute</code> &mdash; captions, metadata, placeholder-weight
+          text
+        </p>
+        <hr />
+        <p class="text-primary">
+          <code>.text-primary</code> &mdash; energy accent, matches atmosphere
+        </p>
+        <p class="text-premium">
+          <code>.text-premium</code> &mdash; premium / warning actions
+        </p>
+        <p class="text-system">
+          <code>.text-system</code> &mdash; system-level information
+        </p>
+        <p class="text-success">
+          <code>.text-success</code> &mdash; confirmations, positive states
+        </p>
+        <p class="text-error">
+          <code>.text-error</code> &mdash; errors, destructive actions
+        </p>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;!-- Emphasis layers --&gt;
+&lt;p class="text-main"&gt;Maximum emphasis&lt;/p&gt;
+&lt;p class="text-dim"&gt;Standard body text&lt;/p&gt;
+&lt;p class="text-mute"&gt;Metadata and captions&lt;/p&gt;
+
+&lt;!-- Semantic colors --&gt;
+&lt;p class="text-primary"&gt;Accent color&lt;/p&gt;
+&lt;p class="text-premium"&gt;Premium / warning&lt;/p&gt;
+&lt;p class="text-system"&gt;System information&lt;/p&gt;
+&lt;p class="text-success"&gt;Success state&lt;/p&gt;
+&lt;p class="text-error"&gt;Error state&lt;/p&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        Emphasis layers use <code>--text-main/dim/mute</code> tokens. Semantic
+        colors use <code>--energy-primary</code> and
+        <code>--color-premium/system/success/error</code> tokens. All are Tailwind
+        utilities &mdash; no SCSS needed.
+      </p>
+    </div>
+
     <!-- CODE FAMILY -->
     <div class="flex flex-col gap-sm">
       <h5>Code Family</h5>

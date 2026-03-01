@@ -5,6 +5,8 @@
   import Switcher from '../ui/Switcher.svelte';
   import Selector from '../ui/Selector.svelte';
   import FormField from '../ui/FormField.svelte';
+  import DropZone from '../ui/DropZone.svelte';
+  import { toast } from '@stores/toast.svelte';
 
   // Text input demo
   let textValue = $state('');
@@ -856,6 +858,95 @@
         Monospace font with <code>tabular-nums</code> ensures numbers align
         consistently. The pill background uses
         <code>alpha(energy-primary, 10%)</code>.
+      </p>
+    </div>
+
+    <!-- ─── FILE UPLOAD ──────────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>File Upload</h5>
+      <p class="text-small text-mute">
+        Drag-and-drop file upload via the <code>DropZone</code> component. Wraps
+        a native <code>&lt;input type="file"&gt;</code> with drag detection, type/size
+        validation, and physics-aware active state. Drop files onto the zone or click
+        to browse.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-col gap-lg">
+        <!-- Basic upload -->
+        <div class="flex flex-col gap-xs">
+          <p class="text-small text-dim">
+            Basic &mdash; any file type or size:
+          </p>
+          <DropZone
+            onfiles={(files) => {
+              toast.show(
+                `Uploaded: ${files.map((f) => f.name).join(', ')}`,
+                'success',
+              );
+            }}
+          />
+        </div>
+
+        <!-- Restricted upload -->
+        <div class="flex flex-col gap-xs">
+          <p class="text-small text-dim">
+            Restricted &mdash; <code>.json</code> and <code>.csv</code> only, max
+            2 MB:
+          </p>
+          <DropZone
+            accept=".json,.csv"
+            maxSize={2 * 1024 * 1024}
+            onfiles={(files) => {
+              toast.show(`Valid upload: ${files[0].name}`, 'success');
+            }}
+          />
+        </div>
+
+        <!-- Multiple files -->
+        <div class="flex flex-col gap-xs">
+          <p class="text-small text-dim">
+            Multiple &mdash; select or drop several files at once:
+          </p>
+          <DropZone
+            multiple
+            onfiles={(files) => {
+              toast.show(
+                `${files.length} file${files.length > 1 ? 's' : ''} received`,
+                'info',
+              );
+            }}
+          />
+        </div>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;script&gt;
+  import DropZone from './ui/DropZone.svelte';
+&lt;/script&gt;
+
+&lt;!-- Basic (any file) --&gt;
+&lt;DropZone onfiles=&#123;(files) =&gt; console.log(files)&#125; /&gt;
+
+&lt;!-- Restricted (type + size) --&gt;
+&lt;DropZone
+  accept=".json,.csv"
+  maxSize=&#123;2 * 1024 * 1024&#125;
+  onfiles=&#123;handleFiles&#125;
+/&gt;
+
+&lt;!-- Multiple files --&gt;
+&lt;DropZone multiple onfiles=&#123;handleFiles&#125; /&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        Props: <code>accept</code> (file type filter), <code>maxSize</code>
+        (bytes), <code>multiple</code>, <code>onfiles</code> (callback). Invalid
+        files are rejected with toast errors. Drag-over triggers
+        <code>data-state="active"</code> with shadow elevation and subtle scale-up;
+        retro physics uses a thicker border instead.
       </p>
     </div>
   </div>

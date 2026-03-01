@@ -91,6 +91,86 @@
       </details>
     </div>
 
+    <!-- ─── GROUPED MENU ──────────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Grouped Menu</h5>
+      <p class="text-small text-mute">
+        Use <code>&lt;hr&gt;</code> dividers to group actions visually. This is the
+        most common real-world dropdown pattern &mdash; edit actions, sharing actions,
+        and destructive actions in separate groups.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-row gap-md justify-center">
+        <Dropdown label="File actions">
+          {#snippet trigger()}
+            <span class="flex items-center gap-xs">
+              File <ChevronDown class="icon" data-size="sm" />
+            </span>
+          {/snippet}
+          <div class="flex flex-col p-md gap-xs">
+            <button
+              class="btn-ghost"
+              onclick={() => toast.show('Renamed', 'success')}
+            >
+              Rename
+            </button>
+            <button
+              class="btn-ghost"
+              onclick={() => toast.show('Duplicated', 'success')}
+            >
+              Duplicate
+            </button>
+            <hr />
+            <button
+              class="btn-ghost"
+              onclick={() => toast.show('Link copied', 'info')}
+            >
+              Copy Link
+            </button>
+            <button
+              class="btn-ghost"
+              onclick={() => toast.show('Exported', 'success')}
+            >
+              Export
+            </button>
+            <hr />
+            <button
+              class="btn-ghost btn-error"
+              onclick={() => toast.show('Moved to trash', 'error')}
+            >
+              Delete
+            </button>
+          </div>
+        </Dropdown>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;Dropdown label="File actions"&gt;
+  &#123;#snippet trigger()&#125;
+    File &lt;ChevronDown class="icon" data-size="sm" /&gt;
+  &#123;/snippet&#125;
+  &lt;div class="flex flex-col p-md gap-xs"&gt;
+    &lt;button class="btn-ghost"&gt;Rename&lt;/button&gt;
+    &lt;button class="btn-ghost"&gt;Duplicate&lt;/button&gt;
+    &lt;hr /&gt;
+    &lt;button class="btn-ghost"&gt;Copy Link&lt;/button&gt;
+    &lt;button class="btn-ghost"&gt;Export&lt;/button&gt;
+    &lt;hr /&gt;
+    &lt;button class="btn-ghost btn-error"&gt;Delete&lt;/button&gt;
+  &lt;/div&gt;
+&lt;/Dropdown&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        The <code>&lt;hr&gt;</code> element inherits physics-aware styling
+        inside the dropdown panel. Destructive actions at the bottom use
+        <code>btn-ghost btn-error</code>.
+      </p>
+    </div>
+
     <!-- ─── PLACEMENT VARIANTS ───────────────────────────────────────────── -->
     <div class="flex flex-col gap-sm">
       <h5>Placement</h5>

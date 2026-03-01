@@ -18,6 +18,9 @@
           >glass-float</code
         >) and sunk (<code>glass-sunk</code>). Solid surfaces provide opaque
         backgrounds. All adapt to the active physics preset and color mode.
+        Glass mode adds backdrop blur and luminous borders. Flat mode uses
+        subtle shadows and muted borders. Retro mode uses hard borders with zero
+        radius and no blur.
       </p>
     </details>
 
@@ -75,9 +78,9 @@
       <p class="text-small text-mute">
         Opaque backgrounds with a thin physics border. No blur or shadow.
         <code>.surface-void</code> uses <code>--bg-canvas</code> (the page
-        background) — use for masking overlaps or solid bars.
+        background) &mdash; use for masking overlaps or solid bars.
         <code>.surface-spotlight</code> uses <code>--bg-spotlight</code>
-        (slightly lighter) — use for highlighted sections or active rows.
+        (slightly lighter) &mdash; use for highlighted sections or active rows.
       </p>
 
       <div class="surface-sunk p-md flex flex-col gap-md tablet:flex-row">
@@ -97,6 +100,86 @@
       </div>
     </div>
 
+    <!-- NESTING DEPTH -->
+    <div class="flex flex-col gap-sm">
+      <h5>Nesting Depth</h5>
+      <p class="text-small text-mute">
+        Surfaces nest to create visual hierarchy. A floating glass card contains
+        a sunk area for inputs or secondary content, which can itself contain
+        spotlight rows or void panels. This layering is how real layouts are
+        built &mdash; each level communicates depth and purpose.
+      </p>
+
+      <div class="surface-glass p-lg flex flex-col gap-md">
+        <h5 class="text-dim">Glass panel (outer)</h5>
+
+        <div class="surface-sunk p-md flex flex-col gap-md">
+          <p class="text-small text-mute">
+            Sunk container (inner) &mdash; recessed area for grouped content
+          </p>
+
+          <div class="surface-spotlight p-md flex flex-col gap-xs">
+            <p class="text-small">Spotlight row &mdash; highlighted item</p>
+          </div>
+
+          <div class="surface-void p-md flex flex-col gap-xs">
+            <p class="text-small text-dim">Void row &mdash; baseline item</p>
+          </div>
+        </div>
+      </div>
+
+      <p class="text-caption text-mute px-xs">
+        Pattern: <code>.surface-glass</code> &rarr;
+        <code>.surface-sunk</code> &rarr;
+        <code>.surface-spotlight</code> / <code>.surface-void</code>. This
+        three-level nesting covers most real-world layouts.
+      </p>
+    </div>
+
+    <!-- QUICK REFERENCE -->
+    <div class="flex flex-col gap-sm">
+      <h5>Quick Reference</h5>
+
+      <div class="surface-sunk p-md">
+        <table>
+          <thead>
+            <tr>
+              <th>Class</th>
+              <th>Depth</th>
+              <th>Use Case</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>.surface-glass</code></td>
+              <td>Floating</td>
+              <td>Panels, cards, content wrappers</td>
+            </tr>
+            <tr>
+              <td><code>.surface-glass-action</code></td>
+              <td>Floating</td>
+              <td>Clickable cards, selectable items</td>
+            </tr>
+            <tr>
+              <td><code>.surface-sunk</code></td>
+              <td>Recessed</td>
+              <td>Input areas, demo containers, sidebars</td>
+            </tr>
+            <tr>
+              <td><code>.surface-void</code></td>
+              <td>Flush</td>
+              <td>Canvas-matching backgrounds, solid bars</td>
+            </tr>
+            <tr>
+              <td><code>.surface-spotlight</code></td>
+              <td>Flush</td>
+              <td>Highlighted rows, active sections, callouts</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <details>
       <summary>View Code</summary>
       <pre><code
@@ -111,7 +194,25 @@
 
 &lt;!-- Solid backgrounds --&gt;
 &lt;div class="surface-void p-lg"&gt;Canvas match&lt;/div&gt;
-&lt;div class="surface-spotlight p-lg"&gt;Highlighted section&lt;/div&gt;</code
+&lt;div class="surface-spotlight p-lg"&gt;Highlighted section&lt;/div&gt;
+
+&lt;!-- Nesting pattern --&gt;
+&lt;div class="surface-glass p-lg"&gt;
+  &lt;div class="surface-sunk p-md"&gt;
+    &lt;div class="surface-spotlight p-md"&gt;Highlighted row&lt;/div&gt;
+    &lt;div class="surface-void p-md"&gt;Baseline row&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+&lt;!-- Selectable card --&gt;
+&lt;button
+  class="surface-glass-action p-lg"
+  data-state=&#123;selected ? 'active' : ''&#125;
+  aria-pressed=&#123;selected&#125;
+  onclick=&#123;() =&gt; (selected = !selected)&#125;
+&gt;
+  Card content
+&lt;/button&gt;</code
         ></pre>
     </details>
 

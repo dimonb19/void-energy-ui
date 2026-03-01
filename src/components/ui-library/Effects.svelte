@@ -3,12 +3,18 @@
   import KineticText from '@components/ui/KineticText.svelte';
   import LoadingTextCycler from '@components/ui/LoadingTextCycler.svelte';
   import Skeleton from '@components/ui/Skeleton.svelte';
+  import { morph } from '@actions/morph';
+  import { navlink } from '@actions/navlink';
 
   let replayChar = $state(0);
   let replayWord = $state(0);
   let replayDecode = $state(0);
   let replaySpeed = $state(0);
   let replayCursor = $state(0);
+  let replayCycle = $state(0);
+
+  // Morph demo
+  let morphExpanded = $state(false);
 </script>
 
 <section id="effects" class="flex flex-col gap-md">
@@ -281,6 +287,39 @@
           automatically after animation completes.
         </p>
       </div>
+
+      <!-- Cycle mode -->
+      <div class="flex flex-col gap-xs">
+        <div class="flex items-center justify-between">
+          <h6 class="text-small text-dim">Cycle</h6>
+          <button class="btn-icon" onclick={() => replayCycle++}>
+            <RotateCcw class="icon" data-size="sm" />
+          </button>
+        </div>
+        <div class="surface-sunk p-lg flex flex-col gap-lg">
+          {#key replayCycle}
+            <KineticText
+              words={[
+                'Initializing...',
+                'Calibrating...',
+                'Optimizing...',
+                'Deploying...',
+              ]}
+              mode="cycle"
+              cycleTransition="type"
+              speed={55}
+              cursor
+              loop
+            />
+          {/key}
+        </div>
+        <p class="text-caption text-mute px-xs">
+          Cycles through a <code>words</code> array using the
+          <code>cycleTransition="type"</code> animation (type in, pause, erase,
+          next word). The <code>loop</code> prop restarts after all words are shown.
+          Use this mode directly for custom loading messages or status rotations.
+        </p>
+      </div>
     </div>
 
     <!-- ─── LOADING TEXT CYCLER ──────────────────────────────────── -->
@@ -344,6 +383,96 @@
       </p>
     </div>
 
+    <!-- ─── SVELTE ACTIONS ──────────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Svelte Actions</h5>
+      <p class="text-small text-mute">
+        Reusable directives that add behavior to any element via
+        <code>use:action</code>. These are the building blocks behind several
+        composite components.
+      </p>
+
+      <!-- Morph -->
+      <div class="flex flex-col gap-xs">
+        <h6 class="text-small text-dim">use:morph</h6>
+        <p class="text-small text-mute">
+          Content-driven resize animation. Watches a container via
+          <code>ResizeObserver</code> and smoothly animates
+          <code>width</code> and/or <code>height</code> changes using FLIP transitions.
+          Click the button below to toggle content length.
+        </p>
+        <div class="surface-sunk p-md flex flex-col gap-md">
+          <button onclick={() => (morphExpanded = !morphExpanded)}>
+            {morphExpanded ? 'Collapse' : 'Expand'}
+          </button>
+          <div
+            class="surface-glass p-md"
+            use:morph={{ height: true, width: false, threshold: 2 }}
+          >
+            {#if morphExpanded}
+              <p class="text-small">
+                The void engine processes your request through multiple layers
+                of semantic analysis, pattern matching, and contextual synthesis
+                before materializing the final response. Each layer refines the
+                signal, discarding noise and amplifying intent until the output
+                crystallizes into form.
+              </p>
+            {:else}
+              <p class="text-small">Compact content.</p>
+            {/if}
+          </div>
+        </div>
+        <p class="text-caption text-mute px-xs">
+          Options: <code>height</code>, <code>width</code> (booleans),
+          <code>threshold</code> (minimum px change to animate). Reads
+          <code>--speed-base</code> and <code>--ease-spring-gentle</code>
+          from CSS tokens. Retro physics: instant. Reduced motion: instant.
+        </p>
+      </div>
+
+      <!-- Navlink -->
+      <div class="flex flex-col gap-xs">
+        <h6 class="text-small text-dim">use:navlink</h6>
+        <p class="text-small text-mute">
+          Sets <code>data-status="loading"</code> and
+          <code>aria-busy="true"</code> on click for MPA navigation links. The DOM
+          is replaced on page load, clearing the state naturally. Click the link
+          below &mdash; the loading state appears until the browser navigates.
+        </p>
+        <div class="surface-sunk p-md flex justify-center">
+          <a href="/components" class="link" use:navlink>
+            Reload this page (with loading state)
+          </a>
+        </div>
+        <p class="text-caption text-mute px-xs">
+          No options. Skips modified clicks (Ctrl/Cmd, Shift, middle button).
+          Pair with SCSS <code>@include when-state('loading')</code> for visual feedback.
+        </p>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;script&gt;
+  import &#123; morph &#125; from '@actions/morph';
+  import &#123; navlink &#125; from '@actions/navlink';
+&lt;/script&gt;
+
+&lt;!-- Morph: smooth height animation on content change --&gt;
+&lt;div use:morph=&#123;&#123; height: true, width: false, threshold: 2 &#125;&#125;&gt;
+  &#123;#if expanded&#125;
+    &lt;p&gt;Long content...&lt;/p&gt;
+  &#123;:else&#125;
+    &lt;p&gt;Short content.&lt;/p&gt;
+  &#123;/if&#125;
+&lt;/div&gt;
+
+&lt;!-- Navlink: loading state on navigation --&gt;
+&lt;a href="/page" use:navlink&gt;Go to page&lt;/a&gt;</code
+          ></pre>
+      </details>
+    </div>
+
     <details>
       <summary>View Code</summary>
       <pre><code
@@ -399,12 +528,16 @@
   cycleTransition="type"
   speed=&#123;65&#125;
   cursor
-/&gt;</code
+/&gt;
+
+&lt;!-- Actions --&gt;
+&lt;div use:morph=&#123;&#123; height: true &#125;&#125;&gt;...&lt;/div&gt;
+&lt;a href="/page" use:navlink&gt;Link&lt;/a&gt;</code
         ></pre>
     </details>
 
     <p class="text-caption text-mute px-xs">
-      Both mixins are defined in
+      Shimmer mixins are defined in
       <code>src/styles/abstracts/_mixins.scss</code>. Container shimmer uses the
       <code>shimmer</code>
       keyframe (4s infinite linear); text shimmer uses a separate

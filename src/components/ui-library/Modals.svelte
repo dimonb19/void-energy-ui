@@ -1,6 +1,7 @@
 <script lang="ts">
   import { modal } from '@lib/modal-manager.svelte';
   import { toast } from '@stores/toast.svelte';
+  import { MODAL_KEYS } from '@config/modal-registry';
 </script>
 
 <section id="modals" class="flex flex-col gap-md">
@@ -9,10 +10,11 @@
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Dialogs for confirmations, alerts, and complex interactions. Focus is
-      trapped inside the modal and restored on close. Three sizes (small,
-      medium, large) adapt to content complexity. Built-in convenience methods
+      trapped inside the modal and restored on close. Four sizes (small, medium,
+      large, full) adapt to content complexity. Built-in convenience methods
       handle the most common patterns &mdash; alerts, confirms with cost badges,
-      theme selection, and settings panels.
+      theme selection, settings panels, keyboard shortcuts, and the command
+      palette.
     </p>
 
     <details>
@@ -24,8 +26,9 @@
         <code>layerStack</code> &mdash; if a dropdown is open above a modal,
         Escape closes the dropdown first. The dialog uses
         <code>glass-float</code> + <code>glass-blur</code> physics and
-        transitions via CSS <code>@starting-style</code>. Three sizes:
-        <code>sm</code>, <code>md</code>, <code>lg</code>.
+        transitions via CSS <code>@starting-style</code>. Four sizes:
+        <code>sm</code>, <code>md</code>, <code>lg</code>,
+        <code>full</code>.
       </p>
     </details>
 
@@ -121,10 +124,165 @@
       </div>
     </div>
 
+    <!-- COMMAND PALETTE & SHORTCUTS -->
+    <div class="flex flex-col gap-sm">
+      <h5>Command Palette & Shortcuts</h5>
+      <p class="text-small text-mute">
+        <code>modal.palette()</code> opens a fuzzy-search command palette (<code
+          >md</code
+        >
+        size). <code>modal.shortcuts()</code> opens a keyboard shortcut
+        reference grouped by category (<code>sm</code> size). The command
+        palette is also wired to <kbd>Cmd</kbd> + <kbd>K</kbd> /
+        <kbd>Ctrl</kbd> + <kbd>K</kbd> globally.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
+        <button onclick={() => modal.palette()}> Command Palette </button>
+        <button onclick={() => modal.shortcuts()}> Shortcuts </button>
+      </div>
+
+      <p class="text-caption text-mute px-xs">
+        The shortcuts modal reads from <code>shortcutRegistry.entries</code>
+        &mdash; any shortcut registered via the registry appears automatically.
+      </p>
+    </div>
+
+    <!-- SIZE COMPARISON -->
+    <div class="flex flex-col gap-sm">
+      <h5>Sizes</h5>
+      <p class="text-small text-mute">
+        Four dialog sizes control width: <code>sm</code> (alerts,
+        confirmations), <code>md</code> (forms, selections),
+        <code>lg</code> (complex panels), <code>full</code> (immersive
+        experiences that fill the viewport). Pass the size as the third argument
+        to <code>modal.open()</code>.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
+        <button
+          onclick={() =>
+            modal.open(
+              MODAL_KEYS.ALERT,
+              {
+                title: 'Small Dialog',
+                body: 'This alert uses the <code>sm</code> size — compact, focused, minimal.',
+              },
+              'sm',
+            )}
+        >
+          Small (sm)
+        </button>
+        <button
+          onclick={() =>
+            modal.open(
+              MODAL_KEYS.ALERT,
+              {
+                title: 'Medium Dialog',
+                body: 'This alert uses the <code>md</code> size — the default for most interactions.',
+              },
+              'md',
+            )}
+        >
+          Medium (md)
+        </button>
+        <button
+          onclick={() =>
+            modal.open(
+              MODAL_KEYS.ALERT,
+              {
+                title: 'Large Dialog',
+                body: 'This alert uses the <code>lg</code> size — for complex panels with more content.',
+              },
+              'lg',
+            )}
+        >
+          Large (lg)
+        </button>
+        <button
+          onclick={() =>
+            modal.open(
+              MODAL_KEYS.ALERT,
+              {
+                title: 'Full Dialog',
+                body: 'This alert uses the <code>full</code> size — fills the viewport with safe area inset awareness. Use for immersive layouts like editors, galleries, or configuration wizards.',
+              },
+              'full',
+            )}
+        >
+          Full (full)
+        </button>
+      </div>
+    </div>
+
+    <!-- CUSTOM FRAGMENTS -->
+    <div class="flex flex-col gap-sm">
+      <h5>Custom Fragments</h5>
+      <p class="text-small text-mute">
+        Add your own modal content by creating a fragment component, registering
+        it in the modal registry, and opening it via <code>modal.open()</code>.
+        Three steps:
+      </p>
+
+      <details>
+        <summary>View Pattern</summary>
+        <pre><code
+            >// 1. Create the fragment component
+// src/components/modals/InviteFragment.svelte
+&lt;script lang="ts"&gt;
+  let &#123; email, onInvite &#125;: &#123;
+    email: string;
+    onInvite: (email: string) =&gt; void;
+  &#125; = $props();
+&lt;/script&gt;
+
+&lt;div class="flex flex-col gap-lg p-xl"&gt;
+  &lt;h2 id="modal-title"&gt;Invite User&lt;/h2&gt;
+  &lt;p&gt;Send an invitation to &lt;strong&gt;&#123;email&#125;&lt;/strong&gt;&lt;/p&gt;
+  &lt;div class="flex justify-end gap-md"&gt;
+    &lt;button class="btn-ghost btn-error" onclick=&#123;() =&gt; modal.close()&#125;&gt;
+      Cancel
+    &lt;/button&gt;
+    &lt;button class="btn-cta" onclick=&#123;() =&gt; onInvite(email)&#125;&gt;
+      Send Invite
+    &lt;/button&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+// 2. Register in src/config/modal-registry.ts
+import InviteFragment from '@components/modals/InviteFragment.svelte';
+
+export const MODAL_KEYS = &#123;
+  // ...existing keys
+  INVITE: 'invite',
+&#125; as const;
+
+export const modalRegistry = &#123;
+  // ...existing entries
+  invite: InviteFragment,
+&#125;;
+
+// 3. Open from anywhere
+modal.open(MODAL_KEYS.INVITE, &#123;
+  email: 'user@example.com',
+  onInvite: (email) =&gt; sendInvite(email),
+&#125;, 'md');</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        Fragment props are type-checked via
+        <code>ModalContract</code> in
+        <code>src/types/modal.d.ts</code>. Add a matching entry there to get
+        full type safety on <code>modal.open()</code> calls.
+      </p>
+    </div>
+
     <details>
       <summary>View Code</summary>
       <pre><code
           >import &#123; modal &#125; from '@lib/modal-manager.svelte';
+import &#123; MODAL_KEYS &#125; from '@config/modal-registry';
 
 // Alert (informational, sm size)
 modal.alert('Title', 'Body text supports &lt;strong&gt;HTML&lt;/strong&gt;.');
@@ -136,20 +294,16 @@ modal.confirm('Delete Item?', 'This cannot be undone.', &#123;
   cost: 500,  // optional badge on confirm button
 &#125;);
 
-// Built-in modals (lg size)
-modal.themes();
-modal.settings();
+// Built-in modals
+modal.themes();      // lg — atmosphere selector
+modal.settings();    // lg — display preferences
+modal.palette();     // md — Cmd+K command palette
+modal.shortcuts();   // sm — keyboard shortcut reference
 
-// Custom modal via registry
-modal.open('my-fragment', &#123; prop: value &#125;, 'md');
+// Generic open (any registered fragment + explicit size)
+modal.open(MODAL_KEYS.ALERT, &#123; title: '...', body: '...' &#125;, 'lg');
 modal.close();</code
         ></pre>
     </details>
-
-    <p class="text-caption text-mute px-xs">
-      Custom modal fragments are registered in
-      <code>src/config/modal-registry.ts</code>. Add new fragments there to
-      extend the modal system with project-specific dialogs.
-    </p>
   </div>
 </section>

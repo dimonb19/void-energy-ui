@@ -14,6 +14,22 @@
     setTimeout(() => loader.error('Connection timed out'), 2000);
   }
 
+  function triggerLoadingWarning() {
+    const loader = toast.loading('Syncing data...');
+
+    setTimeout(() => loader.update('Partial response received...'), 1000);
+    setTimeout(
+      () => loader.warning('Sync completed with warnings — 3 items skipped'),
+      2500,
+    );
+  }
+
+  function triggerClearAll() {
+    toast.show('Reactor 1 online', 'info');
+    setTimeout(() => toast.show('Reactor 2 online', 'success'), 200);
+    setTimeout(() => toast.show('Reactor 3 standby', 'warning'), 400);
+  }
+
   function triggerPromise() {
     const fakeRequest = new Promise<string>((resolve) =>
       setTimeout(() => resolve('42 records'), 2000),
@@ -141,13 +157,21 @@
       </p>
 
       <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
-        <button onclick={triggerLoading}> Loading &rarr; Success </button>
-        <button onclick={triggerLoadingError}> Loading &rarr; Error </button>
+        <button class="btn-success" onclick={triggerLoading}>
+          Loading &rarr; Success
+        </button>
+        <button class="btn-error" onclick={triggerLoadingError}>
+          Loading &rarr; Error
+        </button>
+        <button class="btn-premium" onclick={triggerLoadingWarning}>
+          Loading &rarr; Warning
+        </button>
       </div>
 
       <p class="text-caption text-mute px-xs">
-        The first button updates the message mid-flight, then resolves as
-        success. The second resolves as error after a delay.
+        Each button demonstrates a different resolution path. The loading toast
+        persists until a terminal method (<code>.success()</code>,
+        <code>.error()</code>, or <code>.warning()</code>) is called.
       </p>
     </div>
 
@@ -163,6 +187,28 @@
       <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
         <button onclick={triggerPromise}> toast.promise() </button>
       </div>
+    </div>
+
+    <!-- CLEAR ALL -->
+    <div class="flex flex-col gap-sm">
+      <h5>Clear All</h5>
+      <p class="text-small text-mute">
+        <code>toast.clearAll()</code> removes every active toast at once. Click &ldquo;Stack
+        Toasts&rdquo; to fire several in quick succession, then &ldquo;Clear All&rdquo;
+        to sweep them away.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
+        <button onclick={triggerClearAll}> Stack Toasts </button>
+        <button class="btn-ghost btn-error" onclick={() => toast.clearAll()}>
+          Clear All
+        </button>
+      </div>
+
+      <p class="text-caption text-mute px-xs">
+        Useful for page transitions or state resets where stale notifications
+        should not persist.
+      </p>
     </div>
 
     <details>
