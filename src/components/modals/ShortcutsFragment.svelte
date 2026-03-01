@@ -18,7 +18,12 @@
       {#each items as entry (entry.key)}
         <div class="flex flex-row items-center justify-between">
           <dt class="text-dim">{entry.label}</dt>
-          <dd><kbd>{entry.key.toUpperCase()}</kbd></dd>
+          <dd>
+            {#if entry.modifier}
+              <kbd>{entry.modifier === 'meta' ? '⌘' : '⌥'}</kbd>
+            {/if}
+            <kbd>{entry.key.toUpperCase()}</kbd>
+          </dd>
         </div>
       {/each}
     </dl>

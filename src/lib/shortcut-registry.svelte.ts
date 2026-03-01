@@ -53,15 +53,23 @@ class ShortcutRegistry {
     )
       return;
 
-    // Guard: skip when any modifier is held (don't conflict with browser shortcuts)
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    // Phase 1: Modifier combos (Cmd+K, Alt+X, etc.)
+    if (e.metaKey || e.ctrlKey || e.altKey) {
+      if (layerStack.hasLayers) return;
+      // Normalize: treat metaKey and ctrlKey both as 'meta' (cross-platform)
+      const mod: 'meta' | 'alt' = e.metaKey || e.ctrlKey ? 'meta' : 'alt';
+      const entry = this.map.get(e.key);
+      if (entry?.modifier === mod) {
+        e.preventDefault();
+        entry.action();
+      }
+      return;
+    }
 
-    // Guard: skip when any dismissible layer is open (modal, dropdown, sidebar)
+    // Phase 2: Plain single-key shortcuts (original behavior)
     if (layerStack.hasLayers) return;
-
-    // Dispatch
     const entry = this.map.get(e.key);
-    if (entry) {
+    if (entry && !entry.modifier) {
       e.preventDefault();
       entry.action();
     }

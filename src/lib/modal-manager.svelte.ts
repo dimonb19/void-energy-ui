@@ -110,6 +110,13 @@ class ModalManager {
   shortcuts() {
     this.open(MODAL_KEYS.SHORTCUTS, {}, 'sm');
   }
+
+  /**
+   * Opens the Command Palette (Cmd+K).
+   */
+  palette() {
+    this.open(MODAL_KEYS.PALETTE, {}, 'md');
+  }
 }
 
 export const modal = new ModalManager();

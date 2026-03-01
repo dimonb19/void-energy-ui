@@ -1228,12 +1228,14 @@ Preset components with built-in layout and physics.
 | `onsubmit` | `(value: string) => void` | — | Callback on Enter key |
 | `oninput` | `(value: string) => void` | — | Callback on keystroke (debounced if `delay` is set) |
 | `disabled` | `boolean` | `false` | Disables input |
+| `...rest` | `HTMLInputAttributes` | — | Native input attributes (`autofocus`, `role`, `aria-*`, etc.) |
 
 **Usage:**
 
 ```svelte
 <SearchField bind:value={query} onsubmit={handleSearch} zoom="in" />
 <SearchField bind:value={query} oninput={(v) => search(v)} delay={300} />
+<SearchField bind:value={query} autofocus role="combobox" aria-label="Commands" />
 ```
 
 ---
@@ -2153,11 +2155,46 @@ modal.confirm('Delete?', 'Are you sure?', { onConfirm: () => deleteItem() });
 modal.settings();
 modal.themes();
 modal.shortcuts();       // Keyboard shortcuts reference
+modal.palette();         // Command palette (Cmd+K)
 ```
 
 **Escape handling:** Managed by the centralized [layer-stack.svelte.ts](src/lib/layer-stack.svelte.ts). The native `<dialog>` cancel event is suppressed (`e.preventDefault()`); the layer stack's global `keydown` listener pops the modal via `modal.close()`. This ensures correct precedence when a dropdown or sidebar is open above a modal — Escape dismisses the topmost layer first (LIFO).
 
 **Enter-to-confirm:** `ConfirmFragment` and `AlertFragment` use `autofocus` on the primary action button. Since `showModal()` auto-focuses the first `autofocus` element, Enter activates it natively — no custom keydown handler needed. Fragments without a primary action (Themes, Settings, Shortcuts) don't use autofocus.
+
+---
+
+#### Command Palette (`⌘K`)
+
+**Description:** Searchable command list that unifies shortcuts, page navigation, and actions into a single filterable overlay.
+**Location:** [src/components/modals/CommandPaletteFragment.svelte](src/components/modals/CommandPaletteFragment.svelte)
+**CSS:** `.command-palette`, `.palette-results`, `.palette-group-label` ([src/styles/components/\_command-palette.scss](src/styles/components/_command-palette.scss))
+**Size:** `md`
+
+**Data sources:**
+| Source | Group | Description |
+| --- | --- | --- |
+| `shortcutRegistry.entries` | Per-entry group | All registered shortcuts (excluding `⌘K` itself) |
+| Static `pages[]` | Pages | Site navigation (`/`, `/components`, `/conexus`) |
+
+**Keyboard navigation:**
+| Key | Action |
+| --- | --- |
+| `↑` / `↓` | Move active highlight |
+| `Enter` | Execute active command |
+| `Home` / `End` | Jump to first / last item |
+| `Escape` | Close (via layer stack) |
+
+**Item styling:** Each command item is a `btn-ghost` button with `data-state="active"` on the highlighted item. No custom item class — styling is fully inherited from the button system. Hint badges use `<kbd>` with caption-size font.
+
+**ARIA:** `role="combobox"` on SearchField, `role="listbox"` on results container, `role="option"` + `aria-selected` on each item, `aria-activedescendant` for screen reader focus tracking.
+
+**Usage:**
+
+```ts
+import { modal } from '@lib/modal-manager.svelte';
+modal.palette();
+```
 
 ---
 
@@ -2715,19 +2752,25 @@ Reactive singletons for app-wide state. Each store uses `$state` + `$derived` an
 | `F` | Toggle browser fullscreen | General |
 | `T` | Open Themes/Atmospheres modal | General |
 | `?` | Show keyboard shortcuts help | General |
+| `⌘K` / `⌃K` | Open command palette | General |
 
-**Safety guards** (enforced by registry's `handle()` method):
+**Safety guards** (enforced by registry's two-phase `handle()` method):
 - Suppressed inside `<input>`, `<textarea>`, and `contentEditable` elements (WCAG 2.1.4)
-- Suppressed when any modifier key is held (`Ctrl`, `Cmd`, `Alt`) — no browser conflicts
-- Suppressed when any dismissible layer is open (modal, dropdown, sidebar) — via `layerStack.hasLayers`
+- **Phase 1 (modifier combos):** Registered `modifier` shortcuts (e.g., `⌘K`) are checked first. `metaKey` and `ctrlKey` both normalize to `'meta'` for cross-platform support (Cmd on Mac, Ctrl on Win/Linux). Blocked when `layerStack.hasLayers` is true.
+- **Phase 2 (plain keys):** Single-key shortcuts fire only when no modifier is held and no layers are open. Entries with a `modifier` field are skipped in this phase to prevent accidental triggers.
 - Conflict detection: `console.warn` on duplicate key, last-write-wins
 
-**Adding a new shortcut:** Call `shortcutRegistry.register({ key, label, group, action })` from any always-mounted component. The entry automatically appears in the Shortcuts modal.
+**Adding a new shortcut:** Call `shortcutRegistry.register({ key, label, group, action })` from any always-mounted component. The entry automatically appears in the Shortcuts modal. Add `modifier: 'meta'` or `modifier: 'alt'` for combo shortcuts.
 
 ```ts
 import { shortcutRegistry } from '@lib/shortcut-registry.svelte';
 
+// Plain single-key shortcut
 shortcutRegistry.register({ key: 'f', label: 'Toggle fullscreen', group: 'General', action: toggleFullscreen });
+
+// Modifier combo (Cmd+K on Mac, Ctrl+K on Win/Linux)
+shortcutRegistry.register({ key: 'k', modifier: 'meta', label: 'Command palette', group: 'General', action: () => modal.palette() });
+
 shortcutRegistry.unregister('f');
 shortcutRegistry.entries;    // VoidShortcutEntry[] (reactive)
 shortcutRegistry.grouped;    // { group: string, items: VoidShortcutEntry[] }[]

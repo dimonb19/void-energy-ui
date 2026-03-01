@@ -17,6 +17,7 @@
   - onsubmit: Callback on Enter key
   - oninput: Callback on every keystroke (debounced if delay is set)
   - class: Additional CSS classes on the wrapper
+  - ...rest: All native input attributes (autofocus, role, aria-*, etc.)
 
   BEHAVIOR:
   - Search icon rotates 90° when input is focused
@@ -27,8 +28,10 @@
 <script lang="ts">
   import Search from '@components/icons/Search.svelte';
   import { debounce } from '@lib/timing';
+  import type { HTMLInputAttributes } from 'svelte/elements';
 
-  interface SearchFieldProps {
+  interface SearchFieldProps
+    extends Omit<HTMLInputAttributes, 'value' | 'oninput' | 'onsubmit'> {
     value: string;
     id?: string;
     placeholder?: string;
@@ -53,6 +56,7 @@
     onsubmit,
     oninput,
     class: className = '',
+    ...rest
   }: SearchFieldProps = $props();
 
   // svelte-ignore state_referenced_locally
@@ -100,6 +104,7 @@
     onblur={() => (focused = false)}
     onkeydown={handleKeydown}
     oninput={handleInput}
+    {...rest}
   />
   <span class="field-slot-left">
     <Search

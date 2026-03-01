@@ -40,6 +40,9 @@ type ModalContract = {
 
   /** Keyboard shortcuts reference */
   shortcuts: {};
+
+  /** Command palette (Cmd+K) */
+  palette: {};
 };
 
 type DemoLayout = 'compact' | 'comfortable';

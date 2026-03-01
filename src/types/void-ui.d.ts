@@ -450,8 +450,11 @@ interface VoidUser {
  * A registered keyboard shortcut entry.
  */
 interface VoidShortcutEntry {
-  /** The keyboard key to match against KeyboardEvent.key (e.g., 'f', '?', 't') */
+  /** The keyboard key to match against KeyboardEvent.key (e.g., 'f', '?', 'k') */
   key: string;
+
+  /** Optional modifier key. 'meta' matches both Cmd (Mac) and Ctrl (Win/Linux). */
+  modifier?: 'meta' | 'alt';
 
   /** Human-readable label describing the action (e.g., "Toggle fullscreen") */
   label: string;

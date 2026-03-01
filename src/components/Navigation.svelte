@@ -155,6 +155,14 @@
     action: () => modal.shortcuts(),
   });
 
+  shortcutRegistry.register({
+    key: 'k',
+    modifier: 'meta',
+    label: 'Command palette',
+    group: 'General',
+    action: () => modal.palette(),
+  });
+
   // ─────────────────────────────────────────────────────────────────────────────
   // NAV MENU PATTERN
   // ─────────────────────────────────────────────────────────────────────────────
