@@ -240,7 +240,7 @@
             <Bell class="icon" />
           {/snippet}
           <div class="p-md flex flex-col gap-xs">
-            <p class="text-small text-dim">No new notifications</p>
+            <p class="text-mute text-center p-lg">No new notifications</p>
           </div>
         </Dropdown>
 

@@ -209,6 +209,12 @@ Icons inherit color from their parent via `currentColor`. Color is always decide
 - **Never create custom static SVG icon components** — use Lucide instead.
 - **Sizing**: `data-size` attribute (sm | md | lg | xl | 2xl | 3xl | 4xl).
 
+### Empty States
+Plain text, muted color, centered, generous padding. No italic — italic is reserved for prose semantics.
+```html
+<p class="text-mute text-center p-lg">No items yet</p>
+```
+
 ---
 
 ## 5. NATIVE-FIRST PROTOCOL

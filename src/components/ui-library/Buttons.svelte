@@ -280,11 +280,7 @@
         use:morph={{ height: true, width: false }}
       >
         {#if chips.length === 0}
-          <p
-            class="text-caption min-h-control flex items-center justify-center"
-          >
-            No chips — add some below
-          </p>
+          <p class="text-mute text-center p-lg">No chips — add some below</p>
         {:else}
           {#each chips as chip (chip.id)}
             <div class={chip.variant} animate:live out:implode>

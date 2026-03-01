@@ -3787,6 +3787,16 @@ Renders silhouette (guest), initial badge (Admin/Creator), or avatar (Player). F
 
 ---
 
+### Q. Empty State
+
+```svelte
+<p class="text-mute text-center p-lg">No items yet</p>
+```
+
+Plain text with muted color, centered, generous padding. No italic — italic is reserved for prose semantics (`<cite>`, `<q>`, `<dfn>`).
+
+---
+
 ## 7. Svelte Actions
 
 Reusable behaviors attached to elements via `use:action` directive.

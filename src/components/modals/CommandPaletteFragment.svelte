@@ -152,9 +152,7 @@
     aria-label="Commands"
   >
     {#if filtered.length === 0}
-      <p class="palette-empty text-dim text-center p-lg">
-        No matching commands
-      </p>
+      <p class="text-mute text-center p-lg">No matching commands</p>
     {:else}
       {#each grouped as { group, items }}
         <div class="palette-group" role="group" aria-label={group}>
