@@ -90,12 +90,12 @@ $physics-presets: (
       map.get(generated.$generated-physics, 'flat'),
       (
         'surface-bg': var(--bg-surface),
-        'shadow-sunk': inset 0 1px 2px rgba(0, 0, 0, 0.05),
-        // 5% = barely visible
-        'shadow-float': 0 1px 3px rgba(0, 0, 0, 0.05),
-        // 5% = subtle lift
-        'shadow-lift': 0 4px 12px rgba(0, 0, 0, 0.1),
-        // 10% = hover emphasis
+        'shadow-sunk': inset 0 1px 2px alpha(var(--bg-canvas), 10%),
+        // 10% = barely visible (flat: external light, subtle depth)
+        'shadow-float': 0 1px 3px alpha(var(--bg-canvas), 10%),
+        // 10% = subtle lift
+        'shadow-lift': 0 4px 12px alpha(var(--bg-canvas), 18%),
+        // 18% = hover emphasis
       )
     ),
   // Retro: hard edges, no blur (terminal, CRT, pixel art).

@@ -13,6 +13,7 @@
   left: 50%;
   transform: translateX(-50%);
 
+  // void-exception: Popover UA reset coupling + behavioral column-reverse stacking order.
   display: flex;
   flex-direction: column-reverse; // Newest at bottom visually
   align-items: center;
@@ -62,10 +63,7 @@
   @include glass-float;
   pointer-events: auto;
 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: var(--space-xs);
+  // Layout (flex items-center justify-center gap-xs) lives on the template via Tailwind.
 
   // Padding: reduce left to balance icon weight.
   padding-block: var(--space-xs);
@@ -143,15 +141,10 @@
 // ==========================================================================
 
 .toast-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  // Layout (flex items-center justify-center shrink-0) lives on the template via Tailwind.
   font-size: 1.1em; // Emojis look better slightly larger
   line-height: 1;
   color: var(--toast-accent);
-
-  // Prevent icon shrink.
-  flex-shrink: 0;
 }
 
 // ==========================================================================

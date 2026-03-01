@@ -321,7 +321,7 @@ code {
 
   // Light mode: bg-sink can be too subtle (3-5% opacity).
   @include when-light($low-specificity: true) {
-    background: alpha(#000, 7%);
+    background: alpha(var(--text-main), 7%);
   }
 }
 

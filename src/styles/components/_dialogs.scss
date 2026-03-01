@@ -136,6 +136,7 @@ dialog {
   }
 
   // Inner content layout.
+  // void-exception: Parent provides structure for dynamically-rendered modal fragments.
   & > div {
     display: flex;
     flex-flow: column nowrap;
@@ -155,20 +156,15 @@ dialog {
     }
   }
 
-  // Keyboard shortcut key caps.
+  // Keyboard shortcut key caps (sizing overrides — physics inherited from global kbd).
   kbd {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: var(--control-height-sm);
-    height: var(--control-height-sm);
-    padding-inline: var(--space-sm);
-    font-family: var(--font-mono);
-    font-size: var(--text-sm);
-    color: var(--text-main);
-    border-radius: var(--radius-sm);
-    border: var(--physics-border-width) solid var(--border-color);
-    background: var(--bg-inset);
+    min-width: var(--space-lg);
+    height: var(--space-lg);
+    padding-inline: var(--space-xs);
+    font-size: var(--font-size-small);
   }
 
   // Scrollbars.

@@ -246,6 +246,7 @@
 // We define everything inside this block to ensure specificity works correctly.
 button:not(.btn-void, .btn-icon),
 .btn {
+  // void-exception: Global element selector + calc() token gaps — no template access.
   // --- A. Layout & Accessibility ---
   min-height: var(--control-height);
   min-width: var(--control-height);
@@ -576,6 +577,7 @@ button:not(.btn-void, .btn-icon),
 }
 
 // Icon Button
+// void-exception: Dual-usage — component (IconBtn) + bare class across files.
 .btn-icon {
   padding: var(--space-xs);
   min-width: var(--control-height);

@@ -206,10 +206,7 @@ $_slot-width: var(--control-padding-x);
   }
 }
 
-.slider-presets {
-  display: flex;
-  justify-content: space-between;
-}
+// .slider-presets layout (flex justify-between) lives on the template via Tailwind.
 
 .slider-preset {
   font-size: var(--font-size-caption);

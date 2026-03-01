@@ -54,6 +54,7 @@
 
 // MIXIN: Chip Structure
 // Creates the structural DNA for interactive chip components.
+// void-exception: CSS-only classes — no Chip component, bare-class usages across files.
 // --------------------------------------------------------------------------
 @mixin _chip-structure {
   @include btn-reset;

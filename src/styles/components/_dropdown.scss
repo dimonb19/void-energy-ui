@@ -81,9 +81,5 @@
     filter: none;
     background: var(--bg-spotlight);
     border: var(--physics-border-width) solid var(--border-color);
-
-    @include when-state('open') {
-      filter: none;
-    }
   }
 }

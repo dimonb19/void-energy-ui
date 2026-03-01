@@ -117,7 +117,11 @@
   />
 
   {#if presets.length > 0}
-    <div class="slider-presets" role="group" aria-label="Presets">
+    <div
+      class="slider-presets flex justify-between"
+      role="group"
+      aria-label="Presets"
+    >
       {#each presets as preset (preset.value)}
         <button
           type="button"

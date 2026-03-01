@@ -1845,9 +1845,9 @@ interface SidebarSection {
 - Any page where `scrollIntoView` navigation between `id`-anchored headings improves orientation
 
 **Physics:**
-- **Glass:** Mobile dropdown gets `glass-blur` when open; sunk background at rest; desktop scrollbar auto-hides (visible on hover with `--energy-secondary`). Scrim: 80% canvas overlay with `materialize`/`dematerialize` transitions
-- **Flat/Light:** Mobile dropdown gets `box-shadow: var(--shadow-float)` in light mode; solid borders. Scrim: 50% text-main overlay
-- **Retro:** `steps(8)` timing on transform transitions; hard borders
+- **Glass:** Mobile dropdown gets `glass-blur` when open; sunk background at rest; desktop scrollbar auto-hides (translucent `--energy-secondary` thumb on hover, `--energy-primary` glow on thumb-hover). Scrim: 80% canvas overlay with `materialize`/`dematerialize` transitions
+- **Flat/Light:** Mobile dropdown gets `box-shadow: var(--shadow-float)` in light mode; solid borders. Desktop scrollbar: solid `--energy-secondary` thumb with `--bg-sink` track, rounded edges. Scrim: 50% text-main overlay
+- **Retro:** `steps(8)` timing on transform transitions; hard borders. Desktop scrollbar: chunky `--energy-primary` thumb, `--bg-sink` track with border, square edges, double-width (`scrollbar-width: auto`)
 
 **Usage:**
 
@@ -2110,7 +2110,7 @@ See [tooltip.ts](src/actions/tooltip.ts) for Svelte action.
 
 | Class | Description |
 | --- | --- |
-| `.toast-icon` | Type-driven icon, colored by `--toast-accent` |
+| `.toast-icon` | Type-driven icon, colored by `--toast-accent`. Layout (`flex items-center justify-center shrink-0`) via Tailwind |
 | `.toast-text` | Message content |
 | `.toast-action` | Optional inline action button (e.g., Undo). Accent-colored, underlined; retro: solid border |
 
@@ -3077,7 +3077,7 @@ h2 {
 **Usage:**
 
 ```scss
-.btn-fake {
+.custom-action {
   @include btn-base;
   appearance: none;
   background: transparent;

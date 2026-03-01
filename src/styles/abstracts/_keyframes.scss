@@ -29,21 +29,7 @@
   }
 }
 
-// C. CYBER PULSE (Active States)
-// Used by: glowing elements
-@keyframes cyber-pulse {
-  0%,
-  100% {
-    opacity: 1;
-    box-shadow: 0 0 10px alpha(var(--energy-primary), 40%);
-  }
-  50% {
-    opacity: 0.9;
-    box-shadow: 0 0 20px alpha(var(--energy-primary), 80%);
-  }
-}
-
-// D. ROTATE LASER (Gemini Button)
+// C. ROTATE LASER (Gemini Button)
 // Used by: .btn-cta via @include gemini-laser
 @keyframes rotate-laser {
   from {
@@ -54,7 +40,7 @@
   }
 }
 
-// E. ROTATE (Generic)
+// D. ROTATE (Generic)
 // Used by: loading spinners
 @keyframes rotate {
   from {
@@ -65,33 +51,7 @@
   }
 }
 
-// F. PROGRESS FILL
-// Used by: progress bars
-@keyframes progress-fill {
-  from {
-    width: 0%;
-  }
-  to {
-    width: 100%;
-  }
-}
-
-// G. LOGO ENTRY (Holographic Materialization)
-// Used by: loading screens
-@keyframes logo-enter {
-  0% {
-    opacity: 0;
-    transform: scale(0.8); // Starts slightly smaller
-    filter: blur(var(--physics-blur)); // Starts out of focus (Void Physics)
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-    filter: blur(0); // Snaps into focus
-  }
-}
-
-// H. STAGGER ENTRY (List item materialization)
+// E. STAGGER ENTRY (List item materialization)
 // Used by: Sidebar items, submenu items via --item-index CSS custom property
 // Svelte equivalent: in:materialize{{ delay: i * 50 }} (doesn't work in {#each}{#if} blocks)
 
@@ -102,7 +62,7 @@
 @keyframes stagger-enter {
   0% {
     opacity: 0;
-    transform: translateY(15px) scale(0.96);
+    transform: translateY(var(--space-sm)) scale(0.96);
   }
   100% {
     opacity: 1;

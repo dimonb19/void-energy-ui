@@ -119,6 +119,7 @@
   // Track
   // ---------------------------------------------------------------------------
 
+  // void-exception: Layout inseparable from em-based CSS variable sizing system.
   .toggle-track {
     position: relative;
     display: flex;
@@ -150,6 +151,7 @@
     width: var(--_content-size);
     height: var(--_content-size);
 
+    // void-exception: Layout coupled to absolute positioning + CSS variable sizing.
     display: flex;
     align-items: center;
     justify-content: center;

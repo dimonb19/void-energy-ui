@@ -56,7 +56,7 @@
 >
   {#each toast.items as item (item.id)}
     <button
-      class="toast-message"
+      class="toast-message flex items-center justify-center gap-xs"
       type="button"
       data-type={item.type}
       onclick={() => toast.close(item.id)}
@@ -65,7 +65,10 @@
       onoutrostart={() => (animatingOut = true)}
       onoutroend={() => (animatingOut = false)}
     >
-      <span class="toast-icon" aria-hidden="true">
+      <span
+        class="toast-icon flex items-center justify-center shrink-0"
+        aria-hidden="true"
+      >
         {#if item.type === 'loading'}
           <LoadingSpin class="text-main" data-size="lg" />
         {:else}

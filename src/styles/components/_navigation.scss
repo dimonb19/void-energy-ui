@@ -117,6 +117,7 @@
 // ==========================================================================
 
 .tab {
+  // void-exception: Bare class on <a>/<button> elements across multiple files.
   // --- A. Layout & Sizing ---
   display: flex;
   align-items: center;
@@ -236,6 +237,7 @@
   }
 }
 
+// void-exception: CSS-only navigation classes — bare class on elements, no wrapping component.
 .submenu {
   width: 100%;
   display: flex;
