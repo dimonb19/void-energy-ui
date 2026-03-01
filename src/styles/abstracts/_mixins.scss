@@ -135,13 +135,13 @@
   background-size: 250% 100%;
   animation: shimmer-beam 2s linear infinite;
 
-  // Dark mode default: muted text base + bright energy beam.
+  // Dark mode default: muted text base + text-main beam.
   background-image:
     linear-gradient(
       90deg,
       transparent 0%,
       transparent 45%,
-      var(--energy-primary) 50%,
+      var(--text-main) 50%,
       transparent 55%,
       transparent 100%
     ),

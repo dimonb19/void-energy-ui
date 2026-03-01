@@ -2468,14 +2468,14 @@ Physics-aware visual effects for loading states and skeleton loaders.
 
 #### `.text-shimmer`
 
-**Description:** Animated gradient clipped to text glyphs. Composes `@include shimmer` with `background-clip: text`. Text renders at 30% opacity (`alpha(--text-main, 0.3)`) with the shimmer band sweeping across glyphs. Same gradient and physics as container shimmer.
+**Description:** Animated gradient clipped to text glyphs. Two-layer technique: solid `--text-mute` base keeps text readable; a narrow `--text-main` beam sweeps across glyphs (retro uses `--energy-primary` hard scan line instead).
 **Mixin:** `@include text-shimmer` ([src/styles/abstracts/\_mixins.scss](src/styles/abstracts/_mixins.scss))
 
 | Physics | Visual |
 | --- | --- |
-| **Glass/Flat dark** | 30% text-main base, `--energy-primary` at 15% sweep |
-| **Light** | 30% text-main base, full white sweep |
-| **Retro** | 30% text-main base, `--border-color` scan line |
+| **Glass/Flat dark** | `--text-mute` base, `--text-main` beam sweep |
+| **Light** | `--text-mute` base, `--text-main` beam sweep |
+| **Retro** | `--text-mute` base, `--energy-primary` hard scan line |
 
 **Usage:**
 
@@ -2902,8 +2902,8 @@ layerStack.hasLayers;         // true if any layers are on the stack
 
 #### `@include text-shimmer`
 
-**Purpose:** Text-clipped loading shimmer. Composes `@include shimmer` with `background-clip: text` to sweep the gradient across text glyphs instead of the background. Physics & mode-aware (inherits all variants from `shimmer`).
-**Visual:** Text at 30% opacity (`alpha(--text-main, 0.3)`) with the shimmer band sweeping across glyphs. Same gradient and physics behavior as container shimmer.
+**Purpose:** Text-clipped loading shimmer. Two-layer technique: solid `--text-mute` base + narrow beam sweep via `background-clip: text`. Physics & mode-aware.
+**Visual:** `--text-mute` base keeps text readable; `--text-main` beam sweeps across glyphs (retro uses `--energy-primary` hard scan line).
 **Source:** [src/styles/abstracts/\_mixins.scss](src/styles/abstracts/_mixins.scss)
 
 **Usage:**
