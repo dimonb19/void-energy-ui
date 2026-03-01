@@ -12,6 +12,8 @@
   let replaySpeed = $state(0);
   let replayCursor = $state(0);
   let replayCycle = $state(0);
+  let replaySentence = $state(0);
+  let replaySentencePair = $state(0);
 
   // Morph demo
   let morphExpanded = $state(false);
@@ -54,7 +56,7 @@
     </details>
 
     <!-- ─── TEXT SHIMMER ─────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Text Shimmer</h5>
       <p class="text-small text-mute">
         <code>@include text-shimmer</code> uses a focused-beam technique: a
@@ -82,7 +84,7 @@
     </div>
 
     <!-- ─── CONTAINER SHIMMER ────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Container Shimmer</h5>
       <p class="text-small text-mute">
         <code>@include shimmer</code> sweeps a light band across a surface
@@ -95,35 +97,24 @@
         <!-- Row of shaped containers -->
         <div class="flex flex-wrap gap-lg items-end">
           <!-- Card -->
-          <div
-            class="shimmer-surface surface-glass"
-            style="width: 10rem; height: 8rem;"
-          ></div>
+          <div class="shimmer-surface surface-glass w-5xl h-4xl"></div>
 
           <!-- Pill -->
           <div
-            class="shimmer-surface surface-glass rounded-full"
-            style="width: 10rem; height: 2.5rem;"
+            class="shimmer-surface surface-glass rounded-full w-5xl h-xl"
           ></div>
 
           <!-- Square -->
-          <div
-            class="shimmer-surface surface-glass"
-            style="width: 4rem; height: 4rem;"
-          ></div>
+          <div class="shimmer-surface surface-glass w-2xl h-2xl"></div>
 
           <!-- Circle -->
           <div
-            class="shimmer-surface surface-glass rounded-full"
-            style="width: 4rem; height: 4rem;"
+            class="shimmer-surface surface-glass rounded-full w-2xl h-2xl"
           ></div>
         </div>
 
         <!-- Wide bar -->
-        <div
-          class="shimmer-surface surface-glass"
-          style="height: 2.5rem;"
-        ></div>
+        <div class="shimmer-surface surface-glass h-xl"></div>
       </div>
 
       <p class="text-caption text-mute px-xs">
@@ -136,7 +127,7 @@
     </div>
 
     <!-- ─── KINETIC TEXT ──────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Kinetic Text</h5>
       <p class="text-small text-mute">
         Physics-aware kinetic typography engine with four animation modes.
@@ -195,6 +186,60 @@
         </p>
       </div>
 
+      <!-- Sentence chunk (word mode) -->
+      <div class="flex flex-col gap-xs">
+        <div class="flex items-center justify-between">
+          <h6 class="text-small text-dim">Sentence Chunk</h6>
+          <button class="btn-icon" onclick={() => replaySentence++}>
+            <RotateCcw class="icon" data-size="sm" />
+          </button>
+        </div>
+        <div class="surface-sunk p-lg flex flex-col gap-lg">
+          {#key replaySentence}
+            <KineticText
+              tag="p"
+              text="The void engine processes your request through multiple layers of semantic analysis. It identifies patterns across dimensional boundaries and cross-references them with known signal archetypes. Each refinement pass discards noise and amplifies intent, narrowing the solution space. Contextual synthesis then weaves the surviving fragments into a coherent response. The final output materializes once all layers converge and the signal stabilizes. This entire pipeline executes in fractions of a second, invisible to the observer."
+              mode="word"
+              chunk="sentence"
+              speed={400}
+              cursor
+            />
+          {/key}
+        </div>
+        <p class="text-caption text-mute px-xs">
+          Sentence-level reveal using <code>chunk="sentence"</code>. Each tick
+          reveals one full sentence. Ideal for AI streaming where responses
+          arrive in sentence-sized bursts.
+        </p>
+      </div>
+
+      <!-- Sentence-pair chunk (word mode) -->
+      <div class="flex flex-col gap-xs">
+        <div class="flex items-center justify-between">
+          <h6 class="text-small text-dim">Sentence Pair Chunk</h6>
+          <button class="btn-icon" onclick={() => replaySentencePair++}>
+            <RotateCcw class="icon" data-size="sm" />
+          </button>
+        </div>
+        <div class="surface-sunk p-lg flex flex-col gap-lg">
+          {#key replaySentencePair}
+            <KineticText
+              tag="p"
+              text="The void engine processes your request through multiple layers of semantic analysis. It identifies patterns across dimensional boundaries and cross-references them with known signal archetypes. Each refinement pass discards noise and amplifies intent, narrowing the solution space. Contextual synthesis then weaves the surviving fragments into a coherent response. The final output materializes once all layers converge and the signal stabilizes. This entire pipeline executes in fractions of a second, invisible to the observer."
+              mode="word"
+              chunk="sentence-pair"
+              speed={600}
+              cursor
+            />
+          {/key}
+        </div>
+        <p class="text-caption text-mute px-xs">
+          Two-sentence reveal using <code>chunk="sentence-pair"</code>. Each
+          tick reveals a pair of sentences. Use for faster streaming where
+          content should appear in larger blocks.
+        </p>
+      </div>
+
       <!-- Decode reveal -->
       <div class="flex flex-col gap-xs">
         <div class="flex items-center justify-between">
@@ -226,21 +271,15 @@
         <div class="surface-sunk p-lg flex flex-col gap-md">
           {#key replaySpeed}
             <div class="flex items-center gap-md">
-              <span class="text-caption text-mute" style="min-width: 3.5rem;"
-                >30ms</span
-              >
+              <span class="text-caption text-mute min-w-2xl">30ms</span>
               <KineticText text="Fast streaming feel" mode="char" speed={30} />
             </div>
             <div class="flex items-center gap-md">
-              <span class="text-caption text-mute" style="min-width: 3.5rem;"
-                >65ms</span
-              >
+              <span class="text-caption text-mute min-w-2xl">65ms</span>
               <KineticText text="Deliberate typing" mode="char" speed={65} />
             </div>
             <div class="flex items-center gap-md">
-              <span class="text-caption text-mute" style="min-width: 3.5rem;"
-                >120ms</span
-              >
+              <span class="text-caption text-mute min-w-2xl">120ms</span>
               <KineticText text="Dramatic pacing" mode="char" speed={120} />
             </div>
           {/key}
@@ -263,9 +302,7 @@
         <div class="surface-sunk p-lg flex flex-col gap-md">
           {#key replayCursor}
             <div class="flex items-center gap-md">
-              <span class="text-caption text-mute" style="min-width: 5rem;"
-                >With cursor</span
-              >
+              <span class="text-caption text-mute min-w-3xl">With cursor</span>
               <KineticText
                 text="Cursor enabled"
                 mode="char"
@@ -274,9 +311,7 @@
               />
             </div>
             <div class="flex items-center gap-md">
-              <span class="text-caption text-mute" style="min-width: 5rem;"
-                >No cursor</span
-              >
+              <span class="text-caption text-mute min-w-3xl">No cursor</span>
               <KineticText text="Cursor disabled" mode="char" speed={65} />
             </div>
           {/key}
@@ -323,7 +358,7 @@
     </div>
 
     <!-- ─── LOADING TEXT CYCLER ──────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Loading Text Cycler</h5>
       <p class="text-small text-mute">
         Cycles through a set of loading status words using the kinetic
@@ -348,7 +383,7 @@
     </div>
 
     <!-- ─── SKELETON LOADING ──────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Skeleton Loading</h5>
       <p class="text-small text-mute">
         Placeholder shapes that shimmer while content loads. Built on the same
@@ -384,7 +419,7 @@
     </div>
 
     <!-- ─── SVELTE ACTIONS ──────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Svelte Actions</h5>
       <p class="text-small text-mute">
         Reusable directives that add behavior to any element via
@@ -517,6 +552,12 @@
 
 &lt;!-- Kinetic text: word-by-word paragraph --&gt;
 &lt;KineticText tag="p" text="Long paragraph..." mode="word" speed=&#123;80&#125; cursor /&gt;
+
+&lt;!-- Kinetic text: sentence-level reveal --&gt;
+&lt;KineticText tag="p" text="First sentence. Second sentence." mode="word" chunk="sentence" speed=&#123;300&#125; cursor /&gt;
+
+&lt;!-- Kinetic text: sentence-pair reveal --&gt;
+&lt;KineticText tag="p" text="First. Second. Third. Fourth." mode="word" chunk="sentence-pair" speed=&#123;500&#125; cursor /&gt;
 
 &lt;!-- Kinetic text: decode reveal --&gt;
 &lt;KineticText text="ACCESS GRANTED" mode="decode" speed=&#123;30&#125; cursor /&gt;

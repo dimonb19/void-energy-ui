@@ -20,6 +20,7 @@
 // ─────────────────────────────────────────────────────────────
 
 export type KineticMode = 'char' | 'word' | 'cycle' | 'decode';
+export type KineticWordChunk = 'word' | 'sentence' | 'sentence-pair';
 
 export interface KineticConfig {
   /** Single text string (for char, word, decode modes) */
@@ -38,6 +39,10 @@ export interface KineticConfig {
   cursorChar?: string;
   /** Remove cursor after animation completes. Default: true */
   cursorRemoveOnComplete?: boolean;
+
+  // ── Word mode ──
+  /** Chunk size for word mode reveal. Default: 'word' */
+  chunk?: KineticWordChunk;
 
   // ── Cycle mode ──
   /** Pause duration on each word before transitioning (ms). Default: 1800 */
@@ -115,6 +120,7 @@ const DEFAULTS: Required<
   Omit<KineticConfig, 'text' | 'words' | 'onComplete' | 'onCycle'>
 > = {
   mode: 'char',
+  chunk: 'word' as KineticWordChunk,
   speed: 40,
   delay: 0,
   cursor: false,
@@ -139,6 +145,26 @@ function prefersReducedMotion(): boolean {
 
 function randomChar(chars: string): string {
   return chars[Math.floor(Math.random() * chars.length)];
+}
+
+// ── Sentence splitting ───────────────────────────────────────
+
+function splitSentences(text: string): string[] {
+  const pattern = /.*?[.!?](?:\s+|$)/g;
+  const chunks: string[] = [];
+  let match: RegExpExecArray | null;
+  let lastIndex = 0;
+
+  while ((match = pattern.exec(text)) !== null) {
+    chunks.push(match[0]);
+    lastIndex = pattern.lastIndex;
+  }
+
+  if (lastIndex < text.length) {
+    chunks.push(text.slice(lastIndex));
+  }
+
+  return chunks.length > 0 ? chunks : [text];
 }
 
 // ── Active instances (cleanup / abort) ──────────────────────
@@ -352,7 +378,23 @@ export class KineticEngine {
     const text = this.config.text ?? '';
     if (!text) return resolve();
 
-    const words = text.split(/(\s+)/); // preserve whitespace
+    const { chunk } = this.config;
+
+    let tokens: string[];
+    if (chunk === 'sentence' || chunk === 'sentence-pair') {
+      const sentences = splitSentences(text);
+      if (chunk === 'sentence-pair') {
+        tokens = [];
+        for (let s = 0; s < sentences.length; s += 2) {
+          tokens.push(sentences[s] + (sentences[s + 1] ?? ''));
+        }
+      } else {
+        tokens = sentences;
+      }
+    } else {
+      tokens = text.split(/(\s+)/); // preserve whitespace
+    }
+
     this.el.textContent = '';
     this.showCursor();
     let i = 0;
@@ -361,8 +403,8 @@ export class KineticEngine {
     const tick = () => {
       if (this.aborted) return resolve();
 
-      if (i < words.length) {
-        built += words[i++];
+      if (i < tokens.length) {
+        built += tokens[i++];
         this.setText(built);
         this.setTimeout(tick, this.getTickDelay());
       } else {

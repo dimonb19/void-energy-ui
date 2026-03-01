@@ -40,6 +40,8 @@
     words?: string[];
     /** Animation mode */
     mode?: KineticMode;
+    /** Chunk size for word mode reveal. Default: 'word' */
+    chunk?: 'word' | 'sentence' | 'sentence-pair';
     /** Ms per animation unit. Defaults vary by mode. */
     speed?: number;
     /** Pause between cycled words (ms). Default: 1800 */
@@ -62,6 +64,7 @@
     text,
     words,
     mode = 'char',
+    chunk,
     speed,
     pauseDuration,
     cycleTransition,
@@ -78,6 +81,7 @@
     text,
     words,
     mode,
+    chunk,
     speed,
     pauseDuration,
     cycleTransition,

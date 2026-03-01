@@ -2680,7 +2680,8 @@ Physics-aware visual effects for loading states and skeleton loaders.
 | `text` | `string` | — | Single text to animate (char, word, decode modes) |
 | `words` | `string[]` | — | Word list to cycle through (cycle mode) |
 | `mode` | `'char' \| 'word' \| 'cycle' \| 'decode'` | `'char'` | Animation mode |
-| `speed` | `number` | `40` | Ms per animation unit (per-char, per-word, or per-scramble tick) |
+| `chunk` | `'word' \| 'sentence' \| 'sentence-pair'` | `'word'` | Chunk size for word mode — `'sentence'` reveals one sentence per tick, `'sentence-pair'` reveals two |
+| `speed` | `number` | `40` | Ms per animation unit (per-char, per-word/sentence, or per-scramble tick) |
 | `pauseDuration` | `number` | `1800` | Pause between cycled words (ms) |
 | `cycleTransition` | `'type' \| 'fade' \| 'decode'` | `'type'` | Transition style for cycle mode |
 | `cursor` | `boolean` | `false` | Show blinking cursor during animation |
@@ -2701,7 +2702,7 @@ Physics-aware visual effects for loading states and skeleton loaders.
 | Mode | Behavior |
 | --- | --- |
 | `char` | Classic typewriter, character by character |
-| `word` | Word-by-word reveal, ideal for long paragraphs |
+| `word` | Word-by-word reveal (default), or sentence/sentence-pair chunks via `chunk` prop |
 | `decode` | Scramble → resolve effect (sci-fi terminal feel) |
 | `cycle` | Rotates through a word list with configurable transitions |
 
@@ -2717,6 +2718,12 @@ Physics-aware visual effects for loading states and skeleton loaders.
 
 <!-- Word-by-word paragraph -->
 <KineticText tag="p" text="Long paragraph..." mode="word" speed={80} cursor />
+
+<!-- Sentence-by-sentence (AI streaming) -->
+<KineticText tag="p" text="First sentence. Second sentence." mode="word" chunk="sentence" speed={400} cursor />
+
+<!-- Two sentences at a time -->
+<KineticText tag="p" text="First. Second. Third. Fourth." mode="word" chunk="sentence-pair" speed={600} cursor />
 
 <!-- Decode reveal -->
 <KineticText text="ACCESS GRANTED" mode="decode" speed={30} />
@@ -3916,6 +3923,12 @@ No manual body padding or scroll offset adjustments needed — `data-has-breadcr
 <!-- Word-by-word paragraph -->
 <KineticText tag="p" text="Long paragraph content here..." mode="word" speed={80} cursor />
 
+<!-- Sentence-by-sentence (AI streaming) -->
+<KineticText tag="p" text="First sentence. Second sentence." mode="word" chunk="sentence" speed={400} cursor />
+
+<!-- Two sentences at a time -->
+<KineticText tag="p" text="First. Second. Third. Fourth." mode="word" chunk="sentence-pair" speed={600} cursor />
+
 <!-- Decode reveal (sci-fi cipher) -->
 <KineticText text="ACCESS GRANTED" mode="decode" speed={30} />
 
@@ -4171,6 +4184,7 @@ Provides both a Svelte action (`use:kinetic`) and a standalone class (`KineticEn
 | `text` | `string` | — | Text to animate (char, word, decode modes) |
 | `words` | `string[]` | — | Word list (cycle mode) |
 | `mode` | `'char' \| 'word' \| 'cycle' \| 'decode'` | `'char'` | Animation mode |
+| `chunk` | `'word' \| 'sentence' \| 'sentence-pair'` | `'word'` | Chunk size for word mode — reveals per-word, per-sentence, or per-sentence-pair |
 | `speed` | `number` | `40` | Ms per animation unit |
 | `delay` | `number` | `0` | Initial delay before animation starts (ms) |
 | `cursor` | `boolean` | `false` | Show blinking cursor |
