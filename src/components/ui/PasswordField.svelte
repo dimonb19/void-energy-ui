@@ -11,6 +11,8 @@
   - value: Password text (bindable)
   - placeholder: Placeholder text
   - disabled: Disables the input
+  - invalid: Maps to aria-invalid on the input (for FormField wiring)
+  - describedby: Maps to aria-describedby on the input (for FormField wiring)
   - class: Additional CSS classes on the wrapper
 
   BEHAVIOR:
@@ -30,6 +32,8 @@
     placeholder?: string;
     disabled?: boolean;
     autocomplete?: HTMLInputElement['autocomplete'];
+    invalid?: boolean;
+    describedby?: string;
     class?: string;
   }
 
@@ -39,6 +43,8 @@
     placeholder = 'Enter password...',
     disabled = false,
     autocomplete = 'current-password',
+    invalid = false,
+    describedby,
     class: className = '',
   }: PasswordFieldProps = $props();
 
@@ -60,11 +66,13 @@
     {disabled}
     {autocomplete}
     bind:value
+    aria-invalid={invalid || undefined}
+    aria-describedby={describedby}
   />
   <span class="field-slot-right">
     <IconBtn
       icon={Eye}
-      iconProps={{ 'data-muted': !visible }}
+      iconProps={{ 'data-muted': !visible, id: inputId }}
       onclick={toggleVisibility}
       aria-label={visible ? 'Hide password' : 'Show password'}
       aria-pressed={visible}

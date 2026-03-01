@@ -1356,22 +1356,106 @@ Preset components with built-in layout and physics.
 
 **Description:** Password input with Eye toggle for show/hide visibility.
 **Location:** [src/components/ui/PasswordField.svelte](src/components/ui/PasswordField.svelte)
-**CSS Class:** `.field`
+**CSS Class:** `.field .password-field`
 
 **Props:**
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `value` | `string` | `$bindable('')` | Password text (bindable) |
+| `id` | `string` | auto-generated | Input element ID (for label association) |
 | `placeholder` | `string` | `'Enter password...'` | Placeholder text |
 | `autocomplete` | `string` | `'current-password'` | HTML autocomplete hint |
 | `disabled` | `boolean` | `false` | Disables input |
+| `invalid` | `boolean` | `false` | Maps to `aria-invalid` (for FormField wiring) |
+| `describedby` | `string` | — | Maps to `aria-describedby` (for FormField wiring) |
 
 **Usage:**
 
 ```svelte
 <PasswordField bind:value={password} />
+
+<!-- With FormField wiring -->
+<FormField label="Password" error={pv.error} fieldId="pw">
+  {#snippet children({ fieldId, descriptionId, invalid })}
+    <PasswordField id={fieldId} bind:value={password} {invalid} describedby={descriptionId} />
+  {/snippet}
+</FormField>
 ```
+
+---
+
+#### `<PasswordMeter>`
+
+**Description:** Visual password strength indicator using a native `<meter>` bar and a text label. Four strength levels with color-coded feedback. Hidden when password is empty.
+**Location:** [src/components/ui/PasswordMeter.svelte](src/components/ui/PasswordMeter.svelte)
+**CSS Class:** `.password-meter` ([src/styles/components/\_fields.scss](src/styles/components/_fields.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `password` | `string` | *required* | Password string (controls visibility — hidden when empty) |
+| `validation` | `PasswordValidationState` | *required* | Reactive state from `createPasswordValidation()` |
+| `class` | `string` | `''` | Additional CSS classes |
+
+**States:**
+
+| State | Attribute | Visual |
+| --- | --- | --- |
+| Weak | `data-strength="weak"` | Red label |
+| Fair | `data-strength="fair"` | Amber label |
+| Good | `data-strength="good"` | Green label |
+| Strong | `data-strength="strong"` | Green label + glow (glass) / underline (retro) |
+
+**Usage:**
+
+```svelte
+const pv = createPasswordValidation(() => password);
+<PasswordMeter password={password} validation={pv} />
+```
+
+**Physics:**
+- **Glass:** Strong level gets green text-shadow glow
+- **Flat:** Clean color transitions, no effects
+- **Retro:** No text-shadow; strong level gets underline decoration
+- **Light:** Uses `-dark` color variants for readability
+
+---
+
+#### `<PasswordChecklist>`
+
+**Description:** Visual list of password requirements with Check/X icons that update reactively. Hidden when password is empty.
+**Location:** [src/components/ui/PasswordChecklist.svelte](src/components/ui/PasswordChecklist.svelte)
+**CSS Class:** `.password-checklist` ([src/styles/components/\_fields.scss](src/styles/components/_fields.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `password` | `string` | *required* | Password string (controls visibility — hidden when empty) |
+| `validation` | `PasswordValidationState` | *required* | Reactive state from `createPasswordValidation()` |
+| `class` | `string` | `''` | Additional CSS classes |
+
+**States:**
+
+| State | Attribute | Visual |
+| --- | --- | --- |
+| Rule met | `data-state="met"` | Green text + Check icon |
+| Rule unmet | (default) | Muted text + X icon |
+
+**Usage:**
+
+```svelte
+const pv = createPasswordValidation(() => password);
+<PasswordChecklist password={password} validation={pv} />
+```
+
+**Physics:**
+- **Glass:** Met rules get green text-shadow glow
+- **Flat:** Clean color transitions, no effects
+- **Retro:** No text-shadow
+- **Light:** Uses dim text for unmet, `-dark` success for met
 
 ---
 
@@ -1593,7 +1677,7 @@ Preset components with built-in layout and physics.
 
 | State | Attribute | Visual |
 | --- | --- | --- |
-| Error | `data-state="error"` | Red error text with CircleAlert icon, slide-in animation |
+| Error | `data-state="error"` | Red error text with CircleAlert icon, materialize/dematerialize transition |
 | Default | `data-state=""` | Standard label + optional hint text |
 
 **Usage:**
@@ -1615,7 +1699,7 @@ Preset components with built-in layout and physics.
 **Physics:**
 - **Glass:** Error text gets a subtle red glow (`text-shadow`)
 - **Flat:** Standard error text, no glow
-- **Retro:** No glow, no entry animation (instant)
+- **Retro:** No glow, instant appear/disappear (no transition)
 
 ---
 
@@ -2741,6 +2825,80 @@ Reactive singletons for app-wide state. Each store uses `$state` + `$derived` an
 
 ---
 
+#### `createPasswordValidation()` — Reactive password validation factory
+
+**Location:** [src/lib/password-validation.svelte.ts](src/lib/password-validation.svelte.ts)
+**Types:** `PasswordValidationState`, `PasswordStrengthLevel`, `PasswordRule` ([src/types/void-ui.d.ts](src/types/void-ui.d.ts))
+**Consumers:** `<PasswordMeter>`, `<PasswordChecklist>`, any submit button `disabled` binding
+
+**Signature:**
+
+```ts
+createPasswordValidation(
+  getPassword: () => string,
+  getConfirmPassword?: () => string,
+  options?: PasswordValidationOptions,
+): PasswordValidationState
+```
+
+**Options:**
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `minLength` | `number` | `8` | Minimum password length |
+| `maxLength` | `number` | `24` | Maximum password length |
+| `allowedChars` | `RegExp` | `/^[a-z\d.,@$!%*#?&]*$/i` | Allowed character pattern |
+| `allowedCharsDescription` | `string` | `'Only letters, numbers, and .,@$!%*#?& are allowed'` | Error message for restricted characters |
+| `requireConfirm` | `boolean` | `false` | Require confirmation password match |
+
+**Returned state (all properties are reactive getters — do NOT destructure):**
+
+| Property | Type | Description |
+| --- | --- | --- |
+| `score` | `number` | Strength score 0–100 (length-dominant + variety bonus) |
+| `level` | `PasswordStrengthLevel` | `'weak'` / `'fair'` / `'good'` / `'strong'` |
+| `rules` | `PasswordRule[]` | Pre-built rule array for PasswordChecklist |
+| `error` | `string` | Restricted chars error message (empty when valid) |
+| `isValid` | `boolean` | All rules pass + no restricted chars + confirm matches |
+| `hasLower` | `boolean` | Has lowercase letter |
+| `hasUpper` | `boolean` | Has uppercase letter |
+| `hasDigit` | `boolean` | Has number |
+| `hasSpecial` | `boolean` | Has special character |
+| `hasValidLength` | `boolean` | Within min–max range |
+| `hasRestrictedChars` | `boolean` | Contains disallowed characters |
+| `passwordsMatch` | `boolean` | Confirm matches (always true if `requireConfirm: false`) |
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+  import { createPasswordValidation } from '@lib/password-validation.svelte';
+  import PasswordField from '@components/ui/PasswordField.svelte';
+  import PasswordMeter from '@components/ui/PasswordMeter.svelte';
+  import PasswordChecklist from '@components/ui/PasswordChecklist.svelte';
+
+  let password = $state('');
+  let confirm = $state('');
+
+  // Do NOT destructure — breaks reactivity
+  const pv = createPasswordValidation(
+    () => password,
+    () => confirm,
+    { requireConfirm: true },
+  );
+</script>
+
+<PasswordField bind:value={password} autocomplete="new-password" />
+<PasswordMeter {password} validation={pv} />
+<PasswordChecklist {password} validation={pv} />
+<PasswordField bind:value={confirm} placeholder="Confirm..." autocomplete="new-password" />
+<button disabled={!pv.isValid}>Submit</button>
+```
+
+**Showcase:** [/components → Composites](src/components/ui-library/Composites.svelte)
+
+---
+
 #### Global Keyboard Shortcuts
 
 **Registry:** [src/lib/shortcut-registry.svelte.ts](src/lib/shortcut-registry.svelte.ts) (singleton, document-level listener)
@@ -2992,7 +3150,7 @@ layerStack.hasLayers;         // true if any layers are on the stack
 
 **Purpose:** Universal state selector mapping data attributes and ARIA states to CSS.
 
-**Parameter:** `$state` — One of: `'active'`, `'open'`, `'loading'`, `'disabled'`, `'error'`
+**Parameter:** `$state` — One of: `'active'`, `'open'`, `'loading'`, `'disabled'`, `'error'`, `'met'`
 
 **Selectors by state:**
 
@@ -3003,6 +3161,7 @@ layerStack.hasLayers;         // true if any layers are on the stack
 | `'loading'` | `[aria-busy='true']`, `[data-status='loading']` |
 | `'disabled'` | `:disabled`, `[aria-disabled='true']`, `[data-state='disabled']` |
 | `'error'` | `[aria-invalid='true']`, `[data-state='error']` |
+| `'met'` | `[data-state='met']` |
 
 **Usage:**
 
@@ -3428,19 +3587,48 @@ toast.show('File uploaded', 'success', 5000, {
 
 ---
 
-### N. Field Composites (Password, Copy, Edit, EditTextarea, Generate)
+### N. Field Composites (Password + Validation, Copy, Edit, EditTextarea, Generate)
 
 ```svelte
 <script lang="ts">
+  import { createPasswordValidation } from '@lib/password-validation.svelte';
   import PasswordField from '@components/ui/PasswordField.svelte';
+  import PasswordMeter from '@components/ui/PasswordMeter.svelte';
+  import PasswordChecklist from '@components/ui/PasswordChecklist.svelte';
+  import FormField from '@components/ui/FormField.svelte';
   import CopyField from '@components/ui/CopyField.svelte';
   import EditField from '@components/ui/EditField.svelte';
   import EditTextarea from '@components/ui/EditTextarea.svelte';
   import GenerateField from '@components/ui/GenerateField.svelte';
   import GenerateTextarea from '@components/ui/GenerateTextarea.svelte';
+
+  let password = $state('');
+  let confirm = $state('');
+  const pv = createPasswordValidation(
+    () => password,
+    () => confirm,
+    { requireConfirm: true },
+  );
 </script>
 
-<PasswordField bind:value={password} />
+<!-- Full password validation flow -->
+<FormField label="Password" error={pv.error} fieldId="pw">
+  {#snippet children({ fieldId, descriptionId, invalid })}
+    <PasswordField
+      id={fieldId}
+      bind:value={password}
+      {invalid}
+      describedby={descriptionId}
+      autocomplete="new-password"
+    />
+  {/snippet}
+</FormField>
+<PasswordMeter {password} validation={pv} />
+<PasswordChecklist {password} validation={pv} />
+<PasswordField bind:value={confirm} placeholder="Confirm..." autocomplete="new-password" />
+<button disabled={!pv.isValid}>Submit</button>
+
+<!-- Other field composites -->
 <CopyField value="sk-1234-abcd-5678" />
 <EditField bind:value={name} onconfirm={saveName} />
 <EditTextarea bind:value={notes} rows={4} onconfirm={saveNotes} />

@@ -32,8 +32,9 @@
  * - FormField     : Label + input (slot) + hint + error with ARIA wiring
  *
  * NON-FIELD COMPOSITES:
- * - MediaSlider   : Mute toggle + range slider + replay (own anatomy)
- * - SliderField   : Label + range slider + preset snap labels (own anatomy)
+ * - MediaSlider    : Mute toggle + range slider + replay (own anatomy)
+ * - SliderField    : Label + range slider + preset snap labels (own anatomy)
+ * - PasswordMeter  : Native meter bar + strength label (own anatomy)
  *
  * @see /src/components/ui/SearchField.svelte
  * @see /src/components/ui/PasswordField.svelte
@@ -44,6 +45,7 @@
  * @see /src/components/ui/GenerateTextarea.svelte
  * @see /src/components/ui/MediaSlider.svelte
  * @see /src/components/ui/SliderField.svelte
+ * @see /src/components/ui/PasswordMeter.svelte
  * ==========================================================================
  */
 
@@ -306,23 +308,114 @@ $_slot-width: var(--control-padding-x);
   @include when-retro {
     text-shadow: none;
   }
+}
 
-  @media (prefers-reduced-motion: no-preference) {
-    animation: field-error-in var(--speed-fast) var(--ease-spring-snappy);
+// ==========================================================================
+// 7. PASSWORD METER (non-field composite)
+// ==========================================================================
+//
+// ANATOMY:
+// ┌─ .password-meter (flex-col, gap-xs) ────────────────────────────────────┐
+// │  <meter>                          Native meter bar (styled in _inputs)   │
+// │  <span class="password-meter-label">   Strength level text              │
+// └─────────────────────────────────────────────────────────────────────────┘
 
-    @include when-retro {
-      animation: none;
+.password-meter-label {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding-inline: var(--space-xs);
+  transition: color var(--speed-fast) var(--ease-spring-snappy);
+}
+
+.password-meter {
+  &[data-strength='weak'] .password-meter-label {
+    color: var(--color-error);
+  }
+
+  &[data-strength='fair'] .password-meter-label {
+    color: var(--color-premium);
+  }
+
+  &[data-strength='good'] .password-meter-label,
+  &[data-strength='strong'] .password-meter-label {
+    color: var(--color-success);
+  }
+
+  @include when-glass {
+    &[data-strength='strong'] .password-meter-label {
+      text-shadow: 0 0 8px alpha(var(--color-success), 50%); // void-ignore (Glow Physics)
+    }
+  }
+
+  @include when-retro {
+    .password-meter-label {
+      text-shadow: none;
+    }
+
+    &[data-strength='strong'] .password-meter-label {
+      text-decoration: underline;
+      text-underline-offset: var(--space-xs);
+    }
+  }
+
+  @include when-light {
+    &[data-strength='weak'] .password-meter-label {
+      color: var(--color-error-dark);
+    }
+
+    &[data-strength='fair'] .password-meter-label {
+      color: var(--color-premium-dark);
+    }
+
+    &[data-strength='good'] .password-meter-label,
+    &[data-strength='strong'] .password-meter-label {
+      color: var(--color-success-dark);
     }
   }
 }
 
-@keyframes field-error-in {
-  from {
-    opacity: 0;
-    transform: translateY(calc(var(--space-xs) * -1));
+// ==========================================================================
+// 8. PASSWORD CHECKLIST (non-field composite)
+// ==========================================================================
+//
+// ANATOMY:
+// ┌─ .password-checklist (flex-col, gap-xs) ─────────────────────────────────┐
+// │  <li class="password-checklist-rule">   Check/X icon + label text        │
+// │    └ data-state="met" when requirement is satisfied                      │
+// └──────────────────────────────────────────────────────────────────────────┘
+
+.password-checklist-rule {
+  font-size: var(--font-size-caption);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-mute);
+  padding-inline: var(--space-xs);
+  transition: color var(--speed-fast) var(--ease-spring-snappy);
+
+  .icon {
+    flex-shrink: 0;
   }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+
+  @include when-state('met') {
+    color: var(--color-success);
+  }
+
+  @include when-glass {
+    @include when-state('met') {
+      text-shadow: 0 0 8px alpha(var(--color-success), 40%); // void-ignore (Glow Physics)
+    }
+  }
+
+  @include when-retro {
+    text-shadow: none;
+  }
+
+  @include when-light {
+    color: var(--text-dim);
+
+    @include when-state('met') {
+      color: var(--color-success-dark);
+    }
   }
 }

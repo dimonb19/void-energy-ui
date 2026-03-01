@@ -1,8 +1,12 @@
 <script lang="ts">
   import { toast } from '@stores/toast.svelte';
+  import { createPasswordValidation } from '@lib/password-validation.svelte';
 
   import SearchField from '../ui/SearchField.svelte';
   import PasswordField from '../ui/PasswordField.svelte';
+  import PasswordMeter from '../ui/PasswordMeter.svelte';
+  import PasswordChecklist from '../ui/PasswordChecklist.svelte';
+  import FormField from '../ui/FormField.svelte';
   import EditField from '../ui/EditField.svelte';
   import EditTextarea from '../ui/EditTextarea.svelte';
   import CopyField from '../ui/CopyField.svelte';
@@ -34,6 +38,14 @@
   // Demo state — Input Fields
   let searchValue = $state('');
   let passwordValue = $state('');
+  let confirmPasswordValue = $state('');
+
+  const pv = createPasswordValidation(
+    () => passwordValue,
+    () => confirmPasswordValue,
+    { requireConfirm: true },
+  );
+
   let editValue = $state('VOID-7G-NEXUS');
   let editTextareaValue = $state(
     'Void energy reactor status: all subsystems nominal. Containment field stable at 99.7% integrity.',
@@ -210,19 +222,43 @@
           </p>
         </div>
 
-        <!-- PasswordField -->
-        <div class="flex flex-col gap-xs">
-          <label for="password-field" class="text-small px-xs"
-            >PasswordField</label
+        <!-- PasswordField + PasswordMeter + PasswordChecklist -->
+        <div class="flex flex-col gap-md">
+          <FormField
+            label="PasswordField + Validation"
+            error={pv.error}
+            fieldId="password-field"
           >
+            {#snippet children({ fieldId, descriptionId, invalid })}
+              <PasswordField
+                id={fieldId}
+                bind:value={passwordValue}
+                placeholder="Enter access key..."
+                {invalid}
+                describedby={descriptionId}
+                autocomplete="new-password"
+              />
+            {/snippet}
+          </FormField>
+          <PasswordMeter password={passwordValue} validation={pv} />
+          <PasswordChecklist password={passwordValue} validation={pv} />
           <PasswordField
-            id="password-field"
-            bind:value={passwordValue}
-            placeholder="Enter access key..."
+            id="confirm-password-field"
+            bind:value={confirmPasswordValue}
+            placeholder="Confirm access key..."
+            autocomplete="new-password"
           />
+          <button
+            disabled={!pv.isValid}
+            onclick={() => toast.show('Password accepted', 'success')}
+          >
+            Submit
+          </button>
           <p class="text-caption text-mute px-xs">
-            Eye icon toggles visibility via <code>data-muted</code>. Input type
-            switches between <code>password</code> and <code>text</code>.
+            Full validation flow via <code>createPasswordValidation()</code>.
+            PasswordMeter and PasswordChecklist read from the shared
+            <code>validation</code> state. Restricted characters trigger a FormField
+            error. Submit is disabled until all rules pass.
           </p>
         </div>
 
@@ -315,12 +351,25 @@
         <pre><code
             >&lt;script&gt;
   import SearchField from './ui/SearchField.svelte';
+  import &#123; createPasswordValidation &#125; from '@lib/password-validation.svelte';
   import PasswordField from './ui/PasswordField.svelte';
+  import PasswordMeter from './ui/PasswordMeter.svelte';
+  import PasswordChecklist from './ui/PasswordChecklist.svelte';
+  import FormField from './ui/FormField.svelte';
   import EditField from './ui/EditField.svelte';
   import EditTextarea from './ui/EditTextarea.svelte';
   import CopyField from './ui/CopyField.svelte';
   import GenerateField from './ui/GenerateField.svelte';
   import GenerateTextarea from './ui/GenerateTextarea.svelte';
+
+  let password = $state('');
+  let confirm = $state('');
+
+  const pv = createPasswordValidation(
+    () =&gt; password,
+    () =&gt; confirm,
+    &#123; requireConfirm: true &#125;,
+  );
 &lt;/script&gt;
 
 &lt;SearchField
@@ -329,11 +378,21 @@
   onsubmit=&#123;(v) =&gt; console.log(v)&#125;
 /&gt;
 
-&lt;PasswordField
-  bind:value=&#123;password&#125;
-  placeholder="Enter password..."
-  autocomplete="new-password"
-/&gt;
+&lt;FormField error=&#123;pv.error&#125;&gt;
+  &#123;#snippet children(&#123; fieldId, descriptionId, invalid &#125;)&#125;
+    &lt;PasswordField
+      id=&#123;fieldId&#125;
+      bind:value=&#123;password&#125;
+      &#123;invalid&#125;
+      describedby=&#123;descriptionId&#125;
+      autocomplete="new-password"
+    /&gt;
+  &#123;/snippet&#125;
+&lt;/FormField&gt;
+&lt;PasswordMeter password=&#123;password&#125; validation=&#123;pv&#125; /&gt;
+&lt;PasswordChecklist password=&#123;password&#125; validation=&#123;pv&#125; /&gt;
+&lt;PasswordField bind:value=&#123;confirm&#125; autocomplete="new-password" /&gt;
+&lt;button disabled=&#123;!pv.isValid&#125;&gt;Submit&lt;/button&gt;
 
 &lt;EditField
   bind:value=&#123;name&#125;
@@ -373,8 +432,15 @@
         <code>autocomplete</code> (default "off"),
         <code>onsubmit</code>, <code>oninput</code>.
         <strong>PasswordField</strong> &mdash; <code>value</code> (bindable),
-        <code>placeholder</code>,
+        <code>placeholder</code>, <code>invalid</code>,
+        <code>describedby</code>,
         <code>autocomplete</code> (default "current-password").
+        <strong>PasswordMeter</strong> &mdash; <code>password</code> (string),
+        <code>validation</code> (PasswordValidationState). Hidden when empty.
+        Four levels: Weak, Fair, Good, Strong.
+        <strong>PasswordChecklist</strong> &mdash; <code>password</code>
+        (string),
+        <code>validation</code> (PasswordValidationState). Hidden when empty.
         <strong>EditField</strong> &mdash; <code>value</code> (bindable),
         <code>placeholder</code>, <code>autocomplete</code>,
         <code>onconfirm</code>.

@@ -443,7 +443,49 @@ interface VoidUser {
 }
 
 // ==========================================================================
-// 9. COMPONENT: KEYBOARD SHORTCUTS
+// 9. COMPONENT: PASSWORD VALIDATION
+// ==========================================================================
+
+/**
+ * Password strength level as computed by PasswordMeter.
+ */
+type PasswordStrengthLevel = 'weak' | 'fair' | 'good' | 'strong';
+
+/**
+ * A single password validation rule with label and pass/fail state.
+ */
+interface PasswordRule {
+  label: string;
+  met: boolean;
+}
+
+/**
+ * Full reactive validation state returned by `createPasswordValidation()`.
+ * All properties are reactive (getter-backed) — do NOT destructure.
+ *
+ * @example
+ * const pv = createPasswordValidation(() => password, () => confirm, { requireConfirm: true });
+ * <PasswordMeter password={password} validation={pv} />
+ * <PasswordChecklist password={password} validation={pv} />
+ * <button disabled={!pv.isValid}>Submit</button>
+ */
+interface PasswordValidationState {
+  hasLower: boolean;
+  hasUpper: boolean;
+  hasDigit: boolean;
+  hasSpecial: boolean;
+  hasRestrictedChars: boolean;
+  hasValidLength: boolean;
+  passwordsMatch: boolean;
+  score: number;
+  level: PasswordStrengthLevel;
+  error: string;
+  rules: PasswordRule[];
+  isValid: boolean;
+}
+
+// ==========================================================================
+// 10. COMPONENT: KEYBOARD SHORTCUTS
 // ==========================================================================
 
 /**
