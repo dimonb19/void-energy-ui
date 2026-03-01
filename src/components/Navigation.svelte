@@ -134,33 +134,42 @@
     }
   }
 
-  shortcutRegistry.register({
-    key: 'f',
-    label: 'Toggle fullscreen',
-    group: 'General',
-    action: toggleFullscreen,
-  });
+  $effect(() => {
+    shortcutRegistry.register({
+      key: 'f',
+      label: 'Toggle fullscreen',
+      group: 'General',
+      action: toggleFullscreen,
+    });
 
-  shortcutRegistry.register({
-    key: 't',
-    label: 'Open atmospheres',
-    group: 'General',
-    action: () => modal.themes(),
-  });
+    shortcutRegistry.register({
+      key: 't',
+      label: 'Open atmospheres',
+      group: 'General',
+      action: () => modal.themes(),
+    });
 
-  shortcutRegistry.register({
-    key: '?',
-    label: 'Show keyboard shortcuts',
-    group: 'General',
-    action: () => modal.shortcuts(),
-  });
+    shortcutRegistry.register({
+      key: '?',
+      label: 'Show keyboard shortcuts',
+      group: 'General',
+      action: () => modal.shortcuts(),
+    });
 
-  shortcutRegistry.register({
-    key: 'k',
-    modifier: 'meta',
-    label: 'Command palette',
-    group: 'General',
-    action: () => modal.palette(),
+    shortcutRegistry.register({
+      key: 'k',
+      modifier: 'meta',
+      label: 'Command palette',
+      group: 'General',
+      action: () => modal.palette(),
+    });
+
+    return () => {
+      shortcutRegistry.unregister('f');
+      shortcutRegistry.unregister('t');
+      shortcutRegistry.unregister('?');
+      shortcutRegistry.unregister('k');
+    };
   });
 
   // ─────────────────────────────────────────────────────────────────────────────

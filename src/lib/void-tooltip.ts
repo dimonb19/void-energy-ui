@@ -89,12 +89,13 @@ export class VoidTooltip {
       computePosition(this.trigger, this.tooltip, {
         placement: this.options.placement,
         middleware: [offset(12), flip(), shift({ padding: 10 })],
-      }).then(({ x, y }) => {
+      }).then(({ x, y, placement: resolvedPlacement }) => {
         Object.assign(this.tooltip!.style, {
           left: `${x}px`,
           top: `${y}px`,
           position: 'absolute',
         });
+        this.tooltip!.dataset.side = resolvedPlacement.split('-')[0];
       });
     });
 

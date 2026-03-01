@@ -2159,17 +2159,31 @@ Floating UI elements with special positioning.
 
 #### `.void-tooltip`
 
-**Description:** Headless floating capsule (Use with Floating UI)
-**Physics:** Small surface, high z-index
-**Positioning:** Managed by Floating UI library
+**Description:** Headless floating capsule positioned by Floating UI via the Popover API (top layer, no z-index needed).
+**Location:** [src/lib/void-tooltip.ts](src/lib/void-tooltip.ts)
+**CSS:** `.void-tooltip` ([src/styles/components/\_tooltips.scss](src/styles/components/_tooltips.scss))
 
-**Usage:**
+**States:**
+
+| State | Attribute | Visual |
+| --- | --- | --- |
+| Closed (default) | — | Invisible (`opacity: 0`, scaled down, blurred) |
+| Open | `data-state="open"` | Fully visible, spring transition in |
+| Side | `data-side="top\|bottom\|left\|right"` | Directional slide offset (set by Floating UI) |
+
+**Physics:**
+- **Glass:** `glass-float` + `glass-blur`, spring transitions, directional slide per `data-side`
+- **Flat/Light:** No blur (`filter: none`), same spring transitions
+- **Retro:** Instant show/hide (`transition: none`, `filter: none`), opaque `--bg-spotlight`, radius 0
+
+**Usage:** Always via `use:tooltip` action — never instantiate `.void-tooltip` directly.
 
 ```svelte
-<div class="void-tooltip" role="tooltip">Tooltip content</div>
+<button use:tooltip="Click to save">Save</button>
+<button use:tooltip={{ content: 'Settings', placement: 'bottom', delay: 200 }}>Settings</button>
 ```
 
-See [tooltip.ts](src/actions/tooltip.ts) for Svelte action.
+See [`use:tooltip` action docs](#b-tooltip-usetooltip) for full options.
 
 ---
 
@@ -2646,7 +2660,7 @@ Physics-aware visual effects for loading states and skeleton loaders.
 <Skeleton variant="paragraph" lines={4} />
 ```
 
-**Physics:** Inherits all physics behavior from the `shimmer` mixin — energy-primary glow in glass/flat dark, white sweep in light, scan-line in retro.
+**Physics:** Base background is `--border-color` (subtle surface fill). Shimmer overlay inherits all physics behavior from the `shimmer` mixin — energy-primary glow in glass/flat dark, white sweep in light, scan-line in retro.
 
 **Showcase:** [/components → Effects](src/components/ui-library/Effects.svelte)
 

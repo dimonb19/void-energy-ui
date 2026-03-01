@@ -71,22 +71,34 @@ $_slot-width: var(--control-padding-x);
   }
 
   // --- Padding adjustments via :has() ---
+  // Slot icons use data-size="lg" (font-size-h5, ~18px) which doesn't scale
+  // with density, but spacing tokens do. At compact density the gap between
+  // icon and text collapses. The inverse-density term adds padding exactly
+  // when density is low and removes it when high, keeping the gap stable.
+  --_slot-correction: calc(var(--space-xs) * (1 - var(--density, 1)));
+
   // Left slot present → pad input/textarea-left to make room for icon
   &:has(.field-slot-left) input,
   &:has(.field-slot-left) textarea {
-    padding-left: calc(#{$_slot-width} + var(--space-lg));
+    padding-left: calc(
+      #{$_slot-width} + var(--space-lg) + var(--_slot-correction)
+    );
   }
 
   // Right slot present → pad input/textarea-right for icon(s)
   &:has(.field-slot-right) input,
   &:has(.field-slot-right) textarea {
-    padding-right: calc(#{$_slot-width} + var(--space-lg));
+    padding-right: calc(
+      #{$_slot-width} + var(--space-lg) + var(--_slot-correction)
+    );
   }
 
   // Two buttons in right slot (editing state) → add room for second icon
   &:has(.field-slot-right > :nth-child(2)) input,
   &:has(.field-slot-right > :nth-child(2)) textarea {
-    padding-right: calc(#{$_slot-width} + var(--space-lg) * 2);
+    padding-right: calc(
+      #{$_slot-width} + var(--space-lg) * 2 + var(--_slot-correction)
+    );
   }
 
   // Textarea fields: align slot icons to the top (not vertically centered)

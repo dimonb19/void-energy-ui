@@ -1,7 +1,6 @@
 /* Tooltip surface styles for floating UI elements. */
 
 @use '../abstracts' as *;
-@use '../base/typography' as *;
 
 .void-tooltip {
   // Popover reset.
@@ -20,8 +19,10 @@
   @include glass-blur;
   background: var(--bg-surface);
 
-  // Typography.
-  @include typography('caption');
+  // Typography (caption level via tokens — no direct base/ import needed).
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  letter-spacing: var(--letter-spacing-caption);
 
   padding: var(--space-xs) var(--space-sm);
   text-align: center;
@@ -29,8 +30,22 @@
 
   // Default (closed) state.
   opacity: 0;
-  transform: translateY(4px) scale(0.95); // void-ignore (Motion Physics)
+  transform: scale(0.95); // void-ignore (Motion Physics)
   filter: blur(calc(var(--physics-blur) / 2));
+
+  // Directional slide per placement side.
+  &[data-side='top'] {
+    transform: translateY(4px) scale(0.95); // void-ignore (Motion Physics)
+  }
+  &[data-side='bottom'] {
+    transform: translateY(-4px) scale(0.95); // void-ignore (Motion Physics)
+  }
+  &[data-side='left'] {
+    transform: translateX(4px) scale(0.95); // void-ignore (Motion Physics)
+  }
+  &[data-side='right'] {
+    transform: translateX(-4px) scale(0.95); // void-ignore (Motion Physics)
+  }
 
   box-shadow: var(--shadow-lift);
 
@@ -43,7 +58,7 @@
   // Open state.
   &[data-state='open'] {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translate(0, 0) scale(1);
     filter: blur(0);
   }
 
