@@ -132,7 +132,7 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
     border-right: none;
     box-shadow: none;
 
-    // Auto-hide scrollbar — appears on hover only
+    // Auto-hide scrollbar — appears on hover only (physics-aware)
     scrollbar-color: transparent transparent;
 
     &::-webkit-scrollbar-thumb {
@@ -140,11 +140,73 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
       transition: background var(--speed-fast) ease;
     }
 
+    // Glass (default): translucent thumb, glow on thumb-hover
     &:hover {
-      scrollbar-color: var(--energy-secondary) transparent;
+      scrollbar-color: alpha(var(--energy-secondary), 50%) transparent;
 
       &::-webkit-scrollbar-thumb {
-        background: var(--energy-secondary);
+        background: alpha(var(--energy-secondary), 50%);
+
+        &:hover {
+          background: alpha(var(--energy-primary), 75%);
+          box-shadow: 0 0 6px alpha(var(--energy-primary), 40%); // void-ignore (Glow Radius — matches laser-scrollbar mixin)
+        }
+      }
+    }
+
+    // Flat: solid thumb, subtle track
+    @include when-flat {
+      &:hover {
+        scrollbar-color: var(--energy-secondary) var(--bg-sink);
+
+        &::-webkit-scrollbar-track {
+          background: var(--bg-sink);
+          border-radius: var(--radius-full);
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: var(--energy-secondary);
+          border-radius: var(--radius-full);
+
+          &:hover {
+            background: var(--energy-primary);
+            box-shadow: none;
+          }
+        }
+      }
+    }
+
+    // Retro: chunky thumb, visible track border, hard edges
+    @include when-retro {
+      scrollbar-width: auto;
+
+      &::-webkit-scrollbar {
+        width: calc(var(--scrollbar-width) * 2);
+        height: calc(var(--scrollbar-width) * 2);
+      }
+
+      &::-webkit-scrollbar-thumb {
+        transition: none;
+      }
+
+      &:hover {
+        scrollbar-color: var(--energy-primary) var(--bg-sink);
+
+        &::-webkit-scrollbar-track {
+          background: var(--bg-sink);
+          border-radius: 0;
+          border: var(--physics-border-width) solid var(--border-color);
+        }
+
+        &::-webkit-scrollbar-thumb {
+          background: var(--energy-primary);
+          border-radius: 0;
+
+          &:hover {
+            background: var(--energy-secondary);
+            box-shadow: none;
+          }
+        }
       }
     }
 
