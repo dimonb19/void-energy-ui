@@ -27,6 +27,7 @@
 5. [Mixin Reference](#5-mixin-reference)
 6. [Quick Patterns (Copy-Paste)](#6-quick-patterns-copy-paste)
 7. [Svelte Actions](#7-svelte-actions)
+8. [Timing Utilities](#8-timing-utilities)
 
 ---
 
@@ -1223,14 +1224,16 @@ Preset components with built-in layout and physics.
 | `placeholder` | `string` | `'Search...'` | Placeholder text |
 | `zoom` | `'in' \| 'out'` | — | Search icon lens variant |
 | `autocomplete` | `string` | `'off'` | HTML autocomplete hint |
+| `delay` | `number` | — | Debounce `oninput` by this many ms (0 or omitted = no debounce) |
 | `onsubmit` | `(value: string) => void` | — | Callback on Enter key |
-| `oninput` | `(value: string) => void` | — | Callback on keystroke |
+| `oninput` | `(value: string) => void` | — | Callback on keystroke (debounced if `delay` is set) |
 | `disabled` | `boolean` | `false` | Disables input |
 
 **Usage:**
 
 ```svelte
 <SearchField bind:value={query} onsubmit={handleSearch} zoom="in" />
+<SearchField bind:value={query} oninput={(v) => search(v)} delay={300} />
 ```
 
 ---
@@ -3970,6 +3973,39 @@ await handle; // or handle.abort();
 
 ---
 
+## 8. Timing Utilities
+
+**Location:** [src/lib/timing.ts](src/lib/timing.ts)
+
+Pure TypeScript timing primitives — no Svelte dependency.
+
+### `debounce(fn, ms)`
+
+Returns a debounced version of `fn` that delays invocation until `ms` milliseconds after the last call.
+
+```typescript
+import { debounce } from '@lib/timing';
+
+const search = debounce((query: string) => fetchResults(query), 300);
+search('hello');  // waits 300ms after last call
+search.cancel();  // cancel pending invocation
+```
+
+### `throttle(fn, ms)`
+
+Returns a throttled version of `fn` that invokes at most once per `ms` milliseconds. Trailing call is guaranteed.
+
+```typescript
+import { throttle } from '@lib/timing';
+
+const onScroll = throttle(() => updatePosition(), 100);
+onScroll.cancel();  // cancel pending trailing call
+```
+
+Both return `T & { cancel(): void }` — the original function signature plus a `cancel` method.
+
+---
+
 ## 📚 Related Documentation
 
 - **[THEME-GUIDE.md](./THEME-GUIDE.md)** — How to create custom themes
@@ -3985,3 +4021,4 @@ await handle; // or handle.abort();
 - **Mixins:** [src/styles/abstracts/\_mixins.scss](src/styles/abstracts/_mixins.scss)
 - **Components:** [src/styles/components/](src/styles/components/)
 - **Actions:** [src/actions/](src/actions/)
+- **Timing:** [src/lib/timing.ts](src/lib/timing.ts)

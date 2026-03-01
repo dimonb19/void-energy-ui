@@ -13,8 +13,9 @@
   - placeholder: Placeholder text
   - disabled: Disables the input
   - zoom: Search icon lens variant ('in' | 'out')
+  - delay: Debounce oninput by this many ms (0 or omitted = no debounce)
   - onsubmit: Callback on Enter key
-  - oninput: Callback on every keystroke
+  - oninput: Callback on every keystroke (debounced if delay is set)
   - class: Additional CSS classes on the wrapper
 
   BEHAVIOR:
@@ -25,6 +26,7 @@
 -->
 <script lang="ts">
   import Search from '@components/icons/Search.svelte';
+  import { debounce } from '@lib/timing';
 
   interface SearchFieldProps {
     value: string;
@@ -33,6 +35,8 @@
     disabled?: boolean;
     autocomplete?: HTMLInputElement['autocomplete'];
     zoom?: 'in' | 'out';
+    /** Debounce oninput callback by this many ms. 0 or omitted = no debounce. */
+    delay?: number;
     onsubmit?: (value: string) => void;
     oninput?: (value: string) => void;
     class?: string;
@@ -45,6 +49,7 @@
     disabled = false,
     autocomplete = 'off',
     zoom,
+    delay,
     onsubmit,
     oninput,
     class: className = '',
@@ -54,6 +59,17 @@
   const inputId = id ?? `search-${Math.random().toString(36).slice(2, 9)}`;
 
   let focused = $state(false);
+  let debouncedInput: ((value: string) => void) | undefined;
+
+  $effect(() => {
+    if (delay && oninput) {
+      const d = debounce(oninput, delay);
+      debouncedInput = d;
+      return () => d.cancel();
+    } else {
+      debouncedInput = undefined;
+    }
+  });
 
   function handleKeydown(e: KeyboardEvent) {
     if (e.key === 'Enter') {
@@ -64,7 +80,11 @@
 
   function handleInput(e: Event) {
     value = (e.target as HTMLInputElement).value;
-    oninput?.(value);
+    if (debouncedInput) {
+      debouncedInput(value);
+    } else {
+      oninput?.(value);
+    }
   }
 </script>
 
