@@ -52,15 +52,7 @@
   let adminOverride = $state(false);
 
   // Temporary theme preview functions
-  function ensureAdaptAtmosphere() {
-    if (!voidEngine.userConfig.adaptAtmosphere) {
-      voidEngine.setPreferences({ adaptAtmosphere: true });
-    }
-  }
-
   function previewCustomAtmosphere() {
-    ensureAdaptAtmosphere();
-
     voidEngine.registerTheme('cyberpunk', {
       mode: 'dark',
       physics: 'glass',
@@ -78,14 +70,27 @@
         'text-dim': 'rgba(255, 230, 240, 0.85)',
       },
     });
-    voidEngine.applyTemporaryTheme('cyberpunk', 'Neon Dreams');
-    toast.show('Custom atmosphere applied', 'success');
+    const applied = voidEngine.applyTemporaryTheme('cyberpunk', 'Neon Dreams');
+    if (applied) {
+      toast.show('Custom atmosphere applied', 'success');
+    } else {
+      toast.show(
+        "Theme locked — enable 'Adapt to story mood' in settings",
+        'warning',
+      );
+    }
   }
 
   function previewBuiltInAtmosphere() {
-    ensureAdaptAtmosphere();
-    voidEngine.applyTemporaryTheme('crimson', 'Blood Moon');
-    toast.show('Crimson atmosphere active', 'success');
+    const applied = voidEngine.applyTemporaryTheme('crimson', 'Blood Moon');
+    if (applied) {
+      toast.show('Crimson atmosphere active', 'success');
+    } else {
+      toast.show(
+        "Theme locked — enable 'Adapt to story mood' in settings",
+        'warning',
+      );
+    }
   }
 </script>
 
