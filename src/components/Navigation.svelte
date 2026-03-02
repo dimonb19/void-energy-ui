@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Component } from 'svelte';
 
+  import { untrack } from 'svelte';
   import { voidEngine } from '@adapters/void-engine.svelte';
   import { modal } from '@lib/modal-manager.svelte';
   import { shortcutRegistry } from '@lib/shortcut-registry.svelte';
@@ -135,33 +136,35 @@
   }
 
   $effect(() => {
-    shortcutRegistry.register({
-      key: 'f',
-      label: 'Toggle fullscreen',
-      group: 'General',
-      action: toggleFullscreen,
-    });
+    untrack(() => {
+      shortcutRegistry.register({
+        key: 'f',
+        label: 'Toggle fullscreen',
+        group: 'General',
+        action: toggleFullscreen,
+      });
 
-    shortcutRegistry.register({
-      key: 't',
-      label: 'Open atmospheres',
-      group: 'General',
-      action: () => modal.themes(),
-    });
+      shortcutRegistry.register({
+        key: 't',
+        label: 'Open atmospheres',
+        group: 'General',
+        action: () => modal.themes(),
+      });
 
-    shortcutRegistry.register({
-      key: '?',
-      label: 'Show keyboard shortcuts',
-      group: 'General',
-      action: () => modal.shortcuts(),
-    });
+      shortcutRegistry.register({
+        key: '?',
+        label: 'Show keyboard shortcuts',
+        group: 'General',
+        action: () => modal.shortcuts(),
+      });
 
-    shortcutRegistry.register({
-      key: 'k',
-      modifier: 'meta',
-      label: 'Command palette',
-      group: 'General',
-      action: () => modal.palette(),
+      shortcutRegistry.register({
+        key: 'k',
+        modifier: 'meta',
+        label: 'Command palette',
+        group: 'General',
+        action: () => modal.palette(),
+      });
     });
 
     return () => {
