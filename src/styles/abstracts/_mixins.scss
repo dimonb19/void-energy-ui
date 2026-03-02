@@ -105,6 +105,7 @@
       transparent 0%,
       transparent 35%,
       rgba(255, 255, 255, 0.6) 50%,
+      // void-ignore (Shimmer Physics)
       transparent 65%,
       transparent 100%
     );
@@ -232,7 +233,7 @@
 
     @starting-style {
       opacity: 0;
-      transform: translateY(10px) scale(0.98);
+      transform: translateY(10px) scale(0.98); // void-ignore (Motion Physics)
       filter: blur(var(--physics-blur));
     }
   }
@@ -330,7 +331,7 @@
 
     &:hover {
       background: alpha(var(--energy-primary), 75%);
-      box-shadow: 0 0 6px alpha(var(--energy-primary), 40%);
+      box-shadow: 0 0 6px alpha(var(--energy-primary), 40%); // void-ignore (Glow Physics)
     }
   }
 

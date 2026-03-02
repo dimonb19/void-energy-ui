@@ -143,11 +143,11 @@
         </p>
 
         <div class="flex flex-row flex-wrap gap-md">
-          <div class="surface-sunk p-sm flex-1 flex flex-col gap-xs">
+          <div class="surface-sunk p-md flex-1 flex flex-col gap-sm">
             <b class="text-small">Geometry</b>
             <code class="text-caption">flex gap-md p-lg</code>
           </div>
-          <div class="surface-sunk p-sm flex-1 flex flex-col gap-xs">
+          <div class="surface-sunk p-md flex-1 flex flex-col gap-sm">
             <b class="text-small">Physics</b>
             <code class="text-caption">glass-float, glass-blur</code>
           </div>
@@ -222,30 +222,30 @@
         </p>
 
         <div
-          class="surface-sunk p-sm flex flex-row gap-md items-end justify-center flex-wrap"
+          class="surface-sunk p-md flex flex-row gap-md items-end justify-center flex-wrap"
         >
           <div class="flex flex-col items-center gap-xs">
-            <span class="block w-xs h-xs bg-primary rounded-xs"></span>
+            <span class="block w-xs h-xs bg-primary rounded"></span>
             <code class="text-caption">xs</code>
           </div>
           <div class="flex flex-col items-center gap-xs">
-            <span class="block w-sm h-sm bg-primary rounded-xs"></span>
+            <span class="block w-sm h-sm bg-primary rounded"></span>
             <code class="text-caption">sm</code>
           </div>
           <div class="flex flex-col items-center gap-xs">
-            <span class="block w-md h-md bg-primary rounded-sm"></span>
+            <span class="block w-md h-md bg-primary rounded"></span>
             <code class="text-caption">md</code>
           </div>
           <div class="flex flex-col items-center gap-xs">
-            <span class="block w-lg h-lg bg-primary rounded-sm"></span>
+            <span class="block w-lg h-lg bg-primary rounded"></span>
             <code class="text-caption">lg</code>
           </div>
           <div class="flex flex-col items-center gap-xs">
-            <span class="block w-xl h-xl bg-primary rounded-sm"></span>
+            <span class="block w-xl h-xl bg-primary rounded"></span>
             <code class="text-caption">xl</code>
           </div>
           <div class="hidden tablet:flex flex-col items-center gap-xs">
-            <span class="block w-2xl h-2xl bg-primary rounded-md"></span>
+            <span class="block w-2xl h-2xl bg-primary rounded"></span>
             <code class="text-caption">2xl</code>
           </div>
         </div>
@@ -505,7 +505,7 @@
 
       <SettingsRow label="Atmosphere Preview">
         <div
-          class="surface-sunk flex flex-col justify-center tablet:flex-row gap-sm p-sm"
+          class="surface-sunk flex flex-col justify-center tablet:flex-row gap-md p-md"
         >
           {#if voidEngine.temporaryThemeInfo?.id === 'cyberpunk'}
             <button
@@ -673,7 +673,7 @@
           controls.
         </p>
         <div
-          class="surface-sunk p-sm flex flex-col flex-wrap justify-center items-center gap-sm tablet:flex-row"
+          class="surface-sunk p-md flex flex-col flex-wrap justify-center items-center gap-md tablet:flex-row"
         >
           <Toggle
             bind:checked={animations}

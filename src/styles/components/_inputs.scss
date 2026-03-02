@@ -139,7 +139,9 @@ input[type='radio'] {
   // Glass: glow on checked state.
   @include when-glass {
     &:checked {
-      filter: drop-shadow(0 0 3px var(--energy-primary));
+      filter: drop-shadow(
+        0 0 3px var(--energy-primary)
+      ); // void-ignore (Glow Physics)
     }
   }
 
@@ -152,7 +154,9 @@ input[type='radio'] {
   @media (hover: hover) {
     &:hover {
       @include when-glass {
-        filter: drop-shadow(0 0 2px var(--energy-primary));
+        filter: drop-shadow(
+          0 0 2px var(--energy-primary)
+        ); // void-ignore (Glow Physics)
       }
     }
   }

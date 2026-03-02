@@ -107,7 +107,7 @@
     @include when-glass {
       box-shadow:
         var(--shadow-lift),
-        0 0 15px -4px alpha(var(--toast-accent), 60%);
+        0 0 15px -4px alpha(var(--toast-accent), 60%); // void-ignore (Glow Physics)
     }
   }
 

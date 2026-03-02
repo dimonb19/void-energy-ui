@@ -167,8 +167,8 @@
     height: var(--space-xs);
     aspect-ratio: 1 / 1;
     flex: none;
-    border-right: 2px solid currentColor;
-    border-bottom: 2px solid currentColor;
+    border-right: 2px solid currentColor; // void-ignore (Chevron Readability)
+    border-bottom: 2px solid currentColor; // void-ignore (Chevron Readability)
     transform: rotate(45deg);
 
     // Only show arrow on hover-capable devices (desktop with mouse)

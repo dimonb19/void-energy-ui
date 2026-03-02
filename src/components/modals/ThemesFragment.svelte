@@ -221,7 +221,7 @@
   {/if}
 
   <div
-    class="theme-menu surface-sunk rounded-md flex flex-col tablet:grid tablet:grid-cols-2 gap-xs p-xs"
+    class="theme-menu surface-sunk rounded-md flex flex-col tablet:grid tablet:grid-cols-2 gap-sm p-sm"
     role="radiogroup"
     aria-label="Select Theme"
   >
