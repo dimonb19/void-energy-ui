@@ -1196,7 +1196,9 @@ Preset components with built-in layout and physics.
 | `checked` | `boolean` | `$bindable(false)` | Toggle state (bindable) |
 | `onchange` | `(checked?: boolean) => void` | — | Callback on state change |
 | `label` | `string` | — | Accessible label text |
+| `id` | `string` | — | HTML `id` attribute |
 | `disabled` | `boolean` | `false` | Disables interaction |
+| `class` | `string` | — | Additional CSS classes |
 | `size` | `string` | — | Size via `data-size` attribute |
 | `iconOn` | `string \| Component` | — | ON state icon (optional) |
 | `iconOff` | `string \| Component` | `Circle` | OFF state icon (default circle) |
@@ -1222,6 +1224,7 @@ Preset components with built-in layout and physics.
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `value` | `string` | `$bindable('')` | Search text (bindable) |
+| `id` | `string` | — | HTML `id` attribute |
 | `placeholder` | `string` | `'Search...'` | Placeholder text |
 | `zoom` | `'in' \| 'out'` | — | Search icon lens variant |
 | `autocomplete` | `string` | `'off'` | HTML autocomplete hint |
@@ -2534,6 +2537,29 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 
 ---
 
+#### `<ThemesBtn>` — Atmosphere indicator button
+
+**Description:** Shows current theme icon (Moon/Sun) and opens themes modal. Can render as icon-only or icon + text.
+**Location:** [src/components/ui/ThemesBtn.svelte](src/components/ui/ThemesBtn.svelte)
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `icon` | `boolean` | `false` | Icon-only mode (uses `btn-icon`) |
+| `size` | `string` | `'lg'` | Icon `data-size` |
+| `class` | `string` | `''` | Additional classes |
+
+**Usage:**
+
+```svelte
+<ThemesBtn />
+<ThemesBtn icon />
+<ThemesBtn icon size="xl" />
+```
+
+---
+
 #### Special Icons
 
 | Icon | Type | Notes |
@@ -3305,6 +3331,42 @@ h2 {
 ```
 
 **See also:** [Container Queries](#j-container-queries) for Tailwind usage and breakpoint rationale.
+
+---
+
+#### `@include respond-up($breakpoint)`
+
+**Purpose:** Viewport media query `min-width` for a breakpoint token. Mobile-first: styles apply at and above the given breakpoint.
+
+**Breakpoints:** `mobile` (0px), `tablet` (768px), `small-desktop` (1024px), `large-desktop` (1440px), `full-hd` (1920px), `quad-hd` (2560px)
+
+**Usage:**
+
+```scss
+.sidebar {
+  display: none;
+
+  @include respond-up('tablet') {
+    display: block; // Visible on tablet and up
+  }
+}
+```
+
+---
+
+#### `@include mobile-only`
+
+**Purpose:** Media query for screens below the `tablet` breakpoint (max-width: 768px). Shorthand for mobile-specific overrides.
+
+**Usage:**
+
+```scss
+.desktop-nav {
+  @include mobile-only {
+    display: none; // Hidden on mobile
+  }
+}
+```
 
 ---
 

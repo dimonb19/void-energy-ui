@@ -60,6 +60,10 @@ WRONG:    import { writable } from 'svelte/store';
 
 CORRECT:  const doubled = $derived(value * 2);
 CORRECT:  $effect(() => { ... });
+CORRECT:  $effect(() => {                    // Cleanup replaces onDestroy
+            const id = layerStack.push(dismiss);
+            return () => layerStack.remove(id);
+          });
 WRONG:    $: reactive = value * 2;
 WRONG:    onMount(() => { ... }); onDestroy(() => { ... });
 ```
@@ -103,17 +107,18 @@ npm run preview        Preview production build locally
 
 ```
 src/
-  actions/          Svelte actions (morph, tooltip)
+  actions/          Svelte actions (morph, tooltip, kinetic, navlink)
   adapters/         VoidEngine singleton (theme/physics runtime state)
   components/
     core/           AtmosphereScope, ThemeScript (Astro scaffolding)
     icons/          Interactive animated SVG icons (icon-[name] namespace)
-    modals/         Modal fragments (Confirm, Settings, Themes)
+    modals/         Modal fragments (Alert, Confirm, CommandPalette, Settings, Shortcuts, Themes)
     ui/             Reusable UI components (Button, Toggle, SearchField, Modal...)
     ui-library/     Showcase/demo pages for the component library
+    *.svelte        App-level components (Modal, Toast, Navigation, index, CoNexus, Components)
   config/           Design tokens (SSOT), modal registry, font registry, constants
   layouts/          Astro layouts
-  lib/              Modal manager, layer stack, transitions, tooltip logic, void-boot
+  lib/              Modal manager, layer stack, transitions, tooltip logic, void-boot, password-validation, shortcut-registry, timing
   pages/            Astro pages
   stores/           Reactive state (toast, user)
   styles/
@@ -252,8 +257,11 @@ Import and use — never re-instantiate.
 .registerTheme(id, partialDef)      Register runtime theme (Safety Merge)
 .applyTemporaryTheme(id, label)     Temporary theme (respects adaptAtmosphere)
 .restoreUserTheme()                 Exit temporary theme
+.loadExternalTheme(url)             Async: fetch + register a remote theme JSON
 .availableAtmospheres               All registered theme IDs
 .builtInAtmospheres                 Static (non-runtime) theme IDs
+.hasTemporaryTheme                  Whether a temporary theme is active (getter)
+.temporaryThemeInfo                 Label + ID of the temporary theme (getter)
 ```
 
 ### Modal (`import { modal } from '@lib/modal-manager.svelte'`)
@@ -264,6 +272,8 @@ Import and use — never re-instantiate.
 .alert(title, body)
 .settings(options?)
 .themes()
+.shortcuts()                        Open keyboard shortcuts modal
+.palette()                          Open command palette modal
 Registry: src/config/modal-registry.ts (add new fragments here)
 ```
 
@@ -376,7 +386,7 @@ Auth visibility utilities (FOUC-safe, set before first paint):
 
 ## 9. GOTCHAS
 
-- **Generated files are read-only.** Never edit `src/styles/config/_generated-themes.scss`, `void-registry.json`, or `void-physics.json`. Edit `src/config/design-tokens.ts` and run `npm run build:tokens`.
+- **Generated files are read-only.** Never edit `src/styles/config/_generated-themes.scss`, `src/config/void-registry.json`, or `src/config/void-physics.json`. Edit `src/config/design-tokens.ts` and run `npm run build:tokens`.
 - **`npm run scan` enforces Token Law.** It exits non-zero if magic pixel values are found in SCSS/Svelte files.
 - **Glass and retro require dark mode.** VoidEngine auto-corrects invalid physics+mode combos. Do not manually set light mode with glass or retro physics.
 - **SCSS import path:** Always `@use '../abstracts' as *;` — never import individual partial files.
