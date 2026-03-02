@@ -26,7 +26,7 @@
 
 // Skeleton — shape variants for shimmer-surface placeholder elements.
 .skeleton {
-  background: var(--border-color);
+  background: alpha(var(--text-main), 6%);
   &[data-variant='text'] {
     width: 100%;
     height: 1em;
