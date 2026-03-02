@@ -29,6 +29,28 @@
   @see /_inputs.scss for select styling
 -->
 <script lang="ts">
+  interface SwitcherOption {
+    value: string | number | null;
+    label: string;
+  }
+
+  interface SelectorProps {
+    options: SwitcherOption[];
+    value?: string | number | null;
+    onchange?: (value: string) => void;
+    label?: string;
+    id?: string;
+    disabled?: boolean;
+    /** Hidden placeholder option text (renders as first option with value={null}) */
+    placeholder?: string;
+    /** CSS classes applied to the inner <select> element */
+    selectClass?: string;
+    /** Flex alignment for the wrapper (default: 'center') */
+    align?: 'start' | 'center' | 'end';
+    /** CSS classes applied to the wrapper div */
+    class?: string;
+  }
+
   let {
     options,
     value = $bindable(),

@@ -8,7 +8,7 @@
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 351 615"
   fill="currentColor"
-  class="icon {className ?? ''}"
+  class="icon-quill icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >

@@ -8,20 +8,24 @@
   // Props
   // ─────────────────────────────────────────────────────────────────────────────
 
-  let {
-    children,
-    onrefresh,
-    onerror,
-    threshold = 48,
-    disabled = false,
-  }: {
+  interface PullRefreshProps {
     children: Snippet;
     onrefresh: () => Promise<void>;
     onerror?: (error: unknown) => void;
     /** Pull distance to trigger refresh (px). Syncs with CSS --pull-threshold. */
     threshold?: number;
     disabled?: boolean;
-  } = $props();
+    class?: string;
+  }
+
+  let {
+    children,
+    onrefresh,
+    onerror,
+    threshold = 48,
+    disabled = false,
+    class: className = '',
+  }: PullRefreshProps = $props();
 
   // ─────────────────────────────────────────────────────────────────────────────
   // Constants (derived from design tokens where applicable)
@@ -560,7 +564,7 @@
 </script>
 
 <div
-  class="pull-refresh"
+  class="pull-refresh {className}"
   data-state={pullState}
   aria-busy={pullState === 'refreshing'}
   style:--pull-distance="{pullDistance}px"

@@ -55,9 +55,10 @@
   aria-atomic="true"
 >
   {#each toast.items as item (item.id)}
-    <button
+    <!-- svelte-ignore a11y_no_noninteractive_element_interactions, a11y_click_events_have_key_events -->
+    <div
       class="toast-message flex items-center justify-center gap-xs"
-      type="button"
+      role="status"
       data-type={item.type}
       onclick={() => toast.close(item.id)}
       in:emerge
@@ -80,27 +81,20 @@
       <span class="toast-text">{item.message}</span>
 
       {#if item.action}
-        <span
-          class="toast-action inline-flex items-center gap-xs py-xs px-sm"
-          role="button"
-          tabindex="0"
+        <button
+          type="button"
+          class="toast-action btn-ghost btn-sm inline-flex items-center gap-xs"
           onclick={(e) => {
             e.stopPropagation();
             item.action!.onclick();
-          }}
-          onkeydown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.stopPropagation();
-              item.action!.onclick();
-            }
           }}
         >
           {#if item.action.label === 'Undo'}
             <Undo data-size="sm" />
           {/if}
           {item.action.label}
-        </span>
+        </button>
       {/if}
-    </button>
+    </div>
   {/each}
 </div>

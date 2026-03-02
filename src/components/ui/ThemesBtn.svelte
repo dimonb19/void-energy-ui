@@ -3,18 +3,21 @@
   import { modal } from '@lib/modal-manager.svelte';
   import { Sun, Moon } from '@lucide/svelte';
 
+  interface ThemesBtnProps {
+    class?: string;
+    icon?: boolean;
+    size?: string;
+  }
+
   let {
     class: className = '',
     icon = false,
     size = 'lg',
-  }: {
-    class?: string;
-    icon?: boolean;
-    size?: string;
-  } = $props();
+  }: ThemesBtnProps = $props();
 </script>
 
 <button
+  type="button"
   class={className}
   class:btn-icon={icon}
   aria-label={icon ? `Theme: ${voidEngine.atmosphere}` : undefined}

@@ -29,6 +29,24 @@
   @see /_switcher.scss for physics-aware styling
 -->
 <script lang="ts">
+  import type { Component } from 'svelte';
+
+  interface SwitcherOption {
+    value: string | number | null;
+    label: string;
+    icon?: string | Component;
+  }
+
+  interface SwitcherProps {
+    options: SwitcherOption[];
+    value: string | number | null;
+    onchange?: (value: string) => void;
+    label?: string;
+    id?: string;
+    disabled?: boolean;
+    class?: string;
+  }
+
   let {
     options,
     value = $bindable(),

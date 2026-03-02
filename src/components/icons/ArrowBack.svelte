@@ -8,7 +8,7 @@
   viewBox="-80 -80 160 160"
   stroke="currentColor"
   fill="currentColor"
-  class="icon {className ?? ''}"
+  class="icon-arrow-back icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >

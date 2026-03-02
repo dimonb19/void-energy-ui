@@ -3,12 +3,12 @@
   import LoadingQuill from '@components/icons/LoadingQuill.svelte';
   import LoadingTextCycler from '@components/ui/LoadingTextCycler.svelte';
 
-  interface Props {
+  interface PortalLoaderProps {
     status?: 'idle' | 'loading';
     class?: string;
   }
 
-  let { status = 'loading', class: className }: Props = $props();
+  let { status = 'loading', class: className }: PortalLoaderProps = $props();
 </script>
 
 <div class="portal-loader {className ?? ''}" role="status">

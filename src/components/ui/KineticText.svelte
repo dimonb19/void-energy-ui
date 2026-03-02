@@ -55,7 +55,7 @@
     /** HTML tag to render. Default: 'span' */
     tag?: string;
     /** Completion callback */
-    onComplete?: () => void;
+    oncomplete?: () => void;
     /** Additional classes (layout/geometry only) */
     class?: string;
   }
@@ -71,7 +71,7 @@
     cursor = false,
     loop,
     tag = 'span',
-    onComplete,
+    oncomplete,
     class: className = '',
   }: KineticTextProps = $props();
 
@@ -89,7 +89,7 @@
     loop,
     onComplete: () => {
       animating = false;
-      onComplete?.();
+      oncomplete?.();
     },
   });
 </script>

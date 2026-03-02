@@ -104,6 +104,7 @@
     type="range"
     min="0"
     max="100"
+    aria-label="Volume"
     bind:value={volume}
     oninput={() => onchange?.(volume)}
     disabled={disabled || muted}

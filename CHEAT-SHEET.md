@@ -2688,7 +2688,7 @@ Physics-aware visual effects for loading states and skeleton loaders.
 | `cursor` | `boolean` | `false` | Show blinking cursor during animation |
 | `loop` | `boolean` | `true` | Loop cycle mode indefinitely |
 | `tag` | `string` | `'span'` | HTML tag to render |
-| `onComplete` | `() => void` | — | Completion callback |
+| `oncomplete` | `() => void` | — | Completion callback |
 | `class` | `string` | `''` | CSS passthrough (layout/geometry only) |
 
 **States:**

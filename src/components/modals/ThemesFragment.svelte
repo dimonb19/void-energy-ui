@@ -24,7 +24,7 @@
   const extractFontName = (family: string) =>
     family.match(/^'([^']+)'/)?.[1] || family;
 
-  const modeOptions: SwitcherOption[] = [
+  const modeOptions = [
     { value: 'dark', label: 'Dark', icon: Moon },
     { value: 'light', label: 'Light', icon: Sun },
   ];
@@ -174,7 +174,7 @@
   role="presentation"
   use:morph={{ height: true, width: false }}
 >
-  <h2 class="text-h3 text-center">
+  <h2 id="modal-title" class="text-h3 text-center">
     Atmosphere: {voidEngine.atmosphere.toUpperCase()}
   </h2>
 
