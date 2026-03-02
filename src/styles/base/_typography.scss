@@ -25,11 +25,11 @@ $letter-spacings: generated.$letter-spacings;
   --font-size-caption: #{map.get($font-scale, 'caption')};
 
   // Line heights.
-  --line-height-heading: #{map.get($line-heights, 'h1')};
-  --line-height-heading-h2: #{map.get($line-heights, 'h2')};
-  --line-height-heading-h3: #{map.get($line-heights, 'h3')};
-  --line-height-subheading: #{map.get($line-heights, 'h4')};
-  --line-height-title: #{map.get($line-heights, 'h5')};
+  --line-height-h1: #{map.get($line-heights, 'h1')};
+  --line-height-h2: #{map.get($line-heights, 'h2')};
+  --line-height-h3: #{map.get($line-heights, 'h3')};
+  --line-height-h4: #{map.get($line-heights, 'h4')};
+  --line-height-h5: #{map.get($line-heights, 'h5')};
   --line-height-body: #{map.get($line-heights, 'body')};
   --line-height-small: #{map.get($line-heights, 'small')};
   --line-height-caption: #{map.get($line-heights, 'caption')};

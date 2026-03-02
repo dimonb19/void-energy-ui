@@ -162,7 +162,7 @@
     color: var(--text-main);
     font-weight: var(--font-weight-bold);
     font-size: var(--font-size-h5);
-    line-height: var(--line-height-title);
+    line-height: var(--line-height-h5);
 
     @include when-light {
       text-shadow: none;

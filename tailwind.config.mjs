@@ -152,7 +152,7 @@ export default {
       h2: 'var(--line-height-h2)',
       h3: 'var(--line-height-h3)',
       h4: 'var(--line-height-h4)',
-      title: 'var(--line-height-title)', // h5
+      title: 'var(--line-height-h5)',
       body: 'var(--line-height-body)',
       small: 'var(--line-height-small)',
       caption: 'var(--line-height-caption)',
@@ -166,7 +166,7 @@ export default {
       h2: 'var(--letter-spacing-h2)',
       h3: 'var(--letter-spacing-h3)',
       h4: 'var(--letter-spacing-h4)',
-      title: 'var(--letter-spacing-title)', // h5
+      title: 'var(--letter-spacing-h5)',
       body: 'var(--letter-spacing-body)',
       small: 'var(--letter-spacing-small)',
       caption: 'var(--letter-spacing-caption)',

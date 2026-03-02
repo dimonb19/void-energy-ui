@@ -111,7 +111,7 @@
   color: var(--text-main);
   padding: var(--space-xs) var(--space-sm);
   border-radius: var(--radius-base);
-  z-index: 1000;
+  z-index: 1000; // void-ignore (Skip-link must be above everything)
   text-decoration: none;
 
   &:focus {

@@ -72,7 +72,7 @@
   }
 
   @include when-retro {
-    transition-duration: 0.3s; // Stepped transition
+    transition-duration: 0.3s; // void-ignore (Stepped retro transition)
   }
 
   @include when-light {
@@ -420,7 +420,7 @@
   }
 
   @include when-retro {
-    transition-duration: 0.3s; // Stepped transition
+    transition-duration: 0.3s; // void-ignore (Stepped retro transition)
   }
 
   @include when-light {

@@ -35,7 +35,7 @@
 
 .kinetic-cursor {
   user-select: none;
-  font-weight: 400;
+  font-weight: var(--font-weight-regular);
   color: var(--text-main);
   animation: kinetic-blink 0.8s steps(2) infinite;
 

@@ -216,7 +216,7 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
   }
 
   @include when-retro {
-    transition-duration: 0.3s; // Stepped transition
+    transition-duration: 0.3s; // void-ignore (Stepped retro transition)
   }
 }
 
@@ -258,7 +258,7 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
 
 .page-sidebar-item {
   font-size: var(--font-size-small);
-  font-weight: var(--font-weight-normal);
+  font-weight: var(--font-weight-regular);
   line-height: var(--line-height-small);
   text-decoration: none;
   color: var(--text-dim);
@@ -311,7 +311,7 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
   }
 
   @include when-retro {
-    transition-duration: 0.3s; // Stepped transition
+    transition-duration: 0.3s; // void-ignore (Stepped retro transition)
   }
 }
 

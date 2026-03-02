@@ -51,7 +51,7 @@
   --radius-full: 9999px;
 
   --text-scale: 1;
-  --scrollbar-width: 6px;
+  --scrollbar-width: 6px; // void-ignore (Scrollbar constant)
 
   // Breadcrumbs height (single-line trail with vertical padding).
   --breadcrumbs-height: calc(var(--space-md) + var(--space-xs) * 2);

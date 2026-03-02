@@ -164,7 +164,7 @@
   }
 
   &:active:not(:disabled) {
-    transition-duration: 50ms;
+    transition-duration: 50ms; // void-ignore (Micro-feedback)
 
     @media (pointer: coarse) {
       transition-duration: 0ms;
@@ -318,7 +318,7 @@ button:not(.btn-void, .btn-icon),
 
   &:active:not(:disabled) {
     // MICRO-TRANSITION: Soft press for mouse, instant for touch/retro.
-    transition-duration: 50ms;
+    transition-duration: 50ms; // void-ignore (Micro-feedback)
 
     @media (pointer: coarse) {
       transition-duration: 0ms;
@@ -391,7 +391,7 @@ button:not(.btn-void, .btn-icon),
 
       // Active state: Inverted terminal look
       &:active:not(:disabled) {
-        transition-duration: 50ms;
+        transition-duration: 50ms; // void-ignore (Micro-feedback)
 
         @media (pointer: coarse) {
           transition-duration: 0ms;
@@ -450,7 +450,7 @@ button:not(.btn-void, .btn-icon),
 
     // --- C. Active Press ---
     &:active:not(:disabled) {
-      transition-duration: 50ms;
+      transition-duration: 50ms; // void-ignore (Micro-feedback)
 
       @media (pointer: coarse) {
         transition-duration: 0ms;
