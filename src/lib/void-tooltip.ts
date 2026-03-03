@@ -12,6 +12,10 @@ import {
   flip,
   shift,
 } from '@floating-ui/dom';
+import {
+  TOOLTIP_OFFSET_PX,
+  TOOLTIP_VIEWPORT_PADDING_PX,
+} from '@config/ui-geometry';
 
 export class VoidTooltip {
   private trigger: HTMLElement;
@@ -88,7 +92,11 @@ export class VoidTooltip {
       if (!this.tooltip) return;
       computePosition(this.trigger, this.tooltip, {
         placement: this.options.placement,
-        middleware: [offset(12), flip(), shift({ padding: 10 })],
+        middleware: [
+          offset(TOOLTIP_OFFSET_PX),
+          flip(),
+          shift({ padding: TOOLTIP_VIEWPORT_PADDING_PX }),
+        ],
       }).then(({ x, y, placement: resolvedPlacement }) => {
         Object.assign(this.tooltip!.style, {
           left: `${x}px`,

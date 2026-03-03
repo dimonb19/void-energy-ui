@@ -43,6 +43,10 @@
     shift,
   } from '@floating-ui/dom';
   import { layerStack } from '@lib/layer-stack.svelte';
+  import {
+    DROPDOWN_PANEL_OFFSET_PX,
+    DROPDOWN_VIEWPORT_PADDING_PX,
+  } from '@config/ui-geometry';
 
   interface DropdownProps {
     trigger: Snippet;
@@ -60,7 +64,7 @@
     trigger,
     children,
     placement = 'bottom-start',
-    offset: offsetPx = 8,
+    offset: offsetPx = DROPDOWN_PANEL_OFFSET_PX,
     class: className = '',
     triggerClass = '',
     open = $bindable(false),
@@ -106,7 +110,11 @@
       if (!panelEl || !triggerEl) return;
       computePosition(triggerEl, panelEl, {
         placement,
-        middleware: [offsetMiddleware(offsetPx), flip(), shift({ padding: 8 })],
+        middleware: [
+          offsetMiddleware(offsetPx),
+          flip(),
+          shift({ padding: DROPDOWN_VIEWPORT_PADDING_PX }),
+        ],
       }).then(({ x, y }) => {
         Object.assign(panelEl!.style, {
           left: `${x}px`,

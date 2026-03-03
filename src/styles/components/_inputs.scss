@@ -122,8 +122,12 @@ input[type='range'] {
 input[type='checkbox'],
 input[type='radio'] {
   appearance: auto;
-  width: calc(1.25rem * var(--density, 1));
-  height: calc(1.25rem * var(--density, 1));
+  width: calc(
+    1.25rem * var(--density, 1)
+  ); // void-ignore (native checkbox size — no token at 1.25rem)
+  height: calc(
+    1.25rem * var(--density, 1)
+  ); // void-ignore (native checkbox size — no token at 1.25rem)
 
   accent-color: var(--energy-primary);
 
@@ -166,14 +170,8 @@ input[type='radio'] {
 // --------------------------------------------------------------------------
 .dropzone {
   position: relative; // Required for overlay.
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
 
-  padding: var(--space-md);
-  width: 100%;
+  // void-hybrid-exception: min-height uses density scaling (physics-dependent geometry).
   min-height: calc(var(--space-5xl) * var(--density, 1));
   border-radius: calc(var(--radius-base) * 2);
 
@@ -202,10 +200,6 @@ input[type='radio'] {
 
   // Visible affordance layer.
   .dropzone-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-sm);
     pointer-events: none; // Let clicks pass through to input.
     z-index: z('base'); // Sit above the sunk background
 
@@ -226,7 +220,6 @@ input[type='radio'] {
   // Hover/drag active.
   &:hover,
   &[data-state='active'],
-  &.drag-active,
   &:focus-within {
     border-color: var(--energy-primary);
     background-color: blend(var(--bg-sink), var(--energy-primary), 5%);
@@ -264,14 +257,14 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 textarea:-webkit-autofill {
-  // Match sunk background.
+  // void-ignore (browser autofill hack — no token equivalent)
   -webkit-box-shadow: 0 0 0px 1000px var(--bg-canvas) inset !important;
 
   -webkit-text-fill-color: var(--text-main) !important;
 
   border-radius: var(--radius-base);
 
-  transition: background-color 5000s ease-in-out 0s; // Prevent flash.
+  transition: background-color 5000s ease-in-out 0s; // void-ignore (autofill flash suppression)
 }
 
 // 8. AUTOFILL OVERRIDE (Firefox)
@@ -288,6 +281,7 @@ textarea:-moz-autofill {
 fieldset {
   margin: 0;
   min-inline-size: 0;
+  // void-hybrid-exception: global element selector, no class handle for Tailwind.
   display: flex;
   flex-direction: column;
   gap: var(--space-sm);
@@ -295,28 +289,9 @@ fieldset {
   border: var(--physics-border-width) solid var(--border-color);
   border-radius: var(--radius-base);
 
-  transition:
-    border-color var(--speed-fast) var(--ease-spring-snappy),
-    box-shadow var(--speed-fast) var(--ease-spring-snappy);
-
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-  }
-
-  // Focus-within: highlight when any child input is focused.
-  &:focus-within {
-    border-color: var(--energy-primary);
-
-    @include when-glass {
-      box-shadow: 0 0 0 var(--physics-border-width)
-        alpha(var(--energy-primary), 20%);
-    }
-  }
-
-  // Retro: double-width border for grouping emphasis.
-  @include when-retro {
-    border-width: calc(var(--physics-border-width) * 2);
   }
 }
 
@@ -327,14 +302,65 @@ legend {
   color: var(--text-dim);
 
   transition: color var(--speed-fast) var(--ease-spring-snappy);
+}
 
-  // Legend highlights when fieldset has focus.
-  fieldset:focus-within > & {
-    color: var(--energy-primary);
+// 10. SWITCHER (Native Radio Foundation)
+// --------------------------------------------------------------------------
+.switcher-group {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.switcher-option {
+  position: relative;
+  margin: 0;
+  cursor: pointer;
+
+  .switcher-option-content {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
+  }
+
+  .switcher-native {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    appearance: none;
+    opacity: 0;
+    filter: none;
+    transform: none;
+    cursor: pointer;
+  }
+
+  &:has(.switcher-native:focus-visible) {
+    border-color: var(--energy-primary);
+    box-shadow: var(--focus-ring);
+  }
+
+  &:has(.switcher-native:disabled) {
+    cursor: not-allowed;
+  }
+
+  &:has(.switcher-native:disabled) .switcher-native {
+    cursor: not-allowed;
+  }
+
+  @media (hover: hover) {
+    &:has(.switcher-native:disabled):hover {
+      transform: none;
+      box-shadow: none;
+      border-color: var(--border-color);
+      background: var(--bg-surface);
+    }
   }
 }
 
-// 10. DETAILS & SUMMARY (Native Disclosure)
+// 11. DETAILS & SUMMARY (Native Disclosure)
 // --------------------------------------------------------------------------
 details {
   @include glass-sunk;
@@ -398,6 +424,7 @@ details {
 }
 
 summary {
+  // void-hybrid-exception: global element selector, no class handle for Tailwind.
   display: flex;
   align-items: center;
   justify-content: space-between;

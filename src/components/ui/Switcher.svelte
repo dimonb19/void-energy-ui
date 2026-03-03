@@ -10,26 +10,29 @@
       { value: 'retro', label: 'Retro' }
     ]}
     bind:value={selectedPhysics}
-    name="physics-selector"
   />
 
   PROPS:
   - options: Array of { value, label, icon? } objects
   - value: Currently selected value (bindable)
   - onchange: Callback when selection changes
-  - name: ARIA label for the radiogroup
+  - label: Optional visible/accessibility label
   - disabled: Disables all interaction
   - class: Additional CSS classes
 
   ACCESSIBILITY:
-  - Uses role="radiogroup" with role="radio" children
-  - Keyboard: Arrow keys navigate, Tab moves focus in/out
-  - Roving tabindex: Only selected option is tabbable
+  - Uses native radio inputs with shared name
+  - Keyboard: browser-native radio behavior (Tab + Arrow keys)
 
-  @see /_switcher.scss for physics-aware styling
+  @see /_inputs.scss for physics-aware styling
 -->
 <script lang="ts">
   import type { Component } from 'svelte';
+  import {
+    createNativeControlIdentity,
+    toNativeControlState,
+    toNativeControlValue,
+  } from '@lib/native-control-foundation';
 
   interface SwitcherOption {
     value: string | number | null;
@@ -57,82 +60,70 @@
     class: className = '',
   }: SwitcherProps = $props();
 
-  // Auto-generate ID for label association if not provided
+  // Shared native-control identity (stable per component instance)
   // svelte-ignore state_referenced_locally
-  const inputId = id ?? `switcher-${Math.random().toString(36).slice(2, 9)}`;
+  const { id: inputId, groupName } = createNativeControlIdentity(
+    'switcher',
+    id,
+  );
+  const labelId = `${inputId}-label`;
 
-  // Track references for focus management
-  let optionRefs = $state<HTMLButtonElement[]>([]);
+  let selectedValue = $derived(toNativeControlValue(value));
 
-  function select(newValue: string) {
+  function select(newValue: string | number | null) {
     if (disabled) return;
-    value = newValue;
-    onchange?.(newValue);
-  }
-
-  function handleKeydown(e: KeyboardEvent, index: number) {
-    let nextIndex: number | null = null;
-
-    // Arrow key navigation (ARIA radiogroup best practice)
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-      e.preventDefault();
-      nextIndex = (index + 1) % options.length;
-    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-      e.preventDefault();
-      nextIndex = (index - 1 + options.length) % options.length;
-    } else if (e.key === 'Home') {
-      e.preventDefault();
-      nextIndex = 0;
-    } else if (e.key === 'End') {
-      e.preventDefault();
-      nextIndex = options.length - 1;
-    }
-
-    if (nextIndex !== null) {
-      select(String(options[nextIndex].value));
-      // Move focus to the newly selected option
-      optionRefs[nextIndex]?.focus();
-    }
+    const next = toNativeControlValue(newValue);
+    value = next;
+    onchange?.(next);
   }
 </script>
 
-<div class="flex flex-col gap-xs justify-center {className}">
+<div class="switcher-wrapper flex flex-col gap-xs justify-center {className}">
   {#if label}
-    <label for={inputId} class="text-small">{label}</label>
+    <p id={labelId} class="text-small">{label}</p>
   {/if}
-  <div
-    class="flex flex-row flex-wrap gap-sm justify-center {className}"
+
+  <fieldset
+    class="switcher-group flex flex-row flex-wrap gap-sm justify-center"
     id={inputId}
-    role="radiogroup"
-    aria-label={label}
-    data-disabled={disabled || undefined}
+    aria-labelledby={label ? labelId : undefined}
+    aria-label={label ? undefined : 'Switcher'}
+    {disabled}
   >
-    {#each options as option, i (option.value)}
-      <button
-        bind:this={optionRefs[i]}
-        type="button"
-        class="switcher-option"
-        role="radio"
-        aria-checked={value === option.value}
-        tabindex={value === option.value ? 0 : -1}
-        {disabled}
-        onclick={() => {
-          if (value !== option.value) select(String(option.value));
-        }}
-        onkeydown={(e) => handleKeydown(e, i)}
+    {#each options as option (option.value)}
+      {@const optionValue = toNativeControlValue(option.value)}
+      {@const optionActive = selectedValue === optionValue}
+
+      <label
+        class="switcher-option btn"
+        data-state={toNativeControlState(optionActive)}
       >
-        {#if option.icon}
-          <span class="switcher-icon" aria-hidden="true">
-            {#if typeof option.icon === 'string'}
-              {option.icon}
-            {:else}
-              {@const Icon = option.icon}
-              <Icon class="icon" />
-            {/if}
-          </span>
-        {/if}
-        <span class="switcher-label">{option.label}</span>
-      </button>
+        <input
+          type="radio"
+          class="switcher-native"
+          name={groupName}
+          value={optionValue}
+          checked={optionActive}
+          {disabled}
+          onchange={() => {
+            if (!optionActive) select(option.value);
+          }}
+        />
+
+        <span class="switcher-option-content">
+          {#if option.icon}
+            <span class="switcher-icon" aria-hidden="true">
+              {#if typeof option.icon === 'string'}
+                {option.icon}
+              {:else}
+                {@const Icon = option.icon}
+                <Icon class="icon" />
+              {/if}
+            </span>
+          {/if}
+          <span class="switcher-label">{option.label}</span>
+        </span>
+      </label>
     {/each}
-  </div>
+  </fieldset>
 </div>

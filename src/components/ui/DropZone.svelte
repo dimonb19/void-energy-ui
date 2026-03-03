@@ -160,8 +160,8 @@
 </script>
 
 <div
-  class="dropzone {className}"
-  data-state={dragActive ? 'active' : ''}
+  class="dropzone flex flex-col items-center justify-center text-center p-md w-full {className}"
+  data-state={dragActive ? 'active' : undefined}
   role="button"
   tabindex={disabled ? -1 : 0}
   aria-label={hasFiles
@@ -188,7 +188,7 @@
     aria-hidden="true"
   />
 
-  <div class="dropzone-content">
+  <div class="dropzone-content flex flex-col items-center gap-sm">
     {#if hasFiles}
       <FileCheck class="icon" data-size="xl" />
       <p>

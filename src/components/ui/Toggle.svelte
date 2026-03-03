@@ -33,8 +33,8 @@
   - hideIcons: Hide icons entirely
 
   ACCESSIBILITY:
-  - Uses role="switch" with aria-checked
-  - Keyboard: Space/Enter toggles state
+  - Uses native checkbox semantics
+  - Keyboard: browser-native checkbox behavior
   - Focus visible ring on keyboard navigation
 
   @see /_toggle.scss for physics-aware styling
@@ -42,6 +42,10 @@
 <script lang="ts">
   import type { Component } from 'svelte';
   import { Circle } from '@lucide/svelte';
+  import {
+    createNativeControlIdentity,
+    toNativeControlState,
+  } from '@lib/native-control-foundation';
 
   interface ToggleProps {
     checked: boolean;
@@ -69,13 +73,13 @@
     hideIcons = false,
   }: ToggleProps = $props();
 
-  // Auto-generate ID for label association if not provided
+  // Shared native-control identity (stable per component instance)
   // svelte-ignore state_referenced_locally
-  const inputId = id ?? `toggle-${Math.random().toString(36).slice(2, 9)}`;
+  const { id: inputId } = createNativeControlIdentity('toggle', id);
 
-  function toggle() {
-    if (disabled) return;
-    checked = !checked;
+  let checkedState = $derived(toNativeControlState(checked));
+
+  function handleChange() {
     onchange?.(checked);
   }
 </script>
@@ -92,17 +96,16 @@
     </label>
   {/if}
 
-  <button
-    id={inputId}
-    type="button"
-    class="toggle btn-void"
-    data-size={size}
-    role="switch"
-    aria-checked={checked}
-    aria-label={label ?? 'Toggle'}
-    {disabled}
-    onclick={toggle}
-  >
+  <div class="toggle" data-size={size} data-state={checkedState}>
+    <input
+      id={inputId}
+      type="checkbox"
+      class="toggle-native"
+      bind:checked
+      aria-label={label ? undefined : 'Toggle'}
+      {disabled}
+      onchange={handleChange}
+    />
     <span class="toggle-track">
       {#if !hideIcons}
         <!-- Left (ON) icon: only rendered if custom iconOn provided -->
@@ -134,5 +137,5 @@
 
       <span class="toggle-thumb" aria-hidden="true"></span>
     </span>
-  </button>
+  </div>
 </div>

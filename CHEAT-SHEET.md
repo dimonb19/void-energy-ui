@@ -1185,7 +1185,7 @@ Preset components with built-in layout and physics.
 
 #### `<Toggle>` (Switch)
 
-**Description:** Boolean on/off switch with optional icon indicators.
+**Description:** Boolean on/off switch built on a native checkbox. Browser-native keyboard behavior (Space toggles).
 **Location:** [src/components/ui/Toggle.svelte](src/components/ui/Toggle.svelte)
 **CSS Class:** `.toggle` ([src/styles/components/\_toggle.scss](src/styles/components/_toggle.scss))
 
@@ -1276,7 +1276,7 @@ Preset components with built-in layout and physics.
 
 #### `<Switcher>` (Segmented Control)
 
-**Description:** Radio-style segmented control with keyboard navigation (arrows, Home/End).
+**Description:** Segmented control built on native radio inputs. Browser-native keyboard behavior (Tab + Arrow keys).
 **Location:** [src/components/ui/Switcher.svelte](src/components/ui/Switcher.svelte)
 
 **Props:**

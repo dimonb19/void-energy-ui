@@ -537,9 +537,9 @@
     <div class="flex flex-col gap-sm">
       <h5>Switcher</h5>
       <p class="text-small text-mute">
-        Segmented control for selecting between N options. Uses
-        <code>role="radiogroup"</code> with roving tabindex for keyboard navigation
-        (arrow keys, Home, End). Only the selected option is tabbable.
+        Segmented control for selecting between N options. Built on native radio
+        inputs with a shared group name, so keyboard behavior follows
+        browser-default radio interaction (Tab + Arrow keys).
       </p>
 
       <div class="surface-sunk p-md flex flex-col items-center gap-md">

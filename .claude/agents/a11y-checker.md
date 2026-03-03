@@ -20,7 +20,7 @@ You are an accessibility specialist reviewing Svelte components for WCAG 2.1 AA 
 
 ### ARIA Attributes
 - Buttons with icons only have `aria-label`
-- Toggle/switch components use `role="switch"` with `aria-checked`
+- Toggle uses native `<input type="checkbox">` with `aria-label` fallback
 - Expandable sections use `aria-expanded`
 - Modals use `role="dialog"` with `aria-modal="true"` and `aria-labelledby`
 - Decorative icons have `aria-hidden="true"`
@@ -62,7 +62,7 @@ For each component:
 - line 18: Consider adding `aria-describedby` for error state
 
 ### Good practices found
-- Uses `role="switch"` with `aria-checked` ✓
+- Uses native `<input type="checkbox">` with `aria-label` ✓
 - Focus ring via `glass-sunk` mixin ✓
 ```
 
