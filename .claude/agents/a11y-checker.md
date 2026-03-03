@@ -25,6 +25,8 @@ You are an accessibility specialist reviewing Svelte components for WCAG 2.1 AA 
 - Modals use `role="dialog"` with `aria-modal="true"` and `aria-labelledby`
 - Decorative icons have `aria-hidden="true"`
 - Live regions use `aria-live` for dynamic content (toasts)
+- Loading indicators use `role="status"` with visually-hidden text (`.sr-only`) for screen reader announcements (see PortalLoader, PullRefresh, Toast)
+- Visually-hidden labels use `.sr-only` class — never `display: none` or `visibility: hidden` (those hide from assistive technology)
 
 ### Keyboard Navigation
 - All interactive elements are focusable (native elements or `tabindex="0"`)

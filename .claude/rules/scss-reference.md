@@ -19,11 +19,17 @@ glass-sunk                          Recessed surface (inputs, wells). Auto focus
 ```
 entry-transition($duration, $delay)  Slide-up fade-in with @starting-style. Respects reduced-motion.
 shimmer                               Loading skeleton animation. Auto-adapts to physics/mode.
+text-shimmer                          Text-clipped loading shimmer. Two-layer: solid --text-mute base + --text-main beam sweep. Utility class: .text-shimmer
+navlink-loading($mode)                Navigation loading shimmer paired with use:navlink action. $mode: surface (::after overlay) or text (background-clip). 150ms delay prevents flicker.
+stagger-enter (keyframe)              Staggered list item entry (opacity + translateY + scale). Use with:
+                                      animation: stagger-enter var(--speed-base) var(--ease-spring-snappy) backwards;
+                                      animation-delay: calc(var(--item-index, 0) * var(--delay-cascade));
+                                      Set --item-index per element: style="--item-index: {i}"
 ```
 
 ## State Selectors
 ```
-when-state($state)        States: 'active', 'open', 'loading', 'disabled', 'error'
+when-state($state)        States: 'active', 'open', 'loading', 'disabled', 'error', 'met'
 when-physics($physics)    Values: 'glass', 'flat', 'retro'. Optional: $low-specificity: true
 when-mode($mode)          Values: 'light', 'dark'. Optional: $low-specificity: true
 when-physics-mode($p, $m) Combined physics + mode selector (use sparingly)
@@ -39,6 +45,7 @@ All accept optional $low-specificity: true for :where() wrapping.
 ```
 respond-up($breakpoint)   Min-width query. Breakpoints: tablet, small-desktop, large-desktop, full-hd, quad-hd
 mobile-only               Max-width: tablet
+container-up($breakpoint) Min-width container query. Breakpoints: sm(320), md(480), lg(640), xl(800). Parent needs container-type: inline-size.
 ```
 
 ## Utilities
@@ -46,6 +53,7 @@ mobile-only               Max-width: tablet
 text-truncate($lines)     Ellipsis clamp. $lines=1 for single-line, >1 for multi-line.
 text-wrap-force           Force word-break for hashes, API keys.
 btn-reset                 Strip all button defaults. Preserves accessibility.
+btn-base                  Structural button base (size, typography, layout). No physics or color. For CSS-only .btn-fake elements.
 laser-scrollbar           Themed scrollbar (thin, energy colors).
 ```
 

@@ -86,6 +86,7 @@ Output:
 - **Remaining consumers:** Any files still using `-legacy` (if migration was scoped)
 - **Ready to delete:** Whether the `-legacy` file can be safely removed (zero remaining consumers)
 - **Manual checks needed:** Any prop behavior differences that need visual testing
+- **Next steps:** After migrating and testing, run `/document $ARGUMENTS` to update CHEAT-SHEET.md with any API changes
 
 ## Rules
 

@@ -56,7 +56,7 @@ Before you begin, ensure you have:
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/<org>/void-energy-ui.git
+git clone https://github.com/<org>/void-energy-ui.git  # Replace <org> with the actual GitHub organization
 cd void-energy-ui
 npm install
 ```
@@ -111,7 +111,7 @@ Follow the [Architecture & Discipline](#4-architecture--discipline) rules strict
 
 #### 3. Test Thoroughly
 
-- Test across **all themes** (void, onyx, terminal, etc.)
+- Test across **all themes**: void, onyx, terminal, nebula, solar, overgrowth, velvet, crimson (dark) and paper, focus, laboratory, playground (light)
 - Test across **all density settings** (high, standard, low)
 - Test across **all physics modes** (glass, flat, retro)
 - Test on mobile, tablet, and desktop viewports
@@ -131,14 +131,34 @@ If you modified [design-tokens.ts](src/config/design-tokens.ts), rebuild tokens:
 npm run build:tokens
 ```
 
+Run type checking to catch TypeScript and Svelte errors:
+
+```bash
+npm run check
+```
+
+Scan for Token Law violations (raw pixel values):
+
+```bash
+npm run scan
+```
+
+Format code:
+
+```bash
+npm run format
+```
+
 #### 5. Commit Your Changes
 
 Write clear, descriptive commit messages:
 
 ```bash
-git add .
+git add src/components/ui/Tooltip.svelte src/styles/components/_tooltip.scss
 git commit -m "feat: add tooltip component with floating UI"
 ```
+
+> Stage specific files rather than `git add .` to avoid accidentally including generated files, `.env`, or binary artifacts.
 
 Commit message format:
 
@@ -274,6 +294,21 @@ See [CHEAT-SHEET.md → The State Protocol](./CHEAT-SHEET.md#the-state-protocol-
 
 ---
 
+### Law 5 — Spacing Gravity
+
+**Default to generous spacing. When uncertain, go one size up.**
+
+| Surface                            | Minimum        |
+| ---------------------------------- | -------------- |
+| Floating surface (cards, panels)   | `p-lg gap-lg`  |
+| Sunk surface (inputs, wells)       | `p-md gap-md`  |
+
+**Never** use `gap-sm` on a card or `p-sm` on a floating surface. If it looks tight, go one size up.
+
+**Exception:** Dense picker collections (chip groups, theme card grids, tag lists) intentionally use `gap-xs` or `gap-sm`. The tight gap signals "these are members of a unified set." Do not "fix" these to `gap-md`.
+
+---
+
 ### The Native-First Protocol
 
 **Build on native HTML elements, not around them.**
@@ -287,6 +322,8 @@ Components are thin wrappers that add layout, labeling, and physics styling. The
 #### Custom Only When
 
 No native element exists for the interaction (e.g., combobox/autocomplete, multi-thumb slider, virtualized data table).
+
+**Reference pattern:** `Selector.svelte` (`src/components/ui/Selector.svelte`) — wraps a native `<select>` with label association and layout. Zero custom dropdown JS. SCSS handles all physics.
 
 #### ✅ Correct
 
@@ -341,6 +378,8 @@ Ensure your PR meets these criteria:
 - [ ] **Theme works across all physics modes** (if applicable)
 - [ ] **No console errors or warnings**
 - [ ] **Build succeeds:** `npm run build`
+- [ ] **Type checking passes:** `npm run check`
+- [ ] **No Token Law violations:** `npm run scan`
 - [ ] **Tokens rebuilt (if modified):** `npm run build:tokens`
 
 ---
@@ -378,6 +417,8 @@ When you open a PR, use this template:
 - [ ] I have tested across multiple density settings
 - [ ] I have tested on mobile, tablet, and desktop
 - [ ] Build passes: `npm run build`
+- [ ] `npm run check` passes (no TypeScript/Svelte errors)
+- [ ] `npm run scan` passes (no raw pixel values)
 - [ ] No console errors or warnings
 - [ ] I have updated documentation (if needed)
 ```
@@ -386,7 +427,7 @@ When you open a PR, use this template:
 
 ### Review Process
 
-1. **Automated checks:** GitHub Actions will run linting and build checks
+1. **Manual pre-flight:** Run `npm run build`, `npm run check`, and `npm run scan` locally before submitting
 2. **Maintainer review:** A project maintainer will review your code
 3. **Feedback:** Address any requested changes
 4. **Merge:** Once approved, your PR will be merged
@@ -525,8 +566,8 @@ interface CardProps {
 ## Questions?
 
 - **Documentation:** [CHEAT-SHEET.md](./CHEAT-SHEET.md), [THEME-GUIDE.md](./THEME-GUIDE.md), [README.md](./README.md)
-- **Issues:** Open a [GitHub issue](https://github.com/<org>/void-energy-ui/issues)
-- **Discussions:** Join our [GitHub Discussions](https://github.com/<org>/void-energy-ui/discussions)
+- **Issues:** Open a GitHub issue <!-- Replace <org> with actual GitHub organization when public -->
+- **Discussions:** Join our GitHub Discussions
 
 ---
 

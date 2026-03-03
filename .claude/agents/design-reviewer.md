@@ -39,9 +39,10 @@ Default generous. When uncertain, one size up.
 
 ## Additional Checks
 
-- **Physics coverage**: Every component SCSS should have `when-glass`, `when-retro`, and `when-light` blocks
+- **Physics coverage**: Components using `glass-float`/`glass-sunk` handle glass physics implicitly — only flag missing `when-glass` if the component makes glass-specific visual overrides. Always flag missing `when-retro` for components with border-radius, box-shadow, or visible borders. Flag missing `when-light` for components with visible background surfaces.
 - **SCSS import**: Must use `@use '../abstracts' as *;` — never individual partials
 - **Token usage**: Verify spacing uses `--space-*`, colors use `--text-*`/`--bg-*`/`--energy-*`
+- **`// void-ignore` exemption**: Raw values annotated with `// void-ignore` are intentional physics exceptions (shimmer highlights, readability floors, scrollbar constants). Do not flag these as Law 2 violations.
 - **Accessibility**: Check for proper `role`, `aria-*` attributes on interactive elements
 
 ## Output Format

@@ -23,6 +23,7 @@
   rules/                     Context loaded on-demand by file type
     tokens-reference.md      Token dictionary (when editing .scss/.svelte/.ts)
     scss-reference.md        SCSS toolkit (when editing styles/components)
+    spacing-protocol.md      Spacing rules (when editing .svelte/.scss/.ts/.astro)
 
   settings.json              Hooks configuration (shared, checked into git)
   settings.local.json        Local permissions (gitignored)
@@ -133,6 +134,7 @@ These load automatically when Claude edits matching file types. No action needed
 |------|-------------------|---------|
 | `tokens-reference.md` | `.scss`, `.svelte`, `.ts`, `tailwind.config.mjs` | Full token dictionary (spacing, colors, physics, z-index, typography) |
 | `scss-reference.md` | `src/styles/**/*.scss`, `src/components/**/*.svelte` | SCSS toolkit (mixins, functions, state selectors) |
+| `spacing-protocol.md` | `.svelte`, `.scss`, `.ts`, `.astro` | Spacing floors, layout gaps, common mistakes, page scaffold |
 
 ---
 

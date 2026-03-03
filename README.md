@@ -10,6 +10,8 @@ It combines the performance of **Tailwind CSS** (for Layout) with a bespoke **SC
 - **[CHEAT-SHEET.md](./CHEAT-SHEET.md)** — Quick reference for developers (components, mixins, tokens)
 - **[THEME-GUIDE.md](./THEME-GUIDE.md)** — Step-by-step guide to creating custom themes
 - **[CONTRIBUTING.md](./CONTRIBUTING.md)** — Contribution guidelines and PR process
+- **[CLAUDE.md](./CLAUDE.md)** — AI assistant instructions and design system laws
+- **[.claude/README.md](./.claude/README.md)** — Claude Code setup, skills, hooks, and agents
 
 ---
 
@@ -34,6 +36,19 @@ The `VoidEngine` includes an active guardrail system that prevents "broken" phys
 | **Retro + Light Mode** | Forces **DARK** Mode | CRT Phosphor effects require a black canvas. |
 
 **Why?** CoNexus is a narrative platform. The visual rendering engine is part of the storytelling. Breaking the physics of a theme breaks the immersion of the story.
+
+### DOM Contract
+
+The `<html>` element carries the runtime state:
+
+| Attribute | Values | Set by |
+| :--- | :--- | :--- |
+| `data-atmosphere` | Theme ID (e.g., `void`, `paper`) | VoidEngine |
+| `data-physics` | `glass` \| `flat` \| `retro` | VoidEngine |
+| `data-mode` | `light` \| `dark` | VoidEngine |
+| `data-auth` | Present (no value) when authenticated | UserScript.astro |
+
+CSS utilities `.auth-only` and `.guest-only` read `data-auth` to show/hide content before Svelte hydrates (FOUC-safe).
 
 ## ⚠️ ARCHITECTURE & DISCIPLINE (READ BEFORE CODING)
 
@@ -80,18 +95,22 @@ We separate **Layout** (Geometry) from **Materials** (Physics).
 /
 ├── scripts/
 │   ├── generate-tokens.ts        <-- 🧠 The Compiler (build:tokens)
+│   ├── generate_context.py       <-- Context generation for AI
 │   ├── scan-physics.ts           <-- Physics preset scanner
 │   └── local-dev.ts              <-- 🛠️ Dev Server Orchestrator
 ├── src/
 │   ├── actions/
+│   │   ├── kinetic.ts            <-- Typewriter/decode text action
 │   │   ├── morph.ts              <-- FLIP size-morphing action
+│   │   ├── navlink.ts            <-- Navigation loading state action
 │   │   └── tooltip.ts            <-- Floating UI tooltip action
 │   ├── adapters/
 │   │   └── void-engine.svelte.ts <-- ⚡ The Reactive Brain (State)
 │   ├── components/
 │   │   ├── core/
+│   │   │   ├── AtmosphereScope.svelte <-- Theme context provider
 │   │   │   ├── ThemeScript.astro <-- 🚀 The Bootloader (Anti-FOUC)
-│   │   │   └── AtmosphereScope.svelte <-- Theme context provider
+│   │   │   └── UserScript.astro  <-- Auth state bootstrapper
 │   │   ├── icons/                <-- 🎨 Interactive animated icons
 │   │   ├── modals/               <-- Modal dialog fragments
 │   │   ├── ui/                   <-- Reusable UI components
@@ -101,15 +120,22 @@ We separate **Layout** (Geometry) from **Materials** (Physics).
 │   │   ├── design-tokens.ts      <-- 🧠 EDIT THIS (Single Source of Truth)
 │   │   ├── font-registry.ts      <-- 🤖 Generated (Font preload map)
 │   │   ├── modal-registry.ts     <-- Modal Component Map
+│   │   ├── ui-geometry.ts        <-- Semantic geometry constants
 │   │   ├── void-physics.json     <-- 🤖 Generated (Physics per preset)
 │   │   └── void-registry.json    <-- 🤖 Generated (Theme metadata)
 │   ├── lib/
+│   │   ├── layer-stack.svelte.ts <-- LIFO Escape key dismissal
 │   │   ├── modal-manager.svelte.ts
+│   │   ├── native-control-foundation.ts <-- Native control wiring
+│   │   ├── password-validation.svelte.ts <-- Password strength logic
+│   │   ├── shortcut-registry.svelte.ts <-- ⌨️ Keyboard shortcuts
+│   │   ├── timing.ts             <-- Duration/timing utilities
 │   │   ├── transitions.svelte.ts <-- 🌌 The Physics Motion Engine
 │   │   ├── void-boot.js          <-- The Shared Kernel (No-Dep)
 │   │   └── void-tooltip.ts       <-- Floating UI Logic
 │   ├── stores/
-│   │   └── toast.svelte.ts       <-- Notification State
+│   │   ├── toast.svelte.ts       <-- Notification State
+│   │   └── user.svelte.ts        <-- User/Auth State
 │   ├── styles/
 │   │   ├── abstracts/            <-- Tools (No CSS Output)
 │   │   ├── base/                 <-- Global Resets & Typography
@@ -119,9 +145,28 @@ We separate **Layout** (Geometry) from **Materials** (Physics).
 │   │   │   └── _fonts.scss       <-- 🤖 Generated (@font-face)
 │   │   └── global.scss           <-- Main CSS Entry Point
 │   └── types/
-│       └── void-ui.d.ts          <-- Type Definitions
+│       ├── api.d.ts              <-- API response types
+│       ├── global.d.ts           <-- Global type augmentations
+│       ├── modal.d.ts            <-- Modal system types
+│       ├── story-engine.d.ts     <-- Story engine types
+│       └── void-ui.d.ts          <-- Design system types
 ├── tailwind.config.mjs           <-- The Bridge (Maps Tokens to Tailwind)
 ```
+
+### Key Singletons
+
+Import and use — never re-instantiate.
+
+| Singleton | Import | Role |
+| :--- | :--- | :--- |
+| `voidEngine` | `@adapters/void-engine.svelte` | Theme, physics, mode |
+| `modal` | `@lib/modal-manager.svelte` | Dialog orchestration |
+| `toast` | `@stores/toast.svelte` | Notification queue |
+| `layerStack` | `@lib/layer-stack.svelte` | Escape-key LIFO dismissal |
+| `shortcutRegistry` | `@lib/shortcut-registry.svelte` | Keyboard shortcut catalog |
+| `user` | `@stores/user.svelte` | Auth state, role flags |
+
+See [CLAUDE.md → State Management & Singletons](./CLAUDE.md) for full API reference.
 
 ## 🔌 API Integration (Future Proofing)
 

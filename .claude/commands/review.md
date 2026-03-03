@@ -22,6 +22,7 @@ For each file, check against the 5 Laws and report violations with `file:line` r
 - **VIOLATION:** Raw rgb/rgba/hsl values
 - **VIOLATION:** Tailwind arbitrary values (`gap-[20px]`, `p-[32px]`, `text-[#fff]`)
 - **OK:** Semantic tokens (`var(--space-md)`, `var(--text-main)`, `gap-md`, `p-lg`)
+- **OK:** Raw values annotated with `// void-ignore` — reviewed physical exceptions (shimmer highlights, scrollbar constants, readability floors)
 
 ### Law 3 — Runes Doctrine (Svelte files only)
 - **VIOLATION:** `export let` (should be `$props()`)
@@ -44,9 +45,9 @@ For each file, check against the 5 Laws and report violations with `file:line` r
 - **OK:** `p-lg gap-lg` on floating surfaces, `p-md gap-md` on sunk surfaces, `gap-xs` for tight coupling
 
 ### Physics Coverage (SCSS files)
-- **WARNING:** Component SCSS missing `when-glass` block
-- **WARNING:** Component SCSS missing `when-retro` block
-- **WARNING:** Component SCSS missing `when-light` block (for components with visible surfaces)
+- **WARNING:** Component SCSS missing `when-retro` block (for components with border-radius, box-shadow, or visible borders)
+- **WARNING:** Component SCSS missing `when-light` block (for components with visible background surfaces)
+- **INFO:** Missing `when-glass` block is only a concern if the component makes glass-specific overrides beyond what `glass-float`/`glass-sunk` provides
 
 ### SCSS Import
 - **VIOLATION:** Importing individual SCSS partials (should be `@use '../abstracts' as *;`)

@@ -2161,6 +2161,106 @@ The chip system includes additional semantic variants beyond the base:
 
 Floating UI elements with special positioning.
 
+#### `<Dropdown>` (Floating Panel)
+
+**Description:** Generic trigger + floating panel container. Uses the Popover API for top-layer positioning and `@floating-ui/dom` for smart placement with `flip()` and `shift()` middleware. Click to open, click outside or Escape to close. Registers with the layer stack for correct Escape precedence when nested with modals or sidebars.
+**Location:** [src/components/ui/Dropdown.svelte](src/components/ui/Dropdown.svelte)
+**CSS:** `.dropdown`, `.dropdown-trigger`, `.dropdown-panel` ([src/styles/components/\_dropdown.scss](src/styles/components/_dropdown.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `trigger` | `Snippet` | *required* | Content rendered inside the toggle button |
+| `children` | `Snippet` | *required* | Panel content (arbitrary markup) |
+| `placement` | `Placement` | `'bottom-start'` | Floating UI placement string |
+| `offset` | `number` | `DROPDOWN_PANEL_OFFSET_PX` (8) | Pixel gap between trigger and panel |
+| `open` | `boolean` | `$bindable(false)` | Open state (two-way bindable) |
+| `onchange` | `(open: boolean) => void` | — | Fired when open state changes |
+| `label` | `string` | `'Toggle dropdown'` | Accessible label for the trigger button |
+| `class` | `string` | `''` | CSS passthrough to `.dropdown` wrapper |
+| `triggerClass` | `string` | `''` | CSS passthrough to trigger button (e.g., `'btn-icon'`) |
+
+**States:**
+
+| State | Attribute | Element | Visual |
+| --- | --- | --- | --- |
+| Closed (default) | — | `.dropdown-panel` | Invisible (`opacity: 0`, scaled down, blurred) |
+| Open | `data-state="open"` | `.dropdown-panel` | Fully visible, spring transition in |
+
+**Architecture:**
+
+| Class | Purpose |
+| --- | --- |
+| `.dropdown` | Wrapper — `position: relative; display: inline-flex` |
+| `.dropdown-trigger` | Toggle `<button>` — receives `aria-expanded`, `aria-haspopup`, `aria-controls` |
+| `.dropdown-panel` | Floating panel — `popover="manual"`, `role="region"`, positioned by `computePosition()` |
+
+**Accessibility:**
+- Trigger: `<button>` with `aria-expanded`, `aria-haspopup="true"`, `aria-controls`
+- Panel: `role="region"`, `aria-label` matching the trigger label
+- Escape closes and returns focus to trigger (via layer stack)
+- Click outside closes (capture-phase document listener)
+
+**Physics:**
+- **Glass:** `glass-float` + `glass-blur`, spring transitions (`--speed-base` + `--ease-spring-gentle`), `--shadow-lift` elevation. Entry: fade + scale(0.95) + translateY(4px) + blur. Exit: reverse
+- **Flat/Light:** No blur (`filter: none`), opaque `--bg-spotlight`, solid border (`--physics-border-width`)
+- **Retro:** Instant show/hide (`transition: none`, `filter: none`), opaque `--bg-spotlight`, `border-radius: 0`
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+  import Dropdown from '@components/ui/Dropdown.svelte';
+  import { ChevronDown, Settings } from '@lucide/svelte';
+</script>
+
+<!-- Basic menu -->
+<Dropdown label="Options menu">
+  {#snippet trigger()}
+    <span class="flex items-center gap-xs">
+      Options <ChevronDown class="icon" data-size="sm" />
+    </span>
+  {/snippet}
+  <div class="flex flex-col gap-xs p-md">
+    <button class="btn-ghost">Edit</button>
+    <button class="btn-ghost">Duplicate</button>
+    <button class="btn-ghost btn-error">Delete</button>
+  </div>
+</Dropdown>
+
+<!-- Icon trigger -->
+<Dropdown label="Settings" triggerClass="btn-icon">
+  {#snippet trigger()}
+    <Settings class="icon" />
+  {/snippet}
+  <div class="p-md">Settings panel</div>
+</Dropdown>
+
+<!-- Controlled state -->
+<Dropdown label="Controlled" bind:open={menuOpen} onchange={(v) => console.log(v)}>
+  {#snippet trigger()}
+    Controlled <ChevronDown class="icon" data-size="sm" />
+  {/snippet}
+  <div class="p-md">
+    <button class="btn-ghost" onclick={() => (menuOpen = false)}>Close</button>
+  </div>
+</Dropdown>
+```
+
+**Implementation Notes:**
+
+| Decision | Rationale |
+| --- | --- |
+| Popover API (`popover="manual"`) | Top-layer positioning without z-index management |
+| `@floating-ui/dom` | Smart placement with `flip()` and `shift()` middleware |
+| Generation counter | Prevents stale `computePosition` callbacks from applying after close |
+| Layer stack integration | Ensures correct Escape dismissal order when nested with modals/sidebars |
+| `transitionend` cleanup | Panel hides popover only after CSS exit transition completes (or immediately if duration is 0) |
+| `triggerClass` prop | Allows `btn-icon` on trigger for icon-only dropdowns without overriding the base `dropdown-trigger` class |
+
+---
+
 #### `.void-tooltip`
 
 **Description:** Headless floating capsule positioned by Floating UI via the Popover API (top layer, no z-index needed).
@@ -3975,7 +4075,7 @@ No manual body padding or scroll offset adjustments needed — `data-has-breadcr
 
 ---
 
-### V. Kinetic Text (Typewriter / Decode / Cycle)
+### U. Kinetic Text (Typewriter / Decode / Cycle)
 
 ```svelte
 <script lang="ts">
@@ -4012,7 +4112,7 @@ No manual body padding or scroll offset adjustments needed — `data-has-breadcr
 
 ---
 
-### U. User State Hydration
+### V. User State Hydration
 
 Import the singleton — all flags are derived reactively. No manual role checking needed.
 
@@ -4048,7 +4148,7 @@ Import the singleton — all flags are derived reactively. No manual role checki
 
 ---
 
-### V. Profile Button (Auth-Aware Avatar)
+### W. Profile Button (Auth-Aware Avatar)
 
 ```svelte
 <script lang="ts">
@@ -4068,7 +4168,7 @@ Renders silhouette (guest), initial badge (Admin/Creator), or avatar (Player). F
 
 ---
 
-### Q. Empty State
+### X. Empty State
 
 ```svelte
 <p class="text-mute text-center p-lg">No items yet</p>

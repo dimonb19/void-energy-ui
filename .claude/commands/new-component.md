@@ -95,8 +95,9 @@ Follow the exact pattern from `src/styles/components/_toggle.scss`:
 Rules:
 - Always start with `@use '../abstracts' as *;`
 - Use semantic tokens only — no raw px, hex, or rgb values
-- Include physics blocks (when-glass, when-flat, when-retro) even if initially empty
-- Include mode blocks (when-light, when-dark) if the component has visible surfaces
+- Include `when-retro` and `when-light` blocks for components with visible surfaces
+- Include `when-glass` only if you need glass-specific overrides beyond what `glass-float`/`glass-sunk` provides
+- Omit empty physics blocks — they add noise without value
 - Transitions use `var(--speed-fast)` and `var(--ease-spring-snappy)`
 
 ### 3. Register the SCSS

@@ -107,6 +107,28 @@ voidEngine.setAtmosphere('my-theme');
 
 ---
 
+### Step 4 (Optional): Runtime-Registered Themes
+
+For themes loaded at runtime without a build step (e.g., from an API or remote JSON), use VoidEngine directly:
+
+```typescript
+import { voidEngine } from '@adapters/void-engine.svelte';
+
+// Register from an object (e.g., fetched from an API):
+voidEngine.registerTheme('my-theme', {
+  mode: 'dark',
+  physics: 'glass',
+  palette: { /* same Palette Contract as build-time themes */ }
+});
+
+// Or fetch and register from a remote URL:
+await voidEngine.loadExternalTheme('https://example.com/my-theme.json');
+```
+
+Runtime themes follow the same Palette Contract and physics constraints described below. The guardrail system auto-corrects invalid physics+mode combinations just like build-time themes.
+
+---
+
 ## 2. Understanding The Palette Contract
 
 Your theme palette is organized into **5 semantic layers**, from deepest (Canvas) to highest (Signal).
@@ -544,6 +566,10 @@ Before considering your theme complete, verify these criteria:
   - Test with High (0.75x), Standard (1x), and Low (1.25x) density
   - Spacing should scale proportionally
 
+- [ ] **No raw values introduced**
+  - Run `npm run scan` — it exits non-zero if raw pixel values or hardcoded colors are found in SCSS/Svelte files
+  - Your palette values in `design-tokens.ts` are exempt (they compile to CSS custom properties)
+
 ---
 
 ### Accessibility
@@ -601,6 +627,8 @@ npm run dev
 ```
 
 Navigate to the Theme Selector (if available in your demo) and switch to your new theme.
+
+**Quick switching tip:** Use `voidEngine.applyTemporaryTheme('my-theme', 'Testing my-theme')` in the browser console to preview your theme without committing it as the permanent selection. Call `voidEngine.restoreUserTheme()` to exit.
 
 #### Test Matrix
 

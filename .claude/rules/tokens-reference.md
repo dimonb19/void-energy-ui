@@ -30,11 +30,14 @@ Semantic:   --color-premium  --color-system  --color-success  --color-error
 ## Physics (change per preset: glass / flat / retro)
 ```
 Motion:     --speed-instant  --speed-fast  --speed-base  --speed-slow
-Delay:      --delay-cascade  --delay-sequence
+Delay:      --delay-cascade(glass:50ms flat:40ms retro:0s)  --delay-sequence(glass:100ms flat:80ms retro:0s)
 Easing:     --ease-spring-gentle  --ease-spring-snappy  --ease-spring-bounce  --ease-flow
-Surface:    --physics-blur  --physics-border-width  --radius-base  --radius-full
-Depth:      --shadow-float  --shadow-lift  --shadow-sunk  --focus-ring
+Surface:    --physics-blur  --physics-border-width
+Depth:      --shadow-float  --shadow-lift  --shadow-sunk  --shadow-offset(retro: 3px)  --focus-ring
 Feedback:   --lift  --scale
+Radius:     --radius-base(glass:8px flat:4px retro:0)  --radius-full(pill, 0 in retro)
+            --radius-sm(4px)  --radius-md(8px)  --radius-lg(16px)  --radius-xl(24px)  (all 0 in retro)
+            Default to --radius-base unless you need a specific size.
 ```
 
 ## Z-Index (use z() function in SCSS)
@@ -47,7 +50,22 @@ sink(-1)  floor(0)  base(1)  decorate(2)  float(10)  sticky(20)  header(40)  dro
 Scales:   text-caption  text-small  text-body  text-h5  text-h4  text-h3  text-h2  text-h1
 Weights:  --font-weight-regular(400)  --font-weight-medium(500)  --font-weight-semibold(600)  --font-weight-bold(700)
 Families: --font-heading  --font-body  --font-code
-Radius:   --radius-base(default, physics-adaptive)  --radius-full(pill, 0 in retro)
-Scale:    --radius-sm(4px)  --radius-md(8px)  --radius-lg(16px)  --radius-xl(24px)  (all 0 in retro)
-Default to --radius-base unless you need a specific size.
+```
+
+## Runtime Variables (set by reset/global, not design-tokens)
+```
+Layout:   --nav-height(64px density-scaled)  --control-height  --size-touch-min(2.75rem)
+          --control-padding-x(--space-sm)  --control-padding-y  --scrollbar-width(6px)
+          --breadcrumbs-height
+Safe:     --safe-top  --safe-bottom  --safe-left  --safe-right  (env(safe-area-inset-*))
+Modal:    --modal-width-xs(24rem)  --modal-width-sm(32rem)  --modal-width-md(40rem)
+          --modal-width-lg(64rem)  --modal-width-xl(75rem)  --tooltip-max-width(250px)
+          --dialog-gutter(--space-xl)  --dialog-gutter-lg(--space-2xl)
+```
+
+## Container Queries
+```
+Parent: class="@container" (or container-type: inline-size in SCSS)
+Child:  @sm: (320px)  @md: (480px)  @lg: (640px)  @xl: (800px)
+SCSS:   @include container-up('md') { ... }
 ```
