@@ -136,6 +136,18 @@
   }
 }
 
+.toast-dismiss {
+  @include btn-reset;
+  border-radius: var(--radius-full);
+  color: inherit;
+  text-align: left;
+  min-width: 0;
+
+  &:focus-visible {
+    box-shadow: var(--focus-ring);
+  }
+}
+
 // ==========================================================================
 // 3. ICONS & LOADER (Micro-Indicators)
 // ==========================================================================

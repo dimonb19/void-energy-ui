@@ -130,6 +130,8 @@
   role="presentation"
   onkeydown={handleKeydown}
 >
+  <h2 id="palette-title" class="sr-only">Command Palette</h2>
+
   <!-- Search Input -->
   <SearchField
     bind:value={query}

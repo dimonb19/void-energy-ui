@@ -55,39 +55,40 @@
   aria-atomic="true"
 >
   {#each toast.items as item (item.id)}
-    <!-- svelte-ignore a11y_no_noninteractive_element_interactions, a11y_click_events_have_key_events -->
     <div
       class="toast-message flex items-center justify-center gap-xs"
       role="status"
       data-type={item.type}
-      onclick={() => toast.close(item.id)}
       in:emerge
       out:dissolve={{ y: 0 }}
       onoutrostart={() => (animatingOut = true)}
       onoutroend={() => (animatingOut = false)}
     >
-      <span
-        class="toast-icon flex items-center justify-center shrink-0"
-        aria-hidden="true"
+      <button
+        type="button"
+        class="toast-dismiss inline-flex items-center justify-center gap-xs"
+        onclick={() => toast.close(item.id)}
       >
-        {#if item.type === 'loading'}
-          <LoadingSpin class="text-main" data-size="lg" />
-        {:else}
-          {@const Icon = icons[item.type] ?? icons.info}
-          <Icon class="icon" />
-        {/if}
-      </span>
+        <span
+          class="toast-icon flex items-center justify-center shrink-0"
+          aria-hidden="true"
+        >
+          {#if item.type === 'loading'}
+            <LoadingSpin class="text-main" data-size="lg" />
+          {:else}
+            {@const Icon = icons[item.type] ?? icons.info}
+            <Icon class="icon" />
+          {/if}
+        </span>
 
-      <span class="toast-text">{item.message}</span>
+        <span class="toast-text">{item.message}</span>
+      </button>
 
       {#if item.action}
         <button
           type="button"
           class="toast-action btn-ghost btn-sm inline-flex items-center gap-xs"
-          onclick={(e) => {
-            e.stopPropagation();
-            item.action!.onclick();
-          }}
+          onclick={() => item.action!.onclick()}
         >
           {#if item.action.label === 'Undo'}
             <Undo data-size="sm" />

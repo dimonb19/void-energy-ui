@@ -2212,9 +2212,10 @@ See [`use:tooltip` action docs](#b-tooltip-usetooltip) for full options.
 
 | Class | Description |
 | --- | --- |
-| `.toast-icon` | Type-driven icon, colored by `--toast-accent`. Layout (`flex items-center justify-center shrink-0`) via Tailwind |
-| `.toast-text` | Message content |
-| `.toast-action` | Optional inline action button (e.g., Undo). Accent-colored, underlined; retro: solid border |
+| `.toast-dismiss` | Dismiss button wrapping icon + text. `btn-reset` base, pill focus ring, keyboard-focusable. Clicking dismisses the toast |
+| `.toast-icon` | Type-driven icon inside dismiss button, colored by `--toast-accent`. Layout (`flex items-center justify-center shrink-0`) via Tailwind |
+| `.toast-text` | Message content inside dismiss button |
+| `.toast-action` | Optional inline action button (e.g., Undo) beside the dismiss button. Accent-colored, underlined; retro: solid border |
 
 **Physics:**
 - **Glass:** `glass-float` + `glass-blur`, glow on hover
@@ -2246,6 +2247,8 @@ See [toast.svelte.ts](src/stores/toast.svelte.ts) for state management.
 ```
 
 See [modal-manager.svelte.ts](src/lib/modal-manager.svelte.ts) for programmatic control.
+
+**Accessible naming:** Each modal fragment is named via `modalA11yNameRegistry` in [modal-registry.ts](src/config/modal-registry.ts). The `<dialog>` receives either `aria-labelledby` (referencing a title element's `id`) or `aria-label` (direct text), never both. Most fragments use `id="modal-title"` on their `<h2>`; Command Palette uses `id="palette-title"` (sr-only) since it has no visible heading.
 
 **Programmatic API:**
 
@@ -2289,7 +2292,7 @@ modal.palette();         // Command palette (Cmd+K)
 
 **Item styling:** Each command item is a `btn-ghost` button with `data-state="active"` on the highlighted item. No custom item class — styling is fully inherited from the button system. Hint badges use `<kbd>` with caption-size font.
 
-**ARIA:** `role="combobox"` on SearchField, `role="listbox"` on results container, `role="option"` + `aria-selected` on each item, `aria-activedescendant` for screen reader focus tracking.
+**ARIA:** `role="combobox"` on SearchField, `role="listbox"` on results container, `role="option"` + `aria-selected` on each item, `aria-activedescendant` for screen reader focus tracking. Dialog is named via `<h2 id="palette-title" class="sr-only">` referenced by `aria-labelledby`.
 
 **Usage:**
 
@@ -2687,7 +2690,7 @@ Physics-aware visual effects for loading states and skeleton loaders.
 <Skeleton variant="paragraph" lines={4} />
 ```
 
-**Physics:** Base background is `--border-color` (subtle surface fill). Shimmer overlay inherits all physics behavior from the `shimmer` mixin — energy-primary glow in glass/flat dark, white sweep in light, scan-line in retro.
+**Physics:** Base background is `alpha(--text-main, 6%)` (subtle text-relative fill that adapts to light/dark modes). Shimmer overlay inherits all physics behavior from the `shimmer` mixin — energy-primary glow in glass/flat dark, white sweep in light, scan-line in retro.
 
 **Showcase:** [/components → Effects](src/components/ui-library/Effects.svelte)
 

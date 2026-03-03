@@ -1,6 +1,6 @@
 <script lang="ts">
   import { modal } from '@lib/modal-manager.svelte';
-  import { modalRegistry } from '@config/modal-registry';
+  import { modalA11yNameRegistry, modalRegistry } from '@config/modal-registry';
   import { layerStack } from '@lib/layer-stack.svelte';
 
   let dialog = $state<HTMLDialogElement | null>(null);
@@ -17,6 +17,18 @@
   // Without this buffer, closing a large modal would snap to default size before fading.
   let renderedSize = $state(modal.state.size);
   let renderedProps = $state(modal.state.props);
+
+  let ariaLabelledBy = $derived.by(() => {
+    if (!modal.state.key) return undefined;
+    const naming = modalA11yNameRegistry[modal.state.key];
+    return 'labelledby' in naming ? naming.labelledby : undefined;
+  });
+
+  let ariaLabel = $derived.by(() => {
+    if (!modal.state.key) return undefined;
+    const naming = modalA11yNameRegistry[modal.state.key];
+    return 'label' in naming ? naming.label : undefined;
+  });
 
   // Sync dialog state on open/close.
   // 1. When modal.state.key changes from null → 'alert', set component and showModal()
@@ -67,7 +79,8 @@
 <dialog
   bind:this={dialog}
   data-size={renderedSize}
-  aria-labelledby="modal-title"
+  aria-labelledby={ariaLabelledBy}
+  aria-label={ariaLabel}
   aria-modal="true"
   onclick={handleBackdrop}
   oncancel={(e) => e.preventDefault()}
