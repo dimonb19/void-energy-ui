@@ -1,0 +1,493 @@
+/* ==========================================================================
+ * CHARTS & DATA VISUALIZATION
+ * ==========================================================================
+ *
+ * Physics-aware chart styling for SVG-based data visualization components.
+ *
+ * ARCHITECTURE:
+ * - Section 1: Chart Series Color System
+ *   - _chart-series-fill   : SVG fill coloring with physics overrides
+ *   - _chart-series-stroke : SVG stroke coloring with physics overrides
+ *   - _chart-series-dot    : Data point indicator fills
+ *   - _chart-legend-swatch : Legend color indicator squares
+ *
+ * - Section 2: Chart Structural Mixins
+ *   - _chart-base  : Common responsive SVG container
+ *   - _chart-grid  : Grid lines with physics-aware dash patterns
+ *   - _chart-label : Axis/value label typography (--font-code for numbers)
+ *   - _chart-legend: Legend row layout and swatch styling
+ *
+ * - Section 3: Chart Component Implementations
+ *   - .chart-sparkline  : Inline sparkline (no axes/labels)
+ *   - .chart-bar        : Vertical bar chart with categories
+ *   - .chart-donut      : Ring/donut chart with center label
+ *   - .chart-line       : Line/area chart with grid and axes
+ *
+ * - Section 4: Chart Keyframes
+ *   - chart-draw-line   : Stroke-dashoffset animation for line draw-in
+ *   - chart-grow-bar    : scaleY animation for bar chart entry
+ *
+ * SERIES COLOR MAP (uses existing semantic tokens):
+ *   0: --energy-primary     (theme accent)
+ *   1: --color-system       (purple)
+ *   2: --color-success      (green)
+ *   3: --color-premium      (gold)
+ *   4: --color-error        (red)
+ *   5: --energy-secondary   (theme secondary)
+ *
+ * PHYSICS BEHAVIOR:
+ * - Glass: Energy glows on fills/strokes, smooth spring animation
+ * - Flat:  Solid fills, crisp lines, clean transitions
+ * - Retro: No fill (stroke-only), dashed grids, instant transitions
+ *
+ * @see /CHEAT-SHEET.md for usage examples
+ * ========================================================================== */
+
+@use '../abstracts' as *;
+
+// ==========================================================================
+// 1. CHART SERIES COLOR SYSTEM
+// ==========================================================================
+//
+// Follows the _badge-variant mixin pattern: a base color with physics-aware
+// overrides for retro (stroke-only) and light mode (contrast-adjusted).
+// SVG charts use fill/stroke instead of background/color.
+
+// Series color map — ordered for maximum visual distinction between neighbors.
+$_chart-series: (
+  0: var(--energy-primary),
+  1: var(--color-system),
+  2: var(--color-success),
+  3: var(--color-premium),
+  4: var(--color-error),
+  5: var(--energy-secondary),
+);
+
+// MIXIN: Chart Series Fill
+// Physics-aware fill for bar chart rects and area segments.
+// --------------------------------------------------------------------------
+@mixin _chart-series-fill {
+  @each $i, $color in $_chart-series {
+    &[data-series='#{$i}'] {
+      fill: alpha($color, 80%);
+
+      @include when-glass {
+        filter: drop-shadow(
+          0 0 6px alpha($color, 40%)
+        ); // void-ignore (Glow Physics)
+      }
+
+      @include when-flat {
+        fill: alpha($color, 70%);
+        filter: none;
+      }
+
+      @include when-retro {
+        fill: alpha($color, 20%);
+        stroke: $color;
+        stroke-width: var(--physics-border-width);
+        filter: none;
+      }
+
+      @include when-light {
+        fill: alpha($color, 65%);
+        filter: none;
+      }
+    }
+  }
+}
+
+// MIXIN: Chart Series Stroke
+// Physics-aware stroke for line chart paths and sparklines.
+// --------------------------------------------------------------------------
+@mixin _chart-series-stroke {
+  @each $i, $color in $_chart-series {
+    &[data-series='#{$i}'] {
+      stroke: $color;
+
+      @include when-glass {
+        filter: drop-shadow(
+          0 0 4px alpha($color, 50%)
+        ); // void-ignore (Glow Physics)
+      }
+
+      @include when-flat {
+        filter: none;
+      }
+
+      @include when-retro {
+        filter: none;
+      }
+
+      @include when-light {
+        stroke: shade($color, 20%);
+        filter: none;
+      }
+    }
+  }
+}
+
+// MIXIN: Chart Series Area Fill
+// Translucent fill for area charts (below line paths).
+// --------------------------------------------------------------------------
+@mixin _chart-series-area {
+  @each $i, $color in $_chart-series {
+    &[data-series='#{$i}'] {
+      fill: alpha($color, 15%);
+
+      @include when-retro {
+        fill: alpha($color, 8%);
+      }
+
+      @include when-light {
+        fill: alpha($color, 12%);
+      }
+    }
+  }
+}
+
+// MIXIN: Chart Series Dot
+// Data point indicator fills for line charts.
+// --------------------------------------------------------------------------
+@mixin _chart-series-dot {
+  @each $i, $color in $_chart-series {
+    &[data-series='#{$i}'] {
+      fill: $color;
+      stroke: var(--bg-surface);
+
+      @include when-light {
+        fill: shade($color, 20%);
+      }
+    }
+  }
+}
+
+// MIXIN: Chart Legend Swatch
+// Badge-variant pattern for legend color indicator squares.
+// --------------------------------------------------------------------------
+@mixin _chart-legend-swatch {
+  @each $i, $color in $_chart-series {
+    &[data-series='#{$i}'] {
+      background: $color;
+
+      @include when-retro {
+        background: transparent;
+        border-color: $color;
+      }
+
+      @include when-light {
+        background: shade($color, 10%);
+      }
+    }
+  }
+}
+
+// ==========================================================================
+// 2. CHART STRUCTURAL MIXINS
+// ==========================================================================
+
+// MIXIN: Chart Base
+// Common container for all SVG chart components.
+// --------------------------------------------------------------------------
+@mixin _chart-base {
+  svg {
+    overflow: visible;
+  }
+}
+
+// MIXIN: Chart Grid
+// Horizontal guide lines for bar and line charts.
+// --------------------------------------------------------------------------
+@mixin _chart-grid {
+  .chart-grid-line {
+    stroke: alpha(var(--border-color), 40%);
+    stroke-width: 1px; // void-ignore (Grid hairline — sub-token scale)
+
+    @include when-retro {
+      stroke: var(--border-color);
+      stroke-width: var(--physics-border-width);
+      stroke-dasharray: 4 4; // void-ignore (Grid Physics — stepped pattern)
+    }
+
+    @include when-light {
+      stroke: alpha(var(--border-color), 30%);
+    }
+  }
+}
+
+// MIXIN: Chart Label
+// Axis labels and value annotations.
+// --------------------------------------------------------------------------
+@mixin _chart-label {
+  .chart-label {
+    fill: var(--text-mute);
+    font-size: var(--font-size-caption);
+    font-family: var(--font-body);
+  }
+
+  .chart-value-label {
+    fill: var(--text-dim);
+    font-size: var(--font-size-caption);
+    font-family: var(--font-code);
+  }
+}
+
+// MIXIN: Chart Legend
+// Legend row with color swatches and labels.
+// --------------------------------------------------------------------------
+@mixin _chart-legend {
+  .chart-legend-swatch {
+    // void-exception: CSS-only swatch element — no Tailwind template access
+    width: var(--space-xs);
+    height: var(--space-xs);
+    border-radius: calc(var(--radius-base) * 0.5);
+    border: var(--physics-border-width) solid transparent;
+    flex-shrink: 0;
+
+    @include _chart-legend-swatch;
+  }
+
+  .chart-legend-label {
+    font-size: var(--font-size-caption);
+    color: var(--text-dim);
+  }
+}
+
+// ==========================================================================
+// 3. CHART COMPONENT IMPLEMENTATIONS
+// ==========================================================================
+
+// --------------------------------------------------------------------------
+// SPARKLINE
+// Inline mini trend line — no axes, no labels, no grid.
+// --------------------------------------------------------------------------
+.chart-sparkline {
+  svg {
+    overflow: visible;
+  }
+
+  .chart-sparkline-path {
+    fill: none;
+    stroke-width: 1.5px; // void-ignore (Sparkline stroke — sub-token scale)
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    @include _chart-series-stroke;
+
+    @include when-retro {
+      stroke-linecap: square;
+      stroke-linejoin: miter;
+      stroke-width: var(--physics-border-width);
+    }
+  }
+
+  .chart-sparkline-area {
+    @include _chart-series-area;
+  }
+}
+
+// --------------------------------------------------------------------------
+// BAR CHART
+// Vertical bar chart with category labels and optional value annotations.
+// --------------------------------------------------------------------------
+.chart-bar {
+  @include _chart-base;
+  @include _chart-grid;
+  @include _chart-label;
+  @include _chart-legend;
+
+  .chart-bar-rect {
+    @include _chart-series-fill;
+
+    rx: var(--radius-sm);
+    transform-origin: bottom;
+    animation: chart-grow-bar var(--speed-base) var(--ease-spring-gentle)
+      backwards;
+    animation-delay: calc(var(--item-index, 0) * var(--delay-cascade));
+
+    transition:
+      opacity var(--speed-fast) var(--ease-spring-snappy),
+      filter var(--speed-fast) var(--ease-spring-snappy);
+
+    @include when-retro {
+      animation: none;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+// --------------------------------------------------------------------------
+// DONUT CHART
+// Ring/donut chart with center metric label and optional legend.
+// --------------------------------------------------------------------------
+.chart-donut {
+  @include _chart-base;
+  @include _chart-legend;
+
+  .chart-donut-segment {
+    fill: none;
+    transition:
+      stroke-width var(--speed-fast) var(--ease-spring-snappy),
+      opacity var(--speed-fast) var(--ease-spring-snappy),
+      filter var(--speed-fast) var(--ease-spring-snappy);
+
+    @include _chart-series-stroke;
+
+    // Override stroke — donut segments use thick strokes for the ring
+    @each $i, $color in $_chart-series {
+      &[data-series='#{$i}'] {
+        stroke: $color;
+      }
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        stroke-width: calc(
+          var(--donut-stroke, 24) * 1.15
+        ); // void-ignore (Donut hover pop)
+        filter: brightness(1.2); // void-ignore (Hover emphasis)
+      }
+    }
+
+    @include when-retro {
+      transition: none;
+
+      @media (hover: hover) {
+        &:hover {
+          filter: none;
+        }
+      }
+    }
+  }
+
+  // Dim non-hovered segments for focus effect
+  @media (hover: hover) {
+    svg:hover .chart-donut-segment:not(:hover) {
+      opacity: 0.5;
+    }
+  }
+
+  .chart-donut-track {
+    fill: none;
+    stroke: alpha(var(--border-color), 20%);
+
+    @include when-retro {
+      stroke: var(--border-color);
+    }
+
+    @include when-light {
+      stroke: alpha(var(--border-color), 15%);
+    }
+  }
+
+  .chart-donut-value {
+    fill: var(--text-main);
+    font-family: var(--font-code);
+    font-weight: var(--font-weight-bold);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .chart-donut-label {
+    fill: var(--text-mute);
+    font-size: var(--font-size-caption);
+    font-family: var(--font-body);
+  }
+}
+
+// --------------------------------------------------------------------------
+// LINE CHART
+// Line/area chart with grid, axes, optional dots, and multi-series support.
+// --------------------------------------------------------------------------
+.chart-line {
+  @include _chart-base;
+  @include _chart-grid;
+  @include _chart-label;
+  @include _chart-legend;
+
+  .chart-line-path {
+    fill: none;
+    stroke-width: 2px; // void-ignore (Line chart stroke — sub-token scale)
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    @include _chart-series-stroke;
+
+    // Draw-in animation (--path-length set by JS measurement)
+    stroke-dasharray: var(--path-length, 9999);
+    stroke-dashoffset: var(--path-length, 9999);
+    animation: chart-draw-line var(--speed-slow) var(--ease-flow) forwards;
+
+    @include when-retro {
+      stroke-linecap: square;
+      stroke-linejoin: miter;
+      stroke-width: var(--physics-border-width);
+      animation: none;
+      stroke-dasharray: none;
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .chart-area-fill {
+    @include _chart-series-area;
+
+    opacity: 0;
+    animation: chart-fade-in var(--speed-base) var(--ease-flow) forwards;
+    animation-delay: calc(var(--speed-slow) * 0.5);
+
+    @include when-retro {
+      animation: none;
+      opacity: 1;
+    }
+  }
+
+  .chart-dot {
+    @include _chart-series-dot;
+    stroke-width: 2px; // void-ignore (Dot border — sub-token scale)
+
+    transition: r var(--speed-fast) var(--ease-spring-snappy);
+
+    @include when-retro {
+      stroke-width: 0;
+    }
+  }
+}
+
+// ==========================================================================
+// 4. CHART KEYFRAMES
+// ==========================================================================
+
+// Line draw-in: stroke-dashoffset from full length to 0
+@keyframes chart-draw-line {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+// Bar grow: scaleY from 0 to 1 (transform-origin: bottom)
+@keyframes chart-grow-bar {
+  from {
+    transform: scaleY(0);
+    opacity: 0;
+  }
+
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+// Area fade-in: delayed reveal after line draw completes
+@keyframes chart-fade-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

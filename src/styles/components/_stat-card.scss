@@ -1,0 +1,54 @@
+/* ==========================================================================
+ * STAT CARD
+ * ==========================================================================
+ *
+ * KPI metric card with label, large value, trend indicator, and optional
+ * sparkline. Container uses glass-float (adapts to all 3 presets + both modes).
+ *
+ * SCSS Classes:
+ * - .chart-stat         : Outer card container (glass-float surface)
+ * - .chart-stat-value   : Large numeric display (monospace, tabular-nums)
+ * - .chart-stat-label   : Uppercase caption label
+ * - .chart-stat-delta   : Trend delta with direction coloring
+ *
+ * @see /src/components/ui/StatCard.svelte
+ * ========================================================================== */
+
+@use '../abstracts' as *;
+
+.chart-stat {
+  @include glass-float;
+  overflow: clip;
+
+  .chart-stat-value {
+    font-family: var(--font-code);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-main);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .chart-stat-label {
+    color: var(--text-mute);
+    font-size: var(--font-size-caption);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-caption);
+  }
+
+  .chart-stat-delta {
+    font-family: var(--font-code);
+    font-size: var(--font-size-small);
+    font-variant-numeric: tabular-nums;
+
+    &[data-trend='up'] {
+      color: var(--color-success);
+    }
+
+    &[data-trend='down'] {
+      color: var(--color-error);
+    }
+
+    &[data-trend='flat'] {
+      color: var(--text-mute);
+    }
+  }
+}

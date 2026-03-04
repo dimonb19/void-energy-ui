@@ -24,6 +24,7 @@
    - [Icons](#e-icons)
    - [Effects](#f-effects)
    - [State Patterns](#g-state-patterns)
+   - [Charts & Data Visualization](#h-charts--data-visualization)
 5. [Mixin Reference](#5-mixin-reference)
 6. [Quick Patterns (Copy-Paste)](#6-quick-patterns-copy-paste)
 7. [Svelte Actions](#7-svelte-actions)
@@ -3168,6 +3169,171 @@ import { layerStack } from '@lib/layer-stack.svelte';
 const id = layerStack.push(() => { /* dismiss logic */ });
 layerStack.remove(id);       // On non-Escape close (click-outside, programmatic)
 layerStack.hasLayers;         // true if any layers are on the stack
+```
+
+---
+
+### H. Charts & Data Visualization
+
+Pure SVG chart components for dashboards and metrics. All charts adapt to atmosphere, physics, and mode via a 6-color series palette applied through `data-series` attributes.
+
+**SCSS:** [src/styles/components/_charts.scss](src/styles/components/_charts.scss), [src/styles/components/_stat-card.scss](src/styles/components/_stat-card.scss)
+
+**Series Colors:**
+
+| Series | Token | Purpose |
+| --- | --- | --- |
+| 0 | `--energy-primary` | Theme accent (default) |
+| 1 | `--color-system` | Purple |
+| 2 | `--color-success` | Green |
+| 3 | `--color-premium` | Gold |
+| 4 | `--color-error` | Red |
+| 5 | `--energy-secondary` | Theme secondary |
+
+**Physics:**
+- **Glass:** Series colors glow via `drop-shadow`. Bar/line strokes have energy glow. Area fills use alpha transparency.
+- **Flat:** Clean solid strokes and fills. No glow effects.
+- **Retro:** All glow removed (`filter: none`). Bar corners squared (`rx` zeroed via `--radius-sm`). Line caps use `square`. Area fills disabled.
+
+> **Note:** Glass and Retro require dark mode — only Flat supports both light and dark. The `@include when-light` overrides in `_charts.scss` apply exclusively to Flat physics.
+
+**Animation:** Physics-driven via `--speed-base` / `--speed-slow`. Bars grow from bottom with staggered delay (`chart-grow-bar`). Lines draw in via `stroke-dashoffset` (`chart-draw-line`). Area fills fade in after line draw. Donut segments pop on hover (stroke-width expansion + brightness, non-hovered segments dim for focus). Retro: all animation disabled.
+
+**Accessibility:** Each chart SVG has `role="img"` with `<title>` + `<desc>` children linked via `aria-labelledby`. Pass a unique `id` prop when multiple charts coexist on the same page.
+
+---
+
+#### `StatCard`
+
+**File:** [src/components/ui/StatCard.svelte](src/components/ui/StatCard.svelte)
+**Description:** KPI metric card with label, formatted value, trend indicator, and optional sparkline.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `label` | `string` | required | Metric label |
+| `value` | `string` | required | Formatted display value |
+| `trend` | `'up'\|'down'\|'flat'` | — | Trend direction (colors delta) |
+| `delta` | `string` | — | Trend delta text |
+| `sparkline` | `number[]` | — | Inline trend data |
+| `id` | `string` | auto | Unique ID prefix for accessible labels |
+| `class` | `string` | `''` | Additional CSS classes |
+
+```svelte
+<StatCard label="Revenue" value="$78.4k" trend="up" delta="+12.5%" sparkline={[38, 42, 35, 48, 52, 45]} />
+```
+
+**Physics:** Container uses `glass-float` — glass gets frosted surface + shadow, flat gets solid surface + border, retro gets hard border + squared corners. Trend colors and sparkline series adapt across all presets.
+
+---
+
+#### `Sparkline`
+
+**File:** [src/components/ui/Sparkline.svelte](src/components/ui/Sparkline.svelte)
+**Description:** Compact inline trend line. No axes or labels.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `data` | `number[]` | required | Trend values (min 2) |
+| `width` | `number` | `120` | SVG width in px |
+| `height` | `number` | `32` | SVG height in px |
+| `series` | `number` | `0` | Color series index (0–5) |
+| `filled` | `boolean` | `false` | Show area fill |
+| `label` | `string` | `'Sparkline trend'` | Accessible label |
+| `id` | `string` | auto | Unique ID prefix for accessible labels |
+| `class` | `string` | `''` | Additional CSS classes |
+
+```svelte
+<Sparkline data={[45, 52, 48, 61, 55, 67, 72]} />
+<Sparkline data={trend} filled series={2} width={160} height={40} />
+```
+
+---
+
+#### `BarChart`
+
+**File:** [src/components/ui/BarChart.svelte](src/components/ui/BarChart.svelte)
+**Description:** Vertical bar chart with category labels, optional grid, and value annotations. Bars auto-color by index through the series palette.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `data` | `{label, value, series?}[]` | required | Data points |
+| `height` | `number` | `240` | Chart height in px |
+| `showValues` | `boolean` | `false` | Value labels above bars |
+| `showGrid` | `boolean` | `true` | Horizontal grid lines |
+| `title` | `string` | `'Bar chart'` | Accessible title |
+| `id` | `string` | auto | Unique ID prefix for accessible labels |
+| `class` | `string` | `''` | Additional CSS classes |
+
+```svelte
+<BarChart data={[
+  { label: 'Q1', value: 12400 },
+  { label: 'Q2', value: 18700 },
+  { label: 'Q3', value: 15200 },
+  { label: 'Q4', value: 22100 },
+]} showValues />
+```
+
+---
+
+#### `DonutChart`
+
+**File:** [src/components/ui/DonutChart.svelte](src/components/ui/DonutChart.svelte)
+**Description:** Ring/donut chart with center metric and legend. Uses stroke-dasharray for arc segments.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `data` | `{label, value, series?}[]` | required | Segments |
+| `size` | `number` | `200` | Ring diameter in px |
+| `thickness` | `number` | `0.3` | Ring thickness (fraction of radius) |
+| `centerMetric` | `{label, value}` | — | Center metric display |
+| `showLegend` | `boolean` | `true` | Show legend below |
+| `title` | `string` | `'Donut chart'` | Accessible title |
+| `id` | `string` | auto | Unique ID prefix for accessible labels |
+| `class` | `string` | `''` | Additional CSS classes |
+
+```svelte
+<DonutChart data={[
+  { label: 'Organic', value: 42 },
+  { label: 'Direct', value: 28 },
+  { label: 'Referral', value: 18 },
+  { label: 'Social', value: 12 },
+]} centerMetric={{ label: 'Sources', value: '100%' }} />
+```
+
+**Hover:** Hovered segment expands (1.15× stroke-width) and brightens (`brightness(1.2)`). Non-hovered segments dim to 50% opacity for focus. Retro: no filter effects.
+
+---
+
+#### `LineChart`
+
+**File:** [src/components/ui/LineChart.svelte](src/components/ui/LineChart.svelte)
+**Description:** Line/area chart with grid, axes, optional dots, and multi-series support. Single series uses `{label, value}[]`, multi-series uses `{name, data, series?}[]`.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `data` | `{label, value}[] \| {name, data, series?}[]` | required | Chart data |
+| `height` | `number` | `240` | Chart height in px |
+| `filled` | `boolean` | `false` | Area fill below lines |
+| `showDots` | `boolean` | `false` | Data point dots |
+| `showGrid` | `boolean` | `true` | Horizontal grid lines |
+| `showLegend` | `boolean` | `false` | Legend (multi-series) |
+| `title` | `string` | `'Line chart'` | Accessible title |
+| `id` | `string` | auto | Unique ID prefix for accessible labels |
+| `class` | `string` | `''` | Additional CSS classes |
+
+```svelte
+<!-- Single series -->
+<LineChart data={[
+  { label: 'Jan', value: 1200 },
+  { label: 'Feb', value: 1850 },
+  { label: 'Mar', value: 2100 },
+]} filled showDots />
+
+<!-- Multi-series -->
+<LineChart data={[
+  { name: 'Sessions', data: [...], series: 0 },
+  { name: 'Conversions', data: [...], series: 2 },
+]} showLegend filled />
 ```
 
 ---

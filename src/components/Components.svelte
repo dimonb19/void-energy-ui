@@ -22,6 +22,8 @@
   import Modals from './ui-library/Modals.svelte';
   // Effects
   import Effects from './ui-library/Effects.svelte';
+  // Data Visualization
+  import Charts from './ui-library/Charts.svelte';
 
   const sidebarSections = [
     {
@@ -62,6 +64,10 @@
     {
       label: 'Effects',
       items: [{ id: 'effects', label: 'Effects' }],
+    },
+    {
+      label: 'Data Visualization',
+      items: [{ id: 'charts', label: 'Charts' }],
     },
   ];
 
@@ -232,6 +238,16 @@
             </p>
           </div>
           <Effects />
+
+          <hr />
+
+          <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+            <h3 class="text-dim">Data Visualization</h3>
+            <p class="text-small text-mute">
+              Charts and metrics for dashboards and data-driven interfaces.
+            </p>
+          </div>
+          <Charts />
         </div>
       </div>
     </PullRefresh>
