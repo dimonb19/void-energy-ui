@@ -55,10 +55,21 @@
 </script>
 
 <div class="chart-stat flex flex-col gap-md p-lg {className}">
-  <span class="chart-stat-label">{label}</span>
+  <div class="flex flex-row justify-between gap-md">
+    <span class="chart-stat-label">{label}</span>
+    {#if trend && delta}
+      <span
+        class="chart-stat-delta flex items-center gap-xs"
+        data-trend={trend}
+      >
+        <TrendIcon class="icon" data-size="sm" />
+        {delta}
+      </span>
+    {/if}
+  </div>
 
-  <div class="flex items-end justify-between gap-md">
-    <span class="chart-stat-value text-h3">{value}</span>
+  <div class="flex flex-wrap justify-between gap-md tablet:flex-nowrap">
+    <span class="chart-stat-value text-h4">{value}</span>
 
     {#if sparkline && sparkline.length >= 2}
       <Sparkline
@@ -71,11 +82,4 @@
       />
     {/if}
   </div>
-
-  {#if trend && delta}
-    <span class="chart-stat-delta flex items-center gap-xs" data-trend={trend}>
-      <TrendIcon class="icon" data-size="sm" />
-      {delta}
-    </span>
-  {/if}
 </div>

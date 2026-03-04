@@ -145,7 +145,7 @@
 
       <div class="surface-sunk p-md">
         <div
-          class="grid grid-cols-1 tablet:grid-cols-2 small-desktop:grid-cols-4 gap-md"
+          class="grid grid-cols-1 tablet:grid-cols-2 full-hd:flex justify-center gap-md"
         >
           <StatCard
             id="stat-revenue"
