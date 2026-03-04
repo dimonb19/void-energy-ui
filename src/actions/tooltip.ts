@@ -2,10 +2,7 @@
 
 import { VoidTooltip } from '@lib/void-tooltip';
 
-export function tooltip(
-  node: HTMLElement,
-  params: string | VoidTooltipOptions,
-) {
+export function tooltip(node: Element, params: string | VoidTooltipOptions) {
   // Accept string shorthand or full options object.
   const config: VoidTooltipOptions =
     typeof params === 'string' ? { content: params } : params;

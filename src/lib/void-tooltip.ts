@@ -18,7 +18,7 @@ import {
 } from '@config/ui-geometry';
 
 export class VoidTooltip {
-  private trigger: HTMLElement;
+  private trigger: Element;
   private tooltip: HTMLElement | null = null;
   private cleanupPositioning: (() => void) | null = null;
   private options: VoidTooltipOptions;
@@ -29,7 +29,7 @@ export class VoidTooltip {
   private boundShow: () => void;
   private boundHide: () => void;
 
-  constructor(node: HTMLElement, options: VoidTooltipOptions) {
+  constructor(node: Element, options: VoidTooltipOptions) {
     this.trigger = node;
     this.options = { placement: 'top', ...options };
 

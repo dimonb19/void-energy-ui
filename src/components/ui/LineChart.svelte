@@ -12,7 +12,7 @@
   ]} filled showDots />
 
   Multi-series:
-  <LineChart data={[
+  <LineChart series={[
     { name: 'Sessions', data: [...] },
     { name: 'Conversions', data: [...], series: 2 },
   ]} showLegend />
@@ -22,20 +22,24 @@
   ANIMATION: Line draws in via stroke-dashoffset (chart-draw-line keyframe).
 -->
 <script lang="ts">
-  interface ChartTimePoint {
+  import { tooltip } from '@actions/tooltip';
+
+  interface LineChartPoint {
     label: string;
     value: number;
   }
 
-  interface ChartSeries {
+  interface LineChartSeries {
     name: string;
-    data: ChartTimePoint[];
+    data: LineChartPoint[];
     series?: number;
   }
 
   interface LineChartProps {
-    /** Single series or multi-series data */
-    data: ChartTimePoint[] | ChartSeries[];
+    /** Single-series data points */
+    data?: LineChartPoint[];
+    /** Multi-series data (takes precedence over data) */
+    series?: LineChartSeries[];
     /** Chart height in px */
     height?: number;
     /** Show filled area below lines */
@@ -44,23 +48,45 @@
     showDots?: boolean;
     /** Show horizontal grid lines */
     showGrid?: boolean;
+    /** Use smooth Catmull-Rom curves instead of straight lines */
+    smooth?: boolean;
     /** Show legend (multi-series) */
     showLegend?: boolean;
+    /** Custom value formatter (default: compact k/M abbreviation) */
+    formatValue?: (value: number) => string;
+    /** Selection callback (fires on dot click or Enter/Space) */
+    onselect?: (item: LineChartPoint, index: number) => void;
+    /** Horizontal reference lines */
+    referenceLines?: { value: number; label?: string; series?: number }[];
+    /** X-axis label */
+    xLabel?: string;
+    /** Y-axis label */
+    yLabel?: string;
     /** Accessible chart title */
     title?: string;
     /** Unique ID prefix for accessible labels */
     id?: string;
+    /** Whether to show entry animations */
+    animated?: boolean;
     /** Additional CSS classes */
     class?: string;
   }
 
   let {
     data,
+    series: seriesProp,
     height = 240,
     filled = false,
     showDots = false,
     showGrid = true,
+    smooth = false,
     showLegend = false,
+    formatValue,
+    onselect,
+    referenceLines,
+    xLabel,
+    yLabel,
+    animated = true,
     title = 'Line chart',
     id,
     class: className = '',
@@ -69,43 +95,67 @@
   // svelte-ignore state_referenced_locally
   const chartId = id ?? `line-chart-${Math.random().toString(36).slice(2, 9)}`;
 
+  // Fluid sizing via ResizeObserver
+  let wrapperEl: HTMLDivElement | undefined = $state();
+  let measuredWidth = $state(0);
+
+  $effect(() => {
+    if (!wrapperEl) return;
+    const ro = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry) measuredWidth = Math.round(entry.contentRect.width);
+    });
+    ro.observe(wrapperEl);
+    return () => ro.disconnect();
+  });
+
   // Layout constants (SVG viewBox coordinates — unitless, not CSS px) // void-ignore
-  const paddingTop = 20;
-  const paddingBottom = 28;
-  const paddingLeft = 40;
+  const basePaddingTop = 20;
+  const basePaddingBottom = 28;
+  const basePaddingLeft = 40;
   const paddingRight = 16;
+
+  // Dynamic padding for axis labels
+  const paddingTop = basePaddingTop;
+  const paddingBottom = $derived(
+    xLabel ? basePaddingBottom + 18 : basePaddingBottom,
+  ); // void-ignore (SVG axis label space)
+  const paddingLeft = $derived(yLabel ? basePaddingLeft + 16 : basePaddingLeft); // void-ignore (SVG axis label space)
   const labelOffset = 18; // void-ignore (SVG axis label offset — sub-token)
-  const svgWidth = 800;
   const dotRadius = 4; // void-ignore (SVG dot radius — sub-token scale)
+  const hitTargetRadius = 12; // void-ignore (SVG hit expansion — accessibility)
 
+  // Computed layout — svgWidth adapts to container
+  const svgWidth = $derived(measuredWidth || 800);
   const plotHeight = $derived(height - paddingTop - paddingBottom);
-  const plotWidth = svgWidth - paddingLeft - paddingRight;
+  const plotWidth = $derived(svgWidth - paddingLeft - paddingRight);
 
-  // Normalize to array of series
-  const isMultiSeries = $derived(
-    data.length > 0 && Array.isArray((data[0] as ChartSeries).data),
-  );
-
-  const series = $derived.by(
-    (): { name: string; data: ChartTimePoint[]; seriesIdx: number }[] => {
-      if (isMultiSeries) {
-        return (data as ChartSeries[]).map((s, i) => ({
+  // Normalize to internal series array — series prop takes precedence
+  const normalizedSeries = $derived.by(
+    (): { name: string; data: LineChartPoint[]; seriesIdx: number }[] => {
+      if (seriesProp && seriesProp.length > 0) {
+        return seriesProp.map((s, i) => ({
           name: s.name,
           data: s.data,
           seriesIdx: s.series ?? i,
         }));
       }
-      return [{ name: '', data: data as ChartTimePoint[], seriesIdx: 0 }];
+      if (data && data.length > 0) {
+        return [{ name: '', data, seriesIdx: 0 }];
+      }
+      return [];
     },
   );
 
+  const isMultiSeries = $derived(normalizedSeries.length > 1);
+
   // Labels from first series
-  const labels = $derived(series[0]?.data.map((d) => d.label) ?? []);
+  const labels = $derived(normalizedSeries[0]?.data.map((d) => d.label) ?? []);
 
   // Global max across all series
   const maxValue = $derived.by(() => {
     let max = 0;
-    for (const s of series) {
+    for (const s of normalizedSeries) {
       for (const d of s.data) {
         if (d.value > max) max = d.value;
       }
@@ -133,11 +183,13 @@
     return 10 * magnitude;
   }
 
-  function formatValue(v: number): string {
+  function defaultFormatValue(v: number): string {
     if (v >= 1000000) return `${(v / 1000000).toFixed(1)}M`;
     if (v >= 1000) return `${(v / 1000).toFixed(v >= 10000 ? 0 : 1)}k`;
     return v.toString();
   }
+
+  const fmt = $derived(formatValue ?? defaultFormatValue);
 
   function pointX(i: number, total: number): number {
     if (total <= 1) return paddingLeft + plotWidth / 2;
@@ -148,18 +200,44 @@
     return paddingTop + plotHeight - (value / maxValue) * plotHeight;
   }
 
+  // Catmull-Rom to cubic Bezier path conversion
+  function catmullRomPath(pts: { x: number; y: number }[]): string {
+    if (pts.length < 2) return '';
+    if (pts.length === 2)
+      return `M ${pts[0].x},${pts[0].y} L ${pts[1].x},${pts[1].y}`;
+
+    const tension = 0.5; // void-ignore (Catmull-Rom tension — math constant)
+    let d = `M ${pts[0].x},${pts[0].y}`;
+
+    for (let i = 0; i < pts.length - 1; i++) {
+      const p0 = pts[Math.max(0, i - 1)];
+      const p1 = pts[i];
+      const p2 = pts[i + 1];
+      const p3 = pts[Math.min(pts.length - 1, i + 2)];
+
+      const cp1x = p1.x + ((p2.x - p0.x) * tension) / 3; // void-ignore (Bezier control point)
+      const cp1y = p1.y + ((p2.y - p0.y) * tension) / 3; // void-ignore (Bezier control point)
+      const cp2x = p2.x - ((p3.x - p1.x) * tension) / 3; // void-ignore (Bezier control point)
+      const cp2y = p2.y - ((p3.y - p1.y) * tension) / 3; // void-ignore (Bezier control point)
+
+      d += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${p2.x},${p2.y}`;
+    }
+
+    return d;
+  }
+
   // Build SVG path strings for each series
   const linePaths = $derived.by(() => {
-    return series.map((s) => {
+    return normalizedSeries.map((s) => {
       const pts = s.data.map((d, i) => {
         const x = pointX(i, s.data.length);
         const y = pointY(d.value);
         return { x, y };
       });
 
-      const linePath = pts
-        .map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x},${p.y}`)
-        .join(' ');
+      const linePath = smooth
+        ? catmullRomPath(pts)
+        : pts.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x},${p.y}`).join(' ');
 
       let areaPath = '';
       if (filled && pts.length >= 2) {
@@ -177,13 +255,15 @@
   });
 
   const accessibleSummary = $derived.by(() => {
-    const allValues = series.flatMap((s) => s.data.map((d) => d.value));
+    const allValues = normalizedSeries.flatMap((s) =>
+      s.data.map((d) => d.value),
+    );
     if (allValues.length === 0) return 'Empty line chart';
     const min = Math.min(...allValues);
     const max = Math.max(...allValues);
-    return series.length > 1
-      ? `Line chart with ${series.length} series, values ranging from ${formatValue(min)} to ${formatValue(max)}.`
-      : `Line chart with ${allValues.length} data points, ranging from ${formatValue(min)} to ${formatValue(max)}.`;
+    return normalizedSeries.length > 1
+      ? `Line chart with ${normalizedSeries.length} series, values ranging from ${fmt(min)} to ${fmt(max)}.`
+      : `Line chart with ${allValues.length} data points, ranging from ${fmt(min)} to ${fmt(max)}.`;
   });
 
   // Measure path lengths for draw animation
@@ -200,7 +280,11 @@
   });
 </script>
 
-<div class="chart-line relative {className}">
+<div
+  bind:this={wrapperEl}
+  class="chart-line relative {className}"
+  data-animated={animated}
+>
   <svg
     bind:this={svgEl}
     class="block w-full h-auto"
@@ -211,7 +295,7 @@
   >
     <title id="{chartId}-title">{title}</title>
     <desc id="{chartId}-desc">{accessibleSummary}</desc>
-    {#if series[0]?.data.length > 0}
+    {#if normalizedSeries[0]?.data.length > 0}
       {#if showGrid}
         <!-- Grid lines -->
         {#each gridLines as gridVal}
@@ -228,7 +312,7 @@
             y={pointY(gridVal) + 4}
             text-anchor="end"
           >
-            {formatValue(gridVal)}
+            {fmt(gridVal)}
           </text>
         {/each}
 
@@ -240,6 +324,30 @@
           x2={svgWidth - paddingRight}
           y2={paddingTop + plotHeight}
         />
+      {/if}
+
+      <!-- Reference lines -->
+      {#if referenceLines}
+        {#each referenceLines as ref}
+          <line
+            class="chart-reference-line"
+            x1={paddingLeft}
+            y1={pointY(ref.value)}
+            x2={svgWidth - paddingRight}
+            y2={pointY(ref.value)}
+            data-series={ref.series}
+          />
+          {#if ref.label}
+            <text
+              class="chart-reference-label"
+              x={svgWidth - paddingRight + 4}
+              y={pointY(ref.value) + 4}
+              text-anchor="start"
+            >
+              {ref.label}
+            </text>
+          {/if}
+        {/each}
       {/if}
 
       <!-- X-axis labels -->
@@ -275,17 +383,68 @@
 
         <!-- Dots -->
         {#if showDots}
-          {#each lp.points as pt}
+          {#each lp.points as pt, di}
             <circle
               class="chart-dot"
               cx={pt.x}
               cy={pt.y}
               r={dotRadius}
               data-series={lp.seriesIdx}
+              use:tooltip={{
+                content: `${lp.data[di].label}: ${fmt(lp.data[di].value)}`,
+              }}
+            />
+          {/each}
+        {/if}
+
+        <!-- Hit targets for interaction -->
+        {#if onselect}
+          {#each lp.data as dataPoint, di}
+            <circle
+              class="chart-hit-target"
+              cx={lp.points[di].x}
+              cy={lp.points[di].y}
+              r={hitTargetRadius}
+              role="button"
+              tabindex="0"
+              aria-label="{dataPoint.label}: {fmt(dataPoint.value)}"
+              onclick={() => onselect(dataPoint, di)}
+              onkeydown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onselect(dataPoint, di);
+                }
+              }}
+              use:tooltip={{
+                content: `${dataPoint.label}: ${fmt(dataPoint.value)}`,
+              }}
             />
           {/each}
         {/if}
       {/each}
+
+      <!-- Axis labels -->
+      {#if xLabel}
+        <text
+          class="chart-axis-label"
+          x={paddingLeft + plotWidth / 2}
+          y={height - 4}
+          text-anchor="middle"
+        >
+          {xLabel}
+        </text>
+      {/if}
+      {#if yLabel}
+        <text
+          class="chart-axis-label"
+          x={14}
+          y={paddingTop + plotHeight / 2}
+          text-anchor="middle"
+          transform="rotate(-90, 14, {paddingTop + plotHeight / 2})"
+        >
+          {yLabel}
+        </text>
+      {/if}
     {:else}
       <text
         class="chart-label"
@@ -300,12 +459,37 @@
   <!-- Legend -->
   {#if showLegend && isMultiSeries}
     <div class="flex flex-row flex-wrap justify-center gap-md mt-md">
-      {#each series as s}
+      {#each normalizedSeries as s}
         <div class="flex items-center gap-xs">
           <span class="chart-legend-swatch" data-series={s.seriesIdx}></span>
           <span class="chart-legend-label">{s.name}</span>
         </div>
       {/each}
     </div>
+  {/if}
+
+  <!-- Screen reader data table -->
+  {#if normalizedSeries.length > 0 && normalizedSeries[0].data.length > 0}
+    <table class="sr-only">
+      <caption>{title}</caption>
+      <thead>
+        <tr>
+          <th>Label</th>
+          {#each normalizedSeries as s}
+            <th>{s.name || 'Value'}</th>
+          {/each}
+        </tr>
+      </thead>
+      <tbody>
+        {#each normalizedSeries[0].data as _, rowIdx}
+          <tr>
+            <td>{normalizedSeries[0].data[rowIdx].label}</td>
+            {#each normalizedSeries as s}
+              <td>{fmt(s.data[rowIdx]?.value ?? 0)}</td>
+            {/each}
+          </tr>
+        {/each}
+      </tbody>
+    </table>
   {/if}
 </div>

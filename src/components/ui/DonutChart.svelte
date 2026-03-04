@@ -16,6 +16,8 @@
   PHYSICS: Glass = glow on segments. Flat = clean strokes. Retro = no glow.
 -->
 <script lang="ts">
+  import { tooltip } from '@actions/tooltip';
+
   interface ChartDataPoint {
     label: string;
     value: number;
@@ -25,8 +27,10 @@
   interface DonutChartProps {
     /** Data segments */
     data: ChartDataPoint[];
-    /** Ring diameter in px */
+    /** Ring coordinate space (viewBox units) */
     size?: number;
+    /** Maximum display size in CSS px */
+    maxSize?: number;
     /** Ring thickness as fraction of radius (0–1) */
     thickness?: number;
     /** Center metric display */
@@ -37,6 +41,12 @@
     title?: string;
     /** Unique ID prefix for accessible labels */
     id?: string;
+    /** Custom value formatter for legend (default: value with percentage) */
+    formatValue?: (value: number) => string;
+    /** Selection callback (fires on segment click or Enter/Space) */
+    onselect?: (item: ChartDataPoint, index: number) => void;
+    /** Whether to show entry animations */
+    animated?: boolean;
     /** Additional CSS classes */
     class?: string;
   }
@@ -44,9 +54,13 @@
   let {
     data,
     size = 200,
+    maxSize,
     thickness = 0.3,
     centerMetric,
     showLegend = true,
+    formatValue,
+    onselect,
+    animated = true,
     title = 'Donut chart',
     id,
     class: className = '',
@@ -69,6 +83,14 @@
   const centerValueOffset = -4; // void-ignore (SVG text baseline nudge — sub-token)
   const centerLabelOffset = 14; // void-ignore (SVG label offset below value — sub-token)
   const centerFontScale = 0.12; // void-ignore (Proportional font size for SVG viewBox)
+
+  function defaultFormatValue(v: number): string {
+    if (v >= 1000000) return `${(v / 1000000).toFixed(1)}M`;
+    if (v >= 1000) return `${(v / 1000).toFixed(v >= 10000 ? 0 : 1)}k`;
+    return v.toString();
+  }
+
+  const fmt = $derived(formatValue ?? defaultFormatValue);
 
   const accessibleSummary = $derived.by(() => {
     if (data.length === 0) return 'Empty donut chart';
@@ -102,14 +124,12 @@
   });
 </script>
 
-<div class="chart-donut relative {className}">
+<div class="chart-donut relative {className}" data-animated={animated}>
   <div class="flex flex-col items-center gap-md">
     <svg
-      class="block"
+      class="block w-full h-auto"
       viewBox="0 0 {size} {size}"
-      width={size}
-      height={size}
-      style="--donut-stroke: {strokeWidth}"
+      style="max-width: {maxSize ?? size}px; --donut-stroke: {strokeWidth}"
       role="img"
       aria-labelledby="{chartId}-title {chartId}-desc"
     >
@@ -126,18 +146,48 @@
         />
 
         <!-- Segments -->
-        {#each segments as seg}
-          <circle
-            class="chart-donut-segment"
-            cx={center}
-            cy={center}
-            r={radius}
-            stroke-width={strokeWidth}
-            stroke-dasharray={seg.dashArray}
-            stroke-dashoffset={seg.dashOffset}
-            data-series={seg.series}
-            stroke-linecap="butt"
-          />
+        {#each segments as seg, i}
+          {#if onselect}
+            <circle
+              class="chart-donut-segment"
+              cx={center}
+              cy={center}
+              r={radius}
+              stroke-width={strokeWidth}
+              stroke-dasharray={seg.dashArray}
+              stroke-dashoffset={seg.dashOffset}
+              data-series={seg.series}
+              stroke-linecap="butt"
+              role="button"
+              tabindex="0"
+              aria-label="{seg.label}: {fmt(seg.value)} ({seg.percentage}%)"
+              onclick={() => onselect(data[i], i)}
+              onkeydown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onselect(data[i], i);
+                }
+              }}
+              use:tooltip={{
+                content: `${seg.label}: ${fmt(seg.value)} (${seg.percentage}%)`,
+              }}
+            />
+          {:else}
+            <circle
+              class="chart-donut-segment"
+              cx={center}
+              cy={center}
+              r={radius}
+              stroke-width={strokeWidth}
+              stroke-dasharray={seg.dashArray}
+              stroke-dashoffset={seg.dashOffset}
+              data-series={seg.series}
+              stroke-linecap="butt"
+              use:tooltip={{
+                content: `${seg.label}: ${fmt(seg.value)} (${seg.percentage}%)`,
+              }}
+            />
+          {/if}
         {/each}
       {:else}
         <text
@@ -155,7 +205,7 @@
           <text
             class="chart-donut-value"
             x={center}
-            y={center + centerValueOffset}
+            y={center + centerValueOffset * 1.25}
             text-anchor="middle"
             dominant-baseline="middle"
             font-size={size * centerFontScale}
@@ -165,7 +215,7 @@
           <text
             class="chart-donut-label"
             x={center}
-            y={center + centerLabelOffset}
+            y={center + centerLabelOffset * 1.25}
             text-anchor="middle"
             dominant-baseline="middle"
           >
@@ -187,6 +237,24 @@
           </div>
         {/each}
       </div>
+    {/if}
+
+    <!-- Screen reader data table -->
+    {#if data.length > 0}
+      <table class="sr-only">
+        <caption>{title}</caption>
+        <thead><tr><th>Segment</th><th>Value</th><th>Percentage</th></tr></thead
+        >
+        <tbody>
+          {#each segments as seg}
+            <tr
+              ><td>{seg.label}</td><td>{fmt(seg.value)}</td><td
+                >{seg.percentage}%</td
+              ></tr
+            >
+          {/each}
+        </tbody>
+      </table>
     {/if}
   </div>
 </div>

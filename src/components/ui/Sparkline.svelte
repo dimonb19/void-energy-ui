@@ -24,10 +24,14 @@
     series?: number;
     /** Show filled area below line */
     filled?: boolean;
+    /** Fluid mode — stretches to fill container width */
+    fluid?: boolean;
     /** Accessible label */
     label?: string;
     /** Unique ID prefix for accessible labels */
     id?: string;
+    /** Whether to show entry animations */
+    animated?: boolean;
     /** Additional CSS classes */
     class?: string;
   }
@@ -38,6 +42,8 @@
     height = 32,
     series = 0,
     filled = false,
+    fluid = false,
+    animated = true,
     label = 'Sparkline trend',
     id,
     class: className = '',
@@ -87,12 +93,18 @@
   });
 </script>
 
-<span class="chart-sparkline inline-flex items-center align-middle {className}">
+<span
+  class="chart-sparkline items-center align-middle {fluid
+    ? 'flex w-full'
+    : 'inline-flex'} {className}"
+  data-animated={animated}
+>
   <svg
-    class="block"
+    class="block {fluid ? 'w-full' : ''}"
     viewBox="0 0 {width} {height}"
-    {width}
-    {height}
+    width={fluid ? undefined : width}
+    height={fluid ? undefined : height}
+    style={fluid ? `height: ${height}px` : undefined}
     preserveAspectRatio="none"
     role="img"
     aria-labelledby="{chartId}-title {chartId}-desc"

@@ -3175,7 +3175,7 @@ layerStack.hasLayers;         // true if any layers are on the stack
 
 ### H. Charts & Data Visualization
 
-Pure SVG chart components for dashboards and metrics. All charts adapt to atmosphere, physics, and mode via a 6-color series palette applied through `data-series` attributes.
+Pure SVG chart components for dashboards and metrics. All charts adapt to atmosphere, physics, and mode via a 6-color series palette applied through `data-series` attributes. Charts are fluid (adapt to container width via `ResizeObserver`) and include tooltips, keyboard navigation, and screen reader table fallbacks.
 
 **SCSS:** [src/styles/components/_charts.scss](src/styles/components/_charts.scss), [src/styles/components/_stat-card.scss](src/styles/components/_stat-card.scss)
 
@@ -3193,13 +3193,26 @@ Pure SVG chart components for dashboards and metrics. All charts adapt to atmosp
 **Physics:**
 - **Glass:** Series colors glow via `drop-shadow`. Bar/line strokes have energy glow. Area fills use alpha transparency.
 - **Flat:** Clean solid strokes and fills. No glow effects.
-- **Retro:** All glow removed (`filter: none`). Bar corners squared (`rx` zeroed via `--radius-sm`). Line caps use `square`. Area fills disabled.
+- **Retro:** All glow removed (`filter: none`). Bar corners squared (`rx` zeroed via `--radius-sm`). Line caps use `square`. All animation and data transitions disabled (`transition: none`).
 
 > **Note:** Glass and Retro require dark mode — only Flat supports both light and dark. The `@include when-light` overrides in `_charts.scss` apply exclusively to Flat physics.
 
-**Animation:** Physics-driven via `--speed-base` / `--speed-slow`. Bars grow from bottom with staggered delay (`chart-grow-bar`). Lines draw in via `stroke-dashoffset` (`chart-draw-line`). Area fills fade in after line draw. Donut segments pop on hover (stroke-width expansion + brightness, non-hovered segments dim for focus). Retro: all animation disabled.
+**Animation & Transitions:**
+- **Entry:** Bars grow from bottom (`chart-grow-bar`). Lines draw in via `stroke-dashoffset` (`chart-draw-line`). Area fills fade in. Progress rings fill from 0. All entry animations stagger via `--delay-cascade`.
+- **Data updates:** Bar geometry (`x`, `y`, `width`, `height`), donut segments (`stroke-dasharray`, `stroke-dashoffset`), and line chart dots (`cx`, `cy`) animate via CSS transitions using `--speed-base` with `--ease-spring-gentle`.
+- **Opt-out:** Set `animated={false}` to disable both entry animations and data transitions. `prefers-reduced-motion` is also respected — line paths and area fills are shown immediately (no invisible initial state).
+- **Retro:** All animation and transition disabled.
 
-**Accessibility:** Each chart SVG has `role="img"` with `<title>` + `<desc>` children linked via `aria-labelledby`. Pass a unique `id` prop when multiple charts coexist on the same page.
+**Interactivity:**
+- **Tooltips:** All chart data elements show tooltips on hover via `use:tooltip`. Displays label + formatted value (+ percentage for donut).
+- **Selection:** Pass `onselect` callback — hit targets appear with `role="button"`, `tabindex="0"`, and keyboard support (Enter/Space).
+- **Value formatting:** All charts accept `formatValue?: (value: number) => string`. Default: compact k/M abbreviation (e.g., `12.4k`, `1.2M`).
+
+**Accessibility:**
+- Each chart SVG has `role="img"` with `<title>` + `<desc>` children linked via `aria-labelledby`.
+- A visually hidden `<table class="sr-only">` adjacent to each chart provides full data access for screen readers.
+- Interactive elements (hit targets, donut segments with `onselect`) have `role="button"`, `tabindex="0"`, and `aria-label`.
+- Pass a unique `id` prop when multiple charts coexist on the same page.
 
 ---
 
@@ -3238,6 +3251,8 @@ Pure SVG chart components for dashboards and metrics. All charts adapt to atmosp
 | `height` | `number` | `32` | SVG height in px |
 | `series` | `number` | `0` | Color series index (0–5) |
 | `filled` | `boolean` | `false` | Show area fill |
+| `fluid` | `boolean` | `false` | Stretch to fill container width |
+| `animated` | `boolean` | `true` | Show entry animations |
 | `label` | `string` | `'Sparkline trend'` | Accessible label |
 | `id` | `string` | auto | Unique ID prefix for accessible labels |
 | `class` | `string` | `''` | Additional CSS classes |
@@ -3245,6 +3260,7 @@ Pure SVG chart components for dashboards and metrics. All charts adapt to atmosp
 ```svelte
 <Sparkline data={[45, 52, 48, 61, 55, 67, 72]} />
 <Sparkline data={trend} filled series={2} width={160} height={40} />
+<Sparkline data={trend} fluid filled />
 ```
 
 ---
@@ -3252,25 +3268,48 @@ Pure SVG chart components for dashboards and metrics. All charts adapt to atmosp
 #### `BarChart`
 
 **File:** [src/components/ui/BarChart.svelte](src/components/ui/BarChart.svelte)
-**Description:** Vertical bar chart with category labels, optional grid, and value annotations. Bars auto-color by index through the series palette.
+**Description:** Bar chart with category labels, optional grid, value annotations, tooltips, and interactive selection. Supports vertical, horizontal, and grouped orientations. Bars auto-color by index through the series palette. Fluid width via `ResizeObserver`.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `data` | `{label, value, series?}[]` | required | Data points |
+| `data` | `{label, value, series?}[]` | `[]` | Data points (one bar per point) |
+| `groups` | `{label, values: {name, value, series?}[]}[]` | — | Grouped bar data (clustered bars per category) |
 | `height` | `number` | `240` | Chart height in px |
-| `showValues` | `boolean` | `false` | Value labels above bars |
-| `showGrid` | `boolean` | `true` | Horizontal grid lines |
+| `orientation` | `'vertical'\|'horizontal'` | `'vertical'` | Bar orientation |
+| `showValues` | `boolean` | `false` | Value labels above/beside bars |
+| `showGrid` | `boolean` | `true` | Grid lines |
+| `showLegend` | `boolean` | `false` | Show legend below chart |
+| `formatValue` | `(value: number) => string` | compact k/M | Custom value formatter |
+| `onselect` | `(item, index) => void` | — | Selection callback (click or Enter/Space) |
+| `referenceLines` | `{value, label?, series?}[]` | — | Horizontal reference lines |
+| `xLabel` | `string` | — | X-axis label |
+| `yLabel` | `string` | — | Y-axis label |
+| `animated` | `boolean` | `true` | Show entry animations and data transitions |
 | `title` | `string` | `'Bar chart'` | Accessible title |
 | `id` | `string` | auto | Unique ID prefix for accessible labels |
 | `class` | `string` | `''` | Additional CSS classes |
 
 ```svelte
+<!-- Basic vertical -->
 <BarChart data={[
   { label: 'Q1', value: 12400 },
   { label: 'Q2', value: 18700 },
   { label: 'Q3', value: 15200 },
   { label: 'Q4', value: 22100 },
 ]} showValues />
+
+<!-- Horizontal with axis labels -->
+<BarChart {data} orientation="horizontal" xLabel="Revenue" yLabel="Quarter" />
+
+<!-- Grouped bars with legend -->
+<BarChart groups={[
+  { label: 'Q1', values: [{ name: 'Revenue', value: 12400 }, { name: 'Cost', value: 8200 }] },
+  { label: 'Q2', values: [{ name: 'Revenue', value: 18700 }, { name: 'Cost', value: 11500 }] },
+]} showLegend showValues />
+
+<!-- With reference line and custom formatter -->
+<BarChart {data} referenceLines={[{ value: 15000, label: 'Target' }]}
+  formatValue={(v) => `$${(v / 1000).toFixed(0)}k`} />
 ```
 
 ---
@@ -3278,15 +3317,19 @@ Pure SVG chart components for dashboards and metrics. All charts adapt to atmosp
 #### `DonutChart`
 
 **File:** [src/components/ui/DonutChart.svelte](src/components/ui/DonutChart.svelte)
-**Description:** Ring/donut chart with center metric and legend. Uses stroke-dasharray for arc segments.
+**Description:** Ring/donut chart with center metric and legend. Uses stroke-dasharray for arc segments. Segments support tooltips, keyboard navigation, and selection callbacks.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `data` | `{label, value, series?}[]` | required | Segments |
-| `size` | `number` | `200` | Ring diameter in px |
+| `size` | `number` | `200` | Ring coordinate space (viewBox units) |
+| `maxSize` | `number` | `size` | Maximum display size in CSS px |
 | `thickness` | `number` | `0.3` | Ring thickness (fraction of radius) |
 | `centerMetric` | `{label, value}` | — | Center metric display |
 | `showLegend` | `boolean` | `true` | Show legend below |
+| `formatValue` | `(value: number) => string` | compact k/M | Custom value formatter for legend |
+| `onselect` | `(item, index) => void` | — | Selection callback (click or Enter/Space) |
+| `animated` | `boolean` | `true` | Show data transitions |
 | `title` | `string` | `'Donut chart'` | Accessible title |
 | `id` | `string` | auto | Unique ID prefix for accessible labels |
 | `class` | `string` | `''` | Additional CSS classes |
@@ -3307,16 +3350,24 @@ Pure SVG chart components for dashboards and metrics. All charts adapt to atmosp
 #### `LineChart`
 
 **File:** [src/components/ui/LineChart.svelte](src/components/ui/LineChart.svelte)
-**Description:** Line/area chart with grid, axes, optional dots, and multi-series support. Single series uses `{label, value}[]`, multi-series uses `{name, data, series?}[]`.
+**Description:** Line/area chart with grid, axes, optional dots, tooltips, and multi-series support. Fluid width via `ResizeObserver`. Supports smooth Catmull-Rom curves.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `data` | `{label, value}[] \| {name, data, series?}[]` | required | Chart data |
+| `data` | `{label, value}[]` | — | Single-series data points |
+| `series` | `{name, data, series?}[]` | — | Multi-series data (takes precedence over `data`) |
 | `height` | `number` | `240` | Chart height in px |
 | `filled` | `boolean` | `false` | Area fill below lines |
 | `showDots` | `boolean` | `false` | Data point dots |
 | `showGrid` | `boolean` | `true` | Horizontal grid lines |
+| `smooth` | `boolean` | `false` | Smooth Catmull-Rom curves instead of straight lines |
 | `showLegend` | `boolean` | `false` | Legend (multi-series) |
+| `formatValue` | `(value: number) => string` | compact k/M | Custom value formatter |
+| `onselect` | `(item, index) => void` | — | Selection callback (click or Enter/Space on dots) |
+| `referenceLines` | `{value, label?, series?}[]` | — | Horizontal reference lines |
+| `xLabel` | `string` | — | X-axis label |
+| `yLabel` | `string` | — | Y-axis label |
+| `animated` | `boolean` | `true` | Show entry animations and dot transitions |
 | `title` | `string` | `'Line chart'` | Accessible title |
 | `id` | `string` | auto | Unique ID prefix for accessible labels |
 | `class` | `string` | `''` | Additional CSS classes |
@@ -3329,12 +3380,54 @@ Pure SVG chart components for dashboards and metrics. All charts adapt to atmosp
   { label: 'Mar', value: 2100 },
 ]} filled showDots />
 
-<!-- Multi-series -->
-<LineChart data={[
+<!-- Multi-series (use `series` prop, not `data`) -->
+<LineChart series={[
   { name: 'Sessions', data: [...], series: 0 },
   { name: 'Conversions', data: [...], series: 2 },
 ]} showLegend filled />
+
+<!-- Smooth curves with reference line -->
+<LineChart {data} smooth filled showDots
+  referenceLines={[{ value: 2000, label: 'Goal', series: 2 }]}
+  xLabel="Month" yLabel="Users" />
 ```
+
+> **Breaking change:** Multi-series data now uses the `series` prop instead of passing an array of `{name, data}` objects to `data`. Single-series `data` usage is unchanged.
+
+---
+
+#### `ProgressRing`
+
+**File:** [src/components/ui/ProgressRing.svelte](src/components/ui/ProgressRing.svelte)
+**CSS:** `.chart-progress-ring` ([src/styles/components/_charts.scss](src/styles/components/_charts.scss))
+**Description:** Circular progress indicator with optional center value label. Uses stroke-dasharray on an SVG circle for the arc fill.
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `number` | required | Current value |
+| `max` | `number` | `100` | Maximum value |
+| `scale` | `'sm'\|'md'\|'lg'\|'xl'` | `'md'` | Display size (sm=`--space-xl`, md=`--space-2xl`, lg=`--space-3xl`, xl=`--space-4xl`) |
+| `thickness` | `number` | `0.25` | Ring thickness (fraction of radius, 0–1) |
+| `series` | `number` | `0` | Series color index (0–5) |
+| `showValue` | `boolean` | `false` | Show percentage/value label in center |
+| `formatValue` | `(value, max) => string` | percentage | Custom center label formatter |
+| `animated` | `boolean` | `true` | Show fill animation on mount |
+| `label` | `string` | `'Progress'` | Accessible label |
+| `id` | `string` | auto | Unique ID prefix |
+| `class` | `string` | `''` | Additional CSS classes |
+
+```svelte
+<ProgressRing value={75} />
+<ProgressRing value={42} max={100} showValue series={2} scale="lg" />
+<ProgressRing value={3} max={10} formatValue={(v, m) => `${v}/${m}`} showValue />
+```
+
+**Accessibility:** `role="progressbar"` with `aria-valuenow`, `aria-valuemin`, `aria-valuemax`.
+
+**Physics:**
+- **Glass:** Series stroke glows via `drop-shadow`.
+- **Flat:** Clean solid stroke. No glow.
+- **Retro:** Square `stroke-linecap`, no animation, no glow.
 
 ---
 

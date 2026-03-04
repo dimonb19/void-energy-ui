@@ -4,6 +4,8 @@
   import BarChart from '../ui/BarChart.svelte';
   import DonutChart from '../ui/DonutChart.svelte';
   import LineChart from '../ui/LineChart.svelte';
+  import ProgressRing from '../ui/ProgressRing.svelte';
+  import Selector from '../ui/Selector.svelte';
   import Toggle from '../ui/Toggle.svelte';
 
   // ── Stat Card data ───────────────────────────────────────────────────────
@@ -19,15 +21,59 @@
   ];
 
   // ── Bar Chart data ───────────────────────────────────────────────────────
-  const revenueByQuarter = [
-    { label: 'Q1', value: 12400 },
-    { label: 'Q2', value: 18700 },
-    { label: 'Q3', value: 15200 },
-    { label: 'Q4', value: 22100 },
+  const monthlyRevenue = [
+    { label: 'Jan', value: 12400 },
+    { label: 'Feb', value: 15800 },
+    { label: 'Mar', value: 18700 },
+    { label: 'Apr', value: 14200 },
+    { label: 'May', value: 21500 },
+    { label: 'Jun', value: 19800 },
+    { label: 'Jul', value: 23100 },
+  ];
+
+  const departmentBudget = [
+    {
+      label: 'Engineering',
+      values: [
+        { name: 'Budget', value: 120000, series: 0 },
+        { name: 'Actual', value: 115000, series: 2 },
+      ],
+    },
+    {
+      label: 'Marketing',
+      values: [
+        { name: 'Budget', value: 80000, series: 0 },
+        { name: 'Actual', value: 92000, series: 4 },
+      ],
+    },
+    {
+      label: 'Design',
+      values: [
+        { name: 'Budget', value: 60000, series: 0 },
+        { name: 'Actual', value: 58000, series: 2 },
+      ],
+    },
+    {
+      label: 'Sales',
+      values: [
+        { name: 'Budget', value: 95000, series: 0 },
+        { name: 'Actual', value: 105000, series: 4 },
+      ],
+    },
+  ];
+
+  const platformUsers = [
+    { label: 'Desktop', value: 4200 },
+    { label: 'Mobile', value: 3800 },
+    { label: 'Tablet', value: 1200 },
+    { label: 'API', value: 890 },
+    { label: 'CLI', value: 420 },
   ];
 
   let barShowValues = $state(true);
   let barShowGrid = $state(true);
+  let barShowGrouped = $state(false);
+  let barShowHorizontal = $state(false);
 
   // ── Line Chart data ──────────────────────────────────────────────────────
   const userGrowth = [
@@ -97,6 +143,34 @@
   ];
 
   let sparklineFilled = $state(false);
+
+  // ── Progress Ring demo ──────────────────────────────────────────────────
+  const seriesLabels = [
+    'Primary',
+    'System',
+    'Success',
+    'Premium',
+    'Error',
+    'Secondary',
+  ];
+
+  const sizeOptions = [
+    { value: 'sm', label: 'Small' },
+    { value: 'md', label: 'Medium' },
+    { value: 'lg', label: 'Large' },
+    { value: 'xl', label: 'Extra Large' },
+  ];
+  const thicknessOptions = [
+    { value: '0.1', label: 'Thin (0.1)' },
+    { value: '0.25', label: 'Default (0.25)' },
+    { value: '0.4', label: 'Thick (0.4)' },
+  ];
+
+  let ringAnimated = $state(true);
+  let ringShowValue = $state(true);
+  let ringValue = $state(75);
+  let ringSize = $state<string | number | null>('lg');
+  let ringThickness = $state<string | number | null>('0.25');
 </script>
 
 <section id="charts" class="flex flex-col gap-md">
@@ -105,10 +179,10 @@
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Data visualization components for dashboards, analytics, and metric
-      displays. Five chart types cover KPI metrics, trends, comparisons, and
-      composition breakdowns. All charts are pure SVG &mdash; no external
-      library. Every element adapts to atmosphere, physics, and mode via the
-      series color system.
+      displays. Six chart types cover KPI metrics, trends, comparisons,
+      composition breakdowns, and circular progress. All charts are pure SVG
+      &mdash; no external library. Every element adapts to atmosphere, physics,
+      and mode via the series color system.
     </p>
 
     <details>
@@ -209,49 +283,106 @@
     <div class="flex flex-col gap-md">
       <h5>Bar Chart</h5>
       <p class="text-small text-mute">
-        Vertical bar chart for comparing values across categories. Bars
-        auto-color by index through the 6-series palette. Toggle options below
-        to explore chart features.
+        Category comparison chart with vertical and horizontal orientations,
+        grouped bar clusters, reference lines, and axis labels. Bars auto-color
+        through the 6-series palette. Toggle options below to explore features.
       </p>
 
       <div class="surface-sunk p-md flex flex-col gap-md">
         <div class="flex flex-row flex-wrap gap-md items-center">
           <Toggle bind:checked={barShowValues} label="Values" />
           <Toggle bind:checked={barShowGrid} label="Grid" />
+          <Toggle
+            bind:checked={barShowGrouped}
+            label="Grouped"
+            onchange={(on) => {
+              if (on) barShowHorizontal = false;
+            }}
+          />
+          <Toggle
+            bind:checked={barShowHorizontal}
+            label="Horizontal"
+            onchange={(on) => {
+              if (on) barShowGrouped = false;
+            }}
+          />
         </div>
 
-        <BarChart
-          data={revenueByQuarter}
-          showValues={barShowValues}
-          showGrid={barShowGrid}
-          title="Revenue by quarter"
-          id="bar-revenue"
-        />
+        {#if barShowGrouped}
+          <BarChart
+            groups={departmentBudget}
+            showValues={barShowValues}
+            showGrid={barShowGrid}
+            showLegend
+            referenceLines={[{ value: 80000, label: 'Target', series: 1 }]}
+            title="Department budget vs actual"
+            id="bar-grouped"
+          />
+        {:else if barShowHorizontal}
+          <BarChart
+            data={platformUsers}
+            orientation="horizontal"
+            showValues={barShowValues}
+            showGrid={barShowGrid}
+            title="Users by platform"
+            id="bar-horizontal"
+          />
+        {:else}
+          <BarChart
+            data={monthlyRevenue}
+            showValues={barShowValues}
+            showGrid={barShowGrid}
+            title="Monthly revenue"
+            id="bar-revenue"
+          />
+        {/if}
       </div>
 
       <details>
         <summary>View Code</summary>
         <pre><code
-            >&lt;BarChart
+            >&lt;!-- Basic --&gt;
+&lt;BarChart
   data=&#123;[
-    &#123; label: 'Q1', value: 12400 &#125;,
-    &#123; label: 'Q2', value: 18700 &#125;,
-    &#123; label: 'Q3', value: 15200 &#125;,
-    &#123; label: 'Q4', value: 22100 &#125;,
+    &#123; label: 'Jan', value: 12400 &#125;,
+    &#123; label: 'Feb', value: 15800 &#125;,
+    ...
   ]&#125;
   showValues
   showGrid
-  title="Revenue by quarter"
+  yLabel="Revenue ($)"
+/&gt;
+
+&lt;!-- Grouped --&gt;
+&lt;BarChart
+  groups=&#123;[
+    &#123; label: 'Engineering', values: [
+      &#123; name: 'Budget', value: 120000 &#125;,
+      &#123; name: 'Actual', value: 115000, series: 2 &#125;,
+    ] &#125;,
+    ...
+  ]&#125;
+  showLegend
+  referenceLines=&#123;[&#123; value: 80000, label: 'Target' &#125;]&#125;
+/&gt;
+
+&lt;!-- Horizontal --&gt;
+&lt;BarChart
+  data=&#123;[...]&#125;
+  orientation="horizontal"
+  xLabel="Users"
 /&gt;</code
           ></pre>
       </details>
 
       <p class="text-caption text-mute px-xs">
-        Props: <code>data</code> (&#123;label, value&#125;[]),
-        <code>height</code> (default 240),
-        <code>showValues</code>, <code>showGrid</code>,
-        <code>title</code>, <code>id</code>. Each bar assigns
-        <code>data-series</code> by index for auto-coloring.
+        Props: <code>data</code>, <code>groups</code>,
+        <code>orientation</code> (<code>'vertical'|'horizontal'</code>),
+        <code>height</code>, <code>showValues</code>, <code>showGrid</code>,
+        <code>showLegend</code>, <code>referenceLines</code>,
+        <code>xLabel</code>, <code>yLabel</code>,
+        <code>formatValue</code>, <code>onselect</code>,
+        <code>animated</code>, <code>title</code>, <code>id</code>.
       </p>
     </div>
 
@@ -273,7 +404,7 @@
 
         {#if lineMultiSeries}
           <LineChart
-            data={multiSeriesData}
+            series={multiSeriesData}
             filled={lineFilled}
             showDots={lineShowDots}
             showGrid={lineShowGrid}
@@ -307,7 +438,7 @@
 
 &lt;!-- Multi-series --&gt;
 &lt;LineChart
-  data=&#123;[
+  series=&#123;[
     &#123; name: 'Sessions', data: [...], series: 0 &#125;,
     &#123; name: 'Conversions', data: [...], series: 2 &#125;,
   ]&#125;
@@ -317,8 +448,8 @@
       </details>
 
       <p class="text-caption text-mute px-xs">
-        Props: <code>data</code> (single: &#123;label, value&#125;[], multi:
-        &#123;name, data, series?&#125;[]),
+        Props: <code>data</code> (&#123;label, value&#125;[]),
+        <code>series</code> (&#123;name, data, series?&#125;[]),
         <code>filled</code>, <code>showDots</code>, <code>showGrid</code>,
         <code>showLegend</code>, <code>id</code>. Multi-series auto-detects from
         <code>name</code> property.
@@ -430,6 +561,103 @@
         <code>width</code> (default 120), <code>height</code> (default 32),
         <code>series</code> (0&ndash;5), <code>filled</code>,
         <code>label</code> (aria).
+      </p>
+    </div>
+
+    <!-- ─── PROGRESS RING ──────────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-md">
+      <h5>Progress Ring</h5>
+      <p class="text-small text-mute">
+        Circular progress indicator with optional center value label. Uses
+        <code>stroke-dasharray</code> for the arc fill. Supports all 6 series colors,
+        configurable size and thickness, and entry animation.
+      </p>
+
+      <!-- Series colors -->
+      <div class="surface-sunk p-md">
+        <div
+          class="grid grid-cols-2 tablet:grid-cols-3 small-desktop:grid-cols-6 gap-md"
+        >
+          {#each seriesLabels as label, i}
+            <div class="flex flex-col items-center gap-xs">
+              <ProgressRing
+                value={75}
+                series={i}
+                showValue
+                id="ring-series-{i}"
+                label="{label} progress"
+              />
+              <span class="text-caption text-mute">{label}</span>
+            </div>
+          {/each}
+        </div>
+      </div>
+
+      <!-- Interactive -->
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <div class="flex flex-row flex-wrap gap-md items-center">
+          <Selector label="Size" options={sizeOptions} bind:value={ringSize} />
+          <Selector
+            label="Thickness"
+            options={thicknessOptions}
+            bind:value={ringThickness}
+          />
+        </div>
+
+        <input type="range" bind:value={ringValue} min="0" max="100" />
+
+        <div class="flex flex-row flex-wrap gap-lg items-end">
+          <div class="flex flex-col items-center gap-xs">
+            <ProgressRing
+              value={ringValue}
+              showValue={ringShowValue}
+              animated={ringAnimated}
+              scale={ringSize as 'sm' | 'md' | 'lg' | 'xl'}
+              thickness={Number(ringThickness)}
+              id="ring-interactive"
+              label="Interactive demo"
+            />
+            <span class="text-caption text-mute">Default</span>
+          </div>
+          <div class="flex flex-col items-center gap-xs">
+            <ProgressRing
+              value={Math.round(ringValue / 10)}
+              max={10}
+              showValue
+              formatValue={(v, m) => `${v}/${m}`}
+              animated={ringAnimated}
+              scale={ringSize as 'sm' | 'md' | 'lg' | 'xl'}
+              thickness={Number(ringThickness)}
+              series={3}
+              id="ring-custom-fmt"
+              label="Custom format"
+            />
+            <span class="text-caption text-mute">Custom format</span>
+          </div>
+        </div>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;ProgressRing value=&#123;75&#125; /&gt;
+&lt;ProgressRing value=&#123;75&#125; showValue series=&#123;2&#125; scale="lg" /&gt;
+&lt;ProgressRing value=&#123;3&#125; max=&#123;10&#125; showValue
+  formatValue=&#123;(v, m) =&gt; `$&#123;v&#125;/$&#123;m&#125;`&#125;
+/&gt;
+
+&lt;!-- Scale: sm | md | lg | xl (default md) --&gt;
+&lt;!-- Series: 0=primary, 1=system, 2=success, 3=premium, 4=error, 5=secondary --&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        Props: <code>value</code>, <code>max</code> (default 100),
+        <code>scale</code> (<code>sm|md|lg|xl</code>, default md),
+        <code>thickness</code> (0&ndash;1, default 0.25),
+        <code>series</code> (0&ndash;5),
+        <code>showValue</code>, <code>formatValue</code>,
+        <code>animated</code>, <code>label</code> (aria), <code>id</code>.
       </p>
     </div>
   </div>

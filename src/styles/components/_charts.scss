@@ -306,17 +306,32 @@ $_chart-series: (
     animation-delay: calc(var(--item-index, 0) * var(--delay-cascade));
 
     transition:
+      x var(--speed-base) var(--ease-spring-gentle),
+      y var(--speed-base) var(--ease-spring-gentle),
+      width var(--speed-base) var(--ease-spring-gentle),
+      height var(--speed-base) var(--ease-spring-gentle),
       opacity var(--speed-fast) var(--ease-spring-snappy),
       filter var(--speed-fast) var(--ease-spring-snappy);
 
     @include when-retro {
       animation: none;
+      transition: none;
     }
 
     @media (hover: hover) {
       &:hover {
         opacity: 0.8;
       }
+    }
+  }
+
+  // Horizontal orientation override
+  &[data-orientation='horizontal'] .chart-bar-rect {
+    transform-origin: left;
+    animation-name: chart-grow-bar-h;
+
+    @include when-retro {
+      animation: none;
     }
   }
 }
@@ -332,6 +347,8 @@ $_chart-series: (
   .chart-donut-segment {
     fill: none;
     transition:
+      stroke-dasharray var(--speed-base) var(--ease-spring-gentle),
+      stroke-dashoffset var(--speed-base) var(--ease-spring-gentle),
       stroke-width var(--speed-fast) var(--ease-spring-snappy),
       opacity var(--speed-fast) var(--ease-spring-snappy),
       filter var(--speed-fast) var(--ease-spring-snappy);
@@ -449,10 +466,14 @@ $_chart-series: (
     @include _chart-series-dot;
     stroke-width: 2px; // void-ignore (Dot border — sub-token scale)
 
-    transition: r var(--speed-fast) var(--ease-spring-snappy);
+    transition:
+      cx var(--speed-base) var(--ease-spring-gentle),
+      cy var(--speed-base) var(--ease-spring-gentle),
+      r var(--speed-fast) var(--ease-spring-snappy);
 
     @include when-retro {
       stroke-width: 0;
+      transition: none;
     }
   }
 }
@@ -481,6 +502,19 @@ $_chart-series: (
   }
 }
 
+// Horizontal bar grow: scaleX from 0 to 1 (transform-origin: left)
+@keyframes chart-grow-bar-h {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
 // Area fade-in: delayed reveal after line draw completes
 @keyframes chart-fade-in {
   from {
@@ -489,5 +523,213 @@ $_chart-series: (
 
   to {
     opacity: 1;
+  }
+}
+
+// ==========================================================================
+// 5. REDUCED MOTION & ANIMATED OPT-OUT
+// ==========================================================================
+//
+// The global _accessibility.scss sets `animation: none !important` under
+// prefers-reduced-motion, but chart elements use CSS initial values that
+// depend on the animation completing (stroke-dashoffset for line draw-in,
+// opacity: 0 for area fade-in). Without these overrides, lines and areas
+// are invisible when reduced motion is active.
+
+@media (prefers-reduced-motion: reduce) {
+  .chart-line-path {
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+  }
+
+  .chart-area-fill {
+    opacity: 1;
+  }
+}
+
+// Animated opt-out via data attribute (consumer-controlled, separate from
+// prefers-reduced-motion and retro physics — all three coexist).
+.chart-bar[data-animated='false'] .chart-bar-rect {
+  animation: none;
+  transition:
+    opacity var(--speed-fast) var(--ease-spring-snappy),
+    filter var(--speed-fast) var(--ease-spring-snappy);
+}
+
+.chart-line[data-animated='false'] {
+  .chart-line-path {
+    animation: none;
+    stroke-dasharray: none;
+    stroke-dashoffset: 0;
+  }
+
+  .chart-area-fill {
+    animation: none;
+    opacity: 1;
+  }
+
+  .chart-dot {
+    transition: r var(--speed-fast) var(--ease-spring-snappy);
+  }
+}
+
+.chart-donut[data-animated='false'] .chart-donut-segment {
+  transition:
+    stroke-width var(--speed-fast) var(--ease-spring-snappy),
+    opacity var(--speed-fast) var(--ease-spring-snappy),
+    filter var(--speed-fast) var(--ease-spring-snappy);
+}
+
+// ==========================================================================
+// 6. INTERACTIVE HIT TARGETS
+// ==========================================================================
+
+.chart-hit-target {
+  fill: transparent;
+  stroke: none;
+  cursor: pointer;
+  outline: none;
+
+  &:focus-visible {
+    outline: 2px solid var(--energy-primary); // void-ignore (Focus ring — a11y standard)
+    outline-offset: 2px; // void-ignore (Focus ring offset — a11y standard)
+  }
+}
+
+// ==========================================================================
+// 7. REFERENCE LINES
+// ==========================================================================
+
+.chart-reference-line {
+  stroke: var(--energy-primary);
+  stroke-width: 1px; // void-ignore (Reference line hairline — sub-token scale)
+  stroke-dasharray: 6 4; // void-ignore (Reference dash pattern — visual constant)
+
+  @include when-retro {
+    stroke-width: var(--physics-border-width);
+    stroke-dasharray: 4 4; // void-ignore (Retro reference dash — stepped pattern)
+  }
+
+  @include when-light {
+    stroke: alpha(var(--energy-primary), 70%);
+  }
+
+  @each $i, $color in $_chart-series {
+    &[data-series='#{$i}'] {
+      stroke: $color;
+
+      @include when-light {
+        stroke: alpha($color, 70%);
+      }
+    }
+  }
+}
+
+.chart-reference-label {
+  fill: var(--text-dim);
+  font-size: var(--font-size-caption);
+  font-family: var(--font-code);
+}
+
+.chart-reference-swatch {
+  // void-exception: CSS-only swatch element — no Tailwind template access
+  width: var(--space-md);
+  height: 0;
+  border-top: 2px dashed var(--energy-primary); // void-ignore (Matches reference line dash style)
+  flex-shrink: 0;
+
+  @include when-retro {
+    border-top-width: var(--physics-border-width);
+  }
+
+  @each $i, $color in $_chart-series {
+    &[data-series='#{$i}'] {
+      border-color: $color;
+    }
+  }
+}
+
+// ==========================================================================
+// 8. AXIS LABELS
+// ==========================================================================
+
+.chart-axis-label {
+  fill: var(--text-dim);
+  font-size: var(--font-size-caption);
+  font-family: var(--font-body);
+  font-weight: var(--font-weight-medium);
+}
+
+// ==========================================================================
+// 9. PROGRESS RING
+// ==========================================================================
+
+.chart-progress-ring {
+  @include _chart-base;
+
+  // Size scale: maps t-shirt sizes to spacing tokens
+  // Default (md) = --space-2xl (64px)
+  svg {
+    max-width: var(--space-2xl);
+  }
+
+  &[data-size='sm'] svg {
+    max-width: var(--space-xl);
+  }
+
+  &[data-size='lg'] svg {
+    max-width: var(--space-3xl);
+  }
+
+  &[data-size='xl'] svg {
+    max-width: var(--space-4xl);
+  }
+
+  .chart-progress-track {
+    fill: none;
+    stroke: alpha(var(--border-color), 20%);
+
+    @include when-retro {
+      stroke: var(--border-color);
+    }
+
+    @include when-light {
+      stroke: alpha(var(--border-color), 15%);
+    }
+  }
+
+  .chart-progress-fill {
+    fill: none;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: center;
+    animation: chart-fill-ring var(--speed-base) var(--ease-spring-gentle)
+      forwards;
+
+    @include _chart-series-stroke;
+
+    @include when-retro {
+      stroke-linecap: square;
+      animation: none;
+    }
+  }
+
+  .chart-progress-value {
+    fill: var(--text-main);
+    font-family: var(--font-code);
+    font-weight: var(--font-weight-bold);
+    font-variant-numeric: tabular-nums;
+  }
+
+  &[data-animated='false'] .chart-progress-fill {
+    animation: none;
+  }
+}
+
+// Progress ring fill animation
+// 'to' is implicit — the element's own stroke-dasharray attribute.
+@keyframes chart-fill-ring {
+  from {
+    stroke-dasharray: 0 9999;
   }
 }
