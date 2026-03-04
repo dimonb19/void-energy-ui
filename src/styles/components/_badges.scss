@@ -1,0 +1,123 @@
+/* ==========================================================================
+ * BADGES
+ * ==========================================================================
+ *
+ * Non-interactive status pill indicators for lists, tables, and inline use.
+ *
+ * ARCHITECTURE:
+ * - Section 1: Badge Mixins
+ *   - _badge-base    : Structural DNA (sizing, typography, shape)
+ *   - _badge-variant : Semantic color with physics-aware overrides
+ *
+ * - Section 2: Badge Implementations
+ *   - .badge          : Neutral (muted) status pill
+ *   - .badge-success  : Green semantic badge
+ *   - .badge-error    : Red semantic badge
+ *   - .badge-premium  : Gold/amber semantic badge
+ *   - .badge-system   : Purple semantic badge
+ *   - .badge-energy   : Theme-accent badge (energy-primary)
+ *
+ * PHYSICS BEHAVIOR:
+ * - Glass: Tinted transparent background, no border, pill shape
+ * - Flat:  Lighter tint, shaded text for contrast, pill shape
+ * - Retro: Transparent background, hard color border, squared (forced)
+ *
+ * USAGE:
+ * ```html
+ * <span class="badge">Draft</span>
+ * <span class="badge-success">Active</span>
+ * <span class="badge-error">Failed</span>
+ * <span class="badge-premium">Pending</span>
+ * <span class="badge-system">Beta</span>
+ * <span class="badge-energy">v2.1</span>
+ * ```
+ *
+ * void-exception: CSS-only classes — no Badge component, bare-class usages across files.
+ *
+ * @see /CHEAT-SHEET.md for usage examples
+ * ==========================================================================
+ */
+
+@use '../abstracts' as *;
+
+// ==========================================================================
+// 1. BADGE-SPECIFIC MIXINS
+// ==========================================================================
+
+// MIXIN: Badge Base
+// Structural DNA for non-interactive status pill indicators.
+// --------------------------------------------------------------------------
+@mixin _badge-base {
+  display: inline-flex;
+  align-items: center;
+
+  // Caption-level typography
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  letter-spacing: var(--letter-spacing-caption);
+  font-weight: var(--font-weight-medium);
+
+  white-space: nowrap;
+  user-select: none;
+  padding-inline: var(--space-xs);
+
+  border-radius: var(--radius-full);
+  // Structural border — transparent by default, used by retro/light overrides.
+  border: var(--physics-border-width) solid transparent;
+}
+
+// MIXIN: Badge Variant
+// Applies semantic color with physics-aware overrides.
+// --------------------------------------------------------------------------
+@mixin _badge-variant($color) {
+  // Glass (default dark)
+  background: alpha($color, 15%);
+  color: $color;
+
+  // Retro override
+  @include when-retro {
+    background: transparent;
+    border-color: $color;
+    color: $color;
+  }
+
+  // Light mode override
+  @include when-light {
+    background: alpha($color, 12%);
+    color: shade($color, 40%);
+  }
+}
+
+// ==========================================================================
+// 2. BADGE IMPLEMENTATIONS
+// ==========================================================================
+
+.badge {
+  @include _badge-base;
+  @include _badge-variant(var(--text-mute));
+}
+
+.badge-success {
+  @include _badge-base;
+  @include _badge-variant(var(--color-success));
+}
+
+.badge-error {
+  @include _badge-base;
+  @include _badge-variant(var(--color-error));
+}
+
+.badge-premium {
+  @include _badge-base;
+  @include _badge-variant(var(--color-premium));
+}
+
+.badge-system {
+  @include _badge-base;
+  @include _badge-variant(var(--color-system));
+}
+
+.badge-energy {
+  @include _badge-base;
+  @include _badge-variant(var(--energy-primary));
+}

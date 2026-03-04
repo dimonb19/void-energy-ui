@@ -24,6 +24,7 @@
  * | _containers   | Layout containers + surface classes  | glass-float/sunk |
  * | _navigation   | Top nav bar + tab system             | when-state       |
  * | _chips        | Interactive data chips               | chip-structure   |
+ * | _badges       | Non-interactive status pills         | badge-variant    |
  * | _tiles        | Story tile cards                     | glass-float      |
  *
  * HYBRID PROTOCOL:
@@ -46,6 +47,7 @@
 @forward 'containers'; // Layout containers + atomic surfaces
 @forward 'navigation'; // Top navigation bar + reusable tab system
 @forward 'chips'; // Interactive data chips (tags, filters, selections)
+@forward 'badges'; // Non-interactive status pill indicators
 @forward 'tiles'; // Story tile cards
 @forward 'pull-refresh'; // Pull-to-refresh indicator + content wrapper
 @forward 'toggle'; // Boolean toggle switch (role="switch")

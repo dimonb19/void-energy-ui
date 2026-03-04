@@ -1183,6 +1183,33 @@ Preset components with built-in layout and physics.
 
 ---
 
+#### `.badge`
+
+**Description:** Non-interactive status pill indicators for lists, tables, and inline use. Lightweight alternative to chips — no hover, no surfaces, caption-sized.
+**Source:** `src/styles/components/_badges.scss` (CSS-only, no Svelte component)
+**Variants:** `.badge`, `.badge-success`, `.badge-error`, `.badge-premium`, `.badge-system`, `.badge-energy`
+
+| Class | Color | Use Case |
+|---|---|---|
+| `.badge` | Muted | Neutral (Draft, Inactive, N/A) |
+| `.badge-success` | Green | Positive (Active, Complete, Online) |
+| `.badge-error` | Red | Negative (Failed, Rejected, Offline) |
+| `.badge-premium` | Gold | Warning (Pending, Review, Premium) |
+| `.badge-system` | Purple | System (Beta, Internal, Debug) |
+| `.badge-energy` | Theme accent | Theme-tinted (v2.1, Custom) |
+
+**Usage:**
+
+```html
+<span class="badge">Draft</span>
+<span class="badge-success">Active</span>
+<span class="badge-error">Failed</span>
+<span class="badge-premium">Pending</span>
+<span class="badge-system">Beta</span>
+```
+
+---
+
 #### `<Toggle>` (Switch)
 
 **Description:** Boolean on/off switch built on a native checkbox. Browser-native keyboard behavior (Space toggles).
@@ -2052,6 +2079,42 @@ The chip system includes additional semantic variants beyond the base:
 
 ```svelte
 <span class="chip chip-premium chip-labeled" data-label="Tier">Gold</span>
+```
+
+**Disabled:** Both `disabled` attribute and `aria-disabled="true"` are supported. Muted colors, reduced opacity, `cursor: not-allowed`.
+
+---
+
+#### `.badge` Variants (Extended)
+
+Non-interactive status pills — the lightweight counterpart to chips. No hover states, no surfaces, caption-sized. Use for lifecycle states in lists and tables.
+
+| Class | Color | Use Case |
+| --- | --- | --- |
+| `.badge` | Muted | Neutral (Draft, Inactive, N/A) |
+| `.badge-success` | Green | Positive (Active, Complete, Online) |
+| `.badge-error` | Red | Negative (Failed, Rejected, Offline) |
+| `.badge-premium` | Gold | Warning (Pending, Review, Premium) |
+| `.badge-system` | Purple | System (Beta, Internal, Debug) |
+| `.badge-energy` | Theme accent | Theme-tinted (v2.1, Custom) |
+
+**Physics:** Glass = tinted pill. Flat/light = lighter tint + darker text. Retro = hard border, no fill, squared.
+
+```html
+<!-- Single badge in a list row -->
+<div class="flex items-center justify-between gap-md">
+  <span>Nexus Gateway</span>
+  <span class="badge-success">Online</span>
+</div>
+
+<!-- Stacked badges -->
+<div class="flex items-center justify-between gap-md">
+  <span>Void Renderer</span>
+  <div class="flex gap-xs">
+    <span class="badge-premium">Deploying</span>
+    <span class="badge-system">Beta</span>
+  </div>
+</div>
 ```
 
 ---

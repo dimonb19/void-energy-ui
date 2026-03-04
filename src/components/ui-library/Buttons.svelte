@@ -42,7 +42,7 @@
 </script>
 
 <section id="buttons" class="flex flex-col gap-md">
-  <h2>06 // BUTTONS & CHIPS</h2>
+  <h2>06 // BUTTONS, CHIPS & BADGES</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
@@ -51,7 +51,8 @@
       primary action on a page, and semantic colors (Premium, System, Success,
       Error) for contextual meaning. Ghost variants provide secondary actions.
       Chips use the same color system for tags, filters, and removable
-      selections.
+      selections. Badges are the non-interactive counterpart &mdash; lightweight
+      status pills for lists and tables.
     </p>
 
     <details>
@@ -396,6 +397,170 @@
       </p>
     </div>
 
+    <!-- ─── BADGES ────────────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Badges</h5>
+      <p class="text-small text-mute">
+        Non-interactive status pills for lifecycle states in lists and tables.
+        Same semantic color system as chips, but lighter &mdash; no surfaces, no
+        hover, caption-sized. Use <code>.badge-*</code> classes on a bare
+        <code>&lt;span&gt;</code>.
+      </p>
+
+      <div
+        class="surface-sunk p-md flex flex-row gap-md flex-wrap justify-center items-center"
+      >
+        <span class="badge">Draft</span>
+        <span class="badge-success">Active</span>
+        <span class="badge-error">Failed</span>
+        <span class="badge-premium">Pending</span>
+        <span class="badge-system">Beta</span>
+        <span class="badge-energy">v2.1</span>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;span class="badge"&gt;Draft&lt;/span&gt;
+&lt;span class="badge-success"&gt;Active&lt;/span&gt;
+&lt;span class="badge-error"&gt;Failed&lt;/span&gt;
+&lt;span class="badge-premium"&gt;Pending&lt;/span&gt;
+&lt;span class="badge-system"&gt;Beta&lt;/span&gt;
+&lt;span class="badge-energy"&gt;v2.1&lt;/span&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        Badges adapt across physics: glass gets tinted pill, flat/light gets
+        lighter tint with darker text, retro gets hard border with no fill. Use
+        badges for read-only status indicators; use chips when the user can
+        add/remove tags.
+      </p>
+    </div>
+
+    <!-- ─── BADGES IN CONTEXT ────────────────────────────────────────── -->
+    <div class="flex flex-col gap-sm">
+      <h5>Badges in Context</h5>
+      <p class="text-small text-mute">
+        Badges are subordinate status indicators designed for list rows,
+        multi-badge stacking, and table columns. They stay small enough to
+        inform without dominating the primary content.
+      </p>
+
+      <h6 class="text-small text-dim">Status List</h6>
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <div class="flex items-center justify-between gap-md">
+          <div class="flex flex-col">
+            <span>Nexus Gateway</span>
+            <span class="text-caption text-mute"
+              >us-east-1 &middot; 3 replicas</span
+            >
+          </div>
+          <span class="badge-success">Online</span>
+        </div>
+        <div class="flex items-center justify-between gap-md">
+          <div class="flex flex-col">
+            <span>Void Renderer</span>
+            <span class="text-caption text-mute"
+              >eu-west-2 &middot; 1 replica</span
+            >
+          </div>
+          <div class="flex gap-xs">
+            <span class="badge-premium">Deploying</span>
+            <span class="badge-system">Beta</span>
+          </div>
+        </div>
+        <div class="flex items-center justify-between gap-md">
+          <div class="flex flex-col">
+            <span>Quantum Relay</span>
+            <span class="text-caption text-mute"
+              >ap-south-1 &middot; 2 replicas</span
+            >
+          </div>
+          <span class="badge-error">Offline</span>
+        </div>
+        <div class="flex items-center justify-between gap-md">
+          <div class="flex flex-col">
+            <span>Telemetry Sink</span>
+            <span class="text-caption text-mute"
+              >us-west-3 &middot; 5 replicas</span
+            >
+          </div>
+          <div class="flex gap-xs">
+            <span class="badge">Standby</span>
+            <span class="badge-energy">v1.4</span>
+          </div>
+        </div>
+      </div>
+
+      <h6 class="text-small text-dim">Table Column</h6>
+      <div class="surface-sunk p-md">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Module</th>
+                <th>Version</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Void Core</td>
+                <td><span class="badge-energy">v4.2</span></td>
+                <td><span class="badge-success">Stable</span></td>
+              </tr>
+              <tr>
+                <td>Physics Engine</td>
+                <td><span class="badge-energy">v3.0-rc1</span></td>
+                <td><span class="badge-premium">RC</span></td>
+              </tr>
+              <tr>
+                <td>Neural Interface</td>
+                <td><span class="badge-energy">v2.8</span></td>
+                <td><span class="badge">Deprecated</span></td>
+              </tr>
+              <tr>
+                <td>Atmosphere Renderer</td>
+                <td><span class="badge-energy">v5.1-beta</span></td>
+                <td><span class="badge-system">Beta</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;!-- Single badge --&gt;
+&lt;div class="flex items-center justify-between gap-md"&gt;
+  &lt;div class="flex flex-col"&gt;
+    &lt;span&gt;Nexus Gateway&lt;/span&gt;
+    &lt;span class="text-caption text-mute"&gt;us-east-1 &amp;middot; 3 replicas&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;span class="badge-success"&gt;Online&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;!-- Stacked badges (use gap-xs) --&gt;
+&lt;div class="flex gap-xs"&gt;
+  &lt;span class="badge-premium"&gt;Deploying&lt;/span&gt;
+  &lt;span class="badge-system"&gt;Beta&lt;/span&gt;
+&lt;/div&gt;
+
+&lt;!-- Table cell --&gt;
+&lt;td&gt;&lt;span class="badge-energy"&gt;v4.2&lt;/span&gt;&lt;/td&gt;
+&lt;td&gt;&lt;span class="badge-success"&gt;Stable&lt;/span&gt;&lt;/td&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        Stack multiple badges with <code>gap-xs</code>. In tables, badges sit
+        naturally alongside version pills (<code>badge-energy</code>). Keep
+        badge text short &mdash; one or two words maximum.
+      </p>
+    </div>
+
     <!-- ─── DISABLED STATES ────────────────────────────────────────────── -->
     <div class="flex flex-col gap-sm">
       <h5>Disabled States</h5>
@@ -411,7 +576,15 @@
         <button disabled>Disabled Button</button>
         <button class="btn-premium" disabled>Disabled Premium</button>
         <button class="btn-ghost" disabled>Disabled Ghost</button>
-        <button class="chip" disabled>Disabled Chip</button>
+        <div class="chip" aria-disabled="true">
+          <p class="chip-label">Disabled Chip</p>
+          <button
+            type="button"
+            class="btn-void chip-remove"
+            disabled
+            aria-label="Remove Disabled Chip">&#10005;</button
+          >
+        </div>
       </div>
 
       <details>
@@ -420,7 +593,10 @@
             >&lt;button disabled&gt;Disabled&lt;/button&gt;
 &lt;button class="btn-premium" disabled&gt;Disabled Premium&lt;/button&gt;
 &lt;button class="btn-ghost" disabled&gt;Disabled Ghost&lt;/button&gt;
-&lt;button class="chip" disabled&gt;Disabled Chip&lt;/button&gt;</code
+&lt;div class="chip" aria-disabled="true"&gt;
+  &lt;p class="chip-label"&gt;Disabled Chip&lt;/p&gt;
+  &lt;button class="btn-void chip-remove" disabled&gt;&amp;#10005;&lt;/button&gt;
+&lt;/div&gt;</code
           ></pre>
       </details>
     </div>

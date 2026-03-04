@@ -126,7 +126,8 @@
     }
   }
 
-  &:disabled {
+  &:disabled,
+  &[aria-disabled='true'] {
     cursor: not-allowed;
     background: shade(var(--bg-sink), 50%);
     color: shade(var(--text-mute), 20%);
@@ -144,7 +145,7 @@
   }
 
   @media (hover: hover) {
-    &:hover:not(:disabled) {
+    &:hover:not(:disabled):not([aria-disabled='true']) {
       transform: translateY(var(--lift)) scale(var(--scale, 1));
       box-shadow: var(--shadow-lift);
     }
