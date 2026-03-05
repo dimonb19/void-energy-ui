@@ -227,14 +227,14 @@
   >
     {#each filteredAtmospheres as atm, i (atm.id)}
       <div
-        class="theme-wrapper p-sm rounded-sm"
+        class="theme-wrapper p-sm"
         data-atmosphere={atm.id}
         data-physics={atm.physics}
         data-mode={atm.mode}
         in:materialize={{ delay: i * 25 }}
       >
         <button
-          class="theme-option w-full flex items-center gap-sm p-xs rounded-sm text-dim text-left"
+          class="theme-option w-full flex items-center gap-sm p-xs text-dim text-left"
           role="radio"
           aria-checked={voidEngine.atmosphere === atm.id}
           tabindex={voidEngine.atmosphere === atm.id ? 0 : -1}
@@ -244,7 +244,7 @@
             class="orb-wrapper relative hidden tablet:flex items-center justify-center"
             aria-hidden="true"
           >
-            <span class="orb relative rounded-full"></span>
+            <span class="orb relative"></span>
           </div>
 
           <span
@@ -367,9 +367,11 @@
     .theme-wrapper {
       background-color: var(--bg-canvas);
       transition: opacity var(--speed-fast) var(--ease-spring-snappy);
+      border-radius: var(--radius-base);
 
       .theme-option {
         position: relative;
+        border-radius: var(--radius-base);
 
         .orb-wrapper {
           width: var(--space-md);
