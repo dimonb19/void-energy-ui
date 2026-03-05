@@ -93,7 +93,7 @@ export class VoidTooltip {
       computePosition(this.trigger, this.tooltip, {
         placement: this.options.placement,
         middleware: [
-          offset(TOOLTIP_OFFSET_PX),
+          offset(this.options.offset ?? TOOLTIP_OFFSET_PX),
           flip(),
           shift({ padding: TOOLTIP_VIEWPORT_PADDING_PX }),
         ],

@@ -20,6 +20,7 @@
 -->
 <script lang="ts">
   import { tooltip } from '@actions/tooltip';
+  import { TOOLTIP_CHART_LABEL_OFFSET_PX } from '@config/ui-geometry';
 
   interface ChartDataPoint {
     label: string;
@@ -335,6 +336,7 @@
               style="--item-index: {gi * subBarCount + vi}"
               use:tooltip={{
                 content: `${group.label} — ${val.name}: ${fmt(val.value)}`,
+                offset: showValues ? TOOLTIP_CHART_LABEL_OFFSET_PX : undefined,
               }}
             />
             {#if showValues}
@@ -532,7 +534,10 @@
             height={barHeight(point.value)}
             data-series={series}
             style="--item-index: {i}"
-            use:tooltip={{ content: `${point.label}: ${fmt(point.value)}` }}
+            use:tooltip={{
+              content: `${point.label}: ${fmt(point.value)}`,
+              offset: showValues ? TOOLTIP_CHART_LABEL_OFFSET_PX : undefined,
+            }}
           />
           {#if showValues}
             <text

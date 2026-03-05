@@ -2349,6 +2349,7 @@ Floating UI elements with special positioning.
 ```svelte
 <button use:tooltip="Click to save">Save</button>
 <button use:tooltip={{ content: 'Settings', placement: 'bottom', delay: 200 }}>Settings</button>
+<rect use:tooltip={{ content: 'Revenue: $12.4k', offset: 28 }}><!-- Custom offset for chart labels -->
 ```
 
 See [`use:tooltip` action docs](#b-tooltip-usetooltip) for full options.
@@ -4500,6 +4501,45 @@ Plain text with muted color, centered, generous padding. No italic — italic is
 
 ---
 
+### Y. Charts & Data Viz
+
+```svelte
+<script lang="ts">
+  import BarChart from '../ui/BarChart.svelte';
+  import LineChart from '../ui/LineChart.svelte';
+  import DonutChart from '../ui/DonutChart.svelte';
+  import ProgressRing from '../ui/ProgressRing.svelte';
+</script>
+
+<!-- Bar chart (vertical, with values) -->
+<BarChart data={[
+  { label: 'Q1', value: 12400 },
+  { label: 'Q2', value: 18700 },
+  { label: 'Q3', value: 15200 },
+]} showValues showGrid />
+
+<!-- Line chart (filled area, with dots) -->
+<LineChart data={[
+  { label: 'Jan', value: 1200 },
+  { label: 'Feb', value: 1850 },
+  { label: 'Mar', value: 2100 },
+]} filled showDots />
+
+<!-- Donut chart with center metric -->
+<DonutChart data={[
+  { label: 'Organic', value: 42 },
+  { label: 'Direct', value: 28 },
+  { label: 'Referral', value: 18 },
+]} centerMetric={{ label: 'Sources', value: '100%' }} />
+
+<!-- Progress ring -->
+<ProgressRing value={75} showValue series={2} scale="lg" />
+```
+
+All charts are pure SVG, fluid-width, and adapt to atmosphere/physics/mode. Pass `id` when multiple charts coexist on the same page. Pass `onselect` for interactive selection. Pass `animated={false}` to disable entry animations.
+
+---
+
 ## 7. Svelte Actions
 
 Reusable behaviors attached to elements via `use:action` directive.
@@ -4592,6 +4632,7 @@ When used inside a `<dialog>` element, morph automatically:
 | `content` | `string` | — | Tooltip text (plain text only, no HTML) |
 | `placement` | `Placement` | `'top'` | Floating UI placement |
 | `delay` | `number` | `0` | Delay in ms before showing (0 = instant) |
+| `offset` | `number` | `12` | Distance in px from trigger element |
 
 **Usage:**
 

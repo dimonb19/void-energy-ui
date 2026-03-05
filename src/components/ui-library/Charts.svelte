@@ -22,13 +22,13 @@
 
   // ── Bar Chart data ───────────────────────────────────────────────────────
   const monthlyRevenue = [
-    { label: 'Jan', value: 12400 },
-    { label: 'Feb', value: 15800 },
-    { label: 'Mar', value: 18700 },
-    { label: 'Apr', value: 14200 },
-    { label: 'May', value: 21500 },
-    { label: 'Jun', value: 19800 },
-    { label: 'Jul', value: 23100 },
+    { label: 'Jan', value: 12400, series: 3 },
+    { label: 'Feb', value: 15800, series: 3 },
+    { label: 'Mar', value: 18700, series: 3 },
+    { label: 'Apr', value: 14200, series: 3 },
+    { label: 'May', value: 21500, series: 3 },
+    { label: 'Jun', value: 19800, series: 3 },
+    { label: 'Jul', value: 23100, series: 3 },
   ];
 
   const departmentBudget = [
@@ -36,38 +36,38 @@
       label: 'Engineering',
       values: [
         { name: 'Budget', value: 120000, series: 0 },
-        { name: 'Actual', value: 115000, series: 2 },
+        { name: 'Actual', value: 115000, series: 5 },
       ],
     },
     {
       label: 'Marketing',
       values: [
         { name: 'Budget', value: 80000, series: 0 },
-        { name: 'Actual', value: 92000, series: 4 },
+        { name: 'Actual', value: 92000, series: 5 },
       ],
     },
     {
       label: 'Design',
       values: [
         { name: 'Budget', value: 60000, series: 0 },
-        { name: 'Actual', value: 58000, series: 2 },
+        { name: 'Actual', value: 58000, series: 5 },
       ],
     },
     {
       label: 'Sales',
       values: [
         { name: 'Budget', value: 95000, series: 0 },
-        { name: 'Actual', value: 105000, series: 4 },
+        { name: 'Actual', value: 105000, series: 5 },
       ],
     },
   ];
 
   const platformUsers = [
-    { label: 'Desktop', value: 4200 },
-    { label: 'Mobile', value: 3800 },
-    { label: 'Tablet', value: 1200 },
-    { label: 'API', value: 890 },
-    { label: 'CLI', value: 420 },
+    { label: 'Desktop', value: 4200, series: 1 },
+    { label: 'Mobile', value: 3800, series: 1 },
+    { label: 'Tablet', value: 1200, series: 1 },
+    { label: 'API', value: 890, series: 1 },
+    { label: 'CLI', value: 420, series: 1 },
   ];
 
   let barShowValues = $state(true);
@@ -219,7 +219,7 @@
 
       <div class="surface-sunk p-md">
         <div
-          class="grid grid-cols-1 tablet:grid-cols-2 full-hd:flex justify-center gap-md"
+          class="grid grid-cols-1 tablet:grid-cols-2 full-hd:grid-cols-4 gap-md"
         >
           <StatCard
             id="stat-revenue"
@@ -284,8 +284,9 @@
       <h5>Bar Chart</h5>
       <p class="text-small text-mute">
         Category comparison chart with vertical and horizontal orientations,
-        grouped bar clusters, reference lines, and axis labels. Bars auto-color
-        through the 6-series palette. Toggle options below to explore features.
+        grouped bar clusters, reference lines, and axis labels. Single-metric
+        charts use uniform color; grouped charts assign distinct series per
+        metric. Toggle options below to explore features.
       </p>
 
       <div class="surface-sunk p-md flex flex-col gap-md">
@@ -358,7 +359,7 @@
   groups=&#123;[
     &#123; label: 'Engineering', values: [
       &#123; name: 'Budget', value: 120000 &#125;,
-      &#123; name: 'Actual', value: 115000, series: 2 &#125;,
+      &#123; name: 'Actual', value: 115000, series: 1 &#125;,
     ] &#125;,
     ...
   ]&#125;

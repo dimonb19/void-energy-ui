@@ -153,10 +153,11 @@ $_chart-series: (
   @each $i, $color in $_chart-series {
     &[data-series='#{$i}'] {
       fill: $color;
-      stroke: var(--bg-surface);
+      stroke: var(--bg-canvas);
 
       @include when-light {
         fill: shade($color, 20%);
+        stroke: var(--bg-surface);
       }
     }
   }
@@ -299,6 +300,7 @@ $_chart-series: (
   .chart-bar-rect {
     @include _chart-series-fill;
 
+    outline: none;
     rx: var(--radius-sm);
     transform-origin: bottom;
     animation: chart-grow-bar var(--speed-base) var(--ease-spring-gentle)
@@ -322,6 +324,10 @@ $_chart-series: (
       &:hover {
         opacity: 0.8;
       }
+    }
+
+    &:focus-visible {
+      opacity: 0.8;
     }
   }
 
@@ -380,13 +386,31 @@ $_chart-series: (
         }
       }
     }
+
+    outline: none;
+
+    &:focus-visible {
+      stroke-width: calc(
+        var(--donut-stroke, 24) * 1.15
+      ); // void-ignore (Donut focus pop — matches hover)
+      filter: brightness(1.2); // void-ignore (Focus emphasis — matches hover)
+
+      @include when-retro {
+        filter: none;
+      }
+    }
   }
 
-  // Dim non-hovered segments for focus effect
+  // Dim non-hovered/non-focused segments for emphasis
   @media (hover: hover) {
     svg:hover .chart-donut-segment:not(:hover) {
       opacity: 0.5;
     }
+  }
+
+  svg:has(.chart-donut-segment:focus-visible)
+    .chart-donut-segment:not(:focus-visible) {
+    opacity: 0.5;
   }
 
   .chart-donut-track {
@@ -464,15 +488,31 @@ $_chart-series: (
 
   .chart-dot {
     @include _chart-series-dot;
+    outline: none;
     stroke-width: 2px; // void-ignore (Dot border — sub-token scale)
 
     transition:
       cx var(--speed-base) var(--ease-spring-gentle),
       cy var(--speed-base) var(--ease-spring-gentle),
-      r var(--speed-fast) var(--ease-spring-snappy);
+      r var(--speed-fast) var(--ease-spring-snappy),
+      filter var(--speed-fast) var(--ease-spring-snappy),
+      stroke-width var(--speed-fast) var(--ease-spring-snappy);
+
+    @media (hover: hover) {
+      &:hover {
+        filter: brightness(1.2); // void-ignore (Dot hover emphasis)
+        stroke-width: 3px; // void-ignore (Dot hover border pop)
+      }
+    }
+
+    &:focus-visible {
+      filter: brightness(
+        1.2
+      ); // void-ignore (Dot focus emphasis — matches hover)
+      stroke-width: 3px; // void-ignore (Dot focus border pop — matches hover)
+    }
 
     @include when-retro {
-      stroke-width: 0;
       transition: none;
     }
   }
@@ -591,8 +631,7 @@ $_chart-series: (
   outline: none;
 
   &:focus-visible {
-    outline: 2px solid var(--energy-primary); // void-ignore (Focus ring — a11y standard)
-    outline-offset: 2px; // void-ignore (Focus ring offset — a11y standard)
+    fill: alpha(var(--energy-primary), 10%);
   }
 }
 

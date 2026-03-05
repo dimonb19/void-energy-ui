@@ -305,6 +305,9 @@ interface VoidTooltipOptions {
 
   /** Delay in ms before showing the tooltip. Default: 0 (instant). */
   delay?: number;
+
+  /** Custom offset in px from trigger. Default: TOOLTIP_OFFSET_PX (12). */
+  offset?: number;
 }
 
 // ==========================================================================
