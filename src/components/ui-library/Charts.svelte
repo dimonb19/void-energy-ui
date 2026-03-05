@@ -115,6 +115,7 @@
   let lineFilled = $state(true);
   let lineShowDots = $state(true);
   let lineShowGrid = $state(true);
+  let lineSmooth = $state(false);
   let lineMultiSeries = $state(false);
 
   // ── Donut Chart data ─────────────────────────────────────────────────────
@@ -275,7 +276,8 @@
       <p class="text-caption text-mute px-xs">
         Props: <code>label</code>, <code>value</code> (formatted string),
         <code>trend</code> (<code>'up'|'down'|'flat'</code>),
-        <code>delta</code> (trend text), <code>sparkline</code> (number[]).
+        <code>delta</code> (trend text), <code>sparkline</code> (number[]),
+        <code>id</code>.
       </p>
     </div>
 
@@ -400,6 +402,7 @@
           <Toggle bind:checked={lineFilled} label="Filled" />
           <Toggle bind:checked={lineShowDots} label="Dots" />
           <Toggle bind:checked={lineShowGrid} label="Grid" />
+          <Toggle bind:checked={lineSmooth} label="Smooth" />
           <Toggle bind:checked={lineMultiSeries} label="Multi-series" />
         </div>
 
@@ -409,6 +412,7 @@
             filled={lineFilled}
             showDots={lineShowDots}
             showGrid={lineShowGrid}
+            smooth={lineSmooth}
             showLegend
             title="Sessions vs Conversions"
             id="line-multi"
@@ -419,6 +423,7 @@
             filled={lineFilled}
             showDots={lineShowDots}
             showGrid={lineShowGrid}
+            smooth={lineSmooth}
             title="User growth"
             id="line-growth"
           />
@@ -451,9 +456,12 @@
       <p class="text-caption text-mute px-xs">
         Props: <code>data</code> (&#123;label, value&#125;[]),
         <code>series</code> (&#123;name, data, series?&#125;[]),
-        <code>filled</code>, <code>showDots</code>, <code>showGrid</code>,
-        <code>showLegend</code>, <code>id</code>. Multi-series auto-detects from
-        <code>name</code> property.
+        <code>height</code>, <code>filled</code>, <code>showDots</code>,
+        <code>showGrid</code>, <code>smooth</code>,
+        <code>showLegend</code>, <code>referenceLines</code>,
+        <code>xLabel</code>, <code>yLabel</code>,
+        <code>formatValue</code>, <code>onselect</code>,
+        <code>animated</code>, <code>title</code>, <code>id</code>.
       </p>
     </div>
 
@@ -506,10 +514,12 @@
 
       <p class="text-caption text-mute px-xs">
         Props: <code>data</code> (&#123;label, value, series?&#125;[]),
-        <code>size</code> (default 200), <code>thickness</code> (0&ndash;1,
-        default 0.3),
+        <code>size</code> (default 200), <code>maxSize</code>,
+        <code>thickness</code> (0&ndash;1, default 0.3),
         <code>centerMetric</code> (&#123;label, value&#125;),
-        <code>showLegend</code>, <code>id</code>.
+        <code>showLegend</code>, <code>formatValue</code>,
+        <code>onselect</code>, <code>animated</code>,
+        <code>title</code>, <code>id</code>.
       </p>
     </div>
 
@@ -561,7 +571,8 @@
         Props: <code>data</code> (number[]),
         <code>width</code> (default 120), <code>height</code> (default 32),
         <code>series</code> (0&ndash;5), <code>filled</code>,
-        <code>label</code> (aria).
+        <code>fluid</code>, <code>animated</code>,
+        <code>label</code> (aria), <code>id</code>.
       </p>
     </div>
 

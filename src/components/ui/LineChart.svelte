@@ -22,6 +22,7 @@
   ANIMATION: Line draws in via stroke-dashoffset (chart-draw-line keyframe).
 -->
 <script lang="ts">
+  import { morph } from '@actions/morph';
   import { tooltip } from '@actions/tooltip';
 
   interface LineChartPoint {
@@ -284,6 +285,7 @@
   bind:this={wrapperEl}
   class="chart-line relative {className}"
   data-animated={animated}
+  use:morph={{ height: true, width: false }}
 >
   <svg
     bind:this={svgEl}

@@ -19,6 +19,7 @@
   ANIMATION: Bars grow from bottom with staggered delay (uses chart-grow-bar keyframe).
 -->
 <script lang="ts">
+  import { morph } from '@actions/morph';
   import { tooltip } from '@actions/tooltip';
   import { TOOLTIP_CHART_LABEL_OFFSET_PX } from '@config/ui-geometry';
 
@@ -270,6 +271,7 @@
   class="chart-bar relative {className}"
   data-animated={animated}
   data-orientation={orientation}
+  use:morph={{ height: true, width: false }}
 >
   <svg
     class="block w-full h-auto"
