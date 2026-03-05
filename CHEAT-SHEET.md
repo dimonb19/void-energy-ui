@@ -2373,18 +2373,20 @@ See [`use:tooltip` action docs](#b-tooltip-usetooltip) for full options.
 | Warning | `data-type="warning"` | Premium/gold accent |
 | Loading | `data-type="loading"` | Muted accent, spinner icon |
 
+**Behavior:** Toasts pause auto-dismiss on hover and resume on mouse leave. Non-loading toasts show a close (X) button for manual dismissal.
+
 **Sub-elements:**
 
 | Class | Description |
 | --- | --- |
-| `.toast-dismiss` | Dismiss button wrapping icon + text. `btn-reset` base, pill focus ring, keyboard-focusable. Clicking dismisses the toast |
-| `.toast-icon` | Type-driven icon inside dismiss button, colored by `--toast-accent`. Layout (`flex items-center justify-center shrink-0`) via Tailwind |
-| `.toast-text` | Message content inside dismiss button |
-| `.toast-action` | Optional inline action button (e.g., Undo) beside the dismiss button. Accent-colored, underlined; retro: solid border |
+| `.toast-icon` | Type-driven icon colored by `--toast-accent`. Layout (`flex items-center justify-center shrink-0`) via Tailwind |
+| `.toast-text` | Message content |
+| `.toast-action` | Optional inline action button (e.g., Undo). Accent-colored with `btn-reset` base; retro: solid border |
+| `.toast-close` | Dismiss X button (`btn-reset` base, pill radius, `shrink-0` via Tailwind). Hidden for loading toasts |
 
 **Physics:**
-- **Glass:** `glass-float` + `glass-blur`, glow on hover
-- **Flat/Light:** Reduced blend (5%), subtle lift on hover
+- **Glass:** `glass-float` + `glass-blur`, accent glow on hover
+- **Flat/Light:** Reduced blend (5%), subtle accent border on hover
 - **Retro:** Canvas blend (10%), solid border, stepped spinner
 
 See [toast.svelte.ts](src/stores/toast.svelte.ts) for state management.
@@ -4000,6 +4002,10 @@ toast.show('File uploaded', 'success', 5000, {
   label: 'View',
   onclick: () => navigateTo('/files'),
 });
+
+// Pause/resume (used internally by Toast.svelte on hover)
+toast.pause(id);   // Pause auto-dismiss timer
+toast.resume(id);  // Resume with remaining time
 ```
 
 ---
@@ -4604,10 +4610,10 @@ When used inside a `<dialog>` element, morph automatically:
 **Toast Message (width only):**
 
 ```svelte
-<button class="toast-message" use:morph={{ height: false }}>
+<div class="toast-message" use:morph={{ height: false }}>
   {#if loading}<LoadingSpin />{:else}<Checkmark />{/if}
   <span>{message}</span>
-</button>
+</div>
 ```
 
 **PullRefresh Indicator:**

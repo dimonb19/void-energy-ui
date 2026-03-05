@@ -286,6 +286,8 @@ Registry: src/config/modal-registry.ts (add new fragments here)
 .clearAll()                                Remove all toasts
 .loading(message)                          Returns controller: { update, success, error, warning, close }
 .promise(promise, { loading, success, error })
+.pause(id)                                 Pause auto-dismiss timer (called on mouseenter)
+.resume(id)                                Resume auto-dismiss timer (called on mouseleave)
 ```
 
 ### Layer Stack (`import { layerStack } from '@lib/layer-stack.svelte'`)

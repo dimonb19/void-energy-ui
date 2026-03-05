@@ -58,13 +58,16 @@
             </button>
             <button
               class="btn-ghost"
-              onclick={() => toast.show('Duplicated', 'success')}
+              onclick={() => toast.show('Item duplicated', 'success')}
             >
               Duplicate
             </button>
             <button
               class="btn-ghost btn-error"
-              onclick={() => toast.show('Deleted', 'error')}
+              onclick={() =>
+                toast.undo('Item deleted', () =>
+                  toast.show('Item restored', 'success'),
+                )}
             >
               Delete
             </button>
@@ -110,33 +113,36 @@
           <div class="flex flex-col p-md gap-xs">
             <button
               class="btn-ghost"
-              onclick={() => toast.show('Renamed', 'success')}
+              onclick={() => toast.show('Item renamed', 'success')}
             >
               Rename
             </button>
             <button
               class="btn-ghost"
-              onclick={() => toast.show('Duplicated', 'success')}
+              onclick={() => toast.show('Item duplicated', 'success')}
             >
               Duplicate
             </button>
             <hr />
             <button
               class="btn-ghost"
-              onclick={() => toast.show('Link copied', 'info')}
+              onclick={() => toast.show('Link copied', 'success')}
             >
               Copy Link
             </button>
             <button
               class="btn-ghost"
-              onclick={() => toast.show('Exported', 'success')}
+              onclick={() => toast.show('Item exported', 'success')}
             >
               Export
             </button>
             <hr />
             <button
               class="btn-ghost btn-error"
-              onclick={() => toast.show('Moved to trash', 'error')}
+              onclick={() =>
+                toast.undo('Item moved to trash', () =>
+                  toast.show('Item restored', 'success'),
+                )}
             >
               Delete
             </button>
@@ -232,7 +238,10 @@
           label="Controlled dropdown"
           bind:open={controlledOpen}
           onchange={(isOpen) =>
-            toast.show(isOpen ? 'Opened' : 'Closed', 'info')}
+            toast.show(
+              isOpen ? 'Details expanded' : 'Details collapsed',
+              'info',
+            )}
         >
           {#snippet trigger()}
             <span class="flex items-center gap-xs">

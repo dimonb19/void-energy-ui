@@ -1,7 +1,6 @@
 /* Toast region and capsule styles. */
 
 @use '../abstracts' as *;
-@use 'buttons';
 
 // ==========================================================================
 // 1. REGION & LAYOUT
@@ -13,9 +12,9 @@
   left: 50%;
   transform: translateX(-50%);
 
-  // void-exception: Popover UA reset coupling + behavioral column-reverse stacking order.
+  // void-ignore (Popover UA reset — column-reverse stacking order requires SCSS-owned flex context)
   display: flex;
-  flex-direction: column-reverse; // Newest at bottom visually
+  flex-direction: column-reverse;
   align-items: center;
   gap: var(--space-xs);
   pointer-events: none;
@@ -57,11 +56,10 @@
 // ==========================================================================
 
 .toast-message {
-  @extend .btn-void; // Base button reset
-
   // Physics (glass capsule).
   @include glass-float;
   pointer-events: auto;
+  cursor: default;
 
   // Layout (flex items-center justify-center gap-xs) lives on the template via Tailwind.
 
@@ -100,14 +98,12 @@
   // Blur
   @include glass-blur;
 
+  // Hover feedback — signals that the toast is paused while hovered.
   &:hover {
     border-color: alpha(var(--toast-accent), 50%);
-    box-shadow: var(--shadow-lift);
 
     @include when-glass {
-      box-shadow:
-        var(--shadow-lift),
-        0 0 15px -4px alpha(var(--toast-accent), 60%); // void-ignore (Glow Physics)
+      box-shadow: 0 0 15px -4px alpha(var(--toast-accent), 60%); // void-ignore (Glow Physics)
     }
   }
 
@@ -136,25 +132,13 @@
   }
 }
 
-.toast-dismiss {
-  @include btn-reset;
-  border-radius: var(--radius-full);
-  color: inherit;
-  text-align: left;
-  min-width: 0;
-
-  &:focus-visible {
-    box-shadow: var(--focus-ring);
-  }
-}
-
 // ==========================================================================
 // 3. ICONS & LOADER (Micro-Indicators)
 // ==========================================================================
 
 .toast-icon {
   // Layout (flex items-center justify-center shrink-0) lives on the template via Tailwind.
-  font-size: 1.1em; // Emojis look better slightly larger
+  font-size: 1.1em; // void-ignore (Emoji optical sizing — relative scale, no token equivalent)
   line-height: 1;
   color: var(--toast-accent);
 }
@@ -218,6 +202,57 @@
   @include when-light {
     &:hover {
       background: alpha(var(--toast-accent), 10%);
+    }
+  }
+}
+
+// ==========================================================================
+// 6. CLOSE BUTTON (Dismiss via X)
+// ==========================================================================
+
+.toast-close {
+  @include btn-reset;
+
+  color: var(--text-mute);
+  padding: var(--space-xs);
+  border-radius: var(--radius-full);
+
+  transition:
+    color var(--speed-fast) var(--ease-spring-snappy),
+    background-color var(--speed-fast) var(--ease-spring-snappy);
+
+  @media (hover: hover) {
+    &:hover {
+      color: var(--text-main);
+      background: alpha(var(--text-main), 10%);
+    }
+  }
+
+  &:active {
+    color: var(--text-main);
+    background: alpha(var(--text-main), 15%);
+  }
+
+  &:focus-visible {
+    box-shadow: var(--focus-ring);
+  }
+
+  @include when-retro {
+    &:hover {
+      background: transparent;
+      filter: brightness(1.25);
+    }
+
+    &:active {
+      filter: none;
+    }
+  }
+
+  @include when-light {
+    @media (hover: hover) {
+      &:hover {
+        background: alpha(var(--text-main), 8%);
+      }
     }
   }
 }

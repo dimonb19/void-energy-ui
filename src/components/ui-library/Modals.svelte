@@ -81,7 +81,6 @@
               'This will clear all cached data and force a full resync. Continue?',
               {
                 onConfirm: () => toast.show('Cache purged', 'success'),
-                onCancel: () => toast.show('Cancelled', 'info'),
               },
             )}
         >
@@ -94,7 +93,7 @@
               'Delete Module',
               'This action is <strong>irreversible</strong>. The module and all associated data will be permanently removed.',
               {
-                onConfirm: () => toast.show('Module deleted', 'error'),
+                onConfirm: () => toast.show('Module deleted', 'success'),
                 cost: 150,
               },
             )}

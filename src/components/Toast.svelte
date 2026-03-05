@@ -1,7 +1,7 @@
 <script lang="ts">
   import { toast } from '@stores/toast.svelte';
   import { emerge, dissolve } from '@lib/transitions.svelte';
-  import { Info, Check, TriangleAlert, X } from '@lucide/svelte';
+  import { Info, Check, TriangleAlert, X, CircleX } from '@lucide/svelte';
   import LoadingSpin from './icons/LoadingSpin.svelte';
   import Undo from './icons/Undo.svelte';
 
@@ -9,7 +9,7 @@
     info: Info,
     success: Check,
     warning: TriangleAlert,
-    error: X,
+    error: CircleX,
   };
 
   let region = $state<HTMLElement | null>(null);
@@ -52,7 +52,6 @@
   popover="manual"
   role="status"
   aria-live="polite"
-  aria-atomic="true"
 >
   {#each toast.items as item (item.id)}
     <div
@@ -63,37 +62,44 @@
       out:dissolve={{ y: 0 }}
       onoutrostart={() => (animatingOut = true)}
       onoutroend={() => (animatingOut = false)}
+      onmouseenter={() => toast.pause(item.id)}
+      onmouseleave={() => toast.resume(item.id)}
     >
-      <button
-        type="button"
-        class="toast-dismiss inline-flex items-center justify-center gap-xs"
-        onclick={() => toast.close(item.id)}
+      <span
+        class="toast-icon flex items-center justify-center shrink-0"
+        aria-hidden="true"
       >
-        <span
-          class="toast-icon flex items-center justify-center shrink-0"
-          aria-hidden="true"
-        >
-          {#if item.type === 'loading'}
-            <LoadingSpin class="text-main" data-size="lg" />
-          {:else}
-            {@const Icon = icons[item.type] ?? icons.info}
-            <Icon class="icon" />
-          {/if}
-        </span>
+        {#if item.type === 'loading'}
+          <LoadingSpin class="text-main" data-size="lg" />
+        {:else}
+          {@const Icon = icons[item.type] ?? icons.info}
+          <Icon class="icon" />
+        {/if}
+      </span>
 
-        <span class="toast-text">{item.message}</span>
-      </button>
+      <span class="toast-text">{item.message}</span>
 
       {#if item.action}
         <button
           type="button"
-          class="toast-action btn-ghost btn-sm inline-flex items-center gap-xs"
+          class="btn-void toast-action inline-flex items-center gap-xs px-xs"
           onclick={() => item.action!.onclick()}
         >
           {#if item.action.label === 'Undo'}
             <Undo data-size="sm" />
           {/if}
           {item.action.label}
+        </button>
+      {/if}
+
+      {#if item.type !== 'loading'}
+        <button
+          type="button"
+          class="btn-void toast-close shrink-0"
+          onclick={() => toast.close(item.id)}
+          aria-label="Dismiss"
+        >
+          <X class="icon" data-size="sm" />
         </button>
       {/if}
     </div>

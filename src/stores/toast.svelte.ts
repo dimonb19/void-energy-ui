@@ -7,6 +7,12 @@ class ToastStore {
   // Timer registry for auto-dismiss toasts.
   private timers = new Map<number, ReturnType<typeof setTimeout>>();
 
+  // Tracks timing metadata for pause/resume on hover.
+  private timerMeta = new Map<
+    number,
+    { startedAt: number; remaining: number }
+  >();
+
   // Counter to ensure unique IDs even within the same millisecond.
   private counter = 0;
 
@@ -27,10 +33,7 @@ class ToastStore {
     this.items.push({ id, message, type, action });
 
     if (type !== 'loading') {
-      const timer = setTimeout(() => {
-        this.close(id);
-      }, duration);
-      this.timers.set(id, timer);
+      this.startTimer(id, duration);
     }
 
     return id;
@@ -61,6 +64,7 @@ class ToastStore {
       clearTimeout(timer);
       this.timers.delete(id);
     }
+    this.timerMeta.delete(id);
 
     // Remove from the queue.
     this.items = this.items.filter((t) => t.id !== id);
@@ -82,8 +86,46 @@ class ToastStore {
     item.message = message;
     item.type = type;
 
+    this.startTimer(id, duration);
+  }
+
+  /**
+   * Starts (or restarts) an auto-dismiss timer for a toast.
+   */
+  private startTimer(id: number, duration: number) {
+    // Clear any existing timer for this ID (transition reuse).
+    const existing = this.timers.get(id);
+    if (existing) clearTimeout(existing);
+
     const timer = setTimeout(() => this.close(id), duration);
     this.timers.set(id, timer);
+    this.timerMeta.set(id, { startedAt: Date.now(), remaining: duration });
+  }
+
+  /**
+   * Pauses auto-dismiss for a toast. Call on mouseenter.
+   */
+  pause(id: number) {
+    const timer = this.timers.get(id);
+    const meta = this.timerMeta.get(id);
+    if (!timer || !meta) return;
+
+    clearTimeout(timer);
+    this.timers.delete(id);
+    meta.remaining = Math.max(
+      0,
+      meta.remaining - (Date.now() - meta.startedAt),
+    );
+  }
+
+  /**
+   * Resumes auto-dismiss for a toast. Call on mouseleave.
+   */
+  resume(id: number) {
+    const meta = this.timerMeta.get(id);
+    if (!meta || this.timers.has(id)) return;
+
+    this.startTimer(id, meta.remaining);
   }
 
   /**
@@ -171,6 +213,7 @@ class ToastStore {
   clearAll() {
     this.timers.forEach((t) => clearTimeout(t));
     this.timers.clear();
+    this.timerMeta.clear();
     this.items = [];
   }
 }

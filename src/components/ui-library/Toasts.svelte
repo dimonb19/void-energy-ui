@@ -140,8 +140,54 @@
       </div>
 
       <p class="text-caption text-mute px-xs">
-        Click the action button inside the toast to trigger the callback.
-        Clicking the toast body (outside the action) dismisses it normally.
+        Click the action button inside the toast to trigger the callback. Use
+        the X button to dismiss a toast early, or wait for auto-dismiss.
+      </p>
+    </div>
+
+    <!-- LONG MESSAGES -->
+    <div class="flex flex-col gap-sm">
+      <h5>Long Messages</h5>
+      <p class="text-small text-mute">
+        Toasts gracefully handle longer content. The capsule stretches
+        horizontally to fit, capped by the region&rsquo;s max-width.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
+        <button
+          onclick={() =>
+            toast.show(
+              'Your session will expire in 5 minutes due to inactivity. Save your work to avoid losing unsaved changes.',
+              'warning',
+            )}
+        >
+          Warning
+        </button>
+        <button
+          class="btn-error"
+          onclick={() =>
+            toast.show(
+              'Failed to save document — the server returned a 503 error. Please check your connection and try again.',
+              'error',
+            )}
+        >
+          Error
+        </button>
+        <button
+          class="btn-success"
+          onclick={() =>
+            toast.undo(
+              '3 items moved to trash. This action will be permanent after 30 days.',
+              () => toast.show('Items restored', 'success'),
+            )}
+        >
+          Undo
+        </button>
+      </div>
+
+      <p class="text-caption text-mute px-xs">
+        Keep messages concise when possible, but longer text is fully supported
+        for cases that need additional context.
       </p>
     </div>
 
