@@ -20,8 +20,10 @@
   import FloatingUI from './ui-library/FloatingUI.svelte';
   import Toasts from './ui-library/Toasts.svelte';
   import Modals from './ui-library/Modals.svelte';
-  // Effects
+  // Effects & Motion
   import Effects from './ui-library/Effects.svelte';
+  import KineticTextShowcase from './ui-library/KineticText.svelte';
+  import MotionPrimitives from './ui-library/MotionPrimitives.svelte';
   // Data Visualization
   import Charts from './ui-library/Charts.svelte';
 
@@ -62,8 +64,12 @@
       ],
     },
     {
-      label: 'Effects',
-      items: [{ id: 'effects', label: 'Effects' }],
+      label: 'Effects & Motion',
+      items: [
+        { id: 'loading-states', label: 'Loading States' },
+        { id: 'kinetic-text', label: 'Kinetic Text' },
+        { id: 'motion-primitives', label: 'Motion Primitives' },
+      ],
     },
     {
       label: 'Data Visualization',
@@ -232,12 +238,14 @@
           <hr />
 
           <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
-            <h3 class="text-dim">Effects</h3>
+            <h3 class="text-dim">Effects & Motion</h3>
             <p class="text-small text-mute">
-              Physics-aware visual effects and loading state animations.
+              Loading indicators, kinetic typography, and motion primitives.
             </p>
           </div>
           <Effects />
+          <KineticTextShowcase />
+          <MotionPrimitives />
 
           <hr />
 
