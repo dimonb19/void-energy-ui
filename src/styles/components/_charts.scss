@@ -69,7 +69,7 @@ $_chart-series: (
 @mixin _chart-series-fill {
   @each $i, $color in $_chart-series {
     &[data-series='#{$i}'] {
-      fill: alpha($color, 80%);
+      fill: alpha($color, 90%);
 
       @include when-glass {
         filter: drop-shadow(
@@ -77,21 +77,10 @@ $_chart-series: (
         ); // void-ignore (Glow Physics)
       }
 
-      @include when-flat {
-        fill: alpha($color, 70%);
-        filter: none;
-      }
-
       @include when-retro {
-        fill: alpha($color, 20%);
+        fill: alpha($color, 70%);
         stroke: $color;
         stroke-width: var(--physics-border-width);
-        filter: none;
-      }
-
-      @include when-light {
-        fill: alpha($color, 65%);
-        filter: none;
       }
     }
   }
@@ -111,17 +100,8 @@ $_chart-series: (
         ); // void-ignore (Glow Physics)
       }
 
-      @include when-flat {
-        filter: none;
-      }
-
-      @include when-retro {
-        filter: none;
-      }
-
       @include when-light {
         stroke: shade($color, 20%);
-        filter: none;
       }
     }
   }
@@ -134,14 +114,6 @@ $_chart-series: (
   @each $i, $color in $_chart-series {
     &[data-series='#{$i}'] {
       fill: alpha($color, 15%);
-
-      @include when-retro {
-        fill: alpha($color, 8%);
-      }
-
-      @include when-light {
-        fill: alpha($color, 12%);
-      }
     }
   }
 }
@@ -201,12 +173,10 @@ $_chart-series: (
 // --------------------------------------------------------------------------
 @mixin _chart-grid {
   .chart-grid-line {
-    stroke: alpha(var(--border-color), 40%);
+    stroke: alpha(var(--border-color), 60%);
     stroke-width: 1px; // void-ignore (Grid hairline — sub-token scale)
 
     @include when-retro {
-      stroke: var(--border-color);
-      stroke-width: var(--physics-border-width);
       stroke-dasharray: 4 4; // void-ignore (Grid Physics — stepped pattern)
     }
 
@@ -416,14 +386,6 @@ $_chart-series: (
   .chart-donut-track {
     fill: none;
     stroke: alpha(var(--border-color), 20%);
-
-    @include when-retro {
-      stroke: var(--border-color);
-    }
-
-    @include when-light {
-      stroke: alpha(var(--border-color), 15%);
-    }
   }
 
   .chart-donut-value {
@@ -727,14 +689,6 @@ $_chart-series: (
   .chart-progress-track {
     fill: none;
     stroke: alpha(var(--border-color), 20%);
-
-    @include when-retro {
-      stroke: var(--border-color);
-    }
-
-    @include when-light {
-      stroke: alpha(var(--border-color), 15%);
-    }
   }
 
   .chart-progress-fill {

@@ -111,6 +111,7 @@
       stroke-dasharray="{fillLength} {gapLength}"
       stroke-dashoffset={circumference / 4}
       data-series={series}
+      opacity={fraction > 0 ? 1 : 0}
     />
 
     <!-- Center value label -->
