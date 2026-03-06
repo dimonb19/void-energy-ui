@@ -63,7 +63,7 @@
         'bg-canvas': '#05010a',
         'bg-spotlight': '#1a0526',
         'bg-surface': 'rgba(20, 5, 30, 0.6)',
-        'bg-sink': 'rgba(10, 0, 15, 0.8)',
+        'bg-sunk': 'rgba(10, 0, 15, 0.8)',
         'energy-primary': '#ff0077',
         'energy-secondary': '#00e5ff',
         'border-color': 'rgba(255, 0, 119, 0.3)',
@@ -355,12 +355,12 @@
             </div>
             <div
               class="flex flex-col items-center gap-xs"
-              use:tooltip={'var(--bg-sink)'}
+              use:tooltip={'var(--bg-sunk)'}
             >
               <span
-                class="block w-3xl h-xl rounded-sm bg-sink border-solid border-border"
+                class="block w-3xl h-xl rounded-sm bg-sunk border-solid border-border"
               ></span>
-              <code class="text-caption">bg-sink</code>
+              <code class="text-caption">bg-sunk</code>
             </div>
             <div
               class="flex flex-col items-center gap-xs"

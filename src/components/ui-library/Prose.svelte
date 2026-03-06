@@ -815,7 +815,7 @@ E = mc&lt;sup&gt;2&lt;/sup&gt;
         </audio>
 
         <p class="text-small text-dim">
-          <code>&lt;iframe&gt;</code> &mdash; physics border, radius, and sink background:
+          <code>&lt;iframe&gt;</code> &mdash; physics border, radius, and sunk background:
         </p>
         <iframe
           src="about:blank"
@@ -826,7 +826,7 @@ E = mc&lt;sup&gt;2&lt;/sup&gt;
         <p class="text-small text-dim">
           <code>&lt;canvas&gt;</code> &mdash; block display, responsive:
         </p>
-        <canvas width="400" height="60" style="background: var(--bg-sink);"
+        <canvas width="400" height="60" style="background: var(--bg-sunk);"
         ></canvas>
       </div>
 

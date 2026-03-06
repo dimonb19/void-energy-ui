@@ -96,7 +96,7 @@ export const VOID_CONTAINER = {
  * Semantic z-index scale for stacking context management
  */
 export const VOID_LAYERS = {
-  sink: '-1', // Below canvas (background patterns)
+  sunk: '-1', // Below canvas (background patterns)
   floor: '0', // Canvas level
   base: '1', // Default element layer
   decorate: '2', // Decorative elements
@@ -522,7 +522,7 @@ export const VOID_TOKENS = {
         'bg-canvas': '#010020',
         'bg-spotlight': '#0a0c2b',
         'bg-surface': 'rgba(22, 30, 95, 0.4)', // 40% Opacity for Glass
-        'bg-sink': 'rgba(0, 2, 41, 0.6)',
+        'bg-sunk': 'rgba(0, 2, 41, 0.6)',
         'energy-primary': '#33e2e6', // Cyan
         'energy-secondary': '#3875fa', // Blue
         'border-color': 'rgba(56, 117, 250, 0.2)',
@@ -544,7 +544,7 @@ export const VOID_TOKENS = {
         'bg-canvas': '#000000',
         'bg-spotlight': '#1c1c1c',
         'bg-surface': 'rgba(30, 30, 30, 0.6)',
-        'bg-sink': '#000000',
+        'bg-sunk': '#000000',
         'energy-primary': '#ffffff',
         'energy-secondary': '#a3a3a3',
         'border-color': 'rgba(255, 255, 255, 0.15)',
@@ -566,7 +566,7 @@ export const VOID_TOKENS = {
         'bg-canvas': '#050505',
         'bg-spotlight': '#141414',
         'bg-surface': 'rgba(0, 20, 0, 0.9)',
-        'bg-sink': '#000000',
+        'bg-sunk': '#000000',
         'energy-primary': '#f5c518', // Amber
         'energy-secondary': '#f5c518',
         'border-color': 'rgba(245, 197, 24, 0.5)',
@@ -589,7 +589,7 @@ export const VOID_TOKENS = {
         'bg-canvas': '#0a0014',
         'bg-spotlight': '#240046',
         'bg-surface': 'rgba(20, 0, 40, 0.6)',
-        'bg-sink': 'rgba(10, 0, 20, 0.8)',
+        'bg-sunk': 'rgba(10, 0, 20, 0.8)',
         'energy-primary': '#d946ef',
         'energy-secondary': '#8b5cf6',
         'border-color': 'rgba(217, 70, 239, 0.2)',
@@ -611,7 +611,7 @@ export const VOID_TOKENS = {
         'bg-canvas': '#120a00',
         'bg-spotlight': '#2b1d00',
         'bg-surface': 'rgba(20, 10, 0, 0.6)',
-        'bg-sink': 'rgba(0, 0, 0, 0.4)',
+        'bg-sunk': 'rgba(0, 0, 0, 0.4)',
         'energy-primary': '#ffaa00',
         'energy-secondary': '#b8860b',
         'border-color': 'rgba(255, 170, 0, 0.25)',
@@ -633,7 +633,7 @@ export const VOID_TOKENS = {
         'bg-canvas': '#051a0a',
         'bg-spotlight': '#0e2e14',
         'bg-surface': 'rgba(0, 40, 10, 0.5)',
-        'bg-sink': 'rgba(0, 20, 5, 0.8)',
+        'bg-sunk': 'rgba(0, 20, 5, 0.8)',
         'energy-primary': '#39ff14',
         'energy-secondary': '#ffd700',
         'border-color': 'rgba(57, 255, 20, 0.2)',
@@ -655,7 +655,7 @@ export const VOID_TOKENS = {
         'bg-canvas': '#1a0510',
         'bg-spotlight': '#2e0b1d',
         'bg-surface': 'rgba(50, 0, 20, 0.5)',
-        'bg-sink': 'rgba(30, 0, 10, 0.8)',
+        'bg-sunk': 'rgba(30, 0, 10, 0.8)',
         'energy-primary': '#ff80a0',
         'energy-secondary': '#c71585',
         'border-color': 'rgba(255, 128, 160, 0.2)',
@@ -677,7 +677,7 @@ export const VOID_TOKENS = {
         'bg-canvas': '#180808',
         'bg-spotlight': '#2b0f0f',
         'bg-surface': 'rgba(60, 0, 0, 0.6)',
-        'bg-sink': 'rgba(20, 0, 0, 0.8)',
+        'bg-sunk': 'rgba(20, 0, 0, 0.8)',
         'energy-primary': '#ff6b6b',
         'energy-secondary': '#8a0000',
         'border-color': 'rgba(255, 107, 107, 0.2)',
@@ -703,7 +703,7 @@ export const VOID_TOKENS = {
         'bg-canvas': '#faeed1',
         'bg-spotlight': '#fff8e1',
         'bg-surface': '#fdf6e3',
-        'bg-sink': 'rgba(0, 0, 0, 0.03)',
+        'bg-sunk': 'rgba(0, 0, 0, 0.03)',
         'energy-primary': '#2c3e50',
         'energy-secondary': '#8d6e63',
         'border-color': 'rgba(141, 110, 99, 0.7)',
@@ -725,7 +725,7 @@ export const VOID_TOKENS = {
         'bg-canvas': '#ffffff',
         'bg-spotlight': '#f5f5f5',
         'bg-surface': '#ffffff',
-        'bg-sink': '#f0f0f0',
+        'bg-sunk': '#f0f0f0',
         'energy-primary': '#000000',
         'energy-secondary': '#000000',
         'border-color': '#000000',
@@ -747,7 +747,7 @@ export const VOID_TOKENS = {
         'bg-canvas': '#f1f5f9',
         'bg-spotlight': '#ffffff',
         'bg-surface': '#ffffff',
-        'bg-sink': 'rgba(0, 0, 0, 0.05)',
+        'bg-sunk': 'rgba(0, 0, 0, 0.05)',
         'energy-primary': '#005bb5',
         'energy-secondary': '#64748b',
         'border-color': 'rgba(0, 91, 181, 0.35)',
@@ -769,7 +769,7 @@ export const VOID_TOKENS = {
         'bg-canvas': '#e0f7fa',
         'bg-spotlight': '#ffffff',
         'bg-surface': '#ffffff',
-        'bg-sink': 'rgba(0, 0, 0, 0.05)',
+        'bg-sunk': 'rgba(0, 0, 0, 0.05)',
         'energy-primary': '#ff4081',
         'energy-secondary': '#00bcd4',
         'border-color': '#00bcd4',

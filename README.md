@@ -77,7 +77,7 @@ We separate **Layout** (Geometry) from **Materials** (Physics).
 | Concept | Rule |
 | :--- | :--- |
 | **Material is Truth** | **Glass:** Blur, Shadows, Glows (0.3s cubic-bezier).<br>**Flat:** Borders, Drop Shadows, No Glows (0.2s ease-out).<br>**Retro:** Pixel Borders, No Shadows (0s steps). |
-| **Depth is Tiered** | **Sink (-Z):** Inputs/Wells (`shadow-sunk`).<br>**Float (+Z):** Cards/Surfaces (`shadow-float`).<br>**Lift (++Z):** Interactive/Modals (`shadow-lift`). |
+| **Depth is Tiered** | **Sunk (-Z):** Inputs/Wells (`shadow-sunk`).<br>**Float (+Z):** Cards/Surfaces (`shadow-float`).<br>**Lift (++Z):** Interactive/Modals (`shadow-lift`). |
 | **Atmosphere is Context** | The UI adapts to the story. Switching from `void` to `paper` changes physics instantly. |
 
 ### 4. The Single Source of Truth
@@ -181,7 +181,7 @@ If a collaborator needs to inject a custom brand theme, send a JSON payload matc
   "palette": {
     "bg-canvas": "#ffffff",
     "bg-surface": "#f0f0f0",
-    "bg-sink": "#e0e0e0",
+    "bg-sunk": "#e0e0e0",
     "bg-spotlight": "#ffffff",
     "energy-primary": "#0066cc",
     "energy-secondary": "#99ccff",

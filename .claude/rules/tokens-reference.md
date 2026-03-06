@@ -19,7 +19,7 @@ Tailwind: gap-xs, p-sm, m-lg, etc.  |  SCSS: var(--space-md)
 
 ## Colors (CSS variables, theme-reactive)
 ```
-Canvas:     --bg-canvas  --bg-surface  --bg-sink  --bg-spotlight
+Canvas:     --bg-canvas  --bg-surface  --bg-sunk  --bg-spotlight
 Energy:     --energy-primary  --energy-secondary
 Text:       --text-main  --text-dim  --text-mute
 Border:     --border-color
@@ -42,7 +42,7 @@ Radius:     --radius-base(glass:8px flat:4px retro:0)  --radius-full(pill, 0 in 
 
 ## Z-Index (use z() function in SCSS)
 ```
-sink(-1)  floor(0)  base(1)  decorate(2)  float(10)  sticky(20)  header(40)  dropdown(50)  overlay(90)
+sunk(-1)  floor(0)  base(1)  decorate(2)  float(10)  sticky(20)  header(40)  dropdown(50)  overlay(90)
 ```
 
 ## Typography

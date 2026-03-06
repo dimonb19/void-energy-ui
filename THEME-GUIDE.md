@@ -49,7 +49,7 @@ export const VOID_TOKENS = {
         'bg-canvas': '#010020',
         'bg-spotlight': '#0a0c2b',
         'bg-surface': 'rgba(22, 30, 95, 0.4)',
-        'bg-sink': 'rgba(0, 2, 41, 0.6)',
+        'bg-sunk': 'rgba(0, 2, 41, 0.6)',
 
         // Layer 3: Energy
         'energy-primary': '#33e2e6',
@@ -148,7 +148,7 @@ graph TB
         S["bg-surface"]
     end
     subgraph "Layer 1: CANVAS (Foundation)"
-        C["bg-canvas<br/>bg-sink<br/>bg-spotlight"]
+        C["bg-canvas<br/>bg-sunk<br/>bg-spotlight"]
     end
 ```
 
@@ -165,7 +165,7 @@ The absolute foundation of your theme. Everything renders on top of this.
 - **Example:** `#010020` (Deep blue-black for "void" theme)
 - **Rule:** Must be the **darkest** tone in dark mode, **lightest** in light mode
 
-#### `bg-sink`
+#### `bg-sunk`
 
 - **Role:** Recessed areas (Inputs, Wells, Sidebars)
 - **Context:** Appears "carved" into the canvas
@@ -505,7 +505,7 @@ Here's a fully annotated theme to use as a template.
     'bg-canvas': '#0a0014',              // Deep purple-black
     'bg-spotlight': '#1a0028',           // Lighter purple for gradients (↑ from canvas)
     'bg-surface': 'rgba(30, 0, 50, 0.4)', // 40% opacity for glass blur effect
-    'bg-sink': 'rgba(5, 0, 10, 0.8)',    // Very dark, recessed areas
+    'bg-sunk': 'rgba(5, 0, 10, 0.8)',    // Very dark, recessed areas
 
     // 4. LAYER 3: ENERGY (Brand & Interaction)
     'energy-primary': '#ff00ff',         // Neon magenta (high contrast with bg-surface)

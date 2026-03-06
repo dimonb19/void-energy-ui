@@ -157,10 +157,10 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
     // Flat: solid thumb, subtle track
     @include when-flat {
       &:hover {
-        scrollbar-color: var(--energy-secondary) var(--bg-sink);
+        scrollbar-color: var(--energy-secondary) var(--bg-sunk);
 
         &::-webkit-scrollbar-track {
-          background: var(--bg-sink);
+          background: var(--bg-sunk);
           border-radius: var(--radius-full);
         }
 
@@ -190,10 +190,10 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
       }
 
       &:hover {
-        scrollbar-color: var(--energy-primary) var(--bg-sink);
+        scrollbar-color: var(--energy-primary) var(--bg-sunk);
 
         &::-webkit-scrollbar-track {
-          background: var(--bg-sink);
+          background: var(--bg-sunk);
           border-radius: 0;
           border: var(--physics-border-width) solid var(--border-color);
         }

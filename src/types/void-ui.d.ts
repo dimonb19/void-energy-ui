@@ -53,7 +53,7 @@ interface VoidPalette {
   'bg-surface': string;
 
   /** Recessed surface for inputs (carved into the void, z-index negative) */
-  'bg-sink': string;
+  'bg-sunk': string;
 
   /** Gradient spotlight overlay (radial-gradient endpoint) */
   'bg-spotlight': string;

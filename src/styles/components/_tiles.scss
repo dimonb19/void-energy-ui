@@ -104,7 +104,7 @@
   // Physics base: mixin with custom background/padding.
   @include glass-float($interactive: true);
   padding: 0; // Images are full bleed
-  background: var(--bg-sink); // Darker than standard cards
+  background: var(--bg-sunk); // Darker than standard cards
 
   text-decoration: none !important;
   overflow: hidden;
@@ -218,7 +218,7 @@
 // --------------------------------------------------------------------------
 .loading-tile {
   @extend .tile;
-  background: var(--bg-sink);
+  background: var(--bg-sunk);
   pointer-events: none; // Non-interactive
 
   h5,

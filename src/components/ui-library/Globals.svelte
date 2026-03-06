@@ -102,13 +102,13 @@
 
   // Flat: solid minimal
   @include when-flat &#123;
-    scrollbar-color: var(--energy-secondary) var(--bg-sink);
+    scrollbar-color: var(--energy-secondary) var(--bg-sunk);
   &#125;
 
   // Retro: chunky double-width
   @include when-retro &#123;
     scrollbar-width: auto;
-    scrollbar-color: var(--energy-primary) var(--bg-sink);
+    scrollbar-color: var(--energy-primary) var(--bg-sunk);
   &#125;
 &#125;
 

@@ -67,7 +67,7 @@
         <h5>.surface-sunk</h5>
         <p class="text-small text-mute">
           Recessed container. Inset shadow creates depth. Background uses
-          <code>--bg-sink</code> token.
+          <code>--bg-sunk</code> token.
         </p>
       </div>
     </div>

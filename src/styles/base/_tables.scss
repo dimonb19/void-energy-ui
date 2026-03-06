@@ -124,10 +124,10 @@ tbody tr {
 // --------------------------------------------------------------------------
 
 .table-striped tbody tr:nth-child(even) {
-  background-color: alpha(var(--bg-sink), 50%);
+  background-color: alpha(var(--bg-sunk), 50%);
 
   @include when-glass($low-specificity: true) {
-    background-color: alpha(var(--bg-sink), 30%);
+    background-color: alpha(var(--bg-sunk), 30%);
   }
 
   @include when-retro($low-specificity: true) {
@@ -135,7 +135,7 @@ tbody tr {
   }
 
   @include when-light($low-specificity: true) {
-    background-color: alpha(var(--bg-sink), 60%);
+    background-color: alpha(var(--bg-sunk), 60%);
   }
 }
 

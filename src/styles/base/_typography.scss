@@ -311,7 +311,7 @@ code {
   color: var(--text-main);
 
   // Inline recessed surface (lighter than glass-sunk).
-  background: var(--bg-sink);
+  background: var(--bg-sunk);
   border: var(--physics-border-width) solid var(--border-color);
   border-radius: calc(var(--radius-base) * 0.5);
   padding: 0.125em 0.375em;
@@ -319,7 +319,7 @@ code {
   // Prevent line-break inside short code fragments.
   white-space: nowrap;
 
-  // Light mode: bg-sink can be too subtle (3-5% opacity).
+  // Light mode: bg-sunk can be too subtle (3-5% opacity).
   @include when-light($low-specificity: true) {
     background: alpha(var(--text-main), 7%);
   }

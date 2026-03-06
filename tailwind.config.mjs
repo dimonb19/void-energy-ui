@@ -61,7 +61,7 @@ export default {
       // Layer 1: Canvas
       canvas: 'var(--bg-canvas)',
       surface: 'var(--bg-surface)',
-      sink: 'var(--bg-sink)',
+      sunk: 'var(--bg-sunk)',
       spotlight: 'var(--bg-spotlight)',
       // Layer 2: Energy
       primary: 'var(--energy-primary)',

@@ -57,7 +57,7 @@
 // MIXIN: Sunk Surface (Inputs, Sidebars)
 // Context: Negative Z-Index. Carved into the void.
 @mixin glass-sunk {
-  background: var(--bg-sink);
+  background: var(--bg-sunk);
 
   border: var(--physics-border-width) solid var(--border-color);
   border-radius: var(--radius-base);
@@ -337,10 +337,10 @@
 
   // Flat: solid minimal thumb, subtle track, no glow
   @include when-flat {
-    scrollbar-color: var(--energy-secondary) var(--bg-sink);
+    scrollbar-color: var(--energy-secondary) var(--bg-sunk);
 
     &::-webkit-scrollbar-track {
-      background: var(--bg-sink);
+      background: var(--bg-sunk);
       border-radius: var(--radius-full);
     }
 
@@ -358,7 +358,7 @@
   // Retro: chunky thumb, visible track border, hard edges
   @include when-retro {
     scrollbar-width: auto;
-    scrollbar-color: var(--energy-primary) var(--bg-sink);
+    scrollbar-color: var(--energy-primary) var(--bg-sunk);
 
     &::-webkit-scrollbar {
       width: calc(var(--scrollbar-width) * 2);
@@ -366,7 +366,7 @@
     }
 
     &::-webkit-scrollbar-track {
-      background: var(--bg-sink);
+      background: var(--bg-sunk);
       border-radius: 0;
       border: var(--physics-border-width) solid var(--border-color);
     }

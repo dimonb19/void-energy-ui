@@ -89,7 +89,7 @@ select {
   cursor: pointer;
 
   // Ensure options are readable in WebKit.
-  background-color: var(--bg-sink);
+  background-color: var(--bg-sunk);
 }
 
 // 4. RANGE SLIDERS (Native + Accent)
@@ -222,7 +222,7 @@ input[type='radio'] {
   &[data-state='active'],
   &:focus-within {
     border-color: var(--energy-primary);
-    background-color: blend(var(--bg-sink), var(--energy-primary), 5%);
+    background-color: blend(var(--bg-sunk), var(--energy-primary), 5%);
     box-shadow: var(--shadow-lift);
     transform: scale(1.005);
 
@@ -272,7 +272,7 @@ textarea:-webkit-autofill {
 input:-moz-autofill,
 textarea:-moz-autofill {
   filter: none;
-  background-color: var(--bg-sink) !important;
+  background-color: var(--bg-sunk) !important;
   color: var(--text-main) !important;
 }
 
@@ -487,7 +487,7 @@ progress {
   overflow: hidden;
 
   // Track.
-  background: var(--bg-sink);
+  background: var(--bg-sunk);
 
   // Firefox: fill color via color property.
   color: var(--energy-primary);
@@ -496,7 +496,7 @@ progress {
 
   // WebKit/Blink track.
   &::-webkit-progress-bar {
-    background: var(--bg-sink);
+    background: var(--bg-sunk);
     border-radius: var(--radius-full);
   }
 
@@ -519,11 +519,11 @@ progress {
     animation: shimmer 2s infinite linear;
     background-image: linear-gradient(
       90deg,
-      var(--bg-sink) 0%,
-      var(--bg-sink) 20%,
+      var(--bg-sunk) 0%,
+      var(--bg-sunk) 20%,
       alpha(var(--energy-primary), 40%) 50%,
-      var(--bg-sink) 80%,
-      var(--bg-sink) 100%
+      var(--bg-sunk) 80%,
+      var(--bg-sunk) 100%
     );
 
     &::-webkit-progress-value {
@@ -534,12 +534,12 @@ progress {
       animation: shimmer 4s infinite steps(4);
       background-image: linear-gradient(
         90deg,
-        var(--bg-sink) 0%,
-        var(--bg-sink) 44%,
+        var(--bg-sunk) 0%,
+        var(--bg-sunk) 44%,
         var(--border-color) 44%,
         var(--border-color) 46%,
-        var(--bg-sink) 46%,
-        var(--bg-sink) 100%
+        var(--bg-sunk) 46%,
+        var(--bg-sunk) 100%
       );
     }
   }
@@ -602,11 +602,11 @@ meter {
   overflow: hidden;
 
   // Track.
-  background: var(--bg-sink);
+  background: var(--bg-sunk);
 
   // WebKit track.
   &::-webkit-meter-bar {
-    background: var(--bg-sink);
+    background: var(--bg-sunk);
     border: none;
     border-radius: var(--radius-full);
   }

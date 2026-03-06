@@ -90,7 +90,7 @@
   }
 
   .chip-label-sunken {
-    background: var(--bg-sink);
+    background: var(--bg-sunk);
     border: var(--physics-border-width) solid var(--border-color);
     color: var(--text-dim);
     padding: calc(var(--space-xs) * 0.25) var(--space-xs);
@@ -129,7 +129,7 @@
   &:disabled,
   &[aria-disabled='true'] {
     cursor: not-allowed;
-    background: shade(var(--bg-sink), 50%);
+    background: shade(var(--bg-sunk), 50%);
     color: shade(var(--text-mute), 20%);
     border-color: shade(var(--text-mute), 50%) !important;
     box-shadow: none !important;

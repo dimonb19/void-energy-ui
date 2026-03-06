@@ -14,7 +14,7 @@ const FALLBACK_DARK: VoidPalette = {
   // Canvas
   'bg-canvas': '#000000',
   'bg-surface': '#111111',
-  'bg-sink': '#000000',
+  'bg-sunk': '#000000',
   'bg-spotlight': '#222222',
   // Energy
   'energy-primary': '#ffffff',
@@ -52,7 +52,7 @@ const FALLBACK_LIGHT: VoidPalette = {
   // Canvas (light mode)
   'bg-canvas': '#ffffff',
   'bg-surface': '#f5f5f5',
-  'bg-sink': '#e0e0e0',
+  'bg-sunk': '#e0e0e0',
   'bg-spotlight': '#fafafa',
   // Energy (dark for contrast)
   'energy-primary': '#000000',
