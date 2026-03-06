@@ -259,7 +259,7 @@ Import and use — never re-instantiate.
 .registerTheme(id, partialDef)      Register runtime theme (Safety Merge)
 .applyTemporaryTheme(id, label)     Temporary theme (respects adaptAtmosphere)
 .restoreUserTheme()                 Exit temporary theme
-.loadExternalTheme(url)             Async: fetch + register a remote theme JSON
+.loadExternalTheme(url)             Async: fetch + validate + register remote theme JSON (returns Result)
 .availableAtmospheres               All registered theme IDs
 .builtInAtmospheres                 Static (non-runtime) theme IDs
 .hasTemporaryTheme                  Whether a temporary theme is active (getter)
@@ -318,10 +318,10 @@ which the stack respects via `defaultPrevented` check — no double-dismissal.
 .isAdmin / .isCreator / .isPlayer / .isGuest    Derived role flags
 .approvedTester                     Derived from user.approved_tester
 .developerMode                      Local preference toggle ($state)
-.login(userData)                    Set user + persist to localStorage
+.login(userData)                    Validate, set, and persist user data (returns Result)
 .logout()                           Clear user + storage + reset flags
-.update(partial)                    Partial user update + persist
-.refresh(fetcher)                   Two-phase: async verify cached user via API
+.update(partial)                    Validate merged user state + persist
+.refresh(fetcher)                   Two-phase: async verify cached user via Result fetcher
 .toggleDeveloperMode()              Toggle dev mode flag
 ```
 

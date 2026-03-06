@@ -44,8 +44,12 @@ const cleanBootSource = bootSource.replace(/^export\s+(?=function\s)/gm, '');
       });
 
       // Preload user font overrides (eliminates FOUT for custom fonts).
-      var userConfig = null;
-      try { userConfig = JSON.parse(localStorage.getItem('${STORAGE_KEYS.USER_CONFIG}')); } catch(e) {}
+      var userConfigResult = readStoredUserConfig('${STORAGE_KEYS.USER_CONFIG}');
+      var userConfig = userConfigResult.value;
+
+      if (userConfigResult.invalid) {
+        try { localStorage.removeItem('${STORAGE_KEYS.USER_CONFIG}'); } catch(e) {}
+      }
 
       if (userConfig) {
         var userFontMap = ${JSON.stringify(USER_FONT_MAP)};

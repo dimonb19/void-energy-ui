@@ -4,16 +4,28 @@
   Reads void_user from localStorage and sets data-auth on <html>
   before first paint — prevents FOUC for auth-dependent content.
   Mirrors ThemeScript pattern.
+
+  Reuses readStoredUser() from void-boot.js (inlined, same as ThemeScript).
 */
+
+import { STORAGE_KEYS } from '@config/constants';
+import bootSource from '@lib/void-boot.js?raw';
+
+const cleanBootSource = bootSource.replace(/^export\s+(?=function\s)/gm, '');
 ---
 
-<script is:inline>
-  (function() {
-    try {
-      var u = localStorage.getItem('void_user');
-      if (u && JSON.parse(u)) {
+<script
+  is:inline
+  set:html={`
+    (function() {
+      ${cleanBootSource}
+
+      var result = readStoredUser('${STORAGE_KEYS.USER}');
+      if (result.value) {
         document.documentElement.setAttribute('data-auth', '');
+      } else if (result.invalid) {
+        try { localStorage.removeItem('${STORAGE_KEYS.USER}'); } catch(e) {}
       }
-    } catch(e) {}
-  })();
-</script>
+    })();
+  `}
+/>

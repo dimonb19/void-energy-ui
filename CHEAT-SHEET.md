@@ -3016,10 +3016,10 @@ Reactive singletons for app-wide state. Each store uses `$state` + `$derived` an
 
 | Method | Description |
 | --- | --- |
-| `login(user)` | Set user, persist to localStorage, sync DOM |
+| `login(user)` | Validate user, persist to localStorage, sync DOM |
 | `logout()` | Clear user + dev mode, remove from localStorage |
-| `update(partial)` | Merge partial fields into current user |
-| `refresh(fetcher)` | Two-phase hydration: async API verify (sets `loading`) |
+| `update(partial)` | Validate merged fields before persisting |
+| `refresh(fetcher)` | Two-phase hydration: async API verify via typed Result fetcher (sets `loading`) |
 | `toggleDeveloperMode()` | Toggle local dev mode flag |
 
 **FOUC Prevention (3 layers):**
@@ -3035,6 +3035,10 @@ Reactive singletons for app-wide state. Each store uses `$state` + `$derived` an
 ```svelte
 <script lang="ts">
   import { user } from '@stores/user.svelte';
+
+  async function verifySession() {
+    await user.refresh(() => Account.getUserResult());
+  }
 </script>
 
 <!-- Reactive flags -->

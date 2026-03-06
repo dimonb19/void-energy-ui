@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { ok } from '@lib/result';
   import { user } from '@stores/user.svelte';
   import { toast } from '@stores/toast.svelte';
   import Toggle from '../ui/Toggle.svelte';
@@ -33,9 +34,16 @@
 
   function loginAs(role: string) {
     const u = demoUsers[role];
-    if (u) {
-      user.login(u);
-      toast.show(`Logged in as ${u.name} (${u.role_name})`, 'success');
+    if (!u) return;
+
+    const result = user.login(u);
+    if (result.ok) {
+      toast.show(
+        `Logged in as ${result.data.name} (${result.data.role_name})`,
+        'success',
+      );
+    } else {
+      toast.show(result.error.message, 'error');
     }
   }
 
@@ -44,15 +52,26 @@
     toast.show('Logged out', 'info');
   }
 
-  function simulateRefresh() {
+  async function simulateRefresh() {
     const cached = user.current;
-    user.refresh(async () => {
+    const result = await user.refresh(async () => {
       // Simulate API latency
-      await new Promise((r) => setTimeout(r, 1500));
+      await new Promise((resolve) => setTimeout(resolve, 1500));
       // Return a "fresh" user with updated name (or null if not logged in)
-      if (!cached) return null;
-      return { ...cached, name: `${cached.name} (verified)` };
+      if (!cached) return ok(null);
+      return ok({ ...cached, name: `${cached.name} (verified)` });
     });
+
+    if (!result.ok) {
+      toast.show(result.error.message, 'error');
+      return;
+    }
+
+    if (result.data) {
+      toast.show(`Verified ${result.data.name}`, 'success');
+    } else {
+      toast.show('No active session to verify', 'info');
+    }
   }
 </script>
 
@@ -133,8 +152,9 @@
       <h5>Two-Phase Hydration</h5>
       <p class="text-small text-mute">
         Phase 1: synchronous cache read (constructor). Phase 2:
-        <code>refresh(fetcher)</code> verifies against the server. The store accepts
-        any async function &mdash; decoupled from API clients.
+        <code>refresh(fetcher)</code> verifies against the server. The fetcher returns
+        a typed Result, so transport and payload failures stay out of the component
+        tree.
       </p>
       <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
         <button
@@ -308,7 +328,7 @@ user.isAuthenticated; // true
 user.approvedTester;  // true
 
 // Two-phase hydration: verify cached user with API
-await user.refresh(() =&gt; Account.getUser());
+await user.refresh(() =&gt; Account.getUserResult());
 // user.loading is true during fetch, false after
 
 // Partial update

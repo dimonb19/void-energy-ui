@@ -21,6 +21,199 @@ export function resolveTheme(storageKey, defaults) {
   return prefersDark ? defaults.ATMOSPHERE : defaults.LIGHT_ATMOSPHERE;
 }
 
+var PALETTE_KEYS = [
+  'bg-canvas',
+  'bg-surface',
+  'bg-sunk',
+  'bg-spotlight',
+  'energy-primary',
+  'energy-secondary',
+  'border-color',
+  'text-main',
+  'text-dim',
+  'text-mute',
+  'color-premium',
+  'color-system',
+  'color-success',
+  'color-error',
+  'color-premium-light',
+  'color-premium-dark',
+  'color-premium-subtle',
+  'color-system-light',
+  'color-system-dark',
+  'color-system-subtle',
+  'color-success-light',
+  'color-success-dark',
+  'color-success-subtle',
+  'color-error-light',
+  'color-error-dark',
+  'color-error-subtle',
+  'font-atmos-heading',
+  'font-atmos-body',
+];
+
+var USER_ROLES = {
+  Admin: true,
+  Creator: true,
+  Player: true,
+  Guest: true,
+};
+
+function isPlainObject(value) {
+  return Object.prototype.toString.call(value) === '[object Object]';
+}
+
+function hasText(value) {
+  return typeof value === 'string' && value.length > 0;
+}
+
+function parseJSON(raw) {
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw);
+  } catch (e) {
+    return null;
+  }
+}
+
+function isMode(value) {
+  return value === 'light' || value === 'dark';
+}
+
+function isPhysics(value) {
+  return value === 'glass' || value === 'flat' || value === 'retro';
+}
+
+function sanitizePalette(input, requireAll) {
+  if (!isPlainObject(input)) return null;
+
+  var palette = {};
+
+  for (var i = 0; i < PALETTE_KEYS.length; i++) {
+    var key = PALETTE_KEYS[i];
+    if (!hasText(input[key])) {
+      if (requireAll) return null;
+      continue;
+    }
+    palette[key] = input[key];
+  }
+
+  return Object.keys(palette).length > 0 ? palette : null;
+}
+
+function sanitizeThemeDefinition(input) {
+  if (!isPlainObject(input)) return null;
+  if (!isMode(input.mode) || !isPhysics(input.physics)) return null;
+
+  var palette = sanitizePalette(input.palette, true);
+  if (!palette) return null;
+
+  return {
+    mode: input.mode,
+    physics: input.physics,
+    palette: palette,
+  };
+}
+
+export function readStoredUserConfig(storageKey) {
+  var raw = null;
+  try {
+    raw = localStorage.getItem(storageKey);
+  } catch (e) {
+    return { value: null, invalid: false };
+  }
+
+  if (!raw) return { value: null, invalid: false };
+
+  var parsed = parseJSON(raw);
+  if (!isPlainObject(parsed)) {
+    return { value: null, invalid: true };
+  }
+
+  // Pick known keys with lightweight type guards. Bad fields are silently dropped
+  // (VoidEngine defaults fill gaps). Full Zod re-validation happens on init().
+  var config = {};
+  if (typeof parsed.fontHeading === 'string' || parsed.fontHeading === null)
+    config.fontHeading = parsed.fontHeading;
+  if (typeof parsed.fontBody === 'string' || parsed.fontBody === null)
+    config.fontBody = parsed.fontBody;
+  if (
+    typeof parsed.scale === 'number' &&
+    isFinite(parsed.scale) &&
+    parsed.scale > 0
+  )
+    config.scale = parsed.scale;
+  if (
+    parsed.density === 'high' ||
+    parsed.density === 'standard' ||
+    parsed.density === 'low'
+  )
+    config.density = parsed.density;
+  if (typeof parsed.adaptAtmosphere === 'boolean')
+    config.adaptAtmosphere = parsed.adaptAtmosphere;
+  if (typeof parsed.fixedNav === 'boolean') config.fixedNav = parsed.fixedNav;
+
+  return {
+    value: Object.keys(config).length > 0 ? config : null,
+    invalid: false,
+  };
+}
+
+export function readCachedTheme(storageKey, themeId) {
+  var raw = null;
+  try {
+    raw = localStorage.getItem(storageKey);
+  } catch (e) {
+    return { value: null, invalid: false };
+  }
+
+  if (!raw) return { value: null, invalid: false };
+
+  var parsed = parseJSON(raw);
+  if (!isPlainObject(parsed)) {
+    return { value: null, invalid: true };
+  }
+
+  if (!Object.prototype.hasOwnProperty.call(parsed, themeId)) {
+    return { value: null, invalid: false };
+  }
+
+  var theme = sanitizeThemeDefinition(parsed[themeId]);
+  return {
+    value: theme,
+    invalid: theme === null,
+  };
+}
+
+export function readStoredUser(storageKey) {
+  var raw = null;
+  try {
+    raw = localStorage.getItem(storageKey);
+  } catch (e) {
+    return { value: null, invalid: false };
+  }
+
+  if (!raw) return { value: null, invalid: false };
+
+  var parsed = parseJSON(raw);
+  if (!isPlainObject(parsed)) {
+    return { value: null, invalid: true };
+  }
+
+  var validUser =
+    hasText(parsed.id) &&
+    hasText(parsed.name) &&
+    hasText(parsed.email) &&
+    (parsed.avatar === null || hasText(parsed.avatar)) &&
+    USER_ROLES[parsed.role_name] === true &&
+    typeof parsed.approved_tester === 'boolean';
+
+  return {
+    value: validUser ? parsed : null,
+    invalid: !validUser,
+  };
+}
+
 /**
  * Applies the Atmosphere, Physics, and Mode to the DOM.
  * @param {HTMLElement} root - The document root
@@ -45,8 +238,7 @@ export function applyTheme(root, theme, constants) {
   // Update <meta name="theme-color"> to match atmosphere canvas.
   var meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
-    var color =
-      theme.canvas || (theme.palette && theme.palette['bg-canvas']) || null;
+    var color = (theme.palette && theme.palette['bg-canvas']) || null;
     if (color) meta.setAttribute('content', color);
   }
 }
@@ -94,7 +286,8 @@ export function applyPreferences(root, config) {
 export function hydrate(registry, storageKeys, attrs, defaults) {
   try {
     var root = document.documentElement;
-    var localConfig = localStorage.getItem(storageKeys.USER_CONFIG);
+    var userConfigResult = readStoredUserConfig(storageKeys.USER_CONFIG);
+    var userConfig = userConfigResult.value;
 
     // Resolve active atmosphere ID using shared logic.
     var activeId = resolveTheme(storageKeys.ATMOSPHERE, defaults);
@@ -112,15 +305,16 @@ export function hydrate(registry, storageKeys, attrs, defaults) {
     var themeData = registry[activeId];
 
     if (!themeData) {
-      try {
-        var cache = JSON.parse(
-          localStorage.getItem('void_theme_cache') || '{}',
-        );
-        themeData = cache[activeId];
-      } catch (e) {
-        console.warn('Void: Cache Error - clearing corrupted cache', e);
+      var cachedThemeResult = readCachedTheme(
+        storageKeys.THEME_CACHE,
+        activeId,
+      );
+      themeData = cachedThemeResult.value;
+
+      if (cachedThemeResult.invalid) {
+        console.warn('Void: Cache Error - clearing corrupted cache');
         try {
-          localStorage.removeItem('void_theme_cache');
+          localStorage.removeItem(storageKeys.THEME_CACHE);
         } catch (ignored) {}
       }
     }
@@ -136,8 +330,15 @@ export function hydrate(registry, storageKeys, attrs, defaults) {
 
     applyTheme(root, themeData, attrs);
 
-    if (localConfig) {
-      applyPreferences(root, JSON.parse(localConfig));
+    if (userConfigResult.invalid) {
+      console.warn('Void: Config Error - clearing corrupted user config');
+      try {
+        localStorage.removeItem(storageKeys.USER_CONFIG);
+      } catch (ignored) {}
+    }
+
+    if (userConfig) {
+      applyPreferences(root, userConfig);
     }
 
     return activeId;

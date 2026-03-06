@@ -6,7 +6,15 @@
 
 import THEME_REGISTRY from '@config/void-registry.json';
 import { STORAGE_KEYS, DOM_ATTRS, DEFAULTS } from '@config/constants';
+import {
+  formatBoundaryError,
+  parseExternalThemePayload,
+  parseStoredThemeCache,
+  parseStoredUserConfig,
+  type BoundaryError,
+} from '@lib/boundary';
 import { applyTheme, applyPreferences } from '@lib/void-boot';
+import { err, ok, type Result } from '@lib/result';
 
 // Mode-aware palette fallbacks for incomplete theme definitions.
 // Uses SEMANTIC_DARK/SEMANTIC_LIGHT from design-tokens.ts for correct semantic colors.
@@ -182,9 +190,7 @@ export class VoidEngine {
 
     // Cache theme to localStorage (non-critical, failures are silently ignored)
     try {
-      const cache = JSON.parse(
-        localStorage.getItem(STORAGE_KEYS.THEME_CACHE) || '{}',
-      );
+      const cache = this.readThemeCache();
       cache[id] = safeTheme;
       localStorage.setItem(STORAGE_KEYS.THEME_CACHE, JSON.stringify(cache));
     } catch {
@@ -194,18 +200,40 @@ export class VoidEngine {
     console.groupEnd();
   }
 
-  async loadExternalTheme(url: string) {
+  async loadExternalTheme(
+    url: string,
+  ): Promise<Result<{ id: string }, BoundaryError>> {
     try {
       const res = await fetch(url);
-      const data = await res.json();
-      if (data.id && data.palette) {
-        this.registerTheme(data.id, data);
-        this.setAtmosphere(data.id);
-        return true;
+      if (!res.ok) {
+        return err({
+          code: 'http_error',
+          source: 'VoidEngine.loadExternalTheme',
+          message: `Theme request failed with status ${res.status}.`,
+          status: res.status,
+        });
       }
+
+      const data = await res.json();
+      const parsed = parseExternalThemePayload(
+        data,
+        'VoidEngine.loadExternalTheme',
+      );
+      if (!parsed.ok) {
+        console.error(formatBoundaryError(parsed.error));
+        return parsed;
+      }
+
+      this.registerTheme(parsed.data.id, parsed.data.definition);
+      this.setAtmosphere(parsed.data.id);
+      return ok({ id: parsed.data.id });
     } catch (e) {
       console.error('Void: External Theme Load Failed', e);
-      return false;
+      return err({
+        code: 'network',
+        source: 'VoidEngine.loadExternalTheme',
+        message: 'Failed to fetch external theme.',
+      });
     }
   }
 
@@ -287,11 +315,19 @@ export class VoidEngine {
     // Load user prefs into state only.
     const storedConfig = localStorage.getItem(STORAGE_KEYS.USER_CONFIG);
     if (storedConfig) {
-      try {
-        this.userConfig = { ...this.userConfig, ...JSON.parse(storedConfig) };
-      } catch (e) {
-        console.error('Void: Corrupt config - resetting to defaults', e);
-        localStorage.removeItem(STORAGE_KEYS.USER_CONFIG);
+      const parsed = parseStoredUserConfig(
+        storedConfig,
+        'VoidEngine.init user config',
+      );
+      if (parsed.ok) {
+        this.userConfig = { ...this.userConfig, ...parsed.data };
+      } else {
+        console.error(formatBoundaryError(parsed.error));
+        try {
+          localStorage.removeItem(STORAGE_KEYS.USER_CONFIG);
+        } catch {
+          // Storage unavailable
+        }
       }
     }
 
@@ -307,7 +343,7 @@ export class VoidEngine {
     if (!meta) return;
     const entry = this.registry[name];
     if (!entry) return;
-    const color = (entry as any).canvas || entry.palette?.['bg-canvas'] || null;
+    const color = entry.palette?.['bg-canvas'] || null;
     if (color) meta.setAttribute('content', color);
   }
 
@@ -343,11 +379,34 @@ export class VoidEngine {
 
   private persist() {
     if (typeof localStorage === 'undefined') return;
-    localStorage.setItem(STORAGE_KEYS.ATMOSPHERE, this.atmosphere);
-    localStorage.setItem(
-      STORAGE_KEYS.USER_CONFIG,
-      JSON.stringify(this.userConfig),
+    try {
+      localStorage.setItem(STORAGE_KEYS.ATMOSPHERE, this.atmosphere);
+      localStorage.setItem(
+        STORAGE_KEYS.USER_CONFIG,
+        JSON.stringify(this.userConfig),
+      );
+    } catch {
+      // Storage full or unavailable
+    }
+  }
+
+  private readThemeCache(): Record<string, VoidThemeDefinition> {
+    const raw = localStorage.getItem(STORAGE_KEYS.THEME_CACHE);
+    if (!raw) return {};
+
+    const parsed = parseStoredThemeCache(
+      raw,
+      'VoidEngine.registerTheme cache read',
     );
+    if (parsed.ok) return parsed.data;
+
+    console.warn(formatBoundaryError(parsed.error));
+    try {
+      localStorage.removeItem(STORAGE_KEYS.THEME_CACHE);
+    } catch {
+      // Storage unavailable
+    }
+    return {};
   }
 
   get availableAtmospheres() {
