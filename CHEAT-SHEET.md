@@ -4892,7 +4892,7 @@ Animate only visual properties (opacity, blur, scale, translateY). Element layou
 
 ### C. Horizontal Collapse: `implode`
 
-Collapses element width, padding, and margin to zero with blur/grayscale dissolve. Exit-only.
+Compositor-only horizontal collapse with blur/grayscale dissolve. Exit-only. Takes the element out of document flow (`position: absolute`) and animates with `scaleX`, `opacity`, and `filter` — zero layout recalculation. Automatically cancels running CSS transitions that would block Svelte's internal `fix()` repositioning.
 
 **Params:**
 

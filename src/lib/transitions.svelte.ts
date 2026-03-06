@@ -368,51 +368,73 @@ export function dissolve(
 }
 
 /**
- * Collapse animation based on computed dimensions.
- * Horizontally collapses element while maintaining vertical space.
+ * Horizontal collapse with dissolution.
  * Usage: <div out:implode>
  *
- * Note: Reads computed styles once at start (width, margin, padding).
- * This causes a single layout reflow at animation start.
+ * Best paired with animate:live for smooth sibling reflow.
+ *
+ * Takes the element out of document flow (position: absolute) and uses
+ * compositor-only properties (transform, opacity, filter) — zero layout
+ * recalculation. If Svelte's fix() already positioned the element, we
+ * preserve its compensating translate. Otherwise we replicate fix()'s
+ * work ourselves, canceling CSS transitions that would block it.
  *
  * Physics behavior:
- * - Retro: Grayscale dissolve while collapsing
- * - Glass/Flat: Blur dissolve while collapsing
- *
- * Related:
- * - Use for horizontal removal (e.g., removing chips, tags, list items)
- * - For vertical collapse, use CSS max-height transitions
+ * - Retro: Grayscale dissolve
+ * - Glass/Flat: Blur dissolve
  */
 export function implode(
   node: HTMLElement,
   { delay = 0, duration = null } = {},
 ) {
-  const style = getComputedStyle(node);
-  const width = parseFloat(style.width);
-  const margin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);
-  const padding =
-    parseFloat(style.paddingLeft) + parseFloat(style.paddingRight);
-
   const { speedFast, isRetro, reducedMotion } = getSystemConfig();
 
-  if (reducedMotion) return { duration: 0, css: () => 'opacity: 0; width: 0;' };
+  if (reducedMotion) return { duration: 0, css: () => 'opacity: 0;' };
+
+  // Svelte's fix() bails when the element has running animations (CSS transitions,
+  // @starting-style, etc.). Without fix(), the element stays in document flow and
+  // the layout-based width collapse causes per-frame flex reflow jank.
+  //
+  // Solution: do fix()'s job ourselves. Cancel CSS transitions so they don't
+  // interfere, capture position, take the element out of flow, then animate
+  // with compositor-only properties (transform, opacity, filter) — zero layout.
+
+  const isFixed = node.style.position === 'absolute';
+
+  if (!isFixed) {
+    // Capture position before taking out of flow
+    const rect = node.getBoundingClientRect();
+    const parentRect = node.offsetParent?.getBoundingClientRect() ?? rect;
+
+    // Cancel CSS transitions that block fix()
+    for (const anim of node.getAnimations()) {
+      if (anim instanceof CSSTransition) anim.cancel();
+    }
+
+    // Take out of document flow (replicating Svelte's fix())
+    node.style.position = 'absolute';
+    node.style.width = `${rect.width}px`;
+    node.style.height = `${rect.height}px`;
+    node.style.left = `${rect.left - parentRect.left}px`;
+    node.style.top = `${rect.top - parentRect.top}px`;
+  }
+
+  const baseTransform = node.style.transform || '';
 
   return {
     delay,
     duration: duration ?? speedFast,
     easing: cubicOut,
     css: (t: number, u: number) => {
-      const filter = isRetro ? `grayscale(${u * 100}%)` : `blur(${u * 5}px)`;
+      const filter = isRetro ? `grayscale(${u * 100}%)` : `blur(${u * 5}px)`; // void-ignore: blur intensity multiplier (physics constant)
+      const scale = `scaleX(${t})`;
+      const transform = baseTransform ? `${baseTransform} ${scale}` : scale;
+
       return `
-        overflow: hidden;
         opacity: ${t};
-        width: ${t * width}px;
-        padding-left: ${t * padding * 0.5}px;
-        padding-right: ${t * padding * 0.5}px;
-        margin-left: ${t * margin * 0.5}px;
-        margin-right: ${t * margin * 0.5}px;
+        transform: ${transform};
         filter: ${filter};
-        white-space: nowrap;
+        pointer-events: none;
       `;
     },
   };
