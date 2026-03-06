@@ -99,6 +99,10 @@
   let pullContentEl: HTMLDivElement | undefined = $state();
   let scrollTarget: HTMLElement | Window | null = null;
 
+  function unreachablePullState(value: never): never {
+    throw new Error(`Unhandled pull state: ${value}`);
+  }
+
   // ─────────────────────────────────────────────────────────────────────────────
   // Derived State
   // ─────────────────────────────────────────────────────────────────────────────
@@ -109,6 +113,8 @@
 
   const message = $derived.by(() => {
     switch (pullState) {
+      case 'idle':
+        return '';
       case 'pulling':
         return 'Pull to refresh';
       case 'threshold':
@@ -119,9 +125,9 @@
         return 'Updated';
       case 'error':
         return 'Failed';
-      default:
-        return '';
     }
+
+    return unreachablePullState(pullState);
   });
 
   // ─────────────────────────────────────────────────────────────────────────────

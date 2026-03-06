@@ -36,35 +36,57 @@
   const inputId = id ?? `copy-${Math.random().toString(36).slice(2, 9)}`;
 
   let copied = $state(false);
-  let timeout: ReturnType<typeof setTimeout>;
+  let timeout: ReturnType<typeof setTimeout> | undefined;
+  let inputEl: HTMLInputElement | undefined;
+
+  function showCopiedFeedback() {
+    copied = true;
+    toast.show('Copied to clipboard', 'success');
+    clearTimeout(timeout);
+    timeout = setTimeout(() => (copied = false), 2000);
+  }
+
+  function fallbackCopy(): boolean {
+    if (!inputEl) return false;
+    inputEl.focus();
+    inputEl.select();
+    return document.execCommand('copy');
+  }
 
   async function copyToClipboard() {
     try {
       await navigator.clipboard.writeText(value);
-      copied = true;
-      toast.show('Copied to clipboard', 'success');
-      clearTimeout(timeout);
-      timeout = setTimeout(() => (copied = false), 2000);
+      showCopiedFeedback();
     } catch {
       // Fallback for older browsers / insecure context
-      const input =
-        document.querySelector<HTMLInputElement>('.copy-field input');
-      input?.select();
-      document.execCommand('copy');
-      copied = true;
-      toast.show('Copied to clipboard', 'success');
-      clearTimeout(timeout);
-      timeout = setTimeout(() => (copied = false), 2000);
+      if (fallbackCopy()) {
+        showCopiedFeedback();
+      } else {
+        toast.show('Copy failed', 'error');
+      }
     }
   }
 
   function selectAll(e: FocusEvent) {
     (e.target as HTMLInputElement).select();
   }
+
+  $effect(() => {
+    return () => {
+      clearTimeout(timeout);
+    };
+  });
 </script>
 
 <div class="field copy-field {className}">
-  <input id={inputId} type="text" readonly {value} onfocus={selectAll} />
+  <input
+    bind:this={inputEl}
+    id={inputId}
+    type="text"
+    readonly
+    {value}
+    onfocus={selectAll}
+  />
   <span class="field-slot-right">
     <IconBtn
       icon={Copy}

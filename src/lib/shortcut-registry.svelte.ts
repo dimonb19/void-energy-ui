@@ -28,7 +28,7 @@ class ShortcutRegistry {
 
     this.map.set(entry.key, entry);
     this.entries.push(entry);
-    this.ensureListener();
+    this.syncListener();
   }
 
   /**
@@ -37,6 +37,7 @@ class ShortcutRegistry {
   unregister(key: string) {
     this.map.delete(key);
     this.entries = this.entries.filter((e) => e.key !== key);
+    this.syncListener();
   }
 
   /**
@@ -92,10 +93,19 @@ class ShortcutRegistry {
 
   // ── Listener lifecycle ──────────────────────────────────────────────
 
-  private ensureListener() {
-    if (this.listening || typeof document === 'undefined') return;
-    document.addEventListener('keydown', this.boundHandle);
-    this.listening = true;
+  private syncListener() {
+    if (typeof document === 'undefined') return;
+
+    if (this.map.size > 0 && !this.listening) {
+      document.addEventListener('keydown', this.boundHandle);
+      this.listening = true;
+      return;
+    }
+
+    if (this.map.size === 0 && this.listening) {
+      document.removeEventListener('keydown', this.boundHandle);
+      this.listening = false;
+    }
   }
 
   /** Bound reference for addEventListener. */

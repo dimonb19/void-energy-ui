@@ -25,7 +25,7 @@ class LayerStack {
     const id = nextId++;
     this.stack.push({ id, dismiss });
     this.count = this.stack.length;
-    this.ensureListener();
+    this.syncListener();
     return id;
   }
 
@@ -33,6 +33,7 @@ class LayerStack {
   remove(id: number): void {
     this.stack = this.stack.filter((layer) => layer.id !== id);
     this.count = this.stack.length;
+    this.syncListener();
   }
 
   /** Whether the stack has any layers. */
@@ -44,10 +45,19 @@ class LayerStack {
 
   private listening = false;
 
-  private ensureListener(): void {
-    if (this.listening || typeof document === 'undefined') return;
-    document.addEventListener('keydown', this.handleKeydown);
-    this.listening = true;
+  private syncListener(): void {
+    if (typeof document === 'undefined') return;
+
+    if (this.count > 0 && !this.listening) {
+      document.addEventListener('keydown', this.handleKeydown);
+      this.listening = true;
+      return;
+    }
+
+    if (this.count === 0 && this.listening) {
+      document.removeEventListener('keydown', this.handleKeydown);
+      this.listening = false;
+    }
   }
 
   private handleKeydown = (e: KeyboardEvent): void => {
@@ -59,6 +69,7 @@ class LayerStack {
 
     const top = this.stack.pop()!;
     this.count = this.stack.length;
+    this.syncListener();
     top.dismiss();
   };
 }

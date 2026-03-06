@@ -115,6 +115,47 @@ function sanitizeThemeDefinition(input) {
   };
 }
 
+function clearThemeOverrides(root) {
+  for (var i = 0; i < PALETTE_KEYS.length; i++) {
+    root.style.removeProperty('--' + PALETTE_KEYS[i]);
+  }
+}
+
+function clearPreferenceOverrides(root) {
+  root.style.removeProperty('--text-scale');
+  root.style.removeProperty('--density');
+  root.style.removeProperty('--user-font-heading');
+  root.style.removeProperty('--user-font-body');
+}
+
+function persistAtmosphere(storageKey, atmosphere) {
+  try {
+    localStorage.setItem(storageKey, atmosphere);
+  } catch (e) {
+    // localStorage unavailable
+  }
+}
+
+function resolveFallbackTheme(registry, defaults) {
+  var fallback = registry && registry[defaults.ATMOSPHERE];
+  var sanitized = sanitizeThemeDefinition(fallback);
+
+  if (sanitized) {
+    return {
+      id: defaults.ATMOSPHERE,
+      mode: sanitized.mode,
+      physics: sanitized.physics,
+      palette: sanitized.palette,
+    };
+  }
+
+  return {
+    id: defaults.ATMOSPHERE,
+    mode: defaults.MODE,
+    physics: defaults.PHYSICS,
+  };
+}
+
 export function readStoredUserConfig(storageKey) {
   var raw = null;
   try {
@@ -322,13 +363,20 @@ export function hydrate(registry, storageKeys, attrs, defaults) {
     // Safety net if no theme is resolved.
     if (!themeData) {
       activeId = defaults.ATMOSPHERE;
-      themeData = registry[defaults.ATMOSPHERE];
+      themeData = resolveFallbackTheme(registry, defaults);
+      persistAtmosphere(storageKeys.ATMOSPHERE, activeId);
     }
 
-    // Attach ID for the apply function.
-    themeData.id = activeId;
+    clearThemeOverrides(root);
 
-    applyTheme(root, themeData, attrs);
+    applyTheme(
+      root,
+      {
+        ...themeData,
+        id: activeId,
+      },
+      attrs,
+    );
 
     if (userConfigResult.invalid) {
       console.warn('Void: Config Error - clearing corrupted user config');
@@ -338,17 +386,22 @@ export function hydrate(registry, storageKeys, attrs, defaults) {
     }
 
     if (userConfig) {
+      clearPreferenceOverrides(root);
       applyPreferences(root, userConfig);
+    } else {
+      clearPreferenceOverrides(root);
     }
 
     return activeId;
   } catch (e) {
     console.warn('Void: Hydration Failed', e);
-    // Absolute fail-safe.
-    document.documentElement.setAttribute(
-      attrs.ATMOSPHERE,
-      defaults.ATMOSPHERE,
-    );
+    var root = document.documentElement;
+
+    clearThemeOverrides(root);
+    clearPreferenceOverrides(root);
+    applyTheme(root, resolveFallbackTheme(registry, defaults), attrs);
+    persistAtmosphere(storageKeys.ATMOSPHERE, defaults.ATMOSPHERE);
+
     return defaults.ATMOSPHERE;
   }
 }
