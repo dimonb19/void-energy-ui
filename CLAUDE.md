@@ -20,7 +20,7 @@ Before writing a single line of code, you MUST complete this audit and report fi
 
 # Void Energy UI — Migration Context
 
-This codebase is being migrated to the **Void Energy UI** system: a design system built on Svelte 5 (Runes), Astro, TypeScript, and a hybrid styling architecture where **SCSS owns visual physics** (surfaces, shadows, blur, animations, state) and **Tailwind owns geometry** (flex, grid, spacing, sizing). Every visual value flows through semantic tokens. Every component adapts to 3 physics presets (glass, flat, retro) and 2 color modes (light, dark). Migration is incremental — one task per session, preserving existing behavior.
+This codebase is being migrated to the **Void Energy UI** system: a design system built on Svelte 5 (Runes), Astro, TypeScript, and a hybrid styling architecture where **SCSS owns visual physics plus token-driven primitive-internal geometry** and **Tailwind owns page composition and consumer-side geometry**. Every visual value flows through semantic tokens. Every component adapts to 3 physics presets (glass, flat, retro) and 2 color modes (light, dark). Migration is incremental — one task per session, preserving existing behavior.
 
 Token dictionary and SCSS toolkit references are loaded on-demand via `.claude/rules/` when editing relevant files.
 
@@ -29,12 +29,13 @@ Token dictionary and SCSS toolkit references are loaded on-demand via `.claude/r
 ## 1. THE 5 LAWS (Hard Constraints)
 
 ### Law 1 — Hybrid Protocol
-Tailwind = layout/geometry. SCSS = visual physics/materials. Never mix.
+Tailwind = page composition and consumer-side geometry. SCSS = visual physics/materials plus approved primitive-internal geometry. Do not use SCSS for arbitrary page/layout composition.
 
 ```
-CORRECT:  class="flex flex-col gap-md p-lg"       (layout in Tailwind)
-CORRECT:  .card { @include glass-float; }          (physics in SCSS)
-WRONG:    .card { display: flex; gap: 24px; }      (layout in SCSS)
+CORRECT:  class="flex flex-col gap-md p-lg"       (composition in Tailwind)
+CORRECT:  .card { @include glass-float; }         (physics in SCSS)
+CORRECT:  button { min-height: var(--control-height); display: inline-flex; }
+WRONG:    .page-section { display: grid; gap: 24px; }   (page layout in SCSS)
 WRONG:    class="shadow-lg bg-blue-500"            (physics in Tailwind)
 ```
 
@@ -269,8 +270,8 @@ Import and use — never re-instantiate.
 ```
 .open(key, props, size?)            Open by registry key. Size: 'sm' | 'md' | 'lg'
 .close()                            Close active modal (restores focus)
-.confirm(title, body, { onConfirm, onCancel?, cost? })
-.alert(title, body)
+.confirm(title, body, { onConfirm, onCancel?, cost? })   // body = trusted internal rich text only
+.alert(title, body)                                      // body = trusted internal rich text only
 .settings(options?)
 .themes()
 .shortcuts()                        Open keyboard shortcuts modal
@@ -390,10 +391,11 @@ Auth visibility utilities (FOUC-safe, set before first paint):
 ## 9. GOTCHAS
 
 - **Generated files are read-only.** Never edit `src/styles/config/_generated-themes.scss`, `src/config/void-registry.json`, or `src/config/void-physics.json`. Edit `src/config/design-tokens.ts` and run `npm run build:tokens`.
-- **`npm run scan` enforces Token Law.** It exits non-zero if magic pixel values are found in SCSS/Svelte files.
+- **`npm run scan` is advisory.** It currently scans `.scss` and `.svelte` files for common raw pixel-value misses. Treat it as a helper, not a complete Token Law gate.
 - **Glass and retro require dark mode.** VoidEngine auto-corrects invalid physics+mode combos. Do not manually set light mode with glass or retro physics.
 - **SCSS import path:** Always `@use '../abstracts' as *;` — never import individual partial files.
 - **Tailwind config is token-driven.** `tailwind.config.mjs` reads from `design-tokens.ts`. Add new values to design-tokens, not the Tailwind config.
+- **TypeScript stance:** The repo is type-checked but not a strict-mode migration target. Avoid easy `any`; do not invent elaborate type machinery without payoff.
 - **Radius tokens in SCSS:** Default to `var(--radius-base)` for border-radius — it adapts per physics (8px glass, 4px flat, 0 retro). Use `var(--radius-full)` for pills. The scale tokens (`--radius-sm/md/lg/xl`) are available when you deliberately need a specific size, but all radius tokens are force-zeroed in retro physics.
 - **Modal dismiss buttons use `btn-ghost btn-error`** — not plain `btn-ghost`. Closing/canceling is a mildly destructive action; red ghost provides subtle signaling without the weight of a solid `btn-error`.
 - **`btn-icon` vs `btn-ghost`:** If a button contains **only an icon** (no text), use `btn-icon` — it provides square hit targets (`var(--control-height)`), centered flex layout, and icon-appropriate hover feedback. `btn-ghost` is for **text-based** secondary actions (Cancel, Dismiss, Skip). Never use `btn-ghost` on an icon-only button.

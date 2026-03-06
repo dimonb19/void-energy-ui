@@ -196,4 +196,4 @@ For migrating a large codebase using the strangler fig pattern:
 
 8. **Use agents for audits.** Ask "Run the design reviewer on src/components/" to scan an entire directory at once.
 
-9. **The hooks are your safety net.** Auto-format keeps code clean. Protect-generated prevents accidents. Token-scan catches raw values early.
+9. **The hooks are your safety net.** Auto-format keeps code clean. Protect-generated prevents accidents. Token-scan can flag common raw-value misses early, but it is advisory.

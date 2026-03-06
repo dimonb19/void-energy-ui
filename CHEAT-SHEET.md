@@ -37,7 +37,7 @@
 
 ### The Hybrid Protocol (Separation of Concerns)
 
-The Void Energy UI separates **Layout** (Geometry) from **Material** (Physics).
+The Void Energy UI separates **Composition Layout** from **Material + Shipped Primitive Geometry**.
 
 ```mermaid
 graph LR
@@ -51,13 +51,19 @@ graph LR
 
 | Layer        | Technology | Responsibility            | Examples                                             |
 | ------------ | ---------- | ------------------------- | ---------------------------------------------------- |
-| **Layout**   | Tailwind   | Geometry, Spacing, Sizing | `flex`, `gap-md`, `p-lg`, `w-full`                   |
-| **Material** | SCSS       | Visuals, Physics, States  | `.surface-glass`, `.btn-cta`, `@include glass-float` |
+| **Layout**   | Tailwind   | Page composition, spacing, responsive structure, consumer-side geometry | `flex`, `gap-md`, `p-lg`, `w-full` |
+| **Material** | SCSS       | Visuals, physics, states, token-driven primitive-internal geometry | `.surface-glass`, `.btn-cta`, `@include glass-float` |
+
+#### Allowed Exceptions
+
+- SCSS may include token-driven geometry when that geometry is part of the shipped primitive behavior and prevents repeated utility boilerplate in every consumer.
+- Valid examples: native button/input baselines, primitive-internal alignment, token-driven modal sizing.
+- Invalid examples: one-off page sections, arbitrary layout wrappers, raw geometry values that bypass tokens.
 
 #### ✅ Correct Usage
 
 ```svelte
-<!-- Layout = Tailwind, Material = SCSS -->
+<!-- Composition = Tailwind, shipped primitive material/geometry = SCSS -->
 <div class="flex flex-col gap-md p-lg surface-glass">
   <h2 class="text-main">Title</h2>
 </div>
@@ -66,10 +72,10 @@ graph LR
 #### ❌ Incorrect Usage
 
 ```scss
-/* NEVER put layout rules in SCSS */
+/* NEVER put arbitrary page/layout rules in SCSS */
 .surface-glass {
-  width: 300px; /* ❌ Layout bleed */
-  margin-bottom: 20px; /* ❌ Layout bleed */
+  width: 300px; /* ❌ Arbitrary layout bleed */
+  margin-bottom: 20px; /* ❌ Arbitrary layout bleed */
   @include glass-float; /* ✅ OK */
 }
 ```
@@ -2429,6 +2435,8 @@ modal.themes();
 modal.shortcuts();       // Keyboard shortcuts reference
 modal.palette();         // Command palette (Cmd+K)
 ```
+
+**Trusted content note:** `modal.alert()` and `modal.confirm()` body strings are for trusted internal rich text only. Do not pipe user-provided or remote HTML into them.
 
 **Escape handling:** Managed by the centralized [layer-stack.svelte.ts](src/lib/layer-stack.svelte.ts). The native `<dialog>` cancel event is suppressed (`e.preventDefault()`); the layer stack's global `keydown` listener pops the modal via `modal.close()`. This ensures correct precedence when a dropdown or sidebar is open above a modal — Escape dismisses the topmost layer first (LIFO).
 

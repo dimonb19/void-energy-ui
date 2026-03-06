@@ -8,6 +8,16 @@ paths:
 
 All available via `@use '../abstracts' as *;`
 
+## Protocol Note
+Use SCSS for:
+- visuals, physics, state styling
+- token-driven primitive-internal geometry that ships with the component out of the box
+
+Do not use SCSS for:
+- arbitrary page/layout composition
+- one-off consumer layout wrappers
+- raw geometry values that bypass tokens
+
 ## Surfaces
 ```
 glass-float($interactive: false)   Floating surface (cards, panels). $interactive=true adds hover lift/glow.

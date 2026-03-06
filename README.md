@@ -55,17 +55,28 @@ CSS utilities `.auth-only` and `.guest-only` read `data-auth` to show/hide conte
 This project uses a strict **Hybrid Protocol** to manage the complexity of the Void Engine.
 
 ### 1. The Separation of Concerns (Hybrid Protocol)
-We separate **Layout** (Geometry) from **Materials** (Physics).
+We separate **Composition Layout** from **Material + Shipped Primitive Geometry**.
 
 * **HTML/Svelte (`.svelte`, `.astro`):**
-    * Use **Tailwind** for Layout, Spacing, and Sizing.
+    * Use **Tailwind** for page composition, spacing, responsive structure, and consumer-side geometry.
     * ✅ `flex flex-col gap-md p-lg w-full`
     * ❌ `<div style="margin-top: 20px">` (Breaks Density Engine)
 
 * **SCSS (`src/styles/**/*.scss`):**
-    * Use **SCSS** for Visuals, Physics, and Complex States.
+    * Use **SCSS** for Visuals, Physics, Complex States, and token-driven component-internal geometry that ships with a primitive out of the box.
     * ✅ `.surface-glass { @include glass-float; }`
-    * ❌ `.surface-glass { width: 300px; margin-bottom: 20px; }` (Layout Bleed)
+    * ✅ `button { min-height: var(--control-height); display: inline-flex; }`
+    * ❌ `.surface-glass { width: 300px; margin-bottom: 20px; }` (Arbitrary page/layout bleed)
+
+**Allowed SCSS geometry exceptions**
+* Native control baselines (`button`, `input`, `select`, `textarea`)
+* Primitive-internal alignment/spacing required so the component works without repeated utility boilerplate
+* Token-driven sizing tied to component state or behavior (for example modal sizing)
+
+**Still not allowed**
+* One-off page layout or section layout in SCSS
+* Raw geometry values that bypass tokens
+* Visual/material effects moved into Tailwind utilities
 
 ### 2. The Law of Tokens
 * **Never hardcode pixels or colors.**
@@ -96,7 +107,7 @@ We separate **Layout** (Geometry) from **Materials** (Physics).
 ├── scripts/
 │   ├── generate-tokens.ts        <-- 🧠 The Compiler (build:tokens)
 │   ├── generate_context.py       <-- Context generation for AI
-│   ├── scan-physics.ts           <-- Physics preset scanner
+│   ├── scan-physics.ts           <-- Advisory raw-value scanner
 │   └── local-dev.ts              <-- 🛠️ Dev Server Orchestrator
 ├── src/
 │   ├── actions/

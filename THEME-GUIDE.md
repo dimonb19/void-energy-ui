@@ -567,7 +567,7 @@ Before considering your theme complete, verify these criteria:
   - Spacing should scale proportionally
 
 - [ ] **No raw values introduced**
-  - Run `npm run scan` — it exits non-zero if raw pixel values or hardcoded colors are found in SCSS/Svelte files
+  - Run `npm run scan` — advisory helper for common raw pixel values in SCSS/Svelte files
   - Your palette values in `design-tokens.ts` are exempt (they compile to CSS custom properties)
 
 ---

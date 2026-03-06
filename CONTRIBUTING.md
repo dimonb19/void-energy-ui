@@ -137,7 +137,7 @@ Run type checking to catch TypeScript and Svelte errors:
 npm run check
 ```
 
-Scan for Token Law violations (raw pixel values):
+Run the advisory raw-value scan:
 
 ```bash
 npm run scan
@@ -196,12 +196,12 @@ Violating these architectural principles will result in PR rejection.
 
 ### The Hybrid Protocol (Separation of Concerns)
 
-We separate **Layout** (Geometry) from **Material** (Physics).
+We separate **Composition Layout** from **Material + Shipped Primitive Geometry**.
 
 | Layer        | Technology | Responsibility                   |
 | ------------ | ---------- | -------------------------------- |
-| **Layout**   | Tailwind   | Geometry, Spacing, Sizing        |
-| **Material** | SCSS       | Visuals, Physics, Complex States |
+| **Layout**   | Tailwind   | Page composition, spacing, responsive structure, consumer-side geometry |
+| **Material** | SCSS       | Visuals, physics, complex states, token-driven primitive-internal geometry |
 
 #### ✅ Correct
 
@@ -211,16 +211,22 @@ We separate **Layout** (Geometry) from **Material** (Physics).
 </div>
 ```
 
+#### Allowed SCSS Geometry Exceptions
+
+- Native control baselines that should work out of the box
+- Primitive-internal alignment and spacing that consumers should not have to restate
+- Token-driven sizing tied to component state or behavior
+
 #### ❌ Incorrect
 
 ```scss
 .surface-glass {
-  width: 300px; /* ❌ Layout in SCSS */
-  margin-bottom: 20px; /* ❌ Layout in SCSS */
+  width: 300px; /* ❌ Arbitrary page/layout geometry in SCSS */
+  margin-bottom: 20px; /* ❌ Arbitrary page/layout geometry in SCSS */
 }
 ```
 
-**Why?** Mixing layout and material breaks the Density Engine and makes components rigid.
+**Why?** Arbitrary layout in SCSS breaks the Density Engine and makes consumers fight shipped primitives instead of composing them.
 
 See [CHEAT-SHEET.md → The Hybrid Protocol](./CHEAT-SHEET.md#the-hybrid-protocol-separation-of-concerns) for details.
 
@@ -370,7 +376,7 @@ See [CLAUDE.md → Native-First Protocol](./CLAUDE.md#5-native-first-protocol) f
 
 Ensure your PR meets these criteria:
 
-- [ ] **Code follows the Hybrid Protocol** (Layout = Tailwind, Material = SCSS)
+- [ ] **Code follows the Hybrid Protocol** (Tailwind for composition, SCSS for material + approved primitive geometry)
 - [ ] **All tokens are semantic** (No magic numbers or hardcoded colors)
 - [ ] **State uses attributes, not classes** (`[data-state="..."]`, not `.is-active`)
 - [ ] **Components use native elements** (no custom reimplementations of `<select>`, `<dialog>`, etc.)
@@ -379,7 +385,7 @@ Ensure your PR meets these criteria:
 - [ ] **No console errors or warnings**
 - [ ] **Build succeeds:** `npm run build`
 - [ ] **Type checking passes:** `npm run check`
-- [ ] **No Token Law violations:** `npm run scan`
+- [ ] **`npm run scan` reviewed:** no unexpected advisory hits
 - [ ] **Tokens rebuilt (if modified):** `npm run build:tokens`
 
 ---
@@ -410,7 +416,7 @@ When you open a PR, use this template:
 
 ## Checklist
 
-- [ ] I have followed the Hybrid Protocol
+- [ ] I have followed the Hybrid Protocol and stayed within the documented SCSS geometry exceptions
 - [ ] I have used native HTML elements (Native-First Protocol)
 - [ ] I have used semantic tokens (no magic numbers)
 - [ ] I have tested across multiple themes
@@ -418,7 +424,7 @@ When you open a PR, use this template:
 - [ ] I have tested on mobile, tablet, and desktop
 - [ ] Build passes: `npm run build`
 - [ ] `npm run check` passes (no TypeScript/Svelte errors)
-- [ ] `npm run scan` passes (no raw pixel values)
+- [ ] I reviewed `npm run scan` output (advisory)
 - [ ] No console errors or warnings
 - [ ] I have updated documentation (if needed)
 ```
@@ -438,7 +444,7 @@ When you open a PR, use this template:
 
 ### TypeScript
 
-- **Strict typing:** Avoid `any`. Use explicit types or `unknown`.
+- **Type hygiene, not type gymnastics:** The repo is type-checked, but it is not a strict-mode migration target. Avoid `any` when a precise type is straightforward; do not add complex type machinery unless it pays for itself.
 - **Interfaces for props:** Use TypeScript interfaces for component prop contracts.
 - **Descriptive names:** Use clear, semantic variable names.
 

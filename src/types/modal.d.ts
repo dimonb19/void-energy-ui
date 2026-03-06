@@ -8,13 +8,13 @@
  * 3. Create component in src/components/modals/
  */
 type ModalContract = {
-  /** Simple information modal with title and body text */
+  /** Simple information modal with title and trusted internal rich body text */
   alert: {
     title: string;
     body: string;
   };
 
-  /** Confirmation dialog with optional callbacks and cost display */
+  /** Confirmation dialog with optional callbacks and trusted internal rich body text */
   confirm: {
     title: string;
     body: string;
