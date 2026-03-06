@@ -98,7 +98,7 @@ npm run dev            Start dev server (auto-generates tokens, watches changes)
 npm run build          Production build (runs build:tokens → astro build)
 npm run build:tokens   Regenerate _generated-themes.scss from design-tokens.ts
 npm run check          Run svelte-check (TypeScript + Svelte type checking)
-npm run scan           Scan for magic pixel violations in SCSS/Svelte
+npm run scan           Advisory scan for common raw pixel-value misses in SCSS/Svelte
 npm run format         Prettier format all files
 npm run preview        Preview production build locally
 ```
@@ -394,7 +394,7 @@ Auth visibility utilities (FOUC-safe, set before first paint):
 - **`npm run scan` is advisory.** It currently scans `.scss` and `.svelte` files for common raw pixel-value misses. Treat it as a helper, not a complete Token Law gate.
 - **Glass and retro require dark mode.** VoidEngine auto-corrects invalid physics+mode combos. Do not manually set light mode with glass or retro physics.
 - **SCSS import path:** Always `@use '../abstracts' as *;` — never import individual partial files.
-- **Tailwind config is token-driven.** `tailwind.config.mjs` reads from `design-tokens.ts`. Add new values to design-tokens, not the Tailwind config.
+- **Tailwind token bridge:** spacing/color utilities are seeded from `design-tokens.ts`, but base screens/container settings still live in `tailwind.config.mjs`. Add semantic design values to `design-tokens.ts`; only touch Tailwind config when you are changing the framework bridge itself.
 - **TypeScript stance:** The repo is type-checked but not a strict-mode migration target. Avoid easy `any`; do not invent elaborate type machinery without payoff.
 - **Radius tokens in SCSS:** Default to `var(--radius-base)` for border-radius — it adapts per physics (8px glass, 4px flat, 0 retro). Use `var(--radius-full)` for pills. The scale tokens (`--radius-sm/md/lg/xl`) are available when you deliberately need a specific size, but all radius tokens are force-zeroed in retro physics.
 - **Modal dismiss buttons use `btn-ghost btn-error`** — not plain `btn-ghost`. Closing/canceling is a mildly destructive action; red ghost provides subtle signaling without the weight of a solid `btn-error`.

@@ -233,7 +233,7 @@ interface VoidToastItem {
   /** Unique identifier for this toast (auto-generated timestamp) */
   id: number;
 
-  /** Message content (HTML string, trusted internal use only) */
+  /** Message content rendered as plain text */
   message: string;
 
   /** Visual type determining color and icon */

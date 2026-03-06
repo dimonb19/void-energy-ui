@@ -18,7 +18,7 @@ class ToastStore {
 
   /**
    * Main entry point. Shows a toast of a specific type.
-   * @param message - Trusted internal string (supports HTML). ⚠️ NO USER INPUT.
+   * @param message - Trusted internal plain string. Rendered as text, not HTML.
    * @param type - 'info' | 'success' | 'error' | 'warning' | 'loading'
    */
   show(

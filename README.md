@@ -182,12 +182,12 @@ See [CLAUDE.md → State Management & Singletons](./CLAUDE.md) for full API refe
 ## 🔌 API Integration (Future Proofing)
 
 The Void Engine is ready to accept dynamic themes from an external API.
-If a collaborator needs to inject a custom brand theme, send a JSON payload matching this schema:
+If a collaborator needs to inject a custom brand theme, send a JSON payload matching this runtime theme shape:
 
 ```json
 {
   "id": "collaborator-brand-v1",
-  "type": "light", // or "dark"
+  "mode": "light", // or "dark"
   "physics": "flat", // "glass", "flat", or "retro"
   "palette": {
     "bg-canvas": "#ffffff",
@@ -208,6 +208,9 @@ If a collaborator needs to inject a custom brand theme, send a JSON payload matc
 }
 ```
 
-Implementation: Pass this object to voidEngine.registerTheme(id, data) and the system will render it instantly.
+Implementation:
 
-⚠️ API Warning: The Active Guardrail system applies here too. If your API payload requests physics: 'glass' but type: 'light', the engine will silently override physics to 'flat' to prevent a broken UI state.
+- `voidEngine.registerTheme(id, partialDef)` accepts partial runtime themes and merges them safely onto the base theme.
+- `await voidEngine.loadExternalTheme(url)` fetches, validates, registers, and activates a remote payload. It returns a typed `Result`.
+
+⚠️ API Warning: The Active Guardrail system applies here too. If your API payload requests `physics: 'glass'` with `mode: 'light'`, the engine will silently override physics to `flat` to prevent a broken UI state.

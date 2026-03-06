@@ -20,7 +20,7 @@ case "$FILE_PATH" in
     SCAN_OUTPUT=$(npm run scan 2>&1)
     SCAN_EXIT=$?
     if [ $SCAN_EXIT -ne 0 ]; then
-      echo "Token scan found violations:"
+      echo "Advisory token scan found raw-value hits:"
       echo "$SCAN_OUTPUT"
     fi
     ;;

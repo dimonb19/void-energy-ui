@@ -1,5 +1,5 @@
 /**
- * 🕵️ Void scanner for magic pixel usage.
+ * 🕵️ Void scanner for common raw pixel-value misses in SCSS/Svelte.
  * Usage: npm run scan
  */
 
@@ -30,7 +30,7 @@ const IGNORE_FILES = [
 const PIXEL_REGEX = /:.*?\b(\d+)px\b/g;
 
 // State tracker.
-let violationCount = 0;
+let hitCount = 0;
 
 function scanDirectory(dir: string) {
   const files = fs.readdirSync(dir);
@@ -66,7 +66,7 @@ function checkFile(filePath: string, fileName: string) {
       const pixelValue = `${match[1]}px`;
 
       if (!ALLOWED_PIXELS.includes(pixelValue)) {
-        violationCount++; 
+          hitCount++;
         
         const relativePath = path.relative(SRC_DIR, filePath);
         console.warn(
@@ -78,14 +78,16 @@ function checkFile(filePath: string, fileName: string) {
   });
 }
 
-console.log('\n🔮 Void Scanner: Searching for Physics Violations...\n');
+console.log('\n🔮 Void Scanner: Searching for advisory raw-value hits...\n');
 scanDirectory(SRC_DIR);
 
 // Final verdict.
-if (violationCount === 0) {
-  console.log('✨ No Physics Violations Found! The Void is stable.');
+if (hitCount === 0) {
+  console.log('✨ No advisory raw-value hits found in scanned SCSS/Svelte files.');
   process.exit(0); // Success
 } else {
-  console.error(`\n💥 Scan failed: ${violationCount} violations found.`);
+  console.error(
+    `\n💥 Advisory scan found ${hitCount} raw-value hit(s) in scanned SCSS/Svelte files.`,
+  );
   process.exit(1); // Failure (Will stop a build pipeline)
 }

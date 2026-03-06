@@ -2184,7 +2184,7 @@ Non-interactive status pills — the lightweight counterpart to chips. No hover 
 
 #### `<PortalLoader>` — Animated portal loading scene
 
-**Description:** Layered loading composition with circuit textures, animated SVG circuitry (`LoadingPortal`), and a centered quill icon (`LoadingQuill`). Fixed 2048×1228 aspect ratio with responsive max-width (640px tablet → 768px small-desktop → 900px large-desktop → 1024px full-HD). Uses `role="status"` with visually-hidden text for screen reader announcements. Quill icon is conditionally rendered — only visible during `loading` state. Label slot is prepared for `LoadingTextCycler` integration (currently commented out).
+**Description:** Layered loading composition with circuit textures, animated SVG circuitry (`LoadingPortal`), and a centered quill icon (`LoadingQuill`). Fixed 2048×1228 aspect ratio with responsive max-width (640px tablet → 768px small-desktop → 900px large-desktop → 1024px full-HD). Uses `role="status"` with visually-hidden text for screen reader announcements. Quill icon is conditionally rendered — only visible during `loading` state. On tablet and up, the label renders `LoadingTextCycler` under the quill during loading.
 **Location:** [src/components/ui/PortalLoader.svelte](src/components/ui/PortalLoader.svelte)
 **CSS:** `.portal-loader`, `.portal-layer`, `.portal-circuits`, `.shadow-vignette`, `.portal-svg`, `.portal-quill`, `.portal-label` (scoped)
 
@@ -2202,11 +2202,11 @@ Non-interactive status pills — the lightweight counterpart to chips. No hover 
 | Circuit texture | `.portal-circuits` | `z('floor')` | Static `circuits.webp` at 5% opacity |
 | Vignette | `.shadow-vignette` | `z('floor')` | Dark vignette overlay at 50% opacity |
 | SVG circuitry | `.portal-svg` | `z('decorate')` | `<LoadingPortal>` animated draw-on paths |
-| Quill + label | `.portal-quill` | `z('float')` | `<LoadingQuill>` centered, conditionally rendered during `loading`. Label slot prepared for `LoadingTextCycler` |
+| Quill + label | `.portal-quill` | `z('float')` | `<LoadingQuill>` centered during `loading`, with `LoadingTextCycler` label on tablet+ |
 
 **Accessibility:** Container uses `role="status"` with a `<span class="sr-only">Loading</span>` that appears when `status === 'loading'`.
 
-**Label animation:** `.portal-label` pulses opacity (0.6 → 1) on a 4s loop (`portal-label-pulse` keyframe). Glass: tinted via `tint(--energy-primary, 50%)`. Retro: `steps(4)` at 2s duration. Reduced motion: animation disabled. Label is currently commented out pending `LoadingTextCycler` integration.
+**Label animation:** `.portal-label` pulses opacity (0.6 → 0.9) on a 3s loop (`portal-label-pulse` keyframe). Glass: tinted via `tint(--energy-primary, 50%)`. Retro: `steps(4)` at the same 3s duration. Reduced motion: animation disabled.
 
 **Usage:**
 

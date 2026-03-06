@@ -37,8 +37,8 @@
       <h5>Alert</h5>
       <p class="text-small text-mute">
         <code>modal.alert(title, body)</code> opens a small informational dialog
-        with a single acknowledge button. The body supports HTML. Size defaults
-        to <code>sm</code>.
+        with a single acknowledge button. The body accepts trusted internal rich
+        text only. Size defaults to <code>sm</code>.
       </p>
 
       <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
@@ -58,7 +58,7 @@
               'Scheduled downtime: <strong>02:00 — 04:00 UTC</strong>. Non-critical systems will be unavailable during this period.',
             )}
         >
-          Alert (HTML body)
+          Alert (rich body)
         </button>
       </div>
     </div>
@@ -283,8 +283,8 @@ modal.open(MODAL_KEYS.INVITE, &#123;
           >import &#123; modal &#125; from '@lib/modal-manager.svelte';
 import &#123; MODAL_KEYS &#125; from '@config/modal-registry';
 
-// Alert (informational, sm size)
-modal.alert('Title', 'Body text supports &lt;strong&gt;HTML&lt;/strong&gt;.');
+// Alert (informational, sm size, trusted internal rich text only)
+modal.alert('Title', 'Body text supports trusted &lt;strong&gt;rich text&lt;/strong&gt;.');
 
 // Confirm (with callbacks, md size)
 modal.confirm('Delete Item?', 'This cannot be undone.', &#123;
