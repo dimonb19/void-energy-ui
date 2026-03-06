@@ -26,6 +26,14 @@ const PATHS = {
   physicsJson: path.resolve(__dirname, '../src/config/void-physics.json'),
 };
 
+type TypographyScale = (typeof VOID_TYPOGRAPHY.scales)[keyof typeof VOID_TYPOGRAPHY.scales];
+
+function hasTabletOverride(
+  config: TypographyScale,
+): config is TypographyScale & { tabletOverride: string } {
+  return 'tabletOverride' in config && typeof config.tabletOverride === 'string';
+}
+
 // Convert raw token numbers to CSS units.
 function toCssValue(key: string, value: string | number): string {
   if (typeof value === 'string') return value;
@@ -54,8 +62,8 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
   // Typography: Tablet overrides map (for H1-H4).
   scss += `$tablet-overrides: (\n`;
   Object.entries(VOID_TYPOGRAPHY.scales).forEach(([level, config]) => {
-    if ('tabletOverride' in config) {
-      scss += `  '${level}': ${(config as any).tabletOverride},\n`;
+    if (hasTabletOverride(config)) {
+      scss += `  '${level}': ${config.tabletOverride},\n`;
     }
   });
   scss += `);\n\n`;

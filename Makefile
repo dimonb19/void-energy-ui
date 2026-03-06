@@ -23,10 +23,13 @@ check:
 scan:
 	$(PKG_MGR) run scan
 
+test:
+	$(PKG_MGR) run test
+
 tokens:
 	$(PKG_MGR) run build:tokens
 
 clean:
 	rm -rf node_modules .astro dist
 
-.PHONY: install dev build format check scan tokens preview clean
+.PHONY: install dev build format check scan test tokens preview clean

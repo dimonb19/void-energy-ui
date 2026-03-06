@@ -36,6 +36,13 @@ class LayerStack {
     this.syncListener();
   }
 
+  /** Clears all layers without invoking dismiss callbacks. */
+  clear(): void {
+    this.stack = [];
+    this.count = 0;
+    this.syncListener();
+  }
+
   /** Whether the stack has any layers. */
   get hasLayers(): boolean {
     return this.count > 0;

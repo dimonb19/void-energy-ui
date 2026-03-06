@@ -39,7 +39,7 @@
   interface IconBtnProps extends HTMLButtonAttributes {
     icon: Component;
     size?: string;
-    iconProps?: Record<string, any>;
+    iconProps?: Record<string, unknown>;
     class?: string;
   }
 

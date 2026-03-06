@@ -2,7 +2,7 @@
  * Returns a debounced version of `fn` that delays invocation until
  * `ms` milliseconds after the last call.
  */
-export function debounce<T extends (...args: any[]) => void>(
+export function debounce<T extends (...args: unknown[]) => void>(
   fn: T,
   ms: number,
 ): T & { cancel(): void } {
@@ -19,7 +19,7 @@ export function debounce<T extends (...args: any[]) => void>(
  * Returns a throttled version of `fn` that invokes at most once
  * per `ms` milliseconds. Trailing call is guaranteed.
  */
-export function throttle<T extends (...args: any[]) => void>(
+export function throttle<T extends (...args: unknown[]) => void>(
   fn: T,
   ms: number,
 ): T & { cancel(): void } {

@@ -41,6 +41,16 @@ class ShortcutRegistry {
   }
 
   /**
+   * Clears all registered shortcuts.
+   * Useful for test isolation and predictable teardown.
+   */
+  clear() {
+    this.map.clear();
+    this.entries = [];
+    this.syncListener();
+  }
+
+  /**
    * Handles a keyboard event. Called by the document-level listener.
    * Applies all safety guards before dispatching to the matching shortcut.
    */

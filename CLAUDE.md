@@ -99,6 +99,7 @@ npm run build          Production build (runs build:tokens → astro build)
 npm run build:tokens   Regenerate _generated-themes.scss from design-tokens.ts
 npm run check          Run svelte-check (TypeScript + Svelte type checking)
 npm run scan           Advisory scan for common raw pixel-value misses in SCSS/Svelte
+npm run test           Run unit tests (vitest — jsdom, no browser needed)
 npm run format         Prettier format all files
 npm run preview        Preview production build locally
 ```
