@@ -1,10 +1,11 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  let {
-    id = 'eye',
-    class: className,
-    ...rest
-  }: HTMLAttributes<SVGElement> = $props();
+  let { id, class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
+  const componentId = $props.id();
+  const defsId = `eye-defs-${componentId}`;
+  const topMaskId = `${defsId}-top-mask`;
+  const bottomMaskId = `${defsId}-bottom-mask`;
+  const crossedMaskId = `${defsId}-crossed-mask`;
   // data-muted attribute
 </script>
 
@@ -16,12 +17,13 @@
   stroke-width="15"
   stroke-linejoin="round"
   stroke-linecap="round"
+  {id}
   class="icon-eye icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
   <defs>
-    <mask id="{id}-top-mask">
+    <mask id={topMaskId}>
       <rect
         class="mask-rect"
         x="-100"
@@ -31,7 +33,7 @@
         fill="white"
       />
     </mask>
-    <mask id="{id}-bottom-mask">
+    <mask id={bottomMaskId}>
       <rect
         class="mask-rect"
         x="100"
@@ -41,7 +43,7 @@
         fill="white"
       />
     </mask>
-    <mask id="{id}-crossed-mask">
+    <mask id={crossedMaskId}>
       <g stroke="white">
         <circle r="20" />
         <path d="M -80 0 Q 0 -90 80 0 Q 0 90 -80 0 Z" />
@@ -50,13 +52,13 @@
     </mask>
   </defs>
 
-  <g mask="url(#{id}-top-mask)">
+  <g mask={`url(#${topMaskId})`}>
     <circle r="20" />
     <path d="M -80 0 Q 0 -90 80 0 Q 0 90 -80 0 Z" />
   </g>
 
-  <g mask="url(#{id}-bottom-mask)">
-    <g mask="url(#{id}-crossed-mask)">
+  <g mask={`url(#${bottomMaskId})`}>
+    <g mask={`url(#${crossedMaskId})`}>
       <circle r="20" />
       <path d="M -80 0 Q 0 -90 80 0 Q 0 90 -80 0 Z" />
     </g>

@@ -1,19 +1,13 @@
 /*
  * Shared foundation for native-backed UI controls.
- * Keeps ID/group generation and state/value normalization consistent.
+ * Component-rendered IDs come from Svelte's $props.id() for hydration safety.
+ * The runtime counter below is reserved for client-only DOM created after mount.
  */
 
-let nativeControlCounter = 0;
+let stableIdCounter = 0;
 
-export function createNativeControlIdentity(
-  prefix: string,
-  explicitId?: string,
-) {
-  const id = explicitId ?? `${prefix}-${++nativeControlCounter}`;
-  return {
-    id,
-    groupName: `${id}-group`,
-  };
+export function createStableId(prefix: string, explicitId?: string) {
+  return explicitId ?? `${prefix}-${++stableIdCounter}`;
 }
 
 export function toNativeControlState(isActive: boolean) {

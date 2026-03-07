@@ -32,8 +32,9 @@
 
   let { value, id, class: className = '' }: CopyFieldProps = $props();
 
-  // svelte-ignore state_referenced_locally
-  const inputId = id ?? `copy-${Math.random().toString(36).slice(2, 9)}`;
+  const componentId = $props.id();
+  const generatedInputId = `copy-${componentId}`;
+  const inputId = $derived(id ?? generatedInputId);
 
   let copied = $state(false);
   let timeout: ReturnType<typeof setTimeout> | undefined;

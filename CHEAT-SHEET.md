@@ -2629,6 +2629,8 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 <Eye data-muted={isMuted} data-size="lg" />
 ```
 
+> **Defs isolation:** Icons using SVG `<defs>` (masks, filters, gradients) auto-generate unique internal IDs via `$props.id()`. Multiple instances of the same icon work without collision — no manual `id` prop needed.
+
 ---
 
 #### `<ActionBtn>` (Icon + Text Button)
@@ -2745,6 +2747,7 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 | `LoadingSpin` | Animated (custom) | Data fetching, backend requests, async operations. CSS `@keyframes rotate`, retro: `steps(8)` |
 | `LoadingQuill` | Animated (custom) | AI content generation, story game launching, creative AI processes. Multi-layer trace/fill/dot animation, `data-status="idle\|loading"`, retro: `steps(4-8)` |
 | `LoadingPortal` | Animated (custom) | Portal loading scene circuitry. Non-square viewBox (2048×1228), staggered draw-on/draw-off path animation, `data-status="idle\|loading"`. Glass: bloom glow. Retro: stepped timing. Light: flat `--energy-primary` fill |
+| `PortalRing` | Animated (custom) | 404 page portal. Parallax-reactive rings with orbital/particle fields, `intensity` prop (0–1). Glass/flat: SVG displacement filters. Retro: no filters |
 | `LogoDGRS` | Logo (custom) | Non-square viewBox, `data-render="logo"` |
 | `LogoCoNexus` | Logo (custom) | Non-square viewBox, `data-render="logo"` |
 

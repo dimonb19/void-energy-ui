@@ -72,9 +72,9 @@
     class: className = '',
   }: GenerateTextareaProps = $props();
 
-  // svelte-ignore state_referenced_locally
-  const textareaId =
-    id ?? `generate-textarea-${Math.random().toString(36).slice(2, 9)}`;
+  const componentId = $props.id();
+  const generatedTextareaId = `generate-textarea-${componentId}`;
+  const textareaId = $derived(id ?? generatedTextareaId);
 
   let generating = $state(false);
   let abortController: AbortController | undefined = $state();

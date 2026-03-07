@@ -29,7 +29,6 @@
 <script lang="ts">
   import type { Component } from 'svelte';
   import {
-    createNativeControlIdentity,
     toNativeControlState,
     toNativeControlValue,
   } from '@lib/native-control-foundation';
@@ -61,12 +60,11 @@
   }: SwitcherProps = $props();
 
   // Shared native-control identity (stable per component instance)
-  // svelte-ignore state_referenced_locally
-  const { id: inputId, groupName } = createNativeControlIdentity(
-    'switcher',
-    id,
-  );
-  const labelId = `${inputId}-label`;
+  const componentId = $props.id();
+  const generatedInputId = `switcher-${componentId}`;
+  const inputId = $derived(id ?? generatedInputId);
+  const groupName = $derived(`${inputId}-group`);
+  const labelId = $derived(`${inputId}-label`);
 
   let selectedValue = $derived(toNativeControlValue(value));
 

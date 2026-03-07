@@ -48,8 +48,9 @@
     class: className = '',
   }: PasswordFieldProps = $props();
 
-  // svelte-ignore state_referenced_locally
-  const inputId = id ?? `password-${Math.random().toString(36).slice(2, 9)}`;
+  const componentId = $props.id();
+  const generatedInputId = `password-${componentId}`;
+  const inputId = $derived(id ?? generatedInputId);
 
   let visible = $state(false);
 
@@ -72,7 +73,7 @@
   <span class="field-slot-right">
     <IconBtn
       icon={Eye}
-      iconProps={{ 'data-muted': !visible, id: inputId }}
+      iconProps={{ 'data-muted': !visible }}
       onclick={toggleVisibility}
       aria-label={visible ? 'Hide password' : 'Show password'}
       aria-pressed={visible}

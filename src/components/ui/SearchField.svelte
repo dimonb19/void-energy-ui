@@ -59,8 +59,9 @@
     ...rest
   }: SearchFieldProps = $props();
 
-  // svelte-ignore state_referenced_locally
-  const inputId = id ?? `search-${Math.random().toString(36).slice(2, 9)}`;
+  const componentId = $props.id();
+  const generatedInputId = `search-${componentId}`;
+  const inputId = $derived(id ?? generatedInputId);
 
   let focused = $state(false);
   let debouncedInput: ((value: string) => void) | undefined;

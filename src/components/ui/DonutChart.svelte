@@ -66,8 +66,9 @@
     class: className = '',
   }: DonutChartProps = $props();
 
-  // svelte-ignore state_referenced_locally
-  const chartId = id ?? `donut-chart-${Math.random().toString(36).slice(2, 9)}`;
+  const componentId = $props.id();
+  const generatedChartId = `donut-chart-${componentId}`;
+  const chartId = $derived(id ?? generatedChartId);
 
   const center = $derived(size / 2);
   const radius = $derived(center * 0.8);

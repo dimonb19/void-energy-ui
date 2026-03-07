@@ -49,8 +49,9 @@
     class: className = '',
   }: SparklineProps = $props();
 
-  // svelte-ignore state_referenced_locally
-  const chartId = id ?? `sparkline-${Math.random().toString(36).slice(2, 9)}`;
+  const componentId = $props.id();
+  const generatedChartId = `sparkline-${componentId}`;
+  const chartId = $derived(id ?? generatedChartId);
 
   // Internal padding to prevent stroke clipping
   const pad = 2; // void-ignore (SVG internal padding — sub-token)

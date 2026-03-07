@@ -305,7 +305,7 @@ which the stack respects via `defaultPrevented` check — no double-dismissal.
 ### Shortcut Registry (`import { shortcutRegistry } from '@lib/shortcut-registry.svelte'`)
 ```
 .register(entry)                    Register { key, label, group, action }
-.unregister(key)                    Remove by key string
+.unregister(key, modifier?)         Remove by key (+ optional modifier)
 .entries                            All registered shortcuts ($state array)
 .grouped                            Entries grouped by group field (getter)
 .handle(event)                      Process KeyboardEvent (internal, document listener)

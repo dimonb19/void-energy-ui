@@ -60,9 +60,9 @@
     class: className = '',
   }: EditTextareaProps = $props();
 
-  // svelte-ignore state_referenced_locally
-  const textareaId =
-    id ?? `edit-textarea-${Math.random().toString(36).slice(2, 9)}`;
+  const componentId = $props.id();
+  const generatedTextareaId = `edit-textarea-${componentId}`;
+  const textareaId = $derived(id ?? generatedTextareaId);
 
   let editing = $state(false);
   let draft = $state('');

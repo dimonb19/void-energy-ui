@@ -75,7 +75,8 @@
   let triggerEl = $state<HTMLButtonElement | null>(null);
   let panelEl = $state<HTMLDivElement | null>(null);
 
-  const panelId = `dropdown-${Math.random().toString(36).slice(2, 9)}`;
+  const componentId = $props.id();
+  const panelId = `dropdown-${componentId}`;
 
   let cleanupAutoUpdate: (() => void) | null = null;
   let generation = 0;

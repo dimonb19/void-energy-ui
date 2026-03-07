@@ -16,12 +16,27 @@ import {
   TOOLTIP_OFFSET_PX,
   TOOLTIP_VIEWPORT_PADDING_PX,
 } from '@config/ui-geometry';
+import { createStableId } from '@lib/native-control-foundation';
+
+function parseIdRefs(value: string | null) {
+  return value?.trim().split(/\s+/).filter(Boolean) ?? [];
+}
+
+function joinIdRefs(tokens: string[]) {
+  return tokens.length > 0 ? tokens.join(' ') : null;
+}
+
+function haveSameIdRefs(a: string[], b: string[]) {
+  return a.length === b.length && a.every((token, index) => token === b[index]);
+}
 
 export class VoidTooltip {
   private trigger: Element;
   private tooltip: HTMLElement | null = null;
   private cleanupPositioning: (() => void) | null = null;
   private options: VoidTooltipOptions;
+  private tooltipId: string | null = null;
+  private initialDescribedBy: string | null = null;
 
   private showTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -78,10 +93,11 @@ export class VoidTooltip {
     this.tooltip.popover = 'manual';
 
     // Apply a11y attributes; physics styling stays in CSS.
-    const id = `tooltip-${Math.random().toString(36).substr(2, 9)}`;
+    const id = createStableId('tooltip');
+    this.tooltipId = id;
     this.tooltip.setAttribute('id', id);
     this.tooltip.setAttribute('role', 'tooltip');
-    this.trigger.setAttribute('aria-describedby', id);
+    this.attachDescription(id);
 
     // Mount to body to escape local stacking contexts.
     document.body.appendChild(this.tooltip);
@@ -89,8 +105,10 @@ export class VoidTooltip {
 
     // Keep position synced with Floating UI.
     this.cleanupPositioning = autoUpdate(this.trigger, this.tooltip, () => {
-      if (!this.tooltip) return;
-      computePosition(this.trigger, this.tooltip, {
+      const tooltipEl = this.tooltip;
+      if (!tooltipEl) return;
+
+      computePosition(this.trigger, tooltipEl, {
         placement: this.options.placement,
         middleware: [
           offset(this.options.offset ?? TOOLTIP_OFFSET_PX),
@@ -98,12 +116,14 @@ export class VoidTooltip {
           shift({ padding: TOOLTIP_VIEWPORT_PADDING_PX }),
         ],
       }).then(({ x, y, placement: resolvedPlacement }) => {
-        Object.assign(this.tooltip!.style, {
+        if (!this.tooltip || this.tooltip !== tooltipEl) return;
+
+        Object.assign(tooltipEl.style, {
           left: `${x}px`,
           top: `${y}px`,
           position: 'absolute',
         });
-        this.tooltip!.dataset.side = resolvedPlacement.split('-')[0];
+        tooltipEl.dataset.side = resolvedPlacement.split('-')[0];
       });
     });
 
@@ -136,19 +156,62 @@ export class VoidTooltip {
       } catch (e) {
         // Ignore race conditions where the element is already gone.
       }
-      this.trigger.removeAttribute('aria-describedby');
+      this.detachDescription();
       this.tooltip = null;
     };
 
     // Align DOM removal with CSS transition duration (retro returns 0).
-    const styles = getComputedStyle(el);
-    const duration = parseFloat(styles.transitionDuration);
+    let duration = 0;
+    try {
+      const styles = getComputedStyle(el);
+      duration = parseFloat(styles.transitionDuration);
+    } catch {
+      destroy();
+      return;
+    }
 
-    if (duration === 0) {
+    if (!Number.isFinite(duration) || duration === 0) {
       destroy();
     } else {
       el.addEventListener('transitionend', destroy, { once: true });
     }
+  }
+
+  private attachDescription(id: string) {
+    this.initialDescribedBy = this.trigger.getAttribute('aria-describedby');
+    const merged = Array.from(
+      new Set([...parseIdRefs(this.initialDescribedBy), id]),
+    );
+    const value = joinIdRefs(merged);
+    if (value) {
+      this.trigger.setAttribute('aria-describedby', value);
+    }
+  }
+
+  private detachDescription() {
+    if (!this.tooltipId) return;
+
+    const current = parseIdRefs(this.trigger.getAttribute('aria-describedby'));
+    const initial = parseIdRefs(this.initialDescribedBy);
+    const next = current.filter((token) => token !== this.tooltipId);
+
+    if (haveSameIdRefs(next, initial)) {
+      if (this.initialDescribedBy == null) {
+        this.trigger.removeAttribute('aria-describedby');
+      } else {
+        this.trigger.setAttribute('aria-describedby', this.initialDescribedBy);
+      }
+    } else {
+      const value = joinIdRefs(next);
+      if (value) {
+        this.trigger.setAttribute('aria-describedby', value);
+      } else {
+        this.trigger.removeAttribute('aria-describedby');
+      }
+    }
+
+    this.tooltipId = null;
+    this.initialDescribedBy = null;
   }
 
   public update(newOptions: Partial<VoidTooltipOptions>) {

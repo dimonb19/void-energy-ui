@@ -6,12 +6,14 @@
     intensity?: number;
   }
 
-  let {
-    id = 'portal-ring',
-    intensity = 1,
-    class: className,
-    ...rest
-  }: Props = $props();
+  let { id, intensity = 1, class: className, ...rest }: Props = $props();
+
+  const componentId = $props.id();
+  const defsId = `portal-ring-defs-${componentId}`;
+  const warpGlassId = `${defsId}-warp-glass`;
+  const warpFlatId = `${defsId}-warp-flat`;
+  const eventHorizonId = `${defsId}-event-horizon`;
+  const voidDepthId = `${defsId}-void-depth`;
 
   let svgEl: SVGElement;
 
@@ -147,13 +149,14 @@
   xmlns="http://www.w3.org/2000/svg"
   viewBox="0 0 400 400"
   fill="none"
+  {id}
   class="icon-portal-ring icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
   <defs>
     <!-- ── Filters ── -->
-    <filter id="{id}-warp-glass" x="-20%" y="-20%" width="140%" height="140%">
+    <filter id={warpGlassId} x="-20%" y="-20%" width="140%" height="140%">
       <feTurbulence
         type="fractalNoise"
         baseFrequency="0.12"
@@ -169,7 +172,7 @@
         yChannelSelector="G"
       />
     </filter>
-    <filter id="{id}-warp-flat" x="-20%" y="-20%" width="140%" height="140%">
+    <filter id={warpFlatId} x="-20%" y="-20%" width="140%" height="140%">
       <feTurbulence
         type="fractalNoise"
         baseFrequency="0.04"
@@ -187,7 +190,7 @@
     </filter>
 
     <!-- ── Gradients ── -->
-    <radialGradient id="{id}-event-horizon" cx="50%" cy="50%" r="50%">
+    <radialGradient id={eventHorizonId} cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="currentColor" stop-opacity="0.12" />
       <stop offset="25%" stop-color="currentColor" stop-opacity="0.06" />
       <stop offset="50%" stop-color="currentColor" stop-opacity="0.1" />
@@ -195,7 +198,7 @@
       <stop offset="100%" stop-color="currentColor" stop-opacity="0" />
     </radialGradient>
 
-    <radialGradient id="{id}-void-depth" cx="50%" cy="50%" r="50%">
+    <radialGradient id={voidDepthId} cx="50%" cy="50%" r="50%">
       <stop offset="0%" stop-color="var(--bg-canvas)" stop-opacity="1" />
       <stop offset="15%" stop-color="var(--bg-canvas)" stop-opacity="0.98" />
       <stop offset="30%" stop-color="var(--bg-canvas)" stop-opacity="0.92" />
@@ -213,7 +216,7 @@
       cx="200"
       cy="200"
       r="190"
-      fill="url(#{id}-event-horizon)"
+      fill={`url(#${eventHorizonId})`}
       class="horizon-bg"
     />
   </g>
@@ -223,7 +226,11 @@
     class="ring-outer-system"
     style:transform="translate({px * 12}px, {py * 12}px) scale({1 +
       ringWobble})"
-    filter={physics !== 'retro' ? `url(#${id}-warp-${physics})` : undefined}
+    filter={physics === 'glass'
+      ? `url(#${warpGlassId})`
+      : physics === 'flat'
+        ? `url(#${warpFlatId})`
+        : undefined}
   >
     <circle cx="200" cy="200" r="175" class="ring ro-1" />
     <circle cx="200" cy="200" r="170" class="ring ro-2" />
@@ -257,7 +264,11 @@
     class="ring-mid-system"
     style:transform="translate({px * 18}px, {py * 18}px) scale({1 +
       ringWobble * 1.3})"
-    filter={physics !== 'retro' ? `url(#${id}-warp-${physics})` : undefined}
+    filter={physics === 'glass'
+      ? `url(#${warpGlassId})`
+      : physics === 'flat'
+        ? `url(#${warpFlatId})`
+        : undefined}
   >
     <circle cx="200" cy="200" r="135" class="ring rm-1" />
     <circle cx="200" cy="200" r="128" class="ring rm-2" />
@@ -287,7 +298,11 @@
     class="ring-inner-system"
     style:transform="translate({px * 26}px, {py * 26}px) scale({1 +
       ringWobble * 1.8})"
-    filter={physics !== 'retro' ? `url(#${id}-warp-${physics})` : undefined}
+    filter={physics === 'glass'
+      ? `url(#${warpGlassId})`
+      : physics === 'flat'
+        ? `url(#${warpFlatId})`
+        : undefined}
   >
     <circle cx="200" cy="200" r="95" class="ring ri-1" />
     <circle cx="200" cy="200" r="88" class="ring ri-2" />
@@ -309,7 +324,11 @@
   <g
     class="orbital-field"
     style:transform="translate({px * 15}px, {py * 15}px)"
-    filter={physics !== 'retro' ? `url(#${id}-warp-${physics})` : undefined}
+    filter={physics === 'glass'
+      ? `url(#${warpGlassId})`
+      : physics === 'flat'
+        ? `url(#${warpFlatId})`
+        : undefined}
   >
     {#each orbitals as orb, i}
       <circle
@@ -328,7 +347,11 @@
   <g
     class="particle-field"
     style:transform="translate({px * 20}px, {py * 20}px)"
-    filter={physics !== 'retro' ? `url(#${id}-warp-${physics})` : undefined}
+    filter={physics === 'glass'
+      ? `url(#${warpGlassId})`
+      : physics === 'flat'
+        ? `url(#${warpFlatId})`
+        : undefined}
   >
     {#each particles as p, i}
       <circle
@@ -349,7 +372,7 @@
       cx="200"
       cy="200"
       r="195"
-      fill="url(#{id}-void-depth)"
+      fill={`url(#${voidDepthId})`}
       class="void-depth"
     />
     <text
@@ -358,7 +381,11 @@
       class="void-text"
       text-anchor="middle"
       dominant-baseline="central"
-      filter={physics !== 'retro' ? `url(#${id}-warp-${physics})` : undefined}>404</text
+      filter={physics === 'glass'
+        ? `url(#${warpGlassId})`
+        : physics === 'flat'
+          ? `url(#${warpFlatId})`
+          : undefined}>404</text
     >
   </g>
 </svg>

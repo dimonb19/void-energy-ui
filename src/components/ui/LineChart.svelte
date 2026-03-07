@@ -25,6 +25,10 @@
   import { morph } from '@actions/morph';
   import { tooltip } from '@actions/tooltip';
 
+  const INVALID_CHART_LABEL = 'Invalid chart data';
+  const SHOULD_WARN_INVALID =
+    import.meta.env.DEV || import.meta.env.MODE === 'test';
+
   interface LineChartPoint {
     label: string;
     value: number;
@@ -93,8 +97,9 @@
     class: className = '',
   }: LineChartProps = $props();
 
-  // svelte-ignore state_referenced_locally
-  const chartId = id ?? `line-chart-${Math.random().toString(36).slice(2, 9)}`;
+  const componentId = $props.id();
+  const generatedChartId = `line-chart-${componentId}`;
+  const chartId = $derived(id ?? generatedChartId);
 
   // Fluid sizing via ResizeObserver
   let wrapperEl: HTMLDivElement | undefined = $state();
@@ -150,8 +155,41 @@
 
   const isMultiSeries = $derived(normalizedSeries.length > 1);
 
+  const lineChartValidation = $derived.by(() => {
+    if (normalizedSeries.length <= 1) {
+      return { valid: true, reason: null as string | null };
+    }
+
+    const baseline = normalizedSeries[0]?.data ?? [];
+
+    for (const series of normalizedSeries.slice(1)) {
+      if (series.data.length !== baseline.length) {
+        return {
+          valid: false,
+          reason: 'Line chart series must contain the same number of points.',
+        };
+      }
+
+      for (let index = 0; index < baseline.length; index += 1) {
+        if (series.data[index]?.label !== baseline[index]?.label) {
+          return {
+            valid: false,
+            reason:
+              'Line chart series must use the same labels in the same order.',
+          };
+        }
+      }
+    }
+
+    return { valid: true, reason: null as string | null };
+  });
+
   // Labels from first series
-  const labels = $derived(normalizedSeries[0]?.data.map((d) => d.label) ?? []);
+  const labels = $derived(
+    lineChartValidation.valid
+      ? (normalizedSeries[0]?.data.map((d) => d.label) ?? [])
+      : [],
+  );
 
   // Global max across all series
   const maxValue = $derived.by(() => {
@@ -229,6 +267,10 @@
 
   // Build SVG path strings for each series
   const linePaths = $derived.by(() => {
+    if (!lineChartValidation.valid) {
+      return [];
+    }
+
     return normalizedSeries.map((s) => {
       const pts = s.data.map((d, i) => {
         const x = pointX(i, s.data.length);
@@ -256,6 +298,10 @@
   });
 
   const accessibleSummary = $derived.by(() => {
+    if (!lineChartValidation.valid) {
+      return `${INVALID_CHART_LABEL}. ${lineChartValidation.reason}`;
+    }
+
     const allValues = normalizedSeries.flatMap((s) =>
       s.data.map((d) => d.value),
     );
@@ -270,6 +316,7 @@
   // Measure path lengths for draw animation
   let pathLengths = $state<number[]>([]);
   let svgEl: SVGSVGElement | undefined = $state();
+  let lastInvalidWarning = $state<string | null>(null);
 
   $effect(() => {
     if (!svgEl) return;
@@ -278,6 +325,22 @@
     pathLengths = Array.from(paths).map((p) =>
       (p as SVGPathElement).getTotalLength(),
     );
+  });
+
+  $effect(() => {
+    if (!SHOULD_WARN_INVALID) return;
+
+    const reason = lineChartValidation.valid
+      ? null
+      : lineChartValidation.reason;
+    if (reason && reason !== lastInvalidWarning) {
+      console.warn(`Void: ${INVALID_CHART_LABEL.toLowerCase()} (${reason})`);
+      lastInvalidWarning = reason;
+    }
+
+    if (!reason) {
+      lastInvalidWarning = null;
+    }
   });
 </script>
 
@@ -297,7 +360,15 @@
   >
     <title id="{chartId}-title">{title}</title>
     <desc id="{chartId}-desc">{accessibleSummary}</desc>
-    {#if normalizedSeries[0]?.data.length > 0}
+    {#if !lineChartValidation.valid}
+      <text
+        class="chart-label"
+        x={svgWidth / 2}
+        y={height / 2}
+        text-anchor="middle"
+        dominant-baseline="middle">{INVALID_CHART_LABEL}</text
+      >
+    {:else if normalizedSeries[0]?.data.length > 0}
       {#if showGrid}
         <!-- Grid lines -->
         {#each gridLines as gridVal}
@@ -459,7 +530,7 @@
   </svg>
 
   <!-- Legend -->
-  {#if showLegend && isMultiSeries}
+  {#if showLegend && isMultiSeries && lineChartValidation.valid}
     <div class="flex flex-row flex-wrap justify-center gap-md mt-md">
       {#each normalizedSeries as s}
         <div class="flex items-center gap-xs">
@@ -471,7 +542,7 @@
   {/if}
 
   <!-- Screen reader data table -->
-  {#if normalizedSeries.length > 0 && normalizedSeries[0].data.length > 0}
+  {#if lineChartValidation.valid && normalizedSeries.length > 0 && normalizedSeries[0].data.length > 0}
     <table class="sr-only">
       <caption>{title}</caption>
       <thead>

@@ -46,8 +46,9 @@
     class: className = '',
   }: StatCardProps = $props();
 
-  // svelte-ignore state_referenced_locally
-  const chartId = id ?? `stat-card-${Math.random().toString(36).slice(2, 9)}`;
+  const componentId = $props.id();
+  const generatedChartId = `stat-card-${componentId}`;
+  const chartId = $derived(id ?? generatedChartId);
 
   const TrendIcon = $derived(
     trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus,

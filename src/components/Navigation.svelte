@@ -171,7 +171,7 @@
       shortcutRegistry.unregister('f');
       shortcutRegistry.unregister('t');
       shortcutRegistry.unregister('?');
-      shortcutRegistry.unregister('k');
+      shortcutRegistry.unregister('k', 'meta');
     };
   });
 

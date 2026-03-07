@@ -23,6 +23,10 @@
   import { tooltip } from '@actions/tooltip';
   import { TOOLTIP_CHART_LABEL_OFFSET_PX } from '@config/ui-geometry';
 
+  const INVALID_CHART_LABEL = 'Invalid chart data';
+  const SHOULD_WARN_INVALID =
+    import.meta.env.DEV || import.meta.env.MODE === 'test';
+
   interface ChartDataPoint {
     label: string;
     value: number;
@@ -94,8 +98,9 @@
     class: className = '',
   }: BarChartProps = $props();
 
-  // svelte-ignore state_referenced_locally
-  const chartId = id ?? `bar-chart-${Math.random().toString(36).slice(2, 9)}`;
+  const componentId = $props.id();
+  const generatedChartId = `bar-chart-${componentId}`;
+  const chartId = $derived(id ?? generatedChartId);
 
   // Fluid sizing via ResizeObserver
   let wrapperEl: HTMLDivElement | undefined = $state();
@@ -113,6 +118,43 @@
 
   const isHorizontal = $derived(orientation === 'horizontal');
   const isGrouped = $derived(!!groups && groups.length > 0);
+  const barChartValidation = $derived.by(() => {
+    if (!isGrouped) {
+      return { valid: true, reason: null as string | null };
+    }
+
+    const baseline = groups?.[0]?.values ?? [];
+
+    for (const group of groups?.slice(1) ?? []) {
+      if (group.values.length !== baseline.length) {
+        return {
+          valid: false,
+          reason:
+            'Grouped bar charts must contain the same number of value slots in every group.',
+        };
+      }
+
+      for (let index = 0; index < baseline.length; index += 1) {
+        const baselineSlot = baseline[index];
+        const groupSlot = group.values[index];
+        const baselineSeries = baselineSlot?.series ?? index;
+        const groupSeries = groupSlot?.series ?? index;
+
+        if (
+          groupSlot?.name !== baselineSlot?.name ||
+          groupSeries !== baselineSeries
+        ) {
+          return {
+            valid: false,
+            reason:
+              'Grouped bar charts must use the same value slots in the same order for every group.',
+          };
+        }
+      }
+    }
+
+    return { valid: true, reason: null as string | null };
+  });
 
   // Layout constants (SVG viewBox coordinates — unitless, not CSS px) // void-ignore
   const basePaddingTop = 24;
@@ -255,6 +297,10 @@
   }
 
   const accessibleSummary = $derived.by(() => {
+    if (!barChartValidation.valid) {
+      return `${INVALID_CHART_LABEL}. ${barChartValidation.reason}`;
+    }
+
     if (isGrouped) {
       if (groups!.length === 0) return 'Empty bar chart';
       const seriesNames = groups![0].values.map((v) => v.name).join(', ');
@@ -263,6 +309,22 @@
     if (data.length === 0) return 'Empty bar chart';
     const maxPoint = data.reduce((a, b) => (b.value > a.value ? b : a));
     return `Bar chart with ${data.length} categories. Highest value is ${fmt(maxPoint.value)} at ${maxPoint.label}.`;
+  });
+
+  let lastInvalidWarning = $state<string | null>(null);
+
+  $effect(() => {
+    if (!SHOULD_WARN_INVALID) return;
+
+    const reason = barChartValidation.valid ? null : barChartValidation.reason;
+    if (reason && reason !== lastInvalidWarning) {
+      console.warn(`Void: ${INVALID_CHART_LABEL.toLowerCase()} (${reason})`);
+      lastInvalidWarning = reason;
+    }
+
+    if (!reason) {
+      lastInvalidWarning = null;
+    }
   });
 </script>
 
@@ -282,7 +344,15 @@
   >
     <title id="{chartId}-title">{title}</title>
     <desc id="{chartId}-desc">{accessibleSummary}</desc>
-    {#if isGrouped || data.length > 0}
+    {#if !barChartValidation.valid}
+      <text
+        class="chart-label"
+        x={svgWidth / 2}
+        y={height / 2}
+        text-anchor="middle"
+        dominant-baseline="middle">{INVALID_CHART_LABEL}</text
+      >
+    {:else if isGrouped || data.length > 0}
       {#if isGrouped}
         <!-- GROUPED MODE -->
         {#if showGrid}
@@ -609,7 +679,7 @@
   </svg>
 
   <!-- Legend -->
-  {#if showLegend && (isGrouped ? groups!.length > 0 : data.length > 0)}
+  {#if barChartValidation.valid && showLegend && (isGrouped ? groups!.length > 0 : data.length > 0)}
     <div class="flex flex-row flex-wrap justify-center gap-md mt-md">
       {#if isGrouped}
         {#each groups![0].values as val, vi}
@@ -631,7 +701,7 @@
     </div>
   {/if}
 
-  {#if referenceLines?.some((r) => r.label)}
+  {#if barChartValidation.valid && referenceLines?.some((r) => r.label)}
     <div class="flex flex-row flex-wrap justify-center gap-md mt-md">
       {#each referenceLines!.filter((r) => r.label) as ref}
         <div class="flex items-center gap-xs">
@@ -643,7 +713,7 @@
   {/if}
 
   <!-- Screen reader data table -->
-  {#if isGrouped ? groups!.length > 0 : data.length > 0}
+  {#if barChartValidation.valid && (isGrouped ? groups!.length > 0 : data.length > 0)}
     <table class="sr-only">
       <caption>{title}</caption>
       {#if isGrouped}

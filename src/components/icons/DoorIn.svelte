@@ -1,10 +1,9 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  let {
-    id = 'door-in',
-    class: className,
-    ...rest
-  }: HTMLAttributes<SVGElement> = $props();
+  let { id, class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
+  const componentId = $props.id();
+
+  const maskId = `door-in-defs-${componentId}-mask`;
 </script>
 
 <svg
@@ -15,12 +14,13 @@
   stroke-width="12"
   stroke-linecap="round"
   stroke-linejoin="round"
+  {id}
   class="icon-door-in icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
   <defs>
-    <mask id="{id}-mask">
+    <mask id={maskId}>
       <rect
         x="-25"
         y="-75"
@@ -49,7 +49,7 @@
     width="100"
     height="150"
     rx="15"
-    mask="url(#{id}-mask)"
+    mask={`url(#${maskId})`}
   />
 </svg>
 

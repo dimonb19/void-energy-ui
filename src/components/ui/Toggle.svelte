@@ -42,10 +42,7 @@
 <script lang="ts">
   import type { Component } from 'svelte';
   import { Circle } from '@lucide/svelte';
-  import {
-    createNativeControlIdentity,
-    toNativeControlState,
-  } from '@lib/native-control-foundation';
+  import { toNativeControlState } from '@lib/native-control-foundation';
 
   interface ToggleProps {
     checked: boolean;
@@ -74,8 +71,9 @@
   }: ToggleProps = $props();
 
   // Shared native-control identity (stable per component instance)
-  // svelte-ignore state_referenced_locally
-  const { id: inputId } = createNativeControlIdentity('toggle', id);
+  const componentId = $props.id();
+  const generatedInputId = `toggle-${componentId}`;
+  const inputId = $derived(id ?? generatedInputId);
 
   let checkedState = $derived(toNativeControlState(checked));
 

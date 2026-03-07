@@ -2,6 +2,17 @@
 
 import { layerStack } from '@lib/layer-stack.svelte';
 
+function serializeShortcut(
+  key: string,
+  modifier?: VoidShortcutEntry['modifier'],
+) {
+  return modifier ? `${modifier}:${key}` : key;
+}
+
+function formatShortcut(key: string, modifier?: VoidShortcutEntry['modifier']) {
+  return modifier ? `${modifier}+${key}` : key;
+}
+
 class ShortcutRegistry {
   /** Reactive list of all registered shortcuts (consumed by ShortcutsFragment). */
   entries = $state<VoidShortcutEntry[]>([]);
@@ -19,14 +30,18 @@ class ShortcutRegistry {
    * Conflict detection: warns on duplicate key, last-write-wins.
    */
   register(entry: VoidShortcutEntry) {
-    if (this.map.has(entry.key)) {
+    const shortcutId = serializeShortcut(entry.key, entry.modifier);
+
+    if (this.map.has(shortcutId)) {
       console.warn(
-        `Void: Shortcut "${entry.key}" already registered ("${this.map.get(entry.key)!.label}"). Overwriting with "${entry.label}".`,
+        `Void: Shortcut "${formatShortcut(entry.key, entry.modifier)}" already registered ("${this.map.get(shortcutId)!.label}"). Overwriting with "${entry.label}".`,
       );
-      this.entries = this.entries.filter((e) => e.key !== entry.key);
+      this.entries = this.entries.filter(
+        (e) => serializeShortcut(e.key, e.modifier) !== shortcutId,
+      );
     }
 
-    this.map.set(entry.key, entry);
+    this.map.set(shortcutId, entry);
     this.entries.push(entry);
     this.syncListener();
   }
@@ -34,9 +49,12 @@ class ShortcutRegistry {
   /**
    * Unregisters a shortcut by key.
    */
-  unregister(key: string) {
-    this.map.delete(key);
-    this.entries = this.entries.filter((e) => e.key !== key);
+  unregister(key: string, modifier?: VoidShortcutEntry['modifier']) {
+    const shortcutId = serializeShortcut(key, modifier);
+    this.map.delete(shortcutId);
+    this.entries = this.entries.filter(
+      (e) => serializeShortcut(e.key, e.modifier) !== shortcutId,
+    );
     this.syncListener();
   }
 
@@ -69,8 +87,8 @@ class ShortcutRegistry {
       if (layerStack.hasLayers) return;
       // Normalize: treat metaKey and ctrlKey both as 'meta' (cross-platform)
       const mod: 'meta' | 'alt' = e.metaKey || e.ctrlKey ? 'meta' : 'alt';
-      const entry = this.map.get(e.key);
-      if (entry?.modifier === mod) {
+      const entry = this.map.get(serializeShortcut(e.key, mod));
+      if (entry) {
         e.preventDefault();
         entry.action();
       }
@@ -79,8 +97,8 @@ class ShortcutRegistry {
 
     // Phase 2: Plain single-key shortcuts (original behavior)
     if (layerStack.hasLayers) return;
-    const entry = this.map.get(e.key);
-    if (entry && !entry.modifier) {
+    const entry = this.map.get(serializeShortcut(e.key));
+    if (entry) {
       e.preventDefault();
       entry.action();
     }

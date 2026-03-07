@@ -62,10 +62,11 @@
     class: className = '',
   }: FormFieldProps = $props();
 
-  // svelte-ignore state_referenced_locally
-  const id = fieldId ?? `field-${Math.random().toString(36).slice(2, 9)}`;
-  const errorId = `${id}-error`;
-  const hintId = `${id}-hint`;
+  const componentId = $props.id();
+  const generatedFieldId = `field-${componentId}`;
+  const id = $derived(fieldId ?? generatedFieldId);
+  const errorId = $derived(`${id}-error`);
+  const hintId = $derived(`${id}-hint`);
 
   const hasError = $derived(!!error);
   const hasHint = $derived(!!hint);

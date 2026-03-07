@@ -61,8 +61,9 @@
     class: className = '',
   }: SliderFieldProps = $props();
 
-  // svelte-ignore state_referenced_locally
-  const inputId = id ?? `slider-${Math.random().toString(36).slice(2, 9)}`;
+  const componentId = $props.id();
+  const generatedInputId = `slider-${componentId}`;
+  const inputId = $derived(id ?? generatedInputId);
 
   const isStrict = $derived(presets.length > 0);
 

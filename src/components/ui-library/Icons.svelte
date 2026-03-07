@@ -150,7 +150,7 @@
           <IconBtn
             icon={Eye}
             size={iconSize}
-            iconProps={{ id: 'eye-demo', 'data-muted': eyeActive }}
+            iconProps={{ 'data-muted': eyeActive }}
             onclick={() => (eyeActive = !eyeActive)}
             aria-label="Toggle visibility"
           />
@@ -161,7 +161,7 @@
           <IconBtn
             icon={Music}
             size={iconSize}
-            iconProps={{ id: 'music-demo', 'data-muted': musicActive }}
+            iconProps={{ 'data-muted': musicActive }}
             onclick={() => (musicActive = !musicActive)}
             aria-label="Toggle music"
           />
@@ -172,7 +172,7 @@
           <IconBtn
             icon={Voice}
             size={iconSize}
-            iconProps={{ id: 'voice-demo', 'data-muted': voiceActive }}
+            iconProps={{ 'data-muted': voiceActive }}
             onclick={() => (voiceActive = !voiceActive)}
             aria-label="Toggle voice"
           />
@@ -282,42 +282,22 @@
         class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
       >
         <div class="flex flex-col items-center gap-xs">
-          <IconBtn
-            icon={DoorIn}
-            size={iconSize}
-            iconProps={{ id: 'door-in-demo' }}
-            aria-label="Sign in"
-          />
+          <IconBtn icon={DoorIn} size={iconSize} aria-label="Sign in" />
           <span class="text-caption text-mute">DoorIn</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <IconBtn
-            icon={DoorOut}
-            size={iconSize}
-            iconProps={{ id: 'door-out-demo' }}
-            aria-label="Sign out"
-          />
+          <IconBtn icon={DoorOut} size={iconSize} aria-label="Sign out" />
           <span class="text-caption text-mute">DoorOut</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <IconBtn
-            icon={Quit}
-            size={iconSize}
-            iconProps={{ id: 'quit-demo' }}
-            aria-label="Quit"
-          />
+          <IconBtn icon={Quit} size={iconSize} aria-label="Quit" />
           <span class="text-caption text-mute">Quit</span>
         </div>
 
         <div class="flex flex-col items-center gap-xs">
-          <IconBtn
-            icon={Switch}
-            size={iconSize}
-            iconProps={{ id: 'switch-demo' }}
-            aria-label="Switch"
-          />
+          <IconBtn icon={Switch} size={iconSize} aria-label="Switch" />
           <span class="text-caption text-mute">Switch</span>
         </div>
       </div>

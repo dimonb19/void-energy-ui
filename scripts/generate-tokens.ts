@@ -145,7 +145,7 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
   scss += `$themes: (\n`;
   Object.entries(tokens.themes).forEach(([themeName, config]) => {
     scss += `  '${themeName}': (\n`;
-    scss += `    'type': '${config.mode}',\n`;
+    scss += `    'mode': '${config.mode}',\n`;
     scss += `    'physics': '${config.physics}',\n`;
     scss += `    'palette': (\n`;
     // Inject fonts.

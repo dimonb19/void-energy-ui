@@ -1,10 +1,11 @@
 <script lang="ts">
   import type { HTMLAttributes } from 'svelte/elements';
-  let {
-    id = 'music',
-    class: className,
-    ...rest
-  }: HTMLAttributes<SVGElement> = $props();
+  let { id, class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
+  const componentId = $props.id();
+  const defsId = `music-defs-${componentId}`;
+  const topMaskId = `${defsId}-top-mask`;
+  const bottomMaskId = `${defsId}-bottom-mask`;
+  const crossedMaskId = `${defsId}-crossed-mask`;
   // data-muted attribute
 </script>
 
@@ -15,12 +16,13 @@
   fill="currentColor"
   stroke-linejoin="round"
   stroke-linecap="round"
+  {id}
   class="icon-music icon {className ?? ''}"
   aria-hidden="true"
   {...rest}
 >
   <defs>
-    <mask id="{id}-top-mask">
+    <mask id={topMaskId}>
       <rect
         class="mask-rect"
         x="-100"
@@ -30,7 +32,7 @@
         fill="white"
       />
     </mask>
-    <mask id="{id}-bottom-mask">
+    <mask id={bottomMaskId}>
       <rect
         class="mask-rect"
         x="100"
@@ -40,7 +42,7 @@
         fill="white"
       />
     </mask>
-    <mask id="{id}-crossed-mask">
+    <mask id={crossedMaskId}>
       <g fill="white" stroke="white">
         <polygon points="-40 -50 85 -85 85 -55 -40 -20" stroke-width="15" />
         <line x1="-35" y1="-40" x2="-35" y2="68" stroke-width="25" />
@@ -59,7 +61,7 @@
     </mask>
   </defs>
 
-  <g mask="url(#{id}-top-mask)">
+  <g mask={`url(#${topMaskId})`}>
     <polygon points="-40 -50 85 -85 85 -55 -40 -20" stroke-width="15" />
     <line x1="-35" y1="-40" x2="-35" y2="68" stroke-width="25" />
     <line x1="80" y1="-60" x2="80" y2="44" stroke-width="25" />
@@ -67,8 +69,8 @@
     <ellipse cx="57" cy="46" rx="35" ry="22" />
   </g>
 
-  <g mask="url(#{id}-bottom-mask)">
-    <g mask="url(#{id}-crossed-mask)">
+  <g mask={`url(#${bottomMaskId})`}>
+    <g mask={`url(#${crossedMaskId})`}>
       <polygon points="-40 -50 85 -85 85 -55 -40 -20" stroke-width="15" />
       <line x1="-35" y1="-40" x2="-35" y2="68" stroke-width="25" />
       <line x1="80" y1="-60" x2="80" y2="44" stroke-width="25" />

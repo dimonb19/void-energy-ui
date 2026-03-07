@@ -68,8 +68,9 @@
     class: className = '',
   }: GenerateFieldProps = $props();
 
-  // svelte-ignore state_referenced_locally
-  const inputId = id ?? `generate-${Math.random().toString(36).slice(2, 9)}`;
+  const componentId = $props.id();
+  const generatedInputId = `generate-${componentId}`;
+  const inputId = $derived(id ?? generatedInputId);
 
   let generating = $state(false);
   let abortController: AbortController | undefined = $state();

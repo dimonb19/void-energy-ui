@@ -154,7 +154,7 @@ $physics-presets: (
 // Generate the palette and mode for an atmosphere.
 @mixin generate-atmosphere($name, $config) {
   $palette: map.get($config, 'palette');
-  $mode: map.get($config, 'type'); // 'light' or 'dark'
+  $mode: map.get($config, 'mode'); // 'light' or 'dark'
 
   @if $palette == null {
     @warn "No palette provided for atmosphere `#{$name}`.";

@@ -53,10 +53,6 @@
     class: className = '',
   }: ProgressRingProps = $props();
 
-  // svelte-ignore state_referenced_locally
-  const chartId =
-    id ?? `progress-ring-${Math.random().toString(36).slice(2, 9)}`;
-
   // ViewBox coordinate space
   const viewBoxSize = 100; // void-ignore (SVG viewBox coordinate space — unitless)
   const center = viewBoxSize / 2;
@@ -78,6 +74,7 @@
 </script>
 
 <div
+  {id}
   class="chart-progress-ring relative {className}"
   data-size={scale}
   data-animated={animated}

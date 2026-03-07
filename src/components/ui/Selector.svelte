@@ -65,8 +65,9 @@
   }: SelectorProps = $props();
 
   // Auto-generate ID for label association if not provided
-  // svelte-ignore state_referenced_locally
-  const inputId = id ?? `select-${Math.random().toString(36).slice(2, 9)}`;
+  const componentId = $props.id();
+  const generatedInputId = `select-${componentId}`;
+  const inputId = $derived(id ?? generatedInputId);
 
   // Normalize empty values: null, undefined, '' all mean "no selection"
   const isEmpty = (v: unknown): boolean => v == null || v === '';

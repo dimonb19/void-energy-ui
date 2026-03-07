@@ -6,6 +6,7 @@
 
 import THEME_REGISTRY from '@config/void-registry.json';
 import { STORAGE_KEYS, DOM_ATTRS, DEFAULTS } from '@config/constants';
+import { VOID_TOKENS } from '@config/design-tokens';
 import {
   formatBoundaryError,
   parseExternalThemePayload,
@@ -94,6 +95,16 @@ const FALLBACK_LIGHT: VoidPalette = {
   'font-atmos-body': 'sans-serif',
 };
 
+const DEFAULT_THEME_PALETTES = {
+  dark: VOID_TOKENS.themes[
+    DEFAULTS.ATMOSPHERE as keyof typeof VOID_TOKENS.themes
+  ].palette,
+  light:
+    VOID_TOKENS.themes[
+      DEFAULTS.LIGHT_ATMOSPHERE as keyof typeof VOID_TOKENS.themes
+    ].palette,
+} as const;
+
 export class VoidEngine {
   // Reactive atmosphere state (source of truth).
   atmosphere = $state<string>(DEFAULTS.ATMOSPHERE);
@@ -161,15 +172,23 @@ export class VoidEngine {
     const fallbackPalette =
       targetMode === 'light' ? FALLBACK_LIGHT : FALLBACK_DARK;
 
-    // Build a complete base theme as a safety net.
-    const registryEntry = this.registry[DEFAULTS.ATMOSPHERE];
+    // Build a mode-compatible base theme so partial runtime palettes inherit
+    // from the correct built-in atmosphere before falling back to generic tokens.
+    const baseThemeId =
+      targetMode === 'light' ? DEFAULTS.LIGHT_ATMOSPHERE : DEFAULTS.ATMOSPHERE;
+    const registryEntry =
+      this.registry[baseThemeId] ?? this.registry[DEFAULTS.ATMOSPHERE];
+    const basePalette = DEFAULT_THEME_PALETTES[targetMode];
 
     const baseTheme: VoidThemeDefinition = {
-      id: DEFAULTS.ATMOSPHERE,
-      mode: registryEntry?.mode ?? 'dark',
-      physics: registryEntry?.physics ?? 'glass',
-      palette: registryEntry?.palette ?? fallbackPalette,
+      id: baseThemeId,
+      mode: registryEntry?.mode ?? targetMode,
+      physics:
+        registryEntry?.physics ??
+        (targetMode === 'light' ? 'flat' : DEFAULTS.PHYSICS),
+      palette: basePalette ?? fallbackPalette,
       fonts: [],
+      tagline: registryEntry?.tagline,
     };
 
     // Merge partial overrides on top of the base.
@@ -179,6 +198,7 @@ export class VoidEngine {
       physics: definition.physics || baseTheme.physics,
       palette: {
         ...fallbackPalette,
+        ...baseTheme.palette,
         ...(definition.palette || {}),
       },
       fonts: definition.fonts || [],
