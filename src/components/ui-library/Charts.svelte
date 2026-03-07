@@ -7,6 +7,7 @@
   import ProgressRing from '../ui/ProgressRing.svelte';
   import Selector from '../ui/Selector.svelte';
   import Toggle from '../ui/Toggle.svelte';
+  import { morph } from '@actions/morph';
 
   // ── Stat Card data ───────────────────────────────────────────────────────
   const revenueSparkline = [38, 42, 35, 48, 52, 45, 61, 58, 67, 72, 68, 78];
@@ -606,7 +607,7 @@
       </div>
 
       <!-- Interactive -->
-      <div class="surface-sunk p-md flex flex-col gap-md">
+      <div class="surface-sunk p-md flex flex-col gap-md" use:morph={{ height: true }}>
         <div class="flex flex-row flex-wrap gap-md items-center">
           <Selector label="Size" options={sizeOptions} bind:value={ringSize} />
           <Selector
