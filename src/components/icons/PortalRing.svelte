@@ -12,7 +12,7 @@
   const defsId = `portal-ring-defs-${componentId}`;
   const warpGlassId = `${defsId}-warp-glass`;
   const warpFlatId = `${defsId}-warp-flat`;
-  const eventHorizonId = `${defsId}-event-horizon`;
+  const warpTextId = `${defsId}-warp-text`;
   const voidDepthId = `${defsId}-void-depth`;
 
   let svgEl: SVGElement;
@@ -21,9 +21,6 @@
   let pointerY = $state(0);
   let pointerDist = $state(0);
   let ringWobble = $state(0);
-
-  // Detect physics for conditional filter application
-  let physics = $state('glass');
 
   // ── Particle generation (golden angle, deterministic) ──
   interface Particle {
@@ -74,19 +71,6 @@
   $effect(() => {
     if (!svgEl) return;
 
-    // Detect physics preset
-    const root = document.documentElement;
-    physics = root.dataset.physics ?? 'glass';
-
-    // Watch for physics changes
-    const observer = new MutationObserver(() => {
-      physics = root.dataset.physics ?? 'glass';
-    });
-    observer.observe(root, {
-      attributes: true,
-      attributeFilter: ['data-physics'],
-    });
-
     // Reduced motion check
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
     const prefersReduced = motionQuery.matches;
@@ -94,6 +78,7 @@
     let targetX = 0;
     let targetY = 0;
     let time = 0;
+    let lastTimestamp = 0;
     let frame: number;
 
     function onPointerMove(e: PointerEvent) {
@@ -106,7 +91,10 @@
       targetY = Math.max(-1, Math.min(1, (e.clientY - cy) / halfH));
     }
 
-    function animate() {
+    function animate(timestamp: number) {
+      const dt = lastTimestamp ? (timestamp - lastTimestamp) / 1000 : 0.016; // void-ignore
+      lastTimestamp = timestamp;
+
       // Damped pointer tracking
       pointerX += (targetX - pointerX) * 0.06;
       pointerY += (targetY - pointerY) * 0.06;
@@ -118,7 +106,7 @@
       );
 
       // Time counter
-      time += 0.016;
+      time += dt;
 
       // Ring wobble: non-repeating sine composition
       const wobbleAmp = 0.5 + pointerDist * 0.5;
@@ -139,7 +127,6 @@
     return () => {
       document.removeEventListener('pointermove', onPointerMove);
       cancelAnimationFrame(frame);
-      observer.disconnect();
     };
   });
 </script>
@@ -152,6 +139,9 @@
   {id}
   class="icon-portal-ring icon {className ?? ''}"
   aria-hidden="true"
+  style:--portal-warp-glass="url(#{warpGlassId})"
+  style:--portal-warp-flat="url(#{warpFlatId})"
+  style:--portal-warp-text="url(#{warpTextId})"
   {...rest}
 >
   <defs>
@@ -188,49 +178,44 @@
         yChannelSelector="G"
       />
     </filter>
+    <filter id={warpTextId} x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0.08"
+        numOctaves="2"
+        seed="0"
+        result="noise"
+      />
+      <feDisplacementMap
+        in="SourceGraphic"
+        in2="noise"
+        scale="4"
+        xChannelSelector="R"
+        yChannelSelector="G"
+      />
+    </filter>
 
-    <!-- ── Gradients ── -->
-    <radialGradient id={eventHorizonId} cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="currentColor" stop-opacity="0.12" />
-      <stop offset="25%" stop-color="currentColor" stop-opacity="0.06" />
-      <stop offset="50%" stop-color="currentColor" stop-opacity="0.1" />
-      <stop offset="70%" stop-color="currentColor" stop-opacity="0.04" />
-      <stop offset="100%" stop-color="currentColor" stop-opacity="0" />
-    </radialGradient>
-
+    <!-- ── Gradient ── -->
     <radialGradient id={voidDepthId} cx="50%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="var(--bg-canvas)" stop-opacity="1" />
-      <stop offset="15%" stop-color="var(--bg-canvas)" stop-opacity="0.98" />
-      <stop offset="30%" stop-color="var(--bg-canvas)" stop-opacity="0.92" />
-      <stop offset="45%" stop-color="var(--bg-canvas)" stop-opacity="0.8" />
-      <stop offset="60%" stop-color="var(--bg-canvas)" stop-opacity="0.55" />
-      <stop offset="75%" stop-color="var(--bg-canvas)" stop-opacity="0.3" />
-      <stop offset="90%" stop-color="var(--bg-canvas)" stop-opacity="0.1" />
+      <stop offset="0%" stop-color="var(--bg-canvas)" stop-opacity="0.5" />
       <stop offset="100%" stop-color="var(--bg-canvas)" stop-opacity="0" />
     </radialGradient>
   </defs>
 
-  <!-- ── Layer 0: Event Horizon ── -->
-  <g class="event-horizon" style:transform="translate({px * 4}px, {py * 4}px)">
-    <circle
-      cx="200"
-      cy="200"
-      r="190"
-      fill={`url(#${eventHorizonId})`}
-      class="horizon-bg"
-    />
-  </g>
+  <!-- ── Layer 0: Void Depth (static, no parallax) ── -->
+  <circle
+    cx="200"
+    cy="200"
+    r="195"
+    fill={`url(#${voidDepthId})`}
+    class="void-depth"
+  />
 
   <!-- ── Layer 1: Outer Ring System ── -->
   <g
     class="ring-outer-system"
     style:transform="translate({px * 12}px, {py * 12}px) scale({1 +
       ringWobble})"
-    filter={physics === 'glass'
-      ? `url(#${warpGlassId})`
-      : physics === 'flat'
-        ? `url(#${warpFlatId})`
-        : undefined}
   >
     <circle cx="200" cy="200" r="175" class="ring ro-1" />
     <circle cx="200" cy="200" r="170" class="ring ro-2" />
@@ -259,16 +244,11 @@
     />
   </g>
 
-  <!-- ── Layer 3: Mid Ring System ── -->
+  <!-- ── Layer 2: Mid Ring System ── -->
   <g
     class="ring-mid-system"
     style:transform="translate({px * 18}px, {py * 18}px) scale({1 +
       ringWobble * 1.3})"
-    filter={physics === 'glass'
-      ? `url(#${warpGlassId})`
-      : physics === 'flat'
-        ? `url(#${warpFlatId})`
-        : undefined}
   >
     <circle cx="200" cy="200" r="135" class="ring rm-1" />
     <circle cx="200" cy="200" r="128" class="ring rm-2" />
@@ -293,16 +273,11 @@
     <path class="glitch" d="M 200 65 A 135 135 0 0 1 310 130" pathLength="1" />
   </g>
 
-  <!-- ── Layer 4: Inner Ring System ── -->
+  <!-- ── Layer 3: Inner Ring System ── -->
   <g
     class="ring-inner-system"
     style:transform="translate({px * 26}px, {py * 26}px) scale({1 +
       ringWobble * 1.8})"
-    filter={physics === 'glass'
-      ? `url(#${warpGlassId})`
-      : physics === 'flat'
-        ? `url(#${warpFlatId})`
-        : undefined}
   >
     <circle cx="200" cy="200" r="95" class="ring ri-1" />
     <circle cx="200" cy="200" r="88" class="ring ri-2" />
@@ -320,15 +295,10 @@
     />
   </g>
 
-  <!-- ── Layer 5: Orbital Markers ── -->
+  <!-- ── Layer 4: Orbital Markers ── -->
   <g
     class="orbital-field"
     style:transform="translate({px * 15}px, {py * 15}px)"
-    filter={physics === 'glass'
-      ? `url(#${warpGlassId})`
-      : physics === 'flat'
-        ? `url(#${warpFlatId})`
-        : undefined}
   >
     {#each orbitals as orb, i}
       <circle
@@ -343,15 +313,10 @@
     {/each}
   </g>
 
-  <!-- ── Layer 6: Particle Field ── -->
+  <!-- ── Layer 5: Particle Field ── -->
   <g
     class="particle-field"
     style:transform="translate({px * 20}px, {py * 20}px)"
-    filter={physics === 'glass'
-      ? `url(#${warpGlassId})`
-      : physics === 'flat'
-        ? `url(#${warpFlatId})`
-        : undefined}
   >
     {#each particles as p, i}
       <circle
@@ -365,27 +330,14 @@
     {/each}
   </g>
 
-  <!-- ── Layer 7: Core Void ── -->
+  <!-- ── Layer 6: Core Text ── -->
   <g class="core-system" style:transform="translate({px * 32}px, {py * 32}px)">
-    <!-- Dark void depth — static, no parallax, covers the full inner area -->
-    <circle
-      cx="200"
-      cy="200"
-      r="195"
-      fill={`url(#${voidDepthId})`}
-      class="void-depth"
-    />
     <text
       x="200"
       y="200"
       class="void-text"
       text-anchor="middle"
-      dominant-baseline="central"
-      filter={physics === 'glass'
-        ? `url(#${warpGlassId})`
-        : physics === 'flat'
-          ? `url(#${warpFlatId})`
-          : undefined}>404</text
+      dominant-baseline="central">404</text
     >
   </g>
 </svg>
@@ -400,7 +352,6 @@
     overflow: visible;
 
     // ── Layer groups ──
-    .event-horizon,
     .ring-outer-system,
     .ring-mid-system,
     .ring-inner-system,
@@ -416,11 +367,6 @@
     .orbital-field,
     .particle-field {
       will-change: transform;
-    }
-
-    // ── Event Horizon ──
-    .horizon-bg {
-      animation: event-horizon-pulse 15s ease-in-out infinite;
     }
 
     // ── Ring base ──
@@ -582,15 +528,11 @@
     }
 
     // ── Core ──
-    .void-depth {
-      animation: event-horizon-pulse 15s ease-in-out infinite;
-    }
-
     .void-text {
       font-size: 64px; // void-ignore
       font-weight: 700;
       fill: currentColor;
-      opacity: 0.25;
+      opacity: 0.5;
       letter-spacing: 0.15em; // void-ignore
       user-select: none;
       pointer-events: none;
@@ -633,13 +575,8 @@
       animation-timing-function: steps(8);
     }
 
-    .horizon-bg,
-    .void-depth {
-      animation-timing-function: steps(4);
-    }
-
     .void-text {
-      font-family: monospace;
+      font-family: var(--font-code);
     }
 
     .ring-outer-system,
@@ -647,9 +584,39 @@
     .ring-inner-system,
     .core-system,
     .particle-field,
-    .orbital-field,
-    .event-horizon {
+    .orbital-field {
       filter: none !important;
+    }
+  }
+
+  // ── Glass physics: displacement warp + bloom glow ──
+  :global([data-physics='glass'] .icon-portal-ring) {
+    .ring-outer-system,
+    .ring-mid-system,
+    .ring-inner-system,
+    .orbital-field,
+    .particle-field {
+      filter: var(--portal-warp-glass)
+        drop-shadow(0 0 12px var(--energy-primary)); // void-ignore
+    }
+
+    .void-text {
+      filter: var(--portal-warp-text);
+    }
+  }
+
+  // ── Flat physics: subtle displacement warp, no glow ──
+  :global([data-physics='flat'] .icon-portal-ring) {
+    .ring-outer-system,
+    .ring-mid-system,
+    .ring-inner-system,
+    .orbital-field,
+    .particle-field {
+      filter: var(--portal-warp-flat);
+    }
+
+    .void-text {
+      filter: var(--portal-warp-text);
     }
   }
 
@@ -679,9 +646,7 @@
       .arc,
       .glitch,
       .orbital,
-      .particle,
-      .void-depth,
-      .horizon-bg {
+      .particle {
         animation: none;
       }
 
@@ -710,10 +675,6 @@
       }
       .orbital {
         opacity: 0.4;
-      }
-
-      .void-depth {
-        opacity: 0.8;
       }
     }
   }
@@ -839,20 +800,20 @@
     }
     30% {
       opacity: 0.7;
-      transform: scale(1) translate(4px, -4px);
-    } // void-ignore
+      transform: scale(1) translate(4px, -4px); // void-ignore
+    }
     50% {
       opacity: 0.5;
-      transform: scale(1.1) translate(8px, -8px);
-    } // void-ignore
+      transform: scale(1.1) translate(8px, -8px); // void-ignore
+    }
     70% {
       opacity: 0.6;
-      transform: scale(0.9) translate(12px, -6px);
-    } // void-ignore
+      transform: scale(0.9) translate(12px, -6px); // void-ignore
+    }
     85% {
       opacity: 0.1;
-      transform: scale(0.5) translate(16px, -10px);
-    } // void-ignore
+      transform: scale(0.5) translate(16px, -10px); // void-ignore
+    }
   }
 
   @keyframes particle-orbit {
@@ -877,19 +838,7 @@
 
   @keyframes orbital-rotate {
     to {
-      transform: rotate(360deg) translateY(-170px);
-    } // void-ignore
-  }
-
-  @keyframes event-horizon-pulse {
-    0%,
-    100% {
-      opacity: 0.5;
-      transform: scale(1);
-    }
-    50% {
-      opacity: 0.8;
-      transform: scale(1.03);
+      transform: rotate(360deg) translateY(-170px); // void-ignore
     }
   }
 </style>
