@@ -205,10 +205,7 @@
 
     if (shouldContinueAnimating()) {
       frameId = requestAnimationFrame(animate);
-      return;
     }
-
-    resetMotion();
   }
 
   function startAnimation() {
