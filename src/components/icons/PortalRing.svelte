@@ -14,16 +14,14 @@
   }: Props = $props();
 
   let svgEl: SVGElement;
-  let turbEl: SVGElement | undefined;
 
   let pointerX = $state(0);
   let pointerY = $state(0);
   let pointerDist = $state(0);
   let ringWobble = $state(0);
-  let accretionTilt = $state(0);
 
   // Detect physics for conditional filter application
-  let filtersActive = $state(false);
+  let physics = $state('glass');
 
   // ── Particle generation (golden angle, deterministic) ──
   interface Particle {
@@ -36,10 +34,10 @@
   }
 
   const GOLDEN_ANGLE = 2.399963;
-  const particles: Particle[] = Array.from({ length: 24 }, (_, i) => {
+  const particles: Particle[] = Array.from({ length: 12 }, (_, i) => {
     const angle = i * GOLDEN_ANGLE;
-    const isDrift = i < 16;
-    const radius = isDrift ? 60 + (i / 16) * 120 : [170, 135, 95][i % 3];
+    const isDrift = i < 8;
+    const radius = isDrift ? 60 + (i / 8) * 120 : [170, 135, 95][i % 3];
 
     return {
       cx: 200 + Math.cos(angle) * radius,
@@ -60,24 +58,13 @@
     delay: number;
   }
 
-  const orbitals: Orbital[] = [
-    // Outer ring orbitals
-    ...Array.from({ length: 6 }, (_, i) => ({
-      angle: (i / 6) * 360,
-      radius: 170,
-      r: 2.5, // void-ignore
-      speed: 45,
-      delay: i * 2,
-    })),
-    // Mid ring orbitals
-    ...Array.from({ length: 4 }, (_, i) => ({
-      angle: (i / 4) * 360 + 22,
-      radius: 130,
-      r: 2, // void-ignore
-      speed: 35,
-      delay: i * 2.5,
-    })),
-  ];
+  const orbitals: Orbital[] = Array.from({ length: 6 }, (_, i) => ({
+    angle: (i / 6) * 360,
+    radius: 170,
+    r: 2.5, // void-ignore
+    speed: 45,
+    delay: i * 2,
+  }));
 
   const px = $derived(pointerX * intensity);
   const py = $derived(pointerY * intensity);
@@ -87,11 +74,11 @@
 
     // Detect physics preset
     const root = document.documentElement;
-    filtersActive = root.dataset.physics === 'glass';
+    physics = root.dataset.physics ?? 'glass';
 
     // Watch for physics changes
     const observer = new MutationObserver(() => {
-      filtersActive = root.dataset.physics === 'glass';
+      physics = root.dataset.physics ?? 'glass';
     });
     observer.observe(root, {
       attributes: true,
@@ -139,16 +126,6 @@
           Math.sin(time * 2.1) * 0.003) *
         wobbleAmp;
 
-      // Accretion disk tilt from pointer Y
-      const targetTilt = pointerY * 8;
-      accretionTilt += (targetTilt - accretionTilt) * 0.04;
-
-      // Turbulence seed cycling (direct DOM mutation)
-      if (!prefersReduced) {
-        const seed = Math.floor(time * 0.5) % 1000;
-        turbEl?.setAttribute('seed', String(seed));
-      }
-
       frame = requestAnimationFrame(animate);
     }
 
@@ -176,11 +153,10 @@
 >
   <defs>
     <!-- ── Filters ── -->
-    <filter id="{id}-warp" x="-20%" y="-20%" width="140%" height="140%">
+    <filter id="{id}-warp-glass" x="-20%" y="-20%" width="140%" height="140%">
       <feTurbulence
-        bind:this={turbEl}
         type="fractalNoise"
-        baseFrequency="0.015"
+        baseFrequency="0.12"
         numOctaves="3"
         seed="0"
         result="noise"
@@ -188,7 +164,23 @@
       <feDisplacementMap
         in="SourceGraphic"
         in2="noise"
-        scale="8"
+        scale="10"
+        xChannelSelector="R"
+        yChannelSelector="G"
+      />
+    </filter>
+    <filter id="{id}-warp-flat" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0.04"
+        numOctaves="3"
+        seed="0"
+        result="noise"
+      />
+      <feDisplacementMap
+        in="SourceGraphic"
+        in2="noise"
+        scale="14"
         xChannelSelector="R"
         yChannelSelector="G"
       />
@@ -226,42 +218,16 @@
     />
   </g>
 
-  <!-- ── Layer 1: Accretion Disk ── -->
-  <g class="accretion-disk" style:transform="translate({px * 8}px, {py * 8}px)">
-    <ellipse
-      cx="200"
-      cy="200"
-      rx="175"
-      ry={158 + accretionTilt}
-      class="accretion-ellipse ae-1"
-    />
-    <ellipse
-      cx="200"
-      cy="200"
-      rx="165"
-      ry={145 + accretionTilt * 0.8}
-      class="accretion-ellipse ae-2"
-    />
-    <ellipse
-      cx="200"
-      cy="200"
-      rx="155"
-      ry={132 + accretionTilt * 0.6}
-      class="accretion-ellipse ae-3"
-    />
-  </g>
-
-  <!-- ── Layer 2: Outer Ring System ── -->
+  <!-- ── Layer 1: Outer Ring System ── -->
   <g
     class="ring-outer-system"
     style:transform="translate({px * 12}px, {py * 12}px) scale({1 +
       ringWobble})"
-    filter={filtersActive ? `url(#${id}-warp)` : undefined}
+    filter={physics !== 'retro' ? `url(#${id}-warp-${physics})` : undefined}
   >
     <circle cx="200" cy="200" r="175" class="ring ro-1" />
     <circle cx="200" cy="200" r="170" class="ring ro-2" />
-    <circle cx="200" cy="200" r="165" class="ring ro-3" />
-    <circle cx="200" cy="200" r="160" class="ring ro-4" />
+    <circle cx="200" cy="200" r="160" class="ring ro-3" />
 
     <!-- Energy arcs -->
     <path
@@ -291,11 +257,10 @@
     class="ring-mid-system"
     style:transform="translate({px * 18}px, {py * 18}px) scale({1 +
       ringWobble * 1.3})"
-    filter={filtersActive ? `url(#${id}-warp)` : undefined}
+    filter={physics !== 'retro' ? `url(#${id}-warp-${physics})` : undefined}
   >
     <circle cx="200" cy="200" r="135" class="ring rm-1" />
     <circle cx="200" cy="200" r="128" class="ring rm-2" />
-    <circle cx="200" cy="200" r="120" class="ring rm-3" />
 
     <!-- Energy arcs -->
     <path
@@ -313,38 +278,8 @@
       d="M 130 310 A 135 135 0 0 1 65 200"
       pathLength="1"
     />
-    <path
-      class="arc arc-mid-d"
-      d="M 85 120 A 135 135 0 0 1 200 65"
-      pathLength="1"
-    />
-    <path
-      class="arc arc-mid-e"
-      d="M 280 95 A 135 135 0 0 1 335 200"
-      pathLength="1"
-    />
-    <path
-      class="arc arc-mid-f"
-      d="M 200 335 A 135 135 0 0 1 85 280"
-      pathLength="1"
-    />
-
-    <!-- Glitch segments -->
-    <path
-      class="glitch glitch-a"
-      d="M 200 65 A 135 135 0 0 1 310 130"
-      pathLength="1"
-    />
-    <path
-      class="glitch glitch-b"
-      d="M 335 200 A 135 135 0 0 1 260 315"
-      pathLength="1"
-    />
-    <path
-      class="glitch glitch-c"
-      d="M 130 310 A 135 135 0 0 1 65 200"
-      pathLength="1"
-    />
+    <!-- Glitch segment -->
+    <path class="glitch" d="M 200 65 A 135 135 0 0 1 310 130" pathLength="1" />
   </g>
 
   <!-- ── Layer 4: Inner Ring System ── -->
@@ -352,7 +287,7 @@
     class="ring-inner-system"
     style:transform="translate({px * 26}px, {py * 26}px) scale({1 +
       ringWobble * 1.8})"
-    filter={filtersActive ? `url(#${id}-warp)` : undefined}
+    filter={physics !== 'retro' ? `url(#${id}-warp-${physics})` : undefined}
   >
     <circle cx="200" cy="200" r="95" class="ring ri-1" />
     <circle cx="200" cy="200" r="88" class="ring ri-2" />
@@ -368,26 +303,13 @@
       d="M 200 295 A 95 95 0 0 1 120 245"
       pathLength="1"
     />
-
-    <!-- Discharge arcs (lightning between inner and mid rings) -->
-    <polyline
-      class="discharge discharge-a"
-      points="200,105 195,95 205,85 198,75 203,65"
-    />
-    <polyline
-      class="discharge discharge-b"
-      points="280,155 290,148 285,140 295,130"
-    />
-    <polyline
-      class="discharge discharge-c"
-      points="120,245 115,255 125,265 118,275 122,285"
-    />
   </g>
 
   <!-- ── Layer 5: Orbital Markers ── -->
   <g
     class="orbital-field"
     style:transform="translate({px * 15}px, {py * 15}px)"
+    filter={physics !== 'retro' ? `url(#${id}-warp-${physics})` : undefined}
   >
     {#each orbitals as orb, i}
       <circle
@@ -406,6 +328,7 @@
   <g
     class="particle-field"
     style:transform="translate({px * 20}px, {py * 20}px)"
+    filter={physics !== 'retro' ? `url(#${id}-warp-${physics})` : undefined}
   >
     {#each particles as p, i}
       <circle
@@ -434,7 +357,8 @@
       y="200"
       class="void-text"
       text-anchor="middle"
-      dominant-baseline="central">404</text
+      dominant-baseline="central"
+      filter={physics !== 'retro' ? `url(#${id}-warp-${physics})` : undefined}>404</text
     >
   </g>
 </svg>
@@ -450,46 +374,26 @@
 
     // ── Layer groups ──
     .event-horizon,
-    .accretion-disk,
     .ring-outer-system,
     .ring-mid-system,
     .ring-inner-system,
     .orbital-field,
     .particle-field,
     .core-system {
-      will-change: transform;
       transform-origin: center;
+    }
+
+    .ring-outer-system,
+    .ring-mid-system,
+    .ring-inner-system,
+    .orbital-field,
+    .particle-field {
+      will-change: transform;
     }
 
     // ── Event Horizon ──
     .horizon-bg {
       animation: event-horizon-pulse 15s ease-in-out infinite;
-    }
-
-    // ── Accretion Disk ──
-    .accretion-ellipse {
-      fill: none;
-      stroke: currentColor;
-      transform-box: fill-box;
-      transform-origin: center;
-    }
-
-    .ae-1 {
-      stroke-width: 0.5; // void-ignore
-      stroke-opacity: 0.15;
-      animation: accretion-spin 120s linear infinite reverse;
-    }
-
-    .ae-2 {
-      stroke-width: 0.75; // void-ignore
-      stroke-opacity: 0.2;
-      animation: accretion-spin 90s linear infinite;
-    }
-
-    .ae-3 {
-      stroke-width: 1; // void-ignore
-      stroke-opacity: 0.25;
-      animation: accretion-spin 70s linear infinite reverse;
     }
 
     // ── Ring base ──
@@ -520,21 +424,12 @@
     }
 
     .ro-3 {
-      stroke-width: 0.3; // void-ignore
-      stroke-dasharray: 2 18 6 14; // void-ignore
-      opacity: 0.2;
-      animation:
-        ring-spin 55s linear infinite reverse,
-        ring-flicker 8s ease-in-out infinite 2s;
-    }
-
-    .ro-4 {
       stroke-width: 0.5; // void-ignore
       stroke-dasharray: 10 8 3 20; // void-ignore
       opacity: 0.35;
       animation:
         ring-spin 45s linear infinite,
-        ring-breathe 9s ease-in-out infinite;
+        ring-flicker 8s ease-in-out infinite 2s;
     }
 
     // Mid ring circles
@@ -544,7 +439,7 @@
       opacity: 0.4;
       animation:
         ring-spin 50s linear infinite,
-        ring-breathe 8s ease-in-out infinite;
+        ring-flicker 8s ease-in-out infinite;
     }
 
     .rm-2 {
@@ -554,15 +449,6 @@
       animation:
         ring-spin 40s linear infinite reverse,
         ring-flicker 6s ease-in-out infinite 0.5s;
-    }
-
-    .rm-3 {
-      stroke-width: 0.6; // void-ignore
-      stroke-dasharray: 2 20 5 10; // void-ignore
-      opacity: 0.35;
-      animation:
-        ring-spin 35s linear infinite,
-        ring-breathe 7s ease-in-out infinite 1s;
     }
 
     // Inner ring circles
@@ -581,7 +467,7 @@
       opacity: 0.55;
       animation:
         ring-spin 25s linear infinite,
-        ring-breathe 6s ease-in-out infinite;
+        ring-flicker 6s ease-in-out infinite;
     }
 
     // ── Energy arcs ──
@@ -618,18 +504,6 @@
       animation-delay: 1.5s;
       animation-duration: 3.2s;
     }
-    .arc-mid-d {
-      animation-delay: 2.1s;
-      animation-duration: 3.6s;
-    }
-    .arc-mid-e {
-      animation-delay: 2.7s;
-      animation-duration: 3.4s;
-    }
-    .arc-mid-f {
-      animation-delay: 3.3s;
-      animation-duration: 3.9s;
-    }
 
     .arc-inner-a {
       stroke-width: 2.5; // void-ignore
@@ -652,31 +526,6 @@
       stroke-dasharray: 1;
       stroke-dashoffset: 0;
       animation: glitch-flash 6s ease-in-out infinite;
-    }
-
-    .glitch-b {
-      animation-delay: 2s;
-    }
-    .glitch-c {
-      animation-delay: 4s;
-    }
-
-    // ── Discharge arcs ──
-    .discharge {
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 1.5; // void-ignore
-      stroke-linecap: round;
-      stroke-linejoin: round;
-      opacity: 0;
-      animation: discharge-flash 8s ease-in-out infinite;
-    }
-
-    .discharge-b {
-      animation-delay: 3s;
-    }
-    .discharge-c {
-      animation-delay: 5.5s;
     }
 
     // ── Orbital markers ──
@@ -714,7 +563,7 @@
       font-size: 64px; // void-ignore
       font-weight: 700;
       fill: currentColor;
-      opacity: 0.12;
+      opacity: 0.25;
       letter-spacing: 0.15em; // void-ignore
       user-select: none;
       pointer-events: none;
@@ -727,28 +576,15 @@
       stroke-dasharray: 6 6; // void-ignore
     }
 
-    .accretion-ellipse {
-      stroke-dasharray: 8 8; // void-ignore
-    }
-
     .ro-1,
     .ro-2,
     .ro-3,
-    .ro-4,
     .rm-1,
     .rm-2,
-    .rm-3,
     .ri-1,
     .ri-2 {
       animation-timing-function: steps(60);
       stroke-width: 1.5; // void-ignore
-    }
-
-    .ae-1,
-    .ae-2,
-    .ae-3 {
-      animation-timing-function: steps(60);
-      stroke-width: 1; // void-ignore
     }
 
     .arc {
@@ -762,10 +598,6 @@
       animation-timing-function: steps(4);
     }
 
-    .discharge {
-      animation-timing-function: steps(3);
-    }
-
     .particle {
       animation-timing-function: steps(4);
     }
@@ -774,8 +606,12 @@
       animation-timing-function: steps(8);
     }
 
+    .horizon-bg,
+    .void-depth {
+      animation-timing-function: steps(4);
+    }
+
     .void-text {
-      opacity: 0.2;
       font-family: monospace;
     }
 
@@ -785,25 +621,13 @@
     .core-system,
     .particle-field,
     .orbital-field,
-    .event-horizon,
-    .accretion-disk {
+    .event-horizon {
       filter: none !important;
     }
   }
 
   // ── Light mode: solid color, no glow ──
   :global([data-mode='light'] .icon-portal-ring) {
-    .ring-outer-system,
-    .ring-mid-system,
-    .ring-inner-system,
-    .core-system,
-    .particle-field,
-    .orbital-field,
-    .event-horizon,
-    .accretion-disk {
-      filter: none !important;
-    }
-
     .ring {
       opacity: 0.5;
     }
@@ -811,14 +635,6 @@
     .ri-1,
     .ri-2 {
       opacity: 0.7;
-    }
-
-    .accretion-ellipse {
-      stroke-opacity: 0.3;
-    }
-
-    .void-text {
-      opacity: 0.15;
     }
   }
 
@@ -829,18 +645,12 @@
       .ro-1,
       .ro-2,
       .ro-3,
-      .ro-4,
       .rm-1,
       .rm-2,
-      .rm-3,
       .ri-1,
       .ri-2,
-      .ae-1,
-      .ae-2,
-      .ae-3,
       .arc,
       .glitch,
-      .discharge,
       .orbital,
       .particle,
       .void-depth,
@@ -850,13 +660,11 @@
 
       .ro-1,
       .ro-2,
-      .ro-3,
-      .ro-4 {
+      .ro-3 {
         opacity: 0.25;
       }
       .rm-1,
-      .rm-2,
-      .rm-3 {
+      .rm-2 {
         opacity: 0.35;
       }
       .ri-1,
@@ -880,10 +688,6 @@
       .void-depth {
         opacity: 0.8;
       }
-
-      .discharge {
-        display: none;
-      }
     }
   }
 
@@ -892,23 +696,6 @@
   @keyframes ring-spin {
     to {
       transform: rotate(360deg);
-    }
-  }
-
-  @keyframes ring-breathe {
-    0%,
-    100% {
-      transform: scale(1);
-      opacity: inherit;
-    }
-    30% {
-      transform: scale(1.012);
-    }
-    60% {
-      transform: scale(0.988);
-    }
-    80% {
-      transform: scale(1.005);
     }
   }
 
@@ -1014,43 +801,6 @@
     }
   }
 
-  @keyframes discharge-flash {
-    0%,
-    100% {
-      opacity: 0;
-    }
-    5% {
-      opacity: 0;
-    }
-    6% {
-      opacity: 0.9;
-    }
-    8% {
-      opacity: 0.3;
-    }
-    9% {
-      opacity: 1;
-    }
-    11% {
-      opacity: 0;
-    }
-    50% {
-      opacity: 0;
-    }
-    51% {
-      opacity: 0.7;
-    }
-    52% {
-      opacity: 0;
-    }
-    53% {
-      opacity: 0.8;
-    }
-    55% {
-      opacity: 0;
-    }
-  }
-
   @keyframes particle-drift {
     0%,
     100% {
@@ -1113,12 +863,6 @@
     50% {
       opacity: 0.8;
       transform: scale(1.03);
-    }
-  }
-
-  @keyframes accretion-spin {
-    to {
-      transform: rotate(360deg);
     }
   }
 </style>
