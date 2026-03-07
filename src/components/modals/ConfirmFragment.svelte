@@ -5,12 +5,22 @@
 
   let {
     title = 'Confirm Action',
-    body,
+    body = '',
+    bodyHtml,
     cost = 0,
     confirmText = 'Confirm',
     cancelText = 'Abort',
     onConfirm,
     onCancel = () => {},
+  }: {
+    title?: string;
+    body?: string;
+    bodyHtml?: string;
+    cost?: number;
+    confirmText?: string;
+    cancelText?: string;
+    onConfirm: () => void;
+    onCancel?: () => void;
   } = $props();
 </script>
 
@@ -21,7 +31,11 @@
 >
   <div class="text-center flex flex-col gap-md">
     <h2 id="modal-title" class="text-h3">{title}</h2>
-    <p>{@html body}</p>
+    {#if bodyHtml != null}
+      <p>{@html bodyHtml}</p>
+    {:else}
+      <p>{body}</p>
+    {/if}
 
     {#if cost > 0}
       <div

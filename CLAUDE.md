@@ -271,8 +271,9 @@ Import and use — never re-instantiate.
 ```
 .open(key, props, size?)            Open by registry key. Size: 'sm' | 'md' | 'lg'
 .close()                            Close active modal (restores focus)
-.confirm(title, body, { onConfirm, onCancel?, cost? })   // body = trusted internal rich text only
-.alert(title, body)                                      // body = trusted internal rich text only
+.confirm(title, body, { onConfirm, onCancel?, cost? })   // body = plain text only
+.alert(title, body)                                      // body = plain text only
+// For trusted HTML: modal.open(key, { bodyHtml: '...' }, size)
 .settings(options?)
 .themes()
 .shortcuts()                        Open keyboard shortcuts modal

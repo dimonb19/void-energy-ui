@@ -1,4 +1,24 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+vi.mock('@floating-ui/dom', () => ({
+  autoUpdate: (
+    _reference: Element,
+    _floating: HTMLElement,
+    update: () => void,
+  ) => {
+    update();
+    return () => {};
+  },
+  computePosition: () =>
+    Promise.resolve({
+      x: 0,
+      y: 0,
+      placement: 'top',
+    }),
+  offset: () => ({}),
+  flip: () => ({}),
+  shift: () => ({}),
+}));
 
 import { VoidTooltip } from '@lib/void-tooltip';
 

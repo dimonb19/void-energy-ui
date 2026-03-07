@@ -121,6 +121,14 @@
     densityMap.indexOf(voidEngine.userConfig.density),
   );
 
+  let themeRefs = $state<(HTMLButtonElement | null)[]>([]);
+  let selectedThemeIndex = $derived(
+    filteredAtmospheres.findIndex((atm) => atm.id === voidEngine.atmosphere),
+  );
+  let focusableThemeIndex = $derived(
+    selectedThemeIndex >= 0 ? selectedThemeIndex : 0,
+  );
+
   // Toggle adaptive atmosphere (persisted via voidEngine.userConfig)
   function toggleAdaptAtmosphere(value?: boolean) {
     const newValue = value ?? !voidEngine.userConfig.adaptAtmosphere;
@@ -165,6 +173,40 @@
     } else {
       toast.show('Navigation bar will hide on scroll');
     }
+  }
+
+  function handleThemeKeydown(event: KeyboardEvent, index: number) {
+    if (filteredAtmospheres.length === 0) return;
+
+    let nextIndex: number | null = null;
+
+    switch (event.key) {
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        nextIndex =
+          (index - 1 + filteredAtmospheres.length) % filteredAtmospheres.length;
+        break;
+      case 'ArrowRight':
+      case 'ArrowDown':
+        nextIndex = (index + 1) % filteredAtmospheres.length;
+        break;
+      case 'Home':
+        nextIndex = 0;
+        break;
+      case 'End':
+        nextIndex = filteredAtmospheres.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+
+    const nextTheme = filteredAtmospheres[nextIndex];
+    if (!nextTheme) return;
+
+    selectTheme(nextTheme.id);
+    themeRefs[nextIndex]?.focus();
   }
 </script>
 
@@ -234,11 +276,13 @@
         in:materialize={{ delay: i * 25 }}
       >
         <button
+          bind:this={themeRefs[i]}
           class="theme-option w-full flex items-center gap-sm p-xs text-dim text-left"
           role="radio"
           aria-checked={voidEngine.atmosphere === atm.id}
-          tabindex={voidEngine.atmosphere === atm.id ? 0 : -1}
+          tabindex={i === focusableThemeIndex ? 0 : -1}
           onclick={() => selectTheme(atm.id)}
+          onkeydown={(event) => handleThemeKeydown(event, i)}
         >
           <div
             class="orb-wrapper relative hidden tablet:flex items-center justify-center"
@@ -293,13 +337,19 @@
         options={headingFontOptions}
         value={voidEngine.userConfig.fontHeading}
         onchange={(v) => {
-          voidEngine.setPreferences({ fontHeading: v || null });
-          if (!v)
+          const nextFont = typeof v === 'string' && v.length > 0 ? v : null;
+
+          voidEngine.setPreferences({ fontHeading: nextFont });
+          if (!nextFont)
             toast.show(
               'Custom font cleared. Reverted to Atmosphere recommendation.',
               'success',
             );
-          else toast.show(`Headings updated to ${extractFontName(v)}`, 'info');
+          else
+            toast.show(
+              `Headings updated to ${extractFontName(nextFont)}`,
+              'info',
+            );
         }}
       />
       <Selector
@@ -307,14 +357,19 @@
         options={bodyFontOptions}
         value={voidEngine.userConfig.fontBody}
         onchange={(v) => {
-          voidEngine.setPreferences({ fontBody: v || null });
-          if (!v)
+          const nextFont = typeof v === 'string' && v.length > 0 ? v : null;
+
+          voidEngine.setPreferences({ fontBody: nextFont });
+          if (!nextFont)
             toast.show(
               'Custom font cleared. Reverted to Atmosphere recommendation.',
               'success',
             );
           else
-            toast.show(`Reading font updated to ${extractFontName(v)}`, 'info');
+            toast.show(
+              `Reading font updated to ${extractFontName(nextFont)}`,
+              'info',
+            );
         }}
       />
     </div>
@@ -372,6 +427,16 @@
       .theme-option {
         position: relative;
         border-radius: var(--radius-base);
+
+        &[aria-checked='true'] {
+          color: var(--text-main);
+        }
+
+        &:focus-visible {
+          box-shadow: var(--focus-ring);
+          color: var(--text-main);
+          outline: none;
+        }
 
         .orb-wrapper {
           width: var(--space-md);

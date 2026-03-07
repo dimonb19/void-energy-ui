@@ -1287,9 +1287,9 @@ Preset components with built-in layout and physics.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `options` | `Array<{ value: string, label: string }>` | *required* | Selection options |
-| `value` | `string \| null` | `$bindable()` | Selected value (bindable) |
-| `onchange` | `(value: string) => void` | — | Callback on selection |
+| `options` | `Array<{ value: string \| number \| null, label: string }>` | *required* | Selection options |
+| `value` | `string \| number \| null` | `$bindable()` | Selected value (bindable) |
+| `onchange` | `(value: string \| number \| null) => void` | — | Callback on selection |
 | `label` | `string` | — | Label text above select |
 | `placeholder` | `string` | — | Hidden first option text |
 | `disabled` | `boolean` | `false` | Disables select |
@@ -1317,9 +1317,9 @@ Preset components with built-in layout and physics.
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `options` | `Array<{ value: string, label: string, icon?: Component }>` | *required* | Options with optional icons |
-| `value` | `string` | `$bindable()` | Selected value (bindable) |
-| `onchange` | `(value: string) => void` | — | Callback on selection |
+| `options` | `Array<{ value: string \| number \| null, label: string, icon?: Component }>` | *required* | Options with optional icons |
+| `value` | `string \| number \| null` | `$bindable()` | Selected value (bindable) |
+| `onchange` | `(value: string \| number \| null) => void` | — | Callback on selection |
 | `label` | `string` | — | Label text |
 | `disabled` | `boolean` | `false` | Disables all options |
 
@@ -2428,15 +2428,23 @@ See [modal-manager.svelte.ts](src/lib/modal-manager.svelte.ts) for programmatic 
 ```typescript
 import { modal } from '@lib/modal-manager.svelte';
 
-modal.alert('Title', 'Body text');
+// Plain text helpers
+modal.alert('Title', 'Body text (plain text only)');
 modal.confirm('Delete?', 'Are you sure?', { onConfirm: () => deleteItem() });
+
+// Trusted HTML via low-level open
+modal.open(MODAL_KEYS.ALERT, {
+  title: 'Title',
+  bodyHtml: 'Trusted <strong>markup</strong> only.',
+}, 'sm');
+
 modal.settings();
 modal.themes();
 modal.shortcuts();       // Keyboard shortcuts reference
 modal.palette();         // Command palette (Cmd+K)
 ```
 
-**Trusted content note:** `modal.alert()` and `modal.confirm()` body strings are for trusted internal rich text only. Do not pipe user-provided or remote HTML into them.
+**Content safety:** `modal.alert()` and `modal.confirm()` render the body as **plain text** (HTML is escaped). For trusted internal markup, use the low-level `modal.open()` path with `bodyHtml`. Never pipe user-provided or remote HTML into `bodyHtml`.
 
 **Escape handling:** Managed by the centralized [layer-stack.svelte.ts](src/lib/layer-stack.svelte.ts). The native `<dialog>` cancel event is suppressed (`e.preventDefault()`); the layer stack's global `keydown` listener pops the modal via `modal.close()`. This ensures correct precedence when a dropdown or sidebar is open above a modal — Escape dismisses the topmost layer first (LIFO).
 

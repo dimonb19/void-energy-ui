@@ -27,10 +27,12 @@
           anchors the center while everything else shifts around it.
         </p>
         <p>
-          <strong>Pointer tracking:</strong> Global
-          <code>pointermove</code> listener normalizes coordinates to &minus;1&hellip;1,
-          smoothed via damped interpolation (factor 0.06). A non-repeating sine composition
-          generates organic ring wobble, amplified by pointer proximity.
+          <strong>Pointer tracking:</strong> While the portal is in the
+          viewport, a global <code>pointermove</code> listener normalizes coordinates
+          to &minus;1&hellip;1, smoothed via damped interpolation (factor 0.06).
+          Bounds are cached and refreshed on resize/scroll shifts instead of on every
+          move. A non-repeating sine composition generates organic ring wobble, amplified
+          by pointer proximity.
         </p>
         <p>
           <strong>Particles &amp; orbitals:</strong> 12 particles placed via golden-angle
@@ -58,9 +60,10 @@
     <div class="flex flex-col gap-sm">
       <h5>Interactive Demo</h5>
       <p class="text-small text-mute">
-        Move your cursor over the portal to destabilize it. Each ring layer
-        tracks at a different depth, creating a parallax tunnel effect. The
-        closer your cursor to the center, the stronger the wobble.
+        Move your cursor anywhere on the page while the portal is visible to
+        destabilize it. Each ring layer tracks at a different depth, creating a
+        parallax tunnel effect. The closer your cursor to the center, the
+        stronger the wobble.
       </p>
 
       <div class="flex flex-col items-center">

@@ -15,12 +15,14 @@
   const warpTextId = `${defsId}-warp-text`;
   const voidDepthId = `${defsId}-void-depth`;
 
-  let svgEl: SVGElement;
+  let svgEl = $state<SVGSVGElement | null>(null);
 
   let pointerX = $state(0);
   let pointerY = $state(0);
   let pointerDist = $state(0);
   let ringWobble = $state(0);
+  let prefersReducedMotion = $state(false);
+  let isVisible = $state(false);
 
   // ── Particle generation (golden angle, deterministic) ──
   interface Particle {
@@ -68,65 +70,268 @@
   const px = $derived(pointerX * intensity);
   const py = $derived(pointerY * intensity);
 
+  const SMOOTHING = 0.06;
+  const WOBBLE_SMOOTHING = 0.08;
+  const MOTION_EPSILON = 0.001;
+
+  let targetX = 0;
+  let targetY = 0;
+  let targetWobble = 0;
+  let wobbleEnergy = 0;
+  let time = 0;
+  let lastTimestamp = 0;
+  let frameId: number | null = null;
+  let rectCache: DOMRect | null = null;
+  let lastPointerX: number | null = null;
+  let lastPointerY: number | null = null;
+
   $effect(() => {
-    if (!svgEl) return;
+    if (typeof window === 'undefined') return;
 
-    // Reduced motion check
     const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const prefersReduced = motionQuery.matches;
+    prefersReducedMotion = motionQuery.matches;
 
-    let targetX = 0;
-    let targetY = 0;
-    let time = 0;
-    let lastTimestamp = 0;
-    let frame: number;
-
-    function onPointerMove(e: PointerEvent) {
-      const rect = svgEl.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const halfW = rect.width / 2 || 1;
-      const halfH = rect.height / 2 || 1;
-      targetX = Math.max(-1, Math.min(1, (e.clientX - cx) / halfW));
-      targetY = Math.max(-1, Math.min(1, (e.clientY - cy) / halfH));
+    function handleMotionChange(event: MediaQueryListEvent) {
+      prefersReducedMotion = event.matches;
     }
 
-    function animate(timestamp: number) {
-      const dt = lastTimestamp ? (timestamp - lastTimestamp) / 1000 : 0.016; // void-ignore
-      lastTimestamp = timestamp;
-
-      // Damped pointer tracking
-      pointerX += (targetX - pointerX) * 0.06;
-      pointerY += (targetY - pointerY) * 0.06;
-
-      // Pointer distance from center (0-1)
-      pointerDist = Math.min(
-        1,
-        Math.sqrt(pointerX * pointerX + pointerY * pointerY),
-      );
-
-      // Time counter
-      time += dt;
-
-      // Ring wobble: non-repeating sine composition
-      const wobbleAmp = 0.5 + pointerDist * 0.5;
-      ringWobble =
-        (Math.sin(time * 0.7) * 0.008 +
-          Math.sin(time * 1.3) * 0.005 +
-          Math.sin(time * 2.1) * 0.003) *
-        wobbleAmp;
-
-      frame = requestAnimationFrame(animate);
-    }
-
-    document.addEventListener('pointermove', onPointerMove);
-    if (!prefersReduced) {
-      frame = requestAnimationFrame(animate);
+    if (motionQuery.addEventListener) {
+      motionQuery.addEventListener('change', handleMotionChange);
+    } else {
+      motionQuery.addListener(handleMotionChange);
     }
 
     return () => {
-      document.removeEventListener('pointermove', onPointerMove);
-      cancelAnimationFrame(frame);
+      if (motionQuery.removeEventListener) {
+        motionQuery.removeEventListener('change', handleMotionChange);
+      } else {
+        motionQuery.removeListener(handleMotionChange);
+      }
+    };
+  });
+
+  $effect(() => {
+    if (!svgEl) return;
+
+    const node = svgEl;
+    const resizeObserver = new ResizeObserver(() => {
+      rectCache = node.getBoundingClientRect();
+    });
+
+    let intersectionObserver: IntersectionObserver | null = null;
+
+    resizeObserver.observe(node);
+
+    if (typeof IntersectionObserver === 'undefined') {
+      isVisible = true;
+    } else {
+      intersectionObserver = new IntersectionObserver((entries) => {
+        isVisible = Boolean(entries[0]?.isIntersecting);
+
+        if (isVisible) {
+          invalidateRectCache();
+        } else {
+          resetMotion();
+          stopAnimation();
+        }
+      });
+
+      intersectionObserver.observe(node);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+      intersectionObserver?.disconnect();
+      isVisible = false;
+      rectCache = null;
+      resetMotion();
+      stopAnimation();
+    };
+  });
+
+  function resetMotion() {
+    lastPointerX = null;
+    lastPointerY = null;
+    targetX = 0;
+    targetY = 0;
+    targetWobble = 0;
+    wobbleEnergy = 0;
+    time = 0;
+    lastTimestamp = 0;
+    pointerX = 0;
+    pointerY = 0;
+    pointerDist = 0;
+    ringWobble = 0;
+  }
+
+  function stopAnimation() {
+    if (frameId !== null) {
+      cancelAnimationFrame(frameId);
+      frameId = null;
+    }
+    lastTimestamp = 0;
+  }
+
+  function shouldContinueAnimating() {
+    return (
+      Math.abs(targetX - pointerX) > MOTION_EPSILON ||
+      Math.abs(targetY - pointerY) > MOTION_EPSILON ||
+      Math.abs(targetWobble - wobbleEnergy) > MOTION_EPSILON ||
+      (targetWobble <= MOTION_EPSILON && Math.abs(ringWobble) > MOTION_EPSILON)
+    );
+  }
+
+  function animate(timestamp: number) {
+    frameId = null;
+
+    const dt = lastTimestamp ? (timestamp - lastTimestamp) / 1000 : 0.016; // void-ignore
+    lastTimestamp = timestamp;
+
+    pointerX += (targetX - pointerX) * SMOOTHING;
+    pointerY += (targetY - pointerY) * SMOOTHING;
+    pointerDist = Math.min(
+      1,
+      Math.sqrt(pointerX * pointerX + pointerY * pointerY),
+    );
+    wobbleEnergy += (targetWobble - wobbleEnergy) * WOBBLE_SMOOTHING;
+
+    time += dt;
+
+    ringWobble =
+      (Math.sin(time * 0.7) * 0.008 +
+        Math.sin(time * 1.3) * 0.005 +
+        Math.sin(time * 2.1) * 0.003) *
+      wobbleEnergy;
+
+    if (shouldContinueAnimating()) {
+      frameId = requestAnimationFrame(animate);
+      return;
+    }
+
+    resetMotion();
+  }
+
+  function startAnimation() {
+    if (frameId !== null || prefersReducedMotion || intensity <= 0) return;
+    frameId = requestAnimationFrame(animate);
+  }
+
+  function invalidateRectCache() {
+    rectCache = null;
+  }
+
+  function updateRectCache() {
+    if (!svgEl) return null;
+    rectCache = svgEl.getBoundingClientRect();
+    return rectCache;
+  }
+
+  function updateTargetFromPoint(clientX: number, clientY: number) {
+    const rect = rectCache ?? updateRectCache();
+    if (!rect) return;
+
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const halfW = rect.width / 2 || 1;
+    const halfH = rect.height / 2 || 1;
+
+    targetX = Math.max(-1, Math.min(1, (clientX - cx) / halfW));
+    targetY = Math.max(-1, Math.min(1, (clientY - cy) / halfH));
+
+    const distance = Math.min(
+      1,
+      Math.sqrt(targetX * targetX + targetY * targetY),
+    );
+    targetWobble = 0.5 + distance * 0.5;
+  }
+
+  function handlePointerMove(event: PointerEvent) {
+    if (!isVisible || prefersReducedMotion || intensity <= 0) return;
+
+    lastPointerX = event.clientX;
+    lastPointerY = event.clientY;
+    updateTargetFromPoint(event.clientX, event.clientY);
+    startAnimation();
+  }
+
+  function handlePointerLeave() {
+    lastPointerX = null;
+    lastPointerY = null;
+    targetX = 0;
+    targetY = 0;
+    targetWobble = 0;
+    startAnimation();
+  }
+
+  function handlePointerOut(event: PointerEvent) {
+    if (event.relatedTarget === null) {
+      handlePointerLeave();
+    }
+  }
+
+  function handleViewportChange() {
+    invalidateRectCache();
+
+    if (
+      !isVisible ||
+      prefersReducedMotion ||
+      intensity <= 0 ||
+      lastPointerX === null ||
+      lastPointerY === null
+    ) {
+      return;
+    }
+
+    updateTargetFromPoint(lastPointerX, lastPointerY);
+    startAnimation();
+  }
+
+  function handleDocumentVisibilityChange() {
+    if (document.hidden) {
+      handlePointerLeave();
+    }
+  }
+
+  $effect(() => {
+    if (
+      typeof window === 'undefined' ||
+      typeof document === 'undefined' ||
+      !svgEl ||
+      !isVisible ||
+      prefersReducedMotion ||
+      intensity <= 0
+    ) {
+      resetMotion();
+      stopAnimation();
+      return;
+    }
+
+    const scrollOptions = { capture: true, passive: true } as const;
+
+    window.addEventListener('pointermove', handlePointerMove, {
+      passive: true,
+    });
+    window.addEventListener('pointerout', handlePointerOut);
+    window.addEventListener('resize', handleViewportChange, { passive: true });
+    window.addEventListener('scroll', handleViewportChange, scrollOptions);
+    window.addEventListener('blur', handlePointerLeave);
+    document.addEventListener(
+      'visibilitychange',
+      handleDocumentVisibilityChange,
+    );
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerout', handlePointerOut);
+      window.removeEventListener('resize', handleViewportChange);
+      window.removeEventListener('scroll', handleViewportChange, scrollOptions);
+      window.removeEventListener('blur', handlePointerLeave);
+      document.removeEventListener(
+        'visibilitychange',
+        handleDocumentVisibilityChange,
+      );
+      resetMotion();
+      stopAnimation();
     };
   });
 </script>

@@ -28,10 +28,7 @@
 -->
 <script lang="ts">
   import type { Component } from 'svelte';
-  import {
-    toNativeControlState,
-    toNativeControlValue,
-  } from '@lib/native-control-foundation';
+  import { toNativeControlState } from '@lib/native-control-foundation';
 
   interface SwitcherOption {
     value: string | number | null;
@@ -42,7 +39,7 @@
   interface SwitcherProps {
     options: SwitcherOption[];
     value: string | number | null;
-    onchange?: (value: string) => void;
+    onchange?: (value: string | number | null) => void;
     label?: string;
     id?: string;
     disabled?: boolean;
@@ -66,13 +63,31 @@
   const groupName = $derived(`${inputId}-group`);
   const labelId = $derived(`${inputId}-label`);
 
-  let selectedValue = $derived(toNativeControlValue(value));
-
   function select(newValue: string | number | null) {
     if (disabled) return;
-    const next = toNativeControlValue(newValue);
-    value = next;
-    onchange?.(next);
+    value = newValue;
+    onchange?.(newValue);
+  }
+
+  function getOptionToken(index: number): string {
+    return `${inputId}-option-${index}`;
+  }
+
+  function isOptionActive(optionValue: string | number | null): boolean {
+    return Object.is(value, optionValue);
+  }
+
+  function handleChange(e: Event) {
+    const target = e.currentTarget as HTMLInputElement;
+    const nextIndex = options.findIndex(
+      (_, index) => getOptionToken(index) === target.value,
+    );
+    if (nextIndex === -1) return;
+
+    const nextOption = options[nextIndex];
+    if (!isOptionActive(nextOption.value)) {
+      select(nextOption.value);
+    }
   }
 </script>
 
@@ -88,9 +103,8 @@
     aria-label={label ? undefined : 'Switcher'}
     {disabled}
   >
-    {#each options as option (option.value)}
-      {@const optionValue = toNativeControlValue(option.value)}
-      {@const optionActive = selectedValue === optionValue}
+    {#each options as option, index (index)}
+      {@const optionActive = isOptionActive(option.value)}
 
       <label
         class="switcher-option btn"
@@ -100,12 +114,10 @@
           type="radio"
           class="switcher-native"
           name={groupName}
-          value={optionValue}
+          value={getOptionToken(index)}
           checked={optionActive}
           {disabled}
-          onchange={() => {
-            if (!optionActive) select(option.value);
-          }}
+          onchange={handleChange}
         />
 
         <span class="switcher-option-content">

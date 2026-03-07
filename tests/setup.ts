@@ -10,9 +10,23 @@ class ResizeObserverMock {
   disconnect(): void {}
 }
 
+class IntersectionObserverMock {
+  observe(): void {}
+  unobserve(): void {}
+  disconnect(): void {}
+}
+
 if (!('ResizeObserver' in globalThis)) {
   Object.defineProperty(globalThis, 'ResizeObserver', {
     value: ResizeObserverMock,
+    configurable: true,
+    writable: true,
+  });
+}
+
+if (!('IntersectionObserver' in globalThis)) {
+  Object.defineProperty(globalThis, 'IntersectionObserver', {
+    value: IntersectionObserverMock,
     configurable: true,
     writable: true,
   });
@@ -30,6 +44,24 @@ if (!('requestAnimationFrame' in globalThis)) {
 if (!('cancelAnimationFrame' in globalThis)) {
   Object.defineProperty(globalThis, 'cancelAnimationFrame', {
     value: (id: number) => clearTimeout(id),
+    configurable: true,
+    writable: true,
+  });
+}
+
+if (!('animate' in Element.prototype)) {
+  Object.defineProperty(Element.prototype, 'animate', {
+    value: () =>
+      ({
+        cancel() {},
+        finish() {},
+        play() {},
+        pause() {},
+        reverse() {},
+        onfinish: null,
+        oncancel: null,
+        finished: Promise.resolve({} as Animation),
+      }) as Partial<Animation> as Animation,
     configurable: true,
     writable: true,
   });

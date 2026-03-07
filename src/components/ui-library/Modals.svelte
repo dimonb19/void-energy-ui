@@ -37,8 +37,9 @@
       <h5>Alert</h5>
       <p class="text-small text-mute">
         <code>modal.alert(title, body)</code> opens a small informational dialog
-        with a single acknowledge button. The body accepts trusted internal rich
-        text only. Size defaults to <code>sm</code>.
+        with a single acknowledge button. The helper body is plain text. Use
+        <code>modal.open(...)</code> with <code>bodyHtml</code> when trusted
+        internal markup is required. Size defaults to <code>sm</code>.
       </p>
 
       <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
@@ -53,12 +54,17 @@
         </button>
         <button
           onclick={() =>
-            modal.alert(
-              'Maintenance Window',
-              'Scheduled downtime: <strong>02:00 — 04:00 UTC</strong>. Non-critical systems will be unavailable during this period.',
+            modal.open(
+              MODAL_KEYS.ALERT,
+              {
+                title: 'Maintenance Window',
+                bodyHtml:
+                  'Scheduled downtime: <strong>02:00 — 04:00 UTC</strong>. Non-critical systems will be unavailable during this period.',
+              },
+              'sm',
             )}
         >
-          Alert (rich body)
+          Alert (trusted HTML)
         </button>
       </div>
     </div>
@@ -68,9 +74,10 @@
       <h5>Confirm</h5>
       <p class="text-small text-mute">
         <code>modal.confirm(title, body, actions)</code> opens a dialog with
-        confirm and cancel buttons. Supports an optional <code>cost</code>
-        badge displayed on the confirm button via tooltip. Size defaults to
-        <code>md</code>.
+        confirm and cancel buttons. The helper body is plain text. Use
+        <code>modal.open(...)</code> with <code>bodyHtml</code> for trusted
+        internal markup. Supports an optional <code>cost</code> badge displayed
+        on the confirm button via tooltip. Size defaults to <code>md</code>.
       </p>
 
       <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">
@@ -89,16 +96,19 @@
         <button
           class="btn-premium"
           onclick={() =>
-            modal.confirm(
-              'Delete Module',
-              'This action is <strong>irreversible</strong>. The module and all associated data will be permanently removed.',
+            modal.open(
+              MODAL_KEYS.CONFIRM,
               {
+                title: 'Delete Module',
+                bodyHtml:
+                  'This action is <strong>irreversible</strong>. The module and all associated data will be permanently removed.',
                 onConfirm: () => toast.show('Module deleted', 'success'),
                 cost: 150,
               },
+              'md',
             )}
         >
-          Confirm (with cost)
+          Confirm (trusted HTML)
         </button>
       </div>
 
@@ -165,7 +175,8 @@
               MODAL_KEYS.ALERT,
               {
                 title: 'Small Dialog',
-                body: 'This alert uses the <code>sm</code> size — compact, focused, minimal.',
+                bodyHtml:
+                  'This alert uses the <code>sm</code> size — compact, focused, minimal.',
               },
               'sm',
             )}
@@ -178,7 +189,8 @@
               MODAL_KEYS.ALERT,
               {
                 title: 'Medium Dialog',
-                body: 'This alert uses the <code>md</code> size — the default for most interactions.',
+                bodyHtml:
+                  'This alert uses the <code>md</code> size — the default for most interactions.',
               },
               'md',
             )}
@@ -191,7 +203,8 @@
               MODAL_KEYS.ALERT,
               {
                 title: 'Large Dialog',
-                body: 'This alert uses the <code>lg</code> size — for complex panels with more content.',
+                bodyHtml:
+                  'This alert uses the <code>lg</code> size — for complex panels with more content.',
               },
               'lg',
             )}
@@ -204,7 +217,8 @@
               MODAL_KEYS.ALERT,
               {
                 title: 'Full Dialog',
-                body: 'This alert uses the <code>full</code> size — fills the viewport with safe area inset awareness. Use for immersive layouts like editors, galleries, or configuration wizards.',
+                bodyHtml:
+                  'This alert uses the <code>full</code> size — fills the viewport with safe area inset awareness. Use for immersive layouts like editors, galleries, or configuration wizards.',
               },
               'full',
             )}
@@ -283,8 +297,8 @@ modal.open(MODAL_KEYS.INVITE, &#123;
           >import &#123; modal &#125; from '@lib/modal-manager.svelte';
 import &#123; MODAL_KEYS &#125; from '@config/modal-registry';
 
-// Alert (informational, sm size, trusted internal rich text only)
-modal.alert('Title', 'Body text supports trusted &lt;strong&gt;rich text&lt;/strong&gt;.');
+// Alert helper (informational, sm size, plain text only)
+modal.alert('Title', 'Body text only.');
 
 // Confirm (with callbacks, md size)
 modal.confirm('Delete Item?', 'This cannot be undone.', &#123;
@@ -292,6 +306,12 @@ modal.confirm('Delete Item?', 'This cannot be undone.', &#123;
   onCancel: () =&gt; console.log('Cancelled'),
   cost: 500,  // optional badge on confirm button
 &#125;);
+
+// Trusted HTML via low-level open
+modal.open(MODAL_KEYS.ALERT, &#123;
+  title: 'Title',
+  bodyHtml: 'Trusted &lt;strong&gt;markup&lt;/strong&gt; only.',
+&#125;, 'sm');
 
 // Built-in modals
 modal.themes();      // lg — atmosphere selector

@@ -49,6 +49,7 @@ class ModalManager {
   // --- Convenience methods ---
 
   // Usage: modal.confirm('Delete?', 'Are you sure?', { onConfirm: () => deleteItem() })
+  // Body is plain text; trusted HTML belongs on the explicit low-level modal.open path.
   confirm(
     title: string,
     body: string,

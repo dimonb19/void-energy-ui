@@ -37,7 +37,7 @@
   interface SelectorProps {
     options: SwitcherOption[];
     value?: string | number | null;
-    onchange?: (value: string) => void;
+    onchange?: (value: string | number | null) => void;
     label?: string;
     id?: string;
     disabled?: boolean;
@@ -68,15 +68,29 @@
   const componentId = $props.id();
   const generatedInputId = `select-${componentId}`;
   const inputId = $derived(id ?? generatedInputId);
+  const placeholderOffset = $derived(placeholder ? 1 : 0);
 
-  // Normalize empty values: null, undefined, '' all mean "no selection"
-  const isEmpty = (v: unknown): boolean => v == null || v === '';
+  function getOptionToken(index: number): string {
+    return `${inputId}-option-${index}`;
+  }
+
+  const selectedOptionIndex = $derived(
+    options.findIndex((option) => Object.is(option.value, value)),
+  );
+
+  const placeholderSelected = $derived(
+    Boolean(placeholder) && selectedOptionIndex === -1,
+  );
 
   function handleChange(e: Event) {
     const target = e.currentTarget as HTMLSelectElement;
-    const newValue = target.value === '' ? null : target.value;
+    const nextIndex = target.selectedIndex - placeholderOffset;
+    const newValue =
+      nextIndex >= 0 && nextIndex < options.length
+        ? options[nextIndex].value
+        : null;
     value = newValue;
-    onchange?.(newValue as string);
+    onchange?.(newValue);
   }
 </script>
 
@@ -86,15 +100,14 @@
   {/if}
   <select id={inputId} {disabled} onchange={handleChange} class={selectClass}>
     {#if placeholder}
-      <option value="" disabled hidden selected={isEmpty(value)}
+      <option value="" disabled hidden selected={placeholderSelected}
         >{placeholder}</option
       >
     {/if}
-    {#each options as option (option.value)}
+    {#each options as option, index (index)}
       <option
-        value={option.value}
-        selected={!isEmpty(value) && String(value) === String(option.value)}
-        >{option.label}</option
+        value={getOptionToken(index)}
+        selected={selectedOptionIndex === index}>{option.label}</option
       >
     {/each}
   </select>

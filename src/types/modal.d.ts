@@ -8,23 +8,43 @@
  * 3. Create component in src/components/modals/
  */
 type ModalContract = {
-  /** Simple information modal with title and trusted internal rich body text */
-  alert: {
-    title: string;
-    body: string;
-  };
+  /** Simple information modal with title and either plain text or explicit trusted HTML */
+  alert:
+    | {
+        title: string;
+        body: string;
+        bodyHtml?: never;
+      }
+    | {
+        title: string;
+        body?: never;
+        bodyHtml: string;
+      };
 
-  /** Confirmation dialog with optional callbacks and trusted internal rich body text */
-  confirm: {
-    title: string;
-    body: string;
-    /** Optional numeric cost displayed with currency formatting */
-    cost?: number;
-    /** Callback fired when user confirms action */
-    onConfirm: () => void;
-    /** Optional callback fired when user cancels (defaults to simple close) */
-    onCancel?: () => void;
-  };
+  /** Confirmation dialog with optional callbacks and either plain text or explicit trusted HTML */
+  confirm:
+    | {
+        title: string;
+        body: string;
+        bodyHtml?: never;
+        /** Optional numeric cost displayed with currency formatting */
+        cost?: number;
+        /** Callback fired when user confirms action */
+        onConfirm: () => void;
+        /** Optional callback fired when user cancels (defaults to simple close) */
+        onCancel?: () => void;
+      }
+    | {
+        title: string;
+        body?: never;
+        bodyHtml: string;
+        /** Optional numeric cost displayed with currency formatting */
+        cost?: number;
+        /** Callback fired when user confirms action */
+        onConfirm: () => void;
+        /** Optional callback fired when user cancels (defaults to simple close) */
+        onCancel?: () => void;
+      };
 
   /** Display preferences demo modal showcasing form controls */
   settings: {
