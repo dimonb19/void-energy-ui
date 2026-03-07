@@ -1,6 +1,7 @@
 <script lang="ts">
   import PullRefresh from '@components/ui/PullRefresh.svelte';
   import PortalLoader from '@components/ui/PortalLoader.svelte';
+  import PortalRing from '@components/icons/PortalRing.svelte';
 
   let portalStatus = $state<'idle' | 'loading'>('loading');
 
@@ -16,6 +17,25 @@
 <PullRefresh onrefresh={handleRefresh} onerror={handleRefreshError}>
   <div class="container py-2xl">
     <div class="flex flex-col gap-2xl">
+      <!-- ─── UNSTABLE PORTAL ────────────────────────────────────────── -->
+      <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+        <h3 class="text-dim">Unstable Portal</h3>
+        <p class="text-small text-mute">
+          Interactive SVG that reacts to pointer position. Move your cursor to
+          destabilize the gateway.
+        </p>
+      </div>
+
+      <div class="surface-glass p-lg flex flex-col items-center gap-lg">
+        <PortalRing class="portal-ring-demo" />
+        <p class="text-caption text-mute text-center px-xs">
+          Five parallax layers &mdash; concentric rings, energy arcs, glitch
+          segments, particles, and a breathing core &mdash; each tracking the
+          pointer at a different depth multiplier. Glass physics adds bloom
+          glow; retro steps all animations.
+        </p>
+      </div>
+
       <!-- ─── PORTAL LOADER ─────────────────────────────────────────── -->
       <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
         <h3 class="text-dim">Portal Loader</h3>
@@ -116,3 +136,10 @@
     </div>
   </div>
 </PullRefresh>
+
+<style lang="scss">
+  :global(.portal-ring-demo) {
+    width: 100%;
+    max-width: 480px; // void-ignore
+  }
+</style>
