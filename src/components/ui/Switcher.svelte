@@ -17,6 +17,9 @@
   - value: Currently selected value (bindable)
   - onchange: Callback when selection changes
   - label: Optional visible/accessibility label
+  - name: Optional radio group name override for native form submission
+  - required: Marks the group as required
+  - form: Associates the radios with a specific form
   - disabled: Disables all interaction
   - class: Additional CSS classes
 
@@ -42,6 +45,9 @@
     onchange?: (value: string | number | null) => void;
     label?: string;
     id?: string;
+    name?: string;
+    required?: boolean;
+    form?: string;
     disabled?: boolean;
     class?: string;
   }
@@ -52,6 +58,9 @@
     onchange,
     label,
     id,
+    name,
+    required = false,
+    form,
     disabled = false,
     class: className = '',
   }: SwitcherProps = $props();
@@ -60,7 +69,8 @@
   const componentId = $props.id();
   const generatedInputId = `switcher-${componentId}`;
   const inputId = $derived(id ?? generatedInputId);
-  const groupName = $derived(`${inputId}-group`);
+  const generatedGroupName = $derived(`${inputId}-group`);
+  const groupName = $derived(name ?? generatedGroupName);
   const labelId = $derived(`${inputId}-label`);
 
   function select(newValue: string | number | null) {
@@ -69,24 +79,13 @@
     onchange?.(newValue);
   }
 
-  function getOptionToken(index: number): string {
-    return `${inputId}-option-${index}`;
-  }
-
   function isOptionActive(optionValue: string | number | null): boolean {
     return Object.is(value, optionValue);
   }
 
-  function handleChange(e: Event) {
-    const target = e.currentTarget as HTMLInputElement;
-    const nextIndex = options.findIndex(
-      (_, index) => getOptionToken(index) === target.value,
-    );
-    if (nextIndex === -1) return;
-
-    const nextOption = options[nextIndex];
-    if (!isOptionActive(nextOption.value)) {
-      select(nextOption.value);
+  function handleChange(nextValue: string | number | null) {
+    if (!isOptionActive(nextValue)) {
+      select(nextValue);
     }
   }
 </script>
@@ -103,7 +102,7 @@
     aria-label={label ? undefined : 'Switcher'}
     {disabled}
   >
-    {#each options as option, index (index)}
+    {#each options as option}
       {@const optionActive = isOptionActive(option.value)}
 
       <label
@@ -114,10 +113,12 @@
           type="radio"
           class="switcher-native"
           name={groupName}
-          value={getOptionToken(index)}
+          value={String(option.value)}
           checked={optionActive}
+          {required}
+          {form}
           {disabled}
-          onchange={handleChange}
+          onchange={() => handleChange(option.value)}
         />
 
         <span class="switcher-option-content">

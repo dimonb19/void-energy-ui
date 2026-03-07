@@ -20,4 +20,38 @@ describe('ProgressRing', () => {
     expect(progressbar.getAttribute('aria-valuemax')).toBe('100');
     expect(screen.getByText('100%')).toBeTruthy();
   });
+
+  it('normalizes a zero max to zero progress', () => {
+    render(ProgressRing, {
+      value: 75,
+      max: 0,
+      showValue: true,
+      label: 'Upload progress',
+    });
+
+    const progressbar = screen.getByRole('progressbar', {
+      name: 'Upload progress',
+    });
+
+    expect(progressbar.getAttribute('aria-valuenow')).toBe('0');
+    expect(progressbar.getAttribute('aria-valuemax')).toBe('0');
+    expect(screen.getByText('0%')).toBeTruthy();
+  });
+
+  it('normalizes a negative max to zero progress', () => {
+    render(ProgressRing, {
+      value: 75,
+      max: -10,
+      showValue: true,
+      label: 'Upload progress',
+    });
+
+    const progressbar = screen.getByRole('progressbar', {
+      name: 'Upload progress',
+    });
+
+    expect(progressbar.getAttribute('aria-valuenow')).toBe('0');
+    expect(progressbar.getAttribute('aria-valuemax')).toBe('0');
+    expect(screen.getByText('0%')).toBeTruthy();
+  });
 });

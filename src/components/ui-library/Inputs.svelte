@@ -283,8 +283,10 @@
       <h5>Select</h5>
       <p class="text-small text-mute">
         The <code>Selector</code> component wraps a native
-        <code>&lt;select&gt;</code> with label association and layout. Zero custom
-        dropdown JS — the browser handles the dropdown entirely.
+        <code>&lt;select&gt;</code> with label association and layout. Zero
+        custom dropdown JS — the browser handles the dropdown entirely. Native
+        form attributes pass through to the underlying
+        <code>&lt;select&gt;</code>.
       </p>
 
       <div class="surface-sunk p-md flex flex-col gap-md">
@@ -314,7 +316,8 @@
       <p class="text-caption text-mute px-xs">
         Props: <code>options</code>, <code>value</code> (bindable),
         <code>label</code>, <code>placeholder</code>, <code>disabled</code>.
-        Supports <code>align="start"</code> for left-aligned labels.
+        Supports <code>align="start"</code> for left-aligned labels. Native form
+        submission serializes <code>String(option.value)</code>.
       </p>
 
       <details>
@@ -539,7 +542,8 @@
       <p class="text-small text-mute">
         Segmented control for selecting between N options. Built on native radio
         inputs with a shared group name, so keyboard behavior follows
-        browser-default radio interaction (Tab + Arrow keys).
+        browser-default radio interaction (Tab + Arrow keys). Native form
+        submission uses the browser's string value for the checked option.
       </p>
 
       <div class="surface-sunk p-md flex flex-col items-center gap-md">
@@ -560,6 +564,7 @@
       <p class="text-caption text-mute px-xs">
         Props: <code>options</code> (value, label, icon?),
         <code>value</code> (bindable), <code>label</code>,
+        <code>name</code>, <code>required</code>, <code>form</code>, and
         <code>disabled</code>.
       </p>
 

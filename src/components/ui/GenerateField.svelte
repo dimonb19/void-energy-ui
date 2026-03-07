@@ -30,7 +30,7 @@
   - Loading state: input disabled, shimmer overlay, LoadingQuill in slot
   - On resolve → value updated with generated text
   - On error → toast notification, value unchanged
-  - Escape during generation → aborts the request
+  - Escape during generation → aborts via a temporary document listener
 
   @see /_fields.scss for field overlay anatomy
 -->
@@ -75,6 +75,24 @@
   let generating = $state(false);
   let abortController: AbortController | undefined = $state();
 
+  function handleEscapeAbort(e: KeyboardEvent) {
+    if (e.key !== 'Escape' || !generating) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    abortController?.abort();
+  }
+
+  $effect(() => {
+    if (!generating || typeof document === 'undefined') return;
+
+    document.addEventListener('keydown', handleEscapeAbort, true);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeAbort, true);
+    };
+  });
+
   async function generate() {
     if (disabled || generating) return;
 
@@ -88,9 +106,7 @@
         signal: abortController.signal,
       });
 
-      if (result) {
-        value = result;
-      }
+      value = result;
     } catch (err) {
       if (err instanceof Error && err.name !== 'AbortError') {
         toast.show(err.message, 'error');
@@ -98,13 +114,6 @@
     } finally {
       generating = false;
       abortController = undefined;
-    }
-  }
-
-  function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Escape' && generating) {
-      e.preventDefault();
-      abortController?.abort();
     }
   }
 </script>
@@ -120,7 +129,6 @@
     {placeholder}
     disabled={disabled || generating}
     bind:value
-    onkeydown={handleKeydown}
   />
   {#key generating}
     <span

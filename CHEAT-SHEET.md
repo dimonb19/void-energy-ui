@@ -1263,7 +1263,7 @@ Preset components with built-in layout and physics.
 | `zoom` | `'in' \| 'out'` | — | Search icon lens variant |
 | `autocomplete` | `string` | `'off'` | HTML autocomplete hint |
 | `delay` | `number` | — | Debounce `oninput` by this many ms (0 or omitted = no debounce) |
-| `onsubmit` | `(value: string) => void` | — | Callback on Enter key |
+| `onsubmit` | `(value: string) => void` | — | Callback on Enter key (only intercepts native Enter behavior when provided) |
 | `oninput` | `(value: string) => void` | — | Callback on keystroke (debounced if `delay` is set) |
 | `disabled` | `boolean` | `false` | Disables input |
 | `...rest` | `HTMLInputAttributes` | — | Native input attributes (`autofocus`, `role`, `aria-*`, etc.) |
@@ -1275,6 +1275,8 @@ Preset components with built-in layout and physics.
 <SearchField bind:value={query} oninput={(v) => search(v)} delay={300} />
 <SearchField bind:value={query} autofocus role="combobox" aria-label="Commands" />
 ```
+
+Enter keeps native browser submit/search behavior unless `onsubmit` is provided.
 
 ---
 
@@ -1294,6 +1296,7 @@ Preset components with built-in layout and physics.
 | `placeholder` | `string` | — | Hidden first option text |
 | `disabled` | `boolean` | `false` | Disables select |
 | `align` | `'start' \| 'center' \| 'end'` | `'center'` | Flex alignment |
+| `...rest` | `HTMLSelectAttributes` | — | Native `<select>` attributes (`name`, `required`, `form`, `aria-*`, etc.) |
 
 **Usage:**
 
@@ -1305,6 +1308,8 @@ Preset components with built-in layout and physics.
   placeholder="Select..."
 />
 ```
+
+Native form submission serializes `String(option.value)`, while `bind:value` and `onchange` keep the original typed value.
 
 ---
 
@@ -1321,6 +1326,9 @@ Preset components with built-in layout and physics.
 | `value` | `string \| number \| null` | `$bindable()` | Selected value (bindable) |
 | `onchange` | `(value: string \| number \| null) => void` | — | Callback on selection |
 | `label` | `string` | — | Label text |
+| `name` | `string` | auto-generated | Native radio group name (set explicitly for meaningful form submission) |
+| `required` | `boolean` | `false` | Marks the radio group as required |
+| `form` | `string` | — | Associates the radio inputs with a specific `<form>` |
 | `disabled` | `boolean` | `false` | Disables all options |
 
 **Usage:**
@@ -1335,6 +1343,8 @@ Preset components with built-in layout and physics.
   bind:value={physics}
 />
 ```
+
+Native form submission serializes `String(option.value)`, while `bind:value` and `onchange` keep the original typed value.
 
 ---
 
@@ -1533,7 +1543,7 @@ const pv = createPasswordValidation(() => password);
 | `instructions` | `string` | — | Developer-provided prompt context for this field's AI generation |
 | `ongenerate` | `(ctx: GenerateContext) => Promise<string>` | *required* | Async handler receiving `{ currentValue, instructions, signal }` |
 
-**States:** idle (editable + Sparkle icon) → generating (disabled + shimmer + LoadingQuill). Escape aborts generation.
+**States:** idle (editable + Sparkle icon) → generating (disabled + shimmer + LoadingQuill). Escape aborts generation through a temporary document-level listener, so parent modal/sidebar layers stay open.
 
 **Usage:**
 
@@ -1565,7 +1575,7 @@ const pv = createPasswordValidation(() => password);
 | `instructions` | `string` | — | Developer-provided prompt context for this field's AI generation |
 | `ongenerate` | `(ctx: GenerateContext) => Promise<string>` | *required* | Async handler receiving `{ currentValue, instructions, signal }` |
 
-**States:** idle (editable + Sparkle icon at top-right) → generating (disabled + shimmer + LoadingQuill). Escape aborts generation.
+**States:** idle (editable + Sparkle icon at top-right) → generating (disabled + shimmer + LoadingQuill). Escape aborts generation through a temporary document-level listener, so parent modal/sidebar layers stay open.
 
 **Usage:**
 
@@ -3187,7 +3197,9 @@ Centralized LIFO stack for Escape key dismissal. Each dismissible surface (modal
 | Dropdown | `Dropdown.svelte` positioning `$effect` | `close()` + `triggerEl.focus()` |
 | Sidebar | `Sidebar.svelte` open `$effect` | `open = false` + `onclose?.()` |
 
-**Element-scoped handlers** (EditField, EditTextarea, GenerateField, GenerateTextarea) are NOT registered. They call `e.preventDefault()` on the `<input>`/`<textarea>` keydown, which the layer stack respects via its `defaultPrevented` guard.
+**Element-scoped handlers** (EditField, EditTextarea) are NOT registered. They call `e.preventDefault()` on the control keydown, which the layer stack respects via its `defaultPrevented` guard.
+
+**GenerateField / GenerateTextarea** add a temporary capture-phase `document` listener only while generation is active. Escape is intercepted there, aborted, and stopped from reaching modal/sidebar dismissal layers.
 
 ```ts
 import { layerStack } from '@lib/layer-stack.svelte';
@@ -4124,6 +4136,8 @@ toast.resume(id);  // Resume with remaining time
 />
 ```
 
+Native form submission serializes `String(option.value)`.
+
 ---
 
 ### N. Field Composites (Password + Validation, Copy, Edit, EditTextarea, Generate)
@@ -4187,6 +4201,8 @@ toast.resume(id);  // Resume with remaining time
   rows={4}
 />
 ```
+
+Escape aborts active generation through a temporary document-level listener, so parent dismissible layers stay open.
 
 ---
 
@@ -4262,6 +4278,8 @@ toast.resume(id);  // Resume with remaining time
   bind:value={view}
 />
 ```
+
+Native form submission serializes `String(option.value)`. Pass `name` when the switcher participates in a real form.
 
 ---
 

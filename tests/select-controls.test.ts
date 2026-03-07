@@ -5,6 +5,27 @@ import Selector from '@components/ui/Selector.svelte';
 import Switcher from '@components/ui/Switcher.svelte';
 
 describe('typed select controls', () => {
+  it('serializes selector values with native browser strings in FormData', () => {
+    const form = document.createElement('form');
+    document.body.append(form);
+
+    render(Selector, {
+      target: form,
+      props: {
+        name: 'font',
+        options: [
+          { value: null, label: 'System Default' },
+          { value: 'Inter', label: 'Inter' },
+        ],
+        value: null,
+      },
+    });
+
+    const formData = new FormData(form);
+
+    expect(formData.get('font')).toBe('null');
+  });
+
   it('returns null for explicit null selector options', async () => {
     const onchange = vi.fn();
     const { container } = render(Selector, {
@@ -46,6 +67,27 @@ describe('typed select controls', () => {
     await fireEvent.change(select!);
 
     expect(onchange).toHaveBeenLastCalledWith(0.85);
+  });
+
+  it('serializes switcher values with native browser strings in FormData', () => {
+    const form = document.createElement('form');
+    document.body.append(form);
+
+    render(Switcher, {
+      target: form,
+      props: {
+        name: 'density',
+        options: [
+          { value: 1, label: 'Standard' },
+          { value: 2, label: 'Max' },
+        ],
+        value: 2,
+      },
+    });
+
+    const formData = new FormData(form);
+
+    expect(formData.get('density')).toBe('2');
   });
 
   it('returns numeric switcher values without string coercion', async () => {

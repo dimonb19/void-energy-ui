@@ -217,8 +217,9 @@
             onsubmit={(v) => toast.show(`Search: "${v}"`, 'info')}
           />
           <p class="text-caption text-mute px-xs">
-            Search icon rotates on focus. Enter key triggers
-            <code>onsubmit</code>. Supports <code>zoom</code> variants.
+            Search icon rotates on focus. Enter only intercepts native behavior
+            when <code>onsubmit</code> is provided. Supports
+            <code>zoom</code> variants.
           </p>
         </div>
 
@@ -322,7 +323,8 @@
           />
           <p class="text-caption text-mute px-xs">
             Always editable. Click Sparkle to trigger AI generation. Input shows
-            shimmer during loading. <code>Escape</code> aborts.
+            shimmer during loading. <code>Escape</code> aborts without closing a
+            parent modal or sidebar.
           </p>
         </div>
 
@@ -340,8 +342,8 @@
             rows={4}
           />
           <p class="text-caption text-mute px-xs">
-            Textarea variant. Same sparkle/shimmer/abort behavior, icons
-            anchored to top-right.
+            Textarea variant. Same sparkle/shimmer/abort behavior, with Escape
+            intercepted before parent layers dismiss. Icons anchor to top-right.
           </p>
         </div>
       </div>

@@ -60,13 +60,14 @@
   const strokeWidth = $derived(radius * thickness);
   const circumference = 2 * Math.PI * radius;
 
-  const clampedValue = $derived(Math.min(Math.max(value, 0), max));
-  const fraction = $derived(max > 0 ? clampedValue / max : 0);
+  const safeMax = $derived(max > 0 ? max : 0);
+  const clampedValue = $derived(Math.min(Math.max(value, 0), safeMax));
+  const fraction = $derived(safeMax > 0 ? clampedValue / safeMax : 0);
   const fillLength = $derived(fraction * circumference);
   const gapLength = $derived(circumference - fillLength);
 
   function defaultFormatValue(v: number, m: number): string {
-    return `${Math.round((v / m) * 100)}%`;
+    return m > 0 ? `${Math.round((v / m) * 100)}%` : '0%';
   }
 
   const fmt = $derived(formatValue ?? defaultFormatValue);
@@ -81,7 +82,7 @@
   role="progressbar"
   aria-valuenow={clampedValue}
   aria-valuemin={0}
-  aria-valuemax={max}
+  aria-valuemax={safeMax}
   aria-label={label}
 >
   <svg
@@ -121,7 +122,7 @@
         dominant-baseline="middle"
         font-size={viewBoxSize * centerFontScale}
       >
-        {fmt(clampedValue, max)}
+        {fmt(clampedValue, safeMax)}
       </text>
     {/if}
   </svg>

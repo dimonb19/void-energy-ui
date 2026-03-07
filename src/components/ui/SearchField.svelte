@@ -21,7 +21,7 @@
 
   BEHAVIOR:
   - Search icon rotates 90° when input is focused
-  - Enter key triggers onsubmit callback
+  - Enter key triggers onsubmit callback when provided
 
   @see /_fields.scss for field overlay anatomy
 -->
@@ -77,9 +77,9 @@
   });
 
   function handleKeydown(e: KeyboardEvent) {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && onsubmit) {
       e.preventDefault();
-      onsubmit?.(value);
+      onsubmit(value);
     }
   }
 

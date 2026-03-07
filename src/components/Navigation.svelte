@@ -370,6 +370,7 @@
         <a
           class="tab"
           href={tab.href}
+          aria-current={activeTab === tab.id ? 'page' : undefined}
           data-state={activeTab === tab.id ? 'active' : ''}
           onclick={(e) => selectTab(e, tab.id)}
           use:navlink
@@ -393,6 +394,7 @@
       class="tab"
       href={tab.href}
       aria-label={tab.label}
+      aria-current={activeTab === tab.id ? 'page' : undefined}
       data-state={activeTab === tab.id ? 'active' : ''}
       onclick={(e) => selectTab(e, tab.id)}
       use:navlink

@@ -25,16 +25,20 @@
   - selectClass: CSS classes for inner <select>
   - align: Flex alignment ('start' | 'center' | 'end'), default 'center'
   - class: CSS classes for wrapper div
+  - ...rest: Native <select> attributes (name, required, form, aria-*, etc.)
 
   @see /_inputs.scss for select styling
 -->
 <script lang="ts">
+  import type { HTMLSelectAttributes } from 'svelte/elements';
+
   interface SwitcherOption {
     value: string | number | null;
     label: string;
   }
 
-  interface SelectorProps {
+  interface SelectorProps
+    extends Omit<HTMLSelectAttributes, 'value' | 'onchange'> {
     options: SwitcherOption[];
     value?: string | number | null;
     onchange?: (value: string | number | null) => void;
@@ -62,6 +66,7 @@
     selectClass = '',
     align = 'center',
     class: className = '',
+    ...rest
   }: SelectorProps = $props();
 
   // Auto-generate ID for label association if not provided
@@ -70,8 +75,8 @@
   const inputId = $derived(id ?? generatedInputId);
   const placeholderOffset = $derived(placeholder ? 1 : 0);
 
-  function getOptionToken(index: number): string {
-    return `${inputId}-option-${index}`;
+  function serializeOptionValue(optionValue: string | number | null): string {
+    return String(optionValue);
   }
 
   const selectedOptionIndex = $derived(
@@ -98,7 +103,13 @@
   {#if label}
     <label for={inputId} class="text-small px-xs">{label}</label>
   {/if}
-  <select id={inputId} {disabled} onchange={handleChange} class={selectClass}>
+  <select
+    id={inputId}
+    {disabled}
+    onchange={handleChange}
+    class={selectClass}
+    {...rest}
+  >
     {#if placeholder}
       <option value="" disabled hidden selected={placeholderSelected}
         >{placeholder}</option
@@ -106,7 +117,7 @@
     {/if}
     {#each options as option, index (index)}
       <option
-        value={getOptionToken(index)}
+        value={serializeOptionValue(option.value)}
         selected={selectedOptionIndex === index}>{option.label}</option
       >
     {/each}
