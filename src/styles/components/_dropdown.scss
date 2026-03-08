@@ -32,6 +32,9 @@
   background: transparent;
   margin: 0;
   inset: unset;
+  position: absolute;
+  top: 0;
+  left: 0;
 
   // Physics surface.
   @include glass-float($interactive: false);
@@ -49,6 +52,7 @@
   color: var(--text-main);
 
   // Default (closed) state.
+  visibility: hidden;
   opacity: 0;
   transform: translateY(4px) scale(0.95); // void-ignore (Motion Physics)
   filter: blur(calc(var(--physics-blur) / 2));
@@ -62,6 +66,7 @@
 
   // Open state.
   @include when-state('open') {
+    visibility: visible;
     opacity: 1;
     transform: translateY(0) scale(1);
     filter: blur(0);

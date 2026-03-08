@@ -2265,7 +2265,7 @@ Floating UI elements with special positioning.
 
 | State | Attribute | Element | Visual |
 | --- | --- | --- | --- |
-| Closed (default) | — | `.dropdown-panel` | Invisible (`opacity: 0`, scaled down, blurred) |
+| Closed (default) | `aria-hidden="true"`, `inert` | `.dropdown-panel` | Hidden (`visibility: hidden`, `opacity: 0`, scaled down, blurred, `pointer-events: none`) |
 | Open | `data-state="open"` | `.dropdown-panel` | Fully visible, spring transition in |
 
 **Architecture:**
@@ -2279,6 +2279,7 @@ Floating UI elements with special positioning.
 **Accessibility:**
 - Trigger: `<button>` with `aria-expanded`, `aria-haspopup="true"`, `aria-controls`
 - Panel: `role="region"`, `aria-label` matching the trigger label
+- Closed panel is fully inert: `aria-hidden="true"`, `inert`, and `visibility: hidden` ensure it is removed from the accessibility tree, tab order, and pointer interaction — even in browsers without Popover API support
 - Escape closes and returns focus to trigger (via layer stack)
 - Click outside closes (capture-phase document listener)
 
@@ -2332,7 +2333,7 @@ Floating UI elements with special positioning.
 
 | Decision | Rationale |
 | --- | --- |
-| Popover API (`popover="manual"`) | Top-layer positioning without z-index management |
+| Popover API (`popover="manual"`) | Top-layer positioning without z-index management. Closed-state fallback (`visibility: hidden`, `inert`, `aria-hidden`) ensures safety when the Popover API is unavailable |
 | `@floating-ui/dom` | Smart placement with `flip()` and `shift()` middleware |
 | Generation counter | Prevents stale `computePosition` callbacks from applying after close |
 | Layer stack integration | Ensures correct Escape dismissal order when nested with modals/sidebars |

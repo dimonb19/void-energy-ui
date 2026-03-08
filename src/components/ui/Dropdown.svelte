@@ -93,6 +93,22 @@
     onchange?.(false);
   }
 
+  // Keep the panel explicitly inert when closed so fallback behavior is
+  // visible in the DOM and does not depend on Popover support.
+  $effect(() => {
+    if (!panelEl) return;
+
+    if ('inert' in panelEl) {
+      (panelEl as HTMLElement & { inert: boolean }).inert = !open;
+    }
+
+    if (open) {
+      panelEl.removeAttribute('inert');
+    } else {
+      panelEl.setAttribute('inert', '');
+    }
+  });
+
   // Positioning & popover lifecycle (generation counter prevents stale callbacks)
   $effect(() => {
     if (!open || !triggerEl || !panelEl) return;
@@ -108,8 +124,12 @@
     });
 
     cleanupAutoUpdate = autoUpdate(triggerEl, panelEl, () => {
-      if (!panelEl || !triggerEl) return;
-      computePosition(triggerEl, panelEl, {
+      const trigger = triggerEl;
+      const panel = panelEl;
+
+      if (!panel || !trigger) return;
+
+      computePosition(trigger, panel, {
         placement,
         middleware: [
           offsetMiddleware(offsetPx),
@@ -117,7 +137,9 @@
           shift({ padding: DROPDOWN_VIEWPORT_PADDING_PX }),
         ],
       }).then(({ x, y }) => {
-        Object.assign(panelEl!.style, {
+        if (panelEl !== panel) return;
+
+        Object.assign(panel.style, {
           left: `${x}px`,
           top: `${y}px`,
           position: 'absolute',
@@ -133,6 +155,8 @@
     });
 
     return () => {
+      generation += 1;
+
       if (layerId !== null) {
         layerStack.remove(layerId);
         layerId = null;
@@ -206,6 +230,7 @@
     class="dropdown-panel"
     popover="manual"
     role="region"
+    aria-hidden={open ? undefined : 'true'}
     aria-label={label}
   >
     {@render children()}
