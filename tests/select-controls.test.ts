@@ -69,6 +69,40 @@ describe('typed select controls', () => {
     expect(onchange).toHaveBeenLastCalledWith(0.85);
   });
 
+  it('maps selector align variants to static Tailwind classes', () => {
+    const start = render(Selector, {
+      label: 'Start aligned',
+      align: 'start',
+      options: [{ value: 'a', label: 'A' }],
+      value: 'a',
+    });
+    expect(start.container.firstElementChild?.className).toContain(
+      'items-start',
+    );
+
+    start.unmount();
+
+    const center = render(Selector, {
+      label: 'Center aligned',
+      align: 'center',
+      options: [{ value: 'a', label: 'A' }],
+      value: 'a',
+    });
+    expect(center.container.firstElementChild?.className).toContain(
+      'items-center',
+    );
+
+    center.unmount();
+
+    const end = render(Selector, {
+      label: 'End aligned',
+      align: 'end',
+      options: [{ value: 'a', label: 'A' }],
+      value: 'a',
+    });
+    expect(end.container.firstElementChild?.className).toContain('items-end');
+  });
+
   it('serializes switcher values with native browser strings in FormData', () => {
     const form = document.createElement('form');
     document.body.append(form);

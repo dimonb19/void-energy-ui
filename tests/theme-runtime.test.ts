@@ -159,4 +159,103 @@ describe('theme runtime correctness', () => {
 
     expect(() => new VoidEngine()).not.toThrow();
   });
+
+  it('restores nested temporary themes in LIFO order', () => {
+    vi.spyOn(console, 'group').mockImplementation(() => {});
+    vi.spyOn(console, 'groupEnd').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const engine = new VoidEngine();
+
+    expect(engine.pushTemporaryTheme('crimson', 'Outer')).toBeTruthy();
+    expect(engine.atmosphere).toBe('crimson');
+
+    expect(engine.pushTemporaryTheme('paper', 'Inner')).toBeTruthy();
+    expect(engine.atmosphere).toBe('paper');
+
+    engine.restoreUserTheme();
+    expect(engine.atmosphere).toBe('crimson');
+    expect(engine.temporaryThemeInfo).toEqual({
+      id: 'crimson',
+      label: 'Outer',
+      returnTo: 'void',
+    });
+
+    engine.restoreUserTheme();
+    expect(engine.atmosphere).toBe('void');
+    expect(engine.hasTemporaryTheme).toBe(false);
+  });
+
+  it('preserves the correct restore path when releasing a non-top temporary handle', () => {
+    vi.spyOn(console, 'group').mockImplementation(() => {});
+    vi.spyOn(console, 'groupEnd').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const engine = new VoidEngine();
+
+    const outer = engine.pushTemporaryTheme('crimson', 'Outer');
+    const middle = engine.pushTemporaryTheme('paper', 'Middle');
+    const inner = engine.pushTemporaryTheme('onyx', 'Inner');
+
+    expect(outer).toBeTruthy();
+    expect(middle).toBeTruthy();
+    expect(inner).toBeTruthy();
+    expect(engine.atmosphere).toBe('onyx');
+
+    engine.releaseTemporaryTheme(middle!);
+
+    expect(engine.atmosphere).toBe('onyx');
+    engine.restoreUserTheme();
+    expect(engine.atmosphere).toBe('crimson');
+    engine.restoreUserTheme();
+    expect(engine.atmosphere).toBe('void');
+  });
+
+  it('clears temporary handles on manual selection and ignores stale releases', () => {
+    vi.spyOn(console, 'group').mockImplementation(() => {});
+    vi.spyOn(console, 'groupEnd').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const engine = new VoidEngine();
+
+    const outer = engine.pushTemporaryTheme('crimson', 'Outer');
+    const inner = engine.pushTemporaryTheme('paper', 'Inner');
+
+    expect(engine.hasTemporaryTheme).toBe(true);
+
+    engine.setAtmosphere('onyx');
+
+    expect(engine.atmosphere).toBe('onyx');
+    expect(engine.hasTemporaryTheme).toBe(false);
+
+    engine.releaseTemporaryTheme(inner!);
+    engine.releaseTemporaryTheme(outer!);
+    engine.restoreUserTheme();
+
+    expect(engine.atmosphere).toBe('onyx');
+    expect(engine.hasTemporaryTheme).toBe(false);
+  });
+
+  it('restores the baseline theme when adaptation is disabled and ignores stale releases', () => {
+    vi.spyOn(console, 'group').mockImplementation(() => {});
+    vi.spyOn(console, 'groupEnd').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const engine = new VoidEngine();
+
+    const outer = engine.pushTemporaryTheme('crimson', 'Outer');
+    const inner = engine.pushTemporaryTheme('paper', 'Inner');
+
+    expect(engine.atmosphere).toBe('paper');
+
+    engine.setPreferences({ adaptAtmosphere: false });
+
+    expect(engine.atmosphere).toBe('void');
+    expect(engine.hasTemporaryTheme).toBe(false);
+
+    engine.releaseTemporaryTheme(inner!);
+    engine.releaseTemporaryTheme(outer!);
+
+    expect(engine.atmosphere).toBe('void');
+  });
 });

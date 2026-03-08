@@ -54,15 +54,15 @@
   </AtmosphereScope>
   ```
 
-  @prop theme - Atmosphere ID (string) or VoidThemeDefinition object
+  @prop theme - Atmosphere ID (string) or PartialThemeDefinition object
   @prop label - Optional label for UI indicator (default: 'Page theme')
 
-  @see voidEngine.applyTemporaryTheme - Underlying API
-  @see voidEngine.registerTheme - Used for object themes
-  @see voidEngine.restoreUserTheme - Called on unmount
+  @see voidEngine.pushTemporaryTheme - Underlying scoped API
+  @see voidEngine.registerEphemeralTheme - Used for object themes
+  @see voidEngine.releaseTemporaryTheme - Called on unmount
 -->
 <script lang="ts">
-  import type { Snippet } from 'svelte';
+  import { untrack, type Snippet } from 'svelte';
   import { voidEngine } from '@adapters/void-engine.svelte';
 
   let {
@@ -70,24 +70,56 @@
     label = 'Page theme',
     children,
   }: {
-    theme: string | VoidThemeDefinition;
+    theme: string | PartialThemeDefinition;
     label?: string;
     children: Snippet;
   } = $props();
 
-  $effect(() => {
-    let themeId: string;
+  const componentId = $props.id();
+  const scopeThemeId = `__scope_${componentId}`;
 
-    if (typeof theme === 'string') {
-      themeId = theme;
+  let temporaryHandle: number | null = null;
+
+  $effect(() => {
+    const adaptAtmosphere = voidEngine.userConfig.adaptAtmosphere;
+    const isObjectTheme = typeof theme !== 'string';
+    const themeId = isObjectTheme ? scopeThemeId : theme;
+    const themeExists =
+      isObjectTheme || untrack(() => Boolean(voidEngine.registry[themeId]));
+
+    if (isObjectTheme) {
+      untrack(() => voidEngine.registerEphemeralTheme(scopeThemeId, theme));
     } else {
-      // Theme object: register it first, then apply
-      themeId = theme.id ?? `__brand_${Date.now()}`;
-      voidEngine.registerTheme(themeId, theme);
+      untrack(() => voidEngine.unregisterEphemeralTheme(scopeThemeId));
     }
 
-    voidEngine.applyTemporaryTheme(themeId, label);
-    return () => voidEngine.restoreUserTheme();
+    if (!adaptAtmosphere || !themeExists) {
+      if (temporaryHandle !== null) {
+        untrack(() => voidEngine.releaseTemporaryTheme(temporaryHandle!));
+        temporaryHandle = null;
+      }
+      return;
+    }
+
+    if (temporaryHandle === null) {
+      temporaryHandle = untrack(() =>
+        voidEngine.pushTemporaryTheme(themeId, label),
+      );
+      return;
+    }
+
+    untrack(() =>
+      voidEngine.updateTemporaryTheme(temporaryHandle!, themeId, label),
+    );
+  });
+
+  $effect(() => {
+    return () => {
+      if (temporaryHandle !== null) {
+        untrack(() => voidEngine.releaseTemporaryTheme(temporaryHandle!));
+      }
+      untrack(() => voidEngine.unregisterEphemeralTheme(scopeThemeId));
+    };
   });
 </script>
 

@@ -74,6 +74,11 @@
   const generatedInputId = `select-${componentId}`;
   const inputId = $derived(id ?? generatedInputId);
   const placeholderOffset = $derived(placeholder ? 1 : 0);
+  const alignClass = {
+    start: 'items-start',
+    center: 'items-center',
+    end: 'items-end',
+  } as const;
 
   function serializeOptionValue(optionValue: string | number | null): string {
     return String(optionValue);
@@ -99,7 +104,7 @@
   }
 </script>
 
-<div class="flex flex-col gap-xs items-{align} {className}">
+<div class="flex flex-col gap-xs {alignClass[align]} {className}">
   {#if label}
     <label for={inputId} class="text-small px-xs">{label}</label>
   {/if}

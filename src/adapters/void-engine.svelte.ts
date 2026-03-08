@@ -110,6 +110,14 @@ const DEFAULT_THEME_PALETTES = {
     ].palette,
 } as const;
 
+interface TemporaryThemeEntry {
+  handle: number;
+  themeId: string;
+  returnTo: string;
+  label: string;
+  ephemeral: boolean;
+}
+
 export class VoidEngine {
   // Reactive atmosphere state (source of truth).
   atmosphere = $state<string>(DEFAULTS.ATMOSPHERE);
@@ -128,10 +136,10 @@ export class VoidEngine {
     fixedNav: false,
   });
 
-  // Temporary theme context (for story themes, previews, or forced contexts).
-  // Stores the previous atmosphere to restore when exiting temporary mode.
-  private previousAtmosphere = $state<string | null>(null);
-  temporaryLabel = $state<string | null>(null);
+  // Temporary theme contexts (for story themes, previews, or forced scopes).
+  private temporaryThemeStack = $state<TemporaryThemeEntry[]>([]);
+  private nextTemporaryHandle = 1;
+  private ephemeralThemeIds = new Set<string>();
 
   // Track built-in themes (from static registry) vs runtime-registered (story themes)
   private builtInThemeIds: Set<string> = new Set(Object.keys(THEME_REGISTRY));
@@ -160,6 +168,23 @@ export class VoidEngine {
     } finally {
       console.groupEnd();
     }
+  }
+
+  registerEphemeralTheme(id: string, definition: PartialThemeDefinition) {
+    const safeTheme = this.normalizeThemeDefinition(id, definition, {
+      silent: true,
+    });
+    this.ephemeralThemeIds.add(id);
+    this.commitTheme(id, safeTheme, false);
+  }
+
+  unregisterEphemeralTheme(id: string) {
+    if (!this.ephemeralThemeIds.has(id)) return;
+
+    this.ephemeralThemeIds.delete(id);
+    const nextRegistry = { ...this.registry };
+    delete nextRegistry[id];
+    this.registry = nextRegistry as ThemeRegistry;
   }
 
   async loadExternalTheme(
@@ -208,10 +233,8 @@ export class VoidEngine {
       return;
     }
 
-    // Clear temporary theme on manual selection (user chose a new theme)
-    this.previousAtmosphere = null;
-    this.temporaryLabel = null;
-
+    // Manual selection invalidates any temporary theme stack.
+    this.clearTemporaryThemes();
     this._applyAtmosphere(name, true);
   }
 
@@ -249,12 +272,16 @@ export class VoidEngine {
   }
 
   setPreferences(prefs: Partial<UserConfig>) {
-    // If disabling adaptAtmosphere while temporary theme is active,
-    // restore user's preference BEFORE persisting (avoids View Transition race)
-    if (prefs.adaptAtmosphere === false && this.previousAtmosphere) {
-      this.atmosphere = this.previousAtmosphere;
-      this.previousAtmosphere = null;
-      this.temporaryLabel = null;
+    // If disabling adaptAtmosphere while temporary themes are active,
+    // restore the user's baseline theme before persisting.
+    if (
+      prefs.adaptAtmosphere === false &&
+      this.temporaryThemeStack.length > 0
+    ) {
+      const returnTo = this.clearTemporaryThemes();
+      if (returnTo) {
+        this.atmosphere = returnTo;
+      }
     }
 
     this.userConfig = { ...this.userConfig, ...prefs };
@@ -532,19 +559,105 @@ export class VoidEngine {
    * Check if a temporary theme is currently active.
    */
   get hasTemporaryTheme(): boolean {
-    return this.previousAtmosphere !== null;
+    return this.temporaryThemeStack.length > 0;
   }
 
   /**
    * Get temporary theme info for UI display.
    */
   get temporaryThemeInfo() {
-    if (!this.previousAtmosphere) return null;
+    const active = this.temporaryThemeStack[this.temporaryThemeStack.length - 1];
+    if (!active) return null;
+
     return {
-      id: this.atmosphere,
-      label: this.temporaryLabel || 'Custom theme',
-      returnTo: this.previousAtmosphere,
+      id: active.themeId,
+      label: active.label,
+      returnTo: active.returnTo,
     };
+  }
+
+  pushTemporaryTheme(
+    themeId: string,
+    label: string = 'Custom theme',
+  ): number | null {
+    if (!this.userConfig.adaptAtmosphere) {
+      return null;
+    }
+
+    if (!this.registry[themeId]) {
+      console.warn(`Void: Unknown atmosphere "${themeId}"`);
+      return null;
+    }
+
+    const handle = this.nextTemporaryHandle++;
+    const active = this.temporaryThemeStack[this.temporaryThemeStack.length - 1];
+
+    this.temporaryThemeStack.push({
+      handle,
+      themeId,
+      returnTo: active?.themeId ?? this.atmosphere,
+      label,
+      ephemeral: this.ephemeralThemeIds.has(themeId),
+    });
+
+    this._applyAtmosphere(themeId);
+    return handle;
+  }
+
+  updateTemporaryTheme(
+    handle: number,
+    themeId: string,
+    label: string = 'Custom theme',
+  ) {
+    const index = this.temporaryThemeStack.findIndex(
+      (entry) => entry.handle === handle,
+    );
+    if (index === -1) return;
+
+    if (!this.registry[themeId]) {
+      console.warn(`Void: Unknown atmosphere "${themeId}"`);
+      return;
+    }
+
+    const entry = this.temporaryThemeStack[index];
+    entry.themeId = themeId;
+    entry.label = label;
+    entry.ephemeral = this.ephemeralThemeIds.has(themeId);
+
+    const nextEntry = this.temporaryThemeStack[index + 1];
+    if (nextEntry) {
+      nextEntry.returnTo = themeId;
+    }
+
+    if (index === this.temporaryThemeStack.length - 1) {
+      this._applyAtmosphere(themeId);
+    }
+  }
+
+  releaseTemporaryTheme(handle: number) {
+    const index = this.temporaryThemeStack.findIndex(
+      (entry) => entry.handle === handle,
+    );
+    if (index === -1) return;
+
+    const entry = this.temporaryThemeStack[index];
+    const isTop = index === this.temporaryThemeStack.length - 1;
+
+    if (!isTop) {
+      const nextEntry = this.temporaryThemeStack[index + 1];
+      if (nextEntry) {
+        nextEntry.returnTo = entry.returnTo;
+      }
+      this.temporaryThemeStack.splice(index, 1);
+      return;
+    }
+
+    this.temporaryThemeStack.pop();
+
+    const nextTop =
+      this.temporaryThemeStack[this.temporaryThemeStack.length - 1];
+    const restoreTo = nextTop?.themeId ?? entry.returnTo;
+    this._applyAtmosphere(restoreTo);
   }
 
   /**
@@ -560,35 +673,16 @@ export class VoidEngine {
     themeId: string,
     label: string = 'Custom theme',
   ): boolean {
-    // Respect user preference - don't override if adaptAtmosphere is disabled
-    if (!this.userConfig.adaptAtmosphere) {
-      return false;
-    }
-
-    if (!this.registry[themeId]) {
-      console.warn(`Void: Unknown atmosphere "${themeId}"`);
-      return false;
-    }
-
-    // Only save returnTo if not already in temporary mode
-    if (!this.previousAtmosphere) {
-      this.previousAtmosphere = this.atmosphere;
-    }
-    this.temporaryLabel = label;
-
-    this._applyAtmosphere(themeId);
-    return true;
+    return this.pushTemporaryTheme(themeId, label) !== null;
   }
 
   /**
    * Exit temporary theme and restore user's preference.
    */
   restoreUserTheme() {
-    if (this.previousAtmosphere) {
-      const returnTo = this.previousAtmosphere;
-      this.previousAtmosphere = null;
-      this.temporaryLabel = null;
-      this._applyAtmosphere(returnTo);
+    const active = this.temporaryThemeStack[this.temporaryThemeStack.length - 1];
+    if (active) {
+      this.releaseTemporaryTheme(active.handle);
     }
   }
 
@@ -615,6 +709,12 @@ export class VoidEngine {
    */
   exitStoryMode() {
     this.restoreUserTheme();
+  }
+
+  private clearTemporaryThemes(): string | null {
+    const returnTo = this.temporaryThemeStack[0]?.returnTo ?? null;
+    this.temporaryThemeStack = [];
+    return returnTo;
   }
 }
 

@@ -281,16 +281,21 @@ Import and use — never re-instantiate.
 .atmosphere                         Current theme ID (reactive)
 .currentTheme                       Derived theme definition (reactive)
 .userConfig                         User preferences (reactive)
-.setAtmosphere(name)                Switch theme (persists, clears temp)
+.setAtmosphere(name)                Switch theme (persists, clears temp stack)
 .setPreferences(prefs)              Update user config (density, scale, fonts)
-.registerTheme(id, partialDef)      Register runtime theme (Safety Merge)
-.applyTemporaryTheme(id, label)     Temporary theme (respects adaptAtmosphere)
-.restoreUserTheme()                 Exit temporary theme
-.loadExternalTheme(url)             Async: fetch + register a remote theme JSON
+.registerTheme(id, partialDef)      Register runtime theme (Safety Merge, persists to cache)
+.registerEphemeralTheme(id, def)    Register scope-owned theme (no localStorage, no console)
+.unregisterEphemeralTheme(id)       Remove a previously registered ephemeral theme
+.applyTemporaryTheme(id, label)     One-shot temporary theme (respects adaptAtmosphere)
+.restoreUserTheme()                 Pop the top temporary theme (LIFO)
+.pushTemporaryTheme(id, label)      Scoped temporary theme; returns handle (number | null)
+.updateTemporaryTheme(h, id, label) Update an existing scoped handle in place
+.releaseTemporaryTheme(handle)      Release a specific scoped handle (idempotent, stack-safe)
+.loadExternalTheme(url)             Async: fetch + validate + register remote theme JSON (returns Result)
 .availableAtmospheres               All registered theme IDs
 .builtInAtmospheres                 Static (non-runtime) theme IDs
-.hasTemporaryTheme                  Whether a temporary theme is active (getter)
-.temporaryThemeInfo                 Label + ID of the temporary theme (getter)
+.hasTemporaryTheme                  Whether any temporary theme is active (getter)
+.temporaryThemeInfo                 Top-of-stack label + ID + returnTo (getter)
 ```
 
 ### Modal (`import { modal } from '@lib/modal-manager.svelte'`)

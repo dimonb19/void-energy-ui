@@ -27,9 +27,7 @@
 
   function handleSave() {
     onSave({ layout, notifications });
-    if (remember) {
-      onRememberChange(true);
-    }
+    onRememberChange(remember);
     modal.close();
   }
 </script>
