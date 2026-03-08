@@ -77,6 +77,7 @@ class ShortcutRegistry {
     const tag = (e.target as HTMLElement)?.tagName;
     if (
       tag === 'INPUT' ||
+      tag === 'SELECT' ||
       tag === 'TEXTAREA' ||
       (e.target as HTMLElement)?.isContentEditable
     )

@@ -184,7 +184,7 @@ export class KineticEngine {
 
   private physics: PhysicsProfile;
   private aborted = false;
-  private timeouts: ReturnType<typeof setTimeout>[] = [];
+  private timeouts = new Set<ReturnType<typeof setTimeout>>();
   private frameId: number | null = null;
   private cursorEl: HTMLSpanElement | null = null;
 
@@ -272,8 +272,8 @@ export class KineticEngine {
 
   abort(): void {
     this.aborted = true;
-    this.timeouts.forEach(clearTimeout);
-    this.timeouts = [];
+    this.timeouts.forEach((id) => clearTimeout(id));
+    this.timeouts.clear();
     if (this.frameId !== null) {
       cancelAnimationFrame(this.frameId);
       this.frameId = null;
@@ -333,8 +333,12 @@ export class KineticEngine {
     fn: () => void,
     ms: number,
   ): ReturnType<typeof setTimeout> {
-    const id = setTimeout(fn, ms);
-    this.timeouts.push(id);
+    let id: ReturnType<typeof setTimeout>;
+    id = setTimeout(() => {
+      this.timeouts.delete(id);
+      fn();
+    }, ms);
+    this.timeouts.add(id);
     return id;
   }
 

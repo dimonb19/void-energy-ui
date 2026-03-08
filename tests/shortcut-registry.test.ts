@@ -57,4 +57,23 @@ describe('shortcut registry modifiers', () => {
     expect(plainAction).toHaveBeenCalledTimes(2);
     expect(altAction).toHaveBeenCalledTimes(2);
   });
+
+  it('ignores shortcuts while focus is inside a native select', async () => {
+    const action = vi.fn();
+    const select = document.createElement('select');
+    select.innerHTML = '<option value="a">A</option>';
+    document.body.appendChild(select);
+
+    shortcutRegistry.register({
+      key: 'k',
+      label: 'Plain K',
+      group: 'General',
+      action,
+    });
+
+    select.focus();
+    await fireEvent.keyDown(select, { key: 'k' });
+
+    expect(action).not.toHaveBeenCalled();
+  });
 });

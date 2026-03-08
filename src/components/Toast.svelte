@@ -56,7 +56,7 @@
   {#each toast.items as item (item.id)}
     <div
       class="toast-message flex items-center justify-center gap-xs"
-      role="status"
+      role="group"
       data-type={item.type}
       in:emerge
       out:dissolve={{ y: 0 }}
@@ -64,6 +64,8 @@
       onoutroend={() => (animatingOut = false)}
       onmouseenter={() => toast.pause(item.id)}
       onmouseleave={() => toast.resume(item.id)}
+      onfocusin={() => toast.pause(item.id)}
+      onfocusout={() => toast.resume(item.id)}
     >
       <span
         class="toast-icon flex items-center justify-center shrink-0"

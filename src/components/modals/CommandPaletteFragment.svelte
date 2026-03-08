@@ -167,6 +167,7 @@
               class="btn-ghost flex flex-row items-center justify-between w-full"
               type="button"
               role="option"
+              tabindex="-1"
               aria-selected={globalIndex === activeIndex}
               data-state={globalIndex === activeIndex ? 'active' : ''}
               onclick={() => item.action()}

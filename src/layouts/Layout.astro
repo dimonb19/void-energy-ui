@@ -43,7 +43,7 @@ const { title = 'Void Energy UI', breadcrumbs } = Astro.props;
       <slot />
     </main>
 
-    <Modal client:load />
-    <Toast client:load />
+    <Modal client:idle />
+    <Toast client:idle />
   </body>
 </html>

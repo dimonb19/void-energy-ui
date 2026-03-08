@@ -2,12 +2,14 @@
 
 @use '../abstracts' as *;
 
-// Results container
+// Results container — focus is managed on the combobox input via
+// aria-activedescendant, so suppress the browser outline on the listbox.
 .palette-results {
   max-height: 50vh;
   overflow-y: auto;
   @include laser-scrollbar;
   padding: var(--space-xs);
+  outline: none;
 }
 
 // Group label (matches slider-preset label pattern)

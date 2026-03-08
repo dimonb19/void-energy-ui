@@ -273,7 +273,8 @@ Import and use — never re-instantiate.
 .close()                            Close active modal (restores focus)
 .confirm(title, body, { onConfirm, onCancel?, cost? })   // body = plain text only
 .alert(title, body)                                      // body = plain text only
-// For trusted HTML: modal.open(key, { bodyHtml: '...' }, size)
+// For trusted internal HTML: modal.open(key, { bodyHtml: '...' }, size)
+// bodyHtml is rendered unsanitized — caller must sanitize. Never use with user input.
 .settings(options?)
 .themes()
 .shortcuts()                        Open keyboard shortcuts modal
@@ -289,8 +290,8 @@ Registry: src/config/modal-registry.ts (add new fragments here)
 .clearAll()                                Remove all toasts
 .loading(message)                          Returns controller: { update, success, error, warning, close }
 .promise(promise, { loading, success, error })
-.pause(id)                                 Pause auto-dismiss timer (called on mouseenter)
-.resume(id)                                Resume auto-dismiss timer (called on mouseleave)
+.pause(id)                                 Pause auto-dismiss timer (called on hover and focus)
+.resume(id)                                Resume auto-dismiss timer (called on mouse/focus leave)
 ```
 
 ### Layer Stack (`import { layerStack } from '@lib/layer-stack.svelte'`)

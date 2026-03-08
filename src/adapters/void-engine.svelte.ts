@@ -277,7 +277,13 @@ export class VoidEngine {
     }
 
     // Load user prefs into state only.
-    const storedConfig = localStorage.getItem(STORAGE_KEYS.USER_CONFIG);
+    let storedConfig: string | null = null;
+    try {
+      storedConfig = localStorage.getItem(STORAGE_KEYS.USER_CONFIG);
+    } catch {
+      storedConfig = null;
+    }
+
     if (storedConfig) {
       const parsed = parseStoredUserConfig(
         storedConfig,
@@ -359,7 +365,13 @@ export class VoidEngine {
   }
 
   private readThemeCache(): Record<string, VoidThemeDefinition> {
-    const raw = localStorage.getItem(STORAGE_KEYS.THEME_CACHE);
+    let raw: string | null = null;
+    try {
+      raw = localStorage.getItem(STORAGE_KEYS.THEME_CACHE);
+    } catch {
+      return {};
+    }
+
     if (!raw) return {};
 
     const parsed = parseStoredThemeCache(
@@ -378,7 +390,13 @@ export class VoidEngine {
   }
 
   private hydrateCachedThemes() {
-    const raw = localStorage.getItem(STORAGE_KEYS.THEME_CACHE);
+    let raw: string | null = null;
+    try {
+      raw = localStorage.getItem(STORAGE_KEYS.THEME_CACHE);
+    } catch {
+      return;
+    }
+
     if (!raw) return;
 
     const parsed = parseRestorableThemeCache(

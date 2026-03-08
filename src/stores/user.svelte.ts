@@ -148,7 +148,13 @@ class UserStore {
   }
 
   private hydrate() {
-    const stored = localStorage.getItem(STORAGE_KEYS.USER);
+    let stored: string | null = null;
+    try {
+      stored = localStorage.getItem(STORAGE_KEYS.USER);
+    } catch {
+      stored = null;
+    }
+
     if (stored) {
       const parsed = parseStoredUser(stored, 'UserStore.hydrate');
       if (parsed.ok) {

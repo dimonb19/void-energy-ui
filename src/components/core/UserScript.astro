@@ -3,22 +3,64 @@
   User auth bootloader.
   Reads void_user from localStorage and sets data-auth on <html>
   before first paint — prevents FOUC for auth-dependent content.
-  Mirrors ThemeScript pattern.
-
-  Reuses readStoredUser() from void-boot.js (inlined, same as ThemeScript).
+  Kept minimal so the full theme bootloader is not inlined twice.
 */
 
 import { STORAGE_KEYS } from '@config/constants';
-import bootSource from '@lib/void-boot.js?raw';
-
-const cleanBootSource = bootSource.replace(/^export\s+(?=function\s)/gm, '');
 ---
 
 <script
   is:inline
   set:html={`
     (function() {
-      ${cleanBootSource}
+      function parseJSON(raw) {
+        if (!raw) return null;
+        try {
+          return JSON.parse(raw);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function hasText(value) {
+        return typeof value === 'string' && value.length > 0;
+      }
+
+      function isPlainObject(value) {
+        return Object.prototype.toString.call(value) === '[object Object]';
+      }
+
+      function readStoredUser(storageKey) {
+        var raw = null;
+        try {
+          raw = localStorage.getItem(storageKey);
+        } catch (e) {
+          return { value: null, invalid: false };
+        }
+
+        if (!raw) return { value: null, invalid: false };
+
+        var parsed = parseJSON(raw);
+        if (!isPlainObject(parsed)) {
+          return { value: null, invalid: true };
+        }
+
+        var validUser =
+          hasText(parsed.id) &&
+          hasText(parsed.name) &&
+          hasText(parsed.email) &&
+          (parsed.avatar === null || hasText(parsed.avatar)) &&
+          (parsed.role_name === 'Admin' ||
+            parsed.role_name === 'Creator' ||
+            parsed.role_name === 'Player' ||
+            parsed.role_name === 'Guest') &&
+          typeof parsed.approved_tester === 'boolean';
+
+        return {
+          value: validUser ? parsed : null,
+          invalid: !validUser,
+        };
+      }
 
       var result = readStoredUser('${STORAGE_KEYS.USER}');
       if (result.value) {

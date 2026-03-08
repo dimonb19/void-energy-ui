@@ -2389,7 +2389,7 @@ See [`use:tooltip` action docs](#b-tooltip-usetooltip) for full options.
 | Warning | `data-type="warning"` | Premium/gold accent |
 | Loading | `data-type="loading"` | Muted accent, spinner icon |
 
-**Behavior:** Toasts pause auto-dismiss on hover and resume on mouse leave. Non-loading toasts show a close (X) button for manual dismissal.
+**Behavior:** Toasts pause auto-dismiss on hover and keyboard focus, and resume on mouse/focus leave. Non-loading toasts show a close (X) button for manual dismissal.
 
 **Sub-elements:**
 
@@ -2454,7 +2454,7 @@ modal.shortcuts();       // Keyboard shortcuts reference
 modal.palette();         // Command palette (Cmd+K)
 ```
 
-**Content safety:** `modal.alert()` and `modal.confirm()` render the body as **plain text** (HTML is escaped). For trusted internal markup, use the low-level `modal.open()` path with `bodyHtml`. Never pipe user-provided or remote HTML into `bodyHtml`.
+**Content safety:** `modal.alert()` and `modal.confirm()` render the body as **plain text** (HTML is escaped). For trusted internal markup, use the low-level `modal.open()` path with `bodyHtml`. `bodyHtml` is rendered unsanitized via `{@html}` — the caller is responsible for sanitization. Never pipe user-provided or remote HTML into `bodyHtml`.
 
 **Escape handling:** Managed by the centralized [layer-stack.svelte.ts](src/lib/layer-stack.svelte.ts). The native `<dialog>` cancel event is suppressed (`e.preventDefault()`); the layer stack's global `keydown` listener pops the modal via `modal.close()`. This ensures correct precedence when a dropdown or sidebar is open above a modal — Escape dismisses the topmost layer first (LIFO).
 
@@ -2485,7 +2485,7 @@ modal.palette();         // Command palette (Cmd+K)
 
 **Item styling:** Each command item is a `btn-ghost` button with `data-state="active"` on the highlighted item. No custom item class — styling is fully inherited from the button system. Hint badges use `<kbd>` with caption-size font.
 
-**ARIA:** `role="combobox"` on SearchField, `role="listbox"` on results container, `role="option"` + `aria-selected` on each item, `aria-activedescendant` for screen reader focus tracking. Dialog is named via `<h2 id="palette-title" class="sr-only">` referenced by `aria-labelledby`.
+**ARIA:** `role="combobox"` on SearchField, `role="listbox"` on results container, `role="option"` + `aria-selected` + `tabindex="-1"` on each item, `aria-activedescendant` for screen reader focus tracking. Focus stays on the input; option buttons are non-tabbable to avoid conflicting with `aria-activedescendant`. Dialog is named via `<h2 id="palette-title" class="sr-only">` referenced by `aria-labelledby`.
 
 **Usage:**
 
@@ -3045,7 +3045,7 @@ Reactive singletons for app-wide state. Each store uses `$state` + `$derived` an
 
 **FOUC Prevention (3 layers):**
 
-1. **`UserScript.astro`** — Inline `<head>` script reads `void_user` from localStorage, sets `data-auth` on `<html>` before first paint
+1. **`UserScript.astro`** — Minimal inline `<head>` script (inlines only `readStoredUser()` and helpers, not the full theme bootloader) reads `void_user` from localStorage, sets `data-auth` on `<html>` before first paint
 2. **CSS utilities** — `.auth-only` hidden when no `data-auth`; `.guest-only` hidden when `data-auth` present. Both use `!important` to override component display values
 3. **`syncAuthDOM()`** — UserStore method keeps `data-auth` in sync during login/logout at runtime
 
@@ -3164,7 +3164,7 @@ createPasswordValidation(
 | `⌘K` / `⌃K` | Open command palette | General |
 
 **Safety guards** (enforced by registry's two-phase `handle()` method):
-- Suppressed inside `<input>`, `<textarea>`, and `contentEditable` elements (WCAG 2.1.4)
+- Suppressed inside `<input>`, `<select>`, `<textarea>`, and `contentEditable` elements (WCAG 2.1.4)
 - **Phase 1 (modifier combos):** Registered `modifier` shortcuts (e.g., `⌘K`) are checked first. `metaKey` and `ctrlKey` both normalize to `'meta'` for cross-platform support (Cmd on Mac, Ctrl on Win/Linux). Blocked when `layerStack.hasLayers` is true.
 - **Phase 2 (plain keys):** Single-key shortcuts fire only when no modifier is held and no layers are open. Entries with a `modifier` field are skipped in this phase to prevent accidental triggers.
 - Conflict detection: `console.warn` on duplicate key, last-write-wins
@@ -4038,7 +4038,7 @@ toast.show('File uploaded', 'success', 5000, {
   onclick: () => navigateTo('/files'),
 });
 
-// Pause/resume (used internally by Toast.svelte on hover)
+// Pause/resume (used internally by Toast.svelte on hover and keyboard focus)
 toast.pause(id);   // Pause auto-dismiss timer
 toast.resume(id);  // Resume with remaining time
 ```

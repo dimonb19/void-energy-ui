@@ -151,4 +151,12 @@ describe('theme runtime correctness', () => {
 
     expect(meta.getAttribute('content')).toBe('#123123');
   });
+
+  it('does not throw when localStorage reads fail during runtime theme hydration', () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new DOMException('Blocked', 'SecurityError');
+    });
+
+    expect(() => new VoidEngine()).not.toThrow();
+  });
 });
