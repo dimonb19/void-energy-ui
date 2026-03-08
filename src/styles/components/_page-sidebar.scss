@@ -85,13 +85,8 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
     transition-timing-function: var(--ease-flow);
   }
 
-  background: var(--bg-surface);
   border-bottom: var(--physics-border-width) solid transparent;
   box-shadow: none;
-
-  @include when-glass {
-    background: var(--bg-sunk);
-  }
 
   @include when-retro {
     transition-timing-function: steps(8);
