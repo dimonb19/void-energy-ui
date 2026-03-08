@@ -2906,8 +2906,9 @@ Physics-aware visual effects for loading states and skeleton loaders.
 | `text` | `string` | — | Single text to animate (char, word, decode modes) |
 | `words` | `string[]` | — | Word list to cycle through (cycle mode) |
 | `mode` | `'char' \| 'word' \| 'cycle' \| 'decode'` | `'char'` | Animation mode |
-| `chunk` | `'word' \| 'sentence' \| 'sentence-pair'` | `'word'` | Chunk size for word mode — `'sentence'` reveals one sentence per tick, `'sentence-pair'` reveals two |
-| `speed` | `number` | `40` | Ms per animation unit (per-char, per-word/sentence, or per-scramble tick) |
+| `chunk` | `'word' \| 'sentence' \| 'sentence-pair'` | `'word'` | Chunk size for word mode — determines grouping for streaming bursts |
+| `charSpeed` | `number` | `8` | Per-character speed (ms) for smooth chunk reveal in word mode — controls the rapid char-by-char animation within each chunk |
+| `speed` | `number` | `40` | Ms per animation unit — in word mode this is the pause between chunks (streaming burst gap) |
 | `pauseDuration` | `number` | `1800` | Pause between cycled words (ms) |
 | `cycleTransition` | `'type' \| 'fade' \| 'decode'` | `'type'` | Transition style for cycle mode |
 | `cursor` | `boolean` | `false` | Show blinking cursor during animation |
@@ -2928,7 +2929,7 @@ Physics-aware visual effects for loading states and skeleton loaders.
 | Mode | Behavior |
 | --- | --- |
 | `char` | Classic typewriter, character by character |
-| `word` | Word-by-word reveal (default), or sentence/sentence-pair chunks via `chunk` prop |
+| `word` | Smooth char-by-char reveal within each chunk (word/sentence/sentence-pair), with a `speed`-controlled pause between chunks to simulate streaming bursts |
 | `decode` | Scramble → resolve effect (sci-fi terminal feel) |
 | `cycle` | Rotates through a word list with configurable transitions |
 
@@ -4760,8 +4761,9 @@ Provides both a Svelte action (`use:kinetic`) and a standalone class (`KineticEn
 | `text` | `string` | — | Text to animate (char, word, decode modes) |
 | `words` | `string[]` | — | Word list (cycle mode) |
 | `mode` | `'char' \| 'word' \| 'cycle' \| 'decode'` | `'char'` | Animation mode |
-| `chunk` | `'word' \| 'sentence' \| 'sentence-pair'` | `'word'` | Chunk size for word mode — reveals per-word, per-sentence, or per-sentence-pair |
-| `speed` | `number` | `40` | Ms per animation unit |
+| `chunk` | `'word' \| 'sentence' \| 'sentence-pair'` | `'word'` | Chunk size for word mode — determines grouping for streaming bursts |
+| `charSpeed` | `number` | `8` | Per-character speed (ms) for smooth chunk reveal within each word/sentence |
+| `speed` | `number` | `40` | Ms per animation unit — in word mode this is the pause between chunks |
 | `delay` | `number` | `0` | Initial delay before animation starts (ms) |
 | `cursor` | `boolean` | `false` | Show blinking cursor |
 | `cursorChar` | `string` | `'▍'` | Cursor character |

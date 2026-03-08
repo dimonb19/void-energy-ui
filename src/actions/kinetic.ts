@@ -43,6 +43,8 @@ export interface KineticConfig {
   // ── Word mode ──
   /** Chunk size for word mode reveal. Default: 'word' */
   chunk?: KineticWordChunk;
+  /** Per-character speed (ms) for smooth chunk reveal in sentence modes. Default: 8 */
+  charSpeed?: number;
 
   // ── Cycle mode ──
   /** Pause duration on each word before transitioning (ms). Default: 1800 */
@@ -121,6 +123,7 @@ const DEFAULTS: Required<
 > = {
   mode: 'char',
   chunk: 'word' as KineticWordChunk,
+  charSpeed: 8,
   speed: 40,
   delay: 0,
   cursor: false,
@@ -408,9 +411,28 @@ export class KineticEngine {
       if (this.aborted) return resolve();
 
       if (i < tokens.length) {
-        built += tokens[i++];
-        this.setText(built);
-        this.setTimeout(tick, this.getTickDelay());
+        const token = tokens[i++];
+
+        if (token.length > 1) {
+          // Rapid char-by-char reveal within the chunk
+          let c = 0;
+          const charTick = () => {
+            if (this.aborted) return resolve();
+            built += token[c++];
+            this.setText(built);
+            if (c < token.length) {
+              this.setTimeout(charTick, this.config.charSpeed);
+            } else {
+              // Pause between chunks (simulates streaming bursts)
+              this.setTimeout(tick, this.getTickDelay());
+            }
+          };
+          charTick();
+        } else {
+          built += token;
+          this.setText(built);
+          this.setTimeout(tick, this.config.charSpeed);
+        }
       } else {
         this.onAnimationEnd(resolve);
       }
