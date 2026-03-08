@@ -257,7 +257,7 @@ The browser's address bar and system chrome automatically tint to match the acti
 **How it works:**
 1. **SSR** — `Layout.astro` renders a static `<meta name="theme-color" content="#010020">` (the `void` default)
 2. **Hydration** — The bootloader (`void-boot.js`) immediately updates the meta tag to match the resolved theme
-3. **Runtime** — `VoidEngine._applyAtmosphere()` updates the meta tag on every atmosphere switch (before the View Transition snapshot)
+3. **Runtime** — `VoidEngine._applyAtmosphere()` updates reactive state synchronously, then paints the DOM via View Transitions (or immediately if unsupported)
 
 No manual intervention needed. Built-in themes use their `canvas` registry field; custom runtime themes that include a `bg-canvas` palette entry also get theme-color support automatically.
 
@@ -3074,6 +3074,63 @@ Reactive singletons for app-wide state. Each store uses `$state` + `$derived` an
 ```
 
 **Showcase:** [/components → User State](src/components/ui-library/UserState.svelte)
+
+---
+
+#### Temporary Themes — Scoped overrides and imperative previews
+
+**Engine:** [src/adapters/void-engine.svelte.ts](src/adapters/void-engine.svelte.ts)
+**Scope component:** [src/components/core/AtmosphereScope.svelte](src/components/core/AtmosphereScope.svelte)
+
+Temporary themes override the user's selected atmosphere without persisting. The engine maintains a LIFO stack of temporary entries, each recording which theme to return to. Two usage patterns exist:
+
+**Scoped (lifecycle-bound)** — `AtmosphereScope` wraps content in a temporary atmosphere and restores the previous one on unmount. Handles nested scopes correctly via the stack. Object themes are registered as ephemeral (no localStorage).
+
+```svelte
+<AtmosphereScope theme="crimson" label="Horror story">
+  <StoryContent />
+</AtmosphereScope>
+
+<!-- Object themes (ephemeral, never persisted) -->
+<AtmosphereScope theme={{ mode: 'dark', physics: 'glass', palette: { 'energy-primary': '#ff0077' } }} label="Brand">
+  <BrandedContent />
+</AtmosphereScope>
+```
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `theme` | `string \| PartialThemeDefinition` | *required* | Atmosphere ID or theme object |
+| `label` | `string` | `'Page theme'` | Display label for the override indicator |
+
+**Imperative (toggle buttons, switchers)** — For UI controls that let the user preview themes without a mount/unmount lifecycle. Always call `restoreUserTheme()` before `applyTemporaryTheme()` to prevent stack accumulation.
+
+```svelte
+<script lang="ts">
+  import { voidEngine } from '@adapters/void-engine.svelte';
+
+  function previewTheme() {
+    voidEngine.restoreUserTheme();  // clear any active preview first
+    voidEngine.applyTemporaryTheme('crimson', 'Blood Moon');
+  }
+</script>
+
+<button onclick={previewTheme}>Preview Crimson</button>
+<button onclick={() => voidEngine.restoreUserTheme()}>Disable Preview</button>
+```
+
+**Key methods:**
+
+| Method | Pattern | Description |
+| --- | --- | --- |
+| `applyTemporaryTheme(id, label)` | Imperative | Push a temporary theme (returns `boolean`) |
+| `restoreUserTheme()` | Imperative | Pop the top temporary theme |
+| `pushTemporaryTheme(id, label)` | Scoped | Push and return a handle (`number \| null`) |
+| `releaseTemporaryTheme(handle)` | Scoped | Release a specific handle (idempotent) |
+| `registerEphemeralTheme(id, def)` | Scoped | Register without persisting to localStorage |
+| `hasTemporaryTheme` | Both | Whether any temporary theme is active (getter) |
+| `temporaryThemeInfo` | Both | Top-of-stack `{ id, label, returnTo }` (getter) |
+
+**UI indicator:** When `hasTemporaryTheme` is true, the Themes modal shows a "Story Override Active" section with restore and opt-out buttons.
 
 ---
 

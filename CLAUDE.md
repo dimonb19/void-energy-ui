@@ -272,6 +272,16 @@ Import and use — never re-instantiate.
 .temporaryThemeInfo                 Top-of-stack label + ID + returnTo (getter)
 ```
 
+**Temporary theme usage patterns:**
+- **Scoped** (AtmosphereScope): Use `pushTemporaryTheme` / `releaseTemporaryTheme` with handles. The stack ensures nested scopes restore correctly on unmount.
+- **Imperative** (toggle buttons, theme switchers): Call `restoreUserTheme()` before `applyTemporaryTheme()` to ensure only one preview is active. Without the restore, repeated calls stack entries and the user must click "Return to..." multiple times in the Themes modal.
+
+```
+CORRECT:  voidEngine.restoreUserTheme();                          // clear any active preview
+          voidEngine.applyTemporaryTheme('crimson', 'Blood Moon'); // push the new one
+WRONG:    voidEngine.applyTemporaryTheme('crimson', 'Blood Moon'); // stacks on top of previous!
+```
+
 ### Modal (`import { modal } from '@lib/modal-manager.svelte'`)
 ```
 .open(key, props, size?)            Open by registry key. Size: 'sm' | 'md' | 'lg'

@@ -243,6 +243,11 @@ export class VoidEngine {
    * Used by temporary theme API to avoid side effects.
    */
   private _applyAtmosphere(name: string, shouldPersist: boolean = false) {
+    // Update reactive state synchronously so subsequent reads (e.g. returnTo
+    // capture in pushTemporaryTheme) see the correct atmosphere immediately.
+    this.atmosphere = name;
+    if (shouldPersist) this.persist();
+
     // Check for View Transitions API support and user preferences
     const prefersReducedMotion =
       typeof window !== 'undefined' &&
@@ -253,9 +258,7 @@ export class VoidEngine {
 
     // Fallback for unsupported browsers or reduced motion preference
     if (!supportsViewTransitions || prefersReducedMotion) {
-      this.atmosphere = name;
       this.syncDOM();
-      if (shouldPersist) this.persist();
       return;
     }
 
@@ -263,11 +266,9 @@ export class VoidEngine {
     // the new status bar color before capturing the old-state snapshot.
     this.updateThemeColorMeta(name);
 
-    // Use View Transitions API for smooth theme transitions
+    // Use View Transitions API for smooth DOM painting
     document.startViewTransition(() => {
-      this.atmosphere = name;
       this.syncDOM();
-      if (shouldPersist) this.persist();
     });
   }
 
@@ -566,7 +567,8 @@ export class VoidEngine {
    * Get temporary theme info for UI display.
    */
   get temporaryThemeInfo() {
-    const active = this.temporaryThemeStack[this.temporaryThemeStack.length - 1];
+    const active =
+      this.temporaryThemeStack[this.temporaryThemeStack.length - 1];
     if (!active) return null;
 
     return {
@@ -590,7 +592,8 @@ export class VoidEngine {
     }
 
     const handle = this.nextTemporaryHandle++;
-    const active = this.temporaryThemeStack[this.temporaryThemeStack.length - 1];
+    const active =
+      this.temporaryThemeStack[this.temporaryThemeStack.length - 1];
 
     this.temporaryThemeStack.push({
       handle,
@@ -680,7 +683,8 @@ export class VoidEngine {
    * Exit temporary theme and restore user's preference.
    */
   restoreUserTheme() {
-    const active = this.temporaryThemeStack[this.temporaryThemeStack.length - 1];
+    const active =
+      this.temporaryThemeStack[this.temporaryThemeStack.length - 1];
     if (active) {
       this.releaseTemporaryTheme(active.handle);
     }

@@ -51,8 +51,11 @@
   let satisfaction = $state(true);
   let adminOverride = $state(false);
 
-  // Temporary theme preview functions
+  // Fully restore any temporary theme before pushing a new preview.
+  // This guarantees at most one preview entry on the stack, with returnTo
+  // always pointing to the user's real theme — not another preview.
   function previewCustomAtmosphere() {
+    voidEngine.restoreUserTheme();
     voidEngine.registerTheme('cyberpunk', {
       mode: 'dark',
       physics: 'glass',
@@ -70,9 +73,13 @@
         'text-dim': 'rgba(255, 230, 240, 0.85)',
       },
     });
+
     const applied = voidEngine.applyTemporaryTheme('cyberpunk', 'Neon Dreams');
     if (applied) {
-      toast.show('Custom atmosphere applied', 'success');
+      toast.show('Custom atmosphere applied', 'success', 4000, {
+        label: 'View',
+        onclick: () => modal.themes(),
+      });
     } else {
       toast.show(
         "Theme locked — enable 'Adapt to story mood' in settings",
@@ -82,9 +89,14 @@
   }
 
   function previewBuiltInAtmosphere() {
+    voidEngine.restoreUserTheme();
+
     const applied = voidEngine.applyTemporaryTheme('crimson', 'Blood Moon');
     if (applied) {
-      toast.show('Crimson atmosphere active', 'success');
+      toast.show('Crimson atmosphere active', 'success', 4000, {
+        label: 'View',
+        onclick: () => modal.themes(),
+      });
     } else {
       toast.show(
         "Theme locked — enable 'Adapt to story mood' in settings",
