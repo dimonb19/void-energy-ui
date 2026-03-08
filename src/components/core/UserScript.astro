@@ -63,7 +63,7 @@ import { STORAGE_KEYS } from '@config/constants';
       }
 
       var result = readStoredUser('${STORAGE_KEYS.USER}');
-      if (result.value && result.value.role_name !== 'Guest') {
+      if (result.value) {
         document.documentElement.setAttribute('data-auth', '');
       } else if (result.invalid) {
         try { localStorage.removeItem('${STORAGE_KEYS.USER}'); } catch(e) {}

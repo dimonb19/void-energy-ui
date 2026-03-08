@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/svelte';
 import { describe, expect, it, vi } from 'vitest';
 
 import { STORAGE_KEYS } from '@config/constants';
+import { user } from '@stores/user.svelte';
 import ProfileBtn from '@components/ui/ProfileBtn.svelte';
 
 const guestUser: VoidUser = {
@@ -39,7 +40,7 @@ describe('user store hydration', () => {
     expect(user.isAuthenticated).toBe(false);
   });
 
-  it('hydrates Guest users without exposing authenticated DOM chrome', async () => {
+  it('hydrates Guest users as authenticated with data-auth', async () => {
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(guestUser));
 
     const { user } = await loadFreshUserStore();
@@ -47,10 +48,10 @@ describe('user store hydration', () => {
     expect(user.current).toMatchObject({ role_name: 'Guest' });
     expect(user.isAuthenticated).toBe(true);
     expect(user.isGuest).toBe(true);
-    expect(document.documentElement.hasAttribute('data-auth')).toBe(false);
+    expect(document.documentElement.hasAttribute('data-auth')).toBe(true);
   });
 
-  it('sets data-auth only for non-Guest users during hydrate and runtime sync', async () => {
+  it('sets data-auth for all authenticated users including Guest', async () => {
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(adminUser));
 
     const { user } = await loadFreshUserStore();
@@ -62,22 +63,43 @@ describe('user store hydration', () => {
 
     user.login(guestUser);
     expect(user.isAuthenticated).toBe(true);
-    expect(document.documentElement.hasAttribute('data-auth')).toBe(false);
+    expect(document.documentElement.hasAttribute('data-auth')).toBe(true);
 
     user.login(adminUser);
     expect(document.documentElement.hasAttribute('data-auth')).toBe(true);
   });
 
-  it('keeps the guest profile affordance available for hydrated Guest users', async () => {
-    const { user } = await import('@stores/user.svelte');
+  it('isGuest is false when no user is logged in', async () => {
+    const { user } = await loadFreshUserStore();
 
+    expect(user.current).toBeNull();
+    expect(user.isGuest).toBe(false);
+    expect(user.isAuthenticated).toBe(false);
+  });
+});
+
+describe('user profile rendering', () => {
+  it('shows authenticated profile badge for Guest users', () => {
     user.logout();
     user.login(guestUser);
 
     const { container } = render(ProfileBtn);
 
+    expect(user.isGuest).toBe(true);
+    expect(document.documentElement.hasAttribute('data-auth')).toBe(true);
+    expect(
+      screen.getByRole('button', { name: 'Profile: Guest User (Guest)' }),
+    ).toBeTruthy();
+    expect(container.querySelector('.auth-only')).toBeTruthy();
+  });
+
+  it('shows guest silhouette for unauthenticated users', () => {
+    user.logout();
+
+    const { container } = render(ProfileBtn);
+
     expect(document.documentElement.hasAttribute('data-auth')).toBe(false);
     expect(screen.getByRole('button', { name: 'Sign in' })).toBeTruthy();
-    expect(container.querySelector('.guest-only')).toBeTruthy();
+    expect(container.querySelector('.public-only')).toBeTruthy();
   });
 });

@@ -154,6 +154,6 @@ html:not([data-auth]) .auth-only {
   display: none !important;
 }
 
-html[data-auth] .guest-only {
+html[data-auth] .public-only {
   display: none !important;
 }

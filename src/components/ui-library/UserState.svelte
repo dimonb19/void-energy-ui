@@ -30,6 +30,14 @@
       role_name: 'Player',
       approved_tester: false,
     },
+    guest: {
+      id: 'usr_000',
+      name: 'Wanderer Nyx',
+      email: 'nyx@void.energy',
+      avatar: null,
+      role_name: 'Guest',
+      approved_tester: false,
+    },
   };
 
   function loginAs(role: string) {
@@ -102,11 +110,11 @@
       <div class="surface-sunk p-md flex flex-col gap-md">
         <p class="text-small">
           <strong>User:</strong>
-          {user.current?.name ?? 'Guest (not logged in)'}
+          {user.current?.name ?? 'Not signed in'}
         </p>
         <p class="text-small">
           <strong>Role:</strong>
-          {user.current?.role_name ?? 'Guest'}
+          {user.current?.role_name ?? 'None'}
         </p>
         <p class="text-small">
           <strong>Flags:</strong>
@@ -137,6 +145,9 @@
           Login as Creator
         </button>
         <button onclick={() => loginAs('player')}> Login as Player </button>
+        <button class="btn-ghost" onclick={() => loginAs('guest')}>
+          Login as Guest
+        </button>
         <button
           class="btn-ghost btn-error"
           onclick={handleLogout}
@@ -175,10 +186,10 @@
       <h5>Profile Button</h5>
       <p class="text-small text-mute">
         Role-aware avatar with tab styling for navbar use. Players show their
-        profile picture, Admins and Creators show a role initial badge, and
-        guests see a silhouette icon. The chevron signals a dropdown menu that
-        works for both auth states. Use the login buttons above to switch
-        between roles.
+        profile picture, all other roles show a role initial badge (G/A/C), and
+        unauthenticated visitors see a silhouette icon. The chevron signals a
+        dropdown menu that works for both auth states. Use the login buttons
+        above to switch between roles.
       </p>
       <div
         class="surface-sunk p-md flex flex-wrap items-center justify-center gap-lg"
@@ -187,9 +198,9 @@
       </div>
       <p class="text-caption text-mute px-sm">
         <strong>Player</strong> (avatar image) &middot;
-        <strong>Admin / Creator</strong> (initial badge) &middot;
-        <strong>Guest</strong> (silhouette icon). Login as each role to see the difference.
-        Hard-refresh (Cmd+Shift+R) to verify no avatar flash.
+        <strong>Admin / Creator / Guest</strong> (initial badge) &middot;
+        <strong>Unauthenticated</strong> (silhouette icon). Login as each role to
+        see the difference. Hard-refresh (Cmd+Shift+R) to verify no avatar flash.
       </p>
     </div>
 
@@ -199,22 +210,22 @@
       <p class="text-small text-mute">
         <code>UserScript.astro</code> sets <code>data-auth</code> on
         <code>&lt;html&gt;</code> before first paint. CSS utilities
-        <code>.auth-only</code> / <code>.guest-only</code> react immediately &mdash;
+        <code>.auth-only</code> / <code>.public-only</code> react immediately &mdash;
         no flash. Login, then hard-refresh to verify.
       </p>
       <div class="surface-sunk p-md flex flex-col gap-md">
         <div class="auth-only p-md border-l-2 border-success">
           <p class="text-small">
             <strong class="text-success">auth-only:</strong> This content is visible
-            only for authenticated non-Guest users. Hidden before Svelte hydrates
-            if the cached state is Guest or no user exists.
+            for any authenticated user, including Guest role. Hidden before Svelte
+            hydrates if no cached user exists.
           </p>
         </div>
-        <div class="guest-only p-md border-l-2 border-system">
+        <div class="public-only p-md border-l-2 border-system">
           <p class="text-small">
-            <strong class="text-system">guest-only:</strong> This content is visible
-            for guests and unauthenticated states. Hidden immediately only when a
-            cached non-Guest user exists.
+            <strong class="text-system">public-only:</strong> This content is visible
+            only when unauthenticated (no user). Hidden immediately when any cached
+            user exists, regardless of role.
           </p>
         </div>
       </div>
@@ -244,7 +255,7 @@
         <ul class="text-small text-dim flex flex-col gap-sm px-md">
           <li>
             Wrap the menu trigger in <code>.auth-only</code> /
-            <code>.guest-only</code> if the trigger itself should change per auth
+            <code>.public-only</code> if the trigger itself should change per auth
             state, or conditionally render menu items inside.
           </li>
           <li>
@@ -336,7 +347,7 @@ await user.refresh(() =&gt; Account.getUserResult());
 // Partial update
 user.update(&#123; name: 'Commander Voss' &#125;);
 
-// Logout (clears everything, resets to guest)
+// Logout (clears everything, resets to unauthenticated)
 user.logout();</code
         ></pre>
     </details>

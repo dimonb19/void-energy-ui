@@ -1,8 +1,8 @@
 <!--
   PROFILEBTN COMPONENT
   Role-aware profile trigger for navbar use. Renders one of three states:
-  - Guest:   Silhouette icon (Profile) + chevron
-  - Admin/Creator: Role initial badge + chevron
+  - Unauthenticated: Silhouette icon (Profile) + chevron
+  - Guest/Admin/Creator: Role initial badge (G/A/C) + chevron
   - Player:  Avatar image + chevron
 
   USAGE
@@ -17,7 +17,7 @@
   - ...rest: All native button attributes (onclick, disabled, aria-*, etc.)
 
   BEHAVIOR:
-  - Uses auth-only / guest-only CSS utilities for FOUC-safe state switching
+  - Uses auth-only / public-only CSS utilities for FOUC-safe state switching
   - Avatar span is aria-hidden (label lives on the button via aria-label)
   - Chevron is always visible to signal dropdown affordance
 
@@ -43,7 +43,7 @@
 
   const roleInitial = $derived.by(() => {
     const role = user.current?.role_name;
-    if (!role || role === 'Guest') return null;
+    if (!role) return null;
     return role.charAt(0);
   });
 
@@ -76,7 +76,7 @@
     {/if}
   </span>
 
-  <Profile data-size={size} class="guest-only" />
+  <Profile data-size={size} class="public-only" />
 
   <ChevronDown class="icon" data-size="sm" />
 </button>

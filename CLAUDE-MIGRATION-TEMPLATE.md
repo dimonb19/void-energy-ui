@@ -407,8 +407,8 @@ Physics constraint rules (auto-enforced):
 - `flat` works with both modes
 
 Auth visibility utilities (FOUC-safe, set before first paint):
-- `.auth-only` — visible only when a non-Guest authenticated user sets `data-auth`
-- `.guest-only` — visible when `data-auth` is absent (guest + unauthenticated states)
+- `.auth-only` — visible when any authenticated user (including Guest role) sets `data-auth`
+- `.public-only` — visible only when unauthenticated (`data-auth` absent)
 
 ---
 

@@ -25,7 +25,7 @@ class UserStore {
     this.current?.role_name === 'Creator' ||
       this.current?.role_name === 'Player',
   );
-  isGuest = $derived(!this.current || this.current.role_name === 'Guest');
+  isGuest = $derived(this.current?.role_name === 'Guest');
   approvedTester = $derived(this.current?.approved_tester ?? false);
 
   // ── Constructor: Synchronous Hydration ─────────────────────────────
@@ -55,7 +55,7 @@ class UserStore {
 
   /**
    * Clears user state and localStorage.
-   * Resets all derived flags to guest state.
+   * Resets all derived flags to unauthenticated state.
    */
   logout() {
     this.current = null;
@@ -140,7 +140,7 @@ class UserStore {
 
   private syncAuthDOM() {
     if (typeof document === 'undefined') return;
-    if (this.current && this.current.role_name !== 'Guest') {
+    if (this.current) {
       document.documentElement.setAttribute('data-auth', '');
     } else {
       document.documentElement.removeAttribute('data-auth');

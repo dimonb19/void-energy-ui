@@ -2705,7 +2705,7 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 
 #### `<ProfileBtn>` — Role-aware profile trigger
 
-**Description:** Auth-aware avatar button for navbar use. Renders three states: guest (silhouette icon), Admin/Creator (role initial badge), Player (avatar image). Uses `.auth-only` / `.guest-only` for FOUC-safe switching.
+**Description:** Auth-aware avatar button for navbar use. Renders three states: unauthenticated (silhouette icon), Guest/Admin/Creator (role initial badge), Player (avatar image). Uses `.auth-only` / `.public-only` for FOUC-safe switching.
 **Location:** [src/components/ui/ProfileBtn.svelte](src/components/ui/ProfileBtn.svelte)
 **CSS:** `.profile-avatar` ([src/styles/components/\_navigation.scss](src/styles/components/_navigation.scss))
 
@@ -2721,8 +2721,8 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 
 | Role | Visual | Element |
 | --- | --- | --- |
-| Guest | `Profile` silhouette icon | `.guest-only` |
-| Admin / Creator | Role initial letter badge (e.g. "A") | `.profile-avatar.auth-only` |
+| Unauthenticated | `Profile` silhouette icon | `.public-only` |
+| Guest / Admin / Creator | Role initial letter badge (e.g. "G", "A") | `.profile-avatar.auth-only` |
 | Player (with avatar) | Circular avatar image | `.profile-avatar.auth-only` |
 
 **Usage:**
@@ -3014,13 +3014,13 @@ Reactive singletons for app-wide state. Each store uses `$state` + `$derived` an
 
 **Location:** [src/stores/user.svelte.ts](src/stores/user.svelte.ts)
 **Boot script:** [src/components/core/UserScript.astro](src/components/core/UserScript.astro)
-**CSS:** `.auth-only`, `.guest-only` ([src/styles/base/\_accessibility.scss](src/styles/base/_accessibility.scss))
+**CSS:** `.auth-only`, `.public-only` ([src/styles/base/\_accessibility.scss](src/styles/base/_accessibility.scss))
 
 **Reactive State:**
 
 | Field | Type | Description |
 | --- | --- | --- |
-| `current` | `VoidUser \| null` | Active user object (null = guest) |
+| `current` | `VoidUser \| null` | Active user object (null = unauthenticated) |
 | `developerMode` | `boolean` | Local preference toggle, resets on logout |
 | `loading` | `boolean` | True during async `refresh()` |
 
@@ -3047,11 +3047,11 @@ Reactive singletons for app-wide state. Each store uses `$state` + `$derived` an
 
 **FOUC Prevention (3 layers):**
 
-1. **`UserScript.astro`** — Minimal inline `<head>` script (inlines only `readStoredUser()` and helpers, not the full theme bootloader) reads `void_user` from localStorage, sets `data-auth` on `<html>` before first paint only for authenticated non-Guest users
-2. **CSS utilities** — `.auth-only` hidden when no `data-auth`; `.guest-only` hidden when `data-auth` present. Both use `!important` to override component display values, so Guest and unauthenticated states share the guest-visible UI path
-3. **`syncAuthDOM()`** — UserStore method keeps `data-auth` in sync during login/logout at runtime using the same non-Guest rule
+1. **`UserScript.astro`** — Minimal inline `<head>` script (inlines only `readStoredUser()` and helpers, not the full theme bootloader) reads `void_user` from localStorage, sets `data-auth` on `<html>` before first paint for any authenticated user (including Guest)
+2. **CSS utilities** — `.auth-only` hidden when no `data-auth`; `.public-only` hidden when `data-auth` present. Both use `!important` to override component display values
+3. **`syncAuthDOM()`** — UserStore method keeps `data-auth` in sync during login/logout at runtime
 
-**DOM attribute:** `data-auth` on `<html>` for authenticated non-Guest UI state (same contract pattern as `data-atmosphere`, `data-physics`, `data-mode`)
+**DOM attribute:** `data-auth` on `<html>` for any authenticated user (same contract pattern as `data-atmosphere`, `data-physics`, `data-mode`)
 
 **Usage:**
 
@@ -3071,7 +3071,7 @@ Reactive singletons for app-wide state. Each store uses `$state` + `$derived` an
 
 <!-- FOUC-safe visibility (works before Svelte hydrates) -->
 <div class="auth-only">Authenticated content</div>
-<div class="guest-only">Guest content</div>
+<div class="public-only">Public content</div>
 ```
 
 **Showcase:** [/components → User State](src/components/ui-library/UserState.svelte)
@@ -4562,7 +4562,7 @@ Import the singleton — all flags are derived reactively. No manual role checki
 
 <!-- FOUC-safe auth visibility (CSS-only, works before Svelte hydrates) -->
 <nav class="auth-only">Dashboard | Settings | Logout</nav>
-<nav class="guest-only">Login | Register</nav>
+<nav class="public-only">Login | Register</nav>
 
 <!-- Login / Logout -->
 <button onclick={() => user.login({ id: '1', name: 'Voss', email: 'v@void.energy', avatar: null, role_name: 'Admin', approved_tester: true })}>
@@ -4573,7 +4573,7 @@ Import the singleton — all flags are derived reactively. No manual role checki
 </button>
 ```
 
-`UserScript.astro` is already in `Layout.astro` `<head>` — no setup needed. `.auth-only` / `.guest-only` classes work globally.
+`UserScript.astro` is already in `Layout.astro` `<head>` — no setup needed. `.auth-only` / `.public-only` classes work globally.
 
 ---
 
@@ -4593,7 +4593,7 @@ Import the singleton — all flags are derived reactively. No manual role checki
 <ProfileBtn size="xl" />
 ```
 
-Renders silhouette (guest), initial badge (Admin/Creator), or avatar (Player). FOUC-safe via `.auth-only` / `.guest-only` CSS. See `Navigation.svelte` for the full nav menu integration blueprint.
+Renders silhouette (unauthenticated), initial badge (Guest/Admin/Creator), or avatar (Player). FOUC-safe via `.auth-only` / `.public-only` CSS. See `Navigation.svelte` for the full nav menu integration blueprint.
 
 ---
 
