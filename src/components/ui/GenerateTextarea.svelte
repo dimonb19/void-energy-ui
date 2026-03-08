@@ -100,6 +100,12 @@
     };
   });
 
+  $effect(() => {
+    return () => {
+      abortController?.abort();
+    };
+  });
+
   async function generate() {
     if (disabled || generating) return;
 

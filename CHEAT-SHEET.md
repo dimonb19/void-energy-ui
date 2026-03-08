@@ -1366,7 +1366,7 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 | `onconfirm` | `(value: string) => void` | — | Callback with new value on confirm |
 | `disabled` | `boolean` | `false` | Disables all interaction |
 
-**States:** idle (readonly + Edit icon) → editing (editable + Undo/Check icons). Enter confirms, Escape resets.
+**States:** idle (readonly + Edit icon) → editing (editable + Undo/Check icons). Enter confirms, Escape resets. Keyboard shortcuts are ignored while in readonly mode to prevent accidental value mutation.
 
 **Usage:**
 
@@ -1392,7 +1392,7 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 | `onconfirm` | `(value: string) => void` | — | Callback with new value on confirm |
 | `disabled` | `boolean` | `false` | Disables all interaction |
 
-**States:** idle (readonly + Edit icon at top-right) → editing (editable + Undo/Check at top-right). Ctrl/Cmd+Enter confirms, Escape resets.
+**States:** idle (readonly + Edit icon at top-right) → editing (editable + Undo/Check at top-right). Ctrl/Cmd+Enter confirms, Escape resets. Keyboard shortcuts are ignored while in readonly mode to prevent accidental value mutation.
 
 **Usage:**
 
@@ -1547,7 +1547,7 @@ const pv = createPasswordValidation(() => password);
 | `ongenerate` | `(ctx: GenerateContext) => Promise<string>` | *required* | Async handler receiving `{ currentValue, instructions, signal }` |
 | `...rest` | `HTMLInputAttributes` | — | Native input attributes (`name`, `form`, `required`, `aria-*`, etc.) |
 
-**States:** idle (editable + Sparkle icon) → generating (disabled + shimmer + LoadingQuill). Escape aborts generation through a temporary document-level listener, so parent modal/sidebar layers stay open.
+**States:** idle (editable + Sparkle icon) → generating (disabled + shimmer + LoadingQuill). Escape aborts generation through a temporary document-level listener, so parent modal/sidebar layers stay open. In-flight generation is also aborted on component teardown via `$effect` cleanup.
 
 **Usage:**
 
@@ -1580,7 +1580,7 @@ const pv = createPasswordValidation(() => password);
 | `ongenerate` | `(ctx: GenerateContext) => Promise<string>` | *required* | Async handler receiving `{ currentValue, instructions, signal }` |
 | `...rest` | `HTMLTextareaAttributes` | — | Native textarea attributes (`name`, `form`, `required`, `aria-*`, etc.) |
 
-**States:** idle (editable + Sparkle icon at top-right) → generating (disabled + shimmer + LoadingQuill). Escape aborts generation through a temporary document-level listener, so parent modal/sidebar layers stay open.
+**States:** idle (editable + Sparkle icon at top-right) → generating (disabled + shimmer + LoadingQuill). Escape aborts generation through a temporary document-level listener, so parent modal/sidebar layers stay open. In-flight generation is also aborted on component teardown via `$effect` cleanup.
 
 **Usage:**
 
@@ -3262,9 +3262,9 @@ Centralized LIFO stack for Escape key dismissal. Each dismissible surface (modal
 | Dropdown | `Dropdown.svelte` positioning `$effect` | `close()` + `triggerEl.focus()` |
 | Sidebar | `Sidebar.svelte` open `$effect` | `open = false` + `onclose?.()` |
 
-**Element-scoped handlers** (EditField, EditTextarea) are NOT registered. They call `e.preventDefault()` on the control keydown, which the layer stack respects via its `defaultPrevented` guard.
+**Element-scoped handlers** (EditField, EditTextarea) are NOT registered. They call `e.preventDefault()` on the control keydown, which the layer stack respects via its `defaultPrevented` guard. Keyboard handlers are gated behind an `editing` check — keypresses in readonly mode are ignored entirely.
 
-**GenerateField / GenerateTextarea** add a temporary capture-phase `document` listener only while generation is active. Escape is intercepted there, aborted, and stopped from reaching modal/sidebar dismissal layers.
+**GenerateField / GenerateTextarea** add a temporary capture-phase `document` listener only while generation is active. Escape is intercepted there, aborted, and stopped from reaching modal/sidebar dismissal layers. A standalone `$effect` cleanup also aborts any in-flight generation if the component is unmounted.
 
 ```ts
 import { layerStack } from '@lib/layer-stack.svelte';

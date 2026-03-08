@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { fireEvent, render, screen, waitFor } from '@testing-library/svelte';
 
 import { layerStack } from '@lib/layer-stack.svelte';
+import { toast } from '@stores/toast.svelte';
 import GenerateField from '@components/ui/GenerateField.svelte';
 import GenerateTextarea from '@components/ui/GenerateTextarea.svelte';
 
@@ -61,6 +62,35 @@ describe('GenerateField', () => {
     await fireEvent.keyDown(document, { key: 'Escape' });
 
     expect(dismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('aborts in-flight generation on unmount without showing an error toast', async () => {
+    let aborted = false;
+    const ongenerate = vi.fn(({ signal }: { signal: AbortSignal }) => {
+      return new Promise<string>((_, reject) => {
+        signal.addEventListener(
+          'abort',
+          () => {
+            aborted = true;
+            reject(new DOMException('Aborted', 'AbortError'));
+          },
+          { once: true },
+        );
+      });
+    });
+
+    const { unmount } = render(GenerateField, {
+      value: 'Existing title',
+      ongenerate,
+    });
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
+    unmount();
+
+    await waitFor(() => expect(aborted).toBe(true));
+    await Promise.resolve();
+
+    expect(toast.items).toHaveLength(0);
   });
 });
 
@@ -122,5 +152,35 @@ describe('GenerateTextarea', () => {
     await fireEvent.keyDown(document, { key: 'Escape' });
 
     expect(dismiss).toHaveBeenCalledTimes(1);
+  });
+
+  it('aborts in-flight generation on unmount without showing an error toast', async () => {
+    let aborted = false;
+    const ongenerate = vi.fn(({ signal }: { signal: AbortSignal }) => {
+      return new Promise<string>((_, reject) => {
+        signal.addEventListener(
+          'abort',
+          () => {
+            aborted = true;
+            reject(new DOMException('Aborted', 'AbortError'));
+          },
+          { once: true },
+        );
+      });
+    });
+
+    const { unmount } = render(GenerateTextarea, {
+      value: 'Existing bio',
+      rows: 4,
+      ongenerate,
+    });
+
+    await fireEvent.click(screen.getByRole('button', { name: 'Generate' }));
+    unmount();
+
+    await waitFor(() => expect(aborted).toBe(true));
+    await Promise.resolve();
+
+    expect(toast.items).toHaveLength(0);
   });
 });

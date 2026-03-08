@@ -77,6 +77,7 @@
   }
 
   function confirm() {
+    if (!editing || disabled) return;
     value = draft;
     editing = false;
     onconfirm?.(value);
@@ -87,6 +88,8 @@
   }
 
   function handleKeydown(e: KeyboardEvent) {
+    if (!editing) return;
+
     if (e.key === 'Enter') {
       e.preventDefault();
       confirm();
