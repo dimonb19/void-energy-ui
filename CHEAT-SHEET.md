@@ -1237,12 +1237,14 @@ Preset components with built-in layout and physics.
 | `iconOn` | `string \| Component` | — | ON state icon (optional) |
 | `iconOff` | `string \| Component` | `Circle` | OFF state icon (default circle) |
 | `hideIcons` | `boolean` | `false` | Hide icons entirely |
+| `...rest` | `HTMLInputAttributes` | — | Native checkbox attributes (`name`, `value`, `form`, `required`, `aria-*`, etc.) |
 
 **Usage:**
 
 ```svelte
 <Toggle bind:checked={enabled} />
 <Toggle bind:checked={darkMode} iconOn={Moon} iconOff={Sun} label="Dark Mode" />
+<Toggle bind:checked={agreed} name="agree" value="yes" required />
 ```
 
 ---
@@ -1417,6 +1419,7 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 | `disabled` | `boolean` | `false` | Disables input |
 | `invalid` | `boolean` | `false` | Maps to `aria-invalid` (for FormField wiring) |
 | `describedby` | `string` | — | Maps to `aria-describedby` (for FormField wiring) |
+| `...rest` | `HTMLInputAttributes` | — | Native input attributes (`name`, `form`, `required`, `aria-*`, etc.) |
 
 **Usage:**
 
@@ -1542,6 +1545,7 @@ const pv = createPasswordValidation(() => password);
 | `disabled` | `boolean` | `false` | Disables input and sparkle button |
 | `instructions` | `string` | — | Developer-provided prompt context for this field's AI generation |
 | `ongenerate` | `(ctx: GenerateContext) => Promise<string>` | *required* | Async handler receiving `{ currentValue, instructions, signal }` |
+| `...rest` | `HTMLInputAttributes` | — | Native input attributes (`name`, `form`, `required`, `aria-*`, etc.) |
 
 **States:** idle (editable + Sparkle icon) → generating (disabled + shimmer + LoadingQuill). Escape aborts generation through a temporary document-level listener, so parent modal/sidebar layers stay open.
 
@@ -1574,6 +1578,7 @@ const pv = createPasswordValidation(() => password);
 | `disabled` | `boolean` | `false` | Disables textarea and sparkle button |
 | `instructions` | `string` | — | Developer-provided prompt context for this field's AI generation |
 | `ongenerate` | `(ctx: GenerateContext) => Promise<string>` | *required* | Async handler receiving `{ currentValue, instructions, signal }` |
+| `...rest` | `HTMLTextareaAttributes` | — | Native textarea attributes (`name`, `form`, `required`, `aria-*`, etc.) |
 
 **States:** idle (editable + Sparkle icon at top-right) → generating (disabled + shimmer + LoadingQuill). Escape aborts generation through a temporary document-level listener, so parent modal/sidebar layers stay open.
 
@@ -2075,6 +2080,7 @@ interface SidebarSection {
 | `rootMargin: '-20% 0px -70% 0px'` | Narrow viewport band — a section becomes active when it crosses ~20% from the top |
 | Hash URL sync | `hashchange` listener keeps `activeId` in sync with browser back/forward navigation |
 | `onclose` callback | Parent returns focus to toggle button after Escape or click — required for keyboard accessibility |
+| Viewport-aware `inert` | Below `large-desktop` (overlay mode), closed sidebar gets `aria-hidden="true"` + `inert` to prevent screen-reader and keyboard access. At `large-desktop+` (sticky column), these are never applied — the sidebar is always interactive regardless of `open` prop. Uses `matchMedia('(min-width: 1440px)')` with SSR guard |
 | Scrim overlay | `page-sidebar-scrim` covers viewport below mobile dropdown; click-to-dismiss; uses materialize/dematerialize transitions; hidden at `large-desktop+` |
 | Shared `{#snippet}` | `sidebarItems()` snippet renders the item list once — no duplication between mobile/desktop |
 
@@ -4751,6 +4757,8 @@ When used inside a `<dialog>` element, morph automatically:
   Settings
 </button>
 ```
+
+**Teardown:** `hide()` sets `data-state="closed"` to trigger CSS exit transition, then removes the tooltip from DOM. Cleanup uses dual strategy: `transitionend` listener for immediate removal when CSS finishes, plus a `setTimeout` fallback (`parsedDuration + 50ms`) for environments where `transitionend` never fires (jsdom, interrupted transitions). Duration parsing handles both `s` and `ms` CSS units and multi-value `transition-duration` strings. When `transitionDuration` is `0` (retro physics), cleanup is synchronous.
 
 ---
 

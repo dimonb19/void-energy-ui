@@ -39,6 +39,7 @@
 <script lang="ts">
   import { materialize, dematerialize } from '@lib/transitions.svelte';
   import { toast } from '@stores/toast.svelte';
+  import type { HTMLTextareaAttributes } from 'svelte/elements';
 
   import IconBtn from './IconBtn.svelte';
   import Sparkle from '@components/icons/Sparkle.svelte';
@@ -50,7 +51,8 @@
     signal: AbortSignal;
   }
 
-  interface GenerateTextareaProps {
+  interface GenerateTextareaProps
+    extends Omit<HTMLTextareaAttributes, 'value'> {
     value: string;
     id?: string;
     placeholder?: string;
@@ -70,6 +72,7 @@
     instructions,
     ongenerate,
     class: className = '',
+    ...rest
   }: GenerateTextareaProps = $props();
 
   const componentId = $props.id();
@@ -133,6 +136,7 @@
     {rows}
     disabled={disabled || generating}
     bind:value
+    {...rest}
   ></textarea>
   {#key generating}
     <span

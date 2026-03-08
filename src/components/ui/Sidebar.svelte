@@ -1,6 +1,9 @@
 <script lang="ts">
   import { materialize, dematerialize } from '@lib/transitions.svelte';
   import { layerStack } from '@lib/layer-stack.svelte';
+  import { VOID_RESPONSIVE } from '@config/design-tokens';
+
+  const LARGE_DESKTOP_QUERY = `(min-width: ${VOID_RESPONSIVE['large-desktop']})`;
 
   // ─────────────────────────────────────────────────────────────────────────
   // Types
@@ -43,9 +46,51 @@
   // ─────────────────────────────────────────────────────────────────────────
 
   let isScrolling = $state(false);
+  let isOverlay = $state<boolean | null>(null);
+  let navEl = $state<HTMLElement | null>(null);
 
   // Flat list of all item IDs for observer setup
   const allItems = $derived(sections.flatMap((s) => s.items));
+  const isOverlayClosed = $derived(isOverlay === true && !open);
+
+  $effect(() => {
+    if (typeof window === 'undefined') return;
+
+    const overlayQuery = window.matchMedia(LARGE_DESKTOP_QUERY);
+    isOverlay = !overlayQuery.matches;
+
+    function handleOverlayChange(event: MediaQueryListEvent) {
+      isOverlay = !event.matches;
+    }
+
+    if (overlayQuery.addEventListener) {
+      overlayQuery.addEventListener('change', handleOverlayChange);
+    } else {
+      overlayQuery.addListener(handleOverlayChange);
+    }
+
+    return () => {
+      if (overlayQuery.removeEventListener) {
+        overlayQuery.removeEventListener('change', handleOverlayChange);
+      } else {
+        overlayQuery.removeListener(handleOverlayChange);
+      }
+    };
+  });
+
+  $effect(() => {
+    if (!navEl) return;
+
+    if ('inert' in navEl) {
+      (navEl as HTMLElement & { inert: boolean }).inert = isOverlayClosed;
+    }
+
+    if (isOverlayClosed) {
+      navEl.setAttribute('inert', '');
+    } else {
+      navEl.removeAttribute('inert');
+    }
+  });
 
   // ─────────────────────────────────────────────────────────────────────────
   // Hash URL Sync (page load + browser back/forward)
@@ -217,9 +262,11 @@
 {/if}
 
 <nav
+  bind:this={navEl}
   id="page-sidebar-nav"
   class="page-sidebar flex flex-col gap-lg px-md {className}"
   data-state={open ? 'open' : undefined}
+  aria-hidden={isOverlayClosed ? 'true' : undefined}
   aria-label="Page sections"
 >
   {@render sidebarItems()}

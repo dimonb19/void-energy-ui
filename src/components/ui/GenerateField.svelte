@@ -37,6 +37,7 @@
 <script lang="ts">
   import { materialize, dematerialize } from '@lib/transitions.svelte';
   import { toast } from '@stores/toast.svelte';
+  import type { HTMLInputAttributes } from 'svelte/elements';
 
   import IconBtn from './IconBtn.svelte';
   import Sparkle from '@components/icons/Sparkle.svelte';
@@ -48,7 +49,8 @@
     signal: AbortSignal;
   }
 
-  interface GenerateFieldProps {
+  interface GenerateFieldProps
+    extends Omit<HTMLInputAttributes, 'type' | 'value'> {
     value: string;
     id?: string;
     placeholder?: string;
@@ -66,6 +68,7 @@
     instructions,
     ongenerate,
     class: className = '',
+    ...rest
   }: GenerateFieldProps = $props();
 
   const componentId = $props.id();
@@ -129,6 +132,7 @@
     {placeholder}
     disabled={disabled || generating}
     bind:value
+    {...rest}
   />
   {#key generating}
     <span

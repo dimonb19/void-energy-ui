@@ -24,9 +24,11 @@
 -->
 <script lang="ts">
   import Eye from '@components/icons/Eye.svelte';
+  import type { HTMLInputAttributes } from 'svelte/elements';
   import IconBtn from './IconBtn.svelte';
 
-  interface PasswordFieldProps {
+  interface PasswordFieldProps
+    extends Omit<HTMLInputAttributes, 'type' | 'value'> {
     value: string;
     id?: string;
     placeholder?: string;
@@ -46,6 +48,7 @@
     invalid = false,
     describedby,
     class: className = '',
+    ...rest
   }: PasswordFieldProps = $props();
 
   const componentId = $props.id();
@@ -69,6 +72,7 @@
     bind:value
     aria-invalid={invalid || undefined}
     aria-describedby={describedby}
+    {...rest}
   />
   <span class="field-slot-right">
     <IconBtn

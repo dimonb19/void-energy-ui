@@ -30,6 +30,25 @@ function haveSameIdRefs(a: string[], b: string[]) {
   return a.length === b.length && a.every((token, index) => token === b[index]);
 }
 
+function parseTransitionDurationMs(value: string): number {
+  return value
+    .split(',')
+    .map((token) => token.trim())
+    .reduce((maxDuration, token) => {
+      let durationMs = Number.NaN;
+
+      if (token.endsWith('ms')) {
+        durationMs = Number.parseFloat(token);
+      } else if (token.endsWith('s')) {
+        durationMs = Number.parseFloat(token) * 1000;
+      }
+
+      return Number.isFinite(durationMs)
+        ? Math.max(maxDuration, durationMs)
+        : maxDuration;
+    }, 0);
+}
+
 export class VoidTooltip {
   private trigger: Element;
   private tooltip: HTMLElement | null = null;
@@ -140,16 +159,39 @@ export class VoidTooltip {
     }
   }
 
+  private getTransitionDurationMs(element: HTMLElement): number {
+    const styles = getComputedStyle(element);
+    return parseTransitionDurationMs(styles.transitionDuration);
+  }
+
   private hide() {
     this.clearShowTimer();
     if (!this.tooltip) return;
     const el = this.tooltip;
+    let destroyed = false;
+    let fallbackTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const handleTransitionEnd = (event: TransitionEvent) => {
+      if (event.target !== el) return;
+      destroy();
+    };
 
     // Trigger CSS exit state.
     el.setAttribute('data-state', 'closed');
 
     const destroy = () => {
+      if (destroyed) return;
+      destroyed = true;
+
+      if (fallbackTimer !== null) {
+        clearTimeout(fallbackTimer);
+        fallbackTimer = null;
+      }
+      el.removeEventListener('transitionend', handleTransitionEnd);
+
       if (this.cleanupPositioning) this.cleanupPositioning();
+      this.cleanupPositioning = null;
+
       try {
         el.hidePopover();
         el.remove();
@@ -161,19 +203,22 @@ export class VoidTooltip {
     };
 
     // Align DOM removal with CSS transition duration (retro returns 0).
-    let duration = 0;
+    let durationMs = 0;
     try {
-      const styles = getComputedStyle(el);
-      duration = parseFloat(styles.transitionDuration);
+      durationMs = this.getTransitionDurationMs(el);
     } catch {
       destroy();
       return;
     }
 
-    if (!Number.isFinite(duration) || duration === 0) {
+    if (!Number.isFinite(durationMs) || durationMs === 0) {
       destroy();
     } else {
-      el.addEventListener('transitionend', destroy, { once: true });
+      el.addEventListener('transitionend', handleTransitionEnd);
+      fallbackTimer = setTimeout(() => {
+        el.removeEventListener('transitionend', handleTransitionEnd);
+        destroy();
+      }, durationMs + 50);
     }
   }
 

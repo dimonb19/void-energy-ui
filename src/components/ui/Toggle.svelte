@@ -41,10 +41,12 @@
 -->
 <script lang="ts">
   import type { Component } from 'svelte';
+  import type { HTMLInputAttributes } from 'svelte/elements';
   import { Circle } from '@lucide/svelte';
   import { toNativeControlState } from '@lib/native-control-foundation';
 
-  interface ToggleProps {
+  interface ToggleProps
+    extends Omit<HTMLInputAttributes, 'checked' | 'onchange' | 'size'> {
     checked: boolean;
     onchange?: (checked?: boolean) => void;
     label?: string;
@@ -68,6 +70,7 @@
     iconOn,
     iconOff,
     hideIcons = false,
+    ...rest
   }: ToggleProps = $props();
 
   // Shared native-control identity (stable per component instance)
@@ -103,6 +106,7 @@
       aria-label={label ? undefined : 'Toggle'}
       {disabled}
       onchange={handleChange}
+      {...rest}
     />
     <span class="toggle-track">
       {#if !hideIcons}
