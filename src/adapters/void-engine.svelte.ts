@@ -10,11 +10,16 @@ import { VOID_TOKENS } from '@config/design-tokens';
 import {
   formatBoundaryError,
   parseExternalThemePayload,
+  parseRestorableThemeCache,
   parseStoredThemeCache,
   parseStoredUserConfig,
   type BoundaryError,
 } from '@lib/boundary';
-import { applyTheme, applyPreferences } from '@lib/void-boot';
+import {
+  applyTheme,
+  applyPreferences,
+  resolveThemeColor,
+} from '@lib/void-boot';
 import { err, ok, type Result } from '@lib/result';
 
 // Mode-aware palette fallbacks for incomplete theme definitions.
@@ -149,75 +154,12 @@ export class VoidEngine {
    */
   registerTheme(id: string, definition: PartialThemeDefinition) {
     console.group(`Void: Registering Atmosphere "${id}"`);
-
-    // Enforce physics/mode constraints.
-    if (definition.physics === 'glass' && definition.mode === 'light') {
-      console.warn(
-        `⚠️ Void Violation: Atmosphere "${id}" attempts to use GLASS physics in LIGHT mode. This breaks visibility. Falling back to FLAT physics.`,
-      );
-      definition.physics = 'flat'; // Force correction
-    }
-
-    if (definition.physics === 'retro' && definition.mode === 'light') {
-      console.warn(
-        `⚠️ Void Violation: RETRO physics requires Dark mode for contrast. Forcing Dark mode.`,
-      );
-      definition.mode = 'dark'; // Force correction
-    }
-
-    // Determine mode first (for fallback selection)
-    const targetMode = definition.mode || 'dark';
-
-    // Select mode-appropriate fallback palette
-    const fallbackPalette =
-      targetMode === 'light' ? FALLBACK_LIGHT : FALLBACK_DARK;
-
-    // Build a mode-compatible base theme so partial runtime palettes inherit
-    // from the correct built-in atmosphere before falling back to generic tokens.
-    const baseThemeId =
-      targetMode === 'light' ? DEFAULTS.LIGHT_ATMOSPHERE : DEFAULTS.ATMOSPHERE;
-    const registryEntry =
-      this.registry[baseThemeId] ?? this.registry[DEFAULTS.ATMOSPHERE];
-    const basePalette = DEFAULT_THEME_PALETTES[targetMode];
-
-    const baseTheme: VoidThemeDefinition = {
-      id: baseThemeId,
-      mode: registryEntry?.mode ?? targetMode,
-      physics:
-        registryEntry?.physics ??
-        (targetMode === 'light' ? 'flat' : DEFAULTS.PHYSICS),
-      palette: basePalette ?? fallbackPalette,
-      fonts: [],
-      tagline: registryEntry?.tagline,
-    };
-
-    // Merge partial overrides on top of the base.
-    const safeTheme: VoidThemeDefinition = {
-      id: id,
-      mode: targetMode,
-      physics: definition.physics || baseTheme.physics,
-      palette: {
-        ...fallbackPalette,
-        ...baseTheme.palette,
-        ...(definition.palette || {}),
-      },
-      fonts: definition.fonts || [],
-      tagline: definition.tagline,
-    };
-
-    // Commit and persist.
-    this.registry[id] = safeTheme;
-
-    // Cache theme to localStorage (non-critical, failures are silently ignored)
     try {
-      const cache = this.readThemeCache();
-      cache[id] = safeTheme;
-      localStorage.setItem(STORAGE_KEYS.THEME_CACHE, JSON.stringify(cache));
-    } catch {
-      // Storage full or unavailable - continue without caching
+      const safeTheme = this.normalizeThemeDefinition(id, definition);
+      this.commitTheme(id, safeTheme, true);
+    } finally {
+      console.groupEnd();
     }
-
-    console.groupEnd();
   }
 
   async loadExternalTheme(
@@ -323,6 +265,8 @@ export class VoidEngine {
   private init() {
     const root = document.documentElement;
 
+    this.hydrateCachedThemes();
+
     // Trust the bootloader paint and sync state from the DOM.
     const domAtmosphere = root.getAttribute(DOM_ATTRS.ATMOSPHERE);
 
@@ -363,7 +307,11 @@ export class VoidEngine {
     if (!meta) return;
     const entry = this.registry[name];
     if (!entry) return;
-    const color = entry.palette?.['bg-canvas'] || null;
+    const color = resolveThemeColor(
+      entry as VoidThemeDefinition & {
+        canvas?: string;
+      },
+    );
     if (color) meta.setAttribute('content', color);
   }
 
@@ -427,6 +375,121 @@ export class VoidEngine {
       // Storage unavailable
     }
     return {};
+  }
+
+  private hydrateCachedThemes() {
+    const raw = localStorage.getItem(STORAGE_KEYS.THEME_CACHE);
+    if (!raw) return;
+
+    const parsed = parseRestorableThemeCache(
+      raw,
+      'VoidEngine.init theme cache',
+    );
+    if (!parsed.ok) {
+      console.warn(formatBoundaryError(parsed.error));
+      try {
+        localStorage.removeItem(STORAGE_KEYS.THEME_CACHE);
+      } catch {
+        // Storage unavailable
+      }
+      return;
+    }
+
+    for (const [id, definition] of Object.entries(parsed.data)) {
+      this.commitTheme(
+        id,
+        this.normalizeThemeDefinition(id, definition, { silent: true }),
+        false,
+      );
+    }
+  }
+
+  private normalizeThemeDefinition(
+    id: string,
+    definition: PartialThemeDefinition,
+    options: { silent?: boolean } = {},
+  ): VoidThemeDefinition {
+    const { silent = false } = options;
+    const nextDefinition: PartialThemeDefinition = {
+      ...definition,
+      palette: definition.palette ? { ...definition.palette } : undefined,
+      fonts: definition.fonts ? [...definition.fonts] : undefined,
+    };
+
+    // Enforce physics/mode constraints.
+    if (nextDefinition.physics === 'glass' && nextDefinition.mode === 'light') {
+      if (!silent) {
+        console.warn(
+          `⚠️ Void Violation: Atmosphere "${id}" attempts to use GLASS physics in LIGHT mode. This breaks visibility. Falling back to FLAT physics.`,
+        );
+      }
+      nextDefinition.physics = 'flat';
+    }
+
+    if (nextDefinition.physics === 'retro' && nextDefinition.mode === 'light') {
+      if (!silent) {
+        console.warn(
+          `⚠️ Void Violation: RETRO physics requires Dark mode for contrast. Forcing Dark mode.`,
+        );
+      }
+      nextDefinition.mode = 'dark';
+    }
+
+    const targetMode = nextDefinition.mode || 'dark';
+    const fallbackPalette =
+      targetMode === 'light' ? FALLBACK_LIGHT : FALLBACK_DARK;
+
+    // Build a mode-compatible base theme so partial runtime palettes inherit
+    // from the correct built-in atmosphere before falling back to generic tokens.
+    const baseThemeId =
+      targetMode === 'light' ? DEFAULTS.LIGHT_ATMOSPHERE : DEFAULTS.ATMOSPHERE;
+    const registryEntry =
+      this.registry[baseThemeId] ?? this.registry[DEFAULTS.ATMOSPHERE];
+    const basePalette = DEFAULT_THEME_PALETTES[targetMode];
+
+    const baseTheme: VoidThemeDefinition = {
+      id: baseThemeId,
+      mode: registryEntry?.mode ?? targetMode,
+      physics:
+        registryEntry?.physics ??
+        (targetMode === 'light' ? 'flat' : DEFAULTS.PHYSICS),
+      palette: basePalette ?? fallbackPalette,
+      fonts: [],
+      tagline: registryEntry?.tagline,
+    };
+
+    return {
+      id,
+      label: nextDefinition.label,
+      mode: targetMode,
+      physics: nextDefinition.physics || baseTheme.physics,
+      palette: {
+        ...fallbackPalette,
+        ...baseTheme.palette,
+        ...(nextDefinition.palette || {}),
+      },
+      fonts: nextDefinition.fonts || [],
+      tagline: nextDefinition.tagline,
+    };
+  }
+
+  private commitTheme(
+    id: string,
+    safeTheme: VoidThemeDefinition,
+    shouldPersist: boolean,
+  ) {
+    this.registry[id] = safeTheme;
+
+    if (!shouldPersist) return;
+
+    // Cache theme to localStorage (non-critical, failures are silently ignored)
+    try {
+      const cache = this.readThemeCache();
+      cache[id] = safeTheme;
+      localStorage.setItem(STORAGE_KEYS.THEME_CACHE, JSON.stringify(cache));
+    } catch {
+      // Storage full or unavailable - continue without caching
+    }
   }
 
   get availableAtmospheres() {

@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/svelte';
 
 import BarChart from '@components/ui/BarChart.svelte';
+import DonutChart from '@components/ui/DonutChart.svelte';
 import LineChart from '@components/ui/LineChart.svelte';
 
 describe('chart data validation', () => {
@@ -65,5 +66,44 @@ describe('chart data validation', () => {
     expect(container.querySelectorAll('.chart-hit-target')).toHaveLength(0);
     expect(container.querySelector('table.sr-only')).toBeNull();
     expect(warnSpy).toHaveBeenCalled();
+  });
+
+  it('keeps donut segment geometry within one circumference budget for dense datasets', () => {
+    const data = Array.from({ length: 300 }, (_, index) => ({
+      label: `Segment ${index + 1}`,
+      value: 1,
+    }));
+
+    const { container } = render(DonutChart, {
+      data,
+      showLegend: false,
+      animated: false,
+    });
+
+    const segments = Array.from(
+      container.querySelectorAll<SVGCircleElement>('.chart-donut-segment'),
+    );
+
+    expect(segments).toHaveLength(data.length);
+
+    const dashLengths = segments.map((segment) => {
+      const dashArray = segment.getAttribute('stroke-dasharray');
+      const dashLength = Number.parseFloat(dashArray?.split(' ')[0] ?? 'NaN');
+
+      expect(Number.isFinite(dashLength)).toBe(true);
+      expect(dashLength).toBeGreaterThanOrEqual(0);
+
+      return dashLength;
+    });
+
+    const size = 200;
+    const radius = (size / 2) * 0.8;
+    const circumference = 2 * Math.PI * radius;
+    const totalAllocatedLength = dashLengths.reduce(
+      (sum, dashLength) => sum + dashLength,
+      0,
+    );
+
+    expect(totalAllocatedLength).toBeLessThanOrEqual(circumference + 0.001);
   });
 });

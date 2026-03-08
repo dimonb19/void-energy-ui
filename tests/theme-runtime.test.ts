@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { compile } from 'sass-embedded';
 
 import { VoidEngine } from '@adapters/void-engine.svelte';
+import { DOM_ATTRS, STORAGE_KEYS } from '@config/constants';
 import { VOID_TOKENS } from '@config/design-tokens';
 
 describe('theme runtime correctness', () => {
@@ -81,5 +82,73 @@ describe('theme runtime correctness', () => {
     expect(result.css).toMatch(
       /\[data-atmosphere=(?:['"])?paper(?:['"])?\][^{]*\{[^}]*color-scheme:\s*light/s,
     );
+  });
+
+  it('silently restores cached runtime themes before resolving the boot-painted atmosphere', () => {
+    const groupSpy = vi.spyOn(console, 'group').mockImplementation(() => {});
+    const groupEndSpy = vi
+      .spyOn(console, 'groupEnd')
+      .mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    localStorage.setItem(
+      STORAGE_KEYS.THEME_CACHE,
+      JSON.stringify({
+        remembered: {
+          mode: 'light',
+          physics: 'glass',
+          palette: {
+            'energy-primary': '#123456',
+          },
+          tagline: 'Recovered from cache',
+        },
+      }),
+    );
+
+    document.documentElement.setAttribute(DOM_ATTRS.ATMOSPHERE, 'remembered');
+    document.documentElement.setAttribute(DOM_ATTRS.MODE, 'light');
+    document.documentElement.setAttribute(DOM_ATTRS.PHYSICS, 'flat');
+
+    const engine = new VoidEngine();
+
+    expect(engine.atmosphere).toBe('remembered');
+    expect(engine.registry.remembered).toBeTruthy();
+    expect(engine.registry.remembered.physics).toBe('flat');
+    expect(engine.registry.remembered.palette['bg-canvas']).toBe(
+      VOID_TOKENS.themes.paper.palette['bg-canvas'],
+    );
+    expect(engine.registry.remembered.palette['energy-primary']).toBe(
+      '#123456',
+    );
+    expect(groupSpy).not.toHaveBeenCalled();
+    expect(groupEndSpy).not.toHaveBeenCalled();
+  });
+
+  it('updates theme-color metadata for built-in and runtime themes at runtime', () => {
+    vi.spyOn(console, 'group').mockImplementation(() => {});
+    vi.spyOn(console, 'groupEnd').mockImplementation(() => {});
+    vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    document.head.innerHTML = '<meta name="theme-color" content="#111111">';
+    const meta = document.querySelector(
+      'meta[name="theme-color"]',
+    ) as HTMLMetaElement;
+
+    const engine = new VoidEngine();
+
+    engine.setAtmosphere('paper');
+    expect(meta.getAttribute('content')).toBe(
+      VOID_TOKENS.themes.paper.palette['bg-canvas'],
+    );
+
+    engine.registerTheme('meta-runtime', {
+      mode: 'dark',
+      palette: {
+        'bg-canvas': '#123123',
+      },
+    });
+    engine.setAtmosphere('meta-runtime');
+
+    expect(meta.getAttribute('content')).toBe('#123123');
   });
 });

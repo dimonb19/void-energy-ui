@@ -72,7 +72,7 @@
   const hasHint = $derived(!!hint);
 
   const descriptionId = $derived(
-    [hasHint ? hintId : null, hasError ? errorId : null]
+    [hasHint && !hasError ? hintId : null, hasError ? errorId : null]
       .filter(Boolean)
       .join(' ') || undefined,
   );

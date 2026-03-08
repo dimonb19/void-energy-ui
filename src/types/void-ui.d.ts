@@ -191,7 +191,13 @@ type ThemeRegistry = Record<string, VoidThemeDefinition>;
  */
 type ThemeRegistryJSON = Record<
   string,
-  { physics: VoidPhysics; mode: VoidMode; tagline?: string }
+  {
+    physics: VoidPhysics;
+    mode: VoidMode;
+    tagline?: string;
+    /** Static built-in canvas color used for meta theme-color updates */
+    canvas?: string;
+  }
 >;
 
 // ==========================================================================

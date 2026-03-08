@@ -115,6 +115,14 @@ function sanitizeThemeDefinition(input) {
   };
 }
 
+export function resolveThemeColor(theme) {
+  if (!isPlainObject(theme)) return null;
+  return (
+    (theme.palette && theme.palette['bg-canvas']) ||
+    (hasText(theme.canvas) ? theme.canvas : null)
+  );
+}
+
 function clearThemeOverrides(root) {
   for (var i = 0; i < PALETTE_KEYS.length; i++) {
     root.style.removeProperty('--' + PALETTE_KEYS[i]);
@@ -146,6 +154,17 @@ function resolveFallbackTheme(registry, defaults) {
       mode: sanitized.mode,
       physics: sanitized.physics,
       palette: sanitized.palette,
+    };
+  }
+
+  if (isPlainObject(fallback)) {
+    return {
+      id: defaults.ATMOSPHERE,
+      mode: isMode(fallback.mode) ? fallback.mode : defaults.MODE,
+      physics: isPhysics(fallback.physics)
+        ? fallback.physics
+        : defaults.PHYSICS,
+      canvas: hasText(fallback.canvas) ? fallback.canvas : undefined,
     };
   }
 
@@ -279,7 +298,7 @@ export function applyTheme(root, theme, constants) {
   // Update <meta name="theme-color"> to match atmosphere canvas.
   var meta = document.querySelector('meta[name="theme-color"]');
   if (meta) {
-    var color = (theme.palette && theme.palette['bg-canvas']) || null;
+    var color = resolveThemeColor(theme);
     if (color) meta.setAttribute('content', color);
   }
 }

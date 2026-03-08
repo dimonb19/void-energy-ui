@@ -79,6 +79,7 @@
 
   // Segment gap in degrees (as fraction of circumference)
   const gapSize = 3; // void-ignore (Donut segment gap — visual constant)
+  const maxGapShare = 0.5; // void-ignore (Keep at least half the circumference for visible arcs)
 
   // SVG coordinate offsets for center text positioning
   const centerValueOffset = -4; // void-ignore (SVG text baseline nudge — sub-token)
@@ -102,17 +103,21 @@
 
   const segments = $derived.by(() => {
     let offset = 0;
-    const totalGap = gapSize * data.length;
-    const availableCircumference = circumference - totalGap;
+    const effectiveGap =
+      data.length > 0
+        ? Math.min(gapSize, (circumference * maxGapShare) / data.length)
+        : 0;
+    const totalGap = effectiveGap * data.length;
+    const availableCircumference = Math.max(circumference - totalGap, 0);
 
     return data.map((point, i) => {
       const fraction = point.value / total;
       const rawDashLength = fraction * availableCircumference;
-      const dashLength = Math.max(rawDashLength, gapSize); // minimum visible arc floor
+      const dashLength = Math.max(rawDashLength, 0);
       const dashGap = circumference - dashLength;
       const rotation = offset - circumference / 4; // start at top (12 o'clock)
 
-      offset += dashLength + gapSize;
+      offset += dashLength + effectiveGap;
 
       return {
         ...point,

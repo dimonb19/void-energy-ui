@@ -124,6 +124,19 @@
   let scrollController: AbortController | undefined;
   let scrollTimeout: ReturnType<typeof setTimeout> | undefined;
 
+  function getScrollBehavior(): ScrollBehavior {
+    if (
+      typeof window === 'undefined' ||
+      typeof window.matchMedia !== 'function'
+    ) {
+      return 'smooth';
+    }
+
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? 'auto'
+      : 'smooth';
+  }
+
   function scrollToSection(event: Event, id: string) {
     event.preventDefault();
     const target = document.getElementById(id);
@@ -144,7 +157,7 @@
 
     // Temporarily suppress observer updates during programmatic scroll
     isScrolling = true;
-    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    target.scrollIntoView({ behavior: getScrollBehavior(), block: 'start' });
 
     // Use scrollend when available, with timeout fallback for Safari < 18
     scrollController = new AbortController();

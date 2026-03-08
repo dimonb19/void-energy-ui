@@ -47,7 +47,7 @@ type SystemConfig = {
 };
 
 let cachedConfig: SystemConfig | null = null;
-let cachedAtmosphere: string | null = null;
+let cachedPhysics: PhysicsPreset | null = null;
 
 // Browser capability checks (run once)
 const reducedMotion =
@@ -60,16 +60,40 @@ const reducedMotion =
 const isFirefox =
   typeof navigator !== 'undefined' && /firefox/i.test(navigator.userAgent);
 
-function getSystemConfig(): SystemConfig {
-  const currentAtmosphere = theme.atmosphere || 'void';
+type PhysicsPreset = 'glass' | 'flat' | 'retro';
 
-  // Return cached config if atmosphere hasn't changed
-  if (cachedConfig && cachedAtmosphere === currentAtmosphere) {
+function isPhysicsPreset(value: unknown): value is PhysicsPreset {
+  return value === 'glass' || value === 'flat' || value === 'retro';
+}
+
+function resolvePhysicsMode(): PhysicsPreset {
+  const domPhysics =
+    typeof document !== 'undefined'
+      ? document.documentElement.getAttribute('data-physics')
+      : null;
+
+  if (isPhysicsPreset(domPhysics)) {
+    return domPhysics;
+  }
+
+  const themePhysics = theme.currentTheme?.physics;
+  if (isPhysicsPreset(themePhysics)) {
+    return themePhysics;
+  }
+
+  const currentAtmosphere = theme.atmosphere || 'void';
+  const themeConfig = REGISTRY[currentAtmosphere] || REGISTRY['void'];
+  return isPhysicsPreset(themeConfig?.physics) ? themeConfig.physics : 'glass';
+}
+
+function getSystemConfig(): SystemConfig {
+  const physicsMode = resolvePhysicsMode();
+
+  // Return cached config if physics hasn't changed
+  if (cachedConfig && cachedPhysics === physicsMode) {
     return cachedConfig;
   }
 
-  const themeConfig = REGISTRY[currentAtmosphere] || REGISTRY['void'];
-  const physicsMode = themeConfig.physics || 'glass';
   const specs = PHYSICS_PRIMITIVES[physicsMode] || PHYSICS_PRIMITIVES['glass'];
 
   const isRetro = physicsMode === 'retro';
@@ -86,7 +110,7 @@ function getSystemConfig(): SystemConfig {
     isFlat,
     reducedMotion,
   };
-  cachedAtmosphere = currentAtmosphere;
+  cachedPhysics = physicsMode;
 
   return cachedConfig;
 }

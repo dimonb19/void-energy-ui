@@ -50,6 +50,31 @@ describe('void boot hydration', () => {
     expect(themeColor?.getAttribute('content')).toBe('#010203');
   });
 
+  it('updates theme-color from built-in registry canvas fields during boot hydration', () => {
+    localStorage.setItem(STORAGE_KEYS.ATMOSPHERE, 'paper');
+    document.head.innerHTML = '<meta name="theme-color" content="#111111">';
+
+    const activeId = hydrate(
+      {
+        paper: {
+          mode: 'light',
+          physics: 'flat',
+          canvas: '#faeed1',
+        },
+      },
+      STORAGE_KEYS,
+      DOM_ATTRS,
+      DEFAULTS,
+    );
+
+    const themeColor = document.querySelector(
+      'meta[name="theme-color"]',
+    ) as HTMLMetaElement | null;
+
+    expect(activeId).toBe('paper');
+    expect(themeColor?.getAttribute('content')).toBe('#faeed1');
+  });
+
   it('falls back to the default triad when hydration throws', () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
 

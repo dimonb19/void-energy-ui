@@ -84,6 +84,35 @@ const StoredThemeCacheSchema = z.record(
   StoredThemeDefinitionSchema,
 );
 
+const RestorableThemeDefinitionSchema = z
+  .object({
+    id: z.string().min(1).optional(),
+    label: z.string().min(1).optional(),
+    tagline: z.string().min(1).optional(),
+    mode: VoidModeSchema.optional(),
+    physics: VoidPhysicsSchema.optional(),
+    palette: PartialVoidPaletteSchema.optional(),
+    fonts: z.array(ThemeFontSchema).optional(),
+  })
+  .strict()
+  .refine(
+    (entry) =>
+      entry.mode !== undefined ||
+      entry.physics !== undefined ||
+      entry.palette !== undefined ||
+      entry.fonts !== undefined ||
+      entry.tagline !== undefined ||
+      entry.label !== undefined,
+    {
+      message: 'Theme cache entry must include at least one valid override.',
+    },
+  );
+
+const RestorableThemeCacheSchema = z.record(
+  z.string(),
+  RestorableThemeDefinitionSchema,
+);
+
 const ExternalThemePayloadSchema = z
   .object({
     id: z.string().min(1),
@@ -190,6 +219,30 @@ export function parseStoredThemeCache(
       code: 'invalid_json',
       source,
       message: 'Stored theme cache is not valid JSON.',
+    });
+  }
+}
+
+export function parseRestorableThemeCache(
+  raw: string,
+  source = 'Restorable theme cache',
+): Result<Record<string, PartialThemeDefinition>, BoundaryError> {
+  try {
+    const parsed = JSON.parse(raw);
+    const result = RestorableThemeCacheSchema.safeParse(parsed);
+    if (!result.success) {
+      return invalidShape(
+        source,
+        'Invalid restorable theme cache.',
+        result.error,
+      );
+    }
+    return ok(result.data as Record<string, PartialThemeDefinition>);
+  } catch {
+    return err({
+      code: 'invalid_json',
+      source,
+      message: 'Restorable theme cache is not valid JSON.',
     });
   }
 }
