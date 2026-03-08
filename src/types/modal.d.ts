@@ -18,7 +18,7 @@ type ModalContract = {
     | {
         title: string;
         body?: never;
-        /** Rendered via {@html}; caller must sanitize. Internal use only. */
+        /** SECURITY: Rendered via {@html}; caller must sanitize. Internal trusted-use API only. */
         bodyHtml: string;
       };
 
@@ -38,7 +38,7 @@ type ModalContract = {
     | {
         title: string;
         body?: never;
-        /** Rendered via {@html}; caller must sanitize. Internal use only. */
+        /** SECURITY: Rendered via {@html}; caller must sanitize. Internal trusted-use API only. */
         bodyHtml: string;
         /** Optional numeric cost displayed with currency formatting */
         cost?: number;

@@ -3046,11 +3046,11 @@ Reactive singletons for app-wide state. Each store uses `$state` + `$derived` an
 
 **FOUC Prevention (3 layers):**
 
-1. **`UserScript.astro`** — Minimal inline `<head>` script (inlines only `readStoredUser()` and helpers, not the full theme bootloader) reads `void_user` from localStorage, sets `data-auth` on `<html>` before first paint
-2. **CSS utilities** — `.auth-only` hidden when no `data-auth`; `.guest-only` hidden when `data-auth` present. Both use `!important` to override component display values
-3. **`syncAuthDOM()`** — UserStore method keeps `data-auth` in sync during login/logout at runtime
+1. **`UserScript.astro`** — Minimal inline `<head>` script (inlines only `readStoredUser()` and helpers, not the full theme bootloader) reads `void_user` from localStorage, sets `data-auth` on `<html>` before first paint only for authenticated non-Guest users
+2. **CSS utilities** — `.auth-only` hidden when no `data-auth`; `.guest-only` hidden when `data-auth` present. Both use `!important` to override component display values, so Guest and unauthenticated states share the guest-visible UI path
+3. **`syncAuthDOM()`** — UserStore method keeps `data-auth` in sync during login/logout at runtime using the same non-Guest rule
 
-**DOM attribute:** `data-auth` on `<html>` (same contract pattern as `data-atmosphere`, `data-physics`, `data-mode`)
+**DOM attribute:** `data-auth` on `<html>` for authenticated non-Guest UI state (same contract pattern as `data-atmosphere`, `data-physics`, `data-mode`)
 
 **Usage:**
 

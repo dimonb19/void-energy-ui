@@ -106,4 +106,112 @@ describe('chart data validation', () => {
 
     expect(totalAllocatedLength).toBeLessThanOrEqual(circumference + 0.001);
   });
+
+  it('logs an error and renders donut empty state for negative values', () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { container } = render(DonutChart, {
+      data: [
+        { label: 'Organic', value: 42 },
+        { label: 'Refunds', value: -5 },
+      ],
+      onselect: vi.fn(),
+    });
+
+    expect(screen.getByText('No data')).toBeTruthy();
+    expect(container.querySelectorAll('.chart-donut-segment')).toHaveLength(0);
+    expect(container.querySelector('table.sr-only')).toBeNull();
+    expect(errorSpy).toHaveBeenCalled();
+  });
+
+  it('logs an error and renders line-chart empty state for negative single-series data', () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { container } = render(LineChart, {
+      data: [
+        {
+          label: 'Jan',
+          value: 120,
+        },
+        {
+          label: 'Feb',
+          value: -4,
+        },
+      ],
+      onselect: vi.fn(),
+    });
+
+    expect(screen.getByText('No data')).toBeTruthy();
+    expect(screen.queryByText('Invalid chart data')).toBeNull();
+    expect(container.querySelectorAll('.chart-hit-target')).toHaveLength(0);
+    expect(container.querySelector('table.sr-only')).toBeNull();
+    expect(errorSpy).toHaveBeenCalled();
+  });
+
+  it('logs an error and renders line-chart empty state for negative multi-series data', () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { container } = render(LineChart, {
+      series: [
+        {
+          name: 'Sessions',
+          data: [
+            { label: 'Jan', value: 120 },
+            { label: 'Feb', value: 160 },
+          ],
+        },
+        {
+          name: 'Conversions',
+          data: [
+            { label: 'Jan', value: 12 },
+            { label: 'Feb', value: -4 },
+          ],
+        },
+      ],
+      onselect: vi.fn(),
+    });
+
+    expect(screen.getByText('No data')).toBeTruthy();
+    expect(screen.queryByText('Invalid chart data')).toBeNull();
+    expect(container.querySelectorAll('.chart-hit-target')).toHaveLength(0);
+    expect(container.querySelector('table.sr-only')).toBeNull();
+    expect(errorSpy).toHaveBeenCalled();
+  });
+
+  it('logs an error and renders bar-chart empty state for negative grouped data', () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { container } = render(BarChart, {
+      groups: [
+        {
+          label: 'Q1',
+          values: [
+            { name: 'Revenue', value: 120 },
+            { name: 'Profit', value: -12 },
+          ],
+        },
+      ],
+      onselect: vi.fn(),
+    });
+
+    expect(screen.getByText('No data')).toBeTruthy();
+    expect(screen.queryByText('Invalid chart data')).toBeNull();
+    expect(container.querySelectorAll('.chart-hit-target')).toHaveLength(0);
+    expect(container.querySelector('table.sr-only')).toBeNull();
+    expect(errorSpy).toHaveBeenCalled();
+  });
+
+  it('logs an error and renders bar-chart empty state for negative horizontal data', () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const { container } = render(BarChart, {
+      data: [
+        { label: 'Q1', value: 120 },
+        { label: 'Q2', value: -12 },
+      ],
+      orientation: 'horizontal',
+      onselect: vi.fn(),
+    });
+
+    expect(screen.getByText('No data')).toBeTruthy();
+    expect(screen.queryByText('Invalid chart data')).toBeNull();
+    expect(container.querySelectorAll('.chart-hit-target')).toHaveLength(0);
+    expect(container.querySelector('table.sr-only')).toBeNull();
+    expect(errorSpy).toHaveBeenCalled();
+  });
 });

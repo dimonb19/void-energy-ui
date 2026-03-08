@@ -46,4 +46,24 @@ describe('stable id plumbing', () => {
     expect(container.querySelectorAll('#secret')).toHaveLength(1);
     expect(screen.getByRole('button', { name: 'Hide password' })).toBeTruthy();
   });
+
+  it('keeps the visibility toggle inert when the field is disabled', async () => {
+    const { container } = render(PasswordField, {
+      value: 'hunter2',
+      disabled: true,
+    });
+
+    const input = container.querySelector('input');
+    const toggle = screen.getByRole('button', { name: 'Show password' }) as
+      | HTMLButtonElement
+      | undefined;
+
+    expect(input?.getAttribute('type')).toBe('password');
+    expect(toggle?.disabled).toBe(true);
+
+    toggle?.click();
+    await fireEvent.keyDown(toggle!, { key: 'Enter' });
+
+    expect(input?.getAttribute('type')).toBe('password');
+  });
 });

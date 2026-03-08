@@ -140,7 +140,7 @@ class UserStore {
 
   private syncAuthDOM() {
     if (typeof document === 'undefined') return;
-    if (this.current) {
+    if (this.current && this.current.role_name !== 'Guest') {
       document.documentElement.setAttribute('data-auth', '');
     } else {
       document.documentElement.removeAttribute('data-auth');

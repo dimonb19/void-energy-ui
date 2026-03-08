@@ -206,13 +206,15 @@
         <div class="auth-only p-md border-l-2 border-success">
           <p class="text-small">
             <strong class="text-success">auth-only:</strong> This content is visible
-            only when authenticated. Hidden before Svelte hydrates if no cached user.
+            only for authenticated non-Guest users. Hidden before Svelte hydrates
+            if the cached state is Guest or no user exists.
           </p>
         </div>
         <div class="guest-only p-md border-l-2 border-system">
           <p class="text-small">
             <strong class="text-system">guest-only:</strong> This content is visible
-            only for guests. Hidden immediately when a cached user exists.
+            for guests and unauthenticated states. Hidden immediately only when a
+            cached non-Guest user exists.
           </p>
         </div>
       </div>

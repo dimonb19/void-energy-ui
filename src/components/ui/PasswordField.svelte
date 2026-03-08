@@ -73,6 +73,7 @@
   <span class="field-slot-right">
     <IconBtn
       icon={Eye}
+      {disabled}
       iconProps={{ 'data-muted': !visible }}
       onclick={toggleVisibility}
       aria-label={visible ? 'Hide password' : 'Show password'}

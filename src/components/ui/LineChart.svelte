@@ -137,7 +137,7 @@
   const plotWidth = $derived(svgWidth - paddingLeft - paddingRight);
 
   // Normalize to internal series array — series prop takes precedence
-  const normalizedSeries = $derived.by(
+  const rawNormalizedSeries = $derived.by(
     (): { name: string; data: LineChartPoint[]; seriesIdx: number }[] => {
       if (seriesProp && seriesProp.length > 0) {
         return seriesProp.map((s, i) => ({
@@ -151,6 +151,22 @@
       }
       return [];
     },
+  );
+
+  const negativeValueReason = $derived.by(() => {
+    for (const series of rawNormalizedSeries) {
+      const point = series.data.find((entry) => entry.value < 0);
+      if (point) {
+        const seriesLabel = series.name || 'Value';
+        return `Series "${seriesLabel}", label "${point.label}" has unsupported value ${point.value}.`;
+      }
+    }
+
+    return null;
+  });
+
+  const normalizedSeries = $derived.by(() =>
+    negativeValueReason ? [] : rawNormalizedSeries,
   );
 
   const isMultiSeries = $derived(normalizedSeries.length > 1);
@@ -317,6 +333,7 @@
   let pathLengths = $state<number[]>([]);
   let svgEl: SVGSVGElement | undefined = $state();
   let lastInvalidWarning = $state<string | null>(null);
+  let lastNegativeValueError = $state<string | null>(null);
 
   $effect(() => {
     if (!svgEl) return;
@@ -325,6 +342,21 @@
     pathLengths = Array.from(paths).map((p) =>
       (p as SVGPathElement).getTotalLength(),
     );
+  });
+
+  $effect(() => {
+    const reason = negativeValueReason;
+    if (reason && reason !== lastNegativeValueError) {
+      console.error(
+        `Void: LineChart does not support negative values. Rendering empty state. (${reason})`,
+      );
+      lastNegativeValueError = reason;
+      return;
+    }
+
+    if (!reason) {
+      lastNegativeValueError = null;
+    }
   });
 
   $effect(() => {

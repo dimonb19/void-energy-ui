@@ -46,9 +46,9 @@ The `<html>` element carries the runtime state:
 | `data-atmosphere` | Theme ID (e.g., `void`, `paper`) | VoidEngine |
 | `data-physics` | `glass` \| `flat` \| `retro` | VoidEngine |
 | `data-mode` | `light` \| `dark` | VoidEngine |
-| `data-auth` | Present (no value) when authenticated | UserScript.astro |
+| `data-auth` | Present (no value) when authenticated and not `Guest` | UserScript.astro |
 
-CSS utilities `.auth-only` and `.guest-only` read `data-auth` to show/hide content before Svelte hydrates (FOUC-safe).
+CSS utilities `.auth-only` and `.guest-only` read `data-auth` to show/hide content before Svelte hydrates (FOUC-safe). `Guest` users stay hydrated in JS state, but they do not set `data-auth`.
 
 ## ⚠️ ARCHITECTURE & DISCIPLINE (READ BEFORE CODING)
 

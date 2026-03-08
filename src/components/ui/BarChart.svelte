@@ -116,16 +116,38 @@
     return () => ro.disconnect();
   });
 
+  const negativeValueReason = $derived.by(() => {
+    if (groups && groups.length > 0) {
+      for (const group of groups) {
+        for (const entry of group.values) {
+          if (entry.value < 0) {
+            return `Group "${group.label}", slot "${entry.name}" has unsupported value ${entry.value}.`;
+          }
+        }
+      }
+
+      return null;
+    }
+
+    const point = data.find((entry) => entry.value < 0);
+    return point
+      ? `Category "${point.label}" has unsupported value ${point.value}.`
+      : null;
+  });
+
+  const normalizedData = $derived(negativeValueReason ? [] : data);
+  const normalizedGroups = $derived(negativeValueReason ? [] : (groups ?? []));
+
   const isHorizontal = $derived(orientation === 'horizontal');
-  const isGrouped = $derived(!!groups && groups.length > 0);
+  const isGrouped = $derived(normalizedGroups.length > 0);
   const barChartValidation = $derived.by(() => {
     if (!isGrouped) {
       return { valid: true, reason: null as string | null };
     }
 
-    const baseline = groups?.[0]?.values ?? [];
+    const baseline = normalizedGroups[0]?.values ?? [];
 
-    for (const group of groups?.slice(1) ?? []) {
+    for (const group of normalizedGroups.slice(1)) {
       if (group.values.length !== baseline.length) {
         return {
           valid: false,
@@ -188,14 +210,14 @@
   const maxValue = $derived.by(() => {
     if (isGrouped) {
       let max = 0;
-      for (const g of groups!) {
+      for (const g of normalizedGroups) {
         for (const v of g.values) {
           if (v.value > max) max = v.value;
         }
       }
       return max || 1;
     }
-    return Math.max(...data.map((d) => d.value), 1);
+    return Math.max(...normalizedData.map((d) => d.value), 1);
   });
 
   // Nice grid intervals
@@ -210,25 +232,27 @@
 
   // Vertical bar geometry
   const barWidth = $derived.by(() => {
-    const count = data.length || 1;
+    const count = normalizedData.length || 1;
     const step = plotWidth / count;
     return Math.min(step * (1 - barGap), maxBarSize);
   });
 
   // Horizontal bar geometry
   const hBarHeight = $derived.by(() => {
-    const count = data.length || 1;
+    const count = normalizedData.length || 1;
     const step = plotHeight / count;
     return Math.min(step * (1 - barGap), maxHBarSize);
   });
 
   // Grouped bar geometry
   const subBarCount = $derived(
-    isGrouped ? (groups![0]?.values.length ?? 0) : 0,
+    isGrouped ? (normalizedGroups[0]?.values.length ?? 0) : 0,
   );
   const innerBarGap = 0.15; // fraction of sub-bar step used as gap within group
 
-  const groupStep = $derived(isGrouped ? plotWidth / groups!.length : 0);
+  const groupStep = $derived(
+    isGrouped ? plotWidth / normalizedGroups.length : 0,
+  );
   const groupWidth = $derived(groupStep * (1 - barGap));
   const subBarStep = $derived(subBarCount > 0 ? groupWidth / subBarCount : 0);
   const subBarWidth = $derived(
@@ -259,7 +283,7 @@
   const fmt = $derived(formatValue ?? defaultFormatValue);
 
   function barX(i: number): number {
-    const step = plotWidth / data.length;
+    const step = plotWidth / normalizedData.length;
     return paddingLeft + i * step + (step - barWidth) / 2;
   }
 
@@ -277,7 +301,7 @@
   }
 
   function hBarY(i: number): number {
-    const step = plotHeight / data.length;
+    const step = plotHeight / normalizedData.length;
     return paddingTop + i * step + (step - hBarHeight) / 2;
   }
 
@@ -302,16 +326,36 @@
     }
 
     if (isGrouped) {
-      if (groups!.length === 0) return 'Empty bar chart';
-      const seriesNames = groups![0].values.map((v) => v.name).join(', ');
-      return `Grouped bar chart with ${groups!.length} categories and ${groups![0].values.length} series (${seriesNames}).`;
+      if (normalizedGroups.length === 0) return 'Empty bar chart';
+      const seriesNames = normalizedGroups[0].values
+        .map((v) => v.name)
+        .join(', ');
+      return `Grouped bar chart with ${normalizedGroups.length} categories and ${normalizedGroups[0].values.length} series (${seriesNames}).`;
     }
-    if (data.length === 0) return 'Empty bar chart';
-    const maxPoint = data.reduce((a, b) => (b.value > a.value ? b : a));
-    return `Bar chart with ${data.length} categories. Highest value is ${fmt(maxPoint.value)} at ${maxPoint.label}.`;
+    if (normalizedData.length === 0) return 'Empty bar chart';
+    const maxPoint = normalizedData.reduce((a, b) =>
+      b.value > a.value ? b : a,
+    );
+    return `Bar chart with ${normalizedData.length} categories. Highest value is ${fmt(maxPoint.value)} at ${maxPoint.label}.`;
   });
 
   let lastInvalidWarning = $state<string | null>(null);
+  let lastNegativeValueError = $state<string | null>(null);
+
+  $effect(() => {
+    const reason = negativeValueReason;
+    if (reason && reason !== lastNegativeValueError) {
+      console.error(
+        `Void: BarChart does not support negative values. Rendering empty state. (${reason})`,
+      );
+      lastNegativeValueError = reason;
+      return;
+    }
+
+    if (!reason) {
+      lastNegativeValueError = null;
+    }
+  });
 
   $effect(() => {
     if (!SHOULD_WARN_INVALID) return;
@@ -352,7 +396,7 @@
         text-anchor="middle"
         dominant-baseline="middle">{INVALID_CHART_LABEL}</text
       >
-    {:else if isGrouped || data.length > 0}
+    {:else if isGrouped || normalizedData.length > 0}
       {#if isGrouped}
         <!-- GROUPED MODE -->
         {#if showGrid}
@@ -395,7 +439,7 @@
           {/each}
         {/if}
 
-        {#each groups! as group, gi}
+        {#each normalizedGroups as group, gi}
           {#each group.values as val, vi}
             {@const series = val.series ?? vi % 6}
             <rect
@@ -506,7 +550,7 @@
           />
         {/if}
 
-        {#each data as point, i}
+        {#each normalizedData as point, i}
           {@const series = point.series ?? i % 6}
           <rect
             class="chart-bar-rect"
@@ -596,7 +640,7 @@
           {/each}
         {/if}
 
-        {#each data as point, i}
+        {#each normalizedData as point, i}
           {@const series = point.series ?? i % 6}
           <rect
             class="chart-bar-rect"
@@ -679,10 +723,10 @@
   </svg>
 
   <!-- Legend -->
-  {#if barChartValidation.valid && showLegend && (isGrouped ? groups!.length > 0 : data.length > 0)}
+  {#if barChartValidation.valid && showLegend && (isGrouped ? normalizedGroups.length > 0 : normalizedData.length > 0)}
     <div class="flex flex-row flex-wrap justify-center gap-md mt-md">
       {#if isGrouped}
-        {#each groups![0].values as val, vi}
+        {#each normalizedGroups[0].values as val, vi}
           {@const series = val.series ?? vi % 6}
           <div class="flex items-center gap-xs">
             <span class="chart-legend-swatch" data-series={series}></span>
@@ -690,7 +734,7 @@
           </div>
         {/each}
       {:else}
-        {#each data as point, i}
+        {#each normalizedData as point, i}
           {@const series = point.series ?? i % 6}
           <div class="flex items-center gap-xs">
             <span class="chart-legend-swatch" data-series={series}></span>
@@ -713,18 +757,19 @@
   {/if}
 
   <!-- Screen reader data table -->
-  {#if barChartValidation.valid && (isGrouped ? groups!.length > 0 : data.length > 0)}
+  {#if barChartValidation.valid && (isGrouped ? normalizedGroups.length > 0 : normalizedData.length > 0)}
     <table class="sr-only">
       <caption>{title}</caption>
       {#if isGrouped}
         <thead
           ><tr
-            ><th>Group</th>{#each groups![0].values as val}<th>{val.name}</th
+            ><th>Group</th>{#each normalizedGroups[0].values as val}<th
+                >{val.name}</th
               >{/each}</tr
           ></thead
         >
         <tbody>
-          {#each groups! as group}
+          {#each normalizedGroups as group}
             <tr
               ><td>{group.label}</td>{#each group.values as val}<td
                   >{fmt(val.value)}</td
@@ -735,7 +780,7 @@
       {:else}
         <thead><tr><th>Category</th><th>Value</th></tr></thead>
         <tbody>
-          {#each data as point}
+          {#each normalizedData as point}
             <tr><td>{point.label}</td><td>{fmt(point.value)}</td></tr>
           {/each}
         </tbody>

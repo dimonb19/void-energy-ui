@@ -70,12 +70,23 @@
   const generatedChartId = `donut-chart-${componentId}`;
   const chartId = $derived(id ?? generatedChartId);
 
+  const negativeValueReason = $derived.by(() => {
+    const point = data.find((entry) => entry.value < 0);
+    return point
+      ? `Segment "${point.label}" has unsupported value ${point.value}.`
+      : null;
+  });
+
+  const normalizedData = $derived(negativeValueReason ? [] : data);
+
   const center = $derived(size / 2);
   const radius = $derived(center * 0.8);
   const strokeWidth = $derived(radius * thickness);
   const circumference = $derived(2 * Math.PI * radius);
 
-  const total = $derived(data.reduce((sum, d) => sum + d.value, 0) || 1);
+  const total = $derived(
+    normalizedData.reduce((sum, point) => sum + point.value, 0) || 1,
+  );
 
   // Segment gap in degrees (as fraction of circumference)
   const gapSize = 3; // void-ignore (Donut segment gap — visual constant)
@@ -95,22 +106,27 @@
   const fmt = $derived(formatValue ?? defaultFormatValue);
 
   const accessibleSummary = $derived.by(() => {
-    if (data.length === 0) return 'Empty donut chart';
-    const largest = data.reduce((a, b) => (b.value > a.value ? b : a));
+    if (normalizedData.length === 0) return 'Empty donut chart';
+    const largest = normalizedData.reduce((a, b) =>
+      b.value > a.value ? b : a,
+    );
     const pct = Math.round((largest.value / total) * 100);
-    return `Donut chart with ${data.length} segments. Largest is ${largest.label} at ${pct}%.`;
+    return `Donut chart with ${normalizedData.length} segments. Largest is ${largest.label} at ${pct}%.`;
   });
 
   const segments = $derived.by(() => {
     let offset = 0;
     const effectiveGap =
-      data.length > 0
-        ? Math.min(gapSize, (circumference * maxGapShare) / data.length)
+      normalizedData.length > 0
+        ? Math.min(
+            gapSize,
+            (circumference * maxGapShare) / normalizedData.length,
+          )
         : 0;
-    const totalGap = effectiveGap * data.length;
+    const totalGap = effectiveGap * normalizedData.length;
     const availableCircumference = Math.max(circumference - totalGap, 0);
 
-    return data.map((point, i) => {
+    return normalizedData.map((point, i) => {
       const fraction = point.value / total;
       const rawDashLength = fraction * availableCircumference;
       const dashLength = Math.max(rawDashLength, 0);
@@ -128,6 +144,23 @@
       };
     });
   });
+
+  let lastNegativeValueError = $state<string | null>(null);
+
+  $effect(() => {
+    const reason = negativeValueReason;
+    if (reason && reason !== lastNegativeValueError) {
+      console.error(
+        `Void: DonutChart does not support negative values. Rendering empty state. (${reason})`,
+      );
+      lastNegativeValueError = reason;
+      return;
+    }
+
+    if (!reason) {
+      lastNegativeValueError = null;
+    }
+  });
 </script>
 
 <div class="chart-donut relative {className}" data-animated={animated}>
@@ -141,7 +174,7 @@
     >
       <title id="{chartId}-title">{title}</title>
       <desc id="{chartId}-desc">{accessibleSummary}</desc>
-      {#if data.length > 0}
+      {#if normalizedData.length > 0}
         <!-- Background track -->
         <circle
           class="chart-donut-track"
@@ -167,11 +200,11 @@
               role="button"
               tabindex="0"
               aria-label="{seg.label}: {fmt(seg.value)} ({seg.percentage}%)"
-              onclick={() => onselect(data[i], i)}
+              onclick={() => onselect(normalizedData[i], i)}
               onkeydown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onselect(data[i], i);
+                  onselect(normalizedData[i], i);
                 }
               }}
               use:tooltip={{
@@ -232,7 +265,7 @@
     </svg>
 
     <!-- Legend -->
-    {#if showLegend && data.length > 0}
+    {#if showLegend && normalizedData.length > 0}
       <div class="flex flex-row flex-wrap justify-center gap-md">
         {#each segments as seg}
           <div class="flex items-center gap-xs">
@@ -246,7 +279,7 @@
     {/if}
 
     <!-- Screen reader data table -->
-    {#if data.length > 0}
+    {#if normalizedData.length > 0}
       <table class="sr-only">
         <caption>{title}</caption>
         <thead><tr><th>Segment</th><th>Value</th><th>Percentage</th></tr></thead

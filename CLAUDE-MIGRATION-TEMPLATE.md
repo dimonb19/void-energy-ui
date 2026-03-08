@@ -398,7 +398,7 @@ The `<html>` element carries the runtime state:
 data-atmosphere="void"      Active theme ID
 data-physics="glass"        Active physics preset (glass | flat | retro)
 data-mode="dark"            Active color mode (light | dark)
-data-auth                   Present when user is authenticated (set by UserScript)
+data-auth                   Present when user is authenticated and not Guest (set by UserScript)
 ```
 
 Physics constraint rules (auto-enforced):
@@ -407,8 +407,8 @@ Physics constraint rules (auto-enforced):
 - `flat` works with both modes
 
 Auth visibility utilities (FOUC-safe, set before first paint):
-- `.auth-only` — visible only when `data-auth` is present
-- `.guest-only` — visible only when `data-auth` is absent
+- `.auth-only` — visible only when a non-Guest authenticated user sets `data-auth`
+- `.guest-only` — visible when `data-auth` is absent (guest + unauthenticated states)
 
 ---
 
