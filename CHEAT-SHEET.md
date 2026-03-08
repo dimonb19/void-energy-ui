@@ -252,14 +252,14 @@ See [THEME-GUIDE.md](./THEME-GUIDE.md) for details.
 
 ### Browser Chrome Integration — `<meta name="theme-color">`
 
-The browser's address bar and system chrome automatically tint to match the active atmosphere. Each theme's `canvas` color (its `bg-canvas` value) is stored in the auto-generated [void-registry.json](src/config/void-registry.json) and applied to `<meta name="theme-color">` on every theme switch.
+The browser's address bar and system chrome automatically tint to match the active atmosphere. The color is resolved via `resolveThemeColor()` in `void-boot.js`: it checks `palette['bg-canvas']` first (runtime themes with full palettes), then falls back to the `canvas` field (built-in static registry entries in [void-registry.json](src/config/void-registry.json)).
 
 **How it works:**
 1. **SSR** — `Layout.astro` renders a static `<meta name="theme-color" content="#010020">` (the `void` default)
 2. **Hydration** — The bootloader (`void-boot.js`) immediately updates the meta tag to match the resolved theme
-3. **Runtime** — `VoidEngine.applyTheme()` updates the meta tag on every atmosphere switch
+3. **Runtime** — `VoidEngine._applyAtmosphere()` updates the meta tag on every atmosphere switch (before the View Transition snapshot)
 
-No manual intervention needed. Custom runtime themes that include a `bg-canvas` palette entry also get theme-color support automatically.
+No manual intervention needed. Built-in themes use their `canvas` registry field; custom runtime themes that include a `bg-canvas` palette entry also get theme-color support automatically.
 
 ---
 
@@ -1718,7 +1718,7 @@ const pv = createPasswordValidation(() => password);
 | Prop | Type | Description |
 | --- | --- | --- |
 | `fieldId` | `string` | Use as `id` on the input element |
-| `descriptionId` | `string \| undefined` | Use as `aria-describedby` (combines hint + error IDs) |
+| `descriptionId` | `string \| undefined` | Use as `aria-describedby` (references hint OR error — never both; error replaces hint when active) |
 | `invalid` | `boolean` | Use as `aria-invalid` |
 
 **States:**
@@ -4856,7 +4856,7 @@ Both return `T & { cancel(): void }` — the original function signature plus a 
 Physics-aware transition functions for conditional element rendering.
 **Location:** [src/lib/transitions.svelte.ts](src/lib/transitions.svelte.ts)
 
-All transitions read physics timing from `void-physics.json` and adapt to the active atmosphere. Retro physics = instant (0ms). Reduced motion = opacity-only or instant.
+All transitions resolve physics from live state: DOM `data-physics` attribute first, then `voidEngine.currentTheme.physics`, then static registry fallback. This ensures runtime themes use their own physics, not the built-in default. Retro physics = instant (0ms). Reduced motion = opacity-only or instant.
 
 ### Choosing the Right Transition
 
