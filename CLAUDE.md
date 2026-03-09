@@ -359,6 +359,9 @@ import { morph } from '@actions/morph'          use:morph={{ width, height, thre
 import { tooltip } from '@actions/tooltip'      use:tooltip={{ content, placement }}
 import { navlink } from '@actions/navlink'      use:navlink (no options — click sets loading state)
 import { kinetic } from '@actions/kinetic'      use:kinetic={{ text, mode, speed, charSpeed, cursor }}
+import { draggable, dropTarget, reorderByDrop } from '@actions/drag'
+  use:draggable={{ id, data, group, axis, handle, disabled, onDragStart, onDragMove, onDragEnd }}
+  use:dropTarget={{ id, group, mode, axis, accepts, onDragEnter, onDragLeave, onDrop, disabled }}
 ```
 
 ### Path Aliases (tsconfig.json)

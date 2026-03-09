@@ -4886,6 +4886,133 @@ await handle; // or handle.abort();
 
 ---
 
+### E. Drag & Drop (`use:draggable` + `use:dropTarget`)
+
+**Purpose:** Pointer Events-based drag-and-drop with physics-aware visual feedback
+**Location:** [src/actions/drag.ts](src/actions/drag.ts), [src/lib/drag-manager.ts](src/lib/drag-manager.ts)
+**CSS:** `data-drag-state` + `data-drop-position` attribute selectors ([src/styles/components/_drag.scss](src/styles/components/_drag.scss))
+
+Two actions that work together: `use:draggable` makes elements draggable, `use:dropTarget` makes elements accept drops. A singleton `DragManager` coordinates hit testing, group matching, sortable insertion (`before` / `after`), and screen reader announcements.
+
+#### `use:draggable` Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `id` | `string` | — | **Required.** Unique identifier for this draggable |
+| `data` | `unknown` | — | Payload transferred on drop |
+| `group` | `string` | — | Only drops onto matching group |
+| `axis` | `'both' \| 'x' \| 'y'` | `'both'` | Constrain drag to an axis |
+| `handle` | `string` | — | CSS selector — only start drag from this child |
+| `disabled` | `boolean` | `false` | Disable dragging |
+| `onDragStart` | `(detail) => void` | — | Fires when drag begins |
+| `onDragMove` | `(detail) => void` | — | Fires during drag (rAF-throttled) |
+| `onDragEnd` | `(detail) => void` | — | Fires when drag ends (drop or cancel) |
+
+#### `use:dropTarget` Props
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `id` | `string` | — | Optional target ID for explicit reorder detail (`targetId`) |
+| `group` | `string` | — | Accepts draggables from matching group |
+| `mode` | `'inside' \| 'between'` | `'inside'` | `inside` for zone drops, `between` for sortable insertion |
+| `axis` | `'vertical' \| 'horizontal'` | `'vertical'` | Resolves `before` / `after` for `mode: 'between'` |
+| `accepts` | `(data, sourceId) => boolean` | — | Fine-grained accept predicate |
+| `onDragEnter` | `(detail) => void` | — | Valid draggable enters |
+| `onDragLeave` | `(detail) => void` | — | Valid draggable leaves |
+| `onDrop` | `(detail) => void` | — | Draggable dropped here |
+| `disabled` | `boolean` | `false` | Disable this drop target |
+
+#### States (set automatically via `data-drag-state`)
+
+| State | Applied to | Visual |
+| --- | --- | --- |
+| `dragging` | Source element | Dimmed opacity, pointer-events none |
+| `drop-ready` | All compatible targets | Subtle primary border |
+| `drop-hover` | Target being hovered | Strong primary border + lift shadow |
+| `drop-invalid` | Incompatible target hovered | Error border + dimmed |
+
+For sortable targets (`mode: 'between'`), hovered elements also receive `data-drop-position="before"` or `data-drop-position="after"` so CSS can render an insertion line.
+
+#### Physics Integration
+
+- Reads `--speed-base` and `--ease-spring-gentle` from CSS (same as `use:morph`)
+- Ghost element (`.drag-ghost`) adapts per physics preset
+- **Glass**: Scale 1.03 + primary glow + canvas shadow
+- **Flat**: Scale 1.01 + subtle shadow
+- **Retro**: No transform, pixel-offset outline + shadow, instant transitions
+- Respects `prefers-reduced-motion` (all transitions disabled)
+
+#### Keyboard Alternative (WCAG 2.2)
+
+Built into `use:draggable` — no separate component needed:
+1. **Tab** to a draggable element
+2. **Enter/Space** to pick up
+3. **Arrow keys** to cycle between compatible drop targets, **Home/End** to jump to first/last
+4. **Enter/Space** to drop, **Escape** to cancel
+
+Screen reader announcements via `aria-live` region: "Picked up [label]", "Drop before [target]", "Dropped after [target]", "Drag canceled".
+
+#### Interactive Elements
+
+When `use:draggable` is applied without a `handle`, pointer drags are blocked from nested interactive children (buttons, links, inputs) to prevent gesture conflicts. The draggable node itself is always allowed — even if it's a `<button>` or `<a>`. When a `handle` selector is provided, only clicks on the handle start a drag, bypassing the interactive check entirely.
+
+#### Sortable Helpers
+
+`reorderByDrop(items, detail)` is exported from `@actions/drag` for keyed list reordering. It expects `detail.id`, `detail.targetId`, and `detail.position`.
+
+#### Usage: Sortable List
+
+```svelte
+<script>
+  import { draggable, dropTarget, reorderByDrop } from '@actions/drag';
+  import { live } from '@lib/transitions.svelte';
+
+  function handleReorder(detail) {
+    items = reorderByDrop(items, detail);
+  }
+</script>
+
+{#each items as item (item.id)}
+  <div
+    use:draggable={{
+      id: item.id,
+      group: 'list',
+      data: item,
+      handle: '[data-drag-handle]'
+    }}
+    use:dropTarget={{
+      id: item.id,
+      group: 'list',
+      mode: 'between',
+      axis: 'vertical',
+      onDrop: handleReorder
+    }}
+    animate:live
+  >
+    <button type="button" data-drag-handle>Drag</button>
+    {item.label}
+  </div>
+{/each}
+```
+
+#### Usage: Drag Between Zones
+
+```svelte
+<div use:dropTarget={{ group: 'cards', onDrop: handleDrop }}>
+  {#each cards as card (card.id)}
+    <div use:draggable={{ id: card.id, group: 'cards', data: card }}>
+      {card.label}
+    </div>
+  {/each}
+</div>
+```
+
+#### Integration with `animate:live`
+
+The drag system does **not** move DOM elements during drag. On drop, the consumer updates a reactive array → Svelte's keyed `{#each}` + `animate:live` handles smooth FLIP reflow. The ghost fades out automatically, and sortable lists should reorder from emitted data rather than querying hover classes out of the DOM.
+
+---
+
 ## 8. Timing Utilities
 
 **Location:** [src/lib/timing.ts](src/lib/timing.ts)

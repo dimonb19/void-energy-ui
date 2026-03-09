@@ -1,0 +1,249 @@
+/* Drag-and-drop component styles.
+ *
+ * Physics-aware visual feedback for drag sources, drop targets, and ghost elements.
+ * States driven by data-drag-state / data-drop-position attributes.
+ *
+ * States:
+ * - dragging:     Source element while being dragged
+ * - drop-ready:   Drop target when a compatible drag is active
+ * - drop-hover:   Drop target being hovered by a compatible drag
+ * - drop-invalid: Drop target being hovered by an incompatible drag
+ */
+
+@use '../abstracts' as *;
+
+// ==========================================================================
+// DRAG SOURCE (element being dragged)
+// ==========================================================================
+
+[data-drag-state='dragging'] {
+  opacity: 0.4;
+  pointer-events: none;
+  cursor: grabbing;
+  transition:
+    opacity var(--speed-fast) var(--ease-spring-snappy),
+    transform var(--speed-base) var(--ease-spring-gentle);
+
+  @include when-glass {
+    opacity: 0.3;
+  }
+
+  @include when-retro {
+    opacity: 0;
+    transition: none;
+  }
+}
+
+// ==========================================================================
+// DROP TARGETS
+// ==========================================================================
+
+// Compatible drag is active somewhere — subtle affordance
+[data-drag-state='drop-ready'] {
+  border-color: alpha(var(--energy-primary), 40%);
+  box-shadow: inset 0 0 0 1px alpha(var(--energy-primary), 12%);
+  transition:
+    border-color var(--speed-fast) var(--ease-spring-snappy),
+    box-shadow var(--speed-fast) var(--ease-spring-snappy);
+
+  @include when-retro {
+    border-style: dashed;
+    transition: none;
+  }
+}
+
+// Being hovered by a compatible drag — strong affordance
+[data-drag-state='drop-hover'] {
+  border-color: var(--energy-primary);
+  box-shadow: var(--shadow-lift);
+  transform: scale(1.005);
+  position: relative;
+  transition:
+    border-color var(--speed-fast) var(--ease-spring-snappy),
+    box-shadow var(--speed-fast) var(--ease-spring-snappy),
+    transform var(--speed-fast) var(--ease-spring-snappy);
+
+  @include when-glass {
+    box-shadow: var(--shadow-lift);
+  }
+
+  @include when-flat {
+    box-shadow: var(--shadow-lift);
+  }
+
+  @include when-retro {
+    border-style: solid;
+    border-color: var(--energy-primary);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0
+      alpha(var(--energy-primary), 50%);
+    transform: none;
+    transition: none;
+  }
+}
+
+[data-drag-state='drop-hover'][data-drop-position] {
+  overflow: visible;
+}
+
+[data-drag-state='drop-hover'][data-drop-position]::before {
+  content: '';
+  position: absolute;
+  left: var(--space-md);
+  right: var(--space-md);
+  height: max(2px, var(--physics-border-width));
+  border-radius: var(--radius-full);
+  background: var(--energy-primary);
+  box-shadow:
+    0 0 0 1px alpha(var(--energy-primary), 25%),
+    0 0 14px alpha(var(--energy-primary), 22%);
+  pointer-events: none;
+  top: 0;
+  transform: translateY(-50%);
+
+  @include when-flat {
+    box-shadow: 0 0 0 1px alpha(var(--energy-primary), 30%);
+  }
+
+  @include when-retro {
+    box-shadow: none;
+    transform: none;
+    top: calc(var(--space-xs) * -1);
+  }
+}
+
+[data-drag-state='drop-hover'][data-drop-position='after']::before {
+  top: auto;
+  bottom: 0;
+  transform: translateY(50%);
+
+  @include when-retro {
+    bottom: calc(var(--space-xs) * -1);
+    transform: none;
+  }
+}
+
+// Incompatible drag hovering — rejection feedback
+[data-drag-state='drop-invalid'] {
+  border-color: var(--color-error);
+  opacity: 0.6;
+  transition:
+    border-color var(--speed-fast) var(--ease-spring-snappy),
+    opacity var(--speed-fast) var(--ease-spring-snappy);
+
+  @include when-retro {
+    transition: none;
+  }
+}
+
+// ==========================================================================
+// DRAG GHOST (fixed-position clone following pointer)
+// ==========================================================================
+
+.drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  z-index: z('overlay');
+  will-change: transform, left, top, opacity;
+
+  // Default: slight lift effect
+  opacity: 0.9;
+  transform: scale(1.03);
+  filter: drop-shadow(
+    0 4px 12px alpha(var(--bg-canvas), 40%)
+  ); // void-ignore: ghost shadow depth (physics constant)
+
+  @include when-glass {
+    $glow: drop-shadow(
+      0 0 8px alpha(var(--energy-primary), 30%)
+    ); // void-ignore: glow radius (physics constant)
+    $shadow: drop-shadow(
+      0 4px 12px alpha(var(--bg-canvas), 40%)
+    ); // void-ignore: shadow depth (physics constant)
+    filter: $glow $shadow;
+  }
+
+  @include when-flat {
+    transform: scale(1.01);
+    filter: drop-shadow(
+      0 2px 8px rgba(0, 0, 0, 0.1)
+    ); // void-ignore: flat ghost shadow (physics constant)
+  }
+
+  @include when-light {
+    filter: drop-shadow(
+      0 4px 12px alpha(var(--text-main), 15%)
+    ); // void-ignore: light-mode ghost shadow (physics constant)
+  }
+
+  @include when-retro {
+    transform: none;
+    filter: none;
+    opacity: 1;
+    outline: var(--physics-border-width) solid var(--energy-primary);
+    box-shadow: var(--shadow-offset) var(--shadow-offset) 0
+      var(--energy-primary);
+  }
+}
+
+// ==========================================================================
+// HANDLES + PRIMITIVE INTERNALS
+// ==========================================================================
+
+[data-drag-handle] {
+  cursor: grab;
+  touch-action: none;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+// Sortable item — physics border (layout via Tailwind in consumer markup)
+.drag-sort-item {
+  border: var(--physics-border-width) solid alpha(var(--energy-primary), 18%);
+}
+
+// Zone container — physics border (layout via Tailwind in consumer markup)
+.drag-zone {
+  min-height: calc(var(--control-height) * 6);
+  border: var(--physics-border-width) solid alpha(var(--energy-primary), 18%);
+}
+
+// Zone card — physics border (layout via Tailwind in consumer markup)
+.drag-zone-card {
+  border: var(--physics-border-width) solid alpha(var(--energy-secondary), 30%);
+}
+
+// Empty zone placeholder
+.drag-zone-empty {
+  min-height: calc(var(--control-height) * 3);
+  margin: 0;
+  border: var(--physics-border-width) dashed alpha(var(--energy-primary), 35%);
+  border-radius: var(--radius-lg);
+  color: var(--text-mute);
+
+  @include when-retro {
+    border-style: solid;
+  }
+}
+
+// ==========================================================================
+// REDUCED MOTION
+// ==========================================================================
+
+@media (prefers-reduced-motion: reduce) {
+  [data-drag-state='dragging'],
+  [data-drag-state='drop-ready'],
+  [data-drag-state='drop-hover'],
+  [data-drag-state='drop-invalid'],
+  .drag-ghost {
+    transition: none;
+    filter: none;
+    transform: none;
+  }
+
+  [data-drag-state='drop-hover'][data-drop-position='after']::before,
+  [data-drag-state='drop-hover'][data-drop-position='before']::before {
+    transform: none;
+  }
+}
