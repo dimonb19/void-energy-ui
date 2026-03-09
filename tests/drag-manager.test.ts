@@ -2,6 +2,50 @@ import { describe, expect, it, vi } from 'vitest';
 import { DragManager } from '@lib/drag-manager';
 import { draggable, reorderByDrop, resolveReorderByDrop } from '@actions/drag';
 
+function stubElementsFromPoint(elements: Element[] = []) {
+  Object.defineProperty(document, 'elementsFromPoint', {
+    value: vi.fn(() => elements),
+    configurable: true,
+    writable: true,
+  });
+}
+
+function createTouch(identifier: number, clientX: number, clientY: number) {
+  return { identifier, clientX, clientY } as Touch;
+}
+
+function dispatchTouchEvent(
+  target: EventTarget,
+  type: string,
+  touches: Touch[] = [],
+  changedTouches: Touch[] = touches,
+) {
+  const event = new Event(type, {
+    bubbles: true,
+    cancelable: true,
+  }) as Event & {
+    touches: Touch[];
+    changedTouches: Touch[];
+    targetTouches: Touch[];
+  };
+
+  Object.defineProperty(event, 'touches', {
+    value: touches,
+    configurable: true,
+  });
+  Object.defineProperty(event, 'changedTouches', {
+    value: changedTouches,
+    configurable: true,
+  });
+  Object.defineProperty(event, 'targetTouches', {
+    value: touches,
+    configurable: true,
+  });
+
+  target.dispatchEvent(event);
+  return event;
+}
+
 describe('reorderByDrop', () => {
   it('reorders items before and after an explicit target', () => {
     const items = [
@@ -190,6 +234,44 @@ describe('DragManager', () => {
     });
   });
 
+  it('resolves horizontal insertion using the target midpoint on the x axis', () => {
+    const manager = new DragManager();
+    const source = document.createElement('div');
+    const target = document.createElement('div');
+
+    source.setAttribute('aria-label', 'Beta');
+    target.setAttribute('aria-label', 'Gamma');
+
+    Object.defineProperty(target, 'getBoundingClientRect', {
+      value: () => new DOMRect(50, 20, 120, 40),
+      configurable: true,
+    });
+
+    stubElementsFromPoint([target]);
+    document.body.append(source, target);
+
+    manager.registerTarget(target, {
+      id: 'gamma',
+      group: 'board',
+      mode: 'between',
+      axis: 'horizontal',
+    });
+
+    manager.startDrag(source, 'beta', { id: 'beta' }, 'board', 60, 40);
+
+    expect(manager.updatePosition(60, 40)).toMatchObject({
+      target,
+      targetId: 'gamma',
+      position: 'before',
+    });
+
+    expect(manager.updatePosition(160, 40)).toMatchObject({
+      target,
+      targetId: 'gamma',
+      position: 'after',
+    });
+  });
+
   it('resolves keyboard hover to before for earlier items and after for later items', () => {
     const manager = new DragManager();
     const wrapper = document.createElement('div');
@@ -338,5 +420,131 @@ describe('draggable action', () => {
 
     instance.destroy();
     wrapper.remove();
+  });
+
+  it('does not start keyboard drag from nested controls when a handle is required', () => {
+    const wrapper = document.createElement('div');
+    const handle = document.createElement('button');
+    const action = document.createElement('button');
+
+    handle.className = 'drag-handle';
+    handle.textContent = 'Drag';
+    action.textContent = 'Action';
+    wrapper.append(handle, action);
+    document.body.appendChild(wrapper);
+
+    const instance = draggable(wrapper, {
+      id: 'wrap-2',
+      data: { id: 'wrap-2' },
+      handle: '.drag-handle',
+    });
+
+    action.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: ' ',
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+
+    expect(wrapper.getAttribute('data-drag-state')).toBeNull();
+
+    handle.dispatchEvent(
+      new KeyboardEvent('keydown', {
+        key: ' ',
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+
+    expect(wrapper.getAttribute('data-drag-state')).toBe('dragging');
+
+    instance.destroy();
+    wrapper.remove();
+  });
+
+  it('applies touch-action to custom handles and restores the original inline style', () => {
+    const wrapper = document.createElement('div');
+    const handle = document.createElement('button');
+
+    handle.className = 'drag-handle';
+    handle.style.touchAction = 'manipulation';
+    wrapper.appendChild(handle);
+    document.body.appendChild(wrapper);
+
+    const instance = draggable(wrapper, {
+      id: 'wrap-3',
+      data: { id: 'wrap-3' },
+      handle: '.drag-handle',
+    });
+
+    expect(handle.style.touchAction).toBe('none');
+
+    instance.update({
+      id: 'wrap-3',
+      data: { id: 'wrap-3' },
+      handle: '.drag-handle',
+      disabled: true,
+    });
+
+    expect(handle.style.touchAction).toBe('manipulation');
+
+    instance.destroy();
+    expect(handle.style.touchAction).toBe('manipulation');
+
+    wrapper.remove();
+  });
+
+  it('starts a touch drag after the activation threshold and suppresses the follow-up click', () => {
+    vi.useFakeTimers();
+    stubElementsFromPoint([]);
+
+    const node = document.createElement('div');
+    const outsideButton = document.createElement('button');
+    const outsideClick = vi.fn();
+
+    outsideButton.addEventListener('click', outsideClick);
+    document.body.append(node, outsideButton);
+
+    const instance = draggable(node, {
+      id: 'touch-1',
+      data: { id: 'touch-1' },
+    });
+
+    dispatchTouchEvent(node, 'touchstart', [createTouch(1, 10, 10)]);
+    const moveEvent = dispatchTouchEvent(window, 'touchmove', [
+      createTouch(1, 18, 18),
+    ]);
+
+    expect(moveEvent.defaultPrevented).toBe(true);
+    expect(node.getAttribute('data-drag-state')).toBe('dragging');
+
+    dispatchTouchEvent(window, 'touchend', [], [createTouch(1, 18, 18)]);
+
+    outsideButton.dispatchEvent(
+      new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+
+    expect(outsideClick).not.toHaveBeenCalled();
+
+    vi.advanceTimersByTime(500);
+
+    outsideButton.dispatchEvent(
+      new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+
+    expect(outsideClick).toHaveBeenCalledTimes(1);
+
+    instance.destroy();
+    node.remove();
+    outsideButton.remove();
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
   });
 });

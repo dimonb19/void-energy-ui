@@ -122,6 +122,34 @@
   }
 }
 
+[data-drop-axis='horizontal'][data-drag-state='drop-hover'][data-drop-position]::before {
+  top: var(--space-md);
+  bottom: var(--space-md);
+  left: 0;
+  right: auto;
+  width: max(2px, var(--physics-border-width));
+  height: auto;
+  transform: translateX(-50%);
+
+  @include when-retro {
+    top: var(--space-sm);
+    bottom: var(--space-sm);
+    left: calc(var(--space-xs) * -1);
+    transform: none;
+  }
+}
+
+[data-drop-axis='horizontal'][data-drag-state='drop-hover'][data-drop-position='after']::before {
+  left: auto;
+  right: 0;
+  transform: translateX(50%);
+
+  @include when-retro {
+    right: calc(var(--space-xs) * -1);
+    transform: none;
+  }
+}
+
 // Incompatible drag hovering — rejection feedback
 [data-drag-state='drop-invalid'] {
   border-color: var(--color-error);

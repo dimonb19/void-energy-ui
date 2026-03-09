@@ -55,6 +55,12 @@
   let dragActive = $derived(dragCounter > 0);
   let hasFiles = $derived(files.length > 0);
 
+  $effect(() => {
+    if (disabled && dragCounter !== 0) {
+      dragCounter = 0;
+    }
+  });
+
   // ---------------------------------------------------------------------------
   // Validation
   // ---------------------------------------------------------------------------
@@ -118,28 +124,45 @@
     onfiles?.(files);
   }
 
+  function isFileDrag(e: DragEvent): boolean {
+    const types = Array.from(e.dataTransfer?.types ?? []);
+    return types.includes('Files');
+  }
+
+  function isInternalDragTransition(e: DragEvent): boolean {
+    return (
+      e.currentTarget instanceof HTMLElement &&
+      e.relatedTarget instanceof Node &&
+      e.currentTarget.contains(e.relatedTarget)
+    );
+  }
+
   function handleDragEnter(e: DragEvent) {
+    if (disabled || !isFileDrag(e) || isInternalDragTransition(e)) return;
     e.preventDefault();
-    if (disabled) return;
     dragCounter++;
   }
 
   function handleDragOver(e: DragEvent) {
+    if (disabled || !isFileDrag(e)) return;
     e.preventDefault();
+    if (e.dataTransfer) {
+      e.dataTransfer.dropEffect = 'copy';
+    }
   }
 
   function handleDragLeave(e: DragEvent) {
+    if (disabled || !isFileDrag(e) || isInternalDragTransition(e)) return;
     e.preventDefault();
-    if (disabled) return;
-    dragCounter--;
+    dragCounter = Math.max(0, dragCounter - 1);
   }
 
   function handleDrop(e: DragEvent) {
+    if (disabled || !isFileDrag(e)) return;
     e.preventDefault();
-    if (disabled) return;
     dragCounter = 0;
 
-    if (e.dataTransfer?.files) {
+    if (e.dataTransfer?.files?.length) {
       processFiles(e.dataTransfer.files);
     }
   }

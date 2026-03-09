@@ -264,9 +264,15 @@ function getPhysicsConfig(el: HTMLElement): PhysicsConfig {
 
 /** Minimum pointer movement before committing to a drag gesture (px) */
 const ACTIVATION_THRESHOLD = 6;
+const SUPPRESS_CLICK_DURATION_MS = 400;
 
 const INTERACTIVE_SELECTOR =
   'button, a[href], input, select, textarea, summary, [contenteditable=""], [contenteditable="true"], [role="button"], [role="link"], [role="textbox"]';
+
+interface ManagedHandleState {
+  element: HTMLElement;
+  touchAction: string;
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Shared drag document state
@@ -277,6 +283,9 @@ let documentSelectionLock: {
   webkitUserSelect: string;
   cursor: string;
 } | null = null;
+
+let clickSuppressionTimeout: number | null = null;
+let clickSuppressionActive = false;
 
 /** Access body.style with webkit prefix safely (Safari requires it). */
 function getBodyStyle(): CSSStyleDeclaration & { webkitUserSelect: string } {
@@ -308,6 +317,63 @@ function unlockDocumentSelection(): void {
   style.webkitUserSelect = documentSelectionLock.webkitUserSelect;
   style.cursor = documentSelectionLock.cursor;
   documentSelectionLock = null;
+}
+
+function handleGlobalClickCapture(event: MouseEvent): void {
+  if (!clickSuppressionActive) return;
+
+  event.preventDefault();
+  event.stopPropagation();
+}
+
+function releaseGlobalClickSuppression(): void {
+  if (typeof window === 'undefined') return;
+
+  if (clickSuppressionTimeout !== null) {
+    window.clearTimeout(clickSuppressionTimeout);
+    clickSuppressionTimeout = null;
+  }
+
+  if (!clickSuppressionActive) return;
+
+  clickSuppressionActive = false;
+  window.removeEventListener('click', handleGlobalClickCapture, true);
+}
+
+function suppressNextClick(): void {
+  if (typeof window === 'undefined') return;
+
+  if (!clickSuppressionActive) {
+    clickSuppressionActive = true;
+    window.addEventListener('click', handleGlobalClickCapture, true);
+  }
+
+  if (clickSuppressionTimeout !== null) {
+    window.clearTimeout(clickSuppressionTimeout);
+  }
+
+  clickSuppressionTimeout = window.setTimeout(() => {
+    releaseGlobalClickSuppression();
+  }, SUPPRESS_CLICK_DURATION_MS);
+}
+
+function hasTouchEventSupport(): boolean {
+  return (
+    typeof window !== 'undefined' &&
+    typeof TouchEvent !== 'undefined' &&
+    'ontouchstart' in window
+  );
+}
+
+function getSurfaceTouchAction(axis: 'both' | 'x' | 'y' = 'both'): string {
+  switch (axis) {
+    case 'x':
+      return 'pan-y';
+    case 'y':
+      return 'pan-x';
+    default:
+      return 'none';
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -429,6 +495,9 @@ function shouldStartDrag(
 
 export function draggable(node: HTMLElement, options: DraggableOptions) {
   let opts = options;
+  const initialTabIndex = node.getAttribute('tabindex');
+  const initialDraggable = node.getAttribute('draggable');
+  const initialTouchAction = node.style.touchAction;
 
   let pendingPointerId: number | null = null;
   let activePointerId: number | null = null;
@@ -455,12 +524,47 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
   let touchTracking = false;
   let globalKeyTracking = false;
 
-  let suppressClick = false;
-  let suppressClickRaf: number | null = null;
+  let managedHandles: ManagedHandleState[] = [];
 
   let keyboardTargets: CompatibleTarget[] = [];
   let keyboardTargetIndex: number | null = null;
   let keyboardBoundaryIndex = 0;
+
+  function restoreManagedHandles(): void {
+    for (const { element, touchAction } of managedHandles) {
+      element.style.touchAction = touchAction;
+    }
+
+    managedHandles = [];
+  }
+
+  function getHandleElements(selector: string): HTMLElement[] {
+    const elements = new Set<HTMLElement>();
+
+    if (node.matches(selector)) {
+      elements.add(node);
+    }
+
+    node.querySelectorAll<HTMLElement>(selector).forEach((element) => {
+      elements.add(element);
+    });
+
+    return [...elements];
+  }
+
+  function syncHandleTouchActions(): void {
+    restoreManagedHandles();
+
+    if (!opts.handle || opts.disabled) return;
+
+    for (const handle of getHandleElements(opts.handle)) {
+      managedHandles.push({
+        element: handle,
+        touchAction: handle.style.touchAction,
+      });
+      handle.style.touchAction = 'none';
+    }
+  }
 
   function syncStaticAttributes(): void {
     if (!node.getAttribute('tabindex') && node.tabIndex < 0) {
@@ -471,15 +575,15 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
     node.setAttribute('data-drag-axis', opts.axis ?? 'both');
     node.setAttribute('draggable', 'false');
 
-    // When there's no handle, the entire node is the gesture surface —
-    // prevent the browser from intercepting touch as scroll/pan.
-    // With a handle, [data-drag-handle] { touch-action: none } in SCSS
-    // covers the handle element; the rest of the item stays scrollable.
-    if (!opts.handle && !opts.disabled) {
-      node.style.touchAction = 'none';
+    // On pointer-only touch platforms we need touch-action to keep the gesture in
+    // our control. When Touch Events are available, the touchmove path can wait
+    // for the activation threshold before canceling scroll.
+    if (!opts.handle && !opts.disabled && !hasTouchEventSupport()) {
+      node.style.touchAction = getSurfaceTouchAction(opts.axis);
     } else {
-      node.style.touchAction = '';
+      node.style.touchAction = initialTouchAction;
     }
+    syncHandleTouchActions();
 
     if (opts.disabled) {
       node.setAttribute('aria-disabled', 'true');
@@ -530,19 +634,6 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
     if (!globalKeyTracking || typeof window === 'undefined') return;
     globalKeyTracking = false;
     window.removeEventListener('keydown', handleGlobalKeyDown);
-  }
-
-  function queueSuppressClick(): void {
-    suppressClick = true;
-
-    if (suppressClickRaf !== null) {
-      cancelAnimationFrame(suppressClickRaf);
-    }
-
-    suppressClickRaf = requestAnimationFrame(() => {
-      suppressClick = false;
-      suppressClickRaf = null;
-    });
   }
 
   function findTouch(touches: TouchList): Touch | null {
@@ -737,7 +828,7 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
 
     const shouldRefocus = isKeyboardDrag;
     if (!isKeyboardDrag) {
-      queueSuppressClick();
+      suppressNextClick();
     }
 
     resetState();
@@ -785,7 +876,7 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
 
     const shouldRefocus = isKeyboardDrag;
     if (!isKeyboardDrag) {
-      queueSuppressClick();
+      suppressNextClick();
     }
 
     resetState();
@@ -833,8 +924,8 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
 
   function handlePointerDown(event: PointerEvent): void {
     if (opts.disabled || dragManager.isDragging) return;
-    if (!event.isPrimary || event.pointerType === 'touch' || event.button !== 0)
-      return;
+    if (!event.isPrimary || event.button !== 0) return;
+    if (event.pointerType === 'touch' && hasTouchEventSupport()) return;
     if (!shouldStartDrag(node, event.target, opts.handle)) return;
 
     if (opts.handle) {
@@ -972,8 +1063,10 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
 
   function handleKeyDown(event: KeyboardEvent): void {
     if (opts.disabled) return;
+    const canStartFromTarget = shouldStartDrag(node, event.target, opts.handle);
 
     if (event.key === 'Enter' || event.key === ' ') {
+      if (!isKeyboardDrag && !canStartFromTarget) return;
       event.preventDefault();
 
       if (!isKeyboardDrag) {
@@ -1024,12 +1117,6 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
     cancelDrag();
   }
 
-  function handleClickCapture(event: MouseEvent): void {
-    if (!suppressClick) return;
-    event.preventDefault();
-    event.stopPropagation();
-  }
-
   function handleNativeDrag(event: DragEvent): void {
     event.preventDefault();
   }
@@ -1039,7 +1126,6 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
   node.addEventListener('pointerdown', handlePointerDown);
   node.addEventListener('touchstart', handleTouchStart, { passive: true });
   node.addEventListener('keydown', handleKeyDown);
-  node.addEventListener('click', handleClickCapture, true);
   node.addEventListener('dragstart', handleNativeDrag);
 
   return {
@@ -1062,18 +1148,27 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
       node.removeEventListener('pointerdown', handlePointerDown);
       node.removeEventListener('touchstart', handleTouchStart);
       node.removeEventListener('keydown', handleKeyDown);
-      node.removeEventListener('click', handleClickCapture, true);
       node.removeEventListener('dragstart', handleNativeDrag);
-
-      if (suppressClickRaf !== null) {
-        cancelAnimationFrame(suppressClickRaf);
-      }
+      restoreManagedHandles();
 
       node.removeAttribute('aria-disabled');
       node.removeAttribute('data-drag-axis');
       node.removeAttribute('data-drag-id');
       node.removeAttribute('data-drag-state');
-      node.style.touchAction = '';
+
+      if (initialTabIndex === null) {
+        node.removeAttribute('tabindex');
+      } else {
+        node.setAttribute('tabindex', initialTabIndex);
+      }
+
+      if (initialDraggable === null) {
+        node.removeAttribute('draggable');
+      } else {
+        node.setAttribute('draggable', initialDraggable);
+      }
+
+      node.style.touchAction = initialTouchAction;
     },
   };
 }
