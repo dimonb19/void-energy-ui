@@ -4892,7 +4892,7 @@ await handle; // or handle.abort();
 **Location:** [src/actions/drag.ts](src/actions/drag.ts), [src/lib/drag-manager.ts](src/lib/drag-manager.ts)
 **CSS:** `data-drag-state` + `data-drop-position` attribute selectors ([src/styles/components/_drag.scss](src/styles/components/_drag.scss))
 
-Two actions that work together: `use:draggable` makes elements draggable, `use:dropTarget` makes elements accept drops. A singleton `DragManager` coordinates hit testing, group matching, sortable insertion (`before` / `after`), and screen reader announcements.
+Two actions that work together: `use:draggable` makes elements draggable, `use:dropTarget` makes elements accept drops. A singleton `DragManager` coordinates hit testing, group matching, sortable insertion (`before` / `after`), and screen reader announcements. Hit testing resolves nested children (including SVG elements inside icon buttons) back to their registered parent drop target, so sortable items remain reliable even when the pointer is over inner buttons or content wrappers.
 
 #### `use:draggable` Props
 
@@ -4926,12 +4926,14 @@ Two actions that work together: `use:draggable` makes elements draggable, `use:d
 
 | State | Applied to | Visual |
 | --- | --- | --- |
-| `dragging` | Source element | Dimmed opacity, pointer-events none |
+| `dragging` | Source element | Dimmed opacity (0.4 default, 0.3 glass, 0 retro), pointer-events none |
 | `drop-ready` | All compatible targets | Subtle primary border |
 | `drop-hover` | Target being hovered | Strong primary border + lift shadow |
 | `drop-invalid` | Incompatible target hovered | Error border + dimmed |
 
-For sortable targets (`mode: 'between'`), hovered elements also receive `data-drop-position="before"` or `data-drop-position="after"` so CSS can render an insertion line.
+For sortable targets (`mode: 'between'`), hovered elements also receive `data-drop-position="before"` or `data-drop-position="after"` so CSS can render an insertion line via `::before` pseudo-element.
+
+The source element's `dragging` state is preserved throughout the drag — the DragManager skips the source when syncing drop-target states, so the dimmed appearance is never overwritten by `drop-ready` or `drop-invalid`.
 
 #### Physics Integration
 
@@ -4954,11 +4956,27 @@ Screen reader announcements via `aria-live` region: "Picked up [label]", "Drop b
 
 #### Interactive Elements
 
-When `use:draggable` is applied without a `handle`, pointer drags are blocked from nested interactive children (buttons, links, inputs) to prevent gesture conflicts. The draggable node itself is always allowed — even if it's a `<button>` or `<a>`. When a `handle` selector is provided, only clicks on the handle start a drag, bypassing the interactive check entirely.
+When `use:draggable` is applied without a `handle`, pointer drags are blocked from nested interactive children (buttons, links, inputs) to prevent gesture conflicts. The draggable node itself is always allowed — even if it's a `<button>` or `<a>`. When a `handle` selector is provided, only clicks on the handle start a drag, bypassing the interactive check entirely. Handle matching uses `Element.closest()` so it resolves correctly even when the click target is an SVG child element inside the handle button.
+
+#### Touch Support
+
+Touch gestures are handled via dedicated `touchstart`/`touchmove`/`touchend` listeners (Pointer Events skip `pointerType: 'touch'`). Key details:
+
+- **Handleless draggables** get `touch-action: none` (inline style) so the browser doesn't intercept the gesture as scroll/pan before the activation threshold is reached.
+- **Handle-based draggables** rely on `[data-drag-handle] { touch-action: none }` in SCSS — only the handle suppresses browser gestures, keeping the rest of the item scrollable.
+- The `touchmove` listener is registered with `{ passive: false }` to allow `preventDefault()` once the drag activates.
+- Activation threshold is the same as pointer (6px) to distinguish tap from drag.
 
 #### Sortable Helpers
 
-`reorderByDrop(items, detail)` is exported from `@actions/drag` for keyed list reordering. It expects `detail.id`, `detail.targetId`, and `detail.position`.
+`reorderByDrop(items, detail)` is exported from `@actions/drag` for keyed list reordering when you only need the next array.
+
+`resolveReorderByDrop(items, detail)` returns:
+- `items`: reordered collection
+- `item`: moved item
+- `request`: backend-ready payload with `id`, `targetId`, `position`, `fromIndex`, `toIndex`, `previousId`, `nextId`, and `orderedIds`
+
+`request.fromIndex` is the source index in the original input array. `request.toIndex` is the final index in the reordered result.
 
 #### Usage: Sortable List
 
@@ -4995,12 +5013,68 @@ When `use:draggable` is applied without a `handle`, pointer drags are blocked fr
 {/each}
 ```
 
-#### Usage: Drag Between Zones
+#### Usage: Sortable List with Backend Persistence
 
 ```svelte
-<div use:dropTarget={{ group: 'cards', onDrop: handleDrop }}>
-  {#each cards as card (card.id)}
-    <div use:draggable={{ id: card.id, group: 'cards', data: card }}>
+<script>
+  import { draggable, dropTarget, resolveReorderByDrop } from '@actions/drag';
+
+  function handleReorder(detail) {
+    const change = resolveReorderByDrop(items, detail);
+    if (!change) return;
+
+    items = change.items;
+    void fetch('/api/items/reorder', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(change.request)
+    });
+  }
+</script>
+```
+
+#### Usage: Kanban Zones (Cross-Zone + Within-Zone Sorting)
+
+Cards are both draggable and sortable drop targets (`mode: 'between'`). Zone containers are drop targets with `mode: 'inside'` to accept drops on empty space. A single handler checks `detail.position` to distinguish reorder from transfer.
+
+```svelte
+<script>
+  import { draggable, dropTarget, reorderByDrop } from '@actions/drag';
+  import { live } from '@lib/transitions.svelte';
+
+  function handleKanbanDrop(detail) {
+    const card = detail.data;
+    const sourceZone = findCardZone(card.id);
+
+    if (detail.position === 'before' || detail.position === 'after') {
+      // Dropped on a card — reorder or cross-zone insert
+      const targetZone = findCardZone(detail.targetId);
+      if (sourceZone === targetZone) {
+        zones[targetZone] = reorderByDrop(zones[targetZone], detail);
+      } else {
+        removeFromZone(sourceZone, card.id);
+        insertIntoZone(targetZone, card, detail.targetId, detail.position);
+      }
+    } else {
+      // Dropped on zone container — transfer and append
+      removeFromZone(sourceZone, card.id);
+      appendToZone(detail.targetId, card);
+    }
+  }
+</script>
+
+<!-- Zone container: mode 'inside' catches drops on empty space -->
+<div use:dropTarget={{ id: 'todo', group: 'kanban', onDrop: handleKanbanDrop }}>
+  {#each todoCards as card (card.id)}
+    <div
+      use:draggable={{ id: card.id, group: 'kanban', data: card }}
+      use:dropTarget={{
+        id: card.id, group: 'kanban',
+        mode: 'between', axis: 'vertical',
+        onDrop: handleKanbanDrop
+      }}
+      animate:live
+    >
       {card.label}
     </div>
   {/each}

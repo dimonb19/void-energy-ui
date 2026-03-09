@@ -122,6 +122,36 @@ type ReorderLike = {
   position?: DropPosition;
 };
 
+type SortableDropPosition = Extract<DropPosition, 'before' | 'after'>;
+
+export interface ReorderRequest {
+  /** Moved item identifier */
+  id: string;
+  /** Item the drop was resolved against */
+  targetId: string;
+  /** Placement relative to targetId */
+  position: SortableDropPosition;
+  /** Original index in the input array before the move */
+  fromIndex: number;
+  /** Final index in the reordered array after the move */
+  toIndex: number;
+  /** Immediate predecessor after the move */
+  previousId: string | null;
+  /** Immediate successor after the move */
+  nextId: string | null;
+  /** Full ordered ID list for backends that persist the canonical order */
+  orderedIds: string[];
+}
+
+export interface ReorderChange<T extends { id: string }> {
+  /** Reordered collection */
+  items: T[];
+  /** The item that moved */
+  item: T;
+  /** Backend-ready reorder payload */
+  request: ReorderRequest;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Utilities
 // ─────────────────────────────────────────────────────────────────────────────
@@ -136,15 +166,28 @@ export function reorderByDrop<T extends { id: string }>(
   items: T[],
   detail: ReorderLike,
 ): T[] {
-  if (!detail.targetId) return items;
-  if (detail.position !== 'before' && detail.position !== 'after') return items;
-  if (detail.id === detail.targetId) return items;
+  return resolveReorderByDrop(items, detail)?.items ?? items;
+}
+
+/**
+ * Resolve a sortable drop into both the next collection state and a
+ * backend-ready payload describing the move.
+ *
+ * Returns null when the detail does not produce a meaningful reorder.
+ */
+export function resolveReorderByDrop<T extends { id: string }>(
+  items: T[],
+  detail: ReorderLike,
+): ReorderChange<T> | null {
+  if (!detail.targetId) return null;
+  if (detail.position !== 'before' && detail.position !== 'after') return null;
+  if (detail.id === detail.targetId) return null;
 
   const fromIndex = items.findIndex((item) => item.id === detail.id);
   const targetIndex = items.findIndex((item) => item.id === detail.targetId);
 
   if (fromIndex === -1 || targetIndex === -1) {
-    return items;
+    return null;
   }
 
   const next = [...items];
@@ -152,17 +195,32 @@ export function reorderByDrop<T extends { id: string }>(
   const insertionIndex = next.findIndex((item) => item.id === detail.targetId);
 
   if (!moved || insertionIndex === -1) {
-    return items;
+    return null;
   }
 
-  next.splice(
-    detail.position === 'after' ? insertionIndex + 1 : insertionIndex,
-    0,
-    moved,
-  );
+  const toIndex =
+    detail.position === 'after' ? insertionIndex + 1 : insertionIndex;
+  next.splice(toIndex, 0, moved);
 
   const changed = next.some((item, index) => item !== items[index]);
-  return changed ? next : items;
+  if (!changed) {
+    return null;
+  }
+
+  return {
+    items: next,
+    item: moved,
+    request: {
+      id: detail.id,
+      targetId: detail.targetId,
+      position: detail.position,
+      fromIndex,
+      toIndex,
+      previousId: next[toIndex - 1]?.id ?? null,
+      nextId: next[toIndex + 1]?.id ?? null,
+      orderedIds: next.map((item) => item.id),
+    },
+  };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -321,8 +379,8 @@ function removeGhost(ghost: HTMLElement, physics: PhysicsConfig): void {
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-function asHTMLElement(target: EventTarget | null): HTMLElement | null {
-  return target instanceof HTMLElement ? target : null;
+function asElement(target: EventTarget | null): Element | null {
+  return target instanceof Element ? target : null;
 }
 
 function isHandleMatch(
@@ -330,7 +388,7 @@ function isHandleMatch(
   target: EventTarget | null,
   selector: string,
 ): boolean {
-  const element = asHTMLElement(target);
+  const element = asElement(target);
   if (!element) return false;
 
   const handle = element.closest(selector);
@@ -341,7 +399,7 @@ function isInteractiveDescendant(
   node: HTMLElement,
   target: EventTarget | null,
 ): boolean {
-  const element = asHTMLElement(target);
+  const element = asElement(target);
   if (!element) return false;
 
   const interactive = element.closest(INTERACTIVE_SELECTOR);
@@ -412,6 +470,16 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
     node.setAttribute('data-drag-id', opts.id);
     node.setAttribute('data-drag-axis', opts.axis ?? 'both');
     node.setAttribute('draggable', 'false');
+
+    // When there's no handle, the entire node is the gesture surface —
+    // prevent the browser from intercepting touch as scroll/pan.
+    // With a handle, [data-drag-handle] { touch-action: none } in SCSS
+    // covers the handle element; the rest of the item stays scrollable.
+    if (!opts.handle && !opts.disabled) {
+      node.style.touchAction = 'none';
+    } else {
+      node.style.touchAction = '';
+    }
 
     if (opts.disabled) {
       node.setAttribute('aria-disabled', 'true');
@@ -769,6 +837,12 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
       return;
     if (!shouldStartDrag(node, event.target, opts.handle)) return;
 
+    if (opts.handle) {
+      // Drag handles are gesture-only affordances, so suppress native button/link
+      // activation on pointer press to keep the drag initiation stable.
+      event.preventDefault();
+    }
+
     pendingPointerId = event.pointerId;
     pendingStartX = event.clientX;
     pendingStartY = event.clientY;
@@ -999,6 +1073,7 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
       node.removeAttribute('data-drag-axis');
       node.removeAttribute('data-drag-id');
       node.removeAttribute('data-drag-state');
+      node.style.touchAction = '';
     },
   };
 }

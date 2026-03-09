@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { DragManager } from '@lib/drag-manager';
-import { reorderByDrop, draggable } from '@actions/drag';
+import { draggable, reorderByDrop, resolveReorderByDrop } from '@actions/drag';
 
 describe('reorderByDrop', () => {
   it('reorders items before and after an explicit target', () => {
@@ -41,6 +41,58 @@ describe('reorderByDrop', () => {
         position: 'inside',
       }),
     ).toBe(items);
+  });
+});
+
+describe('resolveReorderByDrop', () => {
+  it('returns reordered items and a backend-ready payload', () => {
+    const items = [
+      { id: 'a', label: 'Alpha' },
+      { id: 'b', label: 'Beta' },
+      { id: 'c', label: 'Gamma' },
+      { id: 'd', label: 'Delta' },
+    ];
+
+    expect(
+      resolveReorderByDrop(items, {
+        id: 'b',
+        targetId: 'd',
+        position: 'after',
+      }),
+    ).toMatchObject({
+      items: [
+        { id: 'a', label: 'Alpha' },
+        { id: 'c', label: 'Gamma' },
+        { id: 'd', label: 'Delta' },
+        { id: 'b', label: 'Beta' },
+      ],
+      item: { id: 'b', label: 'Beta' },
+      request: {
+        id: 'b',
+        targetId: 'd',
+        position: 'after',
+        fromIndex: 1,
+        toIndex: 3,
+        previousId: 'd',
+        nextId: null,
+        orderedIds: ['a', 'c', 'd', 'b'],
+      },
+    });
+  });
+
+  it('returns null when the drop does not change order', () => {
+    const items = [
+      { id: 'a', label: 'Alpha' },
+      { id: 'b', label: 'Beta' },
+    ];
+
+    expect(
+      resolveReorderByDrop(items, {
+        id: 'a',
+        targetId: 'b',
+        position: 'before',
+      }),
+    ).toBeNull();
   });
 });
 
@@ -98,6 +150,44 @@ describe('DragManager', () => {
         position: 'before',
       }),
     );
+  });
+
+  it('resolves a nested child back to its registered drop target', () => {
+    const manager = new DragManager();
+    const source = document.createElement('div');
+    const target = document.createElement('div');
+    const child = document.createElement('button');
+
+    source.setAttribute('aria-label', 'Beta');
+    target.setAttribute('aria-label', 'Gamma');
+    target.appendChild(child);
+
+    Object.defineProperty(target, 'getBoundingClientRect', {
+      value: () => new DOMRect(0, 50, 120, 40),
+      configurable: true,
+    });
+
+    Object.defineProperty(document, 'elementsFromPoint', {
+      value: vi.fn(() => [child]),
+      configurable: true,
+      writable: true,
+    });
+
+    document.body.append(source, target);
+
+    manager.registerTarget(target, {
+      id: 'gamma',
+      group: 'list',
+      mode: 'between',
+    });
+
+    manager.startDrag(source, 'beta', { id: 'beta' }, 'list', 20, 85);
+
+    expect(manager.updatePosition(20, 85)).toMatchObject({
+      target,
+      targetId: 'gamma',
+      position: 'after',
+    });
   });
 
   it('resolves keyboard hover to before for earlier items and after for later items', () => {

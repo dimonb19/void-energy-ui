@@ -7,8 +7,11 @@
     dropTarget,
     reorderByDrop,
     type DropDetail,
+    type DropPosition,
   } from '@actions/drag';
-  import { live } from '@lib/transitions.svelte';
+  import { live, emerge, dissolve } from '@lib/transitions.svelte';
+
+  // ── Sortable List ───────────────────────────────────────────────────────
 
   interface ListItem {
     id: string;
@@ -40,17 +43,21 @@
     const toIndex = fromIndex + direction;
     if (toIndex < 0 || toIndex >= sortableItems.length) return;
 
-    const next = [...sortableItems];
-    const [moved] = next.splice(fromIndex, 1);
-    if (!moved) return;
+    const targetId = sortableItems[toIndex]?.id;
+    if (!targetId) return;
 
-    next.splice(toIndex, 0, moved);
-    sortableItems = next;
+    sortableItems = reorderByDrop(sortableItems, {
+      id,
+      targetId,
+      position: direction > 0 ? 'after' : 'before',
+    });
   }
 
   function resetSortable(): void {
     sortableItems = [...initialItems];
   }
+
+  // ── Kanban Zones ────────────────────────────────────────────────────────
 
   interface CardItem {
     id: string;
@@ -58,34 +65,90 @@
   }
 
   const initialZoneA: CardItem[] = [
-    { id: 'card-1', label: 'Task A' },
-    { id: 'card-2', label: 'Task B' },
-    { id: 'card-3', label: 'Task C' },
+    { id: 'card-1', label: 'Design Review' },
+    { id: 'card-2', label: 'API Integration' },
+    { id: 'card-3', label: 'Unit Tests' },
+  ];
+
+  const initialZoneB: CardItem[] = [
+    { id: 'card-4', label: 'Documentation' },
+    { id: 'card-5', label: 'Code Review' },
   ];
 
   let zoneA = $state<CardItem[]>([...initialZoneA]);
-  let zoneB = $state<CardItem[]>([]);
+  let zoneB = $state<CardItem[]>([...initialZoneB]);
 
-  function handleZoneDrop(targetZone: 'a' | 'b', detail: DropDetail): void {
-    const card = detail.data as CardItem;
+  function findCardZone(cardId: string): 'a' | 'b' | null {
+    if (zoneA.some((c) => c.id === cardId)) return 'a';
+    if (zoneB.some((c) => c.id === cardId)) return 'b';
+    return null;
+  }
 
-    if (targetZone === 'b') {
-      zoneA = zoneA.filter((item) => item.id !== card.id);
-      if (!zoneB.find((item) => item.id === card.id)) {
-        zoneB = [...zoneB, card];
-      }
+  function removeFromZone(zone: 'a' | 'b', cardId: string): void {
+    if (zone === 'a') zoneA = zoneA.filter((c) => c.id !== cardId);
+    else zoneB = zoneB.filter((c) => c.id !== cardId);
+  }
+
+  function insertIntoZone(
+    zone: 'a' | 'b',
+    card: CardItem,
+    targetId: string,
+    position: DropPosition,
+  ): void {
+    const items = zone === 'a' ? [...zoneA] : [...zoneB];
+    const targetIndex = items.findIndex((c) => c.id === targetId);
+
+    if (targetIndex === -1) {
+      appendToZone(zone, card);
       return;
     }
 
-    zoneB = zoneB.filter((item) => item.id !== card.id);
-    if (!zoneA.find((item) => item.id === card.id)) {
-      zoneA = [...zoneA, card];
+    const insertAt = position === 'after' ? targetIndex + 1 : targetIndex;
+    items.splice(insertAt, 0, card);
+
+    if (zone === 'a') zoneA = items;
+    else zoneB = items;
+  }
+
+  function appendToZone(zone: 'a' | 'b', card: CardItem): void {
+    if (zone === 'a') zoneA = [...zoneA, card];
+    else zoneB = [...zoneB, card];
+  }
+
+  function handleKanbanDrop(detail: DropDetail): void {
+    const card = detail.data as CardItem;
+    const sourceZone = findCardZone(card.id);
+    if (!sourceZone) return;
+
+    if (detail.position === 'before' || detail.position === 'after') {
+      // Dropped on another card — reorder or cross-zone insert
+      const targetZone = findCardZone(detail.targetId!);
+      if (!targetZone) return;
+
+      if (sourceZone === targetZone) {
+        // Same zone: reorder in place
+        if (targetZone === 'a') {
+          zoneA = reorderByDrop(zoneA, detail);
+        } else {
+          zoneB = reorderByDrop(zoneB, detail);
+        }
+      } else {
+        // Cross-zone: remove from source, insert at position in target
+        removeFromZone(sourceZone, card.id);
+        insertIntoZone(targetZone, card, detail.targetId!, detail.position);
+      }
+    } else {
+      // Dropped on zone container (mode: 'inside') — transfer and append
+      const targetZone = detail.targetId === 'zone-a' ? 'a' : 'b';
+      if (sourceZone === targetZone) return;
+      removeFromZone(sourceZone, card.id);
+      appendToZone(targetZone, card);
     }
   }
 
   function resetZones(): void {
     zoneA = [...initialZoneA];
-    zoneB = [];
+    zoneB = [...initialZoneB];
   }
 </script>
 
@@ -94,21 +157,89 @@
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
-      Custom drag-and-drop for real UI work: explicit sortable insertion,
-      keyboard parity, pointer-safe handles, and finished physics states.
-      Sortable drops expose <code>targetId</code> +
-      <code>position</code>, so reorder logic stays in reactive data instead of
-      DOM queries.
+      Pointer Events-based drag-and-drop with a custom ghost element,
+      physics-aware visual states, full keyboard parity, and screen reader
+      announcements. Not built on the HTML5 Drag and Drop API.
     </p>
 
+    <details>
+      <summary>Technical Details</summary>
+      <div class="p-md flex flex-col gap-md">
+        <div class="flex flex-col gap-xs">
+          <p class="text-small text-dim font-medium">Keyboard</p>
+          <p class="text-small text-mute">
+            <strong>Enter</strong> or <strong>Space</strong> to pick up,
+            <strong>Arrow keys</strong> to cycle targets,
+            <strong>Home / End</strong> to jump to first / last,
+            <strong>Enter</strong> to drop, <strong>Escape</strong> to cancel.
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-xs">
+          <p class="text-small text-dim font-medium">Screen Reader</p>
+          <p class="text-small text-mute">
+            An <code>aria-live</code> region announces pickup, navigation between
+            targets, drop confirmation, and cancellation.
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-xs">
+          <p class="text-small text-dim font-medium">Physics Integration</p>
+          <p class="text-small text-mute">
+            The ghost element adapts per physics preset: glass adds a glow and
+            lift, flat uses a subtle shadow, retro uses a hard outline with an
+            offset shadow. Transition speeds are read from
+            <code>--speed-base</code> and <code>--ease-spring-gentle</code>. All
+            feedback is disabled under <code>prefers-reduced-motion</code>.
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-xs">
+          <p class="text-small text-dim font-medium">Sortable Insertion</p>
+          <p class="text-small text-mute">
+            <code>mode: 'between'</code> resolves <code>before</code> or
+            <code>after</code> by comparing the pointer position to the target
+            element's midpoint. A <code>::before</code> pseudo-element renders the
+            insertion indicator line.
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-xs">
+          <p class="text-small text-dim font-medium">WCAG 2.2 Compliance</p>
+          <p class="text-small text-mute">
+            Move buttons satisfy
+            <strong>2.5.7 Dragging Movements</strong> by providing a
+            single-pointer alternative. When a <code>handle</code> selector is set,
+            nested interactive children (buttons, links, inputs) are automatically
+            excluded from drag initiation.
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-xs">
+          <p class="text-small text-dim font-medium">Backend Persistence</p>
+          <p class="text-small text-mute">
+            <code>resolveReorderByDrop(items, detail)</code> returns both the
+            reordered array and a <code>ReorderRequest</code> payload with
+            <code>id</code>, <code>targetId</code>, <code>position</code>,
+            <code>fromIndex</code>, <code>toIndex</code>,
+            <code>previousId</code>, <code>nextId</code>, and
+            <code>orderedIds</code>. Use
+            <code>reorderByDrop(items, detail)</code>
+            when you only need the reordered array.
+          </p>
+        </div>
+      </div>
+    </details>
+
+    <!-- Sortable List -->
     <div class="flex flex-col gap-sm">
       <div class="flex flex-col gap-xs">
         <h5>Sortable List</h5>
         <p class="text-small text-mute">
           Each item is both <code>use:draggable</code> and
           <code>use:dropTarget</code> with <code>mode: 'between'</code>. Drag
-          from the handle, drop before or after a sibling, or use the move
-          buttons as a non-drag alternative.
+          from the grip handle, drop before or after a sibling. Move buttons
+          provide a non-drag alternative for WCAG 2.5.7.
         </p>
       </div>
 
@@ -204,18 +335,23 @@
       </div>
 
       <p class="text-caption text-mute px-xs">
-        Sortable items no longer rely on <code>querySelector</code> against
-        transient hover state. Use <code>reorderByDrop(items, detail)</code>
-        with the emitted <code>targetId</code> and <code>position</code>.
+        Use <code>reorderByDrop(items, detail)</code> for local reorder, or
+        <code>resolveReorderByDrop(items, detail)</code> when you also need a
+        backend-ready <code>ReorderRequest</code> payload.
       </p>
     </div>
 
+    <!-- Kanban Zones -->
     <div class="flex flex-col gap-sm">
       <div class="flex flex-col gap-xs">
-        <h5>Drag Between Zones</h5>
+        <h5>Kanban Zones</h5>
         <p class="text-small text-mute">
-          Zone containers use the default <code>inside</code> drop mode, so the detail
-          represents a direct transfer rather than before/after insertion.
+          Cards are sortable within each column and transferable between
+          columns. Each card registers both <code>use:draggable</code> and
+          <code>use:dropTarget</code> with <code>mode: 'between'</code> for
+          insertion ordering. Zone containers register a second
+          <code>use:dropTarget</code> with <code>mode: 'inside'</code> so empty zones
+          can still accept drops.
         </p>
       </div>
 
@@ -224,28 +360,38 @@
 
         <div class="grid grid-cols-1 gap-md md:grid-cols-2">
           <div
-            class="drag-zone surface-glass flex flex-col gap-md p-lg"
-            aria-label="Zone A"
+            class="drag-zone surface-sunk flex flex-col gap-md p-lg"
+            aria-label="To Do"
             use:dropTarget={{
-              group: 'zones',
-              onDrop: (detail) => handleZoneDrop('a', detail),
+              id: 'zone-a',
+              group: 'kanban',
+              onDrop: handleKanbanDrop,
             }}
           >
             <div class="flex items-center justify-between gap-sm">
-              <h6 class="text-small text-dim">Zone A</h6>
+              <h6 class="text-small text-dim">To Do</h6>
               <span class="text-caption text-mute">{zoneA.length} cards</span>
             </div>
 
             <div class="flex flex-1 flex-col gap-sm">
               {#each zoneA as card (card.id)}
                 <div
-                  class="drag-zone-card surface-sunk p-md cursor-grab"
+                  class="drag-zone-card surface-glass p-md cursor-grab"
                   aria-label={card.label}
                   use:draggable={{
                     id: card.id,
-                    group: 'zones',
+                    group: 'kanban',
                     data: card,
                   }}
+                  use:dropTarget={{
+                    id: card.id,
+                    group: 'kanban',
+                    mode: 'between',
+                    axis: 'vertical',
+                    onDrop: handleKanbanDrop,
+                  }}
+                  in:emerge
+                  out:dissolve
                   animate:live
                 >
                   <span class="text-small font-medium">{card.label}</span>
@@ -253,7 +399,11 @@
               {/each}
 
               {#if zoneA.length === 0}
-                <p class="drag-zone-empty grid place-items-center">
+                <p
+                  class="drag-zone-empty grid place-items-center"
+                  in:emerge
+                  out:dissolve
+                >
                   Drop cards here
                 </p>
               {/if}
@@ -261,28 +411,38 @@
           </div>
 
           <div
-            class="drag-zone surface-glass flex flex-col gap-md p-lg"
-            aria-label="Zone B"
+            class="drag-zone surface-sunk flex flex-col gap-md p-lg"
+            aria-label="Done"
             use:dropTarget={{
-              group: 'zones',
-              onDrop: (detail) => handleZoneDrop('b', detail),
+              id: 'zone-b',
+              group: 'kanban',
+              onDrop: handleKanbanDrop,
             }}
           >
             <div class="flex items-center justify-between gap-sm">
-              <h6 class="text-small text-dim">Zone B</h6>
+              <h6 class="text-small text-dim">Done</h6>
               <span class="text-caption text-mute">{zoneB.length} cards</span>
             </div>
 
             <div class="flex flex-1 flex-col gap-sm">
               {#each zoneB as card (card.id)}
                 <div
-                  class="drag-zone-card surface-sunk p-md cursor-grab"
+                  class="drag-zone-card surface-glass p-md cursor-grab"
                   aria-label={card.label}
                   use:draggable={{
                     id: card.id,
-                    group: 'zones',
+                    group: 'kanban',
                     data: card,
                   }}
+                  use:dropTarget={{
+                    id: card.id,
+                    group: 'kanban',
+                    mode: 'between',
+                    axis: 'vertical',
+                    onDrop: handleKanbanDrop,
+                  }}
+                  in:emerge
+                  out:dissolve
                   animate:live
                 >
                   <span class="text-small font-medium">{card.label}</span>
@@ -290,7 +450,11 @@
               {/each}
 
               {#if zoneB.length === 0}
-                <p class="drag-zone-empty grid place-items-center">
+                <p
+                  class="drag-zone-empty grid place-items-center"
+                  in:emerge
+                  out:dissolve
+                >
                   Drop cards here
                 </p>
               {/if}
@@ -300,16 +464,18 @@
       </div>
 
       <p class="text-caption text-mute px-xs">
-        Containers use <code>use:dropTarget</code> with the default
-        <code>inside</code> mode. Cards keep the interaction lightweight: pointer
-        drag, keyboard pickup, and transfer on drop.
+        Nested drop targets resolve naturally: the pointer over a card hits the
+        card's <code>mode: 'between'</code> target first; over empty space it
+        hits the zone's <code>mode: 'inside'</code> target. A single handler
+        checks <code>detail.position</code> to distinguish reorder from transfer.
       </p>
     </div>
 
     <details>
       <summary>View Code</summary>
       <pre><code
-          >&lt;script&gt;
+          >&lt;!-- Sortable List --&gt;
+&lt;script&gt;
   import &#123; draggable, dropTarget, reorderByDrop &#125; from '@actions/drag';
   import &#123; live &#125; from '@lib/transitions.svelte';
 
@@ -340,7 +506,50 @@
       &#123;item.label&#125;
     &lt;/li&gt;
   &#123;/each&#125;
-&lt;/ol&gt;</code
+&lt;/ol&gt;
+
+&lt;!-- Kanban (cross-zone + within-zone sorting) --&gt;
+&lt;script&gt;
+  // Cards: use:draggable + use:dropTarget mode:'between'
+  // Zones: use:dropTarget mode:'inside' (accepts drops on empty space)
+
+  function handleKanbanDrop(detail) &#123;
+    const card = detail.data;
+    const sourceZone = findCardZone(card.id);
+
+    if (detail.position === 'before' || detail.position === 'after') &#123;
+      // Dropped on a card — reorder or cross-zone insert
+      const targetZone = findCardZone(detail.targetId);
+      if (sourceZone === targetZone) &#123;
+        zones[targetZone] = reorderByDrop(zones[targetZone], detail);
+      &#125; else &#123;
+        removeFromZone(sourceZone, card.id);
+        insertIntoZone(targetZone, card, detail.targetId, detail.position);
+      &#125;
+    &#125; else &#123;
+      // Dropped on zone container — transfer and append
+      const targetZone = detail.targetId;
+      removeFromZone(sourceZone, card.id);
+      appendToZone(targetZone, card);
+    &#125;
+  &#125;
+&lt;/script&gt;
+
+&lt;div use:dropTarget=&#123;&#123; id: 'todo', group: 'kanban', onDrop: handleKanbanDrop &#125;&#125;&gt;
+  &#123;#each todoCards as card (card.id)&#125;
+    &lt;div
+      use:draggable=&#123;&#123; id: card.id, group: 'kanban', data: card &#125;&#125;
+      use:dropTarget=&#123;&#123;
+        id: card.id, group: 'kanban',
+        mode: 'between', axis: 'vertical',
+        onDrop: handleKanbanDrop
+      &#125;&#125;
+      animate:live
+    &gt;
+      &#123;card.label&#125;
+    &lt;/div&gt;
+  &#123;/each&#125;
+&lt;/div&gt;</code
         ></pre>
     </details>
   </div>

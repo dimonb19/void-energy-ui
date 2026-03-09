@@ -414,12 +414,27 @@ export class DragManager {
 
     const elements = document.elementsFromPoint(x, y);
     for (const element of elements) {
-      if (element instanceof HTMLElement && this.dropTargets.has(element)) {
-        const config = this.dropTargets.get(element);
-        if (config && !config.disabled) {
-          return element;
-        }
+      if (!(element instanceof HTMLElement)) continue;
+
+      const target = this.findRegisteredTarget(element);
+      if (target) {
+        return target;
       }
+    }
+
+    return null;
+  }
+
+  private findRegisteredTarget(element: HTMLElement): HTMLElement | null {
+    let current: HTMLElement | null = element;
+
+    while (current) {
+      const config = this.dropTargets.get(current);
+      if (config && !config.disabled) {
+        return current;
+      }
+
+      current = current.parentElement;
     }
 
     return null;
@@ -477,6 +492,9 @@ export class DragManager {
     element: HTMLElement,
     config: DropTargetRegistration | undefined,
   ): void {
+    // Never overwrite the source element's "dragging" state
+    if (this.activeDrag && element === this.activeDrag.source) return;
+
     if (
       this.activeDrag &&
       config &&
@@ -491,6 +509,9 @@ export class DragManager {
   }
 
   private applyActiveState(hover: HoverState): void {
+    // Never overwrite the source element's "dragging" state
+    if (this.activeDrag && hover.element === this.activeDrag.source) return;
+
     hover.element.setAttribute(
       'data-drag-state',
       hover.compatible ? 'drop-hover' : 'drop-invalid',
