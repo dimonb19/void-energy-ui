@@ -65,7 +65,7 @@
 </script>
 
 <section id="inputs" class="flex flex-col gap-md">
-  <h2>07 // INPUTS & CONTROLS</h2>
+  <h2>08 // INPUTS & CONTROLS</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
@@ -89,7 +89,7 @@
     </details>
 
     <!-- ─── TEXT INPUT ─────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Text Input</h5>
       <p class="text-small text-mute">
         Native <code>&lt;input type="text"&gt;</code> with
@@ -144,7 +144,7 @@
     </div>
 
     <!-- ─── TEXTAREA ───────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Textarea</h5>
       <p class="text-small text-mute">
         Native <code>&lt;textarea&gt;</code> with vertical resize. Same sunk physics
@@ -173,7 +173,7 @@
     </div>
 
     <!-- ─── VALIDATION & FORMFIELD ────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Validation & FormField</h5>
       <p class="text-small text-mute">
         The <code>FormField</code> wrapper handles label association, error
@@ -279,7 +279,7 @@
     </div>
 
     <!-- ─── SELECT ─────────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Select</h5>
       <p class="text-small text-mute">
         The <code>Selector</code> component wraps a native
@@ -341,7 +341,7 @@
     </div>
 
     <!-- ─── RANGE SLIDER ───────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Range Slider</h5>
       <p class="text-small text-mute">
         Native <code>&lt;input type="range"&gt;</code> with
@@ -374,7 +374,7 @@
     </div>
 
     <!-- ─── CHECKBOX & RADIO ───────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Checkbox & Radio</h5>
       <p class="text-small text-mute">
         Native <code>&lt;input type="checkbox"&gt;</code> and
@@ -468,7 +468,7 @@
     </div>
 
     <!-- ─── TOGGLE ─────────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Toggle</h5>
       <p class="text-small text-mute">
         Physics-aware switch for boolean states. Supports custom Lucide icons,
@@ -537,7 +537,7 @@
     </div>
 
     <!-- ─── SWITCHER ───────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Switcher</h5>
       <p class="text-small text-mute">
         Segmented control for selecting between N options. Built on native radio
@@ -590,7 +590,7 @@
     </div>
 
     <!-- ─── DETAILS & SUMMARY ────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Details & Summary</h5>
       <p class="text-small text-mute">
         Native <code>&lt;details&gt;</code> disclosure element for collapsible
@@ -710,7 +710,7 @@
     </div>
 
     <!-- ─── PROGRESS BAR ─────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Progress Bar</h5>
       <p class="text-small text-mute">
         Fully custom-styled <code>&lt;progress&gt;</code> element. Pill-shaped fill
@@ -760,7 +760,7 @@
     </div>
 
     <!-- ─── METER ────────────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Meter</h5>
       <p class="text-small text-mute">
         Native <code>&lt;meter&gt;</code> element for scalar measurements. Three
@@ -812,7 +812,7 @@
     </div>
 
     <!-- ─── OUTPUT ───────────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Output</h5>
       <p class="text-small text-mute">
         The <code>&lt;output&gt;</code> element for computed/calculated values.
@@ -867,7 +867,7 @@
     </div>
 
     <!-- ─── FILE UPLOAD ──────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>File Upload</h5>
       <p class="text-small text-mute">
         Drag-and-drop file upload via the <code>DropZone</code> component. Wraps

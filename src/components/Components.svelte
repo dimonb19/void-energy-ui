@@ -6,6 +6,7 @@
   // Foundations
   import Typography from './ui-library/Typography.svelte';
   import Surfaces from './ui-library/Surfaces.svelte';
+  import Atmospheres from './ui-library/Atmospheres.svelte';
   import Prose from './ui-library/Prose.svelte';
   import Globals from './ui-library/Globals.svelte';
   // Primitives
@@ -35,6 +36,7 @@
       items: [
         { id: 'typography', label: 'Typography' },
         { id: 'surfaces', label: 'Surfaces' },
+        { id: 'atmospheres', label: 'Atmospheres' },
         { id: 'prose', label: 'Prose & Content' },
         { id: 'globals', label: 'Global Treatments' },
       ],
@@ -181,7 +183,9 @@
         <div class="flex flex-col gap-2xl">
           <hr />
 
-          <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+          <div
+            class="flex flex-col gap-sm border-0 border-l border-solid border-primary pl-md"
+          >
             <h3 class="text-dim">Foundations</h3>
             <p class="text-small text-mute">
               Typography, color, and surface primitives that everything else is
@@ -190,12 +194,15 @@
           </div>
           <Typography />
           <Surfaces />
+          <Atmospheres />
           <Prose />
           <Globals />
 
           <hr />
 
-          <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+          <div
+            class="flex flex-col gap-sm border-0 border-l border-solid border-primary pl-md"
+          >
             <h3 class="text-dim">Primitives</h3>
             <p class="text-small text-mute">
               The atomic building blocks &mdash; icons and interactive elements.
@@ -206,7 +213,9 @@
 
           <hr />
 
-          <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+          <div
+            class="flex flex-col gap-sm border-0 border-l border-solid border-primary pl-md"
+          >
             <h3 class="text-dim">Form Controls</h3>
             <p class="text-small text-mute">
               Native HTML form elements with physics-aware styling.
@@ -216,7 +225,9 @@
 
           <hr />
 
-          <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+          <div
+            class="flex flex-col gap-sm border-0 border-l border-solid border-primary pl-md"
+          >
             <h3 class="text-dim">Composites</h3>
             <p class="text-small text-mute">
               Higher-order components that combine primitives into purpose-built
@@ -228,7 +239,9 @@
 
           <hr />
 
-          <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+          <div
+            class="flex flex-col gap-sm border-0 border-l border-solid border-primary pl-md"
+          >
             <h3 class="text-dim">Overlays & Feedback</h3>
             <p class="text-small text-mute">
               Floating panels, notifications, and dialogs for user
@@ -241,7 +254,9 @@
 
           <hr />
 
-          <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+          <div
+            class="flex flex-col gap-sm border-0 border-l border-solid border-primary pl-md"
+          >
             <h3 class="text-dim">Effects & Motion</h3>
             <p class="text-small text-mute">
               Loading indicators, kinetic typography, and motion primitives.
@@ -255,7 +270,9 @@
 
           <hr />
 
-          <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+          <div
+            class="flex flex-col gap-sm border-0 border-l border-solid border-primary pl-md"
+          >
             <h3 class="text-dim">Data Visualization</h3>
             <p class="text-small text-mute">
               Charts and metrics for dashboards and data-driven interfaces.

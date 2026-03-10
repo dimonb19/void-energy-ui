@@ -14,7 +14,7 @@
 </script>
 
 <section id="kinetic-text" class="flex flex-col gap-md">
-  <h2>14 // KINETIC TEXT</h2>
+  <h2>15 // KINETIC TEXT</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
@@ -243,7 +243,7 @@
     </div>
 
     <!-- ─── LOADING TEXT CYCLER ─────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Loading Text Cycler</h5>
       <p class="text-small text-mute">
         Pre-built cycler component that wraps KineticText&rsquo;s cycle mode.

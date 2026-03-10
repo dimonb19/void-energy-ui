@@ -140,7 +140,7 @@
     <div class="flex flex-col gap-sm">
       <h5>Quick Reference</h5>
 
-      <div class="surface-sunk p-md">
+      <div class="surface-sunk p-md table-responsive">
         <table>
           <thead>
             <tr>

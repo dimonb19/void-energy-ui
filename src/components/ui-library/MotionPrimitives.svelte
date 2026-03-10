@@ -42,7 +42,7 @@
 </script>
 
 <section id="motion-primitives" class="flex flex-col gap-md">
-  <h2>15 // MOTION PRIMITIVES</h2>
+  <h2>16 // MOTION PRIMITIVES</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
@@ -57,7 +57,7 @@
     </p>
 
     <!-- ─── SVELTE ACTIONS ──────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Svelte Actions</h5>
       <p class="text-small text-mute">
         Reusable directives that add behavior to any element via
@@ -147,7 +147,7 @@
     </div>
 
     <!-- ─── SVELTE TRANSITIONS ──────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Svelte Transitions</h5>
       <p class="text-small text-mute">
         Physics-aware motion primitives for Svelte&rsquo;s <code>in:</code>,

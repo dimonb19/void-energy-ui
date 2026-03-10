@@ -153,7 +153,7 @@
 </script>
 
 <section id="drag-and-drop" class="flex flex-col gap-md">
-  <h2>16 // DRAG & DROP</h2>
+  <h2>17 // DRAG & DROP</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
@@ -264,7 +264,7 @@
         >
           {#each sortableItems as item, index (item.id)}
             <li
-              class="drag-sort-item surface-glass p-sm px-md"
+              class="drag-sort-item surface-glass p-md"
               aria-label={item.label}
               use:draggable={{
                 id: item.id,
@@ -373,7 +373,7 @@
               <span class="text-caption text-mute">{zoneA.length} cards</span>
             </div>
 
-            <div class="flex flex-1 flex-col gap-sm">
+            <div class="flex flex-1 flex-col gap-md">
               {#each zoneA as card (card.id)}
                 <div
                   class="drag-zone-card surface-glass p-md cursor-grab"
@@ -424,7 +424,7 @@
               <span class="text-caption text-mute">{zoneB.length} cards</span>
             </div>
 
-            <div class="flex flex-1 flex-col gap-sm">
+            <div class="flex flex-1 flex-col gap-md">
               {#each zoneB as card (card.id)}
                 <div
                   class="drag-zone-card surface-glass p-md cursor-grab"

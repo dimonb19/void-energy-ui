@@ -3,7 +3,7 @@
 </script>
 
 <section id="globals" class="flex flex-col gap-md">
-  <h2>04 // GLOBAL TREATMENTS</h2>
+  <h2>05 // GLOBAL TREATMENTS</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
@@ -33,7 +33,7 @@
     </details>
 
     <!-- ─── TEXT SELECTION ──────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Text Selection</h5>
       <p class="text-small text-mute">
         The <code>::selection</code> pseudo-element uses
@@ -45,7 +45,7 @@
     </div>
 
     <!-- ─── SCROLLBARS ─────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Scrollbars</h5>
       <p class="text-small text-mute">
         The <code>@include laser-scrollbar</code> mixin styles all scrollable containers.
@@ -59,6 +59,7 @@
           Vertical scroll &mdash; applied globally to <code>html</code> and inherited
           by scrollable containers:
         </p>
+        <!-- void-ignore: demo scroll container height -->
         <div
           class="surface-void p-md"
           style="max-height: 10rem; overflow-y: auto;"
@@ -127,7 +128,7 @@ html &#123;
     </div>
 
     <!-- ─── PRINT STYLESHEET ───────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Print Stylesheet</h5>
       <p class="text-small text-mute">
         A comprehensive <code>@media print</code> stylesheet optimizes every
@@ -233,7 +234,7 @@ html &#123;
     </div>
 
     <!-- ─── CONTAINER QUERIES ──────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Container Queries</h5>
       <p class="text-small text-mute">
         Component-scoped responsive styles based on container width, not
@@ -283,6 +284,7 @@ html &#123;
           Live demo &mdash; drag the bottom-right corner to resize this
           container and watch the layout reflow at 480px:
         </p>
+        <!-- void-ignore: demo resize container min-width -->
         <div
           class="@container surface-void p-md"
           style="resize: horizontal; overflow: auto; min-width: 12rem; max-width: 100%; width: 100%; border: var(--physics-border-width) dashed var(--border-color); border-radius: var(--radius-base);"

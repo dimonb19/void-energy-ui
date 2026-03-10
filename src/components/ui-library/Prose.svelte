@@ -1,5 +1,5 @@
 <section id="prose" class="flex flex-col gap-md">
-  <h2>03 // PROSE & CONTENT</h2>
+  <h2>04 // PROSE & CONTENT</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
@@ -28,7 +28,7 @@
     </details>
 
     <!-- INLINE TEXT SEMANTICS -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Inline Text Semantics</h5>
       <p class="text-small text-mute">
         Nine semantic inline elements for annotating prose. All inherit parent
@@ -78,7 +78,7 @@
     </div>
 
     <!-- MARK — PHYSICS COMPARISON -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Mark &mdash; Physics Comparison</h5>
       <p class="text-small text-mute">
         The <code>&lt;mark&gt;</code> element changes appearance per physics
@@ -100,7 +100,7 @@
     </div>
 
     <!-- INDIVIDUAL ELEMENTS -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Individual Elements</h5>
       <p class="text-small text-mute">
         Each inline element isolated for reference. <code>del</code> and
@@ -148,7 +148,7 @@ E = mc&lt;sup&gt;2&lt;/sup&gt;
     </div>
 
     <!-- BLOCKQUOTE -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Blockquote</h5>
       <p class="text-small text-mute">
         Statement-level quotations with a physics-differentiated left border.
@@ -220,7 +220,7 @@ E = mc&lt;sup&gt;2&lt;/sup&gt;
     </div>
 
     <!-- FIGURE & CAPTION -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Figure &amp; Caption</h5>
       <p class="text-small text-mute">
         The <code>&lt;figure&gt;</code> element wraps self-contained content
@@ -276,7 +276,7 @@ E = mc&lt;sup&gt;2&lt;/sup&gt;
     </div>
 
     <!-- ADDRESS -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Address</h5>
       <p class="text-small text-mute">
         The <code>&lt;address&gt;</code> element provides contact information.
@@ -307,7 +307,7 @@ E = mc&lt;sup&gt;2&lt;/sup&gt;
     </div>
 
     <!-- PROSE LISTS -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Prose Lists</h5>
       <p class="text-small text-mute">
         The <code>.prose</code> class re-enables list markers stripped by the
@@ -442,7 +442,7 @@ E = mc&lt;sup&gt;2&lt;/sup&gt;
     </div>
 
     <!-- LEGAL CONTENT -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Legal Content</h5>
       <p class="text-small text-mute">
         The <code>.legal-content</code> scope class (defined in
@@ -544,7 +544,7 @@ E = mc&lt;sup&gt;2&lt;/sup&gt;
     </div>
 
     <!-- PROSE vs LEGAL-CONTENT COMPARISON -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Prose vs Legal-Content</h5>
       <p class="text-small text-mute">
         Same markup, different scopes. <code>.prose</code> uses energy-colored
@@ -605,7 +605,7 @@ E = mc&lt;sup&gt;2&lt;/sup&gt;
     </p>
 
     <!-- ─── TABLES ───────────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Tables</h5>
       <p class="text-small text-mute">
         Raw <code>&lt;table&gt;</code> elements are styled automatically &mdash;
@@ -616,7 +616,7 @@ E = mc&lt;sup&gt;2&lt;/sup&gt;
         <code>.table-responsive</code> for horizontal scrolling.
       </p>
 
-      <div class="surface-sunk p-md flex flex-col gap-lg">
+      <div class="surface-sunk p-md flex flex-col gap-lg table-responsive">
         <!-- Default table -->
         <table>
           <caption>Subsystem Power Allocation</caption>
@@ -784,7 +784,7 @@ E = mc&lt;sup&gt;2&lt;/sup&gt;
     </div>
 
     <!-- ─── MEDIA DEFAULTS ───────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Media Defaults</h5>
       <p class="text-small text-mute">
         Base responsive defaults for media elements. All media is
@@ -817,6 +817,7 @@ E = mc&lt;sup&gt;2&lt;/sup&gt;
         <p class="text-small text-dim">
           <code>&lt;iframe&gt;</code> &mdash; physics border, radius, and sunk background:
         </p>
+        <!-- void-ignore: demo iframe display height -->
         <iframe
           src="about:blank"
           title="Empty iframe demonstrating base styling"

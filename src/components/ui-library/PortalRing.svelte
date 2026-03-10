@@ -6,7 +6,7 @@
 </script>
 
 <section id="portal-ring" class="flex flex-col gap-md">
-  <h2>17 // PORTAL RING</h2>
+  <h2>18 // PORTAL RING</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
@@ -57,7 +57,7 @@
     </details>
 
     <!-- ─── INTERACTIVE DEMO ──────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Interactive Demo</h5>
       <p class="text-small text-mute">
         Move your cursor anywhere on the page while the portal is visible to
@@ -79,7 +79,7 @@
     </div>
 
     <!-- ─── INTENSITY CONTROL ─────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Intensity Control</h5>
       <p class="text-small text-mute">
         The <code>intensity</code> prop multiplies all parallax translations. At
@@ -109,7 +109,7 @@
     </div>
 
     <!-- ─── PHYSICS ADAPTATION ────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Physics Adaptation</h5>
       <p class="text-small text-mute">
         The portal adapts its rendering to the active physics preset. Switch

@@ -46,7 +46,7 @@
 </script>
 
 <section id="toasts" class="flex flex-col gap-md">
-  <h2>11 // TOASTS</h2>
+  <h2>12 // TOASTS</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
@@ -72,7 +72,7 @@
     </details>
 
     <!-- BASIC TYPES -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Semantic Types</h5>
       <p class="text-small text-mute">
         Each type sets the border, background blend, and icon color via the
@@ -146,7 +146,7 @@
     </div>
 
     <!-- LONG MESSAGES -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Long Messages</h5>
       <p class="text-small text-mute">
         Toasts gracefully handle longer content. The capsule stretches
@@ -192,7 +192,7 @@
     </div>
 
     <!-- LOADING CONTROLLER -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Loading Controller</h5>
       <p class="text-small text-mute">
         <code>toast.loading()</code> returns a controller with
@@ -222,7 +222,7 @@
     </div>
 
     <!-- PROMISE WRAPPER -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Promise Wrapper</h5>
       <p class="text-small text-mute">
         <code>toast.promise()</code> wraps any <code>Promise</code> with automatic
@@ -236,7 +236,7 @@
     </div>
 
     <!-- CLEAR ALL -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Clear All</h5>
       <p class="text-small text-mute">
         <code>toast.clearAll()</code> removes every active toast at once. Click &ldquo;Stack

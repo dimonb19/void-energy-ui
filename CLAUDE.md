@@ -258,6 +258,7 @@ Import and use — never re-instantiate.
 .setAtmosphere(name)                Switch theme (persists, clears temp stack)
 .setPreferences(prefs)              Update user config (density, scale, fonts)
 .registerTheme(id, partialDef)      Register runtime theme (Safety Merge, persists to cache)
+.unregisterTheme(id)                Remove a custom theme (clears cache, falls back if active)
 .registerEphemeralTheme(id, def)    Register scope-owned theme (no localStorage, no console)
 .unregisterEphemeralTheme(id)       Remove a previously registered ephemeral theme
 .applyTemporaryTheme(id, label)     One-shot temporary theme (respects adaptAtmosphere)
@@ -268,6 +269,7 @@ Import and use — never re-instantiate.
 .loadExternalTheme(url)             Async: fetch + validate + register remote theme JSON (returns Result)
 .availableAtmospheres               All registered theme IDs
 .builtInAtmospheres                 Static (non-runtime) theme IDs
+.customAtmospheres                  User-registered themes (excludes built-in and ephemeral)
 .hasTemporaryTheme                  Whether any temporary theme is active (getter)
 .temporaryThemeInfo                 Top-of-stack label + ID + returnTo (getter)
 ```

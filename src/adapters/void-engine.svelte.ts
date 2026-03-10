@@ -187,6 +187,34 @@ export class VoidEngine {
     this.registry = nextRegistry as ThemeRegistry;
   }
 
+  /**
+   * Unregister a custom (non-built-in, non-ephemeral) theme.
+   * If the theme is currently active, falls back to the default atmosphere.
+   * Also removes it from the localStorage cache.
+   */
+  unregisterTheme(id: string) {
+    if (this.builtInThemeIds.has(id) || this.ephemeralThemeIds.has(id)) return;
+    if (!this.registry[id]) return;
+
+    // If this theme is active, fall back to default
+    if (this.atmosphere === id) {
+      this.setAtmosphere('void');
+    }
+
+    const nextRegistry = { ...this.registry };
+    delete nextRegistry[id];
+    this.registry = nextRegistry as ThemeRegistry;
+
+    // Remove from localStorage cache
+    try {
+      const cache = this.readThemeCache();
+      delete cache[id];
+      localStorage.setItem(STORAGE_KEYS.THEME_CACHE, JSON.stringify(cache));
+    } catch {
+      // Storage unavailable
+    }
+  }
+
   async loadExternalTheme(
     url: string,
   ): Promise<Result<{ id: string }, BoundaryError>> {
@@ -549,6 +577,16 @@ export class VoidEngine {
   get builtInAtmospheres(): string[] {
     return Object.keys(this.registry).filter((id) =>
       this.builtInThemeIds.has(id),
+    );
+  }
+
+  /**
+   * Returns only user-registered custom themes (excludes built-in and ephemeral).
+   * Use this for showing custom themes in the theme selector UI.
+   */
+  get customAtmospheres(): string[] {
+    return Object.keys(this.registry).filter(
+      (id) => !this.builtInThemeIds.has(id) && !this.ephemeralThemeIds.has(id),
     );
   }
 

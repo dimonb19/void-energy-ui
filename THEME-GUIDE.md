@@ -123,9 +123,15 @@ voidEngine.registerTheme('my-theme', {
 
 // Or fetch and register from a remote URL:
 await voidEngine.loadExternalTheme('https://example.com/my-theme.json');
+
+// List only user-registered custom themes (excludes built-in and ephemeral):
+const customThemes = voidEngine.customAtmospheres; // string[]
+
+// Remove a custom theme (clears cache, falls back to default if active):
+voidEngine.unregisterTheme('my-theme');
 ```
 
-Runtime themes follow the same Palette Contract and physics constraints described below. The guardrail system auto-corrects invalid physics+mode combinations just like build-time themes.
+Runtime themes follow the same Palette Contract and physics constraints described below. The guardrail system auto-corrects invalid physics+mode combinations just like build-time themes. Custom themes appear in the Themes modal under a "Custom Atmospheres" section with a remove button.
 
 ---
 

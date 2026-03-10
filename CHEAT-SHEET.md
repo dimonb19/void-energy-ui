@@ -4944,6 +4944,16 @@ The source element's `dragging` state is preserved throughout the drag — the D
 - **Retro**: No transform, pixel-offset outline + shadow, instant transitions
 - Respects `prefers-reduced-motion` (all transitions disabled)
 
+#### CSS Classes (`_drag.scss`)
+
+| Class | Purpose |
+| --- | --- |
+| `.drag-ghost` | Fixed-position clone following the pointer during drag |
+| `.drag-sort-item` | Physics border for sortable list items |
+| `.drag-zone` | Zone container with min-height and physics border |
+| `.drag-zone-card` | Card inside a zone with secondary-colored physics border |
+| `.drag-zone-empty` | Empty zone placeholder with dashed border and muted text |
+
 #### Keyboard Alternative (WCAG 2.2)
 
 Built into `use:draggable` — no separate component needed:

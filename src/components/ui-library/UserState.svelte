@@ -84,7 +84,7 @@
 </script>
 
 <section id="user-state" class="flex flex-col gap-md">
-  <h2>09 // USER STATE</h2>
+  <h2>10 // USER STATE</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
@@ -214,14 +214,14 @@
         no flash. Login, then hard-refresh to verify.
       </p>
       <div class="surface-sunk p-md flex flex-col gap-md">
-        <div class="auth-only p-md border-l-2 border-success">
+        <div class="auth-only p-md border-l border-success">
           <p class="text-small">
             <strong class="text-success">auth-only:</strong> This content is visible
             for any authenticated user, including Guest role. Hidden before Svelte
             hydrates if no cached user exists.
           </p>
         </div>
-        <div class="public-only p-md border-l-2 border-system">
+        <div class="public-only p-md border-l border-system">
           <p class="text-small">
             <strong class="text-system">public-only:</strong> This content is visible
             only when unauthenticated (no user). Hidden immediately when any cached

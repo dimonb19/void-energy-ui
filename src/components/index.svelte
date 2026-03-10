@@ -3,20 +3,47 @@
   import { tooltip } from '@actions/tooltip';
   import { toast } from '@stores/toast.svelte';
   import { live, implode } from '@lib/transitions.svelte';
-
-  import { FONTS } from '@config/design-tokens';
-  import { voidEngine } from '@adapters/void-engine.svelte';
   import { morph } from '@actions/morph';
   import { navlink } from '@actions/navlink';
 
+  import { voidEngine } from '@adapters/void-engine.svelte';
+
   import ThemesBtn from './ui/ThemesBtn.svelte';
-  import SettingsRow from './ui/SettingsRow.svelte';
-  import Toggle from './ui/Toggle.svelte';
+  import Switcher from './ui/Switcher.svelte';
   import Selector from './ui/Selector.svelte';
+  import SearchField from './ui/SearchField.svelte';
 
-  import { Moon, Sun, Sparkles, Palette, Undo2 } from '@lucide/svelte';
+  import {
+    Zap,
+    Layers,
+    Scaling,
+    ArrowDown,
+    Check,
+    Wrench,
+  } from '@lucide/svelte';
 
-  // Consolidated chip demo state
+  // ── Live Proof: atmosphere previewer ──────────────────────────────────
+  const proofAtmospheres = [
+    { value: 'void', label: 'Void' },
+    { value: 'paper', label: 'Paper' },
+    { value: 'terminal', label: 'Terminal' },
+    { value: 'nebula', label: 'Nebula' },
+    { value: 'crimson', label: 'Crimson' },
+  ];
+
+  // Derived: only highlights if current atmosphere is one of the curated set
+  const proofIds = proofAtmospheres.map((a) => a.value);
+  let proofSelection = $derived(
+    proofIds.includes(voidEngine.atmosphere) ? voidEngine.atmosphere : null,
+  );
+
+  function switchProofAtmosphere(value: string | number | null) {
+    if (typeof value === 'string') {
+      voidEngine.setAtmosphere(value);
+    }
+  }
+
+  // ── Sandbox: chip demo state ─────────────────────────────────────────
   const chipVariants = [
     { value: 'chip', label: 'Default' },
     { value: 'chip-system', label: 'System' },
@@ -44,520 +71,360 @@
   ]);
   let newChipTag = $state('Motion');
 
-  // Local state for toggle showcase
-  let animations = $state(true);
-  let colorMode = $state(true);
-  let reducedMotion = $state(false);
-  let satisfaction = $state(true);
-  let adminOverride = $state(false);
-
-  // Fully restore any temporary theme before pushing a new preview.
-  // This guarantees at most one preview entry on the stack, with returnTo
-  // always pointing to the user's real theme — not another preview.
-  function previewCustomAtmosphere() {
-    voidEngine.restoreUserTheme();
-    voidEngine.registerTheme('cyberpunk', {
-      mode: 'dark',
-      physics: 'glass',
-      tagline: 'High Tech / Low Life',
-      palette: {
-        'font-atmos-heading': FONTS.mystic.family,
-        'font-atmos-body': FONTS.tech.family,
-        'bg-canvas': '#05010a',
-        'bg-spotlight': '#1a0526',
-        'bg-surface': 'rgba(20, 5, 30, 0.6)',
-        'bg-sunk': 'rgba(10, 0, 15, 0.8)',
-        'energy-primary': '#ff0077',
-        'energy-secondary': '#00e5ff',
-        'border-color': 'rgba(255, 0, 119, 0.3)',
-        'text-dim': 'rgba(255, 230, 240, 0.85)',
-      },
-    });
-
-    const applied = voidEngine.applyTemporaryTheme('cyberpunk', 'Neon Dreams');
-    if (applied) {
-      toast.show('Custom atmosphere applied', 'success', 4000, {
-        label: 'View',
-        onclick: () => modal.themes(),
-      });
-    } else {
-      toast.show(
-        "Theme locked — enable 'Adapt to story mood' in settings",
-        'warning',
-      );
-    }
-  }
-
-  function previewBuiltInAtmosphere() {
-    voidEngine.restoreUserTheme();
-
-    const applied = voidEngine.applyTemporaryTheme('crimson', 'Blood Moon');
-    if (applied) {
-      toast.show('Crimson atmosphere active', 'success', 4000, {
-        label: 'View',
-        onclick: () => modal.themes(),
-      });
-    } else {
-      toast.show(
-        "Theme locked — enable 'Adapt to story mood' in settings",
-        'warning',
-      );
-    }
-  }
+  // ── Sandbox: search demo state ───────────────────────────────────────
+  let searchQuery = $state('');
 </script>
 
 <div class="container flex flex-col gap-2xl py-2xl">
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- HERO                                                              -->
+  <!-- 1. HERO                                                           -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <header class="flex flex-col gap-lg items-center text-center">
     <h1 class="text-primary">Void Energy</h1>
 
+    <p class="text-h3 max-w-3xl">A runtime theme engine for existing UI.</p>
+
     <p class="text-body text-dim max-w-3xl">
-      Design systems break when products need to support multiple brands,
-      themes, or visual contexts. Rebuilding components for every palette is
-      expensive; maintaining parallel style sheets is worse. Most teams settle
-      for one look and live with the rigidity.
+      Void Energy layers atmospheres, motion physics, and semantic tokens onto
+      your current components. No component rewrite. No duplicate themes to
+      maintain.
     </p>
 
-    <p class="text-body max-w-3xl">
-      Void Energy solves this. One UI system. 12 atmospheres. 3 physics engines.
-      Instant theming at runtime. Every element adapts to light, motion, and
-      density &mdash; build once, and the interface shapes itself to the
-      context.
-    </p>
+    <div class="flex flex-row flex-wrap gap-md justify-center">
+      <span class="chip"><span class="chip-label">12 Atmospheres</span></span>
+      <span class="chip"><span class="chip-label">3 Physics Presets</span></span
+      >
+      <span class="chip"><span class="chip-label">Runtime Theming</span></span>
+      <span class="chip"><span class="chip-label">Density Scaling</span></span>
+    </div>
 
-    <p class="text-small text-mute max-w-2xl">
-      We replaced static pixels with reactive materials. Interfaces don't float
-      in a vacuum &mdash; they exist within living environments that exert
-      physical force on the user's experience. Atmosphere is context. Content
-      adapts to narrative.
-    </p>
-
-    <span class="flex justify-center">
-      <ThemesBtn class="btn-cta" />
-    </span>
+    <ThemesBtn class="btn-cta" />
     <p class="text-caption text-mute">
-      Try switching the atmosphere &mdash; every element on this page will
-      adapt.
+      Switch the atmosphere &mdash; every element on this page adapts.
     </p>
   </header>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- CORE CONCEPTS — 4 CARDS                                           -->
+  <!-- 2. LIVE PROOF                                                     -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <section class="flex flex-col gap-xl">
-    <h2 class="text-center">Core Concepts</h2>
+  <section class="flex flex-col gap-lg">
+    <div class="flex flex-col gap-sm items-center text-center">
+      <h2>Your Components. Our Materials.</h2>
+      <p class="text-dim max-w-2xl">
+        These elements are standard HTML &mdash; buttons, inputs, cards. Void
+        Energy applies the surface physics, palette, and typography. Switch the
+        atmosphere and watch the same markup transform.
+      </p>
+    </div>
+
+    <Switcher
+      options={proofAtmospheres}
+      value={proofSelection}
+      onchange={switchProofAtmosphere}
+      label="Try an Atmosphere"
+      class="items-center"
+    />
 
     <div class="grid grid-cols-1 tablet:grid-cols-2 gap-lg">
-      <!-- Card 1: Hybrid Protocol -->
+      <!-- Proof card: surface + text hierarchy -->
       <div class="surface-glass p-lg flex flex-col gap-md">
-        <h3>The Hybrid Protocol</h3>
+        <h3>Surface Card</h3>
         <p class="text-dim">
-          Geometry and physics are separate concerns. Layout (flex, grid,
-          spacing) lives in Tailwind. Material (surfaces, shadows, blur,
-          animation) lives in SCSS. They never cross.
+          This card uses <code>surface-glass</code> &mdash; a floating surface with
+          physics-aware shadows, borders, and optional backdrop blur.
         </p>
-
-        <div class="flex flex-row flex-wrap gap-md">
-          <div class="surface-sunk p-md flex-1 flex flex-col gap-sm">
-            <b class="text-small">Geometry</b>
-            <code class="text-caption">flex gap-md p-lg</code>
-          </div>
-          <div class="surface-sunk p-md flex-1 flex flex-col gap-sm">
-            <b class="text-small">Physics</b>
-            <code class="text-caption">glass-float, glass-blur</code>
-          </div>
+        <div class="surface-sunk p-md flex flex-col gap-sm">
+          <span class="text-main font-bold">Primary text</span>
+          <span class="text-dim">Secondary text</span>
+          <span class="text-mute">Tertiary text</span>
         </div>
-
-        <details>
-          <summary>Technical Details</summary>
-          <p class="p-md">
-            Tailwind handles rigid grids and fluid spacing. SCSS handles
-            texture, motion, and light via mixins like
-            <code>glass-float</code>, <code>glass-sunk</code>, and
-            <code>glass-blur</code>. This separation means layout never breaks
-            when the physics preset changes, and visual materials never leak
-            into structural code.
-          </p>
-        </details>
-      </div>
-
-      <!-- Card 2: Triad Architecture -->
-      <div class="surface-glass p-lg flex flex-col gap-md">
-        <h3>The Triad Architecture</h3>
-        <p class="text-dim">
-          Every pixel is the intersection of three variables: Atmosphere (color,
-          typography, mood), Physics (glass, flat, or retro rendering), and Mode
-          (light or dark polarity).
-        </p>
-
-        <div class="flex flex-row gap-md flex-wrap">
+        <div class="flex flex-row gap-sm flex-wrap">
+          <span class="chip-success">
+            <span class="chip-label">Success</span>
+          </span>
+          <span class="chip-error">
+            <span class="chip-label">Error</span>
+          </span>
           <span class="chip-premium">
-            <span class="chip-label">Atmosphere</span>
+            <span class="chip-label">Premium</span>
           </span>
           <span class="chip-system">
-            <span class="chip-label">Physics</span>
-          </span>
-          <span class="chip">
-            <span class="chip-label">Mode</span>
+            <span class="chip-label">System</span>
           </span>
         </div>
-
-        <details>
-          <summary>Technical Details</summary>
-          <div class="p-md flex flex-col gap-xs">
-            <p>
-              <b>Atmosphere</b> defines the mood, palette, and typography. Examples:
-              Void (Sci-Fi), Onyx (Stealth), Terminal (Retro), Paper (Light).
-            </p>
-            <p>
-              <b>Physics</b> defines how materials react. Glass: translucent, blurred,
-              glowing. Flat: opaque, sharp, efficient. Retro: hard pixels, stepped
-              animation (CRT style).
-            </p>
-            <p>
-              <b>Mode</b> defines contrast. Dark: low luminosity background. Light:
-              high luminosity background.
-            </p>
-            <p>
-              <b>Compatibility Matrix:</b> Glass and Retro require dark mode (glows
-              need darkness, CRT phosphor needs a black substrate). Flat works in
-              both modes. The engine auto-enforces this.
-            </p>
-          </div>
-        </details>
       </div>
 
-      <!-- Card 3: Density Engine -->
+      <!-- Proof card: interactive elements -->
       <div class="surface-glass p-lg flex flex-col gap-md">
-        <h3>The Density Engine</h3>
-        <p class="text-dim">
-          Every margin, padding, and gap scales from a global density
-          coefficient. Developers describe the <em>intent</em> of the space using
-          a semantic T-shirt scale &mdash; the engine calculates the rest.
-        </p>
-
-        <div
-          class="surface-sunk p-md flex flex-row gap-md items-end justify-center flex-wrap"
-        >
-          <div class="flex flex-col items-center gap-xs">
-            <span class="block w-xs h-xs bg-primary rounded"></span>
-            <code class="text-caption">xs</code>
-          </div>
-          <div class="flex flex-col items-center gap-xs">
-            <span class="block w-sm h-sm bg-primary rounded"></span>
-            <code class="text-caption">sm</code>
-          </div>
-          <div class="flex flex-col items-center gap-xs">
-            <span class="block w-md h-md bg-primary rounded"></span>
-            <code class="text-caption">md</code>
-          </div>
-          <div class="flex flex-col items-center gap-xs">
-            <span class="block w-lg h-lg bg-primary rounded"></span>
-            <code class="text-caption">lg</code>
-          </div>
-          <div class="flex flex-col items-center gap-xs">
-            <span class="block w-xl h-xl bg-primary rounded"></span>
-            <code class="text-caption">xl</code>
-          </div>
-          <div class="hidden tablet:flex flex-col items-center gap-xs">
-            <span class="block w-2xl h-2xl bg-primary rounded"></span>
-            <code class="text-caption">2xl</code>
-          </div>
+        <h3>Interactive Elements</h3>
+        <SearchField
+          bind:value={searchQuery}
+          placeholder="Search components..."
+          aria-label="Search components"
+        />
+        <div class="flex flex-row gap-sm flex-wrap">
+          <button>Primary</button>
+          <button class="btn-system">System</button>
+          <button class="btn-premium">Premium</button>
+          <button class="btn-error">Danger</button>
+          <button class="btn-ghost">Ghost</button>
         </div>
-
-        <details>
-          <summary>Technical Details</summary>
-          <div class="p-md flex flex-col gap-xs">
-            <p>
-              <b>Micro</b> (<code>xs</code>, <code>sm</code>): Atomic grouping.
-              Inside buttons, between icon and text.
-            </p>
-            <p>
-              <b>Structure</b> (<code>md</code>, <code>lg</code>): Component
-              definition. Padding inside cards, gaps between form elements.
-            </p>
-            <p>
-              <b>Macro</b> (<code>xl</code>, <code>2xl</code>,
-              <code>4xl</code>): Layout geometry. Section separation, page
-              grids.
-            </p>
-            <p>
-              Density multipliers: Standard (1x), High Density (0.75x) for data
-              grids, Low Density (1.25x) for reading modes.
-            </p>
-          </div>
-        </details>
-      </div>
-
-      <!-- Card 4: Native Protocol -->
-      <div class="surface-glass p-lg flex flex-col gap-md">
-        <h3>The Native Protocol</h3>
-        <p class="text-dim">
-          Components are thin wrappers around native HTML elements. The browser
-          owns behavior and accessibility; SCSS owns the material. No
-          reimplementations.
+        <p class="text-caption text-mute">
+          Every button, input, and chip reads from the same CSS custom
+          properties. The atmosphere changes the values &mdash; the components
+          never change.
         </p>
-
-        <div class="flex flex-row gap-xs flex-wrap">
-          <code class="chip"
-            ><span class="chip-label">&lt;button&gt;</span></code
-          >
-          <code class="chip"
-            ><span class="chip-label">&lt;select&gt;</span></code
-          >
-          <code class="chip"
-            ><span class="chip-label">&lt;dialog&gt;</span></code
-          >
-          <code class="chip"
-            ><span class="chip-label">&lt;details&gt;</span></code
-          >
-          <code class="chip"><span class="chip-label">&lt;input&gt;</span></code
-          >
-          <code class="chip"
-            ><span class="chip-label">&lt;fieldset&gt;</span></code
-          >
-        </div>
-
-        <details>
-          <summary>Technical Details</summary>
-          <p class="p-md">
-            Buttons are <code>&lt;button&gt;</code>, selects are
-            <code>&lt;select&gt;</code>, dialogs are
-            <code>&lt;dialog&gt;</code>. Custom components are only built when
-            no native element exists for the interaction (e.g., combobox,
-            multi-thumb slider). Simplicity is the architecture.
-          </p>
-        </details>
       </div>
     </div>
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- PALETTE CONTRACT                                                  -->
+  <!-- 3. FITS YOUR STACK                                                -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <section class="flex flex-col gap-md">
-    <h2>The Palette Contract</h2>
+  <section class="flex flex-col gap-lg">
+    <h2 class="text-center">Fits Your Stack</h2>
 
     <div class="surface-glass p-lg flex flex-col gap-lg">
-      <p class="text-center text-dim">
-        Colors are semantic, not absolute. Every palette is organized into a
-        <strong>5-Layer System</strong> &mdash; from the deepest canvas to the highest
-        text signal. Each layer has a fixed role. Atmospheres change the values;
-        the architecture never moves.
-      </p>
-
-      <div class="surface-sunk p-lg flex flex-col gap-md">
-        <div class="flex flex-col gap-sm">
-          <h4>Layer 1: Canvas (Foundation)</h4>
-          <p class="text-small text-dim">
-            The absolute floor. Recessed areas are carved into it; ambient light
-            radiates from above.
-          </p>
-          <div class="flex flex-row gap-sm flex-wrap">
-            <div
-              class="flex flex-col items-center gap-xs"
-              use:tooltip={'var(--bg-canvas)'}
-            >
-              <span
-                class="block w-3xl h-xl rounded-sm bg-canvas border-solid border-border"
-              ></span>
-              <code class="text-caption">bg-canvas</code>
-            </div>
-            <div
-              class="flex flex-col items-center gap-xs"
-              use:tooltip={'var(--bg-sunk)'}
-            >
-              <span
-                class="block w-3xl h-xl rounded-sm bg-sunk border-solid border-border"
-              ></span>
-              <code class="text-caption">bg-sunk</code>
-            </div>
-            <div
-              class="flex flex-col items-center gap-xs"
-              use:tooltip={'var(--bg-spotlight)'}
-            >
-              <span
-                class="block w-3xl h-xl rounded-sm bg-spotlight border-solid border-border"
-              ></span>
-              <code class="text-caption">bg-spotlight</code>
-            </div>
-          </div>
+      <div
+        class="flex flex-col tablet:flex-row items-center justify-center gap-md text-center"
+      >
+        <div
+          class="surface-sunk p-md rounded flex flex-col items-center gap-xs w-full tablet:w-auto"
+        >
+          <b class="text-small">Your Components</b>
+          <span class="text-caption text-mute">Buttons, cards, forms</span>
         </div>
-
-        <div class="flex flex-col gap-sm">
-          <h4>Layer 2: Surface (Float)</h4>
-          <p class="text-small text-dim">
-            Floating elements &mdash; cards, modals, headers. Rendered above the
-            canvas with depth.
-          </p>
-          <div class="flex flex-row gap-sm">
-            <div
-              class="flex flex-col items-center gap-xs"
-              use:tooltip={'var(--bg-surface)'}
-            >
-              <span
-                class="block w-3xl h-xl rounded-sm bg-surface border-solid border-border"
-              ></span>
-              <code class="text-caption">bg-surface</code>
-            </div>
-          </div>
+        <ArrowDown class="icon text-primary tablet:-rotate-90" />
+        <div
+          class="surface-sunk p-md rounded flex flex-col items-center gap-xs w-full tablet:w-auto"
+        >
+          <b class="text-small">Token Aliasing</b>
+          <span class="text-caption text-mute">CSS variable mapping</span>
         </div>
-
-        <div class="flex flex-col gap-sm">
-          <h4>Layer 3: Energy (Interaction)</h4>
-          <p class="text-small text-dim">
-            Brand and interaction colors. Drives buttons, focus states, and
-            emphasis.
-          </p>
-          <div class="flex flex-row gap-sm">
-            <div
-              class="flex flex-col items-center gap-xs"
-              use:tooltip={'var(--energy-primary)'}
-            >
-              <span
-                class="block w-3xl h-xl rounded-sm bg-primary border-solid border-border"
-              ></span>
-              <code class="text-caption">energy-primary</code>
-            </div>
-            <div
-              class="flex flex-col items-center gap-xs"
-              use:tooltip={'var(--energy-secondary)'}
-            >
-              <span
-                class="block w-3xl h-xl rounded-sm bg-secondary border-solid border-border"
-              ></span>
-              <code class="text-caption">energy-secondary</code>
-            </div>
-          </div>
+        <ArrowDown class="icon text-primary tablet:-rotate-90" />
+        <div
+          class="surface-sunk p-md rounded flex flex-col items-center gap-xs w-full tablet:w-auto"
+        >
+          <b class="text-small">Void Energy Engine</b>
+          <span class="text-caption text-mute"
+            >Atmosphere + Physics + Density</span
+          >
         </div>
-
-        <div class="flex flex-col gap-sm">
-          <h4>Layer 4: Structure (Borders)</h4>
-          <p class="text-small text-dim">
-            Unified border system. 1px in Glass and Flat, 2px in Retro.
-          </p>
-          <div class="flex flex-row gap-sm">
-            <div
-              class="flex flex-col items-center gap-xs"
-              use:tooltip={'var(--border-color)'}
-            >
-              <span
-                class="block w-3xl h-xl rounded-sm bg-border border-solid border-border"
-              ></span>
-              <code class="text-caption">border-color</code>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-sm">
-          <h4>Layer 5: Signal (Text Hierarchy)</h4>
-          <p class="text-small text-dim">
-            Three levels of emphasis for information hierarchy.
-          </p>
-          <div class="flex flex-row gap-lg items-baseline">
-            <span class="text-main font-bold">Main</span>
-            <span class="text-dim">Dim</span>
-            <span class="text-mute">Mute</span>
-          </div>
+        <ArrowDown class="icon text-primary tablet:-rotate-90" />
+        <div
+          class="surface-sunk p-md rounded flex flex-col items-center gap-xs w-full tablet:w-auto"
+        >
+          <b class="text-small">UI Adapts</b>
+          <span class="text-caption text-mute">Runtime, no rebuild</span>
         </div>
       </div>
 
-      <div class="surface-sunk p-lg flex flex-col gap-md">
-        <h3>Semantic Colors</h3>
-        <p class="text-small text-dim">
-          Four signal colors provide consistent meaning across all atmospheres.
-          Each generates light, dark, and subtle variants automatically via
-          OKLCH.
-        </p>
-        <div class="grid grid-cols-2 tablet:grid-cols-4 gap-sm">
-          <div
-            class="flex flex-col items-center gap-xs p-sm rounded-sm bg-success-subtle"
-          >
-            <span class="block w-lg h-lg rounded-full bg-success"></span>
-            <b class="text-success">Success</b>
-            <p class="text-caption text-center">
-              Positive outcome, confirmation
-            </p>
-          </div>
-          <div
-            class="flex flex-col items-center gap-xs p-sm rounded-sm bg-error-subtle"
-          >
-            <span class="block w-lg h-lg rounded-full bg-error"></span>
-            <b class="text-error">Error</b>
-            <p class="text-caption text-center">Destructive, failure</p>
-          </div>
-          <div
-            class="flex flex-col items-center gap-xs p-sm rounded-sm bg-premium-subtle"
-          >
-            <span class="block w-lg h-lg rounded-full bg-premium"></span>
-            <b class="text-premium">Premium</b>
-            <p class="text-caption text-center">Attention, cost, exclusive</p>
-          </div>
-          <div
-            class="flex flex-col items-center gap-xs p-sm rounded-sm bg-system-subtle"
-          >
-            <span class="block w-lg h-lg rounded-full bg-system"></span>
-            <b class="text-system">System</b>
-            <p class="text-caption text-center">Informational, neutral</p>
-          </div>
-        </div>
+      <p class="text-dim text-center max-w-2xl mx-auto">
+        You keep your components. Void Energy supplies the token system, theme
+        runtime, and motion model. Your component styles read CSS custom
+        properties &mdash; when the atmosphere changes, every property updates
+        and every component adapts.
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- 4. INTEGRATION IN 30 SECONDS                                      -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <section class="flex flex-col gap-lg">
+    <h2 class="text-center">Integration in 30 Seconds</h2>
+
+    <div class="grid grid-cols-1 tablet:grid-cols-2 gap-lg">
+      <!-- JS side -->
+      <div class="surface-glass p-lg flex flex-col gap-md">
+        <h3>Register &amp; Switch</h3>
+        <pre class="surface-sunk p-md text-caption overflow-x-auto"><code
+            >{`// Register a custom atmosphere
+voidEngine.registerTheme('brand', {
+  mode: 'dark',
+  physics: 'glass',
+  palette: {
+    'bg-canvas':      '#060816',
+    'bg-surface':     'rgba(20, 24, 44, 0.72)',
+    'energy-primary': '#6ee7ff',
+    'text-main':      '#f8fafc',
+  }
+});
+
+// Switch — every component adapts instantly
+voidEngine.setAtmosphere('brand');`}</code
+          ></pre>
+      </div>
+
+      <!-- CSS side -->
+      <div class="surface-glass p-lg flex flex-col gap-md">
+        <h3>Your Component Styles</h3>
+        <pre class="surface-sunk p-md text-caption overflow-x-auto"><code
+            >{`/* Your existing CSS — just use the tokens */
+.card {
+  background: var(--bg-surface);
+  border: var(--physics-border-width) solid
+    var(--border-color);
+  border-radius: var(--radius-base);
+  box-shadow: var(--shadow-float);
+  color: var(--text-main);
+}
+
+.card:hover {
+  border-color: var(--energy-primary);
+  box-shadow: var(--shadow-lift);
+}`}</code
+          ></pre>
+      </div>
+    </div>
+
+    <!-- What you get vs what you build -->
+    <div class="grid grid-cols-1 tablet:grid-cols-2 gap-lg">
+      <div class="surface-glass p-lg flex flex-col gap-md">
+        <h3 class="text-success">What You Get</h3>
+        <ul class="flex flex-col gap-sm">
+          <li class="flex flex-row gap-sm items-center">
+            <Check class="icon text-success shrink-0" data-size="sm" />
+            <span>12 built-in atmospheres with complete palettes</span>
+          </li>
+          <li class="flex flex-row gap-sm items-center">
+            <Check class="icon text-success shrink-0" data-size="sm" />
+            <span>3 physics presets (glass, flat, retro)</span>
+          </li>
+          <li class="flex flex-row gap-sm items-center">
+            <Check class="icon text-success shrink-0" data-size="sm" />
+            <span>Runtime theme engine with scoped &amp; temporary themes</span>
+          </li>
+          <li class="flex flex-row gap-sm items-center">
+            <Check class="icon text-success shrink-0" data-size="sm" />
+            <span>Density scaling (compact / standard / relaxed)</span>
+          </li>
+          <li class="flex flex-row gap-sm items-center">
+            <Check class="icon text-success shrink-0" data-size="sm" />
+            <span>Token pipeline &amp; build tooling</span>
+          </li>
+          <li class="flex flex-row gap-sm items-center">
+            <Check class="icon text-success shrink-0" data-size="sm" />
+            <span>Physics-aware transitions &amp; animations</span>
+          </li>
+        </ul>
+      </div>
+
+      <div class="surface-glass p-lg flex flex-col gap-md">
+        <h3 class="text-premium">What You Build</h3>
+        <ul class="flex flex-col gap-sm">
+          <li class="flex flex-row gap-sm items-center">
+            <Wrench class="icon text-premium shrink-0" data-size="sm" />
+            <span
+              >Token aliasing &mdash; map your CSS properties to Void's semantic
+              tokens (<code>--bg-surface</code>, <code>--energy-primary</code>,
+              etc.)</span
+            >
+          </li>
+          <li class="flex flex-row gap-sm items-center">
+            <Wrench class="icon text-premium shrink-0" data-size="sm" />
+            <span
+              >Component style mapping &mdash; update your component styles to
+              read from CSS custom properties instead of hardcoded values</span
+            >
+          </li>
+          <li class="flex flex-row gap-sm items-center">
+            <Wrench class="icon text-premium shrink-0" data-size="sm" />
+            <span
+              >Custom atmospheres &mdash; define palettes that match your brand
+              identity using the token contract</span
+            >
+          </li>
+        </ul>
       </div>
     </div>
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- INTERACTIVE SANDBOX                                               -->
+  <!-- 5. WHY CHOOSE VOID                                                -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <section class="flex flex-col gap-md">
-    <h2>Interactive Sandbox</h2>
+  <section class="flex flex-col gap-lg">
+    <h2 class="text-center">Why Void Energy</h2>
 
-    <div class="surface-glass p-lg flex flex-col gap-md">
-      <p class="text-dim text-center">
-        Try the components below. Every element reacts to the active atmosphere,
-        physics preset, and density setting. Change the theme to see the entire
-        page adapt in real-time.
+    <div class="grid grid-cols-1 tablet:grid-cols-3 gap-lg">
+      <div
+        class="surface-glass p-lg flex flex-col gap-md items-center text-center"
+      >
+        <Zap class="icon text-primary" data-size="xl" />
+        <h3>Runtime Atmospheres</h3>
+        <p class="text-dim text-small">
+          Not just light/dark. Full palette, typography, and mood changes at
+          runtime. Register new themes on the fly. Scope themes to components.
+          No rebuild required.
+        </p>
+      </div>
+
+      <div
+        class="surface-glass p-lg flex flex-col gap-md items-center text-center"
+      >
+        <Layers class="icon text-primary" data-size="xl" />
+        <h3>Physics Engine</h3>
+        <p class="text-dim text-small">
+          Components don't just recolor &mdash; they change visual behavior.
+          Glass renders translucent surfaces with glow. Flat renders clean
+          material. Retro renders hard-pixel CRT. Same components, different
+          physics.
+        </p>
+      </div>
+
+      <div
+        class="surface-glass p-lg flex flex-col gap-md items-center text-center"
+      >
+        <Scaling class="icon text-primary" data-size="xl" />
+        <h3>Density Scaling</h3>
+        <p class="text-dim text-small">
+          Every spacing value flows through a global density coefficient.
+          Compact for data-heavy dashboards. Relaxed for reading experiences.
+          One setting, every component adapts.
+        </p>
+      </div>
+    </div>
+
+    <!-- Honesty block -->
+    <div class="surface-glass p-lg flex flex-col tablet:flex-row gap-lg">
+      <div class="flex-1 flex flex-col gap-sm">
+        <h4 class="text-success">Best For</h4>
+        <ul class="flex flex-col gap-sm text-dim text-small">
+          <li>White-label platforms and multi-tenant products</li>
+          <li>Narrative or immersive experiences</li>
+          <li>Multi-brand apps where visual identity is a feature</li>
+          <li>Products that need runtime theme customization</li>
+        </ul>
+      </div>
+      <div class="flex-1 flex flex-col gap-sm">
+        <h4 class="text-mute">Not Needed When</h4>
+        <ul class="flex flex-col gap-sm text-dim text-small">
+          <li>
+            Your product has one fixed brand and one theme is fine forever
+          </li>
+          <li>You need a massive component library out of the box</li>
+          <li>You prefer copy-paste component ownership (see shadcn)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- 6. INTERACTIVE SANDBOX                                            -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <section class="flex flex-col gap-lg">
+    <div class="flex flex-col gap-sm items-center text-center">
+      <h2>Interactive Sandbox</h2>
+      <p class="text-dim max-w-2xl">
+        Try the components below. Modals, toasts, animated chips &mdash; all
+        reacting to the active atmosphere.
       </p>
+    </div>
 
-      <SettingsRow label="Atmosphere Preview">
-        <div
-          class="surface-sunk flex flex-col justify-center tablet:flex-row gap-md p-md"
-        >
-          {#if voidEngine.temporaryThemeInfo?.id === 'cyberpunk'}
-            <button
-              class="btn-error"
-              onclick={() => voidEngine.restoreUserTheme()}
-            >
-              <Undo2 class="icon" />
-              Disable Custom Palette
-            </button>
-          {:else}
-            <button class="btn-premium" onclick={previewCustomAtmosphere}>
-              <Sparkles class="icon" />
-              Apply Custom Palette
-            </button>
-          {/if}
-          {#if voidEngine.temporaryThemeInfo?.id === 'crimson'}
-            <button
-              class="btn-error"
-              onclick={() => voidEngine.restoreUserTheme()}
-            >
-              <Undo2 class="icon" />
-              Disable Built-in Atmosphere
-            </button>
-          {:else}
-            <button class="btn-system" onclick={previewBuiltInAtmosphere}>
-              <Palette class="icon" />
-              Preview Built-in Atmosphere
-            </button>
-          {/if}
-        </div>
-      </SettingsRow>
-
-      <hr />
-
-      <SettingsRow label="Feedback Patterns">
+    <div class="surface-glass p-lg flex flex-col gap-lg">
+      <!-- Feedback patterns -->
+      <div class="flex flex-col gap-md">
+        <h3>Feedback Patterns</h3>
         <div
           class="surface-sunk p-lg flex flex-row flex-wrap gap-md justify-center"
         >
@@ -593,7 +460,6 @@
                       error: 'Failed to save preferences',
                     },
                   );
-                  console.log('Selected preferences:', prefs);
                 },
               });
             }}
@@ -621,11 +487,13 @@
             Show Error
           </button>
         </div>
-      </SettingsRow>
+      </div>
 
       <hr />
 
-      <SettingsRow label="Chip Variants">
+      <!-- Chip builder -->
+      <div class="flex flex-col gap-md">
+        <h3>Chip Variants</h3>
         <div
           class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center"
           use:morph={{ height: true, width: false }}
@@ -652,7 +520,7 @@
             {/each}
           {/if}
         </div>
-        <div class="flex flex-col gap-xs tablet:flex-row tablet:items-end">
+        <div class="flex flex-col gap-md tablet:flex-row tablet:items-end">
           <Selector
             bind:value={chipVariant}
             options={chipVariants}
@@ -680,63 +548,18 @@
             disabled={!newChipTag}>Add Tag</button
           >
         </div>
-      </SettingsRow>
-
-      <hr />
-
-      <SettingsRow label="Toggle Variants">
-        <p class="text-caption text-mute">
-          Demo toggles &mdash; these showcase visual variants, not functional
-          controls.
-        </p>
-        <div
-          class="surface-sunk p-md flex flex-col flex-wrap justify-center items-center gap-md tablet:flex-row"
-        >
-          <Toggle
-            bind:checked={animations}
-            id="toggle-animations"
-            label="Default"
-          />
-          <Toggle
-            bind:checked={colorMode}
-            id="toggle-color-mode"
-            label="Custom Icons"
-            iconOn={Sun}
-            iconOff={Moon}
-          />
-          <Toggle
-            bind:checked={reducedMotion}
-            id="toggle-reduced-motion"
-            label="No Icons"
-            hideIcons={true}
-          />
-          <Toggle
-            bind:checked={satisfaction}
-            id="toggle-satisfaction"
-            label="Emoji Icons"
-            iconOn="😄"
-            iconOff="😡"
-          />
-          <Toggle
-            bind:checked={adminOverride}
-            id="toggle-admin"
-            label="Disabled"
-            disabled={true}
-          />
-        </div>
-      </SettingsRow>
+      </div>
     </div>
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- CONCLUSION                                                        -->
+  <!-- 7. CTA                                                            -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="flex flex-col gap-md items-center text-center">
     <p class="text-dim max-w-2xl">
-      One codebase. Zero rebuilds. Every component you've seen adapts across 12
-      atmospheres, 3 physics presets, and 2 color modes &mdash; without touching
-      a single line of component code. Ship a product, change the brand, and the
-      entire interface follows.
+      One codebase. Zero rebuilds. Every component adapts across 12 atmospheres,
+      3 physics presets, and 2 color modes &mdash; without touching a single
+      line of component code.
     </p>
     <a href="/components" class="btn" use:navlink>
       Explore the Component Library

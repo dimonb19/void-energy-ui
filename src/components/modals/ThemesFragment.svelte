@@ -14,7 +14,7 @@
   import SliderField from '../ui/SliderField.svelte';
   import Selector from '../ui/Selector.svelte';
   import SettingsRow from '../ui/SettingsRow.svelte';
-  import { Sun, Moon } from '@lucide/svelte';
+  import { Sun, Moon, X } from '@lucide/svelte';
   import Toggle from '../ui/Toggle.svelte';
 
   // Helper to capitalize strings (e.g., "void" → "Void")
@@ -143,9 +143,35 @@
     }
   }
 
+  // Custom (user-registered, non-ephemeral) themes filtered by active mode
+  // Includes inline style with full palette (no build-time SCSS for runtime themes)
+  let customAtmospheres = $derived(
+    voidEngine.customAtmospheres
+      .filter((id: string) => voidEngine.registry[id]?.mode === activeMode)
+      .map((id: string) => {
+        const meta = voidEngine.registry[id];
+        const style = Object.entries(meta.palette)
+          .map(([key, value]) => `--${key}: ${value}`)
+          .join('; ');
+        return {
+          id,
+          label: capitalize(id),
+          tagline: meta.tagline,
+          physics: meta.physics,
+          mode: meta.mode,
+          style,
+        };
+      }),
+  );
+
   function selectTheme(id: string) {
     voidEngine.setAtmosphere(id);
     toast.show(`${id.toUpperCase()} theme selected`, 'success');
+  }
+
+  function removeCustomTheme(id: string) {
+    voidEngine.unregisterTheme(id);
+    toast.show(`${capitalize(id)} atmosphere removed`, 'success');
   }
 
   function handleRestore() {
@@ -263,7 +289,7 @@
   {/if}
 
   <div
-    class="theme-menu surface-sunk rounded-md flex flex-col tablet:grid tablet:grid-cols-2 gap-sm p-sm"
+    class="theme-menu surface-sunk flex flex-col tablet:grid tablet:grid-cols-2 gap-sm p-sm"
     role="radiogroup"
     aria-label="Select Theme"
   >
@@ -303,6 +329,61 @@
       </div>
     {/each}
   </div>
+
+  <!-- Custom Atmospheres -->
+  {#if customAtmospheres.length > 0}
+    <div class="flex flex-col gap-sm">
+      <h5 class="text-center text-dim">Custom Atmospheres</h5>
+      <div
+        class="theme-menu surface-sunk flex flex-col tablet:grid tablet:grid-cols-2 gap-sm p-sm"
+        role="radiogroup"
+        aria-label="Custom Themes"
+      >
+        {#each customAtmospheres as atm (atm.id)}
+          <div
+            class="theme-wrapper p-sm"
+            data-atmosphere={atm.id}
+            data-physics={atm.physics}
+            data-mode={atm.mode}
+            style={atm.style}
+            in:materialize
+          >
+            <div class="flex items-center gap-xs">
+              <button
+                class="theme-option w-full flex items-center gap-sm p-xs text-dim text-left"
+                role="radio"
+                aria-checked={voidEngine.atmosphere === atm.id}
+                onclick={() => selectTheme(atm.id)}
+              >
+                <div
+                  class="orb-wrapper relative hidden tablet:flex items-center justify-center"
+                  aria-hidden="true"
+                >
+                  <span class="orb relative"></span>
+                </div>
+
+                <span
+                  class="w-full flex flex-row items-center justify-between gap-sm"
+                >
+                  <span>{atm.label}</span>
+                  {#if atm.tagline}
+                    <span class="text-caption">{atm.tagline}</span>
+                  {/if}
+                </span>
+              </button>
+              <button
+                class="btn-icon text-dim"
+                aria-label="Remove {atm.label} atmosphere"
+                onclick={() => removeCustomTheme(atm.id)}
+              >
+                <X class="icon" data-size="sm" />
+              </button>
+            </div>
+          </div>
+        {/each}
+      </div>
+    </div>
+  {/if}
 
   <!-- Display Settings -->
   <hr />
@@ -416,7 +497,7 @@
 </div>
 
 <style lang="scss">
-  @use '/src/styles/abstracts' as *;
+  @use '../../styles/abstracts' as *;
 
   .theme-menu {
     .theme-wrapper {

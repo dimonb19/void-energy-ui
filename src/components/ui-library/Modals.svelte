@@ -5,7 +5,7 @@
 </script>
 
 <section id="modals" class="flex flex-col gap-md">
-  <h2>12 // MODALS & DIALOGS</h2>
+  <h2>13 // MODALS & DIALOGS</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
@@ -33,7 +33,7 @@
     </details>
 
     <!-- ALERT -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Alert</h5>
       <p class="text-small text-mute">
         <code>modal.alert(title, body)</code> opens a small informational dialog
@@ -70,7 +70,7 @@
     </div>
 
     <!-- CONFIRM -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Confirm</h5>
       <p class="text-small text-mute">
         <code>modal.confirm(title, body, actions)</code> opens a dialog with
@@ -119,7 +119,7 @@
     </div>
 
     <!-- THEMES & SETTINGS -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Themes & Settings</h5>
       <p class="text-small text-mute">
         Convenience methods for built-in modals. <code>modal.themes()</code>
@@ -134,7 +134,7 @@
     </div>
 
     <!-- COMMAND PALETTE & SHORTCUTS -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Command Palette & Shortcuts</h5>
       <p class="text-small text-mute">
         <code>modal.palette()</code> opens a fuzzy-search command palette (<code
@@ -158,7 +158,7 @@
     </div>
 
     <!-- SIZE COMPARISON -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Sizes</h5>
       <p class="text-small text-mute">
         Four dialog sizes control width: <code>sm</code> (alerts,
@@ -229,7 +229,7 @@
     </div>
 
     <!-- CUSTOM FRAGMENTS -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Custom Fragments</h5>
       <p class="text-small text-mute">
         Add your own modal content by creating a fragment component, registering

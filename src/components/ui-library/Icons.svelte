@@ -79,7 +79,7 @@
 </script>
 
 <section id="icons" class="flex flex-col gap-md">
-  <h2>05 // ICONS</h2>
+  <h2>06 // ICONS</h2>
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Two-tier icon system: hand-crafted animated icons for interactive
@@ -125,7 +125,7 @@
     </p>
 
     <!-- ─── TOGGLE ICONS ─────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Toggle</h5>
       <p class="text-small text-mute">
         Click to switch between two persistent states. Uses
@@ -193,7 +193,7 @@
     </div>
 
     <!-- ─── HOVER ICONS ──────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Hover</h5>
       <p class="text-small text-mute">
         Animate on pointer enter via <code>data-state="active"</code>. Grouped
@@ -361,7 +361,7 @@
     </div>
 
     <!-- ─── LOADING ICONS ──────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Loading</h5>
       <p class="text-small text-mute">
         Physics-aware loading indicators: smooth animation in glass/flat,
@@ -399,7 +399,7 @@
     </div>
 
     <!-- ─── STATIC ICONS ─────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Static</h5>
       <p class="text-small text-mute">
         Display-only icons with no interactive state. Accept only
@@ -426,7 +426,7 @@
     </div>
 
     <!-- ─── LUCIDE INTEGRATION ───────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Lucide (Static Library)</h5>
       <p class="text-small text-mute">
         For generic static icons, use
