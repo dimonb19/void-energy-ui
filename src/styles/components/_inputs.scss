@@ -251,7 +251,147 @@ input[type='radio'] {
   }
 }
 
-// 7. AUTOFILL OVERRIDE (Webkit Browsers)
+// 7. DATE & TIME INPUTS (Native Pickers)
+// --------------------------------------------------------------------------
+// Style the WebKit picker indicator and internal edit segments to match
+// the design system. The OS-level calendar/clock popup can't be styled,
+// but the trigger icon and in-field segments can.
+
+input[type='date'],
+input[type='time'],
+input[type='datetime-local'] {
+  // Picker indicator icon (calendar / clock)
+  &::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    border-radius: var(--radius-base);
+    padding: calc(var(--space-xs) / 2);
+    transition: filter var(--speed-fast) var(--ease-spring-snappy);
+
+    // Hover: subtle bg tint matching btn-icon pattern
+    &:hover {
+      background-color: alpha(var(--energy-secondary), 8%);
+    }
+  }
+
+  // Internal text segments (day, month, year, hour, minute)
+  &::-webkit-datetime-edit {
+    font-family: var(--font-body);
+    color: var(--text-main);
+  }
+
+  &::-webkit-datetime-edit-fields-wrapper {
+    padding: 0;
+  }
+
+  // Segment separators (/, :, etc.)
+  &::-webkit-datetime-edit-text {
+    color: var(--text-mute);
+  }
+
+  // Individual segments — dim when placeholder, normal when filled
+  &::-webkit-datetime-edit-day-field,
+  &::-webkit-datetime-edit-month-field,
+  &::-webkit-datetime-edit-year-field,
+  &::-webkit-datetime-edit-hour-field,
+  &::-webkit-datetime-edit-minute-field,
+  &::-webkit-datetime-edit-second-field,
+  &::-webkit-datetime-edit-ampm-field {
+    color: var(--text-main);
+
+    &:focus {
+      background: alpha(var(--energy-primary), 20%);
+      border-radius: var(--radius-base);
+      color: var(--text-main);
+    }
+  }
+
+  // Icon color is handled by color-scheme (dark/light) on the global
+  // input selector — no filter inversion needed.
+
+  // Light: match btn-icon light hover tint
+  @include when-light {
+    &::-webkit-calendar-picker-indicator:hover {
+      background-color: alpha(var(--energy-primary), 8%);
+    }
+  }
+
+  // Retro: dim icon at rest for CRT feel, brighten on hover
+  @include when-retro {
+    &::-webkit-calendar-picker-indicator {
+      border-radius: 0;
+      transition: none;
+      opacity: 0.6;
+
+      &:hover {
+        opacity: 1;
+      }
+    }
+
+    &::-webkit-datetime-edit-day-field,
+    &::-webkit-datetime-edit-month-field,
+    &::-webkit-datetime-edit-year-field,
+    &::-webkit-datetime-edit-hour-field,
+    &::-webkit-datetime-edit-minute-field,
+    &::-webkit-datetime-edit-second-field,
+    &::-webkit-datetime-edit-ampm-field {
+      &:focus {
+        border-radius: 0;
+      }
+    }
+  }
+}
+
+// 8. COLOR INPUT (Native Swatch)
+// --------------------------------------------------------------------------
+// Strip browser chrome from the color picker and make the swatch integrate
+// with the glass-sunk surface. The OS color dialog can't be styled, but the
+// trigger swatch can.
+
+input[type='color'] {
+  appearance: none;
+  -webkit-appearance: none;
+  padding: var(--control-padding-y);
+  cursor: pointer;
+  height: var(--control-height);
+  width: var(--control-height);
+  min-height: 0;
+
+  // The swatch pseudo-element (WebKit/Blink)
+  &::-webkit-color-swatch-wrapper {
+    padding: 0;
+  }
+
+  &::-webkit-color-swatch {
+    border: var(--physics-border-width) solid alpha(var(--border-color), 40%);
+    border-radius: calc(var(--radius-base) / 2);
+  }
+
+  // Firefox swatch
+  &::-moz-color-swatch {
+    border: var(--physics-border-width) solid alpha(var(--border-color), 40%);
+    border-radius: calc(var(--radius-base) / 2);
+  }
+
+  // Retro: squared swatch
+  @include when-retro {
+    border-radius: 0;
+
+    &::-webkit-color-swatch,
+    &::-moz-color-swatch {
+      border-radius: 0;
+    }
+  }
+
+  // Light: stronger swatch border for visibility
+  @include when-light {
+    &::-webkit-color-swatch,
+    &::-moz-color-swatch {
+      border-color: alpha(var(--border-color), 60%);
+    }
+  }
+}
+
+// 9. AUTOFILL OVERRIDE (Webkit Browsers)
 // --------------------------------------------------------------------------
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -267,7 +407,7 @@ textarea:-webkit-autofill {
   transition: background-color 5000s ease-in-out 0s; // void-ignore (autofill flash suppression)
 }
 
-// 8. AUTOFILL OVERRIDE (Firefox)
+// 10. AUTOFILL OVERRIDE (Firefox)
 // --------------------------------------------------------------------------
 input:-moz-autofill,
 textarea:-moz-autofill {
@@ -276,7 +416,7 @@ textarea:-moz-autofill {
   color: var(--text-main) !important;
 }
 
-// 9. FIELDSET & LEGEND
+// 11. FIELDSET & LEGEND
 // --------------------------------------------------------------------------
 fieldset {
   margin: 0;
@@ -304,7 +444,7 @@ legend {
   transition: color var(--speed-fast) var(--ease-spring-snappy);
 }
 
-// 10. SWITCHER (Native Radio Foundation)
+// 12. SWITCHER (Native Radio Foundation)
 // --------------------------------------------------------------------------
 .switcher-group {
   padding: 0;
@@ -360,7 +500,7 @@ legend {
   }
 }
 
-// 11. DETAILS & SUMMARY (Native Disclosure)
+// 13. DETAILS & SUMMARY (Native Disclosure)
 // --------------------------------------------------------------------------
 details {
   @include glass-sunk;
@@ -469,7 +609,7 @@ summary {
   }
 }
 
-// 11. PROGRESS BAR
+// 14. PROGRESS BAR
 // --------------------------------------------------------------------------
 // void-hybrid-exception: progress height is a physics-dependent visual
 // property (retro uses taller bars, glass uses thinner). display: block on
@@ -584,7 +724,7 @@ progress {
   }
 }
 
-// 12. METER
+// 15. METER
 // --------------------------------------------------------------------------
 // Same dimensions as progress for visual consistency.
 // Three semantic ranges: optimum (success), sub-optimum (premium/amber),
@@ -662,7 +802,7 @@ meter {
   }
 }
 
-// 13. OUTPUT
+// 16. OUTPUT
 // --------------------------------------------------------------------------
 // Computed value display element. Styled as a data pill — monospace font,
 // subtle energy-tinted background, pill shape.

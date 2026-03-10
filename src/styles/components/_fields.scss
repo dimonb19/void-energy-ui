@@ -170,7 +170,119 @@ $_slot-width: var(--control-padding-x);
 }
 
 // ==========================================================================
-// 3. GENERATE FIELD (AI generation shimmer during loading)
+// 3. COLOR FIELD (swatch + hex display)
+// ==========================================================================
+//
+// ANATOMY:
+// ┌─ .color-field.field (position: relative) ─────────────────────────────┐
+// │  <input type="color" class="color-field-native">  (hidden, visually) │
+// │  ┌─ .color-field-display ──────────────────────────────────────────┐  │
+// │  │  [.field-slot-left]       .color-field-hex                      │  │
+// │  │   .color-field-swatch       #FF5733                             │  │
+// │  └────────────────────────────────────────────────────────────────┘  │
+// └────────────────────────────────────────────────────────────────────────┘
+//
+// @see /src/components/ui/ColorField.svelte
+
+// Hide native input — it only exists for the picker dialog.
+// !important keeps it hidden even when :disabled overrides opacity in _inputs.scss.
+.color-field-native {
+  position: absolute;
+  width: 0;
+  height: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  opacity: 0 !important; // void-ignore — must beat :disabled { opacity: 0.5 }
+  pointer-events: none;
+}
+
+// Display area — mimics a glass-sunk text input
+.color-field-display {
+  @include glass-sunk;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: var(--control-height);
+  padding: var(--control-padding-y) var(--control-padding-x);
+  padding-left: calc(#{$_slot-width} + var(--space-lg) + var(--space-xs));
+  border-radius: var(--radius-base);
+  cursor: pointer;
+
+  transition:
+    border-color var(--speed-fast) var(--ease-spring-snappy),
+    box-shadow var(--speed-fast) var(--ease-spring-snappy);
+}
+
+// Swatch preview dot
+.color-field-swatch {
+  display: block;
+  width: var(--space-md);
+  height: var(--space-md);
+  border-radius: var(--radius-full);
+  border: var(--physics-border-width) solid alpha(var(--border-color), 40%);
+  flex-shrink: 0;
+
+  transition: box-shadow var(--speed-fast) var(--ease-spring-snappy);
+
+  @include when-retro {
+    border-radius: 0;
+  }
+}
+
+// Hex value text
+.color-field-hex {
+  font-family: var(--font-code);
+  font-size: var(--font-size-body);
+  color: var(--text-main);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  user-select: none;
+}
+
+// Focus ring — native input is visually hidden, so show ring on the display label
+.color-field:focus-within .color-field-display {
+  border-color: var(--energy-primary);
+  box-shadow: var(--focus-ring);
+}
+
+// Physics presets
+.color-field {
+  @include when-glass {
+    @media (hover: hover) {
+      &:hover .color-field-swatch {
+        box-shadow: 0 0 var(--space-xs) alpha(var(--energy-primary), 40%);
+      }
+    }
+  }
+
+  @include when-retro {
+    .color-field-display {
+      border-radius: 0;
+    }
+  }
+
+  @include when-light {
+    .color-field-swatch {
+      border-color: alpha(var(--border-color), 60%);
+    }
+  }
+
+  &.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+
+    // Prevent double-dimming — the wrapper handles the disabled opacity,
+    // so the hidden native input should not add its own.
+    .color-field-native:disabled {
+      opacity: 1;
+    }
+  }
+}
+
+// ==========================================================================
+// 4. GENERATE FIELD (AI generation shimmer during loading)
 // ==========================================================================
 
 .generate-field,
@@ -184,7 +296,7 @@ $_slot-width: var(--control-padding-x);
 }
 
 // ==========================================================================
-// 4. MEDIA SLIDER (non-field composite)
+// 5. MEDIA SLIDER (non-field composite)
 // ==========================================================================
 
 .media-slider {
@@ -200,7 +312,7 @@ $_slot-width: var(--control-padding-x);
 }
 
 // ==========================================================================
-// 5. SLIDER FIELD (non-field composite)
+// 6. SLIDER FIELD (non-field composite)
 // ==========================================================================
 //
 // ANATOMY:
@@ -270,7 +382,7 @@ $_slot-width: var(--control-padding-x);
 }
 
 // ==========================================================================
-// 6. FORM FIELD WRAPPER (Label + Input + Hint/Error)
+// 7. FORM FIELD WRAPPER (Label + Input + Hint/Error)
 // ==========================================================================
 //
 // ANATOMY:
@@ -323,7 +435,7 @@ $_slot-width: var(--control-padding-x);
 }
 
 // ==========================================================================
-// 7. PASSWORD METER (non-field composite)
+// 8. PASSWORD METER (non-field composite)
 // ==========================================================================
 //
 // ANATOMY:
@@ -389,7 +501,7 @@ $_slot-width: var(--control-padding-x);
 }
 
 // ==========================================================================
-// 8. PASSWORD CHECKLIST (non-field composite)
+// 9. PASSWORD CHECKLIST (non-field composite)
 // ==========================================================================
 //
 // ANATOMY:

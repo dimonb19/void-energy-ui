@@ -159,7 +159,7 @@
 
           <details class="surface-glass text-left">
             <summary>New here? Key concepts</summary>
-            <div class="p-md flex flex-col gap-md">
+            <div class="p-lg flex flex-col gap-md">
               <p>
                 <strong>Atmosphere</strong> &mdash; the active color palette,
                 typography, and mood. 12 built-in presets (Void, Onyx, Terminal,

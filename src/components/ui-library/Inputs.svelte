@@ -5,6 +5,7 @@
   import Switcher from '../ui/Switcher.svelte';
   import Selector from '../ui/Selector.svelte';
   import FormField from '../ui/FormField.svelte';
+  import ColorField from '../ui/ColorField.svelte';
   import DropZone from '../ui/DropZone.svelte';
   import { toast } from '@stores/toast.svelte';
 
@@ -19,6 +20,15 @@
 
   // Range demo
   let rangeValue = $state(50);
+
+  // Date & time demos
+  let dateValue = $state('');
+  let timeValue = $state('');
+  let datetimeValue = $state('');
+
+  // Color demos
+  let colorValue = $state('#7c3aed');
+  let colorFieldValue = $state('#00e055');
 
   // Toggle demos
   let telemetry = $state(true);
@@ -371,6 +381,188 @@
 &lt;input id="volume" type="range" bind:value min="0" max="100" /&gt;</code
           ></pre>
       </details>
+    </div>
+
+    <!-- ─── DATE & TIME ────────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-md">
+      <h5>Date & Time</h5>
+      <p class="text-small text-mute">
+        Native <code>&lt;input type="date"&gt;</code>,
+        <code>&lt;input type="time"&gt;</code>, and
+        <code>&lt;input type="datetime-local"&gt;</code> with themed picker indicators
+        and segment styling. The OS-level calendar/clock popup is native &mdash;
+        SCSS styles the trigger icon, internal text segments, and focus highlights
+        to match the active atmosphere.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <div class="flex flex-col tablet:flex-row gap-md">
+          <div class="flex flex-col gap-xs flex-1">
+            <label class="text-small px-xs" for="demo-date">Launch Date</label>
+            <input id="demo-date" type="date" bind:value={dateValue} />
+          </div>
+          <div class="flex flex-col gap-xs flex-1">
+            <label class="text-small px-xs" for="demo-time">Launch Time</label>
+            <input id="demo-time" type="time" bind:value={timeValue} />
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-xs">
+          <label class="text-small px-xs" for="demo-datetime"
+            >Full Launch Schedule</label
+          >
+          <input
+            id="demo-datetime"
+            type="datetime-local"
+            bind:value={datetimeValue}
+          />
+        </div>
+
+        <div class="flex flex-col gap-xs">
+          <label class="text-small px-xs" for="demo-date-disabled"
+            >Mission End (locked)</label
+          >
+          <input
+            id="demo-date-disabled"
+            type="date"
+            value="2026-12-31"
+            disabled
+          />
+        </div>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;label for="date"&gt;Launch Date&lt;/label&gt;
+&lt;input id="date" type="date" bind:value /&gt;
+
+&lt;label for="time"&gt;Launch Time&lt;/label&gt;
+&lt;input id="time" type="time" bind:value /&gt;
+
+&lt;label for="datetime"&gt;Full Schedule&lt;/label&gt;
+&lt;input id="datetime" type="datetime-local" bind:value /&gt;
+
+&lt;!-- With FormField for label + error + hint --&gt;
+&lt;FormField label="Launch Date" error=&#123;dateError&#125; hint="Select a future date."&gt;
+  &#123;#snippet children(&#123; fieldId, descriptionId, invalid &#125;)&#125;
+    &lt;input type="date" id=&#123;fieldId&#125; aria-invalid=&#123;invalid&#125;
+      aria-describedby=&#123;descriptionId&#125; /&gt;
+  &#123;/snippet&#125;
+&lt;/FormField&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        No wrapper component needed &mdash; these are styled natively in
+        <code>_inputs.scss</code>. Use with <code>FormField</code> for
+        label/hint/error wiring. The picker icon color is handled by
+        <code>color-scheme</code> (dark/light). Individual date segments highlight
+        with energy-primary on focus.
+      </p>
+    </div>
+
+    <!-- ─── COLOR PICKER ─────────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-md">
+      <h5>Color Picker</h5>
+      <p class="text-small text-mute">
+        Two approaches: a standalone native <code
+          >&lt;input type="color"&gt;</code
+        >
+        swatch (styled in <code>_inputs.scss</code>), and the
+        <code>ColorField</code> composite that adds a hex value display alongside
+        the swatch preview. Both open the OS-native color picker dialog.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-col gap-lg">
+        <!-- Native color input -->
+        <div class="flex flex-col gap-xs">
+          <p class="text-small text-dim">
+            Native swatch &mdash; standalone <code
+              >&lt;input type="color"&gt;</code
+            >:
+          </p>
+          <div class="flex flex-row items-center gap-md">
+            <input
+              type="color"
+              bind:value={colorValue}
+              aria-label="Pick a color"
+            />
+            <span class="text-small text-mute">
+              Selected: <code>{colorValue.toUpperCase()}</code>
+            </span>
+          </div>
+        </div>
+
+        <!-- ColorField composite -->
+        <div class="flex flex-col gap-xs">
+          <p class="text-small text-dim">
+            ColorField composite &mdash; swatch + hex display in a field:
+          </p>
+          <ColorField bind:value={colorFieldValue} />
+        </div>
+
+        <!-- ColorField with FormField -->
+        <div class="flex flex-col gap-xs">
+          <p class="text-small text-dim">
+            With <code>FormField</code> wrapper for label + hint:
+          </p>
+          <FormField
+            label="Brand Color"
+            hint="Used across your dashboard theme."
+            fieldId="brand-color"
+          >
+            {#snippet children({ fieldId, descriptionId, invalid })}
+              <ColorField
+                id={fieldId}
+                describedby={descriptionId}
+                {invalid}
+                bind:value={colorFieldValue}
+                onchange={(v) => toast.show(`Color changed to ${v}`, 'info')}
+              />
+            {/snippet}
+          </FormField>
+        </div>
+
+        <!-- Disabled -->
+        <div class="flex flex-col gap-xs">
+          <p class="text-small text-dim">Disabled state:</p>
+          <ColorField value="#6b7280" disabled />
+        </div>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;!-- Native swatch only --&gt;
+&lt;input type="color" bind:value aria-label="Pick a color" /&gt;
+
+&lt;!-- ColorField composite (swatch + hex) --&gt;
+&lt;script&gt;
+  import ColorField from './ui/ColorField.svelte';
+  let color = $state('#7c3aed');
+&lt;/script&gt;
+
+&lt;ColorField bind:value=&#123;color&#125; /&gt;
+&lt;ColorField bind:value=&#123;color&#125; onchange=&#123;handleChange&#125; /&gt;
+&lt;ColorField value="#6b7280" disabled /&gt;
+
+&lt;!-- With FormField --&gt;
+&lt;FormField label="Brand Color" hint="Dashboard theme color." fieldId="brand-color"&gt;
+  &#123;#snippet children(&#123; fieldId, descriptionId, invalid &#125;)&#125;
+    &lt;ColorField id=&#123;fieldId&#125; describedby=&#123;descriptionId&#125; &#123;invalid&#125; bind:value=&#123;color&#125; /&gt;
+  &#123;/snippet&#125;
+&lt;/FormField&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        The native <code>&lt;input type="color"&gt;</code> renders as a
+        <code>--control-height</code> square swatch with glass-sunk physics. Use
+        <code>ColorField</code> when you need the hex value visible alongside
+        the swatch. Props: <code>value</code> (bindable), <code>onchange</code>,
+        <code>disabled</code>.
+      </p>
     </div>
 
     <!-- ─── CHECKBOX & RADIO ───────────────────────────────────────────── -->

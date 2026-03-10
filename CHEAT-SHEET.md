@@ -830,6 +830,51 @@ Styled as a data pill — monospace font, `tabular-nums`, energy-tinted backgrou
 </form>
 ```
 
+#### Date & Time Inputs — Native Pickers
+
+**Source:** [src/styles/components/\_inputs.scss](src/styles/components/_inputs.scss) (section 7)
+
+SCSS-only styling for `<input type="date">`, `<input type="time">`, and `<input type="datetime-local">`. The OS-level calendar/clock popup cannot be styled, but the in-field segments and trigger icon are themed.
+
+| Feature | Treatment |
+| --- | --- |
+| Picker icon | Browser-native icon, colored via `color-scheme` (dark/light) |
+| Segment text | `--font-body`, `--text-main` color |
+| Segment focus | Energy-primary alpha'd background highlight |
+| Separators | `--text-mute` color |
+
+| Physics | Visual |
+| --- | --- |
+| **Glass/Flat** | Standard themed segments |
+| **Retro** | Squared segment focus (no border-radius) |
+| **Light** | `color-scheme: light` auto-adjusts icon color |
+
+```html
+<input type="date" />
+<input type="time" />
+<input type="datetime-local" />
+```
+
+No wrapper component needed — use `<FormField>` for label/hint/error wiring.
+
+#### Color Input — Native Swatch
+
+**Source:** [src/styles/components/\_inputs.scss](src/styles/components/_inputs.scss) (section 8)
+
+SCSS-only styling for `<input type="color">`. Strips browser chrome and renders a clean swatch with physics-aware borders.
+
+| Physics | Visual |
+| --- | --- |
+| **Glass/Flat** | Rounded swatch, 40% alpha border |
+| **Retro** | Squared swatch (no border-radius) |
+| **Light** | Stronger border (60% alpha) for visibility |
+
+```html
+<input type="color" value="#ff5733" />
+```
+
+For hex value display and label/hint/error parity, use the `<ColorField>` composite instead.
+
 ---
 
 ### H. Media & Interactive Elements
@@ -1544,6 +1589,45 @@ const pv = createPasswordValidation(() => password);
 ```svelte
 <CopyField value="sk-1234-abcd-5678" />
 ```
+
+---
+
+#### `<ColorField>`
+
+**Description:** Color picker with swatch preview and hex value display. Wraps a hidden native `<input type="color">` with a clickable display area.
+**Location:** [src/components/ui/ColorField.svelte](src/components/ui/ColorField.svelte)
+**CSS Class:** `.field .color-field` ([src/styles/components/\_fields.scss](src/styles/components/_fields.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `value` | `string` | `$bindable('#000000')` | Hex color string (bindable) |
+| `id` | `string` | auto-generated | ID for the native input |
+| `onchange` | `(value: string) => void` | — | Callback when color changes |
+| `disabled` | `boolean` | `false` | Disables the picker |
+| `invalid` | `boolean` | `false` | Maps to `aria-invalid` (for FormField wiring) |
+| `describedby` | `string` | — | Maps to `aria-describedby` (for FormField wiring) |
+| `...rest` | `HTMLInputAttributes` | — | Native input attributes |
+
+**Usage:**
+
+```svelte
+<ColorField bind:value={color} />
+
+<!-- With FormField -->
+<FormField label="Brand Color" fieldId="brand">
+  {#snippet children({ fieldId, descriptionId, invalid })}
+    <ColorField id={fieldId} describedby={descriptionId} {invalid} bind:value={brandColor} />
+  {/snippet}
+</FormField>
+```
+
+**Physics:**
+- **Glass:** Glow on swatch hover
+- **Flat:** Standard themed display
+- **Retro:** Squared swatch and display (no border-radius)
+- **Light:** Stronger swatch border for visibility
 
 ---
 
@@ -4222,7 +4306,7 @@ Native form submission serializes `String(option.value)`.
 
 ---
 
-### N. Field Composites (Password + Validation, Copy, Edit, EditTextarea, Generate)
+### N. Field Composites (Password + Validation, Copy, Color, Edit, EditTextarea, Generate)
 
 ```svelte
 <script lang="ts">
@@ -4232,6 +4316,7 @@ Native form submission serializes `String(option.value)`.
   import PasswordChecklist from '@components/ui/PasswordChecklist.svelte';
   import FormField from '@components/ui/FormField.svelte';
   import CopyField from '@components/ui/CopyField.svelte';
+  import ColorField from '@components/ui/ColorField.svelte';
   import EditField from '@components/ui/EditField.svelte';
   import EditTextarea from '@components/ui/EditTextarea.svelte';
   import GenerateField from '@components/ui/GenerateField.svelte';
@@ -4265,6 +4350,7 @@ Native form submission serializes `String(option.value)`.
 
 <!-- Other field composites -->
 <CopyField value="sk-1234-abcd-5678" />
+<ColorField bind:value={brandColor} />
 <EditField bind:value={name} onconfirm={saveName} />
 <EditTextarea bind:value={notes} rows={4} onconfirm={saveNotes} />
 
