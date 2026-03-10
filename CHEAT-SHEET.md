@@ -17,6 +17,7 @@
    - [Global Treatments](#i-global-treatments)
    - [Container Queries](#j-container-queries)
 4. [Component Catalog](#4-component-catalog)
+   - [Coverage Model](#coverage-model)
    - [Surfaces](#a-surfaces-the-skin)
    - [Composites](#b-composites-skin--bone)
    - [Overlays](#c-overlays-the-ether)
@@ -951,6 +952,22 @@ Smaller than viewport breakpoints by design — components resize before the pag
 ---
 
 ## 4. Component Catalog
+
+### Coverage Model
+
+Void Energy is a **native-first** system. Not every common UI pattern is shipped as a dedicated Svelte primitive.
+
+Patterns in this library are delivered in three forms:
+
+| Delivery Mode | What ships | Use when | Examples |
+| --- | --- | --- | --- |
+| **Reusable Primitive** | A dedicated Svelte component | Behavior is non-trivial, repeated, and worth standardizing | `Dropdown`, `Sidebar`, `Toggle`, `Selector`, `Switcher`, charts, modals |
+| **Native-Styled HTML** | Global styling on semantic elements | The platform already provides the correct semantics and behavior | `<details>`, `<table>`, `<progress>`, `<meter>`, `<audio>`, prose elements |
+| **Documented Recipe** | A composition pattern using HTML + Tailwind + existing primitives | The pattern is useful but too app-specific to freeze into a single API | Nav menu, accordion groups via `details[name]`, drawer-like layouts built from `Sidebar` |
+
+**Rule of thumb:** if the browser already provides semantics and the composition stays simple, prefer native HTML over inventing another wrapper component.
+
+The system standardizes shared interaction and accessibility contracts, but deliberately leaves browser-native semantics in place when the platform already provides the right abstraction. A missing wrapper is not, by itself, evidence that a capability is missing from the design system.
 
 ### A. Surfaces (The Skin)
 

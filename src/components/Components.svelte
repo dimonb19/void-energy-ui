@@ -150,6 +150,12 @@
             atmospheres, physics presets, and density settings. Interactive
             demos for everyone &mdash; expandable code examples for developers.
           </p>
+          <p class="text-small text-mute max-w-3xl mx-auto">
+            This library is native-first: some patterns ship as reusable Svelte
+            primitives, some are provided as styled semantic HTML, and some are
+            documented recipes built from Tailwind plus existing primitives. A
+            missing wrapper does not automatically mean a missing capability.
+          </p>
 
           <details class="surface-glass text-left">
             <summary>New here? Key concepts</summary>
@@ -168,6 +174,14 @@
               <p>
                 <strong>Mode</strong> &mdash; light or dark contrast. Glass and Retro
                 require dark mode; Flat works in both.
+              </p>
+              <p>
+                <strong>Coverage model</strong> &mdash; use shipped primitives
+                for reusable interaction logic (<code>Dropdown</code>,
+                <code>Sidebar</code>, <code>Toggle</code>), raw semantic HTML
+                for browser-native patterns (<code>&lt;details&gt;</code>,
+                <code>&lt;table&gt;</code>), and documented recipes for
+                app-specific compositions like nav menus.
               </p>
             </div>
           </details>

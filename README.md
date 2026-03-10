@@ -100,6 +100,22 @@ We separate **Composition Layout** from **Material + Shipped Primitive Geometry*
 * Use semantic attributes: `[data-state="open"]`, `[aria-pressed="true"]`.
 * This ensures CSS transitions (Enter/Exit) trigger correctly via the Physics Engine.
 
+## 🧩 UI Pattern Philosophy
+
+Void Energy is a **native-first** design system. It does not try to ship a bespoke Svelte primitive for every UI noun.
+
+Patterns in this system are delivered in three ways:
+
+| Delivery Mode | Meaning | Examples |
+| :--- | :--- | :--- |
+| **Reusable Primitive** | Shipped component when behavior is non-trivial, repeated, and worth standardizing | `Dropdown`, `Sidebar`, `Toggle`, `Selector`, `Switcher`, charts, modals |
+| **Native-Styled HTML** | Semantic HTML element styled globally so raw markup already looks like the system | `<details>`, `<table>`, `<progress>`, `<meter>`, `<audio>`, prose elements |
+| **Documented Recipe** | Composition pattern built from HTML + Tailwind + existing primitives, documented but not abstracted into a dedicated component | Nav menu, accordion groups via `details[name]`, drawer-like layouts built from `Sidebar` |
+
+This means a pattern is **not automatically missing** just because there is no single file named after it.
+
+The goal is to standardize the parts that carry shared behavior and shared accessibility contracts, while leaving browser-native semantics intact wherever the platform already gives the right abstraction. If semantic HTML plus existing system styles are enough, Void Energy prefers that over adding another wrapper component.
+
 ## 📂 Project Structure
 
 ```text
