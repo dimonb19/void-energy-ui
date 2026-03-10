@@ -3137,7 +3137,7 @@ Temporary themes override the user's selected atmosphere without persisting. The
 | `hasTemporaryTheme` | Both | Whether any temporary theme is active (getter) |
 | `temporaryThemeInfo` | Both | Top-of-stack `{ id, label, returnTo }` (getter) |
 
-**UI indicator:** When `hasTemporaryTheme` is true, the Themes modal shows a "Story Override Active" section with restore and opt-out buttons.
+**UI indicator:** When `hasTemporaryTheme` is true, the Themes modal shows a "Theme Override Active" section with restore and disable-overrides buttons. Custom themes appear in the same unified grid as built-in themes, distinguished by an X remove button.
 
 ---
 

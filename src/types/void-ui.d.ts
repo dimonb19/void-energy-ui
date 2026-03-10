@@ -217,7 +217,7 @@ interface UserConfig {
   scale: number;
   /** Spacing density factor */
   density: VoidDensity;
-  /** Allow themes to adapt to story mood */
+  /** Allow theme overrides (temporary themes can override user preference) */
   adaptAtmosphere: boolean;
   /** Keep navigation bar visible while scrolling */
   fixedNav: boolean;

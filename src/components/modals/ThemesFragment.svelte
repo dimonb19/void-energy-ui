@@ -2,7 +2,7 @@
   import { modal } from '@lib/modal-manager.svelte';
   import { voidEngine } from '@adapters/void-engine.svelte';
   import { toast } from '@stores/toast.svelte';
-  import { dematerialize, materialize } from '@lib/transitions.svelte';
+  import { dissolve, materialize } from '@lib/transitions.svelte';
   import { morph } from '@actions/morph';
   import {
     FONTS,
@@ -32,9 +32,9 @@
   // Default tab to current theme's mode
   let activeMode = $state<'dark' | 'light'>(voidEngine.currentTheme.mode);
 
-  // Filter themes by mode - only show built-in themes (not story themes)
-  let filteredAtmospheres = $derived(
-    voidEngine.builtInAtmospheres
+  // Unified theme list: built-in first, then custom — all filtered by active mode
+  let allAtmospheres = $derived([
+    ...voidEngine.builtInAtmospheres
       .filter((id: string) => voidEngine.registry[id]?.mode === activeMode)
       .map((id: string) => {
         const meta = voidEngine.registry[id];
@@ -44,9 +44,28 @@
           tagline: meta.tagline,
           physics: meta.physics,
           mode: meta.mode,
+          custom: false,
+          style: undefined as string | undefined,
         };
       }),
-  );
+    ...voidEngine.customAtmospheres
+      .filter((id: string) => voidEngine.registry[id]?.mode === activeMode)
+      .map((id: string) => {
+        const meta = voidEngine.registry[id];
+        const style = Object.entries(meta.palette)
+          .map(([key, value]) => `--${key}: ${value}`)
+          .join('; ');
+        return {
+          id,
+          label: capitalize(id),
+          tagline: meta.tagline,
+          physics: meta.physics,
+          mode: meta.mode,
+          custom: true,
+          style,
+        };
+      }),
+  ]);
 
   // Get current atmosphere's theme definition (single lookup, used by both font keys)
   let currentThemeDef = $derived(
@@ -123,7 +142,7 @@
 
   let themeRefs = $state<(HTMLButtonElement | null)[]>([]);
   let selectedThemeIndex = $derived(
-    filteredAtmospheres.findIndex((atm) => atm.id === voidEngine.atmosphere),
+    allAtmospheres.findIndex((atm) => atm.id === voidEngine.atmosphere),
   );
   let focusableThemeIndex = $derived(
     selectedThemeIndex >= 0 ? selectedThemeIndex : 0,
@@ -135,34 +154,13 @@
     voidEngine.setPreferences({ adaptAtmosphere: newValue });
 
     if (newValue) {
-      toast.show("Interface will now adapt to the story's mood.", 'success');
+      toast.show('Theme overrides are now allowed.', 'success');
     } else {
       toast.show(
         'Theme locked to your preference. No further changes will occur.',
       );
     }
   }
-
-  // Custom (user-registered, non-ephemeral) themes filtered by active mode
-  // Includes inline style with full palette (no build-time SCSS for runtime themes)
-  let customAtmospheres = $derived(
-    voidEngine.customAtmospheres
-      .filter((id: string) => voidEngine.registry[id]?.mode === activeMode)
-      .map((id: string) => {
-        const meta = voidEngine.registry[id];
-        const style = Object.entries(meta.palette)
-          .map(([key, value]) => `--${key}: ${value}`)
-          .join('; ');
-        return {
-          id,
-          label: capitalize(id),
-          tagline: meta.tagline,
-          physics: meta.physics,
-          mode: meta.mode,
-          style,
-        };
-      }),
-  );
 
   function selectTheme(id: string) {
     voidEngine.setAtmosphere(id);
@@ -202,25 +200,24 @@
   }
 
   function handleThemeKeydown(event: KeyboardEvent, index: number) {
-    if (filteredAtmospheres.length === 0) return;
+    if (allAtmospheres.length === 0) return;
 
     let nextIndex: number | null = null;
 
     switch (event.key) {
       case 'ArrowLeft':
       case 'ArrowUp':
-        nextIndex =
-          (index - 1 + filteredAtmospheres.length) % filteredAtmospheres.length;
+        nextIndex = (index - 1 + allAtmospheres.length) % allAtmospheres.length;
         break;
       case 'ArrowRight':
       case 'ArrowDown':
-        nextIndex = (index + 1) % filteredAtmospheres.length;
+        nextIndex = (index + 1) % allAtmospheres.length;
         break;
       case 'Home':
         nextIndex = 0;
         break;
       case 'End':
-        nextIndex = filteredAtmospheres.length - 1;
+        nextIndex = allAtmospheres.length - 1;
         break;
       default:
         return;
@@ -228,7 +225,7 @@
 
     event.preventDefault();
 
-    const nextTheme = filteredAtmospheres[nextIndex];
+    const nextTheme = allAtmospheres[nextIndex];
     if (!nextTheme) return;
 
     selectTheme(nextTheme.id);
@@ -265,13 +262,13 @@
     {@const info = voidEngine.temporaryThemeInfo}
     <div
       class="surface-sunk flex flex-col items-center gap-md p-md"
-      out:dematerialize
+      out:dissolve
     >
-      <h5>Story Override Active</h5>
+      <h5>Theme Override Active</h5>
       <p>
         <strong>{info?.label}</strong>
-        is using
-        <strong>{info?.id}</strong>
+        applied
+        <strong>{capitalize(info?.id ?? '')}</strong>
         atmosphere.
       </p>
       <span class="flex flex-row flex-wrap justify-center gap-sm">
@@ -282,7 +279,7 @@
           class="btn-error"
           onclick={(event) => toggleAdaptAtmosphere(false)}
         >
-          Don't adapt to stories
+          Disable overrides
         </button>
       </span>
     </div>
@@ -293,97 +290,56 @@
     role="radiogroup"
     aria-label="Select Theme"
   >
-    {#each filteredAtmospheres as atm, i (atm.id)}
+    {#each allAtmospheres as atm, i (atm.id)}
       <div
         class="theme-wrapper p-sm"
         data-atmosphere={atm.id}
         data-physics={atm.physics}
         data-mode={atm.mode}
+        style={atm.style}
         in:materialize={{ delay: i * 25 }}
+        out:dissolve
       >
-        <button
-          bind:this={themeRefs[i]}
-          class="theme-option w-full flex items-center gap-sm p-xs text-dim text-left"
-          role="radio"
-          aria-checked={voidEngine.atmosphere === atm.id}
-          tabindex={i === focusableThemeIndex ? 0 : -1}
-          onclick={() => selectTheme(atm.id)}
-          onkeydown={(event) => handleThemeKeydown(event, i)}
-        >
-          <div
-            class="orb-wrapper relative hidden tablet:flex items-center justify-center"
-            aria-hidden="true"
+        <div class="flex items-center gap-xs">
+          <button
+            bind:this={themeRefs[i]}
+            class="theme-option w-full flex items-center gap-sm p-xs text-dim text-left"
+            role="radio"
+            aria-checked={voidEngine.atmosphere === atm.id}
+            tabindex={i === focusableThemeIndex ? 0 : -1}
+            onclick={() => selectTheme(atm.id)}
+            onkeydown={(event) => handleThemeKeydown(event, i)}
           >
-            <span class="orb relative"></span>
-          </div>
+            <div
+              class="orb-wrapper relative hidden tablet:flex items-center justify-center"
+              aria-hidden="true"
+            >
+              <span class="orb relative"></span>
+            </div>
 
-          <span
-            class="w-full flex flex-row items-center justify-between gap-sm"
-          >
-            <span>{atm.label}</span>
-            {#if atm.tagline}
-              <span class="text-caption">{atm.tagline}</span>
-            {/if}
-          </span>
-        </button>
+            <span
+              class="w-full flex flex-row items-center justify-between gap-sm"
+            >
+              <span>{atm.label}</span>
+              {#if atm.tagline}
+                <span class="text-caption">{atm.tagline}</span>
+              {/if}
+            </span>
+          </button>
+
+          {#if atm.custom}
+            <button
+              class="btn-icon text-dim"
+              aria-label="Remove {atm.label} atmosphere"
+              onclick={() => removeCustomTheme(atm.id)}
+            >
+              <X class="icon" data-size="sm" />
+            </button>
+          {/if}
+        </div>
       </div>
     {/each}
   </div>
-
-  <!-- Custom Atmospheres -->
-  {#if customAtmospheres.length > 0}
-    <div class="flex flex-col gap-sm">
-      <h5 class="text-center text-dim">Custom Atmospheres</h5>
-      <div
-        class="theme-menu surface-sunk flex flex-col tablet:grid tablet:grid-cols-2 gap-sm p-sm"
-        role="radiogroup"
-        aria-label="Custom Themes"
-      >
-        {#each customAtmospheres as atm (atm.id)}
-          <div
-            class="theme-wrapper p-sm"
-            data-atmosphere={atm.id}
-            data-physics={atm.physics}
-            data-mode={atm.mode}
-            style={atm.style}
-            in:materialize
-          >
-            <div class="flex items-center gap-xs">
-              <button
-                class="theme-option w-full flex items-center gap-sm p-xs text-dim text-left"
-                role="radio"
-                aria-checked={voidEngine.atmosphere === atm.id}
-                onclick={() => selectTheme(atm.id)}
-              >
-                <div
-                  class="orb-wrapper relative hidden tablet:flex items-center justify-center"
-                  aria-hidden="true"
-                >
-                  <span class="orb relative"></span>
-                </div>
-
-                <span
-                  class="w-full flex flex-row items-center justify-between gap-sm"
-                >
-                  <span>{atm.label}</span>
-                  {#if atm.tagline}
-                    <span class="text-caption">{atm.tagline}</span>
-                  {/if}
-                </span>
-              </button>
-              <button
-                class="btn-icon text-dim"
-                aria-label="Remove {atm.label} atmosphere"
-                onclick={() => removeCustomTheme(atm.id)}
-              >
-                <X class="icon" data-size="sm" />
-              </button>
-            </div>
-          </div>
-        {/each}
-      </div>
-    </div>
-  {/if}
 
   <!-- Display Settings -->
   <hr />
@@ -479,11 +435,11 @@
       <span class="flex flex-col items-center gap-xs">
         <Toggle
           bind:checked={voidEngine.userConfig.adaptAtmosphere}
-          label="Adapt to story mood"
+          label="Allow theme overrides"
           onchange={toggleAdaptAtmosphere}
         />
         <p class="text-caption text-mute">
-          (Stories can temporarily override your theme)
+          (Temporary themes can override your preference)
         </p>
       </span>
     </div>

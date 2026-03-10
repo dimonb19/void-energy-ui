@@ -5,6 +5,7 @@
   import { FONTS } from '@config/design-tokens';
   import { voidEngine } from '@adapters/void-engine.svelte';
   import { Sparkles, Undo2 } from '@lucide/svelte';
+  import { dematerialize, materialize } from '@lib/transitions.svelte';
 
   // ── Built-in atmospheres table data ────────────────────────────────────
   const builtInAtmospheres = [
@@ -62,7 +63,9 @@
     },
   ];
 
-  // ── Custom atmosphere demo ─────────────────────────────────────────────
+  // ── Custom atmosphere demos ────────────────────────────────────────────
+
+  // 1. Cyberpunk (dark glass)
   let cyberpunkRegistered = $derived(
     voidEngine.availableAtmospheres.includes('cyberpunk'),
   );
@@ -85,12 +88,81 @@
         'text-dim': 'rgba(255, 230, 240, 0.85)',
       },
     });
-    toast.show('Cyberpunk atmosphere registered', 'success');
+    toast.undo('Cyberpunk atmosphere registered', () =>
+      voidEngine.unregisterTheme('cyberpunk'),
+    );
   }
 
   function applyCyberpunk() {
     voidEngine.setAtmosphere('cyberpunk');
-    toast.show('Cyberpunk atmosphere applied', 'success');
+  }
+
+  // 2. Slate (dark flat)
+  let slateRegistered = $derived(
+    voidEngine.availableAtmospheres.includes('slate'),
+  );
+
+  function registerSlate() {
+    voidEngine.registerTheme('slate', {
+      mode: 'dark',
+      physics: 'flat',
+      tagline: 'Professional / Clean',
+      palette: {
+        'font-atmos-heading': FONTS.clean.family,
+        'font-atmos-body': FONTS.clean.family,
+        'bg-canvas': '#111118',
+        'bg-spotlight': '#1c1c26',
+        'bg-surface': '#1e1e2a',
+        'bg-sunk': '#0c0c12',
+        'energy-primary': '#6ea1ff',
+        'energy-secondary': '#8b8fa3',
+        'border-color': 'rgba(110, 161, 255, 0.2)',
+        'text-main': '#e8e8ed',
+        'text-dim': '#a0a0b0',
+        'text-mute': '#64647a',
+      },
+    });
+    toast.undo('Slate atmosphere registered', () =>
+      voidEngine.unregisterTheme('slate'),
+    );
+  }
+
+  function applySlate() {
+    voidEngine.setAtmosphere('slate');
+  }
+
+  // 3. Meridian (light flat brand)
+  let meridianRegistered = $derived(
+    voidEngine.availableAtmospheres.includes('meridian'),
+  );
+
+  function registerMeridian() {
+    voidEngine.registerTheme('meridian', {
+      mode: 'light',
+      physics: 'flat',
+      tagline: 'Fintech / Brand',
+      palette: {
+        'font-atmos-heading': FONTS.lab.family,
+        'font-atmos-body': FONTS.clean.family,
+        'bg-canvas': '#f4f6f9',
+        'bg-spotlight': '#ffffff',
+        'bg-surface': '#ffffff',
+        'bg-sunk': '#e8ecf1',
+        'energy-primary': '#0d6e6e',
+        'energy-secondary': '#4a3df7',
+        'border-color': 'rgba(13, 110, 110, 0.25)',
+        'text-main': '#0f1729',
+        'text-dim': '#3d4a5c',
+        'text-mute': '#7c8797',
+      },
+    });
+    toast.undo('Meridian atmosphere registered', () =>
+      voidEngine.unregisterTheme('meridian'),
+    );
+  }
+
+  function applyMeridian() {
+    voidEngine.setAtmosphere('meridian');
   }
 
   // ── Temporary theme demo ───────────────────────────────────────────────
@@ -118,7 +190,7 @@
       });
     } else {
       toast.show(
-        "Theme locked — enable 'Adapt to story mood' in settings",
+        "Theme locked — enable 'Allow theme overrides' in settings",
         'warning',
       );
     }
@@ -259,13 +331,23 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
         Register a new atmosphere at runtime with
         <code>voidEngine.registerTheme()</code>. Provide only the palette values
         you want to override &mdash; Safety Merge fills the rest from defaults.
-        The example below registers a &ldquo;Cyberpunk&rdquo; atmosphere with
-        custom neon palette and typography.
+        The three examples below cover every physics+mode combination: dark
+        glass, dark flat, and light flat.
       </p>
 
+      <!-- Cyberpunk (dark glass) -->
       <div class="surface-sunk p-md flex flex-col gap-md">
-        <pre class="text-caption overflow-x-auto"><code
-            >{`voidEngine.registerTheme('cyberpunk', {
+        <h5>
+          Cyberpunk <span class="text-mute text-small">&mdash; dark glass</span>
+        </h5>
+        <p class="text-caption text-dim">
+          Neon-soaked glass with custom typography. Demonstrates the full glass
+          pipeline: translucent surfaces, glow effects, and blur.
+        </p>
+        <details>
+          <summary>View Palette Code</summary>
+          <pre class="text-caption overflow-x-auto"><code
+              >{`voidEngine.registerTheme('cyberpunk', {
   mode: 'dark',
   physics: 'glass',
   tagline: 'High Tech / Low Life',
@@ -282,7 +364,8 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
     'text-dim':           'rgba(255, 230, 240, 0.85)',
   }
 });`}</code
-          ></pre>
+            ></pre>
+        </details>
 
         <div class="flex flex-row gap-md flex-wrap">
           <button onclick={registerCyberpunk} disabled={cyberpunkRegistered}>
@@ -295,11 +378,131 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
               class="btn-premium"
               onclick={applyCyberpunk}
               disabled={voidEngine.atmosphere === 'cyberpunk'}
+              in:materialize
+              out:dematerialize
             >
               <Sparkles class="icon" />
               {voidEngine.atmosphere === 'cyberpunk'
                 ? 'Cyberpunk Active'
                 : 'Apply Cyberpunk'}
+            </button>
+          {/if}
+        </div>
+      </div>
+
+      <!-- Slate (dark flat) -->
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <h5>
+          Slate <span class="text-mute text-small">&mdash; dark flat</span>
+        </h5>
+        <p class="text-caption text-dim">
+          Professional dark interface without glass effects. Opaque surfaces, no
+          blur, sharp borders &mdash; proves flat physics works in dark mode
+          too.
+        </p>
+        <details>
+          <summary>View Palette Code</summary>
+          <pre class="text-caption overflow-x-auto"><code
+              >{`voidEngine.registerTheme('slate', {
+  mode: 'dark',
+  physics: 'flat',
+  tagline: 'Professional / Clean',
+  palette: {
+    'font-atmos-heading': "'Inter', sans-serif",
+    'font-atmos-body':    "'Inter', sans-serif",
+    'bg-canvas':          '#111118',
+    'bg-spotlight':       '#1c1c26',
+    'bg-surface':         '#1e1e2a',
+    'bg-sunk':            '#0c0c12',
+    'energy-primary':     '#6ea1ff',
+    'energy-secondary':   '#8b8fa3',
+    'border-color':       'rgba(110, 161, 255, 0.2)',
+    'text-main':          '#e8e8ed',
+    'text-dim':           '#a0a0b0',
+    'text-mute':          '#64647a',
+  }
+});`}</code
+            ></pre>
+        </details>
+
+        <div class="flex flex-row gap-md flex-wrap">
+          <button onclick={registerSlate} disabled={slateRegistered}>
+            <Sparkles class="icon" />
+            {slateRegistered ? 'Registered' : 'Register Slate'}
+          </button>
+
+          {#if slateRegistered}
+            <button
+              class="btn-premium"
+              onclick={applySlate}
+              disabled={voidEngine.atmosphere === 'slate'}
+              in:materialize
+              out:dematerialize
+            >
+              <Sparkles class="icon" />
+              {voidEngine.atmosphere === 'slate'
+                ? 'Slate Active'
+                : 'Apply Slate'}
+            </button>
+          {/if}
+        </div>
+      </div>
+
+      <!-- Meridian (light flat brand) -->
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <h5>
+          Meridian <span class="text-mute text-small"
+            >&mdash; light flat brand</span
+          >
+        </h5>
+        <p class="text-caption text-dim">
+          A fictional fintech brand atmosphere. Shows how any company can create
+          its own identity by overriding a handful of palette values &mdash;
+          teal primary, indigo accent, clean typography.
+        </p>
+        <details>
+          <summary>View Palette Code</summary>
+          <pre class="text-caption overflow-x-auto"><code
+              >{`voidEngine.registerTheme('meridian', {
+  mode: 'light',
+  physics: 'flat',
+  tagline: 'Fintech / Brand',
+  palette: {
+    'font-atmos-heading': "'Open Sans', sans-serif",
+    'font-atmos-body':    "'Inter', sans-serif",
+    'bg-canvas':          '#f4f6f9',
+    'bg-spotlight':       '#ffffff',
+    'bg-surface':         '#ffffff',
+    'bg-sunk':            '#e8ecf1',
+    'energy-primary':     '#0d6e6e',
+    'energy-secondary':   '#4a3df7',
+    'border-color':       'rgba(13, 110, 110, 0.25)',
+    'text-main':          '#0f1729',
+    'text-dim':           '#3d4a5c',
+    'text-mute':          '#7c8797',
+  }
+});`}</code
+            ></pre>
+        </details>
+
+        <div class="flex flex-row gap-md flex-wrap">
+          <button onclick={registerMeridian} disabled={meridianRegistered}>
+            <Sparkles class="icon" />
+            {meridianRegistered ? 'Registered' : 'Register Meridian'}
+          </button>
+
+          {#if meridianRegistered}
+            <button
+              class="btn-premium"
+              onclick={applyMeridian}
+              disabled={voidEngine.atmosphere === 'meridian'}
+              in:materialize
+              out:dematerialize
+            >
+              <Sparkles class="icon" />
+              {voidEngine.atmosphere === 'meridian'
+                ? 'Meridian Active'
+                : 'Apply Meridian'}
             </button>
           {/if}
         </div>
