@@ -11,16 +11,10 @@
   import ThemesBtn from './ui/ThemesBtn.svelte';
   import Switcher from './ui/Switcher.svelte';
   import Selector from './ui/Selector.svelte';
-  import SearchField from './ui/SearchField.svelte';
+  import MediaSlider from './ui/MediaSlider.svelte';
 
-  import {
-    Zap,
-    Layers,
-    Scaling,
-    ArrowDown,
-    Check,
-    Wrench,
-  } from '@lucide/svelte';
+  import { Check, Wrench, Repeat, Shuffle } from '@lucide/svelte';
+  import Toggle from './ui/Toggle.svelte';
 
   // ── Live Proof: atmosphere previewer ──────────────────────────────────
   const proofAtmospheres = [
@@ -28,7 +22,7 @@
     { value: 'paper', label: 'Paper' },
     { value: 'terminal', label: 'Terminal' },
     { value: 'nebula', label: 'Nebula' },
-    { value: 'crimson', label: 'Crimson' },
+    { value: 'playground', label: 'Playground' },
   ];
 
   // Derived: only highlights if current atmosphere is one of the curated set
@@ -71,8 +65,40 @@
   ]);
   let newChipTag = $state('Motion');
 
-  // ── Sandbox: search demo state ───────────────────────────────────────
-  let searchQuery = $state('');
+  // ── Media slider demo state ────────────────────────────────────────
+  let mediaVolume = $state(65);
+  let mediaMuted = $state(false);
+  let mediaPaused = $state(false);
+
+  // ── Toggle demo state ──────────────────────────────────────────────
+  let toggleSimple = $state(true);
+  let toggleIcons = $state(false);
+
+  // ── Physics annotation ─────────────────────────────────────────────
+  const physicsDescriptions: Record<string, string> = {
+    glass: 'Translucent surfaces, glow shadows, spring easing, backdrop blur.',
+    flat: 'Clean surfaces, minimal shadows, smooth motion.',
+    retro: 'Zero radius, hard pixel shadows, instant transitions, 2px borders.',
+  };
+
+  let currentPhysics = $derived(voidEngine.currentTheme?.physics ?? 'glass');
+
+  // ── Density demo ───────────────────────────────────────────────────
+  const densityOptions = [
+    { value: 'high', label: 'Compact' },
+    { value: 'standard', label: 'Standard' },
+    { value: 'low', label: 'Relaxed' },
+  ];
+
+  let currentDensity = $derived(voidEngine.userConfig.density);
+
+  function switchDensity(value: string | number | null) {
+    if (typeof value === 'string') {
+      voidEngine.setPreferences({
+        density: value as 'high' | 'standard' | 'low',
+      });
+    }
+  }
 </script>
 
 <div class="container flex flex-col gap-2xl py-2xl">
@@ -82,12 +108,15 @@
   <header class="flex flex-col gap-lg items-center text-center">
     <h1 class="text-primary">Void Energy</h1>
 
-    <p class="text-h3 max-w-3xl">A runtime theme engine for existing UI.</p>
+    <p class="text-h3 max-w-3xl">
+      Atmospheres, physics, and density for any UI.
+    </p>
 
     <p class="text-body text-dim max-w-3xl">
-      Void Energy layers atmospheres, motion physics, and semantic tokens onto
-      your current components. No component rewrite. No duplicate themes to
-      maintain.
+      Not just theming. Void Energy changes how surfaces feel &mdash;
+      translucent glass, clean flat, or hard-pixel retro &mdash; while scaling
+      every spacing value through a single density coefficient. One codebase,
+      zero rebuilds.
     </p>
 
     <div class="flex flex-row flex-wrap gap-md justify-center">
@@ -157,10 +186,12 @@
       <!-- Proof card: interactive elements -->
       <div class="surface-glass p-lg flex flex-col gap-md">
         <h3>Interactive Elements</h3>
-        <SearchField
-          bind:value={searchQuery}
-          placeholder="Search components..."
-          aria-label="Search components"
+        <MediaSlider
+          bind:volume={mediaVolume}
+          bind:muted={mediaMuted}
+          bind:paused={mediaPaused}
+          icon="music"
+          playback
         />
         <div class="flex flex-row gap-sm flex-wrap">
           <button>Primary</button>
@@ -169,6 +200,15 @@
           <button class="btn-error">Danger</button>
           <button class="btn-ghost">Ghost</button>
         </div>
+        <div class="flex flex-row gap-lg flex-wrap">
+          <Toggle bind:checked={toggleSimple} label="Auto-play" />
+          <Toggle
+            bind:checked={toggleIcons}
+            label="Shuffle"
+            iconOn={Shuffle}
+            iconOff={Repeat}
+          />
+        </div>
         <p class="text-caption text-mute">
           Every button, input, and chip reads from the same CSS custom
           properties. The atmosphere changes the values &mdash; the components
@@ -176,63 +216,83 @@
         </p>
       </div>
     </div>
+
+    <p class="text-dim text-center text-small max-w-2xl mx-auto">
+      Active physics: <b class="text-primary">{currentPhysics}</b> &mdash;
+      {physicsDescriptions[currentPhysics]}
+      Each atmosphere defines its own physics preset and typography.
+    </p>
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- 3. FITS YOUR STACK                                                -->
+  <!-- 3. DENSITY SCALING                                                -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="flex flex-col gap-lg">
-    <h2 class="text-center">Fits Your Stack</h2>
+    <div class="flex flex-col gap-sm items-center text-center">
+      <h2>Density Scaling</h2>
+      <p class="text-dim max-w-2xl">
+        Every spacing value flows through a global density coefficient. One
+        setting &mdash; every gap, padding, and control height adapts.
+      </p>
+    </div>
 
-    <div class="surface-glass p-lg flex flex-col gap-lg">
-      <div
-        class="flex flex-col tablet:flex-row items-center justify-center gap-md text-center"
-      >
-        <div
-          class="surface-sunk p-md rounded flex flex-col items-center gap-xs w-full tablet:w-auto"
-        >
-          <b class="text-small">Your Components</b>
-          <span class="text-caption text-mute">Buttons, cards, forms</span>
+    <Switcher
+      options={densityOptions}
+      value={currentDensity}
+      onchange={switchDensity}
+      label="Density"
+      class="items-center"
+    />
+
+    <div class="grid grid-cols-1 tablet:grid-cols-2 gap-lg">
+      <div class="surface-glass p-lg flex flex-col gap-md">
+        <h3>Sample Card</h3>
+        <p class="text-dim">
+          This card's padding, gaps, and control heights all scale with the
+          density setting above. The content stays the same &mdash; only the
+          whitespace changes.
+        </p>
+        <div class="surface-sunk p-md flex flex-col gap-sm">
+          <span class="text-main font-bold">Primary text</span>
+          <span class="text-dim">Secondary text</span>
+          <span class="text-mute">Tertiary text</span>
         </div>
-        <ArrowDown class="icon text-primary tablet:-rotate-90" />
-        <div
-          class="surface-sunk p-md rounded flex flex-col items-center gap-xs w-full tablet:w-auto"
-        >
-          <b class="text-small">Token Aliasing</b>
-          <span class="text-caption text-mute">CSS variable mapping</span>
-        </div>
-        <ArrowDown class="icon text-primary tablet:-rotate-90" />
-        <div
-          class="surface-sunk p-md rounded flex flex-col items-center gap-xs w-full tablet:w-auto"
-        >
-          <b class="text-small">Void Energy Engine</b>
-          <span class="text-caption text-mute"
-            >Atmosphere + Physics + Density</span
-          >
-        </div>
-        <ArrowDown class="icon text-primary tablet:-rotate-90" />
-        <div
-          class="surface-sunk p-md rounded flex flex-col items-center gap-xs w-full tablet:w-auto"
-        >
-          <b class="text-small">UI Adapts</b>
-          <span class="text-caption text-mute">Runtime, no rebuild</span>
+        <div class="flex flex-row gap-sm flex-wrap">
+          <button>Action</button>
+          <button class="btn-system">System</button>
+          <button class="btn-ghost">Cancel</button>
         </div>
       </div>
 
-      <p class="text-dim text-center max-w-2xl mx-auto">
-        You keep your components. Void Energy supplies the token system, theme
-        runtime, and motion model. Your component styles read CSS custom
-        properties &mdash; when the atmosphere changes, every property updates
-        and every component adapts.
-      </p>
+      <div class="surface-glass p-lg flex flex-col gap-md">
+        <h3>Use Cases</h3>
+        <ul class="flex flex-col gap-sm text-dim">
+          <li>
+            <b class="text-main">Compact</b> &mdash; data-heavy dashboards, admin
+            panels, tables with many rows
+          </li>
+          <li>
+            <b class="text-main">Standard</b> &mdash; balanced default, general-purpose
+            applications
+          </li>
+          <li>
+            <b class="text-main">Relaxed</b> &mdash; reading experiences, accessibility,
+            content-focused layouts
+          </li>
+        </ul>
+        <p class="text-caption text-mute">
+          Density is a user preference, independent of the active atmosphere.
+          All 12 atmospheres respect the same density setting.
+        </p>
+      </div>
     </div>
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- 4. INTEGRATION IN 30 SECONDS                                      -->
+  <!-- 4. HOW IT WORKS                                                   -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="flex flex-col gap-lg">
-    <h2 class="text-center">Integration in 30 Seconds</h2>
+    <h2 class="text-center">How It Works</h2>
 
     <div class="grid grid-cols-1 tablet:grid-cols-2 gap-lg">
       <!-- JS side -->
@@ -341,51 +401,11 @@ voidEngine.setAtmosphere('brand');`}</code
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- 5. WHY CHOOSE VOID                                                -->
+  <!-- 5. BEST FOR                                                       -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="flex flex-col gap-lg">
-    <h2 class="text-center">Why Void Energy</h2>
+    <h2 class="text-center">Is Void Energy Right For You?</h2>
 
-    <div class="grid grid-cols-1 tablet:grid-cols-3 gap-lg">
-      <div
-        class="surface-glass p-lg flex flex-col gap-md items-center text-center"
-      >
-        <Zap class="icon text-primary" data-size="xl" />
-        <h3>Runtime Atmospheres</h3>
-        <p class="text-dim text-small">
-          Not just light/dark. Full palette, typography, and mood changes at
-          runtime. Register new themes on the fly. Scope themes to components.
-          No rebuild required.
-        </p>
-      </div>
-
-      <div
-        class="surface-glass p-lg flex flex-col gap-md items-center text-center"
-      >
-        <Layers class="icon text-primary" data-size="xl" />
-        <h3>Physics Engine</h3>
-        <p class="text-dim text-small">
-          Components don't just recolor &mdash; they change visual behavior.
-          Glass renders translucent surfaces with glow. Flat renders clean
-          material. Retro renders hard-pixel CRT. Same components, different
-          physics.
-        </p>
-      </div>
-
-      <div
-        class="surface-glass p-lg flex flex-col gap-md items-center text-center"
-      >
-        <Scaling class="icon text-primary" data-size="xl" />
-        <h3>Density Scaling</h3>
-        <p class="text-dim text-small">
-          Every spacing value flows through a global density coefficient.
-          Compact for data-heavy dashboards. Relaxed for reading experiences.
-          One setting, every component adapts.
-        </p>
-      </div>
-    </div>
-
-    <!-- Honesty block -->
     <div class="surface-glass p-lg flex flex-col tablet:flex-row gap-lg">
       <div class="flex-1 flex flex-col gap-sm">
         <h4 class="text-success">Best For</h4>
