@@ -62,9 +62,11 @@ describe('ThemesFragment', () => {
     const group = screen.getByRole('radiogroup', { name: 'Select Theme' });
     const radios = within(group).getAllByRole('radio');
 
+    // The outgoing dark-mode options stay mounted during the dissolve transition,
+    // so assert against the incoming first visible light theme instead of the
+    // whole transient radiogroup.
+    expect(radios[0].textContent).toContain('Paper');
     expect(radios[0].getAttribute('tabindex')).toBe('0');
-    expect(
-      radios.every((radio) => radio.getAttribute('aria-checked') === 'false'),
-    ).toBe(true);
+    expect(radios[0].getAttribute('aria-checked')).toBe('false');
   });
 });

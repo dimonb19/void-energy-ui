@@ -271,11 +271,6 @@ export class VoidEngine {
    * Used by temporary theme API to avoid side effects.
    */
   private _applyAtmosphere(name: string, shouldPersist: boolean = false) {
-    // Update reactive state synchronously so subsequent reads (e.g. returnTo
-    // capture in pushTemporaryTheme) see the correct atmosphere immediately.
-    this.atmosphere = name;
-    if (shouldPersist) this.persist();
-
     // Check for View Transitions API support and user preferences
     const prefersReducedMotion =
       typeof window !== 'undefined' &&
@@ -286,6 +281,8 @@ export class VoidEngine {
 
     // Fallback for unsupported browsers or reduced motion preference
     if (!supportsViewTransitions || prefersReducedMotion) {
+      this.atmosphere = name;
+      if (shouldPersist) this.persist();
       this.syncDOM();
       return;
     }
@@ -294,8 +291,13 @@ export class VoidEngine {
     // the new status bar color before capturing the old-state snapshot.
     this.updateThemeColorMeta(name);
 
-    // Use View Transitions API for smooth DOM painting
+    // Reactive state ($state) and CSS custom properties must update together
+    // inside the callback. Setting this.atmosphere before startViewTransition
+    // would trigger Svelte reactivity before the old-state screenshot is
+    // captured, producing a broken intermediate frame (new content, old colors).
     document.startViewTransition(() => {
+      this.atmosphere = name;
+      if (shouldPersist) this.persist();
       this.syncDOM();
     });
   }
