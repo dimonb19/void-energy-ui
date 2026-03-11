@@ -14,7 +14,7 @@
 </script>
 
 <section id="kinetic-text" class="flex flex-col gap-md">
-  <h2>15 // KINETIC TEXT</h2>
+  <h2>16 // KINETIC TEXT</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">

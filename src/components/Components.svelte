@@ -17,6 +17,7 @@
   // Composites
   import Composites from './ui-library/Composites.svelte';
   import UserState from './ui-library/UserState.svelte';
+  import TabsShowcase from './ui-library/TabsShowcase.svelte';
   // Overlays & Feedback
   import FloatingUI from './ui-library/FloatingUI.svelte';
   import Toasts from './ui-library/Toasts.svelte';
@@ -56,6 +57,7 @@
       label: 'Composites',
       items: [
         { id: 'composites', label: 'Composites' },
+        { id: 'tabs', label: 'Tabs' },
         { id: 'user-state', label: 'User State' },
       ],
     },
@@ -249,6 +251,7 @@
             </p>
           </div>
           <Composites />
+          <TabsShowcase />
           <UserState />
 
           <hr />

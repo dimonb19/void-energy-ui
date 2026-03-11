@@ -244,7 +244,7 @@
 // 1. BASE BUTTON & VARIANTS
 // --------------------------------------------------------------------------
 // We define everything inside this block to ensure specificity works correctly.
-button:not(.btn-void, .btn-icon),
+button:not(.btn-void, .btn-icon, .tabs-trigger),
 .btn {
   // void-exception: Global element selector + calc() token gaps — no template access.
   // --- A. Layout & Accessibility ---

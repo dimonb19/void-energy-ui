@@ -1,0 +1,145 @@
+// ==========================================================================
+// TABS
+// ==========================================================================
+//
+// Horizontal tab interface with WAI-ARIA tablist/tab/tabpanel semantics.
+// Physics-aware: glass gets glowing sliding indicator, flat gets solid,
+// retro gets a filled pill background.
+//
+// MARKUP:
+// <div class="tabs flex flex-col gap-md">
+//   <div class="tabs-list flex flex-row" role="tablist">
+//     <button class="tabs-trigger" role="tab" data-state="active">General</button>
+//     <button class="tabs-trigger" role="tab">Advanced</button>
+//     <span class="tabs-indicator" aria-hidden="true"></span>
+//   </div>
+//   <div class="tabs-panel" role="tabpanel">...</div>
+// </div>
+//
+// HYBRID PROTOCOL:
+// - Tailwind: flex, gap on root container (consumer-side composition)
+// - SCSS: tab trigger visuals, sliding indicator, focus, physics adaptation
+//
+// ==========================================================================
+
+@use '../abstracts' as *;
+
+// --------------------------------------------------------------------------
+// 1. TAB LIST (container for triggers)
+// --------------------------------------------------------------------------
+.tabs-list {
+  position: relative;
+  border-bottom: var(--physics-border-width) solid var(--border-color);
+
+  @include when-retro {
+    border-bottom: none;
+    background: alpha(var(--text-dim), 10%);
+    padding: var(--physics-border-width);
+  }
+}
+
+// --------------------------------------------------------------------------
+// 2. TAB TRIGGER (individual tab button)
+// --------------------------------------------------------------------------
+.tabs-trigger {
+  // --- A. Reset (kills inherited button styles) ---
+  @include btn-reset;
+
+  // --- B. Layout ---
+  position: relative;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  min-height: var(--control-height);
+
+  // --- C. Typography ---
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  color: var(--text-mute);
+
+  // --- D. Transitions ---
+  transition: color var(--speed-fast) var(--ease-spring-snappy);
+
+  // --- E. Interaction States ---
+  @media (hover: hover) {
+    &:not(:disabled):hover {
+      color: var(--text-main);
+    }
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-base);
+  }
+
+  // --- F. Active State ---
+  @include when-state('active') {
+    color: var(--energy-primary);
+  }
+
+  // --- G. Disabled ---
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+    border: none;
+  }
+
+  // --- H. Retro: active tab gets filled background from indicator ---
+  @include when-retro {
+    z-index: z('base'); // Sit above the pill indicator
+
+    @include when-state('active') {
+      color: var(--text-main);
+    }
+  }
+}
+
+// --------------------------------------------------------------------------
+// 3. SLIDING INDICATOR
+// --------------------------------------------------------------------------
+// Single shared element that physically slides between active tabs.
+// Positioned via CSS custom properties set by JS on tab change.
+// --------------------------------------------------------------------------
+.tabs-indicator {
+  position: absolute;
+  bottom: calc(-1 * var(--physics-border-width));
+  left: var(--_indicator-left, 0);
+  width: var(--_indicator-width, 0);
+  height: 2px; // void-ignore (Indicator Readability — 1px too subtle, especially for glass glow)
+  border-radius: var(--radius-full);
+  background: var(--energy-primary);
+  pointer-events: none;
+
+  transition:
+    left var(--speed-base) var(--ease-spring-snappy),
+    width var(--speed-base) var(--ease-spring-snappy);
+
+  // --- Glass: glowing underline ---
+  @include when-glass {
+    box-shadow: 0 0 var(--space-xs) alpha(var(--energy-primary), 50%);
+  }
+
+  // --- Retro: filled pill behind active tab ---
+  @include when-retro {
+    bottom: var(--physics-border-width);
+    top: var(--physics-border-width);
+    height: auto;
+    border-radius: 0;
+    background: var(--bg-surface);
+    box-shadow: none;
+  }
+}
+
+// --------------------------------------------------------------------------
+// 4. TAB PANEL
+// --------------------------------------------------------------------------
+.tabs-panel {
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-base);
+  }
+}

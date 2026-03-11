@@ -1006,7 +1006,7 @@ Patterns in this library are delivered in three forms:
 
 | Delivery Mode | What ships | Use when | Examples |
 | --- | --- | --- | --- |
-| **Reusable Primitive** | A dedicated Svelte component | Behavior is non-trivial, repeated, and worth standardizing | `Dropdown`, `Sidebar`, `Toggle`, `Selector`, `Switcher`, charts, modals |
+| **Reusable Primitive** | A dedicated Svelte component | Behavior is non-trivial, repeated, and worth standardizing | `Dropdown`, `Sidebar`, `Toggle`, `Selector`, `Switcher`, `Tabs`, charts, modals |
 | **Native-Styled HTML** | Global styling on semantic elements | The platform already provides the correct semantics and behavior | `<details>`, `<table>`, `<progress>`, `<meter>`, `<audio>`, prose elements |
 | **Documented Recipe** | A composition pattern using HTML + Tailwind + existing primitives | The pattern is useful but too app-specific to freeze into a single API | Nav menu, accordion groups via `details[name]`, drawer-like layouts built from `Sidebar` |
 
@@ -1409,6 +1409,60 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 ```
 
 Native form submission serializes `String(option.value)`, while `bind:value` and `onchange` keep the original typed value.
+
+---
+
+#### `<Tabs>` (Tabbed Interface)
+
+**Description:** Horizontal tabbed interface with WAI-ARIA tablist/tab/tabpanel semantics. Data-driven with snippet-based panel rendering. A single shared `.tabs-indicator` element slides between active tabs, positioned via JS-measured CSS custom properties (`--_indicator-left`, `--_indicator-width`). The indicator suppresses its transition on first paint to avoid animating from the origin.
+**Location:** [src/components/ui/Tabs.svelte](src/components/ui/Tabs.svelte)
+**CSS:** `.tabs`, `.tabs-list`, `.tabs-trigger`, `.tabs-indicator`, `.tabs-panel` ([src/styles/components/_tabs.scss](src/styles/components/_tabs.scss))
+**Note:** `.tabs-trigger` is excluded from global button styles in `_buttons.scss` (`button:not(.btn-void, .btn-icon, .tabs-trigger)`).
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `tabs` | `TabItem[]` — `{ id: string, label: string, icon?: string \| Component, disabled?: boolean }` | *required* | Tab definitions |
+| `value` | `string` | `$bindable()` | Active tab ID (defaults to first non-disabled tab) |
+| `onchange` | `(id: string) => void` | — | Callback when tab changes |
+| `panel` | `Snippet<[TabItem]>` | *required* | Render function for panel content |
+| `class` | `string` | `''` | Additional CSS classes on root |
+
+**States:**
+
+| State | Attribute | Visual |
+| --- | --- | --- |
+| Active | `data-state="active"` + `aria-selected="true"` | `--energy-primary` text + sliding indicator |
+| Disabled | `disabled` + `aria-disabled="true"` | 40% opacity, `cursor: not-allowed` |
+
+**Keyboard:** Arrow Left/Right moves focus and roving tabindex independently from selection (manual activation). Home/End jumps to first/last enabled tab. Enter/Space activates the focused tab. Tabindex resets to the selected tab on activation. Disabled tabs are skipped. Stale or disabled values are coerced to the first enabled tab.
+
+**Usage:**
+
+```svelte
+<Tabs
+  tabs={[
+    { id: 'general', label: 'General' },
+    { id: 'advanced', label: 'Advanced', icon: Settings },
+    { id: 'locked', label: 'Locked', disabled: true },
+  ]}
+  bind:value={activeTab}
+>
+  {#snippet panel(tab)}
+    {#if tab.id === 'general'}
+      <p>General content</p>
+    {:else if tab.id === 'advanced'}
+      <p>Advanced content</p>
+    {/if}
+  {/snippet}
+</Tabs>
+```
+
+**Physics:**
+- **Glass:** Glowing underline indicator (`box-shadow` glow on `.tabs-indicator`)
+- **Flat:** Solid `--energy-primary` underline (bottom of `.tabs-list` border)
+- **Retro:** Filled pill background behind the active tab (`.tabs-indicator` becomes a full-height slab with `--bg-surface` background, no border-radius); `.tabs-list` gets a tinted background instead of a bottom border
 
 ---
 
@@ -4448,6 +4502,52 @@ Escape aborts active generation through a temporary document-level listener, so 
 ```
 
 Native form submission serializes `String(option.value)`. Pass `name` when the switcher participates in a real form.
+
+---
+
+### P½. Tabs (Tabbed Interface)
+
+```svelte
+<script lang="ts">
+  import Tabs from '@components/ui/Tabs.svelte';
+  import { Settings, User } from '@lucide/svelte';
+  let activeTab = $state('profile');
+</script>
+
+<!-- Basic -->
+<Tabs
+  tabs={[
+    { id: 'profile', label: 'Profile' },
+    { id: 'settings', label: 'Settings' },
+  ]}
+  bind:value={activeTab}
+>
+  {#snippet panel(tab)}
+    {#if tab.id === 'profile'}
+      <p>Profile content</p>
+    {:else if tab.id === 'settings'}
+      <p>Settings content</p>
+    {/if}
+  {/snippet}
+</Tabs>
+
+<!-- With icons and disabled tab -->
+<Tabs
+  tabs={[
+    { id: 'profile', label: 'Profile', icon: User },
+    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'admin', label: 'Admin', disabled: true },
+  ]}
+  bind:value={activeTab}
+  onchange={(id) => console.log('Tab:', id)}
+>
+  {#snippet panel(tab)}
+    <!-- panel content -->
+  {/snippet}
+</Tabs>
+```
+
+ARIA wiring is automatic -- `aria-selected`, `aria-controls`, `aria-labelledby`, and roving `tabindex` are all managed internally. Arrow Left/Right navigates, Home/End jump, Enter/Space activates. A single `.tabs-indicator` element slides between tabs via JS-measured CSS custom properties. Physics: glass = glowing underline, flat = solid underline, retro = filled pill background. `.tabs-trigger` is excluded from global button styles in `_buttons.scss`.
 
 ---
 

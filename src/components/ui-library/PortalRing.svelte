@@ -6,7 +6,7 @@
 </script>
 
 <section id="portal-ring" class="flex flex-col gap-md">
-  <h2>18 // PORTAL RING</h2>
+  <h2>19 // PORTAL RING</h2>
 
   <div class="surface-glass p-lg flex flex-col gap-lg">
     <p class="text-dim">
