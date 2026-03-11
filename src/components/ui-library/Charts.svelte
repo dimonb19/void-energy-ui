@@ -178,7 +178,7 @@
 <section id="charts" class="flex flex-col gap-md">
   <h2>20 // CHARTS & DATA VIZ</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Data visualization components for dashboards, analytics, and metric
       displays. Six chart types cover KPI metrics, trends, comparisons,

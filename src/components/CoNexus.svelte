@@ -25,7 +25,7 @@
         </p>
       </div>
 
-      <div class="surface-glass p-lg flex flex-col gap-lg">
+      <div class="surface-raised p-lg flex flex-col gap-lg">
         <details>
           <summary>Technical Details</summary>
           <div class="p-md flex flex-col gap-md">
@@ -95,7 +95,7 @@
         <p class="text-small text-mute">Features on the roadmap for CoNexus.</p>
       </div>
 
-      <div class="surface-glass p-lg flex flex-col gap-lg">
+      <div class="surface-raised p-lg flex flex-col gap-lg">
         <ul class="flex flex-col gap-md">
           <li>
             <strong>Story categories</strong> &mdash; browsable tile grid that organizes

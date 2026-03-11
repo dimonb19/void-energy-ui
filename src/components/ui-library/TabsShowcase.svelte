@@ -20,7 +20,7 @@
 <section id="tabs" class="flex flex-col gap-md">
   <h2>10 // TABS</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       The <code>Tabs</code> component provides a horizontal tabbed interface
       with full WAI-ARIA <code>tablist</code>/<code>tab</code>/<code

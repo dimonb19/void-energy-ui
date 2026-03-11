@@ -86,7 +86,7 @@
 <section id="user-state" class="flex flex-col gap-md">
   <h2>11 // USER STATE</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Reactive user hydration from localStorage. The store reads synchronously
       at construction time &mdash; before any component renders. Derived role

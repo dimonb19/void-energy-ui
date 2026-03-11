@@ -144,7 +144,7 @@
     height: var(--_track-height);
     padding: var(--_thumb-offset);
 
-    @include glass-sunk;
+    @include surface-sunk;
     border-radius: var(--radius-full);
 
     transition:

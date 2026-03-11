@@ -50,7 +50,7 @@
   z-index: z('sticky'); // Below navbar (90), above content (1)
 
   // Glass capsule surface
-  @include glass-float;
+  @include surface-raised;
   @include glass-blur;
 
   // Sizing
@@ -283,10 +283,10 @@ body[data-has-breadcrumbs] {
 // PHYSICS OVERRIDES
 // ==========================================================================
 
-// Glass: default glass-float + glass-blur applied on .pull-indicator — no overrides needed
+// Glass: default surface-raised + glass-blur applied on .pull-indicator — no overrides needed
 .pull-indicator {
   @include when-glass {
-    // Inherits glass-float + glass-blur defaults
+    // Inherits surface-raised + glass-blur defaults
   }
 }
 

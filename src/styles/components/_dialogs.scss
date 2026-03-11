@@ -79,7 +79,7 @@ dialog {
   filter: blur(0);
 
   // Apply glass physics (static).
-  @include glass-float($interactive: false);
+  @include surface-raised($interactive: false);
 
   // Blur
   @include glass-blur;

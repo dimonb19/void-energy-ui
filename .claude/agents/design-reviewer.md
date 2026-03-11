@@ -32,14 +32,14 @@ State via data attributes or ARIA, not utility classes.
 
 ### Law 5 — Spacing Gravity
 Default generous. When uncertain, one size up.
-- Flag: `p-sm` or `p-xs` on `surface-glass` or `surface-glass-action` (must be `p-lg`)
+- Flag: `p-sm` or `p-xs` on `surface-raised` or `surface-raised-action` (must be `p-lg`)
 - Flag: `p-xs` on `surface-sunk` (must be `p-md` minimum)
 - Flag: `gap-sm` or `gap-xs` on button/action rows (must be `gap-md`)
 - Flag: `gap-xs` between content groups (only valid for label→input, icon+text, title+subtitle)
 
 ## Additional Checks
 
-- **Physics coverage**: Components using `glass-float`/`glass-sunk` handle glass physics implicitly — only flag missing `when-glass` if the component makes glass-specific visual overrides. Always flag missing `when-retro` for components with border-radius, box-shadow, or visible borders. Flag missing `when-light` for components with visible background surfaces.
+- **Physics coverage**: Components using `surface-raised`/`surface-sunk` handle glass physics implicitly — only flag missing `when-glass` if the component makes glass-specific visual overrides. Always flag missing `when-retro` for components with border-radius, box-shadow, or visible borders. Flag missing `when-light` for components with visible background surfaces.
 - **SCSS import**: Must use `@use '../abstracts' as *;` — never individual partials
 - **Token usage**: Verify spacing uses `--space-*`, colors use `--text-*`/`--bg-*`/`--energy-*`
 - **`// void-ignore` exemption**: Raw values annotated with `// void-ignore` are intentional physics exceptions (shimmer highlights, readability floors, scrollbar constants). Do not flag these as Law 2 violations.

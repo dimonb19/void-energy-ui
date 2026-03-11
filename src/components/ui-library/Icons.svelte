@@ -80,7 +80,7 @@
 
 <section id="icons" class="flex flex-col gap-md">
   <h2>06 // ICONS</h2>
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Two-tier icon system: hand-crafted animated icons for interactive
       elements, and <strong>Lucide</strong> (1500+ open-source icons) for everything

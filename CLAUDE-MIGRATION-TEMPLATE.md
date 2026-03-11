@@ -93,7 +93,7 @@ Tailwind = layout/geometry. SCSS = visual physics/materials. Never mix.
 
 ```
 CORRECT:  class="flex flex-col gap-md p-lg"       (layout in Tailwind)
-CORRECT:  .card { @include glass-float; }          (physics in SCSS)
+CORRECT:  .card { @include surface-raised; }          (physics in SCSS)
 WRONG:    .card { display: flex; gap: 24px; }      (layout in SCSS)
 WRONG:    class="shadow-lg bg-blue-500"            (physics in Tailwind)
 ```
@@ -217,7 +217,7 @@ src/
 @use '../abstracts' as *;
 
 .my-component {
-  @include glass-float;
+  @include surface-raised;
 
   @include when-state('active') {
     border-color: var(--energy-primary);

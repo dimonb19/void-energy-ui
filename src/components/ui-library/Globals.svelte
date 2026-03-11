@@ -5,7 +5,7 @@
 <section id="globals" class="flex flex-col gap-md">
   <h2>05 // GLOBAL TREATMENTS</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Global treatments that apply across every page without any component
       classes. Text selection, scrollbars, print optimization, and container

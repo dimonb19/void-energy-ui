@@ -48,7 +48,7 @@
 <section id="toasts" class="flex flex-col gap-md">
   <h2>13 // TOASTS</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Non-blocking notifications for success, error, warning, and informational
       feedback. Toasts appear, deliver the message, and auto-dismiss. A loading

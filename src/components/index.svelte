@@ -156,10 +156,10 @@
 
     <div class="grid grid-cols-1 tablet:grid-cols-2 gap-lg">
       <!-- Proof card: surface + text hierarchy -->
-      <div class="surface-glass p-lg flex flex-col gap-md">
+      <div class="surface-raised p-lg flex flex-col gap-md">
         <h3>Surface Card</h3>
         <p class="text-dim">
-          This card uses <code>surface-glass</code> &mdash; a floating surface with
+          This card uses <code>surface-raised</code> &mdash; a floating surface with
           physics-aware shadows, borders, and optional backdrop blur.
         </p>
         <div class="surface-sunk p-md flex flex-col gap-sm">
@@ -184,7 +184,7 @@
       </div>
 
       <!-- Proof card: interactive elements -->
-      <div class="surface-glass p-lg flex flex-col gap-md">
+      <div class="surface-raised p-lg flex flex-col gap-md">
         <h3>Interactive Elements</h3>
         <MediaSlider
           bind:volume={mediaVolume}
@@ -245,7 +245,7 @@
     />
 
     <div class="grid grid-cols-1 tablet:grid-cols-2 gap-lg">
-      <div class="surface-glass p-lg flex flex-col gap-md">
+      <div class="surface-raised p-lg flex flex-col gap-md">
         <h3>Sample Card</h3>
         <p class="text-dim">
           This card's padding, gaps, and control heights all scale with the
@@ -264,7 +264,7 @@
         </div>
       </div>
 
-      <div class="surface-glass p-lg flex flex-col gap-md">
+      <div class="surface-raised p-lg flex flex-col gap-md">
         <h3>Use Cases</h3>
         <ul class="flex flex-col gap-sm text-dim">
           <li>
@@ -296,7 +296,7 @@
 
     <div class="grid grid-cols-1 tablet:grid-cols-2 gap-lg">
       <!-- JS side -->
-      <div class="surface-glass p-lg flex flex-col gap-md">
+      <div class="surface-raised p-lg flex flex-col gap-md">
         <h3>Register &amp; Switch</h3>
         <pre class="surface-sunk p-md text-caption overflow-x-auto"><code
             >{`// Register a custom atmosphere
@@ -317,7 +317,7 @@ voidEngine.setAtmosphere('brand');`}</code
       </div>
 
       <!-- CSS side -->
-      <div class="surface-glass p-lg flex flex-col gap-md">
+      <div class="surface-raised p-lg flex flex-col gap-md">
         <h3>Your Component Styles</h3>
         <pre class="surface-sunk p-md text-caption overflow-x-auto"><code
             >{`/* Your existing CSS — just use the tokens */
@@ -340,7 +340,7 @@ voidEngine.setAtmosphere('brand');`}</code
 
     <!-- What you get vs what you build -->
     <div class="grid grid-cols-1 tablet:grid-cols-2 gap-lg">
-      <div class="surface-glass p-lg flex flex-col gap-md">
+      <div class="surface-raised p-lg flex flex-col gap-md">
         <h3 class="text-success">What You Get</h3>
         <ul class="flex flex-col gap-sm">
           <li class="flex flex-row gap-sm items-center">
@@ -370,7 +370,7 @@ voidEngine.setAtmosphere('brand');`}</code
         </ul>
       </div>
 
-      <div class="surface-glass p-lg flex flex-col gap-md">
+      <div class="surface-raised p-lg flex flex-col gap-md">
         <h3 class="text-premium">What You Build</h3>
         <ul class="flex flex-col gap-sm">
           <li class="flex flex-row gap-sm items-center">
@@ -406,7 +406,7 @@ voidEngine.setAtmosphere('brand');`}</code
   <section class="flex flex-col gap-lg">
     <h2 class="text-center">Is Void Energy Right For You?</h2>
 
-    <div class="surface-glass p-lg flex flex-col tablet:flex-row gap-lg">
+    <div class="surface-raised p-lg flex flex-col tablet:flex-row gap-lg">
       <div class="flex-1 flex flex-col gap-sm">
         <h4 class="text-success">Best For</h4>
         <ul class="flex flex-col gap-sm text-dim text-small">
@@ -441,7 +441,7 @@ voidEngine.setAtmosphere('brand');`}</code
       </p>
     </div>
 
-    <div class="surface-glass p-lg flex flex-col gap-lg">
+    <div class="surface-raised p-lg flex flex-col gap-lg">
       <!-- Feedback patterns -->
       <div class="flex flex-col gap-md">
         <h3>Feedback Patterns</h3>

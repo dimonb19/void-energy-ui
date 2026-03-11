@@ -33,7 +33,7 @@ Tailwind = page composition and consumer-side geometry. SCSS = visual physics/ma
 
 ```
 CORRECT:  class="flex flex-col gap-md p-lg"       (composition in Tailwind)
-CORRECT:  .card { @include glass-float; }         (physics in SCSS)
+CORRECT:  .card { @include surface-raised; }         (physics in SCSS)
 CORRECT:  button { min-height: var(--control-height); display: inline-flex; }
 WRONG:    .page-section { display: grid; gap: 24px; }   (page layout in SCSS)
 WRONG:    class="shadow-lg bg-blue-500"            (physics in Tailwind)
@@ -164,7 +164,7 @@ src/
 @use '../abstracts' as *;
 
 .my-component {
-  @include glass-float;
+  @include surface-raised;
 
   @include when-state('active') {
     border-color: var(--energy-primary);
@@ -240,7 +240,7 @@ No native element exists for the interaction (e.g., combobox/autocomplete, multi
 
 ```
 CORRECT:  <select onchange={handleChange}>           (native behavior)
-CORRECT:  .select { @include glass-float; }           (SCSS physics on native element)
+CORRECT:  .select { @include surface-raised; }           (SCSS physics on native element)
 WRONG:    <div role="listbox" on:keydown={...}>       (reimplenting <select> from scratch)
 ```
 

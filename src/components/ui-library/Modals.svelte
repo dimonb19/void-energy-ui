@@ -7,7 +7,7 @@
 <section id="modals" class="flex flex-col gap-md">
   <h2>14 // MODALS & DIALOGS</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Dialogs for confirmations, alerts, and complex interactions. Focus is
       trapped inside the modal and restored on close. Four sizes (small, medium,
@@ -25,7 +25,7 @@
         focus; closing restores it. Escape dismissal is handled by the
         <code>layerStack</code> &mdash; if a dropdown is open above a modal,
         Escape closes the dropdown first. The dialog uses
-        <code>glass-float</code> + <code>glass-blur</code> physics and
+        <code>surface-raised</code> + <code>glass-blur</code> physics and
         transitions via CSS <code>@starting-style</code>. Four sizes:
         <code>sm</code>, <code>md</code>, <code>lg</code>,
         <code>full</code>.

@@ -159,7 +159,7 @@
             missing wrapper does not automatically mean a missing capability.
           </p>
 
-          <details class="surface-glass text-left">
+          <details class="surface-raised text-left">
             <summary>New here? Key concepts</summary>
             <div class="p-lg flex flex-col gap-md">
               <p>

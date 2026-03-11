@@ -5,7 +5,7 @@
 <section id="loading-states" class="flex flex-col gap-md">
   <h2>15 // LOADING STATES</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Physics-aware loading indicators. The shimmer system provides two mixins
       &mdash; <code>@include shimmer</code> for container overlays and
@@ -81,24 +81,24 @@
         <!-- Row of shaped containers -->
         <div class="flex flex-wrap gap-lg items-end">
           <!-- Card -->
-          <div class="shimmer-surface surface-glass w-5xl h-4xl"></div>
+          <div class="shimmer-surface surface-raised w-5xl h-4xl"></div>
 
           <!-- Pill -->
           <div
-            class="shimmer-surface surface-glass rounded-full w-5xl h-xl"
+            class="shimmer-surface surface-raised rounded-full w-5xl h-xl"
           ></div>
 
           <!-- Square -->
-          <div class="shimmer-surface surface-glass w-2xl h-2xl"></div>
+          <div class="shimmer-surface surface-raised w-2xl h-2xl"></div>
 
           <!-- Circle -->
           <div
-            class="shimmer-surface surface-glass rounded-full w-2xl h-2xl"
+            class="shimmer-surface surface-raised rounded-full w-2xl h-2xl"
           ></div>
         </div>
 
         <!-- Wide bar -->
-        <div class="shimmer-surface surface-glass h-xl"></div>
+        <div class="shimmer-surface surface-raised h-xl"></div>
       </div>
 
       <p class="text-caption text-mute px-xs">
@@ -154,7 +154,7 @@
 &lt;p class="text-shimmer"&gt;Processing your request...&lt;/p&gt;
 
 &lt;!-- Container shimmer (skeleton loader) --&gt;
-&lt;div class="shimmer-surface surface-glass" style="height: 8rem"&gt;&lt;/div&gt;
+&lt;div class="shimmer-surface surface-raised" style="height: 8rem"&gt;&lt;/div&gt;
 
 &lt;!-- SCSS usage --&gt;
 .loading-label &#123;

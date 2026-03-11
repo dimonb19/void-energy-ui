@@ -53,7 +53,7 @@
 
    ⚠️ CRITICAL RULES (The Hybrid Protocol):
    1. LAYOUT (Geometry)   → Tailwind (`flex gap-md p-lg`)
-   2. MATERIAL (Physics)  → SCSS (`.surface-glass .btn-cta`)
+   2. MATERIAL (Physics)  → SCSS (`.surface-raised .btn-cta`)
    3. STATE (Attributes)  → `[data-state="open"]` NOT `.is-active`
 
    📝 SCSS NAMING CONVENTION:
@@ -70,8 +70,8 @@
    └─────────────────────────────────────────────────────────────────────────┘
 
    👉 See /CHEAT-SHEET.md for:
-   - Full component catalog (.surface-glass, .surface-sunk, .btn-cta)
-   - Mixin reference with examples (@include glass-float, @include glass-sunk)
+   - Full component catalog (.surface-raised, .surface-sunk, .btn-cta)
+   - Mixin reference with examples (@include surface-raised, @include surface-sunk)
    - Spacing & responsive breakpoints (xs, sm, md, lg, xl...)
    - Copy-paste patterns (modals, cards, inputs, buttons)
 

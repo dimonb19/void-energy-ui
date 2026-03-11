@@ -206,7 +206,7 @@ We separate **Composition Layout** from **Material + Shipped Primitive Geometry*
 #### ✅ Correct
 
 ```svelte
-<div class="flex flex-col gap-md p-lg surface-glass">
+<div class="flex flex-col gap-md p-lg surface-raised">
   <h2 class="text-main">Title</h2>
 </div>
 ```
@@ -220,7 +220,7 @@ We separate **Composition Layout** from **Material + Shipped Primitive Geometry*
 #### ❌ Incorrect
 
 ```scss
-.surface-glass {
+.surface-raised {
   width: 300px; /* ❌ Arbitrary page/layout geometry in SCSS */
   margin-bottom: 20px; /* ❌ Arbitrary page/layout geometry in SCSS */
 }
@@ -471,7 +471,7 @@ interface CardProps {
 ```scss
 .custom-card {
   // Use the floating surface physics
-  @include glass-float(true);
+  @include surface-raised(true);
 
   // Responsive padding scales with density
   padding: var(--space-lg);
@@ -518,7 +518,7 @@ interface CardProps {
   const isEven = $derived(internalCount % 2 === 0);
 </script>
 
-<div class="surface-glass p-md">
+<div class="surface-raised p-md">
   <h3>{title}</h3>
   <p>Count: {internalCount} ({isEven ? 'even' : 'odd'})</p>
   <button onclick={increment}>Increment</button>

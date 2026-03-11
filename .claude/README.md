@@ -43,7 +43,7 @@ Scaffolds a new component with the correct Void Energy patterns.
 
 Creates:
 - `src/components/ui/DataGrid.svelte` — Svelte 5 runes, props interface, data-attributes
-- `src/styles/components/_datagrid.scss` — glass-float, physics blocks, token-only values
+- `src/styles/components/_datagrid.scss` — surface-raised, physics blocks, token-only values
 
 ### `/migrate ComponentName`
 

@@ -155,7 +155,7 @@
 <section id="drag-and-drop" class="flex flex-col gap-md">
   <h2>18 // DRAG & DROP</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Pointer Events-based drag-and-drop with a custom ghost element,
       physics-aware visual states, full keyboard parity, and screen reader
@@ -264,7 +264,7 @@
         >
           {#each sortableItems as item, index (item.id)}
             <li
-              class="drag-sort-item surface-glass p-md"
+              class="drag-sort-item surface-raised p-md"
               aria-label={item.label}
               use:draggable={{
                 id: item.id,
@@ -376,7 +376,7 @@
             <div class="flex flex-1 flex-col gap-md">
               {#each zoneA as card (card.id)}
                 <div
-                  class="drag-zone-card surface-glass p-md cursor-grab"
+                  class="drag-zone-card surface-raised p-md cursor-grab"
                   aria-label={card.label}
                   use:draggable={{
                     id: card.id,
@@ -427,7 +427,7 @@
             <div class="flex flex-1 flex-col gap-md">
               {#each zoneB as card (card.id)}
                 <div
-                  class="drag-zone-card surface-glass p-md cursor-grab"
+                  class="drag-zone-card surface-raised p-md cursor-grab"
                   aria-label={card.label}
                   use:draggable={{
                     id: card.id,

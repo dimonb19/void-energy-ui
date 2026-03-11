@@ -1,7 +1,7 @@
 <section id="prose" class="flex flex-col gap-md">
   <h2>04 // PROSE & CONTENT</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Semantic HTML elements for long-form content: inline text semantics,
       blockquotes, figures, and opt-in list styling. Every element adapts to the

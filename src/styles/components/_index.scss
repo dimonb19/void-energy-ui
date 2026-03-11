@@ -15,17 +15,17 @@
  * | File          | Purpose                              | Key Mixins       |
  * |---------------|--------------------------------------|------------------|
  * | _icons        | SVG icon sizing and interactions     | -                |
- * | _tooltips     | Floating tooltip surfaces            | glass-float      |
- * | _dialogs      | Modal dialog styling                 | glass-float      |
+ * | _tooltips     | Floating tooltip surfaces            | surface-raised      |
+ * | _dialogs      | Modal dialog styling                 | surface-raised      |
  * | _anchors      | Link/anchor styling with laser line  | -                |
  * | _buttons      | Button base + CTA + semantic vars    | btn-variant      |
- * | _inputs       | Form inputs, selects, dropzone       | glass-sunk       |
- * | _toasts       | Notification toast styling           | glass-float      |
- * | _containers   | Layout containers + surface classes  | glass-float/sunk |
+ * | _inputs       | Form inputs, selects, dropzone       | surface-sunk       |
+ * | _toasts       | Notification toast styling           | surface-raised      |
+ * | _containers   | Layout containers + surface classes  | surface-raised/sunk |
  * | _navigation   | Top nav bar + tab system             | when-state       |
  * | _chips        | Interactive data chips               | chip-structure   |
  * | _badges       | Non-interactive status pills         | badge-variant    |
- * | _tiles        | Story tile cards                     | glass-float      |
+ * | _tiles        | Story tile cards                     | surface-raised      |
  *
  * HYBRID PROTOCOL:
  * - Layout (padding, gap, flex) -> Tailwind utilities

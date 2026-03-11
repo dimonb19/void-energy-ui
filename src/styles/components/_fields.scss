@@ -8,7 +8,7 @@
  *
  * ANATOMY:
  * ┌─ .field (position: relative) ─────────────────────────────────────┐
- * │  ┌─ input (native glass-sunk, extra padding) ──────────────────┐  │
+ * │  ┌─ input (native surface-sunk, extra padding) ──────────────────┐  │
  * │  │  [.field-slot-left]    text    [.field-slot-right]           │  │
  * │  │   abs left               ↕      abs right                   │  │
  * │  └─────────────────────────────────────────────────────────────┘  │
@@ -197,9 +197,9 @@ $_slot-width: var(--control-padding-x);
   pointer-events: none;
 }
 
-// Display area — mimics a glass-sunk text input
+// Display area — mimics a surface-sunk text input
 .color-field-display {
-  @include glass-sunk;
+  @include surface-sunk;
   display: flex;
   align-items: center;
   width: 100%;

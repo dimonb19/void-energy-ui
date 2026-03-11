@@ -38,7 +38,7 @@ For each file, check against the 5 Laws and report violations with `file:line` r
 - **OK:** `data-state="active"`, `aria-checked="true"`, `aria-pressed="true"`, `aria-expanded="true"`
 
 ### Law 5 — Spacing Gravity
-- **VIOLATION:** `p-sm` or `p-xs` on `.surface-glass` / `.surface-glass-action` (must be `p-lg`)
+- **VIOLATION:** `p-sm` or `p-xs` on `.surface-raised` / `.surface-raised-action` (must be `p-lg`)
 - **VIOLATION:** `p-xs` on `.surface-sunk` (must be `p-md` minimum; `p-sm` only for justified dense pickers)
 - **VIOLATION:** `gap-sm` or `gap-xs` on button/action rows inside containers (must be `gap-md`)
 - **VIOLATION:** `gap-xs` between content groups (only valid for tight coupling: label→input, icon+text, title+subtitle)
@@ -47,7 +47,7 @@ For each file, check against the 5 Laws and report violations with `file:line` r
 ### Physics Coverage (SCSS files)
 - **WARNING:** Component SCSS missing `when-retro` block (for components with border-radius, box-shadow, or visible borders)
 - **WARNING:** Component SCSS missing `when-light` block (for components with visible background surfaces)
-- **INFO:** Missing `when-glass` block is only a concern if the component makes glass-specific overrides beyond what `glass-float`/`glass-sunk` provides
+- **INFO:** Missing `when-glass` block is only a concern if the component makes glass-specific overrides beyond what `surface-raised`/`surface-sunk` provides
 
 ### SCSS Import
 - **VIOLATION:** Importing individual SCSS partials (should be `@use '../abstracts' as *;`)

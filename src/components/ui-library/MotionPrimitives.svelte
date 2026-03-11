@@ -44,7 +44,7 @@
 <section id="motion-primitives" class="flex flex-col gap-md">
   <h2>17 // MOTION PRIMITIVES</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Low-level building blocks for interactive motion. Svelte actions (<code
         >use:morph</code
@@ -79,7 +79,7 @@
             {morphExpanded ? 'Collapse' : 'Expand'}
           </button>
           <div
-            class="surface-glass p-md"
+            class="surface-raised p-md"
             use:morph={{ height: true, width: false, threshold: 2 }}
           >
             {#if morphExpanded}
@@ -170,7 +170,7 @@
           </button>
           <p class="text-small text-mute">Content above</p>
           {#if showEmerge}
-            <div class="surface-glass p-md" in:emerge out:dissolve>
+            <div class="surface-raised p-md" in:emerge out:dissolve>
               <p class="text-small">
                 This block grows into the layout on entry and collapses out on
                 exit. Notice how the content below shifts smoothly.
@@ -203,7 +203,7 @@
           <div class="relative h-4xl">
             {#if showMaterialize}
               <div
-                class="surface-glass p-md absolute inset-x-0 top-0"
+                class="surface-raised p-md absolute inset-x-0 top-0"
                 in:materialize
                 out:dematerialize
               >

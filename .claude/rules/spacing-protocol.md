@@ -14,7 +14,7 @@ Default generous. When unsure, go ONE size up.
 
 | Surface | Padding | Inner Gap | Never |
 |---------|---------|-----------|-------|
-| Floating (`.surface-glass`, `.surface-glass-action`) | `p-lg` | `gap-lg` | Never `p-md` or `p-sm` |
+| Floating (`.surface-raised`, `.surface-raised-action`) | `p-lg` | `gap-lg` | Never `p-md` or `p-sm` |
 | Sunk (`.surface-sunk`) | `p-md` | `gap-md` | Never `p-xs` |
 | Sunk dense (justified exception: theme grid, picker) | `p-sm` | `gap-sm` | Must be explicitly justified |
 
@@ -37,7 +37,7 @@ Default generous. When unsure, go ONE size up.
 ## Common AI Mistakes
 
 ```
-WRONG:  surface-glass p-md gap-sm   ->  CORRECT: surface-glass p-lg gap-lg
+WRONG:  surface-raised p-md gap-sm   ->  CORRECT: surface-raised p-lg gap-lg
 WRONG:  section gap-lg              ->  CORRECT: section gap-xl or gap-2xl
 WRONG:  card grid gap-md            ->  CORRECT: card grid gap-lg
 WRONG:  button row gap-sm           ->  CORRECT: button row gap-md
@@ -50,7 +50,7 @@ WRONG:  surface-sunk p-sm (default) ->  CORRECT: surface-sunk p-md (p-sm only fo
 ```svelte
 <div class="container flex flex-col gap-2xl py-2xl">        <!-- page wrapper -->
   <section class="flex flex-col gap-xl">                     <!-- section -->
-    <div class="surface-glass p-lg flex flex-col gap-lg">    <!-- card -->
+    <div class="surface-raised p-lg flex flex-col gap-lg">    <!-- card -->
       <div class="flex flex-col gap-xs">                     <!-- subsection header -->
         <h3>Title</h3>
         <p class="text-dim">Description</p>

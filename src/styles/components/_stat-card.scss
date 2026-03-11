@@ -3,10 +3,10 @@
  * ==========================================================================
  *
  * KPI metric card with label, large value, trend indicator, and optional
- * sparkline. Container uses glass-float (adapts to all 3 presets + both modes).
+ * sparkline. Container uses surface-raised (adapts to all 3 presets + both modes).
  *
  * SCSS Classes:
- * - .chart-stat         : Outer card container (glass-float surface)
+ * - .chart-stat         : Outer card container (surface-raised surface)
  * - .chart-stat-value   : Large numeric display (monospace, tabular-nums)
  * - .chart-stat-label   : Uppercase caption label
  * - .chart-stat-delta   : Trend delta with direction coloring
@@ -17,7 +17,7 @@
 @use '../abstracts' as *;
 
 .chart-stat {
-  @include glass-float;
+  @include surface-raised;
 
   .chart-stat-value {
     font-family: var(--font-code);

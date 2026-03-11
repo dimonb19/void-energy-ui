@@ -64,9 +64,9 @@ We separate **Composition Layout** from **Material + Shipped Primitive Geometry*
 
 * **SCSS (`src/styles/**/*.scss`):**
     * Use **SCSS** for Visuals, Physics, Complex States, and token-driven component-internal geometry that ships with a primitive out of the box.
-    * ✅ `.surface-glass { @include glass-float; }`
+    * ✅ `.surface-raised { @include surface-raised; }`
     * ✅ `button { min-height: var(--control-height); display: inline-flex; }`
-    * ❌ `.surface-glass { width: 300px; margin-bottom: 20px; }` (Arbitrary page/layout bleed)
+    * ❌ `.surface-raised { width: 300px; margin-bottom: 20px; }` (Arbitrary page/layout bleed)
 
 **Allowed SCSS geometry exceptions**
 * Native control baselines (`button`, `input`, `select`, `textarea`)

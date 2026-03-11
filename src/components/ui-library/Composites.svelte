@@ -171,7 +171,7 @@
 <section id="composites" class="flex flex-col gap-md">
   <h2>09 // COMPOSITES</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Higher-order components that combine icons, inputs, and buttons into
       ready-to-use patterns. Search fields, password fields with visibility
@@ -185,10 +185,10 @@
       <p class="p-md">
         Input fields use the <code>.field</code> overlay pattern: icons are
         <strong>absolutely positioned</strong> inside the native input, which
-        keeps its own <code>glass-sunk</code> styling untouched. Padding adjusts
-        automatically via <code>:has()</code> selectors. Icons provide visual
-        state feedback &mdash; rotation, checkmarks, cross-outs &mdash; driven
-        by <code>data-state</code> and <code>data-muted</code> attributes.
+        keeps its own <code>surface-sunk</code> styling untouched. Padding
+        adjusts automatically via <code>:has()</code> selectors. Icons provide
+        visual state feedback &mdash; rotation, checkmarks, cross-outs &mdash;
+        driven by <code>data-state</code> and <code>data-muted</code> attributes.
       </p>
     </details>
 
@@ -198,7 +198,7 @@
       <p class="text-small text-mute">
         Each field wraps a native <code>&lt;input&gt;</code> inside a
         <code>.field</code> container. The input keeps all native styling (<code
-          >glass-sunk</code
+          >surface-sunk</code
         >, focus ring, border). Icon slots are absolutely positioned via
         <code>.field-slot-left</code>
         /

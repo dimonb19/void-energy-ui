@@ -29,7 +29,7 @@ Create `src/components/ui-library/SectionName.svelte` following this exact patte
 <section class="flex flex-col gap-md mt-md">
   <h2>NN // SECTION TITLE</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <!-- Intro paragraph -->
     <p class="text-dim">
       The <code>ComponentName</code> component does X. It reuses the

@@ -65,7 +65,7 @@ Follow the exact pattern from `src/styles/components/_toggle.scss`:
 @use '../abstracts' as *;
 
 .component-name {
-  @include glass-float;  // or glass-sunk for input-like components
+  @include surface-raised;  // or surface-sunk for input-like components
 
   // State handling
   @include when-state('active') {
@@ -96,7 +96,7 @@ Rules:
 - Always start with `@use '../abstracts' as *;`
 - Use semantic tokens only — no raw px, hex, or rgb values
 - Include `when-retro` and `when-light` blocks for components with visible surfaces
-- Include `when-glass` only if you need glass-specific overrides beyond what `glass-float`/`glass-sunk` provides
+- Include `when-glass` only if you need glass-specific overrides beyond what `surface-raised`/`surface-sunk` provides
 - Omit empty physics blocks — they add noise without value
 - Transitions use `var(--speed-fast)` and `var(--ease-spring-snappy)`
 

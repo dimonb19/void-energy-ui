@@ -207,7 +207,7 @@
 <section id="atmospheres" class="flex flex-col gap-md">
   <h2>03 // ATMOSPHERES</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Atmospheres define the visual identity of the interface &mdash; palette,
       typography, and mood. Void Energy ships 12 built-in atmospheres spanning

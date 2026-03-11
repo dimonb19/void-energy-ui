@@ -11,7 +11,7 @@
 // MIXIN: Floating Surface (Cards, Modals)
 // Context: Positive Z-Index. Floats above the void.
 // $interactive: boolean - Set to true ONLY if the element is clickable (Link/Button)
-@mixin glass-float($interactive: false) {
+@mixin surface-raised($interactive: false) {
   // Texture and geometry.
   background: var(--surface-bg);
   border-radius: var(--radius-base);
@@ -56,7 +56,7 @@
 
 // MIXIN: Sunk Surface (Inputs, Sidebars)
 // Context: Negative Z-Index. Carved into the void.
-@mixin glass-sunk {
+@mixin surface-sunk {
   background: var(--bg-sunk);
 
   border: var(--physics-border-width) solid var(--border-color);

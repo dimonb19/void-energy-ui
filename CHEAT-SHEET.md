@@ -45,7 +45,7 @@ graph LR
     A[HTML/Svelte] -->|Layout| B[Tailwind CSS]
     A -->|Material| C[SCSS Physics]
     B --> D["flex, gap-md, p-lg, w-full"]
-    C --> E[".surface-glass, .btn-cta"]
+    C --> E[".surface-raised, .btn-cta"]
 ```
 
 #### Rules
@@ -53,7 +53,7 @@ graph LR
 | Layer        | Technology | Responsibility            | Examples                                             |
 | ------------ | ---------- | ------------------------- | ---------------------------------------------------- |
 | **Layout**   | Tailwind   | Page composition, spacing, responsive structure, consumer-side geometry | `flex`, `gap-md`, `p-lg`, `w-full` |
-| **Material** | SCSS       | Visuals, physics, states, token-driven primitive-internal geometry | `.surface-glass`, `.btn-cta`, `@include glass-float` |
+| **Material** | SCSS       | Visuals, physics, states, token-driven primitive-internal geometry | `.surface-raised`, `.btn-cta`, `@include surface-raised` |
 
 #### Allowed Exceptions
 
@@ -65,7 +65,7 @@ graph LR
 
 ```svelte
 <!-- Composition = Tailwind, shipped primitive material/geometry = SCSS -->
-<div class="flex flex-col gap-md p-lg surface-glass">
+<div class="flex flex-col gap-md p-lg surface-raised">
   <h2 class="text-main">Title</h2>
 </div>
 ```
@@ -74,10 +74,10 @@ graph LR
 
 ```scss
 /* NEVER put arbitrary page/layout rules in SCSS */
-.surface-glass {
+.surface-raised {
   width: 300px; /* ❌ Arbitrary layout bleed */
   margin-bottom: 20px; /* ❌ Arbitrary layout bleed */
-  @include glass-float; /* ✅ OK */
+  @include surface-raised; /* ✅ OK */
 }
 ```
 
@@ -545,7 +545,7 @@ Our spacing scale is **100% compatible** with Tailwind CSS:
 **Standard Card (md padding):**
 
 ```svelte
-<div class="surface-glass p-md">
+<div class="surface-raised p-md">
   <h3>Card Title</h3>
   <p>Card content with optimal 24px breathing room.</p>
 </div>
@@ -1018,32 +1018,32 @@ The system standardizes shared interaction and accessibility contracts, but deli
 
 Base surface classes for applying physics.
 
-#### `.surface-glass`
+#### `.surface-raised`
 
-**Description:** Static floating glass (Cards, containers)
+**Description:** Static floating surface (Cards, containers)
 **Physics:** Blur, subtle shadow, border glow
 **Interactive:** No hover effects
 
 **Usage:**
 
 ```svelte
-<div class="surface-glass p-lg">
+<div class="surface-raised p-lg">
   <p>Static card content</p>
 </div>
 ```
 
 ---
 
-#### `.surface-glass-action`
+#### `.surface-raised-action`
 
-**Description:** Interactive glass (Clickable cards, buttons)
+**Description:** Interactive floating surface (Clickable cards, buttons)
 **Physics:** Blur, shadow, border glow
 **Interactive:** Lifts on hover, border brightens
 
 **Usage:**
 
 ```svelte
-<a href="/detail" class="surface-glass-action p-md">
+<a href="/detail" class="surface-raised-action p-md">
   <h3>Click Me</h3>
 </a>
 ```
@@ -1225,7 +1225,7 @@ Preset components with built-in layout and physics.
 | **Validation on drop** | Browsers don't enforce `accept` on drag-and-drop (only on file dialog). `validateFiles()` manually checks type and size on drop, reporting failures via toast. |
 | **Input value reset** | `input.value = ''` after reading files so re-selecting the same file still triggers `onchange`. |
 | **Keyboard access** | Outer `div` has `role="button"` + `tabindex={0}`. Enter/Space programmatically clicks the hidden `<input type="file">`. |
-| **No new SCSS** | Reuses existing `.dropzone` physics from `_inputs.scss` — dashed `glass-sunk` border, spring transitions, energy-highlighted active state. |
+| **No new SCSS** | Reuses existing `.dropzone` physics from `_inputs.scss` — dashed `surface-sunk` border, spring transitions, energy-highlighted active state. |
 
 **Physics:**
 
@@ -2299,15 +2299,15 @@ Non-interactive status pills — the lightweight counterpart to chips. No hover 
 
 #### `<details>` / `<summary>` (Native Disclosure)
 
-**Description:** Collapsible disclosure widget. Uses the native `<details>` element with animated expand/collapse via `::details-content`. Sunk surface by default (`glass-sunk`); override with `.surface-glass` for standalone use.
+**Description:** Collapsible disclosure widget. Uses the native `<details>` element with animated expand/collapse via `::details-content`. Sunk surface by default (`surface-sunk`); override with `.surface-raised` for standalone use.
 **Source:** [src/styles/components/\_inputs.scss](src/styles/components/_inputs.scss) (section 10)
 
 **Surface behavior:**
 
 | Context | Class | Result |
 | --- | --- | --- |
-| Inside a container (default) | *(none)* | Sunk surface (`glass-sunk` baked in) |
-| Standalone on page | `.surface-glass` | Floating glass surface (overrides sunk) |
+| Inside a container (default) | *(none)* | Sunk surface (`surface-sunk` baked in) |
+| Standalone on page | `.surface-raised` | Floating raised surface (overrides sunk) |
 
 **Typography:** `font-size: var(--font-size-small)` on `<details>`. `<p>` elements inside inherit this size automatically — no `text-small` class needed.
 
@@ -2330,7 +2330,7 @@ Non-interactive status pills — the lightweight counterpart to chips. No hover 
 </details>
 
 <!-- Standalone (glass override) -->
-<details class="surface-glass">
+<details class="surface-raised">
   <summary>Expand</summary>
   <p class="p-md">Floating glass container</p>
 </details>
@@ -2445,7 +2445,7 @@ Floating UI elements with special positioning.
 - Click outside closes (capture-phase document listener)
 
 **Physics:**
-- **Glass:** `glass-float` + `glass-blur`, spring transitions (`--speed-base` + `--ease-spring-gentle`), `--shadow-lift` elevation. Entry: fade + scale(0.95) + translateY(4px) + blur. Exit: reverse
+- **Glass:** `surface-raised` + `glass-blur`, spring transitions (`--speed-base` + `--ease-spring-gentle`), `--shadow-lift` elevation. Entry: fade + scale(0.95) + translateY(4px) + blur. Exit: reverse
 - **Flat/Light:** No blur (`filter: none`), opaque `--bg-spotlight`, solid border (`--physics-border-width`)
 - **Retro:** Instant show/hide (`transition: none`, `filter: none`), opaque `--bg-spotlight`, `border-radius: 0`
 
@@ -2518,7 +2518,7 @@ Floating UI elements with special positioning.
 | Side | `data-side="top\|bottom\|left\|right"` | Directional slide offset (set by Floating UI) |
 
 **Physics:**
-- **Glass:** `glass-float` + `glass-blur`, spring transitions, directional slide per `data-side`
+- **Glass:** `surface-raised` + `glass-blur`, spring transitions, directional slide per `data-side`
 - **Flat/Light:** No blur (`filter: none`), same spring transitions
 - **Retro:** Instant show/hide (`transition: none`, `filter: none`), opaque `--bg-spotlight`, radius 0
 
@@ -2563,7 +2563,7 @@ See [`use:tooltip` action docs](#b-tooltip-usetooltip) for full options.
 | `.toast-close` | Dismiss X button (`btn-reset` base, pill radius, `shrink-0` via Tailwind). Hidden for loading toasts |
 
 **Physics:**
-- **Glass:** `glass-float` + `glass-blur`, accent glow on hover
+- **Glass:** `surface-raised` + `glass-blur`, accent glow on hover
 - **Flat/Light:** Reduced blend (5%), subtle accent border on hover
 - **Retro:** Canvas blend (10%), solid border, stepped spinner
 
@@ -2729,7 +2729,7 @@ On mobile, the indicator renders as an icon-only circular pill (equal padding). 
 
 **Physics:**
 
-- **Glass:** Default `glass-float` + `glass-blur` capsule surface
+- **Glass:** Default `surface-raised` + `glass-blur` capsule surface
 - **Flat:** Standard surface with token-driven border/shadow
 - **Retro:** No blur, binary visibility (pops like terminal UI)
 - **Light:** Uses `--bg-surface` background
@@ -2987,10 +2987,10 @@ Physics-aware visual effects for loading states and skeleton loaders.
 
 ```svelte
 <!-- Skeleton card -->
-<div class="shimmer-surface surface-glass" style="height: 8rem"></div>
+<div class="shimmer-surface surface-raised" style="height: 8rem"></div>
 
 <!-- Skeleton pill -->
-<div class="shimmer-surface surface-glass rounded-full" style="height: 2.5rem; width: 10rem"></div>
+<div class="shimmer-surface surface-raised rounded-full" style="height: 2.5rem; width: 10rem"></div>
 ```
 
 **Showcase:** [/components → Effects](src/components/ui-library/Effects.svelte)
@@ -3493,7 +3493,7 @@ Pure SVG chart components for dashboards and metrics. All charts adapt to atmosp
 <StatCard label="Revenue" value="$78.4k" trend="up" delta="+12.5%" sparkline={[38, 42, 35, 48, 52, 45]} />
 ```
 
-**Physics:** Container uses `glass-float` — glass gets frosted surface + shadow, flat gets solid surface + border, retro gets hard border + squared corners. Trend colors and sparkline series adapt across all presets.
+**Physics:** Container uses `surface-raised` — glass gets frosted surface + shadow, flat gets solid surface + border, retro gets hard border + squared corners. Trend colors and sparkline series adapt across all presets.
 
 ---
 
@@ -3693,7 +3693,7 @@ Pure SVG chart components for dashboards and metrics. All charts adapt to atmosp
 
 ### Surface Mixins
 
-#### `@include glass-float($interactive: false)`
+#### `@include surface-raised($interactive: false)`
 
 **Purpose:** Floating surface physics (Cards, Modals)
 **Context:** Positive Z-Index, floats above the void
@@ -3710,17 +3710,17 @@ Pure SVG chart components for dashboards and metrics. All charts adapt to atmosp
 
 ```scss
 .my-card {
-  @include glass-float(); // Static card
+  @include surface-raised(); // Static card
 }
 
 .my-button {
-  @include glass-float(true); // Interactive (hover lift)
+  @include surface-raised(true); // Interactive (hover lift)
 }
 ```
 
 ---
 
-#### `@include glass-sunk`
+#### `@include surface-sunk`
 
 **Purpose:** Recessed surface physics (Inputs, Wells)
 **Context:** Negative Z-Index, carved into the canvas
@@ -3737,7 +3737,7 @@ Pure SVG chart components for dashboards and metrics. All charts adapt to atmosp
 
 ```scss
 .my-input {
-  @include glass-sunk;
+  @include surface-sunk;
 }
 ```
 
@@ -4139,7 +4139,7 @@ All accept optional `$low-specificity: true`.
 ### B. Static Glass Card
 
 ```svelte
-<div class="surface-glass flex flex-col gap-md p-lg">
+<div class="surface-raised flex flex-col gap-md p-lg">
   <h2 class="text-main">Card Title</h2>
   <p class="text-dim">Description text here.</p>
 </div>
@@ -4150,7 +4150,7 @@ All accept optional `$low-specificity: true`.
 ### C. Interactive Glass Card (Clickable)
 
 ```svelte
-<a href="/detail" class="surface-glass-action flex flex-col gap-sm p-md">
+<a href="/detail" class="surface-raised-action flex flex-col gap-sm p-md">
   <h3 class="text-main">Click Me</h3>
   <span class="text-mute">Hover for lift effect</span>
 </a>
@@ -4200,7 +4200,7 @@ All accept optional `$low-specificity: true`.
 ### G. Truncated Text Card
 
 ```svelte
-<div class="surface-glass p-md flex flex-col gap-sm">
+<div class="surface-raised p-md flex flex-col gap-sm">
   <h4 class="text-main">Article Title</h4>
   <p class="text-dim truncate-3-lines">
     Long description that will be clamped to 3 lines with an ellipsis at the
@@ -4297,9 +4297,9 @@ toast.resume(id);  // Resume with remaining time
 <div
   class="grid grid-cols-1 tablet:grid-cols-2 large-desktop:grid-cols-3 gap-md"
 >
-  <div class="surface-glass p-md">Item 1</div>
-  <div class="surface-glass p-md">Item 2</div>
-  <div class="surface-glass p-md">Item 3</div>
+  <div class="surface-raised p-md">Item 1</div>
+  <div class="surface-raised p-md">Item 2</div>
+  <div class="surface-raised p-md">Item 3</div>
 </div>
 ```
 
@@ -4563,7 +4563,7 @@ ARIA wiring is automatic -- `aria-selected`, `aria-controls`, `aria-labelledby`,
 </details>
 
 <!-- Standalone: glass override -->
-<details class="surface-glass">
+<details class="surface-raised">
   <summary>Key Concepts</summary>
   <div class="p-md">...</div>
 </details>

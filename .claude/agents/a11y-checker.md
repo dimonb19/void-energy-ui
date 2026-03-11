@@ -35,7 +35,7 @@ You are an accessibility specialist reviewing Svelte components for WCAG 2.1 AA 
 - Custom components handle Enter/Space for activation
 - Escape closes modals/dropdowns
 - No keyboard traps (Tab cycles within modals)
-- `:focus-visible` styling exists (check for `glass-sunk` mixin which adds it)
+- `:focus-visible` styling exists (check for `surface-sunk` mixin which adds it)
 
 ### Color and Contrast
 - Text colors use semantic tokens (`--text-main`, `--text-dim`) — not raw values
@@ -66,7 +66,7 @@ For each component:
 
 ### Good practices found
 - Uses native `<input type="checkbox">` with `aria-label` ✓
-- Focus ring via `glass-sunk` mixin ✓
+- Focus ring via `surface-sunk` mixin ✓
 ```
 
 End with a summary: `X critical, Y warnings across Z components`.

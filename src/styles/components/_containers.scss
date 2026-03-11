@@ -44,14 +44,14 @@
 // A. FLOATING SURFACES (Positive Z)
 // --------------------------------------------------------------------------
 
-// Static Glass (Decoration / Wrapper)
-.surface-glass {
-  @include glass-float($interactive: false);
+// Static Raised (Decoration / Wrapper)
+.surface-raised {
+  @include surface-raised($interactive: false);
 }
 
-// Interactive Glass (Clickable Cards)
-.surface-glass-action {
-  @include glass-float($interactive: true);
+// Interactive Raised (Clickable Cards)
+.surface-raised-action {
+  @include surface-raised($interactive: true);
   cursor: pointer;
 }
 
@@ -60,7 +60,7 @@
 
 // Recessed areas (for groupings, not just inputs)
 .surface-sunk {
-  @include glass-sunk;
+  @include surface-sunk;
 }
 
 // C. SOLID SURFACES (Opaque)

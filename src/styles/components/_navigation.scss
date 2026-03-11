@@ -6,7 +6,7 @@
  *
  * ARCHITECTURE:
  * - Section 1: Navigation Bar
- *   - .nav-bar : Top navigation container (use with .surface-glass)
+ *   - .nav-bar : Top navigation container (use with .surface-raised)
  *   - .nav-menu : Slide-out navigation menu
  *   - .bottom-bar  : Nested submenu within nav menu
  *
@@ -22,7 +22,7 @@
  *
  * USAGE:
  * ```html
- * <nav class="nav-bar surface-glass backdrop-blur-physics ...">
+ * <nav class="nav-bar surface-raised backdrop-blur-physics ...">
  *   <a class="tab" href="/">Home</a>
  *   <a class="tab" data-state="active" href="/about">About</a>
  * </nav>
@@ -37,12 +37,12 @@
 // ==========================================================================
 // 1. NAVIGATION BAR
 // ==========================================================================
-// The nav-bar class modifies .surface-glass for header-specific styling.
-// Use with: class="nav-bar surface-glass backdrop-blur-physics ..."
+// The nav-bar class modifies .surface-raised for header-specific styling.
+// Use with: class="nav-bar surface-raised backdrop-blur-physics ..."
 // ==========================================================================
 
 .nav-bar {
-  @include glass-float;
+  @include surface-raised;
   @include glass-blur;
 
   height: calc(var(--nav-height) + var(--space-md) + var(--safe-top));
@@ -320,7 +320,7 @@
 // ==========================================================================
 
 .bottom-nav {
-  @include glass-float;
+  @include surface-raised;
   @include glass-blur;
 
   position: fixed;

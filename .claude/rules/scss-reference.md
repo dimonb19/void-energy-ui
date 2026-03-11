@@ -20,9 +20,9 @@ Do not use SCSS for:
 
 ## Surfaces
 ```
-glass-float($interactive: false)   Floating surface (cards, panels). $interactive=true adds hover lift/glow.
+surface-raised($interactive: false)   Floating surface (cards, panels). $interactive=true adds hover lift/glow.
 glass-blur                          Backdrop blur (@supports progressive enhancement).
-glass-sunk                          Recessed surface (inputs, wells). Auto focus-ring on :focus-visible.
+surface-sunk                          Recessed surface (inputs, wells). Auto focus-ring on :focus-visible.
 ```
 
 ## Animation

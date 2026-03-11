@@ -1,7 +1,7 @@
 <section id="typography" class="flex flex-col gap-md">
   <h2>01 // TYPOGRAPHY & TEXT</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       A complete type system with headings, body text, code elements, and
       utility classes. Every size scales with user preferences &mdash; change

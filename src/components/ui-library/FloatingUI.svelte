@@ -10,7 +10,7 @@
 <section id="floating-ui" class="flex flex-col gap-md">
   <h2>12 // FLOATING UI</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Dropdown menus for actions and settings, plus tooltips for contextual
       hints. Both position themselves intelligently &mdash; they flip and shift
@@ -26,7 +26,7 @@
         <code>@floating-ui/dom</code> for smart placement with flip and shift. Dropdown
         is a declarative Svelte component (click-triggered, arbitrary content). Tooltip
         is an imperative Svelte action (hover/focus-triggered, text-only). Both use
-        glass-float, glass-blur, and spring transitions.
+        surface-raised, glass-blur, and spring transitions.
       </p>
     </details>
 

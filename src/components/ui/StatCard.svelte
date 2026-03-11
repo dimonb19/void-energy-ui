@@ -10,7 +10,7 @@
   <StatCard label="Latency" value="142ms" trend="down" delta="-23%" />
   ─────────────────────────────────────────────────────────────────────────
 
-  PHYSICS: Container uses glass-float (adapts to all 3 presets + both modes).
+  PHYSICS: Container uses surface-raised (adapts to all 3 presets + both modes).
   TREND: up = green (success), down = red (error), flat = muted.
 -->
 <script lang="ts">

@@ -78,7 +78,7 @@
     background-color var(--speed-base) var(--ease-spring-snappy);
 
   border-radius: var(--radius-base);
-  @include glass-float($interactive: true);
+  @include surface-raised($interactive: true);
 
   .chip-label {
     display: flex;

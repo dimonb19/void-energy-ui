@@ -57,7 +57,7 @@
 
 .toast-message {
   // Physics (glass capsule).
-  @include glass-float;
+  @include surface-raised;
   pointer-events: auto;
   cursor: default;
 

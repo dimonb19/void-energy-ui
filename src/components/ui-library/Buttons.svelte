@@ -44,7 +44,7 @@
 <section id="buttons" class="flex flex-col gap-md">
   <h2>07 // BUTTONS, CHIPS & BADGES</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Interactive elements for actions and selections. Six semantic variants
       communicate intent at a glance: Default for standard actions, CTA for the

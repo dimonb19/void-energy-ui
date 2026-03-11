@@ -40,7 +40,7 @@ select {
   color: var(--text-main);
 
   // Apply sunk physics.
-  @include glass-sunk;
+  @include surface-sunk;
 
   // Unified Spring Transitions
   // All focus/error state changes use the same spring for cohesive feel
@@ -176,7 +176,7 @@ input[type='radio'] {
   border-radius: calc(var(--radius-base) * 2);
 
   border: var(--physics-border-width) dashed alpha(var(--energy-secondary), 30%);
-  @include glass-sunk;
+  @include surface-sunk;
   border-style: dashed; // Override sunk solid border
 
   cursor: pointer;
@@ -344,7 +344,7 @@ input[type='datetime-local'] {
 // 8. COLOR INPUT (Native Swatch)
 // --------------------------------------------------------------------------
 // Strip browser chrome from the color picker and make the swatch integrate
-// with the glass-sunk surface. The OS color dialog can't be styled, but the
+// with the surface-sunk surface. The OS color dialog can't be styled, but the
 // trigger swatch can.
 
 input[type='color'] {
@@ -503,7 +503,7 @@ legend {
 // 13. DETAILS & SUMMARY (Native Disclosure)
 // --------------------------------------------------------------------------
 details {
-  @include glass-sunk;
+  @include surface-sunk;
   margin: 0;
   font-size: var(--font-size-small);
 

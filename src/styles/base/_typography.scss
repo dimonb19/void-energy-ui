@@ -310,7 +310,7 @@ code {
   line-height: inherit;
   color: var(--text-main);
 
-  // Inline recessed surface (lighter than glass-sunk).
+  // Inline recessed surface (lighter than surface-sunk).
   background: var(--bg-sunk);
   border: var(--physics-border-width) solid var(--border-color);
   border-radius: calc(var(--radius-base) * 0.5);
@@ -338,7 +338,7 @@ pre {
   tab-size: 2;
 
   // Block recessed surface.
-  @include glass-sunk;
+  @include surface-sunk;
   padding: var(--space-md);
   overflow-x: auto;
   @include laser-scrollbar;

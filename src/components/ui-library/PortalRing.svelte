@@ -8,7 +8,7 @@
 <section id="portal-ring" class="flex flex-col gap-md">
   <h2>19 // PORTAL RING</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       The 404 page centerpiece. A pointer-reactive parallax SVG with six
       composited animation layers &mdash; concentric rings, energy arcs, glitch

@@ -15,7 +15,7 @@
   max-width: var(--tooltip-max-width); // Readability constraint
 
   // Physics inheritance.
-  @include glass-float($interactive: false);
+  @include surface-raised($interactive: false);
   @include glass-blur;
   background: var(--bg-surface);
 

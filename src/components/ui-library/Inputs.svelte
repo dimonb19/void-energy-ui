@@ -77,7 +77,7 @@
 <section id="inputs" class="flex flex-col gap-md">
   <h2>08 // INPUTS & CONTROLS</h2>
 
-  <div class="surface-glass p-lg flex flex-col gap-lg">
+  <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Standard form elements &mdash; text inputs, selects, checkboxes, radios,
       range sliders, and toggles &mdash; all styled to match the active
@@ -90,9 +90,10 @@
       <summary>Technical Details</summary>
       <p class="p-md">
         Form elements follow the native-first protocol &mdash; thin wrappers
-        around browser controls with <code>glass-sunk</code> physics applied via
-        SCSS. The browser owns interaction, accessibility, and form integration.
-        Accent colors, focus rings, and error states are token-driven.
+        around browser controls with <code>surface-sunk</code> physics applied
+        via SCSS. The browser owns interaction, accessibility, and form
+        integration. Accent colors, focus rings, and error states are
+        token-driven.
         <code>Toggle</code> and <code>Switcher</code> are the only custom controls
         &mdash; they exist because no native element provides the same interaction.
       </p>
@@ -103,7 +104,7 @@
       <h5>Text Input</h5>
       <p class="text-small text-mute">
         Native <code>&lt;input type="text"&gt;</code> with
-        <code>glass-sunk</code> physics. Focus shows the energy-primary border
+        <code>surface-sunk</code> physics. Focus shows the energy-primary border
         and focus ring. Supports <code>placeholder</code>,
         <code>disabled</code>, and <code>aria-invalid</code> for error state.
       </p>
@@ -558,7 +559,8 @@
 
       <p class="text-caption text-mute px-xs">
         The native <code>&lt;input type="color"&gt;</code> renders as a
-        <code>--control-height</code> square swatch with glass-sunk physics. Use
+        <code>--control-height</code> square swatch with surface-sunk physics.
+        Use
         <code>ColorField</code> when you need the hex value visible alongside
         the swatch. Props: <code>value</code> (bindable), <code>onchange</code>,
         <code>disabled</code>.
