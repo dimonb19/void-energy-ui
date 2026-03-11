@@ -1466,6 +1466,51 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 
 ---
 
+#### `<Pagination>` (Page Navigation)
+
+**Description:** Controlled page navigation with prev/next arrows, optional first/last jump buttons, and a windowed page number display with ellipsis collapse. Responsive: on mobile (< tablet) collapses to a compact "Page X of Y" indicator with prev/next arrows. Only renders when `totalPages > 1`.
+**Location:** [src/components/ui/Pagination.svelte](src/components/ui/Pagination.svelte)
+**CSS:** `.pagination-btn`, `.pagination-compact`, `.pagination-ellipsis` ([src/styles/components/_pagination.scss](src/styles/components/_pagination.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `currentPage` | `number` | `$bindable(1)` | Active page (1-indexed) |
+| `totalPages` | `number` | *required* | Total number of pages |
+| `onchange` | `(page: number) => void` | — | Callback when page changes |
+| `siblings` | `number` | `1` | Pages visible on each side of current page |
+| `showFirstLast` | `boolean` | `true` | Show jump-to-first/last buttons (desktop only) |
+| `showPrevNext` | `boolean` | `true` | Show prev/next arrows on desktop (always visible on mobile) |
+| `label` | `string` | `'Pagination'` | `aria-label` for the `<nav>` landmark |
+| `class` | `string` | `''` | Additional CSS classes on `<nav>` |
+
+**States:**
+
+| State | Attribute | Visual |
+| --- | --- | --- |
+| Active page | `data-state="active"` + `aria-current="page"` | `--energy-primary` fill + border |
+| Disabled | `disabled` | 40% opacity, `cursor: not-allowed` |
+
+**Windowing (desktop):** Always shows first and last page numbers. Shows `siblings` pages on each side of the current page. Ellipsis (`…`) appears when gaps exist between visible ranges. Small `totalPages` shows all pages without ellipsis. Example with `siblings=1`, `currentPage=5`, `totalPages=10`: `[«] [‹] [1] […] [4] [5] [6] […] [10] [›] [»]`
+
+**Mobile (< tablet):** Collapses to `[‹] Page 5 of 10 [›]` — prev/next arrows with a compact page indicator. First/last buttons and windowed page numbers are hidden.
+
+**Usage:**
+
+```svelte
+<Pagination bind:currentPage={page} totalPages={20} />
+<Pagination bind:currentPage={page} totalPages={50} siblings={2} />
+<Pagination bind:currentPage={page} totalPages={15} showFirstLast={false} />
+```
+
+**Physics:**
+- **Glass:** Glowing `box-shadow` on active page button (`alpha(--energy-primary, 25%)`)
+- **Flat:** Solid `--energy-primary` background fill with transparent border
+- **Retro:** Inverted terminal style — active page gets `--energy-primary` background with `--bg-canvas` text, hard border, no glow
+
+---
+
 #### `<EditField>`
 
 **Description:** Readonly input that unlocks for editing with confirm/reset actions.
@@ -4548,6 +4593,38 @@ Native form submission serializes `String(option.value)`. Pass `name` when the s
 ```
 
 ARIA wiring is automatic -- `aria-selected`, `aria-controls`, `aria-labelledby`, and roving `tabindex` are all managed internally. Arrow Left/Right navigates, Home/End jump, Enter/Space activates. A single `.tabs-indicator` element slides between tabs via JS-measured CSS custom properties. Physics: glass = glowing underline, flat = solid underline, retro = filled pill background. `.tabs-trigger` is excluded from global button styles in `_buttons.scss`.
+
+---
+
+### P2. Pagination (Page Navigation)
+
+```svelte
+<script lang="ts">
+  import Pagination from '@components/ui/Pagination.svelte';
+  let page = $state(1);
+</script>
+
+<!-- Basic -->
+<Pagination bind:currentPage={page} totalPages={20} />
+
+<!-- Wider window (2 siblings each side) -->
+<Pagination bind:currentPage={page} totalPages={50} siblings={2} />
+
+<!-- With callback -->
+<Pagination
+  bind:currentPage={page}
+  totalPages={30}
+  onchange={(p) => fetchData(p)}
+/>
+
+<!-- No first/last jump buttons -->
+<Pagination bind:currentPage={page} totalPages={15} showFirstLast={false} />
+
+<!-- Numbers only on desktop (arrows still visible on mobile) -->
+<Pagination bind:currentPage={page} totalPages={10} showPrevNext={false} />
+```
+
+Controlled API with `bind:currentPage`. Windowing algorithm always shows first + last page, `siblings` pages around current, ellipsis for gaps. Responsive: on mobile (< tablet) collapses to `[‹] Page X of Y [›]` — prev/next always visible, page numbers and first/last hidden. Icons: Lucide `ChevronLeft`/`Right` for prev/next, `ChevronsLeft`/`Right` for first/last. Only renders when `totalPages > 1`. Physics: glass = glow on active, flat = solid fill, retro = inverted terminal (energy-primary bg + canvas text).
 
 ---
 

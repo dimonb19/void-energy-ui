@@ -1,0 +1,150 @@
+// ==========================================================================
+// PAGINATION
+// ==========================================================================
+//
+// Controlled page navigation with prev/next, optional first/last, and
+// windowed page numbers with ellipsis.
+//
+// DESKTOP (>= tablet):
+// <nav class="pagination flex items-center gap-sm" aria-label="…">
+//   <button class="pagination-btn hidden tablet:inline-flex" aria-label="First page">«</button>
+//   <button class="pagination-btn" aria-label="Previous page">‹</button>
+//   <div class="hidden tablet:flex items-center gap-sm">
+//     <button class="pagination-btn" data-state="active" aria-current="page">5</button>
+//     <span class="pagination-ellipsis" aria-hidden="true">…</span>
+//   </div>
+//   <button class="pagination-btn" aria-label="Next page">›</button>
+//   <button class="pagination-btn hidden tablet:inline-flex" aria-label="Last page">»</button>
+// </nav>
+//
+// MOBILE (< tablet):
+// <nav class="pagination flex items-center gap-sm" aria-label="…">
+//   <button class="pagination-btn" aria-label="Previous page">‹</button>
+//   <span class="pagination-compact" aria-current="page">Page 5 of 10</span>
+//   <button class="pagination-btn" aria-label="Next page">›</button>
+// </nav>
+//
+// HYBRID PROTOCOL:
+// - Tailwind: flex, items-center, gap, responsive show/hide (consumer-side composition)
+// - SCSS: button visuals, active state, focus, compact indicator, physics adaptation
+//
+// ==========================================================================
+
+@use '../abstracts' as *;
+
+// --------------------------------------------------------------------------
+// 1. PAGE BUTTON (individual page/nav button)
+// --------------------------------------------------------------------------
+.pagination-btn {
+  // --- A. Reset ---
+  @include btn-reset;
+
+  // --- B. Layout ---
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: var(--control-height);
+  min-height: var(--control-height);
+  padding: 0 var(--space-xs);
+
+  // --- C. Typography ---
+  font-weight: var(--font-weight-medium);
+  font-size: var(--font-size-body);
+  line-height: var(--line-height-body);
+  color: var(--text-dim);
+
+  // --- D. Shape ---
+  border: var(--physics-border-width) solid transparent;
+  border-radius: var(--radius-base);
+
+  // --- E. Transitions ---
+  transition:
+    color var(--speed-fast) var(--ease-spring-snappy),
+    background-color var(--speed-fast) var(--ease-spring-snappy),
+    border-color var(--speed-fast) var(--ease-spring-snappy),
+    box-shadow var(--speed-fast) var(--ease-spring-snappy);
+
+  // --- F. Hover ---
+  @media (hover: hover) {
+    &:not(:disabled):hover {
+      color: var(--text-main);
+      background: alpha(var(--energy-secondary), 8%);
+
+      @include when-light {
+        background: alpha(var(--energy-primary), 8%);
+      }
+
+      @include when-retro {
+        background: transparent;
+        color: var(--energy-primary);
+      }
+    }
+  }
+
+  // --- G. Focus ---
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  // --- H. Active Page ---
+  @include when-state('active') {
+    color: var(--energy-primary);
+    background: alpha(var(--energy-primary), 12%);
+    border-color: alpha(var(--energy-primary), 40%);
+
+    @include when-glass {
+      box-shadow: 0 0 var(--space-xs) alpha(var(--energy-primary), 25%);
+    }
+
+    @include when-light {
+      background: alpha(var(--energy-primary), 10%);
+      color: var(--energy-primary);
+    }
+
+    @include when-retro {
+      background: var(--energy-primary);
+      color: var(--bg-canvas);
+      border-color: var(--energy-primary);
+      box-shadow: none;
+    }
+  }
+
+  // --- I. Disabled ---
+  &:disabled {
+    color: var(--text-mute);
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+// --------------------------------------------------------------------------
+// 2. COMPACT INDICATOR (mobile: "Page X of Y")
+// --------------------------------------------------------------------------
+.pagination-compact {
+  align-items: center;
+  justify-content: center;
+  min-height: var(--control-height);
+  padding: 0 var(--space-xs);
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-dim);
+  white-space: nowrap;
+  user-select: none;
+}
+
+// --------------------------------------------------------------------------
+// 3. ELLIPSIS (non-interactive gap indicator)
+// --------------------------------------------------------------------------
+.pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--control-height);
+  min-height: var(--control-height);
+  color: var(--text-mute);
+  font-size: var(--font-size-body);
+  user-select: none;
+  pointer-events: none;
+}

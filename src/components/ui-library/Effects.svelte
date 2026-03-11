@@ -3,7 +3,7 @@
 </script>
 
 <section id="loading-states" class="flex flex-col gap-md">
-  <h2>15 // LOADING STATES</h2>
+  <h2>16 // LOADING STATES</h2>
 
   <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">

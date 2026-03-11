@@ -18,6 +18,7 @@
   import Composites from './ui-library/Composites.svelte';
   import UserState from './ui-library/UserState.svelte';
   import TabsShowcase from './ui-library/TabsShowcase.svelte';
+  import PaginationShowcase from './ui-library/PaginationShowcase.svelte';
   // Overlays & Feedback
   import FloatingUI from './ui-library/FloatingUI.svelte';
   import Toasts from './ui-library/Toasts.svelte';
@@ -58,6 +59,7 @@
       items: [
         { id: 'composites', label: 'Composites' },
         { id: 'tabs', label: 'Tabs' },
+        { id: 'pagination', label: 'Pagination' },
         { id: 'user-state', label: 'User State' },
       ],
     },
@@ -252,6 +254,7 @@
           </div>
           <Composites />
           <TabsShowcase />
+          <PaginationShowcase />
           <UserState />
 
           <hr />
