@@ -237,7 +237,7 @@
   class="modal-content"
   onclick={(e) => e.stopPropagation()}
   role="presentation"
-  use:morph={{ height: true, width: false }}
+  use:morph={{ width: false }}
 >
   <h2 id="modal-title" class="text-h3 text-center">
     Atmosphere: {voidEngine.atmosphere.toUpperCase()}

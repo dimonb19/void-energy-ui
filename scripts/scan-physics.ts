@@ -28,9 +28,14 @@ const IGNORE_FILES = [
 
 // Strict px matcher.
 const PIXEL_REGEX = /:.*?\b(\d+)px\b/g;
+const VOID_IGNORE_DIRECTIVE_REGEX = /^\s*\/\/\s*void-ignore\b/;
 
 // State tracker.
 let hitCount = 0;
+
+function isVoidIgnoreDirectiveLine(line: string) {
+  return VOID_IGNORE_DIRECTIVE_REGEX.test(line);
+}
 
 function scanDirectory(dir: string) {
   const files = fs.readdirSync(dir);
@@ -57,8 +62,15 @@ function checkFile(filePath: string, fileName: string) {
   const lines = content.split('\n');
 
   lines.forEach((line, index) => {
-    // Skip comments and void-ignore.
-    if (line.trim().startsWith('//') || line.includes('// void-ignore')) return;
+    // Skip comments and void-ignore (current line or preceding directive line).
+    const prevLine = index > 0 ? lines[index - 1] : '';
+    if (
+      line.trim().startsWith('//') ||
+      line.includes('// void-ignore') ||
+      isVoidIgnoreDirectiveLine(prevLine)
+    ) {
+      return;
+    }
 
     let match;
     while ((match = PIXEL_REGEX.exec(line)) !== null) {

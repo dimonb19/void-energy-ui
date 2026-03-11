@@ -380,7 +380,7 @@
   bind:this={wrapperEl}
   class="chart-line relative {className}"
   data-animated={animated}
-  use:morph={{ height: true, width: false }}
+  use:morph={{ width: false }}
 >
   <svg
     bind:this={svgEl}

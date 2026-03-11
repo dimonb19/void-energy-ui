@@ -278,7 +278,7 @@
 
       <div
         class="surface-sunk p-md flex flex-row gap-md flex-wrap justify-center"
-        use:morph={{ height: true, width: false }}
+        use:morph={{ width: false }}
       >
         {#if chips.length === 0}
           <p class="text-mute text-center p-lg">No chips — add some below</p>

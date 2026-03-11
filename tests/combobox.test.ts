@@ -328,6 +328,30 @@ describe('Combobox', () => {
     expect(onchange).not.toHaveBeenCalled();
   });
 
+  it('clears the committed value and fires onchange(null) when clearable is enabled', async () => {
+    const onchange = vi.fn();
+    const { container } = render(Combobox, {
+      options: [
+        { value: 'fr', label: 'France' },
+        { value: 'de', label: 'Germany' },
+      ],
+      value: 'de',
+      clearable: true,
+      onchange,
+    });
+    const input = getInput(container);
+
+    expect(input.value).toBe('Germany');
+
+    await fireEvent.click(
+      screen.getByRole('button', { name: 'Clear selection' }),
+    );
+
+    expect(onchange).toHaveBeenCalledWith(null);
+    expect(input.value).toBe('');
+    expect(document.activeElement).toBe(input);
+  });
+
   // ── Free-text / allowCustomValue ──────────────────────────────────────────
 
   it('commits free text on Enter when allowCustomValue is true', async () => {
@@ -460,6 +484,31 @@ describe('Combobox', () => {
         value: null,
       },
     });
+
+    const formData = new FormData(form);
+    expect(formData.get('country')).toBe('');
+  });
+
+  it('serializes a cleared value as empty string in FormData', async () => {
+    const form = document.createElement('form');
+    document.body.append(form);
+
+    render(Combobox, {
+      target: form,
+      props: {
+        options: [
+          { value: 'fr', label: 'France' },
+          { value: 'de', label: 'Germany' },
+        ],
+        name: 'country',
+        value: 'de',
+        clearable: true,
+      },
+    });
+
+    await fireEvent.click(
+      screen.getByRole('button', { name: 'Clear selection' }),
+    );
 
     const formData = new FormData(form);
     expect(formData.get('country')).toBe('');

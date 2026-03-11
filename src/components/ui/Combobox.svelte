@@ -1,6 +1,9 @@
 <script lang="ts">
-  import { ChevronDown, Check } from '@lucide/svelte';
+  import { ChevronDown, Check, X } from '@lucide/svelte';
   import type { HTMLInputAttributes } from 'svelte/elements';
+  import { morph } from '@actions/morph';
+  import IconBtn from './IconBtn.svelte';
+  import { materialize, dematerialize } from '@lib/transitions.svelte';
   import {
     computePosition,
     autoUpdate,
@@ -30,6 +33,7 @@
     value?: string | number | null;
     open?: boolean;
     allowCustomValue?: boolean;
+    clearable?: boolean;
     required?: boolean;
     name?: string;
     form?: string;
@@ -43,6 +47,7 @@
     value = $bindable<string | number | null>(null),
     open = $bindable(false),
     allowCustomValue = false,
+    clearable = false,
     required,
     name,
     form,
@@ -166,10 +171,10 @@
       }).then(({ x, y }) => {
         if (panelEl !== panel) return;
         Object.assign(panel.style, {
-          left: `${x}px`,
-          top: `${y}px`,
+          left: `${x}px`, // void-ignore — Floating UI computed position
+          top: `${y}px`, // void-ignore — Floating UI computed position
           position: 'absolute',
-          width: `${triggerWidth}px`,
+          width: `${triggerWidth}px`, // void-ignore — Floating UI computed width
         });
       });
     });
@@ -278,6 +283,14 @@
     inputEl?.focus();
   }
 
+  function handleClear() {
+    value = null;
+    query = '';
+    open = false;
+    onchange?.(null);
+    inputEl?.focus();
+  }
+
   // Returns the next enabled option index in direction dir (1=down, -1=up).
   // Wraps around. Returns -1 if all options are disabled.
   function nextEnabledIndex(from: number, dir: 1 | -1): number {
@@ -380,6 +393,7 @@
   value           string | number | null — bindable committed selection
   open            boolean — bindable panel visibility
   allowCustomValue  Commit raw query text on Enter when no option is active
+  clearable         Show an × button when a value is selected; clears to null
   name/form       Route to hidden input only — NOT the visible text input
   required        Maps to aria-required only (no native constraint validation in v1)
   placeholder     Input placeholder (default 'Select...')
@@ -427,8 +441,21 @@
     onclick={() => openPanel()}
     {...rest}
   />
-  <span class="field-slot-right" aria-hidden="true">
-    <ChevronDown class="icon" data-size="lg" />
+  <span
+    class="field-slot-right"
+    aria-hidden={clearable && value != null ? undefined : 'true'}
+  >
+    {#if clearable && value != null}
+      <div in:materialize={{ y: 0 }} out:dematerialize={{ y: 0 }}>
+        <IconBtn
+          icon={X}
+          {disabled}
+          onclick={handleClear}
+          aria-label="Clear selection"
+        />
+      </div>
+    {/if}
+    <ChevronDown class="icon" data-size="lg" aria-hidden="true" />
   </span>
 </div>
 
@@ -449,41 +476,43 @@
   aria-label={placeholder}
   aria-hidden={open ? undefined : 'true'}
 >
-  <div class="combobox-listbox">
-    {#if filtered.length === 0}
-      <p class="text-mute text-center p-lg">No options</p>
-    {:else}
-      {#each filtered as option, i}
-        <button
-          id="{comboboxId}-option-{i}"
-          class="combobox-option btn-ghost"
-          type="button"
-          role="option"
-          tabindex="-1"
-          aria-selected={Object.is(option.value, value) ? 'true' : 'false'}
-          aria-disabled={option.disabled || undefined}
-          data-state={i === activeIndex ? 'active' : ''}
-          onpointerdown={(e) => {
-            e.preventDefault(); // Keep focus on the input (blur-before-click fix)
-            commitOption(option);
-          }}
-          onpointerenter={() => {
-            if (!option.disabled) activeIndex = i;
-          }}
-        >
-          <span class="combobox-option-label">
-            <span>{option.label}</span>
-            {#if option.description}
-              <span class="combobox-option-description"
-                >{option.description}</span
-              >
+  {#key open}
+    <div use:morph={{ width: false }} class="combobox-listbox">
+      {#if filtered.length === 0}
+        <p class="text-mute text-center p-lg">No options</p>
+      {:else}
+        {#each filtered as option, i}
+          <button
+            id="{comboboxId}-option-{i}"
+            class="combobox-option btn-ghost"
+            type="button"
+            role="option"
+            tabindex="-1"
+            aria-selected={Object.is(option.value, value) ? 'true' : 'false'}
+            aria-disabled={option.disabled || undefined}
+            data-state={i === activeIndex ? 'active' : ''}
+            onpointerdown={(e) => {
+              e.preventDefault(); // Keep focus on the input (blur-before-click fix)
+              commitOption(option);
+            }}
+            onpointerenter={() => {
+              if (!option.disabled) activeIndex = i;
+            }}
+          >
+            <span class="combobox-option-label">
+              <span>{option.label}</span>
+              {#if option.description}
+                <span class="combobox-option-description"
+                  >{option.description}</span
+                >
+              {/if}
+            </span>
+            {#if Object.is(option.value, value)}
+              <Check class="icon combobox-option-check" data-size="sm" />
             {/if}
-          </span>
-          {#if Object.is(option.value, value)}
-            <Check class="icon combobox-option-check" data-size="sm" />
-          {/if}
-        </button>
-      {/each}
-    {/if}
-  </div>
+          </button>
+        {/each}
+      {/if}
+    </div>
+  {/key}
 </div>

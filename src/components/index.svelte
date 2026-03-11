@@ -516,7 +516,7 @@ voidEngine.setAtmosphere('brand');`}</code
         <h3>Chip Variants</h3>
         <div
           class="surface-sunk p-sm flex flex-row gap-xs flex-wrap justify-center"
-          use:morph={{ height: true, width: false }}
+          use:morph={{ width: false }}
         >
           {#if chipTags.length === 0}
             <p

@@ -288,7 +288,7 @@
   //       onpointerleave={closeMenuDelayed}
   //       in:materialize
   //       out:dematerialize={{ y: 0 }}
-  //       use:morph={{ height: true, width: false }}
+  //       use:morph={{ width: false }}
   //     >
   //       {#each menuItems as item, i (item.id)}
   //         {#if isComponentItem(item)}

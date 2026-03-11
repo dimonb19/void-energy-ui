@@ -67,6 +67,14 @@ if (!('animate' in Element.prototype)) {
   });
 }
 
+if (!('getAnimations' in Element.prototype)) {
+  Object.defineProperty(Element.prototype, 'getAnimations', {
+    value: () => [],
+    configurable: true,
+    writable: true,
+  });
+}
+
 if (!('showPopover' in HTMLElement.prototype)) {
   Object.defineProperty(HTMLElement.prototype, 'showPopover', {
     value(this: HTMLElement) {

@@ -49,6 +49,7 @@
     ChevronsLeft,
     ChevronsRight,
   } from '@lucide/svelte';
+  import { materialize, implode, live } from '@lib/transitions.svelte';
 
   interface PaginationProps {
     currentPage: number;
@@ -182,20 +183,22 @@
 
     <!-- Desktop: full windowed page numbers -->
     <div class="hidden tablet:flex items-center gap-sm">
-      {#each pages as item, i}
-        {#if item === ELLIPSIS}
-          <span class="pagination-ellipsis" aria-hidden="true">…</span>
-        {:else}
-          <button
-            class="pagination-btn"
-            type="button"
-            aria-current={item === clampedPage ? 'page' : undefined}
-            data-state={item === clampedPage ? 'active' : undefined}
-            onclick={() => goTo(item)}
-          >
-            {item}
-          </button>
-        {/if}
+      {#each pages as item, i (item === ELLIPSIS ? 'e' + i : item)}
+        <div animate:live in:materialize={{ y: 0 }} out:implode>
+          {#if item === ELLIPSIS}
+            <span class="pagination-ellipsis" aria-hidden="true">…</span>
+          {:else}
+            <button
+              class="pagination-btn"
+              type="button"
+              aria-current={item === clampedPage ? 'page' : undefined}
+              data-state={item === clampedPage ? 'active' : undefined}
+              onclick={() => goTo(item)}
+            >
+              {item}
+            </button>
+          {/if}
+        </div>
       {/each}
     </div>
 

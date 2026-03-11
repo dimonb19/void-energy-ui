@@ -1295,7 +1295,7 @@ Preset components with built-in layout and physics.
 | `id` | `string` | — | HTML `id` attribute |
 | `disabled` | `boolean` | `false` | Disables interaction |
 | `class` | `string` | — | Additional CSS classes |
-| `size` | `string` | — | Size via `data-size` attribute |
+| `size` | `'sm' \| 'md' \| 'lg' \| 'xl' \| '2xl' \| '3xl' \| '4xl'` | — | Size via `data-size` attribute |
 | `iconOn` | `string \| Component` | — | ON state icon (optional) |
 | `iconOff` | `string \| Component` | `Circle` | OFF state icon (default circle) |
 | `hideIcons` | `boolean` | `false` | Hide icons entirely |
@@ -1393,6 +1393,7 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 | `value` | `string \| number \| null` | `$bindable(null)` | Committed selection (bindable) |
 | `open` | `boolean` | `$bindable(false)` | Panel visibility (bindable) |
 | `allowCustomValue` | `boolean` | `false` | Commit free text on Enter |
+| `clearable` | `boolean` | `false` | Show an × button when a value is selected; clears `value` to `null` and fires `onchange` |
 | `name` | `string` | — | Routes to hidden `<input type="hidden">` — **not** the visible input |
 | `form` | `string` | — | Hidden input form association |
 | `required` | `boolean` | — | Maps to `aria-required` only. Native constraint validation not supported in v1 — use `FormField` error prop |
@@ -1433,6 +1434,9 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 <!-- Free-text entry (allowCustomValue commits raw text on Enter) -->
 <Combobox options={suggestions} bind:value={tag} allowCustomValue placeholder="Add a tag..." />
 
+<!-- Clearable (shows × when a value is selected) -->
+<Combobox options={countries} bind:value={country} clearable />
+
 <!-- Async filtering -->
 <Combobox
   options={asyncResults}
@@ -1456,7 +1460,7 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 **Physics:**
 - **Glass:** Options follow `btn-ghost` hover (secondary tint). Keyboard-active row gets an additional inset primary border glow.
 - **Flat:** Options follow `btn-ghost` hover (primary tint). Keyboard-active row shown with a subdued primary background.
-- **Retro:** Zero border-radius on all option rows. `btn-ghost` hover shows underline. Keyboard-active row inverts: primary background, canvas-colored text and check icon.
+- **Retro:** Zero border-radius on all option rows. `btn-ghost` hover shows underline. Keyboard-active row inverts: `--energy-primary` background, `--text-main` colored text and check icon.
 
 ---
 
@@ -1477,6 +1481,8 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 | `required` | `boolean` | `false` | Marks the radio group as required |
 | `form` | `string` | — | Associates the radio inputs with a specific `<form>` |
 | `disabled` | `boolean` | `false` | Disables all options |
+| `id` | `string` | — | `id` on the wrapper (for form/label association) |
+| `class` | `string` | `''` | Additional CSS classes on the wrapper |
 
 **Usage:**
 
@@ -1626,9 +1632,11 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 ```
 
 **Physics:**
-- **Glass:** Pill button with subtle `--energy-secondary` border (20% alpha), dim text; hover lifts to 8% tinted background + 40% border
+- **Glass:** Pill button with subtle `--energy-secondary` border (20% alpha), dim text; hover lifts to 8% tinted background + 40% border + secondary glow (`box-shadow`); focus-visible adds the same glow alongside the focus ring
 - **Flat:** Same hover tint but uses `--energy-primary` in light mode
 - **Retro:** Hard `--text-mute` border at rest; hover inverts to `--energy-primary` text + border, transparent background
+
+**Showcase:** [/components → Pagination](src/components/ui-library/PaginationShowcase.svelte)
 
 ---
 
@@ -2010,6 +2018,7 @@ const pv = createPasswordValidation(() => password);
 | --- | --- | --- | --- |
 | `label` | `string` | *required* | Row label text |
 | `children` | `Snippet` | *required* | Control elements |
+| `class` | `string` | `''` | Additional CSS classes on the wrapper |
 
 **Usage:**
 
@@ -2776,7 +2785,7 @@ modal.open(MODAL_KEYS.ALERT, {
   bodyHtml: 'Trusted <strong>markup</strong> only.',
 }, 'sm');
 
-modal.settings();
+modal.settings();        // Settings modal (replace SettingsFragment with your own for real apps)
 modal.themes();
 modal.shortcuts();       // Keyboard shortcuts reference
 modal.palette();         // Command palette (Cmd+K)
@@ -2787,6 +2796,72 @@ modal.palette();         // Command palette (Cmd+K)
 **Escape handling:** Managed by the centralized [layer-stack.svelte.ts](src/lib/layer-stack.svelte.ts). The native `<dialog>` cancel event is suppressed (`e.preventDefault()`); the layer stack's global `keydown` listener pops the modal via `modal.close()`. This ensures correct precedence when a dropdown or sidebar is open above a modal — Escape dismisses the topmost layer first (LIFO).
 
 **Enter-to-confirm:** `ConfirmFragment` and `AlertFragment` use `autofocus` on the primary action button. Since `showModal()` auto-focuses the first `autofocus` element, Enter activates it natively — no custom keydown handler needed. Fragments without a primary action (Themes, Settings, Shortcuts) don't use autofocus.
+
+**SettingsFragment note:** The built-in `SettingsFragment` is a reference implementation for demo purposes — it shows that Void Energy UI supports a settings modal pattern but uses placeholder preferences. Real applications should replace it with a fragment tailored to their own settings schema.
+
+#### `AlertFragment` — System alert dialog
+
+**Description:** Single-action informational modal. Renders a centered title + body with an "Acknowledge" button (`btn-system`). Prefer `modal.alert()` for standard plain-text alerts; use the low-level `modal.open()` path only for advanced cases like trusted `bodyHtml`.
+**Location:** [src/components/modals/AlertFragment.svelte](src/components/modals/AlertFragment.svelte)
+**Default helper size:** `sm`
+
+**Props** (passed through `modal.alert()` or `modal.open()`):
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` | `string` | `'System Alert'` | Dialog heading |
+| `body` | `string` | `''` | Plain text body (HTML-escaped) |
+| `bodyHtml` | `string` | — | Trusted HTML body — caller must sanitize; never use with user input |
+
+**Usage:**
+```ts
+modal.alert('Title', 'Plain text body');
+// Trusted HTML (internal only):
+modal.open(MODAL_KEYS.ALERT, { title: 'Title', bodyHtml: 'Trusted <strong>markup</strong>' }, 'sm');
+```
+
+---
+
+#### `ConfirmFragment` — Confirmation dialog with optional cost warning
+
+**Description:** Two-action confirmation modal with Abort + Confirm buttons. Shows a credit-cost warning badge when `cost > 0`. Prefer `modal.confirm()` for standard flows; use the low-level `modal.open()` path only for advanced overrides such as trusted `bodyHtml` or custom button labels.
+**Location:** [src/components/modals/ConfirmFragment.svelte](src/components/modals/ConfirmFragment.svelte)
+**Default helper size:** `md`
+
+**Props** (passed through `modal.confirm()` or `modal.open()`):
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` | `string` | `'Confirm Action'` | Dialog heading |
+| `body` | `string` | `''` | Plain text body (HTML-escaped) |
+| `bodyHtml` | `string` | — | Trusted HTML body — caller must sanitize; never use with user input |
+| `cost` | `number` | `0` | Credit cost; when `> 0` shows a `surface-sunk` cost badge with `TriangleAlert` icon |
+| `confirmText` | `string` | `'Confirm'` | Primary action button label |
+| `cancelText` | `string` | `'Abort'` | Secondary action button label |
+| `onConfirm` | `() => void` | *required* | Called on primary action click |
+| `onCancel` | `() => void` | `() => {}` | Called on cancel button click |
+
+**Usage:**
+```ts
+modal.confirm('Delete project?', 'This cannot be undone.', {
+  onConfirm: () => deleteProject(),
+});
+
+// With cost warning:
+modal.confirm('Generate content', 'This will use 5 credits.', {
+  onConfirm: generate,
+  cost: 5,
+});
+
+// Custom button labels:
+modal.open(MODAL_KEYS.CONFIRM, {
+  title: 'Deploy to production?',
+  body: 'Are you sure?',
+  confirmText: 'Deploy',
+  cancelText: 'Cancel',
+  onConfirm: deploy,
+});
+```
 
 ---
 

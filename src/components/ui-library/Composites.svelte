@@ -236,7 +236,7 @@
     </details>
 
     <!-- ─── INPUT FIELDS ─────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Input Fields</h5>
       <p class="text-small text-mute">
         Each field wraps a native <code>&lt;input&gt;</code> inside a
@@ -504,7 +504,7 @@
     </div>
 
     <!-- ─── SLIDER FIELD ─────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Slider Field</h5>
       <p class="text-small text-mute">
         A range slider with optional preset snap points. When presets are
@@ -589,7 +589,7 @@
     </div>
 
     <!-- ─── MEDIA CONTROLS ───────────────────────────────────────────── -->
-    <div class="flex flex-col gap-sm">
+    <div class="flex flex-col gap-md">
       <h5>Media Controls</h5>
       <p class="text-small text-mute">
         Horizontal control bars for audio and media. The mute toggle uses
@@ -661,7 +661,7 @@
     </div>
 
     <!-- ─── ACTION BUTTON ──────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-md">
       <h5>Action Button</h5>
       <p class="text-small text-mute">
         <code>ActionBtn</code> composes any interactive icon with a text label.
@@ -724,7 +724,7 @@
     </div>
 
     <!-- ─── ICON BUTTON ────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-md">
       <h5>Icon Button</h5>
       <p class="text-small text-mute">
         <code>IconBtn</code> is a circular icon-only button (<code
@@ -790,7 +790,7 @@
     </div>
 
     <!-- ─── THEME BUTTON ──────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-md">
       <h5>Theme Button</h5>
       <p class="text-small text-mute">
         <code>ThemesBtn</code> combines a Lucide Moon/Sun icon with a button
@@ -829,7 +829,7 @@
     </div>
 
     <!-- ─── SETTINGS ROW ────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-md">
       <h5>Settings Row</h5>
       <p class="text-small text-mute">
         <code>SettingsRow</code> is a label + content layout for settings panels.
@@ -910,7 +910,7 @@
     </div>
 
     <!-- ─── COMBOBOX ────────────────────────────────────────────────── -->
-    <div class="flex flex-col gap-xs">
+    <div class="flex flex-col gap-md">
       <h5>Combobox</h5>
       <p class="text-small text-mute">
         <code>Combobox</code> is an input/select hybrid: type to filter a list
@@ -923,21 +923,26 @@
       </p>
 
       <div class="surface-sunk p-md flex flex-col gap-md">
-        <!-- Country picker with descriptions -->
+        <!-- Country picker — descriptions, disabled item, clearable -->
         <div class="flex flex-col gap-xs">
           <label for="demo-country" class="text-small px-xs"
-            >Country picker (with descriptions)</label
+            >Country picker (descriptions + clearable)</label
           >
           <Combobox
             id="demo-country"
             options={comboboxCountryOptions}
             bind:value={comboboxCountry}
             placeholder="Search countries..."
+            clearable
+            onchange={(v) =>
+              toast.show(v ? `Selected: ${v}` : 'Cleared', 'info')}
           />
           <p class="text-caption text-mute px-xs">
-            Selected: <code>{comboboxCountry ?? 'none'}</code>. Australia is
-            disabled. Type to filter; arrow keys navigate; Enter commits; Escape
-            restores.
+            Selected: <code>{comboboxCountry ?? 'none'}</code>. Options support
+            an optional <code>description</code> and <code>disabled</code> flag
+            (Australia is disabled). The <code>clearable</code> prop adds an ×
+            button that resets <code>value</code> to <code>null</code> and fires
+            <code>onchange</code>.
           </p>
         </div>
 
@@ -969,10 +974,18 @@
     &#123; value: 'de', label: 'Germany', description: 'Berlin, Munich' &#125;,
     &#123; value: 'jp', label: 'Japan', disabled: true &#125;,
   ];
+  const suggestions = [
+    &#123; value: 'svelte', label: 'Svelte' &#125;,
+    &#123; value: 'react', label: 'React' &#125;,
+  ];
   let country = $state(null);
+  let tag = $state(null);
 &lt;/script&gt;
 
 &lt;Combobox options=&#123;countries&#125; bind:value=&#123;country&#125; placeholder="Search..." /&gt;
+
+&lt;!-- Clearable with commit callback --&gt;
+&lt;Combobox options=&#123;countries&#125; bind:value=&#123;country&#125; clearable onchange=&#123;(value) =&gt; console.log(value)&#125; /&gt;
 
 &lt;!-- With form submission --&gt;
 &lt;Combobox options=&#123;countries&#125; bind:value=&#123;country&#125; name="country" /&gt;
@@ -990,6 +1003,8 @@
         <code>name</code>/<code>form</code> (route to hidden input — not the
         visible input),
         <code>allowCustomValue</code> (free text on Enter),
+        <code>clearable</code> (shows × when a value is selected — clears to
+        null),
         <code>required</code> (maps to <code>aria-required</code> only — no
         native constraint validation in v1),
         <code>oninput</code> (keystroke callback for async loading),

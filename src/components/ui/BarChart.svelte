@@ -377,7 +377,7 @@
   class="chart-bar relative {className}"
   data-animated={animated}
   data-orientation={orientation}
-  use:morph={{ height: true, width: false }}
+  use:morph={{ width: false }}
 >
   <svg
     class="block w-full h-auto"

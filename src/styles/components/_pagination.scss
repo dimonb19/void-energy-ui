@@ -225,12 +225,27 @@
     cursor: not-allowed;
   }
 
-  // --- I. Light mode border ---
+  // --- I. Glass hover glow ---
+  @include when-glass {
+    @media (hover: hover) {
+      &:not(:disabled):hover {
+        box-shadow: 0 0 var(--space-sm) alpha(var(--energy-secondary), 20%);
+      }
+    }
+
+    &:focus-visible {
+      box-shadow:
+        var(--focus-ring),
+        0 0 var(--space-sm) alpha(var(--energy-secondary), 20%);
+    }
+  }
+
+  // --- J. Light mode border ---
   @include when-light {
     border-color: alpha(var(--energy-primary), 20%);
   }
 
-  // --- J. Retro border ---
+  // --- K. Retro border ---
   @include when-retro {
     border-color: var(--text-mute);
   }

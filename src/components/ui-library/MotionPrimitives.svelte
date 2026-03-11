@@ -78,10 +78,7 @@
           <button onclick={() => (morphExpanded = !morphExpanded)}>
             {morphExpanded ? 'Collapse' : 'Expand'}
           </button>
-          <div
-            class="surface-raised p-md"
-            use:morph={{ height: true, width: false, threshold: 2 }}
-          >
+          <div class="surface-raised p-md" use:morph={{ width: false }}>
             {#if morphExpanded}
               <p class="text-small">
                 The void engine processes your request through multiple layers
@@ -132,7 +129,7 @@
 &lt;/script&gt;
 
 &lt;!-- Morph: smooth height animation on content change --&gt;
-&lt;div use:morph=&#123;&#123; height: true, width: false, threshold: 2 &#125;&#125;&gt;
+&lt;div use:morph=&#123;&#123; width: false &#125;&#125;&gt;
   &#123;#if expanded&#125;
     &lt;p&gt;Long content...&lt;/p&gt;
   &#123;:else&#125;
@@ -253,7 +250,7 @@
               onclick={resetImplodeItems}
             />
           </div>
-          <div class="flex flex-wrap gap-sm" use:morph={{ height: true }}>
+          <div class="flex flex-wrap gap-sm" use:morph>
             {#each implodeItems as item (item)}
               <button
                 class="chip"

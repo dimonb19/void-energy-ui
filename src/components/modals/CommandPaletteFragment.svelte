@@ -2,6 +2,7 @@
   import { modal } from '@lib/modal-manager.svelte';
   import { shortcutRegistry } from '@lib/shortcut-registry.svelte';
   import SearchField from '@components/ui/SearchField.svelte';
+  import { morph } from '@actions/morph';
 
   // ── Data Sources ──────────────────────────────────────────────────────
 
@@ -125,6 +126,7 @@
 </script>
 
 <div
+  use:morph={{ width: false }}
   class="modal-content command-palette"
   onclick={(e) => e.stopPropagation()}
   role="presentation"

@@ -108,14 +108,14 @@
 
     @include when-state('active') {
       background: var(--energy-primary);
-      color: var(--bg-canvas);
+      color: var(--text-main);
 
       .combobox-option-description {
-        color: alpha(var(--bg-canvas), 70%);
+        color: var(--text-dim);
       }
 
       .combobox-option-check {
-        color: var(--bg-canvas);
+        color: var(--text-main);
       }
     }
   }
@@ -140,10 +140,10 @@
   gap: var(--space-xs);
   flex: 1;
   min-width: 0;
+  text-align: left;
 
-  // Wide panel (≥ 280px): label and description share the row
+  // void-ignore: UX breakpoint — no semantic container-width token exists
   @container (min-width: 280px) {
-    // void-ignore: UX breakpoint — no semantic container-width token exists
     flex-direction: row;
     align-items: baseline;
     justify-content: space-between;

@@ -582,7 +582,7 @@
   <!-- Indicator: Floats above content, revealed on pull -->
   <div
     class="pull-indicator flex items-center gap-xs"
-    use:morph={{ height: false, width: true }}
+    use:morph={{ height: false }}
   >
     {#if pullState === 'done'}
       <Check class="icon pull-checkmark" aria-hidden="true" />

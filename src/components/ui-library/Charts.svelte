@@ -607,10 +607,7 @@
       </div>
 
       <!-- Interactive -->
-      <div
-        class="surface-sunk p-md flex flex-col gap-md"
-        use:morph={{ height: true }}
-      >
+      <div class="surface-sunk p-md flex flex-col gap-md" use:morph>
         <div class="flex flex-row flex-wrap gap-md items-center">
           <Selector label="Size" options={sizeOptions} bind:value={ringSize} />
           <Selector
