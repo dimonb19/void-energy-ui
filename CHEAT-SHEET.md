@@ -1414,7 +1414,7 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 
 #### `<Tabs>` (Tabbed Interface)
 
-**Description:** Horizontal tabbed interface with WAI-ARIA tablist/tab/tabpanel semantics. Data-driven with snippet-based panel rendering. A single shared `.tabs-indicator` element slides between active tabs, positioned via JS-measured CSS custom properties (`--_indicator-left`, `--_indicator-width`). The indicator suppresses its transition on first paint to avoid animating from the origin.
+**Description:** Horizontal tabbed interface with WAI-ARIA tablist/tab/tabpanel semantics. Data-driven with snippet-based panel rendering. A single shared `.tabs-indicator` element slides between active tabs, positioned via JS-measured CSS custom properties (`--_indicator-left`, `--_indicator-width`). The indicator suppresses its transition on first paint to avoid animating from the origin. `.tabs-list` scrolls horizontally (`overflow-x: auto`) when tabs overflow their container.
 **Location:** [src/components/ui/Tabs.svelte](src/components/ui/Tabs.svelte)
 **CSS:** `.tabs`, `.tabs-list`, `.tabs-trigger`, `.tabs-indicator`, `.tabs-panel` ([src/styles/components/_tabs.scss](src/styles/components/_tabs.scss))
 **Note:** `.tabs-trigger` is excluded from global button styles in `_buttons.scss` (`button:not(.btn-void, .btn-icon, .tabs-trigger)`).
@@ -1508,6 +1508,44 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 - **Glass:** Glowing `box-shadow` on active page button (`alpha(--energy-primary, 25%)`)
 - **Flat:** Solid `--energy-primary` background fill with transparent border
 - **Retro:** Inverted terminal style — active page gets `--energy-primary` background with `--bg-canvas` text, hard border, no glow
+
+---
+
+#### `<LoadMore>` — Observer-driven infinite pagination
+
+**Description:** Appends items to a list via `IntersectionObserver` auto-triggering. A manual "Load more" button is always rendered as an intentional fallback alongside auto-load. Set `observer={false}` for button-only mode. The component unmounts entirely when `hasMore` is false.
+**Location:** [src/components/ui/LoadMore.svelte](src/components/ui/LoadMore.svelte)
+**CSS:** `.load-more`, `.load-more-btn`, `.load-more-sentinel` ([src/styles/components/_pagination.scss](src/styles/components/_pagination.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `loading` | `boolean` | `false` | Whether a load is in progress — disables observer + button |
+| `hasMore` | `boolean` | `true` | Whether more items exist — hides component when false |
+| `onloadmore` | `() => void` | *required* | Callback to trigger the next batch |
+| `rootMargin` | `number` | `0` | Pixel offset for early trigger (IO `rootMargin`) |
+| `observer` | `boolean` | `true` | Enable auto-load via `IntersectionObserver`; `false` = button only |
+| `label` | `string` | `'Load more'` | Button text and `aria-label` |
+| `class` | `string` | `''` | Additional CSS classes on the wrapper |
+
+**Usage:**
+
+```svelte
+<!-- Infinite scroll (auto-load + manual button fallback) -->
+<LoadMore {loading} {hasMore} onloadmore={fetchNextPage} />
+
+<!-- Early trigger — fires 200px before sentinel is visible -->
+<LoadMore {loading} {hasMore} onloadmore={fetchNextPage} rootMargin={200} />
+
+<!-- Button only — no IntersectionObserver -->
+<LoadMore {loading} {hasMore} onloadmore={fetchNextPage} observer={false} />
+```
+
+**Physics:**
+- **Glass:** Pill button with subtle `--energy-secondary` border (20% alpha), dim text; hover lifts to 8% tinted background + 40% border
+- **Flat:** Same hover tint but uses `--energy-primary` in light mode
+- **Retro:** Hard `--text-mute` border at rest; hover inverts to `--energy-primary` text + border, transparent background
 
 ---
 

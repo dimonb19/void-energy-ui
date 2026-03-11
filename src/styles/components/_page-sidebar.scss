@@ -97,6 +97,7 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
     transform: translateY(0);
     overflow-y: auto;
     border-bottom-color: var(--border-color);
+    background: var(--bg-surface);
 
     @include when-glass {
       @include glass-blur;

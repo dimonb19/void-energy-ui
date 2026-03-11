@@ -29,6 +29,7 @@
 // --------------------------------------------------------------------------
 .tabs-list {
   position: relative;
+  overflow-x: auto;
   border-bottom: var(--physics-border-width) solid var(--border-color);
 
   @include when-retro {

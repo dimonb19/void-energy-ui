@@ -482,6 +482,7 @@
           background: var(--bg-canvas);
           overflow: hidden;
           border: var(--physics-border-width) solid var(--border-color);
+          flex-shrink: 0;
 
           .orb {
             position: absolute;
