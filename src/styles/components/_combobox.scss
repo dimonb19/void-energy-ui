@@ -1,0 +1,172 @@
+/* ==========================================================================
+ * COMBOBOX
+ * ==========================================================================
+ *
+ * Styles for the Combobox custom widget (input/select hybrid).
+ *
+ * ANATOMY:
+ * ┌─ .field.combobox-field (position: relative) ─────────────────────────┐
+ * │  <input role="combobox" type="text">       Visible text input        │
+ * │  .field-slot-right                          ChevronDown indicator    │
+ * └───────────────────────────────────────────────────────────────────────┘
+ * ┌─ .dropdown-panel.combobox-panel (top layer via Popover API) ──────────┐
+ * │  .combobox-listbox (max-height + scroll)                              │
+ * │    .combobox-option (button[role="option"])   × N options             │
+ * │      .combobox-option-label                   Label + description     │
+ * │      .combobox-option-description             (optional)             │
+ * │      .combobox-option-check                   Check icon (selected)  │
+ * └───────────────────────────────────────────────────────────────────────┘
+ *
+ * The panel surface (.dropdown-panel) handles the raised surface, blur, and
+ * open/close transitions. This file only styles the listbox interior.
+ *
+ * STATE:
+ * - data-state="active"  on .combobox-option  → keyboard-highlighted row
+ * - aria-selected="true" on .combobox-option  → committed selection
+ * - aria-disabled="true" on .combobox-option  → disabled row
+ *
+ * @see /src/components/ui/Combobox.svelte
+ * @see /src/styles/components/_dropdown.scss for .dropdown-panel surface
+ * @see /src/styles/components/_fields.scss for .field anatomy
+ * ==========================================================================
+ */
+
+@use '../abstracts' as *;
+
+// ==========================================================================
+// 1. PANEL CONSTRAINTS
+// ==========================================================================
+
+// The combobox panel must not grow taller than the viewport.
+// .dropdown-panel already owns overflow-y: auto + laser-scrollbar.
+.combobox-panel {
+  max-height: 50vh; // void-ignore: viewport-relative UX cap — no semantic token for this constraint
+  container-type: inline-size;
+}
+
+// ==========================================================================
+// 2. LISTBOX INNER CONTAINER
+// ==========================================================================
+
+.combobox-listbox {
+  padding: var(--space-xs);
+  outline: none; // Focus is managed on the visible input via aria-activedescendant
+}
+
+// ==========================================================================
+// 3. OPTION ROW
+// ==========================================================================
+
+// btn-ghost provides: rest surface strip, hover reveal, transitions, focus-ring.
+// This block only overrides the btn base geometry (designed for standalone buttons)
+// and adds listbox-specific states not covered by btn-ghost.
+.combobox-option {
+  // Override btn base layout for a full-width listbox row
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-base);
+
+  // Override btn base typography (uppercase/semibold/small → normal body label)
+  font-size: var(--font-size-body);
+  font-weight: var(--font-weight-regular);
+  text-transform: none;
+  letter-spacing: normal;
+
+  // --- Keyboard-active row (aria-activedescendant target) ---
+  @include when-state('active') {
+    background: alpha(var(--energy-primary), 12%);
+    color: var(--energy-primary);
+  }
+
+  // --- Committed selection ---
+  &[aria-selected='true'] {
+    color: var(--energy-primary);
+  }
+
+  // --- Disabled (uses aria-disabled, not :disabled, so btn's rule won't fire) ---
+  &[aria-disabled='true'] {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  // --- Physics: Glass ---
+  @include when-glass {
+    @include when-state('active') {
+      box-shadow: inset 0 0 0 var(--physics-border-width)
+        alpha(var(--energy-primary), 30%);
+    }
+  }
+
+  // --- Physics: Retro ---
+  @include when-retro {
+    border-radius: 0;
+
+    @include when-state('active') {
+      background: var(--energy-primary);
+      color: var(--bg-canvas);
+
+      .combobox-option-description {
+        color: alpha(var(--bg-canvas), 70%);
+      }
+
+      .combobox-option-check {
+        color: var(--bg-canvas);
+      }
+    }
+  }
+
+  // --- Color mode: Light ---
+  @include when-light {
+    @include when-state('active') {
+      background: alpha(var(--energy-primary), 8%);
+    }
+  }
+}
+
+// ==========================================================================
+// 4. OPTION INTERNALS
+// ==========================================================================
+
+// Label + optional description — stacked on narrow panels, inline on wide ones.
+// The container query fires on .combobox-panel's inline size.
+.combobox-option-label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  flex: 1;
+  min-width: 0;
+
+  // Wide panel (≥ 280px): label and description share the row
+  @container (min-width: 280px) {
+    // void-ignore: UX breakpoint — no semantic container-width token exists
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-sm);
+  }
+}
+
+// Secondary text — description hint
+.combobox-option-description {
+  font-size: var(--font-size-caption);
+  color: var(--text-mute);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  transition: color var(--speed-fast) var(--ease-spring-snappy);
+}
+
+// Check icon shown on the committed selection
+.combobox-option-check {
+  flex-shrink: 0;
+  margin-left: auto;
+  color: var(--energy-primary);
+
+  transition: color var(--speed-fast) var(--ease-spring-snappy);
+}

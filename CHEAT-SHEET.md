@@ -1375,6 +1375,89 @@ Enter keeps native browser submit/search behavior unless `onsubmit` is provided.
 
 Native form submission serializes `String(option.value)`, while `bind:value` and `onchange` keep the original typed value.
 
+> **When to use `Selector` vs `Combobox`:** Use `Selector` for simple enumerations where browser-native keyboard behavior and OS-styled options are acceptable. Use `Combobox` when you need client-side filtering, rich option descriptions, a large option list, or optional free-text entry.
+
+---
+
+#### `<Combobox>` (Filterable Select)
+
+**Description:** Input/select hybrid with client-side filtering, keyboard navigation, and optional free-text entry. Backed by the ARIA combobox + listbox pattern.
+**Location:** [src/components/ui/Combobox.svelte](src/components/ui/Combobox.svelte)
+**CSS:** `.combobox-field`, `.combobox-panel`, `.combobox-option` ([src/styles/components/_combobox.scss](src/styles/components/_combobox.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `options` | `Array<{ value: string \| number \| null, label: string, description?: string, disabled?: boolean }>` | *required* | Filterable options |
+| `value` | `string \| number \| null` | `$bindable(null)` | Committed selection (bindable) |
+| `open` | `boolean` | `$bindable(false)` | Panel visibility (bindable) |
+| `allowCustomValue` | `boolean` | `false` | Commit free text on Enter |
+| `name` | `string` | — | Routes to hidden `<input type="hidden">` — **not** the visible input |
+| `form` | `string` | — | Hidden input form association |
+| `required` | `boolean` | — | Maps to `aria-required` only. Native constraint validation not supported in v1 — use `FormField` error prop |
+| `placeholder` | `string` | `'Select...'` | Input placeholder |
+| `disabled` | `boolean` | `false` | Disables the combobox |
+| `onchange` | `(value: string \| number \| null) => void` | — | Called when a value is committed |
+| `oninput` | `(query: string) => void` | — | Called on every keystroke (for async option loading) |
+| `class` | `string` | — | Additional classes on the `.field` wrapper |
+| `...rest` | `HTMLInputAttributes` | — | Forwards to the visible `<input>` (`autofocus`, `inputmode`, `aria-*`, etc.). `name`, `form`, `required` are intercepted and NOT forwarded. |
+
+**Keyboard:**
+
+| Key | Behavior |
+| --- | --- |
+| `ArrowDown` / `ArrowUp` | Open panel (if closed); navigate options (skips disabled) |
+| `Enter` | Commit active option; commit raw text if `allowCustomValue` and no option is active |
+| `Escape` | Close panel + restore committed display value |
+| `Tab` | Close panel only — does **not** auto-commit the highlighted option |
+| `Home` / `End` | Native caret movement — not intercepted |
+
+**Usage:**
+
+```svelte
+<!-- Basic -->
+<Combobox
+  options={[
+    { value: 'fr', label: 'France', description: 'Paris, Lyon' },
+    { value: 'de', label: 'Germany' },
+    { value: 'jp', label: 'Japan', disabled: true },
+  ]}
+  bind:value={countryCode}
+  placeholder="Search countries..."
+/>
+
+<!-- With form submission (committed value goes to hidden input) -->
+<Combobox options={countries} bind:value={country} name="country" />
+
+<!-- Free-text entry (allowCustomValue commits raw text on Enter) -->
+<Combobox options={suggestions} bind:value={tag} allowCustomValue placeholder="Add a tag..." />
+
+<!-- Async filtering -->
+<Combobox
+  options={asyncResults}
+  bind:value={assigneeId}
+  oninput={(q) => fetchAssignees(q)}
+  placeholder="Search assignees..."
+/>
+```
+
+**Form interop notes:**
+- `name` and `form` route to a hidden `<input type="hidden">`, not the visible text input. The visible input is intentionally unnamed to prevent double form submission.
+- Hidden input only renders when `name` is provided **and** `!disabled`.
+- `required` maps to `aria-required` only — use `FormField`'s `error` prop for validation feedback.
+- FormData serializes `String(option.value)`. `onchange` delivers the original typed value.
+
+**Option anatomy:**
+- Options use `btn-ghost` styling — muted text at rest, primary color + subtle tint on hover (same as Cmd+K results).
+- The panel width is locked to the trigger input width.
+- When the panel is ≥ 280px wide, `description` text appears inline to the right of the label; below 280px it stacks underneath.
+
+**Physics:**
+- **Glass:** Options follow `btn-ghost` hover (secondary tint). Keyboard-active row gets an additional inset primary border glow.
+- **Flat:** Options follow `btn-ghost` hover (primary tint). Keyboard-active row shown with a subdued primary background.
+- **Retro:** Zero border-radius on all option rows. `btn-ghost` hover shows underline. Keyboard-active row inverts: primary background, canvas-colored text and check icon.
+
 ---
 
 #### `<Switcher>` (Segmented Control)

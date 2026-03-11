@@ -19,6 +19,7 @@
   import IconBtn from '../ui/IconBtn.svelte';
   import ThemesBtn from '../ui/ThemesBtn.svelte';
   import Selector from '../ui/Selector.svelte';
+  import Combobox from '../ui/Combobox.svelte';
   import SettingsRow from '../ui/SettingsRow.svelte';
   import Toggle from '../ui/Toggle.svelte';
 
@@ -165,6 +166,48 @@
     { value: 'compact', label: 'Compact' },
     { value: 'comfortable', label: 'Comfortable' },
     { value: 'spacious', label: 'Spacious' },
+  ];
+
+  // Combobox demo state
+  let comboboxCountry = $state<string | null>(null);
+  let comboboxFramework = $state<string | null>(null);
+  const comboboxCountryOptions = [
+    { value: 'fr', label: 'France', description: 'Paris, Lyon, Marseille' },
+    { value: 'de', label: 'Germany', description: 'Berlin, Munich, Hamburg' },
+    { value: 'jp', label: 'Japan', description: 'Tokyo, Osaka, Kyoto' },
+    {
+      value: 'us',
+      label: 'United States',
+      description: 'New York, Los Angeles, Chicago',
+    },
+    {
+      value: 'uk',
+      label: 'United Kingdom',
+      description: 'London, Manchester, Edinburgh',
+    },
+    {
+      value: 'ca',
+      label: 'Canada',
+      description: 'Toronto, Vancouver, Montreal',
+    },
+    {
+      value: 'au',
+      label: 'Australia',
+      description: 'Sydney, Melbourne, Brisbane',
+      disabled: true,
+    },
+    {
+      value: 'br',
+      label: 'Brazil',
+      description: 'São Paulo, Rio de Janeiro, Brasília',
+    },
+  ];
+  const comboboxFrameworkOptions = [
+    { value: 'svelte', label: 'Svelte' },
+    { value: 'react', label: 'React' },
+    { value: 'vue', label: 'Vue' },
+    { value: 'solid', label: 'Solid' },
+    { value: 'angular', label: 'Angular' },
   ];
 </script>
 
@@ -863,6 +906,95 @@
         Props: <code>label</code> (string &mdash; left column heading). Content
         is passed as a Svelte snippet (slot). The label column is
         <code>12rem</code> wide on desktop.
+      </p>
+    </div>
+
+    <!-- ─── COMBOBOX ────────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-xs">
+      <h5>Combobox</h5>
+      <p class="text-small text-mute">
+        <code>Combobox</code> is an input/select hybrid: type to filter a list
+        of options, navigate with arrow keys, commit with Enter. Unlike
+        <code>Selector</code> (which wraps a native
+        <code>&lt;select&gt;</code>),
+        <code>Combobox</code> supports client-side filtering, rich option descriptions,
+        and optional free-text entry. Form submission is handled via a hidden input;
+        the visible input is intentionally unnamed.
+      </p>
+
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <!-- Country picker with descriptions -->
+        <div class="flex flex-col gap-xs">
+          <label for="demo-country" class="text-small px-xs"
+            >Country picker (with descriptions)</label
+          >
+          <Combobox
+            id="demo-country"
+            options={comboboxCountryOptions}
+            bind:value={comboboxCountry}
+            placeholder="Search countries..."
+          />
+          <p class="text-caption text-mute px-xs">
+            Selected: <code>{comboboxCountry ?? 'none'}</code>. Australia is
+            disabled. Type to filter; arrow keys navigate; Enter commits; Escape
+            restores.
+          </p>
+        </div>
+
+        <!-- Simple list, no descriptions -->
+        <div class="flex flex-col gap-xs">
+          <label for="demo-framework" class="text-small px-xs"
+            >Framework picker (plain labels)</label
+          >
+          <Combobox
+            id="demo-framework"
+            options={comboboxFrameworkOptions}
+            bind:value={comboboxFramework}
+            placeholder="Pick a framework..."
+          />
+          <p class="text-caption text-mute px-xs">
+            Selected: <code>{comboboxFramework ?? 'none'}</code>.
+          </p>
+        </div>
+      </div>
+
+      <details>
+        <summary>View Code</summary>
+        <pre><code
+            >&lt;script&gt;
+  import Combobox from './ui/Combobox.svelte';
+
+  const countries = [
+    &#123; value: 'fr', label: 'France', description: 'Paris, Lyon' &#125;,
+    &#123; value: 'de', label: 'Germany', description: 'Berlin, Munich' &#125;,
+    &#123; value: 'jp', label: 'Japan', disabled: true &#125;,
+  ];
+  let country = $state(null);
+&lt;/script&gt;
+
+&lt;Combobox options=&#123;countries&#125; bind:value=&#123;country&#125; placeholder="Search..." /&gt;
+
+&lt;!-- With form submission --&gt;
+&lt;Combobox options=&#123;countries&#125; bind:value=&#123;country&#125; name="country" /&gt;
+
+&lt;!-- Allow free-text entry --&gt;
+&lt;Combobox options=&#123;suggestions&#125; bind:value=&#123;tag&#125; allowCustomValue /&gt;</code
+          ></pre>
+      </details>
+
+      <p class="text-caption text-mute px-xs">
+        Props: <code>options</code> (Array of
+        <code>&#123; value, label, description?, disabled? &#125;</code>),
+        <code>value</code> (<code>string | number | null</code>, bindable),
+        <code>open</code> (bindable),
+        <code>name</code>/<code>form</code> (route to hidden input — not the
+        visible input),
+        <code>allowCustomValue</code> (free text on Enter),
+        <code>required</code> (maps to <code>aria-required</code> only — no
+        native constraint validation in v1),
+        <code>oninput</code> (keystroke callback for async loading),
+        <code>onchange</code> (commit callback). All other
+        <code>HTMLInputAttributes</code> forward to the visible input.
       </p>
     </div>
   </div>
