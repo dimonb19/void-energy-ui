@@ -162,14 +162,20 @@
     }
   }
 
+  function getAtmosphereLabel(id: string): string {
+    return voidEngine.registry[id]?.label ?? capitalize(id);
+  }
+
   function selectTheme(id: string) {
+    const label = getAtmosphereLabel(id);
     voidEngine.setAtmosphere(id);
-    toast.show(`${id.toUpperCase()} theme selected`, 'success');
+    toast.show(`${label} atmosphere selected`, 'success');
   }
 
   function removeCustomTheme(id: string) {
+    const label = getAtmosphereLabel(id);
     voidEngine.unregisterTheme(id);
-    toast.show(`${capitalize(id)} atmosphere removed`, 'success');
+    toast.show(`${label} atmosphere removed`, 'success');
   }
 
   function handleRestore() {
@@ -240,7 +246,7 @@
   use:morph={{ width: false }}
 >
   <h2 id="modal-title" class="text-h3 text-center">
-    Atmosphere: {voidEngine.atmosphere.toUpperCase()}
+    Atmosphere: {getAtmosphereLabel(voidEngine.atmosphere)}
   </h2>
 
   <div
@@ -268,12 +274,12 @@
       <p>
         <strong>{info?.label}</strong>
         applied
-        <strong>{capitalize(info?.id ?? '')}</strong>
+        <strong>{getAtmosphereLabel(info?.id ?? '')}</strong>
         atmosphere.
       </p>
       <span class="flex flex-row flex-wrap justify-center gap-sm">
         <button class="btn-system" onclick={handleRestore}>
-          Return to {capitalize(info?.returnTo ?? '')}
+          Return to {getAtmosphereLabel(info?.returnTo ?? '')}
         </button>
         <button
           class="btn-error"
