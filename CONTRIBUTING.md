@@ -56,7 +56,7 @@ Before you begin, ensure you have:
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/<org>/void-energy-ui.git  # Replace <org> with the actual GitHub organization
+git clone https://github.com/dimonb19/void-energy-ui.git
 cd void-energy-ui
 npm install
 ```
@@ -135,6 +135,12 @@ Run type checking to catch TypeScript and Svelte errors:
 
 ```bash
 npm run check
+```
+
+Run the unit test suite when you change behavior, shared primitives, or state coordination:
+
+```bash
+npm run test
 ```
 
 Run the advisory raw-value scan:
@@ -572,8 +578,8 @@ interface CardProps {
 ## Questions?
 
 - **Documentation:** [CHEAT-SHEET.md](./CHEAT-SHEET.md), [THEME-GUIDE.md](./THEME-GUIDE.md), [README.md](./README.md)
-- **Issues:** Open a GitHub issue <!-- Replace <org> with actual GitHub organization when public -->
-- **Discussions:** Join our GitHub Discussions
+- **Repository:** [github.com/dimonb19/void-energy-ui](https://github.com/dimonb19/void-energy-ui)
+- **Issues:** Open an issue in the repository with context, screenshots, and reproduction steps when relevant
 
 ---
 

@@ -1,5 +1,21 @@
-# [Your Project Name] — Void Energy Migration
-<!-- ADAPT: Replace [Your Project Name] with your actual project name -->
+# Void Energy Migration Template
+
+> Copy this file into the target repository as `CLAUDE.md`, then replace every `ADAPT:` and `REPLACE:` marker in Section 0 before using `/migrate`.
+
+This template is intentionally generic. Section 0 captures the host repository's legacy patterns so Claude can translate them into **Void Energy UI** conventions with minimal guesswork. The remaining sections define the migration laws, commands, file structure, and component patterns that stay stable across migrations.
+
+## How to Use This Template
+
+1. Rename the file to `CLAUDE.md` in the target repository.
+2. Replace the project name placeholder with the real repository name.
+3. Rewrite every placeholder block in Section 0 using real examples from the host codebase.
+4. Update commands and paths only where the target repo differs from the defaults below.
+
+After Section 0 is grounded in the host repo's reality, Claude can use `/migrate`, `/review`, and the rest of the workflow safely.
+
+---
+
+**Target repo placeholder:** `[Your Project Name]`
 
 This codebase is being migrated to the **Void Energy UI** system. Migration is incremental — one component per session, preserving existing behavior. Both old and new patterns coexist during the transition.
 
@@ -9,11 +25,11 @@ Token dictionary and SCSS toolkit references are loaded on-demand via `.claude/r
 
 ---
 
-## 0. LEGACY PATTERNS (Replace With Your Own)
+## 0. Host Repo Snapshot (Required Customization)
 
-<!-- Fill in this section with YOUR repo's current patterns. -->
+<!-- Fill in this section with the host repo's current patterns. -->
 <!-- The more specific you are, the better /migrate will work. -->
-<!-- Delete the placeholder examples and write your actual patterns. -->
+<!-- Replace the placeholder examples below with real code and conventions. -->
 
 ### Current Component Pattern
 ```svelte
@@ -284,6 +300,7 @@ Import and use — never re-instantiate.
 .setAtmosphere(name)                Switch theme (persists, clears temp stack)
 .setPreferences(prefs)              Update user config (density, scale, fonts)
 .registerTheme(id, partialDef)      Register runtime theme (Safety Merge, persists to cache)
+.unregisterTheme(id)                Remove a custom theme (clears cache, falls back if active)
 .registerEphemeralTheme(id, def)    Register scope-owned theme (no localStorage, no console)
 .unregisterEphemeralTheme(id)       Remove a previously registered ephemeral theme
 .applyTemporaryTheme(id, label)     One-shot temporary theme (respects adaptAtmosphere)
@@ -294,6 +311,7 @@ Import and use — never re-instantiate.
 .loadExternalTheme(url)             Async: fetch + validate + register remote theme JSON (returns Result)
 .availableAtmospheres               All registered theme IDs
 .builtInAtmospheres                 Static (non-runtime) theme IDs
+.customAtmospheres                  User-registered themes (excludes built-in and ephemeral)
 .hasTemporaryTheme                  Whether any temporary theme is active (getter)
 .temporaryThemeInfo                 Top-of-stack label + ID + returnTo (getter)
 ```
@@ -362,7 +380,7 @@ which the stack respects via `defaultPrevented` check — no double-dismissal.
 ### Shortcut Registry (`import { shortcutRegistry } from '@lib/shortcut-registry.svelte'`)
 ```
 .register(entry)                    Register { key, label, group, action }
-.unregister(key)                    Remove by key string
+.unregister(key, modifier?)         Remove by key (+ optional modifier)
 .entries                            All registered shortcuts ($state array)
 .grouped                            Entries grouped by group field (getter)
 .handle(event)                      Process KeyboardEvent (internal, document listener)
@@ -376,10 +394,10 @@ which the stack respects via `defaultPrevented` check — no double-dismissal.
 .isAdmin / .isCreator / .isPlayer / .isGuest    Derived role flags
 .approvedTester                     Derived from user.approved_tester
 .developerMode                      Local preference toggle ($state)
-.login(userData)                    Set user + persist to localStorage
+.login(userData)                    Validate, set, and persist user data (returns Result)
 .logout()                           Clear user + storage + reset flags
-.update(partial)                    Partial user update + persist
-.refresh(fetcher)                   Two-phase: async verify cached user via API
+.update(partial)                    Validate merged user state + persist
+.refresh(fetcher)                   Two-phase: async verify cached user via Result fetcher
 .toggleDeveloperMode()              Toggle dev mode flag
 ```
 
@@ -398,7 +416,7 @@ The `<html>` element carries the runtime state:
 data-atmosphere="void"      Active theme ID
 data-physics="glass"        Active physics preset (glass | flat | retro)
 data-mode="dark"            Active color mode (light | dark)
-data-auth                   Present when user is authenticated and not Guest (set by UserScript)
+data-auth                   Present when any user is authenticated, including Guest (set by UserScript)
 ```
 
 Physics constraint rules (auto-enforced):
@@ -444,7 +462,7 @@ Modal-legacy.svelte       ← OLD (original, read-only reference)
 
 <!-- ADAPT: Update file paths if your repo structure differs -->
 - **Generated files are read-only.** Never edit `_generated-themes.scss`, `void-registry.json`, or `void-physics.json`. Edit `src/config/design-tokens.ts` and run `npm run build:tokens`.
-- **`npm run scan` enforces Token Law.** It exits non-zero if magic pixel values are found in SCSS/Svelte files.
+- **`npm run scan` is advisory.** It scans `.scss` and `.svelte` files for common raw pixel-value misses. Treat it as a helper, not a complete Token Law gate.
 - **Glass and retro require dark mode.** VoidEngine auto-corrects invalid physics+mode combos. Do not manually set light mode with glass or retro physics.
 - **SCSS import path:** Always `@use '../abstracts' as *;` — never import individual partial files.
 - **Tailwind config is token-driven.** `tailwind.config.mjs` reads from `design-tokens.ts`. Add new values to design-tokens, not the Tailwind config.

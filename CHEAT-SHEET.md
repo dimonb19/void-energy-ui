@@ -564,9 +564,9 @@ Our spacing scale is **100% compatible** with Tailwind CSS:
 
 **📚 Related Documentation:**
 
-- **Implementation**: [/src/styles/base/\_reset.scss:9-79](../src/styles/base/_reset.scss) (Density Engine)
-- **Token Definitions**: [/src/config/design-tokens.ts:20-66](../src/config/design-tokens.ts) (Spacing scale)
-- **Tailwind Integration**: [/tailwind.config.mjs](../tailwind.config.mjs) (Spacing utilities)
+- **Implementation**: [/src/styles/base/\_reset.scss:9-79](./src/styles/base/_reset.scss) (Density Engine)
+- **Token Definitions**: [/src/config/design-tokens.ts:20-66](./src/config/design-tokens.ts) (Spacing scale)
+- **Tailwind Integration**: [/tailwind.config.mjs](./tailwind.config.mjs) (Spacing utilities)
 
 ---
 
