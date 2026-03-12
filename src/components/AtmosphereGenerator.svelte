@@ -341,6 +341,7 @@
         <Toggle bind:checked={rememberKey} label="Remember on this device" />
         <ActionBtn
           icon={Contract}
+          class="btn-success"
           text="Save Key"
           type="submit"
           disabled={!apiKey.trim()}
@@ -417,7 +418,7 @@
         out:dissolve
       >
         <div class="flex flex-row flex-wrap gap-md justify-center">
-          <button onclick={keep} disabled={generating}>
+          <button class="btn-premium" onclick={keep} disabled={generating}>
             Keep This Atmosphere
           </button>
           <ActionBtn

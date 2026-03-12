@@ -202,9 +202,9 @@ describe('typed select controls', () => {
     const darkLabel = darkInput.closest('label');
 
     expect(shells.length).toBe(3);
-    expect(shells.every((shell) => shell.getAttribute('aria-disabled') === 'true')).toBe(
-      true,
-    );
+    expect(
+      shells.every((shell) => shell.getAttribute('aria-disabled') === 'true'),
+    ).toBe(true);
     expect(darkLabel?.getAttribute('data-state')).toBe('active');
   });
 });
