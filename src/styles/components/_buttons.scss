@@ -307,7 +307,7 @@ button:not(.btn-void, .btn-icon, .tabs-trigger),
   }
 
   @media (hover: hover) {
-    &:hover:not(:disabled) {
+    &:hover:not(:disabled, [aria-disabled='true']) {
       background: blend(var(--bg-surface), var(--energy-secondary), 8%);
       border-color: var(--energy-primary);
       transform: translateY(var(--lift)) scale(var(--scale, 1));
@@ -316,7 +316,7 @@ button:not(.btn-void, .btn-icon, .tabs-trigger),
     }
   }
 
-  &:active:not(:disabled) {
+  &:active:not(:disabled, [aria-disabled='true']) {
     // MICRO-TRANSITION: Soft press for mouse, instant for touch/retro.
     transition-duration: 50ms; // void-ignore (Micro-feedback)
 

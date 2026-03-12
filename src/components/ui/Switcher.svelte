@@ -122,6 +122,7 @@
       <label
         class="switcher-option btn"
         data-state={toNativeControlState(optionActive)}
+        aria-disabled={optionDisabled || undefined}
       >
         <input
           type="radio"

@@ -142,7 +142,7 @@ input[type='radio'] {
 
   // Glass: glow on checked state.
   @include when-glass {
-    &:checked {
+    &:checked:not(:disabled) {
       filter: drop-shadow(
         0 0 3px var(--energy-primary)
       ); // void-ignore (Glow Physics)
@@ -156,7 +156,7 @@ input[type='radio'] {
 
   // Hover enhancement (hover-capable devices only).
   @media (hover: hover) {
-    &:hover {
+    &:hover:not(:disabled) {
       @include when-glass {
         filter: drop-shadow(
           0 0 2px var(--energy-primary)
@@ -493,15 +493,6 @@ legend {
 
   &:has(.switcher-native:disabled) .switcher-option-content {
     opacity: 0.6;
-  }
-
-  @media (hover: hover) {
-    &:has(.switcher-native:disabled):hover {
-      transform: none;
-      box-shadow: none;
-      border-color: var(--border-color);
-      background: var(--bg-surface);
-    }
   }
 }
 

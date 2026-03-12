@@ -155,9 +155,13 @@ describe('typed select controls', () => {
 
     const glassInput = screen.getByLabelText('Glass') as HTMLInputElement;
     const flatInput = screen.getByLabelText('Flat') as HTMLInputElement;
+    const glassLabel = glassInput.closest('label');
+    const flatLabel = flatInput.closest('label');
 
     expect(glassInput.disabled).toBe(true);
     expect(flatInput.disabled).toBe(false);
+    expect(glassLabel?.getAttribute('aria-disabled')).toBe('true');
+    expect(flatLabel?.hasAttribute('aria-disabled')).toBe(false);
   });
 
   it('does not fire onchange when clicking a disabled switcher option', async () => {
@@ -177,5 +181,30 @@ describe('typed select controls', () => {
     await fireEvent.click(screen.getByLabelText('Glass'));
 
     expect(onchange).not.toHaveBeenCalled();
+  });
+
+  it('marks the selected shell as aria-disabled when the whole switcher is disabled', () => {
+    const { container } = render(Switcher, {
+      label: 'Mode',
+      options: [
+        { value: null, label: 'Auto' },
+        { value: 'dark', label: 'Dark' },
+        { value: 'light', label: 'Light' },
+      ],
+      value: 'dark',
+      disabled: true,
+    });
+
+    const shells = Array.from(
+      container.querySelectorAll<HTMLLabelElement>('.switcher-option'),
+    );
+    const darkInput = screen.getByLabelText('Dark') as HTMLInputElement;
+    const darkLabel = darkInput.closest('label');
+
+    expect(shells.length).toBe(3);
+    expect(shells.every((shell) => shell.getAttribute('aria-disabled') === 'true')).toBe(
+      true,
+    );
+    expect(darkLabel?.getAttribute('data-state')).toBe('active');
   });
 });
