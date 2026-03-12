@@ -40,7 +40,7 @@
         const meta = voidEngine.registry[id];
         return {
           id,
-          label: capitalize(id),
+          label: meta.label ?? capitalize(id),
           tagline: meta.tagline,
           physics: meta.physics,
           mode: meta.mode,
@@ -57,7 +57,7 @@
           .join('; ');
         return {
           id,
-          label: capitalize(id),
+          label: meta.label ?? capitalize(id),
           tagline: meta.tagline,
           physics: meta.physics,
           mode: meta.mode,

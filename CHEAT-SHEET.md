@@ -3528,12 +3528,52 @@ Temporary themes override the user's selected atmosphere without persisting. The
 | `applyTemporaryTheme(id, label)` | Imperative | Push a temporary theme (returns `boolean`) |
 | `restoreUserTheme()` | Imperative | Pop the top temporary theme |
 | `pushTemporaryTheme(id, label)` | Scoped | Push and return a handle (`number \| null`) |
+| `updateTemporaryTheme(handle, id, label)` | Scoped | Swap theme on existing handle in-place (single transition) |
 | `releaseTemporaryTheme(handle)` | Scoped | Release a specific handle (idempotent) |
 | `registerEphemeralTheme(id, def)` | Scoped | Register without persisting to localStorage |
+| `unregisterEphemeralTheme(id)` | Scoped | Remove a previously registered ephemeral theme |
 | `hasTemporaryTheme` | Both | Whether any temporary theme is active (getter) |
 | `temporaryThemeInfo` | Both | Top-of-stack `{ id, label, returnTo }` (getter) |
 
 **UI indicator:** When `hasTemporaryTheme` is true, the Themes modal shows a "Theme Override Active" section with restore and disable-overrides buttons. Custom themes appear in the same unified grid as built-in themes, distinguished by an X remove button.
+
+---
+
+#### `AtmosphereGenerator` — AI theme generation from creative concepts
+
+**Location:** [src/components/AtmosphereGenerator.svelte](src/components/AtmosphereGenerator.svelte)
+**Engine:** [src/lib/atmosphere-generator.ts](src/lib/atmosphere-generator.ts)
+
+Generates complete `VoidThemeDefinition` palettes from natural language descriptions using the Claude API (client-side, user's own key). Lives in `src/components/` (not `ui/`) because it's a landing-page feature, not a registered primitive.
+
+**Lifecycle:**
+
+| Action | Flow | Transitions |
+| --- | --- | --- |
+| Generate | `registerEphemeralTheme` → `pushTemporaryTheme` → preview | 1 |
+| Regenerate | `registerEphemeralTheme(new)` → `updateTemporaryTheme(handle)` → `unregisterEphemeralTheme(old)` | 1 (in-place swap) |
+| Keep | `unregisterEphemeralTheme` → `registerTheme` → `setAtmosphere` | 1 (`setAtmosphere` clears stack without restoring) |
+| Revert | `releaseTemporaryTheme` → `unregisterEphemeralTheme` | 1 (restores previous) |
+
+**API key handling:** Session-first (`$state`). Opt-in "Remember on this device" toggle persists to `localStorage` via `STORAGE_KEYS.CLAUDE_API_KEY`. Key is trimmed at request time.
+
+**Generation contract:** Claude returns `{ mode, physics, tagline, label, fontHeadingKey, fontBodyKey, palette }` with 10 core tokens. The parser auto-fills 12 semantic variant tokens from `SEMANTIC_DARK`/`SEMANTIC_LIGHT` and resolves font keys to CSS family strings.
+
+**Edge cases:**
+- `pushTemporaryTheme` returns `null` when `adaptAtmosphere` is off — promotes directly via `registerTheme` + `setAtmosphere`
+- All preview controls disabled during generation to prevent race conditions
+- Escape key aborts in-flight generation via `AbortController`
+- CSS color values validated via `CSS.supports('color', value)` before registration
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+  import AtmosphereGenerator from '@components/AtmosphereGenerator.svelte';
+</script>
+
+<AtmosphereGenerator class="max-w-2xl mx-auto w-full" />
+```
 
 ---
 
@@ -5736,5 +5776,6 @@ FLIP animation for keyed `{#each}` blocks. Smoothly repositions siblings when li
 - **Mixins:** [src/styles/abstracts/\_mixins.scss](src/styles/abstracts/_mixins.scss)
 - **Components:** [src/styles/components/](src/styles/components/)
 - **Actions:** [src/actions/](src/actions/)
+- **Atmosphere Generator:** [src/lib/atmosphere-generator.ts](src/lib/atmosphere-generator.ts)
 - **Transitions:** [src/lib/transitions.svelte.ts](src/lib/transitions.svelte.ts)
 - **Timing:** [src/lib/timing.ts](src/lib/timing.ts)

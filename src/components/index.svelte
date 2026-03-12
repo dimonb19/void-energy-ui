@@ -15,6 +15,7 @@
 
   import { Check, Wrench, Repeat, Shuffle } from '@lucide/svelte';
   import Toggle from './ui/Toggle.svelte';
+  import AtmosphereGenerator from './AtmosphereGenerator.svelte';
 
   // ── Live Proof: atmosphere previewer ──────────────────────────────────
   const proofAtmospheres = [
@@ -398,6 +399,21 @@ voidEngine.setAtmosphere('brand');`}</code
         </ul>
       </div>
     </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- 4.5. AI ATMOSPHERE GENERATOR                                      -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <section class="flex flex-col gap-lg">
+    <div class="flex flex-col gap-sm items-center text-center">
+      <h2>Create Your Own</h2>
+      <p class="text-dim max-w-2xl">
+        Type a vibe, get a complete atmosphere. Powered by Claude &mdash; uses
+        your own API key, runs entirely in your browser.
+      </p>
+    </div>
+
+    <AtmosphereGenerator class="max-w-2xl mx-auto w-full" />
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->

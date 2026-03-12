@@ -237,7 +237,7 @@ export const FONTS: Record<string, FontDefinition> = {
   },
 };
 
-const SEMANTIC_DARK = {
+export const SEMANTIC_DARK = {
   // Base Colors
   'color-premium': '#ff8c00', // Gold/Orange
   'color-system': '#a078ff', // Purple
@@ -259,7 +259,7 @@ const SEMANTIC_DARK = {
   'color-error-subtle': 'oklch(from #ff3c40 l c h / 0.15)',
 };
 
-const SEMANTIC_LIGHT = {
+export const SEMANTIC_LIGHT = {
   // Base Colors
   'color-premium': '#b45309',
   'color-system': '#6d28d9',

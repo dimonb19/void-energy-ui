@@ -149,6 +149,12 @@ Run the advisory raw-value scan:
 npm run scan
 ```
 
+Verify the component registry is in sync with source files:
+
+```bash
+npm run check:registry
+```
+
 Format code:
 
 ```bash
@@ -392,6 +398,7 @@ Ensure your PR meets these criteria:
 - [ ] **Build succeeds:** `npm run build`
 - [ ] **Type checking passes:** `npm run check`
 - [ ] **`npm run scan` reviewed:** no unexpected advisory hits
+- [ ] **Registry consistent (if UI components changed):** `npm run check:registry`
 - [ ] **Tokens rebuilt (if modified):** `npm run build:tokens`
 
 ---
@@ -431,6 +438,7 @@ When you open a PR, use this template:
 - [ ] Build passes: `npm run build`
 - [ ] `npm run check` passes (no TypeScript/Svelte errors)
 - [ ] I reviewed `npm run scan` output (advisory)
+- [ ] `npm run check:registry` passes (if UI components changed)
 - [ ] No console errors or warnings
 - [ ] I have updated documentation (if needed)
 ```

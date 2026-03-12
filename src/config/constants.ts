@@ -3,6 +3,7 @@ export const STORAGE_KEYS = {
   USER_CONFIG: 'void_user_config',
   THEME_CACHE: 'void_theme_cache',
   USER: 'void_user',
+  CLAUDE_API_KEY: 'void_claude_api_key',
 } as const;
 
 export const DOM_ATTRS = {
