@@ -24,6 +24,8 @@
     setStoredApiKey,
     clearStoredApiKey,
     type GeneratedAtmosphere,
+    type PhysicsPreference,
+    type ModePreference,
   } from '@lib/atmosphere-generator';
 
   import { emerge, dissolve } from '@lib/transitions.svelte';
@@ -31,6 +33,7 @@
   import PasswordField from './ui/PasswordField.svelte';
   import ActionBtn from './ui/ActionBtn.svelte';
   import Toggle from './ui/Toggle.svelte';
+  import Switcher from './ui/Switcher.svelte';
   import Sparkle from './icons/Sparkle.svelte';
   import Contract from './icons/Contract.svelte';
   import Refresh from './icons/Refresh.svelte';
@@ -95,6 +98,58 @@
   let previewId = $state<string | null>(null);
   let previewHandle = $state<number | null>(null);
   let previewResult = $state<GeneratedAtmosphere | null>(null);
+
+  // ── Preference State ──────────────────────────────────────────────────
+
+  let selectedPhysics = $state<PhysicsPreference | null>(null);
+  let selectedMode = $state<ModePreference | null>(null);
+
+  // Glass and retro require dark mode; light only works with flat.
+  const physicsOptions = $derived([
+    { value: null, label: 'Auto' },
+    {
+      value: 'glass' as const,
+      label: 'Glass',
+      disabled: selectedMode === 'light',
+    },
+    { value: 'flat' as const, label: 'Flat' },
+    {
+      value: 'retro' as const,
+      label: 'Retro',
+      disabled: selectedMode === 'light',
+    },
+  ]);
+
+  const modeOptions = $derived([
+    { value: null, label: 'Auto' },
+    { value: 'dark' as const, label: 'Dark' },
+    {
+      value: 'light' as const,
+      label: 'Light',
+      disabled: selectedPhysics === 'glass' || selectedPhysics === 'retro',
+    },
+  ]);
+
+  // Reconcile stale state: if the other switcher makes our value invalid, reset to Auto.
+  // This is a defensive cleanup path — with disabled options the user can't normally
+  // reach an invalid combo through clicks, but programmatic or rapid state changes
+  // could leave stale values.
+  $effect(() => {
+    if (
+      selectedMode === 'light' &&
+      (selectedPhysics === 'glass' || selectedPhysics === 'retro')
+    ) {
+      selectedPhysics = null;
+    }
+  });
+  $effect(() => {
+    if (
+      (selectedPhysics === 'glass' || selectedPhysics === 'retro') &&
+      selectedMode === 'light'
+    ) {
+      selectedMode = null;
+    }
+  });
 
   let canGenerate = $derived(keyReady && vibe.trim().length > 0 && !generating);
 
@@ -199,7 +254,10 @@
     const result = await generateAtmosphere({
       apiKey,
       vibe: vibe.trim(),
+      physics: selectedPhysics ?? undefined,
+      mode: selectedMode ?? undefined,
       signal: controller.signal,
+      existingIds: new Set(voidEngine.availableAtmospheres),
     });
 
     generating = false;
@@ -333,35 +391,43 @@
           class="shrink-0"
         />
       </div>
+
+      <!-- ── Optional Preferences ──────────────────────────────────── -->
+      <div class="flex flex-row gap-lg flex-wrap items-start">
+        <Switcher
+          options={physicsOptions}
+          bind:value={selectedPhysics}
+          label="Physics"
+          disabled={generating}
+        />
+        <Switcher
+          options={modeOptions}
+          bind:value={selectedMode}
+          label="Mode"
+          disabled={generating}
+        />
+      </div>
+      <p class="text-caption text-mute">
+        Glass and Retro require dark mode. Leave on Auto to let the AI decide.
+      </p>
     </form>
 
     <!-- ── Preview Controls ─────────────────────────────────────────── -->
     {#if previewResult && previewHandle !== null}
       <div
-        class="surface-sunk p-md flex flex-col gap-md"
+        class="surface-sunk p-md flex flex-col-reverse small-desktop:flex-col gap-md items-center"
         in:emerge
         out:dissolve
       >
-        <div class="flex flex-col gap-xs">
-          <span class="text-small font-bold">{previewResult.label}</span>
-          <span class="text-caption text-dim">{previewResult.tagline}</span>
-          <span class="text-caption text-mute">
-            {previewResult.definition.physics} &middot; {previewResult
-              .definition.mode}
-          </span>
-        </div>
-        <div class="flex flex-row gap-sm flex-wrap">
-          <ActionBtn
-            icon={Contract}
-            text="Keep This Atmosphere"
-            onclick={keep}
-            disabled={generating}
-          />
+        <div class="flex flex-row flex-wrap gap-md justify-center">
+          <button onclick={keep} disabled={generating}>
+            Keep This Atmosphere
+          </button>
           <ActionBtn
             icon={Refresh}
             text="Try Another"
             type="button"
-            class="btn-system"
+            class="btn-ghost"
             onclick={generate}
             disabled={generating}
           />
@@ -373,6 +439,17 @@
             onclick={revert}
             disabled={generating}
           />
+        </div>
+
+        <div class="flex flex-row flex-wrap gap-md justify-center">
+          <div class="flex flex-row gap-md">
+            <span class="text-small text-main">{previewResult.label}</span>
+            <span class="text-small text-mute">{previewResult.tagline}</span>
+          </div>
+          <div class="flex flex-row gap-sm">
+            <span class="badge">{previewResult.definition.physics}</span>
+            <span class="badge">{previewResult.definition.mode}</span>
+          </div>
         </div>
       </div>
     {/if}

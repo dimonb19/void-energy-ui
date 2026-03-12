@@ -413,7 +413,7 @@ voidEngine.setAtmosphere('brand');`}</code
       </p>
     </div>
 
-    <AtmosphereGenerator class="max-w-2xl mx-auto w-full" />
+    <AtmosphereGenerator class="max-w-3xl mx-auto w-full" />
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->

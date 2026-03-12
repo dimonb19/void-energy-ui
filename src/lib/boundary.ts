@@ -5,7 +5,8 @@ export type BoundaryErrorCode =
   | 'invalid_json'
   | 'invalid_shape'
   | 'network'
-  | 'http_error';
+  | 'http_error'
+  | 'preference_mismatch';
 
 export interface BoundaryError {
   code: BoundaryErrorCode;

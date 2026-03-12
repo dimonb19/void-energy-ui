@@ -20,7 +20,9 @@
   type="button"
   class={className}
   class:btn-icon={icon}
-  aria-label={icon ? `Theme: ${voidEngine.atmosphere}` : undefined}
+  aria-label={icon
+    ? `Theme: ${voidEngine.currentTheme.label || voidEngine.atmosphere}`
+    : undefined}
   onclick={() => modal.themes()}
 >
   {#if voidEngine.currentTheme.mode === 'dark'}
@@ -30,7 +32,8 @@
   {/if}
   {#if !icon}
     Theme:
-    {voidEngine.atmosphere.charAt(0).toUpperCase() +
-      voidEngine.atmosphere.slice(1)}
+    {voidEngine.currentTheme.label ||
+      voidEngine.atmosphere.charAt(0).toUpperCase() +
+        voidEngine.atmosphere.slice(1)}
   {/if}
 </button>

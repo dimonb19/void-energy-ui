@@ -23,6 +23,11 @@
   - disabled: Disables all interaction
   - class: Additional CSS classes
 
+  PER-OPTION DISABLED:
+  Each option may carry `disabled: true` to grey it out individually.
+  The native <input> is disabled, preventing keyboard and programmatic selection.
+  SCSS targets `.switcher-option:has(.switcher-native:disabled)` for visual muting.
+
   ACCESSIBILITY:
   - Uses native radio inputs with shared name
   - Keyboard: browser-native radio behavior (Tab + Arrow keys)
@@ -37,6 +42,7 @@
     value: string | number | null;
     label: string;
     icon?: string | Component;
+    disabled?: boolean;
   }
 
   interface SwitcherProps {
@@ -73,8 +79,15 @@
   const groupName = $derived(name ?? generatedGroupName);
   const labelId = $derived(`${inputId}-label`);
 
+  function isOptionDisabled(optionValue: string | number | null): boolean {
+    if (disabled) return true;
+    return (
+      options.find((o) => Object.is(o.value, optionValue))?.disabled ?? false
+    );
+  }
+
   function select(newValue: string | number | null) {
-    if (disabled) return;
+    if (isOptionDisabled(newValue)) return;
     value = newValue;
     onchange?.(newValue);
   }
@@ -104,6 +117,7 @@
   >
     {#each options as option}
       {@const optionActive = isOptionActive(option.value)}
+      {@const optionDisabled = disabled || option.disabled}
 
       <label
         class="switcher-option btn"
@@ -117,7 +131,7 @@
           checked={optionActive}
           {required}
           {form}
-          {disabled}
+          disabled={optionDisabled}
           onchange={() => handleChange(option.value)}
         />
 

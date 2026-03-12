@@ -54,10 +54,16 @@ interface ClaudeResponse {
   palette: Record<string, string>;
 }
 
+export type PhysicsPreference = 'glass' | 'flat' | 'retro';
+export type ModePreference = 'dark' | 'light';
+
 export interface GenerateOptions {
   apiKey: string;
   vibe: string;
+  physics?: PhysicsPreference;
+  mode?: ModePreference;
   signal?: AbortSignal;
+  existingIds?: ReadonlySet<string>;
 }
 
 // ── API Key Storage ──────────────────────────────────────────────────────────
@@ -192,6 +198,27 @@ ${fontCatalog.map((f) => `- "${f.key}": ${f.name}`).join('\n')}
 ${JSON.stringify(themeExamples, null, 2)}`;
 }
 
+// ── User Message Construction ────────────────────────────────────────────────
+
+/** Build the user message, appending hard constraints when prefs are set. */
+export function buildUserMessage(
+  vibe: string,
+  physics?: PhysicsPreference,
+  mode?: ModePreference,
+): string {
+  let message = `Create an atmosphere for: "${vibe}"`;
+
+  const constraints: string[] = [];
+  if (physics) constraints.push(`physics MUST be exactly "${physics}"`);
+  if (mode) constraints.push(`mode MUST be exactly "${mode}"`);
+
+  if (constraints.length > 0) {
+    message += `\n\nIMPORTANT — The user has explicitly selected these preferences. You MUST follow them exactly:\n- ${constraints.join('\n- ')}\nDo NOT deviate from these values under any circumstances.`;
+  }
+
+  return message;
+}
+
 // ── Response Parsing & Validation ────────────────────────────────────────────
 
 /**
@@ -226,16 +253,24 @@ function resolveFontKey(
   return role === 'body' ? FONTS.clean.family : FONTS.tech.family;
 }
 
-/** Generate a kebab-case ID from a vibe string with a random suffix. */
-function generateThemeId(vibe: string): string {
-  const base = vibe
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-')
-    .slice(0, 30);
-  const suffix = Math.random().toString(36).slice(2, 5);
-  return `${base || 'generated'}-${suffix}`;
+/** Generate a clean kebab-case ID from a label, with numeric suffix only on collision. */
+function generateThemeId(
+  label: string,
+  existingIds: ReadonlySet<string>,
+): string {
+  const base =
+    label
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .trim()
+      .replace(/\s+/g, '-')
+      .slice(0, 30) || 'generated';
+
+  if (!existingIds.has(base)) return base;
+
+  let n = 2;
+  while (existingIds.has(`${base}-${n}`)) n++;
+  return `${base}-${n}`;
 }
 
 /**
@@ -245,6 +280,9 @@ function generateThemeId(vibe: string): string {
 function parseResponse(
   text: string,
   vibe: string,
+  existingIds: ReadonlySet<string>,
+  requestedPhysics?: PhysicsPreference,
+  requestedMode?: ModePreference,
 ): Result<GeneratedAtmosphere, BoundaryError> {
   const jsonStr = extractJson(text);
   if (!jsonStr) {
@@ -288,6 +326,22 @@ function parseResponse(
     });
   }
 
+  // Validate user-requested preferences match exactly
+  if (requestedPhysics && parsed.physics !== requestedPhysics) {
+    return err({
+      code: 'preference_mismatch',
+      source: 'AtmosphereGenerator.parseResponse',
+      message: `AI returned "${parsed.physics}" physics but you requested "${requestedPhysics}". Try again.`,
+    });
+  }
+  if (requestedMode && parsed.mode !== requestedMode) {
+    return err({
+      code: 'preference_mismatch',
+      source: 'AtmosphereGenerator.parseResponse',
+      message: `AI returned "${parsed.mode}" mode but you requested "${requestedMode}". Try again.`,
+    });
+  }
+
   // Validate all 10 core palette keys exist and are valid CSS colors
   for (const key of CORE_PALETTE_KEYS) {
     const value = parsed.palette[key];
@@ -326,7 +380,7 @@ function parseResponse(
 
   const label = parsed.label || vibe;
   const tagline = parsed.tagline || vibe;
-  const id = generateThemeId(vibe);
+  const id = generateThemeId(label, existingIds);
 
   return ok({
     id,
@@ -351,10 +405,11 @@ function parseResponse(
 export async function generateAtmosphere(
   options: GenerateOptions,
 ): Promise<Result<GeneratedAtmosphere, BoundaryError>> {
-  const { apiKey: rawKey, vibe, signal } = options;
+  const { apiKey: rawKey, vibe, physics, mode, signal } = options;
   const apiKey = rawKey.trim();
 
   const systemPrompt = buildSystemPrompt();
+  const userMessage = buildUserMessage(vibe, physics, mode);
 
   let response: Response;
   try {
@@ -374,7 +429,7 @@ export async function generateAtmosphere(
         messages: [
           {
             role: 'user',
-            content: `Create an atmosphere for: "${vibe}"`,
+            content: userMessage,
           },
         ],
       }),
@@ -440,5 +495,11 @@ export async function generateAtmosphere(
     });
   }
 
-  return parseResponse(textBlock.text, vibe);
+  return parseResponse(
+    textBlock.text,
+    vibe,
+    options.existingIds ?? new Set(),
+    physics,
+    mode,
+  );
 }

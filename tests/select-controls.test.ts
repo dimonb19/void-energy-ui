@@ -141,4 +141,41 @@ describe('typed select controls', () => {
 
     expect(onchange).toHaveBeenLastCalledWith(2);
   });
+
+  it('disables individual switcher options via option.disabled', () => {
+    render(Switcher, {
+      label: 'Physics',
+      options: [
+        { value: null, label: 'Auto' },
+        { value: 'glass', label: 'Glass', disabled: true },
+        { value: 'flat', label: 'Flat' },
+      ],
+      value: null,
+    });
+
+    const glassInput = screen.getByLabelText('Glass') as HTMLInputElement;
+    const flatInput = screen.getByLabelText('Flat') as HTMLInputElement;
+
+    expect(glassInput.disabled).toBe(true);
+    expect(flatInput.disabled).toBe(false);
+  });
+
+  it('does not fire onchange when clicking a disabled switcher option', async () => {
+    const onchange = vi.fn();
+
+    render(Switcher, {
+      label: 'Physics',
+      options: [
+        { value: null, label: 'Auto' },
+        { value: 'glass', label: 'Glass', disabled: true },
+        { value: 'flat', label: 'Flat' },
+      ],
+      value: null,
+      onchange,
+    });
+
+    await fireEvent.click(screen.getByLabelText('Glass'));
+
+    expect(onchange).not.toHaveBeenCalled();
+  });
 });

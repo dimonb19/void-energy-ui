@@ -7,7 +7,6 @@
   import { dematerialize, materialize } from '@lib/transitions.svelte';
   import ActionBtn from '../ui/ActionBtn.svelte';
   import Sparkle from '../icons/Sparkle.svelte';
-  import Switch from '../icons/Switch.svelte';
   import Undo from '../icons/Undo.svelte';
 
   // ── Built-in atmospheres table data ────────────────────────────────────
@@ -414,15 +413,15 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
 
           {#if cyberpunkRegistered}
             <span in:materialize out:dematerialize>
-              <ActionBtn
-                icon={Switch}
-                text={voidEngine.atmosphere === 'cyberpunk'
-                  ? 'Cyberpunk Active'
-                  : 'Apply Cyberpunk'}
-                class="btn-premium"
+              <button
+                class="btn btn-premium"
                 onclick={applyCyberpunk}
                 disabled={voidEngine.atmosphere === 'cyberpunk'}
-              />
+              >
+                {voidEngine.atmosphere === 'cyberpunk'
+                  ? 'Cyberpunk Active'
+                  : 'Apply Cyberpunk'}
+              </button>
             </span>
           {/if}
         </div>
@@ -473,15 +472,15 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
 
           {#if slateRegistered}
             <span in:materialize out:dematerialize>
-              <ActionBtn
-                icon={Switch}
-                text={voidEngine.atmosphere === 'slate'
-                  ? 'Slate Active'
-                  : 'Apply Slate'}
-                class="btn-premium"
+              <button
+                class="btn btn-premium"
                 onclick={applySlate}
                 disabled={voidEngine.atmosphere === 'slate'}
-              />
+              >
+                {voidEngine.atmosphere === 'slate'
+                  ? 'Slate Active'
+                  : 'Apply Slate'}
+              </button>
             </span>
           {/if}
         </div>
@@ -534,15 +533,15 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
 
           {#if meridianRegistered}
             <span in:materialize out:dematerialize>
-              <ActionBtn
-                icon={Switch}
-                text={voidEngine.atmosphere === 'meridian'
-                  ? 'Meridian Active'
-                  : 'Apply Meridian'}
-                class="btn-premium"
+              <button
+                class="btn btn-premium"
                 onclick={applyMeridian}
                 disabled={voidEngine.atmosphere === 'meridian'}
-              />
+              >
+                {voidEngine.atmosphere === 'meridian'
+                  ? 'Meridian Active'
+                  : 'Apply Meridian'}
+              </button>
             </span>
           {/if}
         </div>
