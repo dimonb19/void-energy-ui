@@ -1,0 +1,958 @@
+{
+  "meta": {
+    "description": "Authoritative AI-facing registry for Void Energy UI primitives, controllers, and class recipes.",
+    "propsNote": "props lists explicit Svelte props. ...rest:* means native element attributes forwarded by spread.",
+    "slotsNote": "slots lists Svelte 5 snippet props or child content expected by the entry.",
+    "contractsNote": "controllers and utilities add methods/contracts when a flat signature string is not enough for autonomous use.",
+    "rules": [
+      "There is no generic Button.svelte. Use native <button> with btn-* classes, or use ActionBtn/IconBtn when you need icon forwarding.",
+      "Use FormField for label, hint, error, and ARIA wiring around form controls.",
+      "Modal and toast are manager-driven. Their shells are mounted globally; use the modal/toast APIs instead of rendering new instances.",
+      "Prefer native HTML when the platform already provides the right semantics. A missing wrapper does not imply a missing capability."
+    ],
+    "spacing": ["xs=8px", "sm=16px", "md=24px", "lg=32px", "xl=48px"]
+  },
+  "components": {
+    "search-field": {
+      "category": "field",
+      "component": "SearchField",
+      "import": "@components/ui/SearchField.svelte",
+      "props": [
+        "value:bindable",
+        "id",
+        "placeholder",
+        "autocomplete",
+        "zoom",
+        "delay",
+        "onsubmit",
+        "oninput",
+        "disabled",
+        "class",
+        "...rest:input"
+      ],
+      "slots": [],
+      "related": ["edit-field", "generate-field", "combobox"],
+      "compose": "Wrap in FormField for label or validation. Use bind:value for reactivity; onsubmit fires on Enter.",
+      "example": "<SearchField bind:value={query} placeholder='Search...' />"
+    },
+    "edit-field": {
+      "category": "field",
+      "component": "EditField",
+      "import": "@components/ui/EditField.svelte",
+      "props": [
+        "value:bindable",
+        "id",
+        "placeholder",
+        "onconfirm",
+        "autocomplete",
+        "disabled",
+        "class"
+      ],
+      "slots": [],
+      "related": ["edit-textarea", "search-field", "generate-field"],
+      "compose": "Use for single-line inline edits that require explicit confirm or cancel. It owns the edit, undo, and confirm affordances already.",
+      "example": "<EditField bind:value={name} onconfirm={saveName} />"
+    },
+    "generate-field": {
+      "category": "field",
+      "component": "GenerateField",
+      "import": "@components/ui/GenerateField.svelte",
+      "props": [
+        "value:bindable",
+        "id",
+        "placeholder",
+        "instructions",
+        "ongenerate",
+        "disabled",
+        "class",
+        "...rest:input"
+      ],
+      "slots": [],
+      "related": ["generate-textarea", "search-field", "edit-field"],
+      "compose": "Provide an async ongenerate handler that returns the final string. Escape aborts generation.",
+      "example": "<GenerateField bind:value={title} instructions='Generate a project title' ongenerate={generateTitle} />"
+    },
+    "password-field": {
+      "category": "field",
+      "component": "PasswordField",
+      "import": "@components/ui/PasswordField.svelte",
+      "props": [
+        "value:bindable",
+        "id",
+        "placeholder",
+        "autocomplete",
+        "invalid",
+        "describedby",
+        "disabled",
+        "class",
+        "...rest:input"
+      ],
+      "slots": [],
+      "related": [
+        "password-meter",
+        "password-checklist",
+        "form-field",
+        "create-password-validation"
+      ],
+      "compose": "Usually pair with FormField plus createPasswordValidation from @lib/password-validation.svelte feeding PasswordMeter and PasswordChecklist.",
+      "example": "<PasswordField id={fieldId} bind:value={password} describedby={descriptionId} {invalid} autocomplete='new-password' />"
+    },
+    "color-field": {
+      "category": "field",
+      "component": "ColorField",
+      "import": "@components/ui/ColorField.svelte",
+      "props": [
+        "value:bindable",
+        "id",
+        "onchange",
+        "invalid",
+        "describedby",
+        "disabled",
+        "class",
+        "...rest:input[color]"
+      ],
+      "slots": [],
+      "related": ["form-field", "copy-field", "selector"],
+      "compose": "Wrap in FormField when you need label, hint, or error wiring. bind:value reflects the native color input.",
+      "example": "<ColorField bind:value={brandColor} />"
+    },
+    "copy-field": {
+      "category": "field",
+      "component": "CopyField",
+      "import": "@components/ui/CopyField.svelte",
+      "props": ["value", "id", "class"],
+      "slots": [],
+      "related": ["icon-button", "form-field"],
+      "compose": "Use for copy-only secrets or IDs. The field is readonly and already handles clipboard feedback.",
+      "example": "<CopyField value={apiKey} class='w-full' />"
+    },
+    "slider-field": {
+      "category": "field",
+      "component": "SliderField",
+      "import": "@components/ui/SliderField.svelte",
+      "props": [
+        "value:bindable",
+        "id",
+        "presets",
+        "min",
+        "max",
+        "step",
+        "label",
+        "onchange",
+        "disabled",
+        "class"
+      ],
+      "slots": [],
+      "related": ["selector", "switcher", "media-slider"],
+      "compose": "Use presets for snap-point selection; without presets it behaves like a labeled native range input.",
+      "example": "<SliderField bind:value={quality} presets={qualityPresets} label='Quality' />"
+    },
+    "toggle": {
+      "category": "field",
+      "component": "Toggle",
+      "import": "@components/ui/Toggle.svelte",
+      "variants": ["sm", "md", "lg", "xl", "2xl", "3xl", "4xl"],
+      "props": [
+        "checked:bindable",
+        "id",
+        "label",
+        "size",
+        "iconOn",
+        "iconOff",
+        "hideIcons",
+        "onchange",
+        "disabled",
+        "class",
+        "...rest:input"
+      ],
+      "slots": [],
+      "related": ["switcher", "selector", "media-slider"],
+      "compose": "Use for boolean state. Native checkbox semantics and focus handling are already built in.",
+      "example": "<Toggle bind:checked={enabled} label='Auto-play' />"
+    },
+    "switcher": {
+      "category": "field",
+      "component": "Switcher",
+      "import": "@components/ui/Switcher.svelte",
+      "props": [
+        "options",
+        "value:bindable",
+        "id",
+        "label",
+        "name",
+        "required",
+        "form",
+        "onchange",
+        "disabled",
+        "class"
+      ],
+      "slots": [],
+      "related": ["selector", "tabs", "toggle"],
+      "compose": "Use when choices are few and mutually exclusive. It renders native radio inputs for form submission.",
+      "example": "<Switcher options={densityOptions} bind:value={density} label='Density' />"
+    },
+    "selector": {
+      "category": "field",
+      "component": "Selector",
+      "import": "@components/ui/Selector.svelte",
+      "props": [
+        "options",
+        "value:bindable",
+        "label",
+        "id",
+        "placeholder",
+        "selectClass",
+        "align",
+        "onchange",
+        "disabled",
+        "class",
+        "...rest:select"
+      ],
+      "slots": [],
+      "related": ["switcher", "combobox", "slider-field"],
+      "compose": "Use when you want native select semantics or a long option list without filtering.",
+      "example": "<Selector options={fontOptions} bind:value={font} label='Heading Font' placeholder='Select a font...' />"
+    },
+    "combobox": {
+      "category": "field",
+      "component": "Combobox",
+      "import": "@components/ui/Combobox.svelte",
+      "props": [
+        "options",
+        "value:bindable",
+        "open:bindable",
+        "allowCustomValue",
+        "clearable",
+        "required",
+        "name",
+        "form",
+        "placeholder",
+        "autocomplete",
+        "onchange",
+        "oninput",
+        "disabled",
+        "class",
+        "id",
+        "...rest:input"
+      ],
+      "slots": [],
+      "related": ["selector", "search-field", "dropdown"],
+      "compose": "Wrap in FormField for label or validation. Use bind:value for committed selection and oninput for async filtering.",
+      "example": "<Combobox options={assignees} bind:value={assignee} placeholder='Select assignee...' clearable />"
+    },
+    "drop-zone": {
+      "category": "field",
+      "component": "DropZone",
+      "import": "@components/ui/DropZone.svelte",
+      "props": [
+        "accept",
+        "maxSize",
+        "multiple",
+        "onfiles",
+        "disabled",
+        "class"
+      ],
+      "slots": [],
+      "related": ["copy-field", "load-more", "toast"],
+      "compose": "Use for drag-and-drop uploads with click fallback. Validation and toast errors are already built in.",
+      "example": "<DropZone accept='.json,.csv' maxSize={5 * 1024 * 1024} onfiles={handleFiles} />"
+    },
+    "form-field": {
+      "category": "form",
+      "component": "FormField",
+      "import": "@components/ui/FormField.svelte",
+      "props": ["label", "error", "hint", "required", "fieldId", "class"],
+      "slots": ["children({ fieldId, descriptionId, invalid })"],
+      "related": ["search-field", "password-field", "color-field"],
+      "compose": "Pass the actual control through the children snippet and forward fieldId, descriptionId, and invalid into it.",
+      "example": "<FormField label='Email'>{#snippet children({ fieldId, descriptionId, invalid })}<input id={fieldId} aria-describedby={descriptionId} aria-invalid={invalid} />{/snippet}</FormField>"
+    },
+    "password-meter": {
+      "category": "form",
+      "component": "PasswordMeter",
+      "import": "@components/ui/PasswordMeter.svelte",
+      "props": ["password", "validation", "class"],
+      "slots": [],
+      "related": [
+        "password-checklist",
+        "password-field",
+        "create-password-validation"
+      ],
+      "compose": "Feed the same createPasswordValidation result used by PasswordChecklist. It hides automatically when password is empty.",
+      "example": "<PasswordMeter password={password} validation={pv} />"
+    },
+    "password-checklist": {
+      "category": "form",
+      "component": "PasswordChecklist",
+      "import": "@components/ui/PasswordChecklist.svelte",
+      "props": ["password", "validation", "class"],
+      "slots": [],
+      "related": [
+        "password-meter",
+        "password-field",
+        "create-password-validation"
+      ],
+      "compose": "Use directly below PasswordField. It expects the validation object returned by createPasswordValidation.",
+      "example": "<PasswordChecklist password={password} validation={pv} />"
+    },
+    "edit-textarea": {
+      "category": "field",
+      "component": "EditTextarea",
+      "import": "@components/ui/EditTextarea.svelte",
+      "props": [
+        "value:bindable",
+        "id",
+        "placeholder",
+        "rows",
+        "onconfirm",
+        "disabled",
+        "class"
+      ],
+      "slots": [],
+      "related": ["edit-field", "generate-textarea"],
+      "compose": "Use for multiline inline edits that require explicit confirm or cancel. Ctrl/Cmd+Enter confirms; Escape cancels.",
+      "example": "<EditTextarea bind:value={bio} rows={5} onconfirm={saveBio} />"
+    },
+    "generate-textarea": {
+      "category": "field",
+      "component": "GenerateTextarea",
+      "import": "@components/ui/GenerateTextarea.svelte",
+      "props": [
+        "value:bindable",
+        "id",
+        "placeholder",
+        "rows",
+        "instructions",
+        "ongenerate",
+        "disabled",
+        "class",
+        "...rest:textarea"
+      ],
+      "slots": [],
+      "related": ["generate-field", "edit-textarea"],
+      "compose": "Provide an async ongenerate handler that returns the final string. Escape aborts generation while loading.",
+      "example": "<GenerateTextarea bind:value={bio} rows={5} instructions='Write a short bio' ongenerate={generateBio} />"
+    },
+    "action-button": {
+      "category": "action",
+      "component": "ActionBtn",
+      "import": "@components/ui/ActionBtn.svelte",
+      "variants": [
+        "btn-cta",
+        "btn-premium",
+        "btn-system",
+        "btn-success",
+        "btn-error",
+        "btn-ghost"
+      ],
+      "props": ["icon", "text", "class", "size", "disabled", "...rest:button"],
+      "slots": [],
+      "related": ["icon-button", "button-native"],
+      "compose": "Use when you need a styled button with an animated icon and optional label. Variant classes go on class.",
+      "example": "<ActionBtn icon={Refresh} text='Retry' class='btn-system' onclick={retry} />"
+    },
+    "icon-button": {
+      "category": "action",
+      "component": "IconBtn",
+      "import": "@components/ui/IconBtn.svelte",
+      "variants": ["btn-icon"],
+      "props": ["icon", "size", "iconProps", "class", "...rest:button"],
+      "slots": [],
+      "related": ["action-button", "themes-button", "profile-button"],
+      "compose": "Use for toolbar or inline icon actions. iconProps can override hover-driven data-state for toggles and timers.",
+      "example": "<IconBtn icon={Undo} aria-label='Reset' onclick={reset} />"
+    },
+    "themes-button": {
+      "category": "action",
+      "component": "ThemesBtn",
+      "import": "@components/ui/ThemesBtn.svelte",
+      "props": ["icon", "size", "class"],
+      "slots": [],
+      "related": ["dropdown", "modal", "profile-button"],
+      "compose": "Opens the themes modal via modal.themes(). Use icon={true} to render the btn-icon variant.",
+      "example": "<ThemesBtn class='btn-cta' />"
+    },
+    "profile-button": {
+      "category": "action",
+      "component": "ProfileBtn",
+      "import": "@components/ui/ProfileBtn.svelte",
+      "props": ["size", "class", "...rest:button"],
+      "slots": [],
+      "related": ["dropdown", "icon-button", "themes-button"],
+      "compose": "Usually use as a Dropdown trigger. It reads auth state from the user store and switches avatar or role badge automatically.",
+      "example": "<ProfileBtn onclick={toggleMenu} aria-expanded={menuOpen} />"
+    },
+    "dropdown": {
+      "category": "overlay",
+      "component": "Dropdown",
+      "import": "@components/ui/Dropdown.svelte",
+      "props": [
+        "open:bindable",
+        "placement",
+        "offset",
+        "label",
+        "triggerClass",
+        "onchange",
+        "class"
+      ],
+      "slots": ["trigger()", "children()"],
+      "related": ["combobox", "profile-button", "sidebar"],
+      "compose": "Use a trigger snippet for the button content and arbitrary panel markup in children. Escape and click-outside handling are built in.",
+      "example": "<Dropdown label='Profile'>{#snippet trigger()}<ProfileBtn />{/snippet}<div class='surface-raised p-md'>Menu</div></Dropdown>"
+    },
+    "tabs": {
+      "category": "nav",
+      "component": "Tabs",
+      "import": "@components/ui/Tabs.svelte",
+      "props": ["tabs", "value:bindable", "onchange", "class"],
+      "slots": ["panel(tab)"],
+      "related": ["switcher", "pagination", "sidebar"],
+      "compose": "Pass tab metadata and render content through the panel snippet. Keyboard and roving-tabindex behavior are already implemented.",
+      "example": "<Tabs tabs={tabs} bind:value={activeTab}>{#snippet panel(tab)}<p>{tab.label}</p>{/snippet}</Tabs>"
+    },
+    "pagination": {
+      "category": "nav",
+      "component": "Pagination",
+      "import": "@components/ui/Pagination.svelte",
+      "props": [
+        "currentPage:bindable",
+        "totalPages",
+        "siblings",
+        "showFirstLast",
+        "showPrevNext",
+        "onchange",
+        "label",
+        "class"
+      ],
+      "slots": [],
+      "related": ["load-more", "tabs"],
+      "compose": "Use for paged collections. It hides itself when totalPages <= 1 and collapses to a compact mobile indicator automatically.",
+      "example": "<Pagination bind:currentPage={page} totalPages={totalPages} />"
+    },
+    "load-more": {
+      "category": "nav",
+      "component": "LoadMore",
+      "import": "@components/ui/LoadMore.svelte",
+      "props": [
+        "loading",
+        "hasMore",
+        "onloadmore",
+        "rootMargin",
+        "observer",
+        "label",
+        "class"
+      ],
+      "slots": [],
+      "related": ["pagination", "skeleton"],
+      "compose": "Place after the list or grid. Keep the manual button even when IntersectionObserver auto-loading is enabled.",
+      "example": "<LoadMore loading={loading} hasMore={hasMore} onloadmore={fetchNextPage} />"
+    },
+    "breadcrumbs": {
+      "category": "nav",
+      "component": "Breadcrumbs",
+      "import": "@components/ui/Breadcrumbs.svelte",
+      "props": ["items", "hidden", "class"],
+      "slots": [],
+      "related": ["sidebar", "tabs"],
+      "compose": "Pass BreadcrumbItem[] with label, href?, and active?. Any active item switches separators to peer-mode slashes.",
+      "example": "<Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Components', href: '/components' }, { label: 'Buttons' }]} />"
+    },
+    "sidebar": {
+      "category": "nav",
+      "component": "Sidebar",
+      "import": "@components/ui/Sidebar.svelte",
+      "props": [
+        "sections",
+        "activeId:bindable",
+        "open:bindable",
+        "trackScroll",
+        "onclose",
+        "class"
+      ],
+      "slots": [],
+      "related": ["tabs", "breadcrumbs", "dropdown"],
+      "compose": "Use for section navigation. It can sync activeId from the URL hash and IntersectionObserver and behaves as an overlay on smaller screens.",
+      "example": "<Sidebar sections={sections} bind:activeId bind:open={sidebarOpen} onclose={closeSidebar} />"
+    },
+    "settings-row": {
+      "category": "layout",
+      "component": "SettingsRow",
+      "import": "@components/ui/SettingsRow.svelte",
+      "props": ["label", "class"],
+      "slots": ["children()"],
+      "related": ["switcher", "selector", "toggle"],
+      "compose": "Use inside settings screens to align a label column with arbitrary controls instead of hand-rolling a grid.",
+      "example": "<SettingsRow label='Density'><Switcher options={densityOptions} bind:value={density} /></SettingsRow>"
+    },
+    "pull-refresh": {
+      "category": "interaction",
+      "component": "PullRefresh",
+      "import": "@components/ui/PullRefresh.svelte",
+      "props": ["onrefresh", "onerror", "threshold", "disabled", "class"],
+      "slots": ["children()"],
+      "related": ["load-more", "skeleton"],
+      "compose": "Wrap the scrollable page content and return a promise from onrefresh. Use for mobile-style refresh affordances.",
+      "example": "<PullRefresh onrefresh={refreshPage}><div class='container py-2xl'>...</div></PullRefresh>"
+    },
+    "skeleton": {
+      "category": "feedback",
+      "component": "Skeleton",
+      "import": "@components/ui/Skeleton.svelte",
+      "variants": ["text", "avatar", "card", "paragraph"],
+      "props": ["variant", "width", "height", "lines", "class"],
+      "slots": [],
+      "related": ["portal-loader", "loading-text-cycler"],
+      "compose": "Use shimmer placeholders during loading. paragraph renders multiple text rows automatically.",
+      "example": "<Skeleton variant='paragraph' lines={3} />"
+    },
+    "portal-loader": {
+      "category": "feedback",
+      "component": "PortalLoader",
+      "import": "@components/ui/PortalLoader.svelte",
+      "props": ["status", "class"],
+      "slots": [],
+      "related": ["skeleton", "loading-text-cycler"],
+      "compose": "Use for branded portal loading states. status='loading' shows the animated quill and cycling copy.",
+      "example": "<PortalLoader status='loading' class='mx-auto' />"
+    },
+    "loading-text-cycler": {
+      "category": "motion",
+      "component": "LoadingTextCycler",
+      "import": "@components/ui/LoadingTextCycler.svelte",
+      "props": ["words", "interval", "cursor", "speed", "class"],
+      "slots": [],
+      "related": ["kinetic-text", "portal-loader"],
+      "compose": "Use when you need rotating loading copy without building a custom kinetic config.",
+      "example": "<LoadingTextCycler words={['Loading', 'Syncing', 'Compiling']} />"
+    },
+    "kinetic-text": {
+      "category": "motion",
+      "component": "KineticText",
+      "import": "@components/ui/KineticText.svelte",
+      "props": [
+        "text",
+        "words",
+        "mode",
+        "chunk",
+        "charSpeed",
+        "speed",
+        "pauseDuration",
+        "cycleTransition",
+        "cursor",
+        "loop",
+        "tag",
+        "oncomplete",
+        "class"
+      ],
+      "slots": [],
+      "related": ["loading-text-cycler"],
+      "compose": "Use text for char, word, or decode modes and words for cycle mode. It is a thin wrapper around the kinetic action.",
+      "example": "<KineticText text='SYSTEM ONLINE' mode='decode' />"
+    },
+    "media-slider": {
+      "category": "field",
+      "component": "MediaSlider",
+      "import": "@components/ui/MediaSlider.svelte",
+      "props": [
+        "volume:bindable",
+        "muted:bindable",
+        "icon",
+        "playback",
+        "paused:bindable",
+        "replay",
+        "onchange",
+        "onmute",
+        "onpause",
+        "onreplay",
+        "disabled",
+        "class"
+      ],
+      "slots": [],
+      "related": ["slider-field", "toggle", "icon-button"],
+      "compose": "Use for audio controls. Mute, play/pause, and replay buttons are already wired to animated icons.",
+      "example": "<MediaSlider bind:volume bind:muted playback bind:paused icon='music' />"
+    },
+    "progress-ring": {
+      "category": "chart",
+      "component": "ProgressRing",
+      "import": "@components/ui/ProgressRing.svelte",
+      "variants": ["sm", "md", "lg", "xl"],
+      "props": [
+        "value",
+        "max",
+        "scale",
+        "thickness",
+        "series",
+        "showValue",
+        "formatValue",
+        "animated",
+        "label",
+        "id",
+        "class"
+      ],
+      "slots": [],
+      "related": ["donut-chart", "stat-card"],
+      "compose": "Use for single-metric progress. series maps to themed color channels.",
+      "example": "<ProgressRing value={75} showValue scale='lg' />"
+    },
+    "sparkline": {
+      "category": "chart",
+      "component": "Sparkline",
+      "import": "@components/ui/Sparkline.svelte",
+      "props": [
+        "data",
+        "width",
+        "height",
+        "series",
+        "filled",
+        "fluid",
+        "label",
+        "id",
+        "animated",
+        "class"
+      ],
+      "slots": [],
+      "related": ["stat-card", "line-chart"],
+      "compose": "Use inside stat cards, tables, or list rows when you only need trend shape and not full axes.",
+      "example": "<Sparkline data={weeklyTrend} filled series={2} />"
+    },
+    "stat-card": {
+      "category": "chart",
+      "component": "StatCard",
+      "import": "@components/ui/StatCard.svelte",
+      "props": ["label", "value", "trend", "delta", "sparkline", "id", "class"],
+      "slots": [],
+      "related": ["sparkline", "progress-ring", "donut-chart"],
+      "compose": "Use inside surface-raised grids for KPI dashboards. trend controls the icon and semantic color.",
+      "example": "<StatCard label='Revenue' value='$12,450' trend='up' delta='+12.5%' sparkline={weeklyRevenue} />"
+    },
+    "donut-chart": {
+      "category": "chart",
+      "component": "DonutChart",
+      "import": "@components/ui/DonutChart.svelte",
+      "props": [
+        "data",
+        "centerMetric",
+        "showLegend",
+        "size",
+        "maxSize",
+        "thickness",
+        "formatValue",
+        "onselect",
+        "animated",
+        "title",
+        "id",
+        "class"
+      ],
+      "slots": [],
+      "related": ["progress-ring", "stat-card", "bar-chart"],
+      "compose": "Use for share or distribution views. Pair with a surrounding surface-raised card.",
+      "example": "<DonutChart data={trafficSources} centerMetric={{ label: 'Total', value: '1,250' }} />"
+    },
+    "line-chart": {
+      "category": "chart",
+      "component": "LineChart",
+      "import": "@components/ui/LineChart.svelte",
+      "props": [
+        "data",
+        "series",
+        "height",
+        "filled",
+        "showDots",
+        "showGrid",
+        "smooth",
+        "showLegend",
+        "formatValue",
+        "referenceLines",
+        "onselect",
+        "xLabel",
+        "yLabel",
+        "animated",
+        "title",
+        "id",
+        "class"
+      ],
+      "slots": [],
+      "related": ["sparkline", "bar-chart", "donut-chart"],
+      "compose": "Use data for a single series or series for multi-series. All series must share labels in the same order.",
+      "example": "<LineChart data={revenueSeries} filled showDots />"
+    },
+    "bar-chart": {
+      "category": "chart",
+      "component": "BarChart",
+      "import": "@components/ui/BarChart.svelte",
+      "props": [
+        "data",
+        "groups",
+        "orientation",
+        "height",
+        "showValues",
+        "showGrid",
+        "formatValue",
+        "showLegend",
+        "referenceLines",
+        "onselect",
+        "xLabel",
+        "yLabel",
+        "animated",
+        "title",
+        "id",
+        "class"
+      ],
+      "slots": [],
+      "related": ["line-chart", "donut-chart", "stat-card"],
+      "compose": "Use data for simple bars or groups for clustered bars. Negative values are not supported.",
+      "example": "<BarChart data={quarterlyRevenue} showValues />"
+    }
+  },
+  "utilities": {
+    "create-password-validation": {
+      "category": "form",
+      "symbol": "createPasswordValidation",
+      "import": "@lib/password-validation.svelte",
+      "signature": "createPasswordValidation(getPassword, getConfirmPassword?, options?)",
+      "args": [
+        "getPassword: () => string",
+        "getConfirmPassword?: () => string",
+        "options?: { minLength?, maxLength?, allowedChars?, allowedCharsDescription?, requireConfirm? }"
+      ],
+      "returns": [
+        "PasswordValidationState",
+        "Getter-backed reactive object: do not destructure",
+        "fields: error, isValid, rules, score, level, hasLower, hasUpper, hasDigit, hasSpecial, hasRestrictedChars, hasValidLength, passwordsMatch"
+      ],
+      "related": ["password-field", "password-meter", "password-checklist"],
+      "compose": "Create once at component top level and pass the returned object directly into PasswordMeter and PasswordChecklist. Use requireConfirm when the confirm field must match.",
+      "example": "import { createPasswordValidation } from '@lib/password-validation.svelte'; const pv = createPasswordValidation(() => password, () => confirm, { requireConfirm: true });"
+    }
+  },
+  "controllers": {
+    "modal": {
+      "category": "overlay",
+      "component": "modal",
+      "import": "@lib/modal-manager.svelte",
+      "api": [
+        "open(key, props, size)",
+        "close()",
+        "confirm(title, body, actions)",
+        "alert(title, body)",
+        "settings()",
+        "themes()",
+        "shortcuts()",
+        "palette()"
+      ],
+      "keys": [
+        "alert",
+        "confirm",
+        "palette",
+        "settings",
+        "shortcuts",
+        "themes"
+      ],
+      "methods": {
+        "open": {
+          "args": ["key", "props", "size='md'"],
+          "keys": [
+            "alert",
+            "confirm",
+            "palette",
+            "settings",
+            "shortcuts",
+            "themes"
+          ],
+          "sizes": ["sm", "md", "lg", "full"],
+          "propsByKey": {
+            "alert": ["title", "body | bodyHtml"],
+            "confirm": [
+              "title",
+              "body | bodyHtml",
+              "onConfirm",
+              "onCancel?",
+              "cost?"
+            ],
+            "palette": [],
+            "settings": [
+              "initialLayout?",
+              "initialNotifications?",
+              "initialRemember?",
+              "onSave?",
+              "onRememberChange?"
+            ],
+            "shortcuts": [],
+            "themes": []
+          }
+        },
+        "close": {
+          "args": []
+        },
+        "confirm": {
+          "args": ["title", "body", "actions"],
+          "actions": ["onConfirm", "onCancel?", "cost?"],
+          "note": "Plain-text body only. Use open('confirm', { bodyHtml, ... }) for trusted HTML."
+        },
+        "alert": {
+          "args": ["title", "body"],
+          "note": "Plain-text body only. Use open('alert', { bodyHtml, ... }) for trusted HTML."
+        },
+        "settings": {
+          "args": ["options?"],
+          "options": [
+            "initialLayout?",
+            "initialNotifications?",
+            "initialRemember?",
+            "onSave?",
+            "onRememberChange?"
+          ]
+        },
+        "themes": {
+          "args": []
+        },
+        "shortcuts": {
+          "args": []
+        },
+        "palette": {
+          "args": []
+        }
+      },
+      "slots": [],
+      "related": ["dropdown", "toast"],
+      "compose": "Do not render a new modal shell. Use the modal manager; the global Modal.svelte host resolves fragments from src/config/modal-registry.ts.",
+      "example": "import { modal } from '@lib/modal-manager.svelte'; modal.confirm('Delete?', 'This cannot be undone.', { onConfirm: removeItem });"
+    },
+    "toast": {
+      "category": "feedback",
+      "component": "toast",
+      "import": "@stores/toast.svelte",
+      "api": [
+        "show(message, type, duration, action)",
+        "undo(message, callback, duration)",
+        "loading(message)",
+        "promise(promise, messages)",
+        "close(id)",
+        "clearAll()"
+      ],
+      "types": ["info", "success", "error", "warning", "loading"],
+      "methods": {
+        "show": {
+          "args": ["message", "type='info'", "duration=4000", "action?"],
+          "action": ["label", "onclick"],
+          "returns": "id:number"
+        },
+        "undo": {
+          "args": ["message", "callback", "duration=6000"],
+          "returns": "id:number"
+        },
+        "loading": {
+          "args": ["message"],
+          "returns": [
+            "id:number",
+            "update(message)",
+            "success(message?, duration=4000)",
+            "error(message?, duration=4000)",
+            "warning(message?, duration=4000)",
+            "close()"
+          ]
+        },
+        "promise": {
+          "args": ["promise", "messages", "duration=4000"],
+          "messages": [
+            "loading:string",
+            "success:string | ((data) => string)",
+            "error:string | ((err) => string)"
+          ],
+          "returns": "Promise<T> (rethrows errors)"
+        },
+        "close": {
+          "args": ["id"]
+        },
+        "clearAll": {
+          "args": []
+        }
+      },
+      "slots": [],
+      "related": ["portal-loader", "skeleton"],
+      "compose": "Do not render a new toast region. Use the toast store; the global Toast.svelte host renders items and handles timing.",
+      "example": "import { toast } from '@stores/toast.svelte'; toast.promise(save(), { loading: 'Saving...', success: 'Saved', error: 'Save failed' });"
+    }
+  },
+  "patterns": {
+    "button-native": {
+      "usage": "<button class='btn-cta'>Save</button>",
+      "variants": [
+        "default",
+        "btn-cta",
+        "btn-premium",
+        "btn-system",
+        "btn-success",
+        "btn-error",
+        "btn-ghost",
+        "btn-void",
+        "btn-icon"
+      ],
+      "note": "There is no Button.svelte. Native <button> already gets base button styling; use ActionBtn or IconBtn when you need icon animation wiring."
+    },
+    "dismiss-button": {
+      "usage": "<button class='btn-ghost btn-error'>Cancel</button>",
+      "note": "Modal dismiss and cancel actions use btn-ghost btn-error, not a plain ghost button."
+    },
+    "surface-raised": {
+      "usage": "class='surface-raised p-lg'",
+      "spacing": "p-lg and gap-lg are the default card recipe",
+      "note": "Static floating surface for cards and primary containers."
+    },
+    "surface-raised-action": {
+      "usage": "class='surface-raised-action p-md'",
+      "spacing": "p-md and gap-md are the usual clickable-card recipe",
+      "note": "Interactive floating surface for clickable cards and tiles."
+    },
+    "surface-sunk": {
+      "usage": "class='surface-sunk p-md'",
+      "spacing": "p-md and gap-md are the default inset recipe",
+      "note": "Recessed surface for inputs, wells, sidebar blocks, and grouped controls."
+    },
+    "surface-void": {
+      "usage": "class='surface-void'",
+      "spacing": "use only when you need an opaque masking surface",
+      "note": "Opaque canvas surface used by modal and overlay contexts."
+    },
+    "surface-spotlight": {
+      "usage": "class='surface-spotlight p-md'",
+      "spacing": "p-md and gap-md work well for highlighted rows and callouts",
+      "note": "Slightly lighter solid surface for active sections, emphasized rows, and callouts."
+    },
+    "shimmer-surface": {
+      "usage": "class='shimmer-surface surface-raised'",
+      "note": "Loading shimmer treatment for Skeleton or custom placeholders."
+    }
+  },
+  "layouts": {
+    "page-stack": {
+      "usage": "class='container flex flex-col gap-2xl py-2xl'",
+      "note": "Standard top-level page column used by the homepage and component docs."
+    },
+    "section-stack": {
+      "usage": "class='flex flex-col gap-lg'",
+      "note": "Default vertical section grouping."
+    },
+    "surface-stack-lg": {
+      "usage": "class='surface-raised p-lg flex flex-col gap-lg'",
+      "note": "Primary card composition for content blocks and demos."
+    },
+    "surface-stack-md": {
+      "usage": "class='surface-sunk p-md flex flex-col gap-md'",
+      "note": "Inset grouped-controls composition for nested sections."
+    },
+    "inline-actions": {
+      "usage": "class='flex flex-row flex-wrap gap-md justify-center'",
+      "note": "Responsive action row for buttons, toggles, and chips."
+    },
+    "split-grid": {
+      "usage": "class='grid grid-cols-1 tablet:grid-cols-2 gap-lg'",
+      "note": "Standard responsive two-column content or stats layout."
+    },
+    "settings-grid": {
+      "usage": "<SettingsRow label='Density'>...</SettingsRow>",
+      "note": "Prefer the SettingsRow component instead of hand-rolling label and control alignment."
+    }
+  }
+}

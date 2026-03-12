@@ -36,5 +36,5 @@ pnpm-lock.yaml
 
 # config
 /src/config/font-registry.ts
-/src/config/*.json
+/src/config/void-*.json
 /src/styles/config/*

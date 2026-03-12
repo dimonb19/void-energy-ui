@@ -9,7 +9,8 @@
     "preview": "astro preview",
     "build:tokens": "tsx scripts/generate-tokens.ts",
     "scan": "tsx scripts/scan-physics.ts",
-    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "check:registry": "tsx scripts/check-component-registry.ts",
+    "check": "npm run check:registry && svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",
     "format": "prettier --write ."
   },
