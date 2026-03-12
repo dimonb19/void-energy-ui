@@ -9,57 +9,89 @@
 
   // ── Built-in atmospheres table data ────────────────────────────────────
   const builtInAtmospheres = [
-    { id: 'void', physics: 'glass', mode: 'dark', tagline: 'Default / Cyber' },
-    { id: 'onyx', physics: 'glass', mode: 'dark', tagline: 'Stealth / Cinema' },
+    {
+      id: 'void',
+      physics: 'glass',
+      mode: 'dark',
+      tagline: 'Default / Cyber',
+      concept: 'Sci-fi control interface scanning deep space',
+    },
+    {
+      id: 'onyx',
+      physics: 'flat',
+      mode: 'dark',
+      tagline: 'Stealth / Cinema',
+      concept: 'Film noir editorial minimalism — content is the only color',
+    },
     {
       id: 'terminal',
       physics: 'retro',
       mode: 'dark',
       tagline: 'Hacker / Retro',
+      concept: '1980s amber phosphor CRT monitor',
     },
     {
       id: 'nebula',
       physics: 'glass',
       mode: 'dark',
       tagline: 'Synthwave / Cosmic',
+      concept: 'Synth-lit observation deck — cosmic and dreamy',
     },
-    { id: 'solar', physics: 'glass', mode: 'dark', tagline: 'Royal / Gold' },
+    {
+      id: 'solar',
+      physics: 'glass',
+      mode: 'dark',
+      tagline: 'Royal / Gold',
+      concept: 'Royal archive chamber at midnight',
+    },
     {
       id: 'overgrowth',
       physics: 'glass',
       mode: 'dark',
       tagline: 'Nature / Organic',
+      concept: 'Bioluminescent forest at night',
     },
     {
       id: 'velvet',
       physics: 'glass',
       mode: 'dark',
       tagline: 'Romance / Soft',
+      concept: 'Candlelit rose garden at midnight',
     },
     {
       id: 'crimson',
       physics: 'glass',
       mode: 'dark',
       tagline: 'Horror / Intense',
+      concept: 'Blood moon at its zenith — beauty through dread',
     },
-    { id: 'paper', physics: 'flat', mode: 'light', tagline: 'Light / Print' },
+    {
+      id: 'paper',
+      physics: 'flat',
+      mode: 'light',
+      tagline: 'Light / Print',
+      concept: 'Quality broadsheet — the quiet authority of print',
+    },
     {
       id: 'focus',
       physics: 'flat',
       mode: 'light',
       tagline: 'Distraction Free',
+      concept: 'A blank page with a pen — nothing else',
     },
     {
       id: 'laboratory',
       physics: 'flat',
       mode: 'light',
       tagline: 'Science / Clinical',
+      concept: 'Precision instruments, sterile surfaces',
     },
     {
       id: 'playground',
       physics: 'flat',
       mode: 'light',
       tagline: 'Playful / Vibrant',
+      concept: "Children's art studio — every color is welcome",
     },
   ];
 
@@ -296,6 +328,7 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
               <th>Physics</th>
               <th>Mode</th>
               <th>Tagline</th>
+              <th>Concept</th>
             </tr>
           </thead>
           <tbody>
@@ -311,6 +344,7 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
                 <td>{atmos.physics}</td>
                 <td>{atmos.mode}</td>
                 <td class="text-dim">{atmos.tagline}</td>
+                <td class="text-dim text-caption">{atmos.concept}</td>
               </tr>
             {/each}
           </tbody>

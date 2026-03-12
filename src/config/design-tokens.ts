@@ -519,38 +519,38 @@ export const VOID_TOKENS = {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.tech.family,
         'font-atmos-body': FONTS.tech.family,
-        'bg-canvas': '#010020',
-        'bg-spotlight': '#0a0c2b',
-        'bg-surface': 'rgba(22, 30, 95, 0.4)', // 40% Opacity for Glass
-        'bg-sunk': 'rgba(0, 2, 41, 0.6)',
+        'bg-canvas': '#010020', // Deep blue-black
+        'bg-spotlight': '#0a0c2b', // Blue-navy
+        'bg-surface': 'rgba(22, 30, 95, 0.4)', // Blue glass
+        'bg-sunk': 'rgba(0, 2, 41, 0.6)', // Deep blue
         'energy-primary': '#33e2e6', // Cyan
         'energy-secondary': '#3875fa', // Blue
-        'border-color': 'rgba(56, 117, 250, 0.2)',
-        'text-main': '#ffffff',
-        'text-dim': '#d9d9de',
-        'text-mute': '#9999a6',
+        'border-color': 'rgba(56, 117, 250, 0.2)', // 20% blue
+        'text-main': '#ffffff', // White
+        'text-dim': '#d9d9de', // Soft white
+        'text-mute': '#9999a6', // Muted gray-blue
       },
     },
 
     // 2. ONYX - Stealth / Cinema
     onyx: {
       mode: 'dark',
-      physics: 'glass',
+      physics: 'flat',
       tagline: 'Stealth / Cinema',
       palette: {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.clean.family,
         'font-atmos-body': FONTS.clean.family,
-        'bg-canvas': '#000000',
-        'bg-spotlight': '#1c1c1c',
-        'bg-surface': 'rgba(30, 30, 30, 0.6)',
-        'bg-sunk': '#000000',
-        'energy-primary': '#ffffff',
-        'energy-secondary': '#a3a3a3',
-        'border-color': 'rgba(255, 255, 255, 0.15)',
-        'text-main': '#ffffff',
-        'text-dim': '#a3a3a3',
-        'text-mute': '#7a7a7a',
+        'bg-canvas': '#000000', // Pure black
+        'bg-spotlight': '#1c1c1c', // Dark gray
+        'bg-surface': '#1e1e1e', // Charcoal
+        'bg-sunk': '#000000', // Pure black
+        'energy-primary': '#ffffff', // White
+        'energy-secondary': '#a3a3a3', // Gray
+        'border-color': 'rgba(255, 255, 255, 0.15)', // 15% white
+        'text-main': '#ffffff', // White
+        'text-dim': '#a3a3a3', // Gray
+        'text-mute': '#7a7a7a', // Dark gray
       },
     },
 
@@ -563,17 +563,17 @@ export const VOID_TOKENS = {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.code.family,
         'font-atmos-body': FONTS.code.family,
-        'bg-canvas': '#050505',
-        'bg-spotlight': '#141414',
-        'bg-surface': 'rgba(0, 20, 0, 0.9)',
-        'bg-sunk': '#000000',
+        'bg-canvas': '#050505', // Near-black
+        'bg-spotlight': '#141414', // Very dark gray
+        'bg-surface': 'rgba(0, 20, 0, 0.9)', // Green-tinted glass
+        'bg-sunk': '#000000', // Pure black
         'energy-primary': '#f5c518', // Amber
-        'energy-secondary': '#f5c518',
-        'border-color': 'rgba(245, 197, 24, 0.5)',
-        'text-main': '#f5c518',
-        'text-dim': '#ad8b12',
-        'text-mute': '#7d650f',
-        'color-premium': '#33e2e6',
+        'energy-secondary': '#c9a820', // Dim amber
+        'border-color': 'rgba(245, 197, 24, 0.5)', // 50% amber
+        'text-main': '#f5c518', // Amber
+        'text-dim': '#ad8b12', // Dark amber
+        'text-mute': '#7d650f', // Deep amber
+        'color-premium': '#33e2e6', // Cyan
       },
     },
 
@@ -586,16 +586,16 @@ export const VOID_TOKENS = {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.mystic.family,
         'font-atmos-body': FONTS.clean.family,
-        'bg-canvas': '#0a0014',
-        'bg-spotlight': '#240046',
-        'bg-surface': 'rgba(20, 0, 40, 0.6)',
-        'bg-sunk': 'rgba(10, 0, 20, 0.8)',
-        'energy-primary': '#d946ef',
-        'energy-secondary': '#8b5cf6',
-        'border-color': 'rgba(217, 70, 239, 0.2)',
-        'text-main': '#fdf4ff',
-        'text-dim': '#d0bde8',
-        'text-mute': '#8e7ea1',
+        'bg-canvas': '#0a0014', // Deep purple
+        'bg-spotlight': '#240046', // Bright purple
+        'bg-surface': 'rgba(20, 0, 40, 0.6)', // Purple glass
+        'bg-sunk': 'rgba(10, 0, 20, 0.8)', // Deep purple
+        'energy-primary': '#d946ef', // Magenta
+        'energy-secondary': '#8b5cf6', // Purple
+        'border-color': 'rgba(217, 70, 239, 0.2)', // 20% magenta
+        'text-main': '#fdf4ff', // Purple-white
+        'text-dim': '#d0bde8', // Lavender
+        'text-mute': '#8e7ea1', // Muted violet
       },
     },
 
@@ -608,16 +608,17 @@ export const VOID_TOKENS = {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.arcane.family,
         'font-atmos-body': FONTS.book.family,
-        'bg-canvas': '#120a00',
-        'bg-spotlight': '#2b1d00',
-        'bg-surface': 'rgba(20, 10, 0, 0.6)',
-        'bg-sunk': 'rgba(0, 0, 0, 0.4)',
-        'energy-primary': '#ffaa00',
-        'energy-secondary': '#b8860b',
-        'border-color': 'rgba(255, 170, 0, 0.25)',
-        'text-main': '#fffbea',
-        'text-dim': '#dbd4bb',
-        'text-mute': '#a09984',
+        'bg-canvas': '#120a00', // Deep brown-black
+        'bg-spotlight': '#2b1d00', // Dark brown
+        'bg-surface': 'rgba(20, 10, 0, 0.6)', // Brown glass
+        'bg-sunk': 'rgba(0, 0, 0, 0.4)', // Dark shadow
+        'energy-primary': '#ffaa00', // Gold
+        'energy-secondary': '#b8860b', // Dark gold
+        'border-color': 'rgba(255, 170, 0, 0.25)', // 25% gold
+        'color-premium': '#0284c7', // Sapphire
+        'text-main': '#fffbea', // Warm cream
+        'text-dim': '#dbd4bb', // Warm beige
+        'text-mute': '#a09984', // Muted tan
       },
     },
 
@@ -630,16 +631,16 @@ export const VOID_TOKENS = {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.nature.family,
         'font-atmos-body': FONTS.nature.family,
-        'bg-canvas': '#051a0a',
-        'bg-spotlight': '#0e2e14',
-        'bg-surface': 'rgba(0, 40, 10, 0.5)',
-        'bg-sunk': 'rgba(0, 20, 5, 0.8)',
-        'energy-primary': '#39ff14',
-        'energy-secondary': '#ffd700',
-        'border-color': 'rgba(57, 255, 20, 0.2)',
-        'text-main': '#f0fff4',
-        'text-dim': '#a1d1a2',
-        'text-mute': '#7aa37c',
+        'bg-canvas': '#051a0a', // Deep forest
+        'bg-spotlight': '#0e2e14', // Dark green
+        'bg-surface': 'rgba(0, 40, 10, 0.5)', // Green glass
+        'bg-sunk': 'rgba(0, 20, 5, 0.8)', // Deep green
+        'energy-primary': '#39ff14', // Neon green
+        'energy-secondary': '#c8a84b', // Wheat gold
+        'border-color': 'rgba(57, 255, 20, 0.2)', // 20% neon green
+        'text-main': '#f0fff4', // Cool white
+        'text-dim': '#a1d1a2', // Sage
+        'text-mute': '#7aa37c', // Muted sage
       },
     },
 
@@ -652,16 +653,16 @@ export const VOID_TOKENS = {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.hand.family,
         'font-atmos-body': FONTS.book.family,
-        'bg-canvas': '#1a0510',
-        'bg-spotlight': '#2e0b1d',
-        'bg-surface': 'rgba(50, 0, 20, 0.5)',
-        'bg-sunk': 'rgba(30, 0, 10, 0.8)',
-        'energy-primary': '#ff80a0',
-        'energy-secondary': '#c71585',
-        'border-color': 'rgba(255, 128, 160, 0.2)',
-        'text-main': '#fff0f5',
-        'text-dim': '#e8b5c8',
-        'text-mute': '#ba8091',
+        'bg-canvas': '#1a0510', // Deep burgundy
+        'bg-spotlight': '#2e0b1d', // Dark rose
+        'bg-surface': 'rgba(50, 0, 20, 0.5)', // Rose glass
+        'bg-sunk': 'rgba(30, 0, 10, 0.8)', // Deep rose
+        'energy-primary': '#ff80a0', // Soft pink
+        'energy-secondary': '#e91e8c', // Vivid magenta
+        'border-color': 'rgba(255, 128, 160, 0.2)', // 20% pink
+        'text-main': '#fff0f5', // Rose white
+        'text-dim': '#e8b5c8', // Blush
+        'text-mute': '#ba8091', // Muted rose
       },
     },
 
@@ -674,16 +675,16 @@ export const VOID_TOKENS = {
         ...SEMANTIC_DARK,
         'font-atmos-heading': FONTS.horror.family,
         'font-atmos-body': FONTS.horror.family,
-        'bg-canvas': '#180808',
-        'bg-spotlight': '#2b0f0f',
-        'bg-surface': 'rgba(60, 0, 0, 0.6)',
-        'bg-sunk': 'rgba(20, 0, 0, 0.8)',
-        'energy-primary': '#ff6b6b',
-        'energy-secondary': '#8a0000',
-        'border-color': 'rgba(255, 107, 107, 0.2)',
-        'text-main': '#ffe5e5',
-        'text-dim': '#e8b5b5',
-        'text-mute': '#ba8080',
+        'bg-canvas': '#180808', // Deep blood
+        'bg-spotlight': '#2b0f0f', // Dark red
+        'bg-surface': 'rgba(60, 0, 0, 0.6)', // Red glass
+        'bg-sunk': 'rgba(20, 0, 0, 0.8)', // Deep red
+        'energy-primary': '#ff6b6b', // Coral red
+        'energy-secondary': '#c0392b', // Oxblood
+        'border-color': 'rgba(255, 107, 107, 0.2)', // 20% coral
+        'text-main': '#ffe5e5', // Rose white
+        'text-dim': '#e8b5b5', // Blush red
+        'text-mute': '#ba8080', // Muted red
       },
     },
 
@@ -700,16 +701,16 @@ export const VOID_TOKENS = {
         ...SEMANTIC_LIGHT,
         'font-atmos-heading': FONTS.book.family,
         'font-atmos-body': FONTS.book.family,
-        'bg-canvas': '#faeed1',
-        'bg-spotlight': '#fff8e1',
-        'bg-surface': '#fdf6e3',
-        'bg-sunk': 'rgba(0, 0, 0, 0.03)',
-        'energy-primary': '#2c3e50',
-        'energy-secondary': '#8d6e63',
-        'border-color': 'rgba(141, 110, 99, 0.7)',
-        'text-main': '#2d2420',
-        'text-dim': '#4e4239',
-        'text-mute': '#796b61',
+        'bg-canvas': '#faeed1', // Aged parchment
+        'bg-spotlight': '#fff8e1', // Warm white
+        'bg-surface': '#fdf6e3', // Cream
+        'bg-sunk': 'rgba(0, 0, 0, 0.03)', // Subtle shadow
+        'energy-primary': '#2c3e50', // Slate
+        'energy-secondary': '#8d6e63', // Warm brown
+        'border-color': 'rgba(141, 110, 99, 0.7)', // 70% brown
+        'text-main': '#2d2420', // Dark brown
+        'text-dim': '#4e4239', // Mid brown
+        'text-mute': '#796b61', // Muted brown
       },
     },
 
@@ -722,16 +723,16 @@ export const VOID_TOKENS = {
         ...SEMANTIC_LIGHT,
         'font-atmos-heading': FONTS.clean.family,
         'font-atmos-body': FONTS.clean.family,
-        'bg-canvas': '#ffffff',
-        'bg-spotlight': '#f5f5f5',
-        'bg-surface': '#ffffff',
-        'bg-sunk': '#f0f0f0',
-        'energy-primary': '#000000',
-        'energy-secondary': '#000000',
-        'border-color': '#000000',
-        'text-main': '#000000',
-        'text-dim': '#222222',
-        'text-mute': '#444444',
+        'bg-canvas': '#ffffff', // White
+        'bg-spotlight': '#f5f5f5', // Off-white
+        'bg-surface': '#ffffff', // White
+        'bg-sunk': '#f0f0f0', // Light gray
+        'energy-primary': '#000000', // Black
+        'energy-secondary': '#000000', // Black
+        'border-color': 'rgba(0, 0, 0, 0.15)', // 15% black
+        'text-main': '#000000', // Black
+        'text-dim': '#222222', // Near black
+        'text-mute': '#444444', // Dark gray
       },
     },
 
@@ -744,16 +745,16 @@ export const VOID_TOKENS = {
         ...SEMANTIC_LIGHT,
         'font-atmos-heading': FONTS.lab.family,
         'font-atmos-body': FONTS.lab.family,
-        'bg-canvas': '#f1f5f9',
-        'bg-spotlight': '#ffffff',
-        'bg-surface': '#ffffff',
-        'bg-sunk': 'rgba(0, 0, 0, 0.05)',
-        'energy-primary': '#005bb5',
-        'energy-secondary': '#64748b',
-        'border-color': 'rgba(0, 91, 181, 0.35)',
-        'text-main': '#0f172a',
-        'text-dim': '#334155',
-        'text-mute': '#94a3b8',
+        'bg-canvas': '#f1f5f9', // Cool gray
+        'bg-spotlight': '#ffffff', // White
+        'bg-surface': '#ffffff', // White
+        'bg-sunk': 'rgba(0, 0, 0, 0.05)', // Subtle shadow
+        'energy-primary': '#005bb5', // Deep blue
+        'energy-secondary': '#3d7ab5', // Medium blue
+        'border-color': 'rgba(0, 91, 181, 0.35)', // 35% blue
+        'text-main': '#0f172a', // Navy
+        'text-dim': '#334155', // Slate gray
+        'text-mute': '#64748b', // Slate
       },
     },
 
@@ -766,16 +767,16 @@ export const VOID_TOKENS = {
         ...SEMANTIC_LIGHT,
         'font-atmos-heading': FONTS.fun.family,
         'font-atmos-body': FONTS.fun.family,
-        'bg-canvas': '#e0f7fa',
-        'bg-spotlight': '#ffffff',
-        'bg-surface': '#ffffff',
-        'bg-sunk': 'rgba(0, 0, 0, 0.05)',
-        'energy-primary': '#ff4081',
-        'energy-secondary': '#00bcd4',
-        'border-color': '#00bcd4',
-        'text-main': '#006064',
-        'text-dim': '#00838f',
-        'text-mute': '#0097a7',
+        'bg-canvas': '#e0f7fa', // Aqua tint
+        'bg-spotlight': '#ffffff', // White
+        'bg-surface': '#ffffff', // White
+        'bg-sunk': 'rgba(0, 0, 0, 0.05)', // Subtle shadow
+        'energy-primary': '#ff4081', // Hot pink
+        'energy-secondary': '#0088a8', // Deep cyan
+        'border-color': 'rgba(0, 188, 212, 0.4)', // 40% cyan
+        'text-main': '#003040', // Deep teal
+        'text-dim': '#1a4a55', // Dark teal
+        'text-mute': '#4a7a85', // Muted teal
       },
     },
   },
