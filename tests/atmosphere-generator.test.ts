@@ -2,8 +2,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   buildUserMessage,
   generateAtmosphere,
-  type PhysicsPreference,
-  type ModePreference,
 } from '@lib/atmosphere-generator';
 
 // ── buildUserMessage ────────────────────────────────────────────────────────

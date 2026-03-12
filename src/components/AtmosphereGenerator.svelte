@@ -23,9 +23,6 @@
     getStoredApiKey,
     setStoredApiKey,
     clearStoredApiKey,
-    type GeneratedAtmosphere,
-    type PhysicsPreference,
-    type ModePreference,
   } from '@lib/atmosphere-generator';
 
   import { emerge, dissolve } from '@lib/transitions.svelte';

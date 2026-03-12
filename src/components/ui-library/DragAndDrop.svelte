@@ -2,13 +2,7 @@
   import { ArrowDown, ArrowUp, GripVertical } from '@lucide/svelte';
   import Restart from '@components/icons/Restart.svelte';
   import ActionBtn from '@components/ui/ActionBtn.svelte';
-  import {
-    draggable,
-    dropTarget,
-    reorderByDrop,
-    type DropDetail,
-    type DropPosition,
-  } from '@actions/drag';
+  import { draggable, dropTarget, reorderByDrop } from '@actions/drag';
   import { live, emerge, dissolve } from '@lib/transitions.svelte';
 
   // ── Sortable List ───────────────────────────────────────────────────────

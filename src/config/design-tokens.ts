@@ -143,13 +143,6 @@ export const DEFAULT_PRELOAD_WEIGHTS = [400, 700] as const;
  * 1. _fonts.scss (@font-face declarations)
  * 2. font-registry.ts (preload mappings)
  */
-export interface FontDefinition {
-  family: string;
-  files: Record<number, string>;
-  /** Override DEFAULT_PRELOAD_WEIGHTS if this font needs different preload behavior */
-  preloadWeights?: number[];
-}
-
 export const FONTS: Record<string, FontDefinition> = {
   tech: {
     family: "'Hanken Grotesk', sans-serif",

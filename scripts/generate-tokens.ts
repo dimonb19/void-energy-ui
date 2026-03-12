@@ -12,7 +12,6 @@ import {
   FONTS,
   FONT_FAMILY_TO_KEY,
   DEFAULT_PRELOAD_WEIGHTS,
-  type FontDefinition,
 } from '../src/config/design-tokens';
 
 const __filename = fileURLToPath(import.meta.url);

@@ -17,13 +17,6 @@
     DROPDOWN_VIEWPORT_PADDING_PX,
   } from '@config/ui-geometry';
 
-  export interface ComboboxOption {
-    value: string | number | null;
-    label: string;
-    description?: string;
-    disabled?: boolean;
-  }
-
   interface ComboboxProps
     extends Omit<
       HTMLInputAttributes,

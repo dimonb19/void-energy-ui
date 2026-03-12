@@ -308,7 +308,7 @@ Import and use — never re-instantiate.
 .pushTemporaryTheme(id, label)      Scoped temporary theme; returns handle (number | null)
 .updateTemporaryTheme(h, id, label) Update an existing scoped handle in place
 .releaseTemporaryTheme(handle)      Release a specific scoped handle (idempotent, stack-safe)
-.loadExternalTheme(url)             Async: fetch + validate + register remote theme JSON (returns Result)
+.loadExternalTheme(url)             Async: fetch + validate + register remote theme JSON (returns VoidResult)
 .availableAtmospheres               All registered theme IDs
 .builtInAtmospheres                 Static (non-runtime) theme IDs
 .customAtmospheres                  User-registered themes (excludes built-in and ephemeral)
@@ -394,17 +394,17 @@ which the stack respects via `defaultPrevented` check — no double-dismissal.
 .isAdmin / .isCreator / .isPlayer / .isGuest    Derived role flags
 .approvedTester                     Derived from user.approved_tester
 .developerMode                      Local preference toggle ($state)
-.login(userData)                    Validate, set, and persist user data (returns Result)
+.login(userData)                    Validate, set, and persist user data (returns VoidResult)
 .logout()                           Clear user + storage + reset flags
 .update(partial)                    Validate merged user state + persist
-.refresh(fetcher)                   Two-phase: async verify cached user via Result fetcher
+.refresh(fetcher)                   Two-phase: async verify cached user via VoidResult fetcher
 .toggleDeveloperMode()              Toggle dev mode flag
 ```
 
 ### Path Aliases (tsconfig.json)
 <!-- ADAPT: Confirm these match your tsconfig after setup -->
 ```
-@actions/*  @adapters/*  @components/*  @config/*  @lib/*  @stores/*  @styles/*  @types/*
+@actions/*  @adapters/*  @components/*  @config/*  @lib/*  @stores/*  @styles/*
 ```
 
 ---

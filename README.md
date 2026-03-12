@@ -172,11 +172,7 @@ The goal is to standardize the parts that carry shared behavior and shared acces
 │   │   │   └── _fonts.scss       <-- 🤖 Generated (@font-face)
 │   │   └── global.scss           <-- Main CSS Entry Point
 │   └── types/
-│       ├── api.d.ts              <-- API response types
-│       ├── global.d.ts           <-- Global type augmentations
-│       ├── modal.d.ts            <-- Modal system types
-│       ├── story-engine.d.ts     <-- Story engine types
-│       └── void-ui.d.ts          <-- Design system types
+│       └── *.d.ts                <-- Ambient and global type declarations
 ├── tailwind.config.mjs           <-- The Bridge (Maps Tokens to Tailwind)
 ```
 
@@ -227,6 +223,6 @@ If a collaborator needs to inject a custom brand theme, send a JSON payload matc
 Implementation:
 
 - `voidEngine.registerTheme(id, partialDef)` accepts partial runtime themes and merges them safely onto the base theme.
-- `await voidEngine.loadExternalTheme(url)` fetches, validates, registers, and activates a remote payload. It returns a typed `Result`.
+- `await voidEngine.loadExternalTheme(url)` fetches, validates, registers, and activates a remote payload. It returns a typed `VoidResult`.
 
 ⚠️ API Warning: The Active Guardrail system applies here too. If your API payload requests `physics: 'glass'` with `mode: 'light'`, the engine will silently override physics to `flat` to prevent a broken UI state.

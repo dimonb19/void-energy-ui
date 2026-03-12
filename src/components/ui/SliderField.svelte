@@ -30,14 +30,9 @@
   @see /_fields.scss for .slider-field styles
 -->
 <script lang="ts">
-  export interface Preset {
-    label: string;
-    value: number;
-  }
-
   interface SliderFieldProps {
     value: number;
-    presets?: Preset[];
+    presets?: SliderFieldPreset[];
     min?: number;
     max?: number;
     step?: number;
@@ -81,7 +76,7 @@
     }
   });
 
-  function snapTo(preset: Preset) {
+  function snapTo(preset: SliderFieldPreset) {
     if (disabled) return;
     value = preset.value;
     onchange?.(value);

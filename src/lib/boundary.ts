@@ -1,20 +1,5 @@
 import { z } from 'zod';
-import { err, ok, type Result } from '@lib/result';
-
-export type BoundaryErrorCode =
-  | 'invalid_json'
-  | 'invalid_shape'
-  | 'network'
-  | 'http_error'
-  | 'preference_mismatch';
-
-export interface BoundaryError {
-  code: BoundaryErrorCode;
-  source: string;
-  message: string;
-  issues?: string[];
-  status?: number;
-}
+import { err, ok } from '@lib/result';
 
 const VoidPhysicsSchema = z.enum(['glass', 'flat', 'retro']);
 const VoidModeSchema = z.enum(['light', 'dark']);
@@ -159,7 +144,7 @@ function invalidShape(
   source: string,
   message: string,
   error: z.ZodError,
-): Result<never, BoundaryError> {
+): VoidResult<never, BoundaryError> {
   return err({
     code: 'invalid_shape',
     source,
@@ -179,7 +164,7 @@ export function formatBoundaryError(error: BoundaryError): string {
 export function parseStoredUserConfig(
   raw: string,
   source = 'Stored user config',
-): Result<Partial<UserConfig>, BoundaryError> {
+): VoidResult<Partial<UserConfig>, BoundaryError> {
   try {
     const parsed = JSON.parse(raw);
     const result = StoredUserConfigSchema.safeParse(parsed);
@@ -203,7 +188,7 @@ export function parseStoredUserConfig(
 export function parseStoredThemeCache(
   raw: string,
   source = 'Stored theme cache',
-): Result<Record<string, VoidThemeDefinition>, BoundaryError> {
+): VoidResult<Record<string, VoidThemeDefinition>, BoundaryError> {
   try {
     const parsed = JSON.parse(raw);
     const result = StoredThemeCacheSchema.safeParse(parsed);
@@ -227,7 +212,7 @@ export function parseStoredThemeCache(
 export function parseRestorableThemeCache(
   raw: string,
   source = 'Restorable theme cache',
-): Result<Record<string, PartialThemeDefinition>, BoundaryError> {
+): VoidResult<Record<string, PartialThemeDefinition>, BoundaryError> {
   try {
     const parsed = JSON.parse(raw);
     const result = RestorableThemeCacheSchema.safeParse(parsed);
@@ -251,7 +236,10 @@ export function parseRestorableThemeCache(
 export function parseExternalThemePayload(
   input: unknown,
   source = 'External theme payload',
-): Result<{ id: string; definition: PartialThemeDefinition }, BoundaryError> {
+): VoidResult<
+  { id: string; definition: PartialThemeDefinition },
+  BoundaryError
+> {
   const result = ExternalThemePayloadSchema.safeParse(input);
   if (!result.success) {
     return invalidShape(
@@ -271,7 +259,7 @@ export function parseExternalThemePayload(
 export function parseStoredUser(
   raw: string,
   source = 'Stored user',
-): Result<VoidUser, BoundaryError> {
+): VoidResult<VoidUser, BoundaryError> {
   try {
     const parsed = JSON.parse(raw);
     const result = VoidUserSchema.safeParse(parsed);
@@ -295,7 +283,7 @@ export function parseStoredUser(
 export function parseIncomingUser(
   input: unknown,
   source = 'Incoming user',
-): Result<VoidUser, BoundaryError> {
+): VoidResult<VoidUser, BoundaryError> {
   const result = VoidUserSchema.safeParse(input);
   if (!result.success) {
     return invalidShape(

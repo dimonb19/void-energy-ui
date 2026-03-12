@@ -5,8 +5,7 @@ import {
   SEMANTIC_LIGHT,
 } from '@config/design-tokens';
 import { STORAGE_KEYS } from '@config/constants';
-import { err, ok, type Result } from '@lib/result';
-import type { BoundaryError } from '@lib/boundary';
+import { err, ok } from '@lib/result';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -29,21 +28,6 @@ const CORE_PALETTE_KEYS = [
   'text-mute',
 ] as const;
 
-// ── Types ────────────────────────────────────────────────────────────────────
-
-export interface GeneratedAtmosphere {
-  id: string;
-  label: string;
-  tagline: string;
-  definition: {
-    mode: 'dark' | 'light';
-    physics: 'glass' | 'flat' | 'retro';
-    label: string;
-    tagline: string;
-    palette: Record<string, string>;
-  };
-}
-
 interface ClaudeResponse {
   mode: 'dark' | 'light';
   physics: 'glass' | 'flat' | 'retro';
@@ -52,18 +36,6 @@ interface ClaudeResponse {
   fontHeadingKey: string;
   fontBodyKey: string;
   palette: Record<string, string>;
-}
-
-export type PhysicsPreference = 'glass' | 'flat' | 'retro';
-export type ModePreference = 'dark' | 'light';
-
-export interface GenerateOptions {
-  apiKey: string;
-  vibe: string;
-  physics?: PhysicsPreference;
-  mode?: ModePreference;
-  signal?: AbortSignal;
-  existingIds?: ReadonlySet<string>;
 }
 
 // ── API Key Storage ──────────────────────────────────────────────────────────
@@ -283,7 +255,7 @@ function parseResponse(
   existingIds: ReadonlySet<string>,
   requestedPhysics?: PhysicsPreference,
   requestedMode?: ModePreference,
-): Result<GeneratedAtmosphere, BoundaryError> {
+): VoidResult<GeneratedAtmosphere, BoundaryError> {
   const jsonStr = extractJson(text);
   if (!jsonStr) {
     return err({
@@ -404,7 +376,7 @@ function parseResponse(
  */
 export async function generateAtmosphere(
   options: GenerateOptions,
-): Promise<Result<GeneratedAtmosphere, BoundaryError>> {
+): Promise<VoidResult<GeneratedAtmosphere, BoundaryError>> {
   const { apiKey: rawKey, vibe, physics, mode, signal } = options;
   const apiKey = rawKey.trim();
 

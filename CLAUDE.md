@@ -267,7 +267,7 @@ Import and use — never re-instantiate.
 .pushTemporaryTheme(id, label)      Scoped temporary theme; returns handle (number | null)
 .updateTemporaryTheme(h, id, label) Update an existing scoped handle in place
 .releaseTemporaryTheme(handle)      Release a specific scoped handle (idempotent, stack-safe)
-.loadExternalTheme(url)             Async: fetch + validate + register remote theme JSON (returns Result)
+.loadExternalTheme(url)             Async: fetch + validate + register remote theme JSON (returns VoidResult)
 .availableAtmospheres               All registered theme IDs
 .builtInAtmospheres                 Static (non-runtime) theme IDs
 .customAtmospheres                  User-registered themes (excludes built-in and ephemeral)
@@ -339,10 +339,10 @@ which the stack respects via `defaultPrevented` check — no double-dismissal.
 .isAdmin / .isCreator / .isPlayer / .isGuest    Derived role flags
 .approvedTester                     Derived from user.approved_tester
 .developerMode                      Local preference toggle ($state)
-.login(userData)                    Validate, set, and persist user data (returns Result)
+.login(userData)                    Validate, set, and persist user data (returns VoidResult)
 .logout()                           Clear user + storage + reset flags
 .update(partial)                    Validate merged user state + persist
-.refresh(fetcher)                   Two-phase: async verify cached user via Result fetcher
+.refresh(fetcher)                   Two-phase: async verify cached user via VoidResult fetcher
 .toggleDeveloperMode()              Toggle dev mode flag
 ```
 
@@ -369,7 +369,7 @@ import { draggable, dropTarget, reorderByDrop } from '@actions/drag'
 
 ### Path Aliases (tsconfig.json)
 ```
-@actions/*  @adapters/*  @components/*  @config/*  @lib/*  @stores/*  @styles/*  @types/*
+@actions/*  @adapters/*  @components/*  @config/*  @lib/*  @stores/*  @styles/*
 ```
 
 ---
@@ -420,6 +420,7 @@ Auth visibility utilities (FOUC-safe, set before first paint):
 - **SCSS import path:** Always `@use '../abstracts' as *;` — never import individual partial files.
 - **Tailwind token bridge:** spacing/color utilities are seeded from `design-tokens.ts`, but base screens/container settings still live in `tailwind.config.mjs`. Add semantic design values to `design-tokens.ts`; only touch Tailwind config when you are changing the framework bridge itself.
 - **TypeScript stance:** The repo is type-checked but not a strict-mode migration target. Avoid easy `any`; do not invent elaborate type machinery without payoff.
+- **Shared type placement:** If a type is reused across files, it belongs in `src/types/` as an ambient global declaration. Do not import it into app code. Keep file-local types unexported inside the implementation file.
 - **Radius tokens in SCSS:** Default to `var(--radius-base)` for border-radius — it adapts per physics (8px glass, 4px flat, 0 retro). Use `var(--radius-full)` for pills. The scale tokens (`--radius-sm/md/lg/xl`) are available when you deliberately need a specific size, but all radius tokens are force-zeroed in retro physics.
 - **Modal dismiss buttons use `btn-ghost btn-error`** — not plain `btn-ghost`. Closing/canceling is a mildly destructive action; red ghost provides subtle signaling without the weight of a solid `btn-error`.
 - **`btn-icon` vs `btn-ghost`:** If a button contains **only an icon** (no text), use `btn-icon` — it provides square hit targets (`var(--control-height)`), centered flex layout, and icon-appropriate hover feedback. `btn-ghost` is for **text-based** secondary actions (Cancel, Dismiss, Skip). Never use `btn-ghost` on an icon-only button.

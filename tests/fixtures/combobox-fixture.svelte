@@ -1,6 +1,5 @@
 <script lang="ts">
   import Combobox from '@components/ui/Combobox.svelte';
-  import type { ComboboxOption } from '@components/ui/Combobox.svelte';
 
   interface Props {
     options?: ComboboxOption[];

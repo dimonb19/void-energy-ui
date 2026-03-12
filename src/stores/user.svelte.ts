@@ -5,11 +5,12 @@ import {
   formatBoundaryError,
   parseIncomingUser,
   parseStoredUser,
-  type BoundaryError,
 } from '@lib/boundary';
-import { ok, err, type Result } from '@lib/result';
+import { ok, err } from '@lib/result';
 
-type UserRefreshFetcher = () => Promise<Result<VoidUser | null, BoundaryError>>;
+type UserRefreshFetcher = () => Promise<
+  VoidResult<VoidUser | null, BoundaryError>
+>;
 
 class UserStore {
   // ── Reactive State ─────────────────────────────────────────────────
@@ -40,7 +41,7 @@ class UserStore {
   /**
    * Sets the active user after login. Persists to localStorage.
    */
-  login(userData: VoidUser): Result<VoidUser, BoundaryError> {
+  login(userData: VoidUser): VoidResult<VoidUser, BoundaryError> {
     const parsed = parseIncomingUser(userData, 'UserStore.login');
     if (!parsed.ok) {
       console.error(formatBoundaryError(parsed.error));
@@ -67,7 +68,7 @@ class UserStore {
   /**
    * Partial update for user fields (e.g., profile edits).
    */
-  update(partial: Partial<VoidUser>): Result<VoidUser, BoundaryError> {
+  update(partial: Partial<VoidUser>): VoidResult<VoidUser, BoundaryError> {
     if (!this.current) {
       return err({
         code: 'invalid_shape',
@@ -100,7 +101,7 @@ class UserStore {
    */
   async refresh(
     fetcher: UserRefreshFetcher,
-  ): Promise<Result<VoidUser | null, BoundaryError>> {
+  ): Promise<VoidResult<VoidUser | null, BoundaryError>> {
     this.loading = true;
     try {
       const result = await fetcher();

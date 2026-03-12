@@ -584,8 +584,8 @@
       </details>
 
       <p class="text-caption text-mute px-xs">
-        Props: <code>value</code> (bindable), <code>presets</code> (Preset[]
-        &mdash; label/value pairs; locks slider to preset values),
+        Props: <code>value</code> (bindable), <code>presets</code>
+        (SliderFieldPreset[] &mdash; label/value pairs; locks slider to preset values),
         <code>min</code>, <code>max</code>, <code>step</code> (ignored when
         presets are provided), <code>label</code>, <code>onchange</code>,
         <code>disabled</code>, <code>class</code>. Presets should be sorted

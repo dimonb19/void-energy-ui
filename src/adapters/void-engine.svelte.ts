@@ -13,14 +13,13 @@ import {
   parseRestorableThemeCache,
   parseStoredThemeCache,
   parseStoredUserConfig,
-  type BoundaryError,
 } from '@lib/boundary';
 import {
   applyTheme,
   applyPreferences,
   resolveThemeColor,
 } from '@lib/void-boot';
-import { err, ok, type Result } from '@lib/result';
+import { err, ok } from '@lib/result';
 
 // Mode-aware palette fallbacks for incomplete theme definitions.
 // Uses SEMANTIC_DARK/SEMANTIC_LIGHT from design-tokens.ts for correct semantic colors.
@@ -217,7 +216,7 @@ export class VoidEngine {
 
   async loadExternalTheme(
     url: string,
-  ): Promise<Result<{ id: string }, BoundaryError>> {
+  ): Promise<VoidResult<{ id: string }, BoundaryError>> {
     try {
       const res = await fetch(url);
       if (!res.ok) {

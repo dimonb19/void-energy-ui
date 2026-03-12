@@ -459,6 +459,7 @@ When you open a PR, use this template:
 ### TypeScript
 
 - **Type hygiene, not type gymnastics:** The repo is type-checked, but it is not a strict-mode migration target. Avoid `any` when a precise type is straightforward; do not add complex type machinery unless it pays for itself.
+- **Shared types live in `src/types/`:** If a type is reused outside the file where it is defined, move it into a focused file under `src/types/`. Shared types there are ambient globals, so app code should not import them. Keep file-local types unexported.
 - **Interfaces for props:** Use TypeScript interfaces for component prop contracts.
 - **Descriptive names:** Use clear, semantic variable names.
 

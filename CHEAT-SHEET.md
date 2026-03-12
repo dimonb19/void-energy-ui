@@ -1967,7 +1967,7 @@ const pv = createPasswordValidation(() => password);
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | `value` | `number` | `$bindable(0)` | Slider value (bindable) |
-| `presets` | `Preset[]` | `[]` | Snap points (`{ label: string, value: number }`); locks slider to preset values |
+| `presets` | `SliderFieldPreset[]` | `[]` | Snap points (`{ label: string, value: number }`); locks slider to preset values |
 | `min` | `number` | `0` | Range minimum |
 | `max` | `number` | `100` | Range maximum |
 | `step` | `number` | `1` | Range step |
@@ -3445,7 +3445,7 @@ Reactive singletons for app-wide state. Each store uses `$state` + `$derived` an
 | `login(user)` | Validate user, persist to localStorage, sync DOM |
 | `logout()` | Clear user + dev mode, remove from localStorage |
 | `update(partial)` | Validate merged fields before persisting |
-| `refresh(fetcher)` | Two-phase hydration: async API verify via typed Result fetcher (sets `loading`) |
+| `refresh(fetcher)` | Two-phase hydration: async API verify via typed VoidResult fetcher (sets `loading`) |
 | `toggleDeveloperMode()` | Toggle local dev mode flag |
 
 **FOUC Prevention (3 layers):**

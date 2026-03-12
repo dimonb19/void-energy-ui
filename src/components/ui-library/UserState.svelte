@@ -164,7 +164,7 @@
       <p class="text-small text-mute">
         Phase 1: synchronous cache read (constructor). Phase 2:
         <code>refresh(fetcher)</code> verifies against the server. The fetcher returns
-        a typed Result, so transport and payload failures stay out of the component
+        a typed VoidResult, so transport and payload failures stay out of the component
         tree.
       </p>
       <div class="surface-sunk p-md flex flex-wrap justify-center gap-md">

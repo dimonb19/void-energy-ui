@@ -27,11 +27,7 @@
   @see src/styles/components/_kinetic.scss for cursor physics
 -->
 <script lang="ts">
-  import {
-    kinetic,
-    type KineticConfig,
-    type KineticMode,
-  } from '@actions/kinetic';
+  import { kinetic } from '@actions/kinetic';
 
   interface KineticTextProps {
     /** Single text to animate (char, word, decode modes) */
@@ -41,7 +37,7 @@
     /** Animation mode */
     mode?: KineticMode;
     /** Chunk size for word mode reveal. Default: 'word' */
-    chunk?: 'word' | 'sentence' | 'sentence-pair';
+    chunk?: KineticWordChunk;
     /** Per-character speed (ms) for smooth chunk reveal in sentence modes. Default: 8 */
     charSpeed?: number;
     /** Ms per animation unit. Defaults vary by mode. */
