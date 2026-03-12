@@ -29,9 +29,15 @@
   import { emerge, dissolve } from '@lib/transitions.svelte';
 
   import PasswordField from './ui/PasswordField.svelte';
+  import ActionBtn from './ui/ActionBtn.svelte';
   import Toggle from './ui/Toggle.svelte';
   import Sparkle from './icons/Sparkle.svelte';
-  import { KeyRound, Trash2, Wand2 } from '@lucide/svelte';
+  import Contract from './icons/Contract.svelte';
+  import Refresh from './icons/Refresh.svelte';
+  import Undo from './icons/Undo.svelte';
+  import Remove from './icons/Remove.svelte';
+  import LoadingQuill from './icons/LoadingQuill.svelte';
+  import { KeyRound } from '@lucide/svelte';
 
   interface AtmosphereGeneratorProps {
     class?: string;
@@ -278,7 +284,12 @@
       />
       <div class="flex flex-row gap-md items-center justify-between">
         <Toggle bind:checked={rememberKey} label="Remember on this device" />
-        <button type="submit" disabled={!apiKey.trim()}>Save Key</button>
+        <ActionBtn
+          icon={Contract}
+          text="Save Key"
+          type="submit"
+          disabled={!apiKey.trim()}
+        />
       </div>
       <p class="text-caption text-mute">
         Your key is stored locally and sent directly to Anthropic. It never
@@ -295,10 +306,13 @@
         <KeyRound class="icon text-success" />
         <span class="text-small text-dim">API key ready</span>
       </div>
-      <button type="button" class="btn-ghost btn-error" onclick={forgetKey}>
-        <Trash2 class="icon" />
-        Clear Key
-      </button>
+      <ActionBtn
+        icon={Remove}
+        text="Clear Key"
+        type="button"
+        class="btn-ghost btn-error"
+        onclick={forgetKey}
+      />
     </div>
 
     <!-- ── Vibe Input ───────────────────────────────────────────────── -->
@@ -311,19 +325,13 @@
           disabled={generating}
           class="flex-1"
         />
-        <button
+        <ActionBtn
+          icon={generating ? LoadingQuill : Sparkle}
+          text={generating ? 'Generating...' : 'Generate'}
           type="submit"
           disabled={!canGenerate}
-          class="flex flex-row gap-xs items-center"
-        >
-          {#if generating}
-            <Wand2 class="icon animate-spin" />
-            Generating...
-          {:else}
-            <Sparkle class="icon" />
-            Generate
-          {/if}
-        </button>
+          class="shrink-0"
+        />
       </div>
     </form>
 
@@ -343,25 +351,28 @@
           </span>
         </div>
         <div class="flex flex-row gap-sm flex-wrap">
-          <button onclick={keep} disabled={generating}
-            >Keep This Atmosphere</button
-          >
-          <button
+          <ActionBtn
+            icon={Contract}
+            text="Keep This Atmosphere"
+            onclick={keep}
+            disabled={generating}
+          />
+          <ActionBtn
+            icon={Refresh}
+            text="Try Another"
             type="button"
             class="btn-system"
             onclick={generate}
             disabled={generating}
-          >
-            Try Another
-          </button>
-          <button
+          />
+          <ActionBtn
+            icon={Undo}
+            text="Revert"
             type="button"
             class="btn-ghost btn-error"
             onclick={revert}
             disabled={generating}
-          >
-            Revert
-          </button>
+          />
         </div>
       </div>
     {/if}

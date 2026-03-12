@@ -48,19 +48,31 @@
     size = 'lg',
     iconProps = {},
     class: className = '',
+    disabled = false,
     ...rest
   }: IconBtnProps = $props();
 
   let hovered = $state(false);
+  let iconState = $derived(!disabled && hovered ? 'active' : '');
+
+  $effect(() => {
+    if (disabled && hovered) {
+      hovered = false;
+    }
+  });
 </script>
 
 <button
   class="btn-icon {className}"
   type="button"
+  {disabled}
   data-size={size}
-  onpointerenter={() => (hovered = true)}
+  onpointerenter={() => {
+    if (disabled) return;
+    hovered = true;
+  }}
   onpointerleave={() => (hovered = false)}
   {...rest}
 >
-  <Icon data-state={hovered ? 'active' : ''} data-size={size} {...iconProps} />
+  <Icon data-state={iconState} data-size={size} {...iconProps} />
 </button>

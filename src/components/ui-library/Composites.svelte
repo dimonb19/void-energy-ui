@@ -33,6 +33,7 @@
   import Undo from '../icons/Undo.svelte';
   import Switch from '../icons/Switch.svelte';
   import Sort from '../icons/Sort.svelte';
+  import Sparkle from '../icons/Sparkle.svelte';
   import DoorIn from '../icons/DoorIn.svelte';
   import DoorOut from '../icons/DoorOut.svelte';
 
@@ -121,6 +122,7 @@
     Undo,
     Switch,
     Sort,
+    Sparkle,
     DoorIn,
     DoorOut,
   };
@@ -136,6 +138,7 @@
     { value: 'Undo', label: 'Undo' },
     { value: 'Switch', label: 'Switch' },
     { value: 'Sort', label: 'Sort' },
+    { value: 'Sparkle', label: 'Sparkle' },
     { value: 'DoorIn', label: 'DoorIn' },
     { value: 'DoorOut', label: 'DoorOut' },
   ];
@@ -150,11 +153,13 @@
   ];
 
   const btnLabel: Record<string, string> = {
+    PlayPause: 'Play',
+    Sparkle: 'Generate',
     DoorIn: 'Sign In',
     DoorOut: 'Sign Out',
   };
 
-  let selectedIcon = $state('DoorIn');
+  let selectedIcon = $state('Refresh');
   let selectedVariant = $state('');
   let activeIcon = $derived(iconMap[selectedIcon]);
   let activeLabel = $derived(btnLabel[selectedIcon] ?? selectedIcon);
@@ -681,7 +686,7 @@
 
       <p class="text-small text-mute">
         Try different icon and style combinations. Hover the button to see the
-        icon animate.
+        icon animate. Sparkle is the default fit for AI and generation actions.
       </p>
 
       <div class="flex flex-col gap-md small-desktop:flex-row">
@@ -706,14 +711,14 @@
         <pre><code
             >&lt;script&gt;
   import ActionBtn from './ui/ActionBtn.svelte';
-  import PlayPause from './icons/PlayPause.svelte';
+  import Sparkle from './icons/Sparkle.svelte';
 &lt;/script&gt;
 
-&lt;!-- Default --&gt;
-&lt;ActionBtn icon=&#123;PlayPause&#125; text="Play" onclick=&#123;handler&#125; /&gt;
+&lt;!-- AI / generate action --&gt;
+&lt;ActionBtn icon=&#123;Sparkle&#125; text="Generate" class="btn-cta" onclick=&#123;generate&#125; /&gt;
 
-&lt;!-- With variant --&gt;
-&lt;ActionBtn icon=&#123;PlayPause&#125; text="Play" class="btn-cta" /&gt;</code
+&lt;!-- Swap icon / variant as needed --&gt;
+&lt;ActionBtn icon=&#123;DoorOut&#125; text="Sign Out" class="btn-error" /&gt;</code
           ></pre>
       </details>
 

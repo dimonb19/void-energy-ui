@@ -3056,7 +3056,7 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 
 #### `<ActionBtn>` (Icon + Text Button)
 
-**Description:** Generic button composing any interactive icon with optional text label. Button hover drives icon animation.
+**Description:** Generic button composing any interactive icon with optional text label. Button hover drives icon animation. Prefer it over hand-rolled `<button>` + icon markup when the action benefits from animated icon feedback.
 **Location:** [src/components/ui/ActionBtn.svelte](src/components/ui/ActionBtn.svelte)
 
 **Props:**
@@ -3072,6 +3072,7 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 **Usage:**
 
 ```svelte
+<ActionBtn icon={Sparkle} text="Generate" class="btn-cta" onclick={handleGenerate} />
 <ActionBtn icon={Play} text="Play" onclick={handlePlay} />
 <ActionBtn icon={Remove} text="Delete" class="btn-error" onclick={handleDelete} />
 <ActionBtn icon={DoorOut} text="Sign Out" onclick={handleSignOut} />

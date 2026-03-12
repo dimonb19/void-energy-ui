@@ -5,7 +5,8 @@
     "slotsNote": "slots lists Svelte 5 snippet props or child content expected by the entry.",
     "contractsNote": "controllers and utilities add methods/contracts when a flat signature string is not enough for autonomous use.",
     "rules": [
-      "There is no generic Button.svelte. Use native <button> with btn-* classes, or use ActionBtn/IconBtn when you need icon forwarding.",
+      "There is no generic Button.svelte. Use native <button> with btn-* classes for text-only actions; prefer ActionBtn/IconBtn when an action benefits from an interactive icon.",
+      "AI and generation actions should default to Sparkle via ActionBtn/IconBtn unless a more specific interactive icon is a better semantic match.",
       "Use FormField for label, hint, error, and ARIA wiring around form controls.",
       "Modal and toast are manager-driven. Their shells are mounted globally; use the modal/toast APIs instead of rendering new instances.",
       "Prefer native HTML when the platform already provides the right semantics. A missing wrapper does not imply a missing capability."
@@ -348,15 +349,22 @@
       "props": ["icon", "text", "class", "size", "disabled", "...rest:button"],
       "slots": [],
       "related": ["icon-button", "button-native"],
-      "compose": "Use when you need a styled button with an animated icon and optional label. Variant classes go on class.",
-      "example": "<ActionBtn icon={Refresh} text='Retry' class='btn-system' onclick={retry} />"
+      "compose": "Use when you need a styled button with an animated icon and optional label. Prefer this over hand-rolled <button><Icon />Label</button> markup for generate, retry, confirm, undo, and auth actions. Variant classes go on class.",
+      "example": "<ActionBtn icon={Sparkle} text='Generate' class='btn-cta' onclick={generate} />"
     },
     "icon-button": {
       "category": "action",
       "component": "IconBtn",
       "import": "@components/ui/IconBtn.svelte",
       "variants": ["btn-icon"],
-      "props": ["icon", "size", "iconProps", "class", "...rest:button"],
+      "props": [
+        "icon",
+        "size",
+        "iconProps",
+        "class",
+        "disabled",
+        "...rest:button"
+      ],
       "slots": [],
       "related": ["action-button", "themes-button", "profile-button"],
       "compose": "Use for toolbar or inline icon actions. iconProps can override hover-driven data-state for toggles and timers.",

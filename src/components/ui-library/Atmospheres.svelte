@@ -4,8 +4,11 @@
   import { modal } from '@lib/modal-manager.svelte';
   import { FONTS } from '@config/design-tokens';
   import { voidEngine } from '@adapters/void-engine.svelte';
-  import { Sparkles, Undo2 } from '@lucide/svelte';
   import { dematerialize, materialize } from '@lib/transitions.svelte';
+  import ActionBtn from '../ui/ActionBtn.svelte';
+  import Sparkle from '../icons/Sparkle.svelte';
+  import Switch from '../icons/Switch.svelte';
+  import Undo from '../icons/Undo.svelte';
 
   // ── Built-in atmospheres table data ────────────────────────────────────
   const builtInAtmospheres = [
@@ -402,24 +405,25 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
         </details>
 
         <div class="flex flex-row gap-md flex-wrap">
-          <button onclick={registerCyberpunk} disabled={cyberpunkRegistered}>
-            <Sparkles class="icon" />
-            {cyberpunkRegistered ? 'Registered' : 'Register Cyberpunk'}
-          </button>
+          <ActionBtn
+            icon={Sparkle}
+            text={cyberpunkRegistered ? 'Registered' : 'Register Cyberpunk'}
+            onclick={registerCyberpunk}
+            disabled={cyberpunkRegistered}
+          />
 
           {#if cyberpunkRegistered}
-            <button
-              class="btn-premium"
-              onclick={applyCyberpunk}
-              disabled={voidEngine.atmosphere === 'cyberpunk'}
-              in:materialize
-              out:dematerialize
-            >
-              <Sparkles class="icon" />
-              {voidEngine.atmosphere === 'cyberpunk'
-                ? 'Cyberpunk Active'
-                : 'Apply Cyberpunk'}
-            </button>
+            <span in:materialize out:dematerialize>
+              <ActionBtn
+                icon={Switch}
+                text={voidEngine.atmosphere === 'cyberpunk'
+                  ? 'Cyberpunk Active'
+                  : 'Apply Cyberpunk'}
+                class="btn-premium"
+                onclick={applyCyberpunk}
+                disabled={voidEngine.atmosphere === 'cyberpunk'}
+              />
+            </span>
           {/if}
         </div>
       </div>
@@ -460,24 +464,25 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
         </details>
 
         <div class="flex flex-row gap-md flex-wrap">
-          <button onclick={registerSlate} disabled={slateRegistered}>
-            <Sparkles class="icon" />
-            {slateRegistered ? 'Registered' : 'Register Slate'}
-          </button>
+          <ActionBtn
+            icon={Sparkle}
+            text={slateRegistered ? 'Registered' : 'Register Slate'}
+            onclick={registerSlate}
+            disabled={slateRegistered}
+          />
 
           {#if slateRegistered}
-            <button
-              class="btn-premium"
-              onclick={applySlate}
-              disabled={voidEngine.atmosphere === 'slate'}
-              in:materialize
-              out:dematerialize
-            >
-              <Sparkles class="icon" />
-              {voidEngine.atmosphere === 'slate'
-                ? 'Slate Active'
-                : 'Apply Slate'}
-            </button>
+            <span in:materialize out:dematerialize>
+              <ActionBtn
+                icon={Switch}
+                text={voidEngine.atmosphere === 'slate'
+                  ? 'Slate Active'
+                  : 'Apply Slate'}
+                class="btn-premium"
+                onclick={applySlate}
+                disabled={voidEngine.atmosphere === 'slate'}
+              />
+            </span>
           {/if}
         </div>
       </div>
@@ -520,24 +525,25 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
         </details>
 
         <div class="flex flex-row gap-md flex-wrap">
-          <button onclick={registerMeridian} disabled={meridianRegistered}>
-            <Sparkles class="icon" />
-            {meridianRegistered ? 'Registered' : 'Register Meridian'}
-          </button>
+          <ActionBtn
+            icon={Sparkle}
+            text={meridianRegistered ? 'Registered' : 'Register Meridian'}
+            onclick={registerMeridian}
+            disabled={meridianRegistered}
+          />
 
           {#if meridianRegistered}
-            <button
-              class="btn-premium"
-              onclick={applyMeridian}
-              disabled={voidEngine.atmosphere === 'meridian'}
-              in:materialize
-              out:dematerialize
-            >
-              <Sparkles class="icon" />
-              {voidEngine.atmosphere === 'meridian'
-                ? 'Meridian Active'
-                : 'Apply Meridian'}
-            </button>
+            <span in:materialize out:dematerialize>
+              <ActionBtn
+                icon={Switch}
+                text={voidEngine.atmosphere === 'meridian'
+                  ? 'Meridian Active'
+                  : 'Apply Meridian'}
+                class="btn-premium"
+                onclick={applyMeridian}
+                disabled={voidEngine.atmosphere === 'meridian'}
+              />
+            </span>
           {/if}
         </div>
       </div>
@@ -563,22 +569,21 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
 
       <div class="surface-sunk p-md flex flex-col gap-md">
         <div class="flex flex-row gap-md flex-wrap">
-          <button
-            onclick={pushTempTheme}
-            disabled={tempHandle !== null || alreadyCrimson}
-          >
-            {alreadyCrimson
+          <ActionBtn
+            icon={Sparkle}
+            text={alreadyCrimson
               ? 'Crimson is already active'
               : 'Push Crimson (Temporary)'}
-          </button>
-          <button
+            onclick={pushTempTheme}
+            disabled={tempHandle !== null || alreadyCrimson}
+          />
+          <ActionBtn
+            icon={Undo}
+            text="Release & Restore"
             class="btn-error"
             onclick={releaseTempTheme}
             disabled={tempHandle === null}
-          >
-            <Undo2 class="icon" />
-            Release &amp; Restore
-          </button>
+          />
         </div>
 
         <div class="flex flex-col gap-xs">
