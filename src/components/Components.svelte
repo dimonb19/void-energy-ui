@@ -16,6 +16,7 @@
   import Inputs from './ui-library/Inputs.svelte';
   // Composites
   import Composites from './ui-library/Composites.svelte';
+  import TilesShowcase from './ui-library/TilesShowcase.svelte';
   import UserState from './ui-library/UserState.svelte';
   import TabsShowcase from './ui-library/TabsShowcase.svelte';
   import PaginationShowcase from './ui-library/PaginationShowcase.svelte';
@@ -58,6 +59,7 @@
       label: 'Composites',
       items: [
         { id: 'composites', label: 'Composites' },
+        { id: 'tiles', label: 'Tiles' },
         { id: 'tabs', label: 'Tabs' },
         { id: 'pagination', label: 'Pagination' },
         { id: 'user-state', label: 'User State' },
@@ -253,6 +255,7 @@
             </p>
           </div>
           <Composites />
+          <TilesShowcase />
           <TabsShowcase />
           <PaginationShowcase />
           <UserState />

@@ -1,7 +1,8 @@
 <script lang="ts">
   import PullRefresh from '@components/ui/PullRefresh.svelte';
   import PortalLoader from '@components/ui/PortalLoader.svelte';
-  import PortalRing from '@components/icons/PortalRing.svelte';
+  import Tile from '@components/ui/Tile.svelte';
+  import StoryCategory from '@components/ui/StoryCategory.svelte';
 
   let portalStatus = $state<'idle' | 'loading'>('loading');
 
@@ -12,11 +13,143 @@
   function handleRefreshError(error: unknown): void {
     console.error('Refresh error:', error);
   }
+
+  // ── Mock story data ─────────────────────────────────────────────────────
+  const hottestStories = [
+    {
+      title: 'Machine Rebellion',
+      href: '#',
+      author: {
+        name: 'Ada Sterling',
+        avatar: 'https://i.pravatar.cc/48?u=ada',
+        href: '#',
+      },
+      genres: ['Psychological', 'Sci-Fi'],
+      image: 'https://picsum.photos/seed/hot1/400/600',
+      mark: 'resume' as const,
+    },
+    {
+      title: 'The Last Archive',
+      href: '#',
+      author: {
+        name: 'Marcus Voss',
+        avatar: 'https://i.pravatar.cc/48?u=marcus',
+        href: '#',
+      },
+      genres: ['Mystery', 'Historical'],
+      image: 'https://picsum.photos/seed/hot2/400/600',
+      mark: 'complete' as const,
+    },
+    {
+      title: 'Neon Requiem',
+      href: '#',
+      author: { name: 'Zara Okafor', href: '#' },
+      genres: ['Cyberpunk', 'Thriller'],
+      image: 'https://picsum.photos/seed/hot3/400/600',
+    },
+    {
+      title: 'Verdant Echoes',
+      href: '#',
+      author: {
+        name: 'Liam Chen',
+        avatar: 'https://i.pravatar.cc/48?u=liam',
+        href: '#',
+      },
+      genres: ['Fantasy'],
+      image: 'https://picsum.photos/seed/hot4/400/600',
+      mark: 'replay' as const,
+    },
+    {
+      title: 'Crimson Meridian',
+      href: '#',
+      author: {
+        name: 'Ivy Nakamura',
+        avatar: 'https://i.pravatar.cc/48?u=ivy',
+        href: '#',
+      },
+      genres: ['Horror', 'Supernatural'],
+      image: 'https://picsum.photos/seed/hot5/400/600',
+    },
+  ];
+
+  const beginnerStories = [
+    {
+      title: 'First Light',
+      href: '#',
+      author: { name: 'CoNexus Team', href: '#' },
+      genres: ['Tutorial', 'Adventure'],
+      image: 'https://picsum.photos/seed/begin1/400/600',
+    },
+    {
+      title: 'The Whispering Woods',
+      href: '#',
+      author: {
+        name: 'Elena Frost',
+        avatar: 'https://i.pravatar.cc/48?u=elena',
+        href: '#',
+      },
+      genres: ['Fantasy', 'Relaxing'],
+      image: 'https://picsum.photos/seed/begin2/400/600',
+      mark: 'complete' as const,
+    },
+    {
+      title: 'Signal Lost',
+      href: '#',
+      author: {
+        name: 'Kai Brandt',
+        avatar: 'https://i.pravatar.cc/48?u=kai',
+        href: '#',
+      },
+      genres: ['Sci-Fi', 'Puzzle'],
+      image: 'https://picsum.photos/seed/begin3/400/600',
+    },
+    {
+      title: 'Echoes of Stone',
+      href: '#',
+      author: { name: 'Priya Sharma', href: '#' },
+      genres: ['Historical', 'Drama'],
+      image: 'https://picsum.photos/seed/begin4/400/600',
+      mark: 'resume' as const,
+    },
+  ];
 </script>
 
 <PullRefresh onrefresh={handleRefresh} onerror={handleRefreshError}>
+  <div class="h-2xl"></div>
+
+  <StoryCategory title="Hottest right now" tagline="Most played this week.">
+    {#each hottestStories as story}
+      <Tile
+        title={story.title}
+        href={story.href}
+        author={story.author}
+        genres={story.genres}
+        image={story.image}
+        mark={story.mark}
+      />
+    {/each}
+  </StoryCategory>
+
+  <StoryCategory
+    title="Getting Started"
+    tagline="Short, beginner-friendly journeys."
+  >
+    {#each beginnerStories as story}
+      <Tile
+        title={story.title}
+        href={story.href}
+        author={story.author}
+        genres={story.genres}
+        image={story.image}
+        mark={story.mark}
+      />
+    {/each}
+  </StoryCategory>
+
   <div class="container py-2xl">
     <div class="flex flex-col gap-2xl">
+      <hr />
+
       <!-- ─── PORTAL LOADER ─────────────────────────────────────────── -->
       <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
         <h3 class="text-dim">Portal Loader</h3>
@@ -86,34 +219,6 @@
           </p>
         </div>
       </div>
-
-      <!-- <hr /> -->
-
-      <!-- ─── WHAT'S COMING ─────────────────────────────────────────── -->
-      <!-- <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
-        <h3 class="text-dim">Coming Soon</h3>
-        <p class="text-small text-mute">Features on the roadmap for CoNexus.</p>
-      </div>
-
-      <div class="surface-raised p-lg flex flex-col gap-lg">
-        <ul class="flex flex-col gap-md">
-          <li>
-            <strong>Story categories</strong> &mdash; browsable tile grid that organizes
-            stories by topic.
-          </li>
-          <li>
-            <strong>Drag & drop</strong> &mdash; direct manipulation for reordering
-            or organizing content by dragging elements into place.
-          </li>
-
-          <hr />
-
-          <li>
-            <strong>Ambient layers</strong> &mdash; atmospheric background visuals
-            that shift with theme and context.
-          </li>
-        </ul>
-      </div> -->
     </div>
   </div>
 </PullRefresh>

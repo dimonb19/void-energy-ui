@@ -1640,6 +1640,100 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 
 ---
 
+#### `<Tile>` — Landscape story card
+
+**Description:** A 3:2 landscape card for the CoNexus storytelling platform. Shows a cover image (left ~40%), title, author with profile picture, and genre labels (right ~60%). Uses the **stretched link** pattern: the title `<a>` has a `::after` pseudo-element covering the full card, making the entire tile clickable. The author link sits above via `z-index` and remains independently clickable. State marks (resume, complete, replay) hang from the top-center as positioned badges.
+**Location:** [src/components/ui/Tile.svelte](src/components/ui/Tile.svelte)
+**CSS:** `.tile`, `.tile-image`, `.tile-content`, `.tile-link`, `.tile-author`, `.tile-pfp`, `.tile-genres`, `.tile-mark` ([src/styles/components/_tiles.scss](src/styles/components/_tiles.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` | `string` | — | Story title (required unless `loading`) |
+| `href` | `string` | — | Story page URL (required unless `loading`) |
+| `author` | `{ name, avatar?, href? }` | — | Author info with optional PFP and profile link |
+| `genres` | `string[]` | `[]` | Genre labels rendered as comma-separated text |
+| `image` | `string` | — | Cover image URL (falls back to sunk surface) |
+| `mark` | `'resume' \| 'complete' \| 'replay'` | — | State badge at top-center |
+| `loading` | `boolean` | `false` | Renders a shimmer skeleton instead of content |
+| `class` | `string` | `''` | Additional CSS classes |
+
+**States:**
+
+| State | Attribute | Visual |
+| --- | --- | --- |
+| Loading | `data-state="loading"` | Shimmer skeleton matching tile anatomy |
+| Resume mark | `data-mark="resume"` | Pennant/bookmark shape in `--energy-primary` |
+| Complete mark | `data-mark="complete"` | Flat-top pill in `--bg-spotlight` / `--energy-secondary` |
+| Replay mark | `data-mark="replay"` | Flat-top pill in `--energy-secondary` |
+
+**Responsive widths:** Viewport-based on mobile (with peek of next tile), unit-based on tablet+ (72→80→88 units scaling with `--density`). Add `.tile-fluid` class for 100% width in grid layouts.
+
+**Usage:**
+
+```svelte
+<Tile
+  title="Machine Rebellion"
+  href="/story/123"
+  author={{ name: 'Ada Sterling', avatar: '/avatars/user.jpg', href: '/user/456' }}
+  genres={['Psychological', 'Sci-Fi']}
+  image="/covers/machine-rebellion.jpg"
+  mark="resume"
+/>
+
+<!-- Loading skeleton -->
+<Tile loading />
+
+<!-- Fluid width (fills container) -->
+<Tile title="Story" href="#" class="tile-fluid" />
+```
+
+**Physics:**
+- **Glass:** Semi-transparent `surface-raised`, soft shadows, blur backdrop
+- **Flat:** Solid surface, subtle shadows, no blur
+- **Retro:** Hard borders, pixel shadows, instant transitions; hover highlights border in `--energy-primary`; marks use hard borders with semantic colors instead of filled backgrounds
+
+**Showcase:** [/components → Tiles](src/components/ui-library/TilesShowcase.svelte)
+
+---
+
+#### `<StoryCategory>` — Categorized tile strip
+
+**Description:** A section container with a title, optional tagline, and a horizontal scroll strip for story tiles. The strip provides smooth scrolling with `laser-scrollbar` styling and tile peek-ability on mobile.
+**Location:** [src/components/ui/StoryCategory.svelte](src/components/ui/StoryCategory.svelte)
+**CSS:** `.story-category`, `.story-category-header`, `.story-category-strip` ([src/styles/components/_tiles.scss](src/styles/components/_tiles.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `title` | `string` | *required* | Category heading |
+| `tagline` | `string` | — | Short description below the heading |
+| `children` | `Snippet` | *required* | Tile elements rendered inside the scroll strip |
+| `class` | `string` | `''` | Additional CSS classes |
+
+**Usage:**
+
+```svelte
+<StoryCategory title="Hottest right now" tagline="Most played this week.">
+  {#each stories as story}
+    <Tile
+      title={story.title}
+      href={story.href}
+      author={story.author}
+      genres={story.genres}
+      image={story.image}
+      mark={story.mark}
+    />
+  {/each}
+</StoryCategory>
+```
+
+**Showcase:** [/conexus → Story Categories](src/components/CoNexus.svelte)
+
+---
+
 #### `<EditField>`
 
 **Description:** Readonly input that unlocks for editing with confirm/reset actions.
@@ -2097,7 +2191,7 @@ const pv = createPasswordValidation(() => password);
 | --- | --- |
 | `.tile` | Fixed-width story card with 2:3 aspect ratio, density-scaled |
 | `.tile-fluid` | Grid-responsive variant (fills column, min-width: 0) |
-| `.loading-tile` | Skeleton state with shimmer animation |
+| `data-state="loading"` | Skeleton state with shimmer animation (use `<Tile loading />`) |
 | `.tiles-collection` | Horizontal scroll container for tiles |
 
 **Usage:**

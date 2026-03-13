@@ -1,0 +1,125 @@
+<!--
+  TILE COMPONENT
+  Landscape story card for the CoNexus storytelling platform.
+
+  USAGE
+  -------------------------------------------------------------------------
+  <Tile
+    title="Machine Rebellion"
+    href="/story/123"
+    author={{ name: 'Creator Name', avatar: '/avatars/user.jpg', href: '/user/456' }}
+    genres={['Psychological', 'Sci-Fi']}
+    image="/covers/machine-rebellion.jpg"
+    mark="resume"
+  />
+
+  Loading skeleton:
+  <Tile loading />
+  -------------------------------------------------------------------------
+
+  PROPS:
+  - title: Story title (required unless loading)
+  - href: Story page URL (required unless loading)
+  - author: { name, avatar?, href? } — author info with optional PFP and profile link
+  - genres: string[] — genre labels rendered as comma-separated text
+  - image: Cover image URL (optional — falls back to sunk surface)
+  - mark: 'resume' | 'complete' | 'replay' — state badge (optional)
+  - loading: boolean — renders a shimmer skeleton instead of content
+  - class: Additional CSS classes
+
+  ANATOMY:
+  - Uses the "stretched link" pattern: title <a> covers full tile via ::after
+  - Author link sits above via z-index — independently clickable
+
+  @see /src/styles/components/_tiles.scss
+-->
+<script lang="ts">
+  interface TileAuthor {
+    name: string;
+    avatar?: string;
+    href?: string;
+  }
+
+  interface TileProps {
+    title?: string;
+    href?: string;
+    author?: TileAuthor;
+    genres?: string[];
+    image?: string;
+    mark?: 'resume' | 'complete' | 'replay';
+    loading?: boolean;
+    class?: string;
+  }
+
+  const MARK_LABELS: Record<string, string> = {
+    resume: 'Resume',
+    complete: 'Complete',
+    replay: 'Replay',
+  };
+
+  let {
+    title,
+    href,
+    author,
+    genres = [],
+    image,
+    mark,
+    loading = false,
+    class: className = '',
+  }: TileProps = $props();
+
+  /** First letter of author name for PFP fallback. */
+  const authorInitial = $derived(author?.name.charAt(0).toUpperCase() ?? '');
+</script>
+
+{#snippet authorInner()}
+  {#if author?.avatar}
+    <img class="tile-pfp" src={author.avatar} alt="" />
+  {:else}
+    <span class="tile-pfp tile-pfp-fallback">{authorInitial}</span>
+  {/if}
+  <span class="text-truncate">{author?.name}</span>
+{/snippet}
+
+<article class="tile {className}" data-state={loading ? 'loading' : undefined}>
+  {#if loading}
+    <div class="tile-image" aria-hidden="true"></div>
+    <div class="tile-content">
+      <span class="skeleton-line"></span>
+    </div>
+  {:else}
+    {#if image}
+      <img class="tile-image" src={image} alt="{title} cover" />
+    {:else}
+      <div class="tile-image" aria-hidden="true"></div>
+    {/if}
+
+    {#if mark}
+      <div class="tile-mark" data-mark={mark}>{MARK_LABELS[mark]}</div>
+    {/if}
+
+    <div class="tile-content">
+      <a {href} class="tile-link">
+        <h5>{title}</h5>
+      </a>
+
+      {#if author}
+        {#if author.href}
+          <a href={author.href} class="tile-author">
+            {@render authorInner()}
+          </a>
+        {:else}
+          <span class="tile-author">
+            {@render authorInner()}
+          </span>
+        {/if}
+      {/if}
+
+      {#if genres.length > 0}
+        <span class="tile-genres">
+          {genres.join(', ')}
+        </span>
+      {/if}
+    </div>
+  {/if}
+</article>
