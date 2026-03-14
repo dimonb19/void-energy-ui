@@ -259,6 +259,22 @@ This collision is easy to introduce when darkening `text-mute` for accessibility
 
 The override must avoid purple (`color-system`), red (`color-error`), and green (`color-success`).
 
+#### Rule 3 — `energy-primary` / `energy-secondary` must not match `color-system`
+
+`SEMANTIC_DARK` sets `color-system: '#a078ff'` (purple). If your energy tokens are in the **purple/violet family**, add a per-theme `color-system` override. Without it, system notifications and AI feature indicators are indistinguishable from primary interactive elements.
+
+```typescript
+// Nebula — purple secondary, sky blue system override
+'energy-secondary': '#8b5cf6',
+'color-system':     '#38bdf8',
+```
+
+The override must avoid gold/orange (`color-premium`), red (`color-error`), and green (`color-success`).
+
+#### Why `color-success` and `color-error` are never overridden
+
+Overgrowth's green energy overlaps with `color-success`, and Crimson's red energy overlaps with `color-error`. These are accepted tradeoffs — green must mean success and red must mean error. Unlike premium/system (arbitrary semantic assignments), these carry universal meaning that no alternative color can replace. The overlap is tolerable because success/error states appear momentarily with explicit text labels (toasts, validation), not persistently alongside energy colors in the same UI region.
+
 ---
 
 ### Layer 4: STRUCTURE (Borders & Outlines)
@@ -892,7 +908,7 @@ The 12 built-in themes demonstrate every valid physics/mode combination and cove
 
 **Palette rationale:** Deep purple canvas (`#0a0014`) saturates every surface with cosmic hue. Even the text tokens carry color: `#fdf4ff` (near-white with purple), `#d0bde8` (lavender), `#8e7ea1` (muted violet) — nothing in this theme is truly neutral. Magenta primary (`#d946ef`) and purple secondary (`#8b5cf6`) sit approximately 45° apart on the color wheel — close enough for harmonic glass bloom, different enough for clear visual distinction. The secondary is deliberately darker than the primary, providing clear brightness hierarchy within the narrow hue range.
 
-**Key decisions:** The "contaminated text" approach (tinting neutral text with the theme hue) creates the most atmospherically immersive effect of any dark theme. Use this technique when the concept requires the user to feel *inside* the environment, not just *looking at* it.
+**Key decisions:** The "contaminated text" approach (tinting neutral text with the theme hue) creates the most atmospherically immersive effect of any dark theme. Use this technique when the concept requires the user to feel *inside* the environment, not just *looking at* it. `color-system` overridden to sky blue (`#38bdf8`). The base `color-system` (`#a078ff`) is purple — nearly indistinguishable from `energy-secondary` (`#8b5cf6`) in this purple-saturated palette. Sky blue provides clear separation from both the magenta primary and purple secondary while remaining cool-toned enough to feel at home in the cosmic palette.
 
 ---
 

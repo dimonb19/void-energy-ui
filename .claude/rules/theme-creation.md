@@ -103,7 +103,38 @@ The override color must avoid:
 
 ---
 
-## 7. Required Token Checklist
+## 7. Semantic Color Conflict Rule — energy tokens ≠ `color-system`
+
+**SEMANTIC_DARK** defines `color-system: '#a078ff'` (purple).
+**SEMANTIC_LIGHT** defines `color-system: '#6d28d9'` (deep violet).
+
+If `energy-primary` or `energy-secondary` is in the **purple/violet family**, add a per-theme `color-system` override. Without it, system notifications and AI feature indicators are visually indistinguishable from primary interactive elements.
+
+```typescript
+// Nebula — purple secondary requires a non-purple system
+'energy-secondary': '#8b5cf6',   // Purple
+'color-system':     '#38bdf8',   // Sky blue override ← required
+```
+
+The override color must avoid:
+- Gold/orange — reserved for `color-premium` (`#ff8c00`)
+- Red — reserved for `color-error`
+- Green — reserved for `color-success`
+- Purple — that's what you're escaping
+
+---
+
+## Accepted Overlap — `color-success` and `color-error`
+
+Overgrowth's neon green (`#39ff14`) overlaps with `color-success` (`#00e055`), and Crimson's coral (`#ff6b6b`) overlaps with `color-error` (`#ff3c40`). Unlike `color-premium` and `color-system`, these are **not overridden** — green must mean success and red must mean error. These are universal signals; replacing them with an arbitrary hue would cause more confusion than the overlap.
+
+The overlap is tolerable because success/error appear in **momentary, contextual states** (toasts, validation, form borders) with explicit text labels that disambiguate meaning. `color-premium` and `color-system` appear persistently alongside energy colors in the same UI regions, making their collisions far more disruptive.
+
+**Do not add `color-success` or `color-error` overrides to any theme.**
+
+---
+
+## 8. Required Token Checklist
 
 Every theme must explicitly set all of the following (spread `...SEMANTIC_DARK` or `...SEMANTIC_LIGHT` first):
 
@@ -115,7 +146,7 @@ Every theme must explicitly set all of the following (spread `...SEMANTIC_DARK` 
 □ bg-surface            Floating elements — see Rule 2 for physics-specific format
 □ bg-sunk               Recessed areas — darker than bg-surface (dark) or lighter (light)
 □ energy-primary        Brand/CTA color — see Rule 6 if gold/amber family
-□ energy-secondary      Supporting accent — see Rules 5 & 6
+□ energy-secondary      Supporting accent — see Rules 5, 6 & 7
 □ border-color          Typically energy-primary or energy-secondary at 20–35% opacity for glass,
                         slightly higher for flat
 □ text-main             Highest contrast — see Rules 3 & 4
@@ -132,7 +163,7 @@ Every theme must explicitly set all of the following (spread `...SEMANTIC_DARK` 
 | void | dark | glass | #33e2e6 cyan | #3875fa blue | — |
 | onyx | dark | flat | #ffffff white | #a3a3a3 gray | — |
 | terminal | dark | retro | #f5c518 amber | #c9a820 dim amber | color-premium: #33e2e6 |
-| nebula | dark | glass | #d946ef magenta | #8b5cf6 purple | — |
+| nebula | dark | glass | #d946ef magenta | #8b5cf6 purple | color-system: #38bdf8 |
 | solar | dark | glass | #ffaa00 gold | #b8860b dark gold | color-premium: #0284c7 |
 | overgrowth | dark | glass | #39ff14 neon green | #c8a84b wheat gold | — |
 | velvet | dark | glass | #ff80a0 soft pink | #e91e8c vivid magenta | — |

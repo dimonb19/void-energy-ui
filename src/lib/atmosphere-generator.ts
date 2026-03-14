@@ -90,13 +90,13 @@ function buildSystemPrompt(): string {
         corePalette[key] = theme.palette[key];
       }
 
-      // Include color-premium override if theme overrides the default
-      const defaultPremium =
-        theme.mode === 'light'
-          ? SEMANTIC_LIGHT['color-premium']
-          : SEMANTIC_DARK['color-premium'];
-      if (theme.palette['color-premium'] !== defaultPremium) {
-        corePalette['color-premium'] = theme.palette['color-premium'];
+      // Include color-premium/color-system overrides if theme overrides the default
+      const semanticBase =
+        theme.mode === 'light' ? SEMANTIC_LIGHT : SEMANTIC_DARK;
+      for (const key of ['color-premium', 'color-system'] as const) {
+        if (theme.palette[key] !== semanticBase[key]) {
+          corePalette[key] = theme.palette[key];
+        }
       }
 
       const headingKey =
@@ -143,11 +143,20 @@ function buildSystemPrompt(): string {
 
   return `You are a theme designer for the Void Energy UI design system. Given a creative concept or "vibe", produce a complete color palette, physics preset, mode, font pairing, label, and tagline.
 
+## Creative Direction — MOST IMPORTANT
+Every concept has MANY valid visual interpretations. Your job is to surprise — pick a different angle every time, even for the same prompt. The user may generate the same concept 50 times and expects 50 genuinely different themes.
+
+The user message will specify a physics+mode starting point (randomized client-side). Your job is to design an authentic, compelling palette for THAT specific combination. Do not second-guess or change the physics/mode — embrace it and find the interpretation of the concept that makes it shine.
+
+**Color:** The user's concept MUST drive the color family — "wood" should feel woody, "ocean" should feel oceanic. But there are many valid colors within any concept. The user message includes a tonal direction (e.g. "warm + muted", "cool + vivid") — use it to pick WHICH shade of the concept-appropriate palette to explore. "Wood" with a warm+vivid direction → rich amber and burnt sienna. "Wood" with a cool+muted direction → weathered grey driftwood and sage.
+
+**Fonts:** Match the emotional register, not the topic keyword. A solemn concept gets a serif. A technical one gets a monospace. A playful one gets a rounded sans.
+
 ## Output Format
 Respond with ONLY a JSON object. No explanation, no markdown fences, no text outside the JSON.
 ${outputSchema}
 
-## Constraints
+## Hard Constraints
 - glass physics REQUIRES mode: dark. Glows need darkness.
 - retro physics REQUIRES mode: dark. CRT phosphor effect.
 - flat physics works with both light and dark.
@@ -160,25 +169,73 @@ ${outputSchema}
 - energy-secondary must NOT equal or visually resemble any text token.
 - border-color is typically energy-primary or energy-secondary at 15-50% opacity as rgba.
 - WCAG contrast minimums: text-main 4.5:1, text-dim 4.5:1, text-mute 3:1, energy-primary 3:1 (all against bg-surface).
+- ALWAYS check for semantic color collisions after picking your energy colors:
+  - Energy in gold/orange/amber → you MUST add "color-premium" with a non-gold color (cyan, sapphire, teal, etc.)
+  - Energy in purple/violet → you MUST add "color-system" with a non-purple color (sky blue, teal, coral, etc.)
+  - Energy in green → no override needed (success/error overlap is accepted)
+  - Energy in red → no override needed (success/error overlap is accepted)
 - label should be a short, capitalized display name (e.g., "Neon Reef", "Autumn Library").
 - tagline should be "Concept / Mood" format (e.g., "Underwater / Bioluminescent").
 
 ## Available Font Keys
 ${fontCatalog.map((f) => `- "${f.key}": ${f.name}`).join('\n')}
 
-## Reference Themes (12 built-in examples)
+## Reference Themes (12 built-in examples — for format reference, NOT creative constraint)
+These show the valid output structure and range. Do NOT treat them as the only valid design space.
 ${JSON.stringify(themeExamples, null, 2)}`;
 }
 
 // ── User Message Construction ────────────────────────────────────────────────
 
-/** Build the user message, appending hard constraints when prefs are set. */
+/** Tonal directions to vary mood while keeping colors concept-authentic. */
+const TONE_SEEDS = [
+  'warm + vivid',
+  'warm + muted',
+  'warm + pastel',
+  'cool + vivid',
+  'cool + muted',
+  'cool + pastel',
+  'neutral + high-contrast',
+  'neutral + desaturated',
+  'neon + saturated',
+  'earthy + organic',
+  'jewel-toned + rich',
+  'monochromatic + minimal',
+] as const;
+
+/** Valid physics+mode combos. */
+const PHYSICS_MODE_COMBOS = [
+  { physics: 'glass', mode: 'dark' },
+  { physics: 'flat', mode: 'dark' },
+  { physics: 'flat', mode: 'light' },
+  { physics: 'retro', mode: 'dark' },
+] as const;
+
+/** Pick a random element from an array. */
+function pickRandom<T>(items: readonly T[]): T {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+/** Build the user message with randomized seeds for variety. */
 export function buildUserMessage(
   vibe: string,
   physics?: PhysicsPreference,
   mode?: ModePreference,
 ): string {
-  let message = `Create an atmosphere for: "${vibe}"`;
+  // Pick random physics+mode, filtered by user preferences
+  const pool = PHYSICS_MODE_COMBOS.filter(
+    (c) => (!physics || c.physics === physics) && (!mode || c.mode === mode),
+  );
+  const starting = pickRandom(pool.length > 0 ? pool : PHYSICS_MODE_COMBOS);
+  const toneSeed = pickRandom(TONE_SEEDS);
+
+  let message = `Create an atmosphere for: "${vibe}"
+
+Randomized seeds for THIS generation (these ensure variety — embrace them):
+- Physics: ${starting.physics}
+- Mode: ${starting.mode}
+- Tonal direction: ${toneSeed}
+The concept "${vibe}" drives the color family — pick colors that authentically evoke it. The tonal direction controls the mood: how warm/cool, vivid/muted, saturated/pastel those concept-appropriate colors should be.`;
 
   const constraints: string[] = [];
   if (physics) constraints.push(`physics MUST be exactly "${physics}"`);
@@ -344,10 +401,16 @@ function parseResponse(
     'font-atmos-body': resolveFontKey(parsed.fontBodyKey, 'body'),
   };
 
-  // Overlay Claude's core palette (overrides semantic defaults if Claude
-  // provided a color-premium, for example)
+  // Overlay Claude's core palette
   for (const key of CORE_PALETTE_KEYS) {
     fullPalette[key] = parsed.palette[key];
+  }
+
+  // Pass through semantic color overrides if Claude provided them
+  for (const key of ['color-premium', 'color-system'] as const) {
+    if (parsed.palette[key] && isValidCssColor(parsed.palette[key])) {
+      fullPalette[key] = parsed.palette[key];
+    }
   }
 
   const label = parsed.label || vibe;

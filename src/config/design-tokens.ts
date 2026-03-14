@@ -589,6 +589,7 @@ export const VOID_TOKENS = {
         'text-main': '#fdf4ff', // Purple-white
         'text-dim': '#d0bde8', // Lavender
         'text-mute': '#8e7ea1', // Muted violet
+        'color-system': '#38bdf8', // Sky blue
       },
     },
 

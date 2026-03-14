@@ -7,9 +7,13 @@ import {
 // ── buildUserMessage ────────────────────────────────────────────────────────
 
 describe('buildUserMessage', () => {
-  it('includes only the vibe when no prefs are set', () => {
+  it('includes the vibe and randomized seeds when no prefs are set', () => {
     const msg = buildUserMessage('deep space');
-    expect(msg).toBe('Create an atmosphere for: "deep space"');
+    expect(msg).toContain('Create an atmosphere for: "deep space"');
+    expect(msg).toContain('Randomized seeds');
+    expect(msg).toContain('Physics:');
+    expect(msg).toContain('Mode:');
+    expect(msg).toContain('Tonal direction');
     expect(msg).not.toContain('MUST');
   });
 
@@ -27,6 +31,15 @@ describe('buildUserMessage', () => {
     const msg = buildUserMessage('deep space', 'flat', 'light');
     expect(msg).toContain('physics MUST be exactly "flat"');
     expect(msg).toContain('mode MUST be exactly "light"');
+  });
+
+  it('produces varied output across multiple calls', () => {
+    const messages = new Set<string>();
+    // Generate enough calls that randomness should produce at least 2 unique messages
+    for (let i = 0; i < 20; i++) {
+      messages.add(buildUserMessage('test'));
+    }
+    expect(messages.size).toBeGreaterThan(1);
   });
 });
 

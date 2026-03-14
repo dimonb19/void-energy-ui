@@ -425,7 +425,7 @@
             icon={Refresh}
             text="Try Another"
             type="button"
-            class="btn-ghost"
+            class="btn-ghost btn-system"
             onclick={generate}
             disabled={generating}
           />
