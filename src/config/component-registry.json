@@ -696,12 +696,13 @@
         "genres",
         "image",
         "mark",
+        "gated",
         "loading",
         "class"
       ],
       "slots": [],
       "related": ["story-category"],
-      "compose": "Use inside a StoryCategory scroll strip. Supports mark states (resume, complete, replay) and the stretched-link pattern for full-tile clickability with an independent author link. Use loading prop for skeleton state.",
+      "compose": "Use inside a StoryCategory scroll strip. Supports mark states (resume, complete, replay), gated prop for premium/NFT-locked tiles, and the stretched-link pattern for full-tile clickability with an independent author link. Use loading prop for skeleton state.",
       "example": "<Tile title='Machine Rebellion' href='/story/123' author={{ name: 'Ada', href: '/user/1' }} genres={['Sci-Fi']} image='/covers/img.jpg' mark='resume' />"
     },
     "story-category": {

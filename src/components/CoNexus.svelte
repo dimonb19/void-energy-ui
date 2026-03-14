@@ -1,10 +1,20 @@
 <script lang="ts">
+  import { toast } from '@stores/toast.svelte';
   import PullRefresh from '@components/ui/PullRefresh.svelte';
   import PortalLoader from '@components/ui/PortalLoader.svelte';
   import Tile from '@components/ui/Tile.svelte';
   import StoryCategory from '@components/ui/StoryCategory.svelte';
 
   let portalStatus = $state<'idle' | 'loading'>('loading');
+
+  function interceptDemoLink(e: MouseEvent | KeyboardEvent) {
+    if (e instanceof KeyboardEvent && e.key !== 'Enter') return;
+    const anchor = (e.target as HTMLElement).closest('a');
+    if (anchor?.getAttribute('href') === '#') {
+      e.preventDefault();
+      toast.show('Demo link — no navigation', 'info');
+    }
+  }
 
   async function handleRefresh(): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -39,6 +49,7 @@
       genres: ['Mystery', 'Historical'],
       image: 'https://picsum.photos/seed/hot2/400/600',
       mark: 'complete' as const,
+      gated: true,
     },
     {
       title: 'Neon Requiem',
@@ -58,6 +69,7 @@
       genres: ['Fantasy'],
       image: 'https://picsum.photos/seed/hot4/400/600',
       mark: 'replay' as const,
+      gated: true,
     },
     {
       title: 'Crimson Meridian',
@@ -92,6 +104,7 @@
       genres: ['Espionage', 'Historical Fiction'],
       image: 'https://picsum.photos/seed/hot7/400/600',
       mark: 'resume' as const,
+      gated: true,
     },
     {
       title: 'Bone Garden',
@@ -201,6 +214,7 @@
       },
       genres: ['Techno-Thriller', 'Conspiracy'],
       image: 'https://picsum.photos/seed/hot18/400/600',
+      gated: true,
     },
     {
       title: 'The Porcelain Saint',
@@ -253,6 +267,7 @@
       },
       genres: ['Sci-Fi', 'Puzzle'],
       image: 'https://picsum.photos/seed/begin3/400/600',
+      gated: true,
     },
     {
       title: 'Echoes of Stone',
@@ -291,6 +306,7 @@
       author: { name: 'CoNexus Team', href: '#' },
       genres: ['Comedy', 'Meta'],
       image: 'https://picsum.photos/seed/begin7/400/600',
+      gated: true,
     },
     {
       title: 'Letters from Nowhere',
@@ -451,6 +467,7 @@
       author: { name: 'Marisol Vargas', href: '#' },
       genres: ['Mythology', 'Mesoamerican'],
       image: 'https://picsum.photos/seed/staff3/400/600',
+      gated: true,
     },
     {
       title: 'Glass Ceiling',
@@ -474,6 +491,7 @@
       },
       genres: ['Epic Fantasy', 'Tragedy'],
       image: 'https://picsum.photos/seed/staff5/400/600',
+      gated: true,
     },
     {
       title: 'Foxfire',
@@ -564,6 +582,7 @@
       },
       genres: ['Body Horror', 'Sci-Fi'],
       image: 'https://picsum.photos/seed/staff14/400/600',
+      gated: true,
     },
     {
       title: 'The Seventh Season',
@@ -628,8 +647,13 @@
   ];
 </script>
 
+<!-- svelte-ignore a11y_no_static_element_interactions -->
 <PullRefresh onrefresh={handleRefresh} onerror={handleRefreshError}>
-  <div class="flex flex-col gap-xl pt-2xl">
+  <div
+    class="flex flex-col gap-xl pt-2xl"
+    onclick={interceptDemoLink}
+    onkeydown={interceptDemoLink}
+  >
     <StoryCategory title="Hottest right now" tagline="Most played this week.">
       {#each hottestStories as story}
         <Tile
@@ -639,6 +663,7 @@
           genres={story.genres}
           image={story.image}
           mark={story.mark}
+          gated={story.gated}
         />
       {/each}
     </StoryCategory>
@@ -655,6 +680,7 @@
           genres={story.genres}
           image={story.image}
           mark={story.mark}
+          gated={story.gated}
         />
       {/each}
     </StoryCategory>
@@ -671,6 +697,7 @@
           genres={story.genres}
           image={story.image}
           mark={story.mark}
+          gated={story.gated}
         />
       {/each}
     </StoryCategory>

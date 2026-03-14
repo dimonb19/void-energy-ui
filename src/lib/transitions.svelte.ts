@@ -161,7 +161,11 @@ export function live(
  */
 export function materialize(
   node: HTMLElement,
-  { delay = 0, duration = null, y = 15 } = {},
+  {
+    delay = 0,
+    duration = null,
+    y = 15,
+  }: { delay?: number; duration?: number | null; y?: number } = {},
 ) {
   const { speedBase, blurInt, isRetro, isFlat, reducedMotion } =
     getSystemConfig();
@@ -269,7 +273,11 @@ export function dematerialize(
  */
 export function emerge(
   node: HTMLElement,
-  { delay = 0, duration = null, y = 15 } = {},
+  {
+    delay = 0,
+    duration = null,
+    y = 15,
+  }: { delay?: number; duration?: number | null; y?: number } = {},
 ) {
   const { speedBase, blurInt, isRetro, isFlat, reducedMotion } =
     getSystemConfig();

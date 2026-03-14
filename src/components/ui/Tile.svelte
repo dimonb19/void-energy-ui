@@ -1,6 +1,6 @@
 <!--
   TILE COMPONENT
-  Landscape story card for the CoNexus storytelling platform.
+  Landscape content card with cover image, stretched-link pattern, and state marks.
 
   USAGE
   -------------------------------------------------------------------------
@@ -24,6 +24,7 @@
   - genres: string[] — genre labels rendered as comma-separated text
   - image: Cover image URL (optional — falls back to sunk surface)
   - mark: 'resume' | 'complete' | 'replay' — state badge (optional)
+  - gated: boolean — premium/NFT-locked tile (lock icon + premium styling)
   - loading: boolean — renders a shimmer skeleton instead of content
   - class: Additional CSS classes
 
@@ -36,6 +37,8 @@
 <script lang="ts">
   import PlayPause from '@components/icons/PlayPause.svelte';
   import Undo from '@components/icons/Undo.svelte';
+  import { dematerialize, materialize } from '@lib/transitions.svelte';
+  import { Lock } from '@lucide/svelte';
 
   interface TileAuthor {
     name: string;
@@ -50,6 +53,7 @@
     genres?: string[];
     image?: string;
     mark?: 'resume' | 'complete' | 'replay';
+    gated?: boolean;
     loading?: boolean;
     class?: string;
   }
@@ -72,6 +76,7 @@
     genres = [],
     image,
     mark,
+    gated = false,
     loading = false,
     class: className = '',
   }: TileProps = $props();
@@ -95,6 +100,8 @@
 <article
   class="tile {className}"
   data-state={loading ? 'loading' : undefined}
+  aria-busy={loading || undefined}
+  data-gated={gated || undefined}
   onpointerenter={() => {
     if (!loading) hovered = true;
   }}
@@ -114,7 +121,7 @@
 
     {#if mark}
       {@const MarkIcon = MARK_ICONS[mark]}
-      <div class="tile-mark" data-mark={mark}>
+      <div class="tile-mark" data-mark={mark} in:materialize out:dematerialize>
         {#if MarkIcon}
           <MarkIcon data-state={iconState} data-size="sm" />
         {/if}
@@ -122,7 +129,17 @@
       </div>
     {/if}
 
-    <div class="tile-content">
+    {#if gated}
+      <div
+        class="tile-gate"
+        in:materialize={{ y: 0 }}
+        out:dematerialize={{ y: 0 }}
+      >
+        <Lock class="icon" data-size="sm" />
+      </div>
+    {/if}
+
+    <div class="tile-content" in:materialize={{ y: 0 }}>
       <a {href} class="tile-link">
         <h5>{title}</h5>
       </a>
