@@ -4,6 +4,8 @@
   import PortalLoader from '@components/ui/PortalLoader.svelte';
   import Tile from '@components/ui/Tile.svelte';
   import StoryCategory from '@components/ui/StoryCategory.svelte';
+  import LoadMore from '@components/ui/LoadMore.svelte';
+  import Skeleton from '@components/ui/Skeleton.svelte';
 
   let portalStatus = $state<'idle' | 'loading'>('loading');
 
@@ -24,9 +26,7 @@
     console.error('Refresh error:', error);
   }
 
-  // ── Paginated category helper ─────────────────────────────────────────
-  // Simulates backend pagination: starts with `initialSize` tiles visible,
-  // loads `pageSize` more per scroll with a network delay.
+  // ── Types ────────────────────────────────────────────────────────────────
 
   interface StoryData {
     title: string;
@@ -38,12 +38,23 @@
     gated?: boolean;
   }
 
-  const PAGE_SIZE = 4;
-  const INITIAL_SIZE = 6;
-  const LOAD_DELAY = 1200;
+  interface CategoryDef {
+    id: string;
+    title: string;
+    tagline: string;
+    stories: StoryData[];
+  }
 
-  function createPaginatedCategory(allStories: StoryData[]) {
-    let visible = $state(allStories.slice(0, INITIAL_SIZE));
+  // ── Tile-level pagination (horizontal) ──────────────────────────────────
+  // Simulates backend pagination: starts with `initialSize` tiles visible,
+  // loads `pageSize` more per scroll with a network delay.
+
+  const TILE_PAGE_SIZE = 4;
+  const TILE_INITIAL_SIZE = 6;
+  const TILE_LOAD_DELAY = 1200;
+
+  function createTilePaginator(allStories: StoryData[]) {
+    let visible = $state(allStories.slice(0, TILE_INITIAL_SIZE));
     let loading = $state(false);
     const hasMore = $derived(visible.length < allStories.length);
 
@@ -51,15 +62,96 @@
       if (loading || !hasMore) return;
       loading = true;
       setTimeout(() => {
-        const nextEnd = Math.min(visible.length + PAGE_SIZE, allStories.length);
+        const nextEnd = Math.min(
+          visible.length + TILE_PAGE_SIZE,
+          allStories.length,
+        );
         visible = allStories.slice(0, nextEnd);
         loading = false;
-      }, LOAD_DELAY);
+      }, TILE_LOAD_DELAY);
     }
 
     return {
       get visible() {
         return visible;
+      },
+      get loading() {
+        return loading;
+      },
+      get hasMore() {
+        return hasMore;
+      },
+      loadMore,
+    };
+  }
+
+  // ── Category-level pagination (vertical) ────────────────────────────────
+  // Starts with `initialCount` categories visible. On loadMore, a skeleton
+  // placeholder is appended immediately (using the real category id for stable
+  // keyed-list identity), then replaced in-place with the resolved category
+  // after the simulated delay. The tile paginator is created exactly once at
+  // resolve time.
+
+  type FeedItem =
+    | {
+        id: string;
+        status: 'ready';
+        title: string;
+        tagline: string;
+        paginator: ReturnType<typeof createTilePaginator>;
+      }
+    | {
+        id: string;
+        status: 'loading';
+      };
+
+  const CATEGORY_INITIAL_COUNT = 2;
+  const CATEGORY_LOAD_DELAY = 800;
+
+  function createPaginatedFeed(allCategories: CategoryDef[]) {
+    let categories = $state<FeedItem[]>(
+      allCategories.slice(0, CATEGORY_INITIAL_COUNT).map((def) => ({
+        id: def.id,
+        status: 'ready' as const,
+        title: def.title,
+        tagline: def.tagline,
+        paginator: createTilePaginator(def.stories),
+      })),
+    );
+    let loading = $state(false);
+    const hasMore = $derived(
+      categories.filter((c) => c.status === 'ready').length <
+        allCategories.length,
+    );
+
+    function loadMore() {
+      if (loading || !hasMore) return;
+
+      const nextDef =
+        allCategories[categories.filter((c) => c.status === 'ready').length];
+      loading = true;
+
+      categories = [...categories, { id: nextDef.id, status: 'loading' }];
+
+      setTimeout(() => {
+        categories = categories.map((item) =>
+          item.id === nextDef.id && item.status === 'loading'
+            ? {
+                id: nextDef.id,
+                status: 'ready' as const,
+                title: nextDef.title,
+                tagline: nextDef.tagline,
+                paginator: createTilePaginator(nextDef.stories),
+              }
+            : item,
+        );
+        loading = false;
+      }, CATEGORY_LOAD_DELAY);
+    }
+
+    return {
+      get categories() {
+        return categories;
       },
       get loading() {
         return loading;
@@ -484,9 +576,6 @@
       image: 'https://picsum.photos/seed/begin17/400/600',
     },
   ];
-
-  const hottest = createPaginatedCategory(hottestStories);
-  const beginner = createPaginatedCategory(beginnerStories);
 
   const staffPickStories = [
     {
@@ -1157,9 +1246,56 @@
     },
   ];
 
-  const staffPicks = createPaginatedCategory(staffPickStories);
-  const risingStars = createPaginatedCategory(risingStarStories);
-  const worldBuilders = createPaginatedCategory(worldBuilderStories);
+  // ── Feed assembly ──────────────────────────────────────────────────────
+
+  const allCategories: CategoryDef[] = [
+    {
+      id: 'hottest',
+      title: 'Hottest right now',
+      tagline: 'Most played this week.',
+      stories: hottestStories,
+    },
+    {
+      id: 'beginner',
+      title: 'Getting Started',
+      tagline: 'Short, beginner-friendly journeys.',
+      stories: beginnerStories,
+    },
+    {
+      id: 'staff-picks',
+      title: 'Staff Picks',
+      tagline: 'Hand-curated by the CoNexus editorial team.',
+      stories: staffPickStories,
+    },
+    {
+      id: 'rising-stars',
+      title: 'Rising Stars',
+      tagline: 'Breakout hits from indie authors.',
+      stories: risingStarStories,
+    },
+    {
+      id: 'world-builders',
+      title: 'World Builders',
+      tagline: 'Immersive universes and epic sagas.',
+      stories: worldBuilderStories,
+    },
+  ];
+
+  const feed = createPaginatedFeed(allCategories);
+
+  // Gate auto-observation until the user has actually scrolled the page.
+  // Prevents the LoadMore sentinel from firing on first paint on tall viewports
+  // where only 2 categories leave the sentinel in the initial viewport.
+  let userHasScrolled = $state(false);
+
+  $effect(() => {
+    function onScroll() {
+      userHasScrolled = true;
+      window.removeEventListener('scroll', onScroll);
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  });
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -1169,105 +1305,51 @@
     onclick={interceptDemoLink}
     onkeydown={interceptDemoLink}
   >
-    <StoryCategory
-      title="Hottest right now"
-      tagline="Most played this week."
-      loading={hottest.loading}
-      hasMore={hottest.hasMore}
-      onloadmore={hottest.loadMore}
-    >
-      {#each hottest.visible as story (story.title)}
-        <Tile
-          title={story.title}
-          href={story.href}
-          author={story.author}
-          genres={story.genres}
-          image={story.image}
-          mark={story.mark}
-          gated={story.gated}
-        />
-      {/each}
-    </StoryCategory>
+    {#each feed.categories as cat (cat.id)}
+      {#if cat.status === 'loading'}
+        <div class="story-category" aria-hidden="true">
+          <div class="story-category-header">
+            <div class="flex flex-col gap-xs flex-1">
+              <Skeleton variant="text" width="40%" />
+              <Skeleton variant="text" width="60%" />
+            </div>
+          </div>
+          <div class="story-category-strip">
+            {#each Array(TILE_INITIAL_SIZE) as _, i (i)}
+              <Tile loading />
+            {/each}
+          </div>
+        </div>
+      {:else}
+        <StoryCategory
+          title={cat.title}
+          tagline={cat.tagline}
+          loading={cat.paginator.loading}
+          hasMore={cat.paginator.hasMore}
+          onloadmore={cat.paginator.loadMore}
+        >
+          {#each cat.paginator.visible as story (story.title)}
+            <Tile
+              title={story.title}
+              href={story.href}
+              author={story.author}
+              genres={story.genres}
+              image={story.image}
+              mark={story.mark}
+              gated={story.gated}
+            />
+          {/each}
+        </StoryCategory>
+      {/if}
+    {/each}
 
-    <StoryCategory
-      title="Getting Started"
-      tagline="Short, beginner-friendly journeys."
-      loading={beginner.loading}
-      hasMore={beginner.hasMore}
-      onloadmore={beginner.loadMore}
-    >
-      {#each beginner.visible as story (story.title)}
-        <Tile
-          title={story.title}
-          href={story.href}
-          author={story.author}
-          genres={story.genres}
-          image={story.image}
-          mark={story.mark}
-          gated={story.gated}
-        />
-      {/each}
-    </StoryCategory>
-
-    <StoryCategory
-      title="Staff Picks"
-      tagline="Hand-curated by the CoNexus editorial team."
-      loading={staffPicks.loading}
-      hasMore={staffPicks.hasMore}
-      onloadmore={staffPicks.loadMore}
-    >
-      {#each staffPicks.visible as story (story.title)}
-        <Tile
-          title={story.title}
-          href={story.href}
-          author={story.author}
-          genres={story.genres}
-          image={story.image}
-          mark={story.mark}
-          gated={story.gated}
-        />
-      {/each}
-    </StoryCategory>
-
-    <StoryCategory
-      title="Rising Stars"
-      tagline="Breakout hits from indie authors."
-      loading={risingStars.loading}
-      hasMore={risingStars.hasMore}
-      onloadmore={risingStars.loadMore}
-    >
-      {#each risingStars.visible as story (story.title)}
-        <Tile
-          title={story.title}
-          href={story.href}
-          author={story.author}
-          genres={story.genres}
-          image={story.image}
-          mark={story.mark}
-          gated={story.gated}
-        />
-      {/each}
-    </StoryCategory>
-
-    <StoryCategory
-      title="World Builders"
-      tagline="Immersive universes and epic sagas."
-      loading={worldBuilders.loading}
-      hasMore={worldBuilders.hasMore}
-      onloadmore={worldBuilders.loadMore}
-    >
-      {#each worldBuilders.visible as story (story.title)}
-        <Tile
-          title={story.title}
-          href={story.href}
-          author={story.author}
-          genres={story.genres}
-          image={story.image}
-          mark={story.mark}
-          gated={story.gated}
-        />
-      {/each}
-    </StoryCategory>
+    <LoadMore
+      loading={feed.loading}
+      hasMore={feed.hasMore}
+      onloadmore={feed.loadMore}
+      observer={userHasScrolled}
+      class="hidden"
+    />
   </div>
 
   <div class="container py-2xl">

@@ -1745,6 +1745,44 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 
 ---
 
+#### Paginated Category Feed (composition pattern)
+
+Two-axis pagination: categories load vertically (page scroll), tiles load horizontally (strip scroll) within each category.
+
+**Ingredients:**
+- `<LoadMore>` — vertical IO sentinel (observer-gated until first scroll)
+- `<StoryCategory>` — horizontal tile pagination (built-in)
+- `<Skeleton>` + `<Tile loading>` — category placeholder while loading
+- `FeedItem` union (`'ready' | 'loading'`) — placeholder appears immediately, replaced in-place when resolved. Use real category `id` for stable keyed identity.
+
+**Skeleton category markup:**
+
+```svelte
+<div class="story-category" aria-hidden="true">
+  <div class="story-category-header">
+    <div class="flex flex-col gap-xs flex-1">
+      <Skeleton variant="text" width="40%" />
+      <Skeleton variant="text" width="60%" />
+    </div>
+  </div>
+  <div class="story-category-strip">
+    {#each Array(6) as _, i (i)}
+      <Tile loading />
+    {/each}
+  </div>
+</div>
+```
+
+**Observer gating** (prevents auto-load on tall viewports before user scrolls):
+
+```svelte
+<LoadMore observer={userHasScrolled} class="hidden" ... />
+```
+
+**Reference implementation:** [CoNexus.svelte](src/components/CoNexus.svelte)
+
+---
+
 #### `<EditField>`
 
 **Description:** Readonly input that unlocks for editing with confirm/reset actions.
