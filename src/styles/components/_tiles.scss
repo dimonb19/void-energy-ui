@@ -85,15 +85,19 @@
   gap: var(--space-xs);
   padding-inline: var(--space-md);
 
-  h3,
-  h4 {
+  @include respond-up('tablet') {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: var(--space-sm);
+  }
+
+  h3 {
     margin: 0;
     color: var(--text-main);
+    font-size: var(--font-size-h4);
   }
 
   p {
-    margin: 0;
-    font-size: var(--font-size-small);
     color: var(--text-mute);
   }
 }
@@ -230,7 +234,13 @@
       color: var(--energy-primary);
 
       .tile-pfp {
-        transform: scale(1.1);
+        transform: translateY(var(--lift));
+        border-color: var(--energy-primary);
+        box-shadow: var(--shadow-lift);
+      }
+
+      .tile-pfp-fallback {
+        color: var(--energy-primary);
       }
     }
   }
@@ -245,7 +255,9 @@
     // Sunk border to give the PFP a recessed look.
     border: var(--physics-border-width) solid var(--border-color);
 
-    transition: transform var(--speed-base) var(--ease-spring-snappy);
+    transition:
+      transform var(--speed-base) var(--ease-spring-snappy),
+      border-color var(--speed-base) var(--ease-spring-snappy);
 
     // Fallback: initial letter on sunk background (when no avatar image).
     &.tile-pfp-fallback {
@@ -296,6 +308,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-xs);
 
   padding: var(--space-xs) var(--space-sm);
 
@@ -312,52 +325,76 @@
   // ── Resume: Bookmark / Pennant Shape ────────────────────────────────────
   // V-notch bottom, hangs from top edge. Matches mark-resume-shape.svg.
   &[data-mark='resume'] {
-    background: var(--energy-primary);
+    background: linear-gradient(
+      to bottom,
+      tint(var(--energy-primary), 60%),
+      var(--energy-primary) 30%
+    );
     color: var(--bg-canvas);
-    padding-bottom: calc(var(--space-sm) + var(--space-xs));
+    padding-bottom: var(--space-md);
 
     // Pennant: flat top, angled V-notch at bottom.
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 75%, 0 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 68%, 0 100%);
   }
 
   // ── Complete: Flat-top pill ─────────────────────────────────────────────
   // Hangs from top edge with rounded bottom corners.
   &[data-mark='complete'] {
-    background: var(--bg-spotlight);
-    color: var(--energy-secondary);
+    background: linear-gradient(
+      to bottom,
+      tint(var(--color-system), 30%),
+      var(--color-system) 40%
+    );
+    color: var(--bg-canvas);
     border-radius: 0 0 var(--radius-base) var(--radius-base);
   }
 
   // ── Replay: Flat-top pill ───────────────────────────────────────────────
   // Same shape as complete, different semantic color.
   &[data-mark='replay'] {
-    background: var(--energy-secondary);
+    background: linear-gradient(
+      to bottom,
+      tint(var(--energy-secondary), 30%),
+      var(--energy-secondary) 40%
+    );
     color: var(--bg-canvas);
     border-radius: 0 0 var(--radius-base) var(--radius-base);
   }
 
   // ── Physics Overrides ───────────────────────────────────────────────────
+  // Flat uses solid background color
+  @include when-flat {
+    &[data-mark='resume'] {
+      background: var(--energy-primary);
+    }
+
+    &[data-mark='complete'] {
+      background: var(--color-system);
+    }
+
+    &[data-mark='replay'] {
+      background: var(--energy-secondary);
+    }
+  }
+
   // Retro uses hard border + transparent background, no clip-paths or radii.
   @include when-retro {
-    background: var(--bg-canvas);
+    background: var(--surface-bg);
     border: var(--physics-border-width) solid;
-    border-top: none;
 
     &[data-mark='resume'] {
+      color: var(--energy-primary);
       clip-path: none;
-      border-color: var(--color-info);
-      color: var(--color-info);
+      padding-bottom: var(--space-xs);
     }
 
     &[data-mark='complete'] {
       border-radius: 0;
-      border-color: var(--color-success);
       color: var(--color-success);
     }
 
     &[data-mark='replay'] {
       border-radius: 0;
-      border-color: var(--color-system);
       color: var(--color-system);
     }
   }

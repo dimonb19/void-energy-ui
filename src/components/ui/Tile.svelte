@@ -34,6 +34,9 @@
   @see /src/styles/components/_tiles.scss
 -->
 <script lang="ts">
+  import PlayPause from '@components/icons/PlayPause.svelte';
+  import Undo from '@components/icons/Undo.svelte';
+
   interface TileAuthor {
     name: string;
     avatar?: string;
@@ -57,6 +60,11 @@
     replay: 'Replay',
   };
 
+  const MARK_ICONS: Record<string, typeof PlayPause | typeof Undo> = {
+    resume: PlayPause,
+    replay: Undo,
+  };
+
   let {
     title,
     href,
@@ -67,6 +75,9 @@
     loading = false,
     class: className = '',
   }: TileProps = $props();
+
+  let hovered = $state(false);
+  const iconState = $derived(hovered && !loading ? 'active' : '');
 
   /** First letter of author name for PFP fallback. */
   const authorInitial = $derived(author?.name.charAt(0).toUpperCase() ?? '');
@@ -81,7 +92,14 @@
   <span class="text-truncate">{author?.name}</span>
 {/snippet}
 
-<article class="tile {className}" data-state={loading ? 'loading' : undefined}>
+<article
+  class="tile {className}"
+  data-state={loading ? 'loading' : undefined}
+  onpointerenter={() => {
+    if (!loading) hovered = true;
+  }}
+  onpointerleave={() => (hovered = false)}
+>
   {#if loading}
     <div class="tile-image" aria-hidden="true"></div>
     <div class="tile-content">
@@ -95,7 +113,13 @@
     {/if}
 
     {#if mark}
-      <div class="tile-mark" data-mark={mark}>{MARK_LABELS[mark]}</div>
+      {@const MarkIcon = MARK_ICONS[mark]}
+      <div class="tile-mark" data-mark={mark}>
+        {#if MarkIcon}
+          <MarkIcon data-state={iconState} data-size="sm" />
+        {/if}
+        {MARK_LABELS[mark]}
+      </div>
     {/if}
 
     <div class="tile-content">
