@@ -1700,9 +1700,9 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 
 #### `<StoryCategory>` — Categorized tile strip
 
-**Description:** A section container with a title, optional tagline, and a horizontal scroll strip for story tiles. The strip provides smooth scrolling with `laser-scrollbar` styling and tile peek-ability on mobile.
+**Description:** A section container with a title, optional tagline, and a horizontal scroll strip for story tiles. The strip provides smooth scrolling with `laser-scrollbar` styling and tile peek-ability on mobile. Supports optional horizontal pagination: an IntersectionObserver sentinel at the end of the strip fires `onloadmore` when scrolled into view, and skeleton tiles are appended while loading.
 **Location:** [src/components/ui/StoryCategory.svelte](src/components/ui/StoryCategory.svelte)
-**CSS:** `.story-category`, `.story-category-header`, `.story-category-strip` ([src/styles/components/_tiles.scss](src/styles/components/_tiles.scss))
+**CSS:** `.story-category`, `.story-category-header`, `.story-category-strip`, `.story-category-sentinel` ([src/styles/components/_tiles.scss](src/styles/components/_tiles.scss))
 
 **Props:**
 
@@ -1711,21 +1711,32 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 | `title` | `string` | *required* | Category heading |
 | `tagline` | `string` | — | Short description below the heading |
 | `children` | `Snippet` | *required* | Tile elements rendered inside the scroll strip |
+| `loading` | `boolean` | `false` | Whether a page is currently loading (appends skeleton tiles) |
+| `hasMore` | `boolean` | `false` | Whether more pages are available (enables sentinel observer) |
+| `onloadmore` | `() => void` | — | Callback fired when the sentinel enters the scroll viewport |
+| `pageSize` | `number` | `4` | Number of skeleton tiles shown while loading |
 | `class` | `string` | `''` | Additional CSS classes |
 
 **Usage:**
 
 ```svelte
+<!-- Basic (no pagination) -->
 <StoryCategory title="Hottest right now" tagline="Most played this week.">
   {#each stories as story}
-    <Tile
-      title={story.title}
-      href={story.href}
-      author={story.author}
-      genres={story.genres}
-      image={story.image}
-      mark={story.mark}
-    />
+    <Tile title={story.title} href={story.href} ... />
+  {/each}
+</StoryCategory>
+
+<!-- With pagination -->
+<StoryCategory
+  title="Hottest right now"
+  tagline="Most played this week."
+  loading={pageLoading}
+  hasMore={hasNextPage}
+  onloadmore={fetchNextPage}
+>
+  {#each visibleStories as story}
+    <Tile title={story.title} href={story.href} ... />
   {/each}
 </StoryCategory>
 ```

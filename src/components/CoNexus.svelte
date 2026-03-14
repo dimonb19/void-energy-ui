@@ -24,6 +24,53 @@
     console.error('Refresh error:', error);
   }
 
+  // ── Paginated category helper ─────────────────────────────────────────
+  // Simulates backend pagination: starts with `initialSize` tiles visible,
+  // loads `pageSize` more per scroll with a network delay.
+
+  interface StoryData {
+    title: string;
+    href: string;
+    author: { name: string; avatar?: string; href?: string };
+    genres: string[];
+    image: string;
+    mark?: 'resume' | 'complete' | 'replay';
+    gated?: boolean;
+  }
+
+  const PAGE_SIZE = 4;
+  const INITIAL_SIZE = 6;
+  const LOAD_DELAY = 1200;
+
+  function createPaginatedCategory(allStories: StoryData[]) {
+    let visible = $state(allStories.slice(0, INITIAL_SIZE));
+    let loading = $state(false);
+    const hasMore = $derived(visible.length < allStories.length);
+
+    function loadMore() {
+      if (loading || !hasMore) return;
+      loading = true;
+      setTimeout(() => {
+        const nextEnd = Math.min(visible.length + PAGE_SIZE, allStories.length);
+        visible = allStories.slice(0, nextEnd);
+        loading = false;
+      }, LOAD_DELAY);
+    }
+
+    return {
+      get visible() {
+        return visible;
+      },
+      get loading() {
+        return loading;
+      },
+      get hasMore() {
+        return hasMore;
+      },
+      loadMore,
+    };
+  }
+
   // ── Mock story data ─────────────────────────────────────────────────────
   const hottestStories = [
     {
@@ -235,6 +282,37 @@
       image: 'https://picsum.photos/seed/hot20/400/600',
       mark: 'replay' as const,
     },
+    {
+      title: 'The Gilded Asylum',
+      href: '#',
+      author: {
+        name: 'Petra Volkov',
+        avatar: 'https://i.pravatar.cc/48?u=petraV',
+        href: '#',
+      },
+      genres: ['Psychological Horror', 'Victorian'],
+      image: 'https://picsum.photos/seed/hot21/400/600',
+    },
+    {
+      title: 'Sunken Throne',
+      href: '#',
+      author: { name: 'Kofi Mensah', href: '#' },
+      genres: ['Atlantean', 'Epic'],
+      image: 'https://picsum.photos/seed/hot22/400/600',
+      mark: 'resume' as const,
+      gated: true,
+    },
+    {
+      title: 'Bitter Seasons',
+      href: '#',
+      author: {
+        name: 'Cora Whitfield',
+        avatar: 'https://i.pravatar.cc/48?u=cora',
+        href: '#',
+      },
+      genres: ['Literary Fiction', 'Generational'],
+      image: 'https://picsum.photos/seed/hot23/400/600',
+    },
   ];
 
   const beginnerStories = [
@@ -405,37 +483,10 @@
       genres: ['Fantasy', 'Parody'],
       image: 'https://picsum.photos/seed/begin17/400/600',
     },
-    {
-      title: "Stargazer's Journal",
-      href: '#',
-      author: { name: 'Malik Osei', href: '#' },
-      genres: ['Astronomy', 'Meditative'],
-      image: 'https://picsum.photos/seed/begin18/400/600',
-    },
-    {
-      title: 'Lost & Found',
-      href: '#',
-      author: {
-        name: "Tara O'Brien",
-        avatar: 'https://i.pravatar.cc/48?u=tara',
-        href: '#',
-      },
-      genres: ['Heartwarming', 'Urban'],
-      image: 'https://picsum.photos/seed/begin19/400/600',
-    },
-    {
-      title: 'The Clocktower Cat',
-      href: '#',
-      author: {
-        name: 'Felix Gruber',
-        avatar: 'https://i.pravatar.cc/48?u=felix',
-        href: '#',
-      },
-      genres: ['Cozy', 'Light Fantasy'],
-      image: 'https://picsum.photos/seed/begin20/400/600',
-      mark: 'replay' as const,
-    },
   ];
+
+  const hottest = createPaginatedCategory(hottestStories);
+  const beginner = createPaginatedCategory(beginnerStories);
 
   const staffPickStories = [
     {
@@ -644,7 +695,471 @@
       genres: ['Metafiction', 'Tragicomedy'],
       image: 'https://picsum.photos/seed/staff20/400/600',
     },
+    {
+      title: 'Midnight Bazaar',
+      href: '#',
+      author: {
+        name: 'Leila Zamani',
+        avatar: 'https://i.pravatar.cc/48?u=leila',
+        href: '#',
+      },
+      genres: ['Magical Realism', 'Persian'],
+      image: 'https://picsum.photos/seed/staff21/400/600',
+      mark: 'complete' as const,
+    },
+    {
+      title: 'The Vermillion Circuit',
+      href: '#',
+      author: { name: 'Santiago Ruiz', href: '#' },
+      genres: ['Cyberpunk', 'Noir'],
+      image: 'https://picsum.photos/seed/staff22/400/600',
+    },
+    {
+      title: 'Kindred Engines',
+      href: '#',
+      author: {
+        name: 'Faye Underwood',
+        avatar: 'https://i.pravatar.cc/48?u=faye',
+        href: '#',
+      },
+      genres: ['Steampunk', 'Found Family'],
+      image: 'https://picsum.photos/seed/staff23/400/600',
+      mark: 'replay' as const,
+    },
+    {
+      title: 'The Paper Menagerie',
+      href: '#',
+      author: {
+        name: 'Jia-Li Wong',
+        avatar: 'https://i.pravatar.cc/48?u=jiali',
+        href: '#',
+      },
+      genres: ['Origami Magic', 'Immigrant Story'],
+      image: 'https://picsum.photos/seed/staff24/400/600',
+      gated: true,
+    },
   ];
+
+  const risingStarStories: StoryData[] = [
+    {
+      title: 'The Rust Belt Siren',
+      href: '#',
+      author: {
+        name: 'Jolene Kaczmarek',
+        avatar: 'https://i.pravatar.cc/48?u=jolene',
+        href: '#',
+      },
+      genres: ['Americana', 'Supernatural'],
+      image: 'https://picsum.photos/seed/rise1/400/600',
+    },
+    {
+      title: 'Pressure Drop',
+      href: '#',
+      author: { name: 'Tobias Grant', href: '#' },
+      genres: ['Submarine Thriller', 'Claustrophobic'],
+      image: 'https://picsum.photos/seed/rise2/400/600',
+      mark: 'resume' as const,
+    },
+    {
+      title: 'Daughters of Silt',
+      href: '#',
+      author: {
+        name: 'Amina Diallo',
+        avatar: 'https://i.pravatar.cc/48?u=amina',
+        href: '#',
+      },
+      genres: ['West African Fantasy', 'Coming of Age'],
+      image: 'https://picsum.photos/seed/rise3/400/600',
+    },
+    {
+      title: 'The Apothecary War',
+      href: '#',
+      author: {
+        name: 'Callum Sheehan',
+        avatar: 'https://i.pravatar.cc/48?u=callum',
+        href: '#',
+      },
+      genres: ['Alchemy', 'Low Fantasy'],
+      image: 'https://picsum.photos/seed/rise4/400/600',
+      gated: true,
+    },
+    {
+      title: 'Frostline',
+      href: '#',
+      author: { name: 'Vigdís Arnarsdóttir', href: '#' },
+      genres: ['Nordic Noir', 'Survival'],
+      image: 'https://picsum.photos/seed/rise5/400/600',
+      mark: 'complete' as const,
+    },
+    {
+      title: 'Spool',
+      href: '#',
+      author: {
+        name: 'Darcy Lam',
+        avatar: 'https://i.pravatar.cc/48?u=darcy',
+        href: '#',
+      },
+      genres: ['Time Loop', 'Romance'],
+      image: 'https://picsum.photos/seed/rise6/400/600',
+    },
+    {
+      title: 'Radio Nowhere',
+      href: '#',
+      author: {
+        name: 'Eugene Marsh',
+        avatar: 'https://i.pravatar.cc/48?u=eugene',
+        href: '#',
+      },
+      genres: ['Post-Apocalyptic', 'Road Trip'],
+      image: 'https://picsum.photos/seed/rise7/400/600',
+      mark: 'replay' as const,
+    },
+    {
+      title: 'Silkworm Throne',
+      href: '#',
+      author: {
+        name: 'Wei Lianhua',
+        avatar: 'https://i.pravatar.cc/48?u=lianhua',
+        href: '#',
+      },
+      genres: ['Wuxia', 'Court Intrigue'],
+      image: 'https://picsum.photos/seed/rise8/400/600',
+      gated: true,
+    },
+    {
+      title: 'Bleach & Bloom',
+      href: '#',
+      author: { name: 'Niamh Callaghan', href: '#' },
+      genres: ['Eco-Horror', 'Rural Gothic'],
+      image: 'https://picsum.photos/seed/rise9/400/600',
+    },
+    {
+      title: 'The Conductor',
+      href: '#',
+      author: {
+        name: 'Rafael Mendoza',
+        avatar: 'https://i.pravatar.cc/48?u=rafael',
+        href: '#',
+      },
+      genres: ['Musical', 'Historical Drama'],
+      image: 'https://picsum.photos/seed/rise10/400/600',
+      mark: 'resume' as const,
+    },
+    {
+      title: 'Guttersnipe',
+      href: '#',
+      author: {
+        name: 'Phoebe Tsang',
+        avatar: 'https://i.pravatar.cc/48?u=phoebe',
+        href: '#',
+      },
+      genres: ['Victorian', 'Street Urchin'],
+      image: 'https://picsum.photos/seed/rise11/400/600',
+    },
+    {
+      title: 'The Cartographer of Bones',
+      href: '#',
+      author: { name: 'Idris Conteh', href: '#' },
+      genres: ['Anthropological', 'Mystery'],
+      image: 'https://picsum.photos/seed/rise12/400/600',
+      mark: 'complete' as const,
+    },
+    {
+      title: 'Venom Season',
+      href: '#',
+      author: {
+        name: 'Luz Esperanza',
+        avatar: 'https://i.pravatar.cc/48?u=luz',
+        href: '#',
+      },
+      genres: ['Latin American Gothic', 'Revenge'],
+      image: 'https://picsum.photos/seed/rise13/400/600',
+    },
+    {
+      title: 'Ember Atlas',
+      href: '#',
+      author: {
+        name: 'Oscar Lindqvist',
+        avatar: 'https://i.pravatar.cc/48?u=oscar',
+        href: '#',
+      },
+      genres: ['Cartography', 'Adventure'],
+      image: 'https://picsum.photos/seed/rise14/400/600',
+      gated: true,
+    },
+    {
+      title: 'Switchboard',
+      href: '#',
+      author: {
+        name: 'Mae Donovan',
+        avatar: 'https://i.pravatar.cc/48?u=mae',
+        href: '#',
+      },
+      genres: ['Cold War', 'Espionage'],
+      image: 'https://picsum.photos/seed/rise15/400/600',
+    },
+    {
+      title: 'The Midwife of Monsters',
+      href: '#',
+      author: { name: 'Bruna Costa', href: '#' },
+      genres: ['Dark Fantasy', 'Motherhood'],
+      image: 'https://picsum.photos/seed/rise16/400/600',
+      mark: 'replay' as const,
+    },
+    {
+      title: 'Tidebreak',
+      href: '#',
+      author: {
+        name: 'Ansel Thorpe',
+        avatar: 'https://i.pravatar.cc/48?u=ansel',
+        href: '#',
+      },
+      genres: ['Nautical', 'Supernatural'],
+      image: 'https://picsum.photos/seed/rise17/400/600',
+    },
+    {
+      title: 'A Feast of Ashes',
+      href: '#',
+      author: {
+        name: 'Dina Khoury',
+        avatar: 'https://i.pravatar.cc/48?u=dina',
+        href: '#',
+      },
+      genres: ['Culinary Noir', 'Family Drama'],
+      image: 'https://picsum.photos/seed/rise18/400/600',
+      mark: 'resume' as const,
+    },
+    {
+      title: 'Coilspring',
+      href: '#',
+      author: { name: 'Tadhg Brennan', href: '#' },
+      genres: ['Steampunk', 'Rebellion'],
+      image: 'https://picsum.photos/seed/rise19/400/600',
+    },
+  ];
+
+  const worldBuilderStories: StoryData[] = [
+    {
+      title: 'Ashenmarch',
+      href: '#',
+      author: {
+        name: 'Elara Thorne',
+        avatar: 'https://i.pravatar.cc/48?u=elara',
+        href: '#',
+      },
+      genres: ['Epic Fantasy', 'War Chronicle'],
+      image: 'https://picsum.photos/seed/world1/400/600',
+      mark: 'resume' as const,
+    },
+    {
+      title: 'The Chromatic Rift',
+      href: '#',
+      author: { name: 'Pascal Ngoma', href: '#' },
+      genres: ['Dimensional Travel', 'Sci-Fantasy'],
+      image: 'https://picsum.photos/seed/world2/400/600',
+    },
+    {
+      title: 'Terraform',
+      href: '#',
+      author: {
+        name: 'Sven Eriksson',
+        avatar: 'https://i.pravatar.cc/48?u=sven',
+        href: '#',
+      },
+      genres: ['Hard Sci-Fi', 'Colonization'],
+      image: 'https://picsum.photos/seed/world3/400/600',
+      gated: true,
+    },
+    {
+      title: 'The Broken Concordance',
+      href: '#',
+      author: {
+        name: 'Miriam Alcázar',
+        avatar: 'https://i.pravatar.cc/48?u=miriam',
+        href: '#',
+      },
+      genres: ['Political Fantasy', 'Diplomacy'],
+      image: 'https://picsum.photos/seed/world4/400/600',
+      mark: 'complete' as const,
+    },
+    {
+      title: 'Pelagic',
+      href: '#',
+      author: { name: 'Ondrej Havel', href: '#' },
+      genres: ['Underwater Civilization', 'Sci-Fi'],
+      image: 'https://picsum.photos/seed/world5/400/600',
+    },
+    {
+      title: 'The Crucible Lands',
+      href: '#',
+      author: {
+        name: 'Aderyn Cooke',
+        avatar: 'https://i.pravatar.cc/48?u=aderyn',
+        href: '#',
+      },
+      genres: ['Grimdark', 'Survival'],
+      image: 'https://picsum.photos/seed/world6/400/600',
+      mark: 'replay' as const,
+    },
+    {
+      title: 'Cascade Protocol',
+      href: '#',
+      author: {
+        name: 'Yuna Kim',
+        avatar: 'https://i.pravatar.cc/48?u=yuna',
+        href: '#',
+      },
+      genres: ['Space Opera', 'AI Rebellion'],
+      image: 'https://picsum.photos/seed/world7/400/600',
+    },
+    {
+      title: 'Root & Ruin',
+      href: '#',
+      author: { name: 'Fintan McCarthy', href: '#' },
+      genres: ['Mycelial Network', 'Bio-Fantasy'],
+      image: 'https://picsum.photos/seed/world8/400/600',
+      gated: true,
+    },
+    {
+      title: 'The Sovereignty Engine',
+      href: '#',
+      author: {
+        name: 'Nadia Volkov',
+        avatar: 'https://i.pravatar.cc/48?u=nadia',
+        href: '#',
+      },
+      genres: ['Magitech', 'Empire Building'],
+      image: 'https://picsum.photos/seed/world9/400/600',
+      mark: 'resume' as const,
+    },
+    {
+      title: 'Titanfall Sonata',
+      href: '#',
+      author: {
+        name: 'Hector Salinas',
+        avatar: 'https://i.pravatar.cc/48?u=hector',
+        href: '#',
+      },
+      genres: ['Mecha', 'Opera'],
+      image: 'https://picsum.photos/seed/world10/400/600',
+    },
+    {
+      title: 'The Wandering Caliphate',
+      href: '#',
+      author: { name: 'Farid Al-Rashid', href: '#' },
+      genres: ['Desert Fantasy', 'Nomadic'],
+      image: 'https://picsum.photos/seed/world11/400/600',
+      mark: 'complete' as const,
+    },
+    {
+      title: 'Spore',
+      href: '#',
+      author: {
+        name: 'Iris Nakagawa',
+        avatar: 'https://i.pravatar.cc/48?u=iris',
+        href: '#',
+      },
+      genres: ['Biopunk', 'Fungal Horror'],
+      image: 'https://picsum.photos/seed/world12/400/600',
+    },
+    {
+      title: 'The Infinite Library',
+      href: '#',
+      author: {
+        name: 'Benedict Harrow',
+        avatar: 'https://i.pravatar.cc/48?u=benedict',
+        href: '#',
+      },
+      genres: ['Borges-Inspired', 'Puzzle'],
+      image: 'https://picsum.photos/seed/world13/400/600',
+      mark: 'replay' as const,
+    },
+    {
+      title: 'Hearthstone Vigil',
+      href: '#',
+      author: { name: 'Siobhán Walsh', href: '#' },
+      genres: ['Celtic Fantasy', 'Druidic'],
+      image: 'https://picsum.photos/seed/world14/400/600',
+    },
+    {
+      title: 'The Graviton Cage',
+      href: '#',
+      author: {
+        name: 'Konstantin Zaytsev',
+        avatar: 'https://i.pravatar.cc/48?u=konstantin',
+        href: '#',
+      },
+      genres: ['Physics Fiction', 'Space Station'],
+      image: 'https://picsum.photos/seed/world15/400/600',
+      gated: true,
+    },
+    {
+      title: 'Obsidian Tide',
+      href: '#',
+      author: {
+        name: 'Moana Teʻo',
+        avatar: 'https://i.pravatar.cc/48?u=moana',
+        href: '#',
+      },
+      genres: ['Polynesian Mythology', 'Oceanic'],
+      image: 'https://picsum.photos/seed/world16/400/600',
+      mark: 'resume' as const,
+    },
+    {
+      title: 'Axiom',
+      href: '#',
+      author: { name: 'Lars Henriksen', href: '#' },
+      genres: ['Mathematical', 'Philosophical Sci-Fi'],
+      image: 'https://picsum.photos/seed/world17/400/600',
+    },
+    {
+      title: 'The Loom of Ages',
+      href: '#',
+      author: {
+        name: 'Freya Blackwood',
+        avatar: 'https://i.pravatar.cc/48?u=freya',
+        href: '#',
+      },
+      genres: ['Time-Weaving', 'Multi-Era'],
+      image: 'https://picsum.photos/seed/world18/400/600',
+      mark: 'complete' as const,
+    },
+    {
+      title: 'Canopy',
+      href: '#',
+      author: {
+        name: 'Zuri Mwangi',
+        avatar: 'https://i.pravatar.cc/48?u=zuri',
+        href: '#',
+      },
+      genres: ['Arboreal Civilization', 'Solarpunk'],
+      image: 'https://picsum.photos/seed/world19/400/600',
+    },
+    {
+      title: 'The Bone Cartographers',
+      href: '#',
+      author: { name: 'Esmé Delaney', href: '#' },
+      genres: ['Necromancy', 'Exploration'],
+      image: 'https://picsum.photos/seed/world20/400/600',
+      mark: 'replay' as const,
+      gated: true,
+    },
+    {
+      title: 'Ferrous',
+      href: '#',
+      author: {
+        name: 'Gunnar Ólafsson',
+        avatar: 'https://i.pravatar.cc/48?u=gunnar',
+        href: '#',
+      },
+      genres: ['Dwarven', 'Industrial Fantasy'],
+      image: 'https://picsum.photos/seed/world21/400/600',
+    },
+  ];
+
+  const staffPicks = createPaginatedCategory(staffPickStories);
+  const risingStars = createPaginatedCategory(risingStarStories);
+  const worldBuilders = createPaginatedCategory(worldBuilderStories);
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -654,8 +1169,14 @@
     onclick={interceptDemoLink}
     onkeydown={interceptDemoLink}
   >
-    <StoryCategory title="Hottest right now" tagline="Most played this week.">
-      {#each hottestStories as story}
+    <StoryCategory
+      title="Hottest right now"
+      tagline="Most played this week."
+      loading={hottest.loading}
+      hasMore={hottest.hasMore}
+      onloadmore={hottest.loadMore}
+    >
+      {#each hottest.visible as story (story.title)}
         <Tile
           title={story.title}
           href={story.href}
@@ -671,8 +1192,11 @@
     <StoryCategory
       title="Getting Started"
       tagline="Short, beginner-friendly journeys."
+      loading={beginner.loading}
+      hasMore={beginner.hasMore}
+      onloadmore={beginner.loadMore}
     >
-      {#each beginnerStories as story}
+      {#each beginner.visible as story (story.title)}
         <Tile
           title={story.title}
           href={story.href}
@@ -688,8 +1212,51 @@
     <StoryCategory
       title="Staff Picks"
       tagline="Hand-curated by the CoNexus editorial team."
+      loading={staffPicks.loading}
+      hasMore={staffPicks.hasMore}
+      onloadmore={staffPicks.loadMore}
     >
-      {#each staffPickStories as story}
+      {#each staffPicks.visible as story (story.title)}
+        <Tile
+          title={story.title}
+          href={story.href}
+          author={story.author}
+          genres={story.genres}
+          image={story.image}
+          mark={story.mark}
+          gated={story.gated}
+        />
+      {/each}
+    </StoryCategory>
+
+    <StoryCategory
+      title="Rising Stars"
+      tagline="Breakout hits from indie authors."
+      loading={risingStars.loading}
+      hasMore={risingStars.hasMore}
+      onloadmore={risingStars.loadMore}
+    >
+      {#each risingStars.visible as story (story.title)}
+        <Tile
+          title={story.title}
+          href={story.href}
+          author={story.author}
+          genres={story.genres}
+          image={story.image}
+          mark={story.mark}
+          gated={story.gated}
+        />
+      {/each}
+    </StoryCategory>
+
+    <StoryCategory
+      title="World Builders"
+      tagline="Immersive universes and epic sagas."
+      loading={worldBuilders.loading}
+      hasMore={worldBuilders.hasMore}
+      onloadmore={worldBuilders.loadMore}
+    >
+      {#each worldBuilders.visible as story (story.title)}
         <Tile
           title={story.title}
           href={story.href}

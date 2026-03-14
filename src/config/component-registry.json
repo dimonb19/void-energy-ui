@@ -709,11 +709,19 @@
       "category": "content",
       "component": "StoryCategory",
       "import": "@components/ui/StoryCategory.svelte",
-      "props": ["title", "tagline", "class"],
+      "props": [
+        "title",
+        "tagline",
+        "loading",
+        "hasMore",
+        "onloadmore",
+        "pageSize",
+        "class"
+      ],
       "slots": ["children()"],
       "related": ["tile"],
-      "compose": "Renders a category header (title + tagline) and a horizontal scroll strip for Tile children.",
-      "example": "<StoryCategory title='Hottest right now' tagline='Most played this week.'><Tile ... /><Tile ... /></StoryCategory>"
+      "compose": "Renders a category header (title + tagline) and a horizontal scroll strip for Tile children. Supports optional pagination: pass loading, hasMore, and onloadmore to auto-append skeleton tiles and trigger loading via IntersectionObserver when the user scrolls near the end.",
+      "example": "<StoryCategory title='Hottest right now' tagline='Most played this week.' loading={pageLoading} hasMore={hasNext} onloadmore={fetchPage}><Tile ... /><Tile ... /></StoryCategory>"
     },
     "bar-chart": {
       "category": "chart",

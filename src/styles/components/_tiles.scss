@@ -180,6 +180,17 @@
   @include laser-scrollbar;
 }
 
+// E. Pagination Sentinel (IntersectionObserver target)
+// --------------------------------------------------------------------------
+// A 1px-wide invisible element at the end of the strip. When it enters the
+// scroll viewport, the IO fires onloadmore to fetch the next page.
+.story-category-sentinel {
+  flex: none;
+  width: 1px; // void-ignore (IO sentinel — must be non-zero to intersect)
+  align-self: stretch;
+  pointer-events: none;
+}
+
 // ==========================================================================
 // 2. TILE (Landscape Story Card)
 // ==========================================================================
@@ -246,7 +257,7 @@
       transition: filter var(--speed-base) var(--ease-spring-snappy);
 
       @starting-style {
-        filter: blur(8px); // void-ignore (Blurred appearance)
+        filter: blur(4px); // void-ignore (Blurred appearance)
       }
     }
   }
