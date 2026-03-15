@@ -224,6 +224,24 @@ describe('NarrativeEngine', () => {
     fireAnimationEnd(el, 'narrative-shake');
     expect(onComplete1).not.toHaveBeenCalled();
   });
+
+  it('deregisters from instance map on destroy so the next engine is independent', () => {
+    const el = createEl();
+    const engine1 = new NarrativeEngine(el, { effect: 'breathe' });
+    engine1.start();
+    engine1.destroy();
+
+    expect(el.dataset.narrative).toBeUndefined();
+
+    // A new engine on the same element should work cleanly without
+    // interfering with the destroyed one (destroy cleared the map entry).
+    const engine2 = new NarrativeEngine(el, { effect: 'drift' });
+    engine2.start();
+
+    expect(el.dataset.narrative).toBe('drift');
+    engine2.destroy();
+    expect(el.dataset.narrative).toBeUndefined();
+  });
 });
 
 describe('narrative Svelte action', () => {

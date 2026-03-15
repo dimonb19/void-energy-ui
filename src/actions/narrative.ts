@@ -32,7 +32,8 @@
 //
 //   const engine = new NarrativeEngine(el, { effect: 'breathe' });
 //   engine.start();
-//   engine.stop();
+//   engine.stop();       // clears the active effect (animation + listener)
+//   engine.destroy();    // stop() + deregisters from the instance map
 //
 // ── Integration with Kinetic reveal ────────────────────────
 //
@@ -126,7 +127,8 @@
 //
 // ── Flow ───────────────────────────────────────────────────
 //
-//   1. {#key} changes → old element destroyed (both actions clean up)
+//   1. {#key} changes → old element destroyed (both actions clean up;
+//      destroy() deregisters from the instance map)
 //   2. New element mounts → kinetic starts revealing text
 //   3. Continuous effect: already set → CSS animation plays during reveal
 //      One-shot effect: null → no-op (waits)
@@ -224,6 +226,7 @@ export class NarrativeEngine {
 
   destroy(): void {
     this.clearEffect();
+    activeInstances.delete(this.el);
   }
 
   // ── Internal ────────────────────────────────────────────────

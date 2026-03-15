@@ -518,50 +518,52 @@
           />
         </div>
 
-        <div
-          class="surface-sunk narrative-test-scroll"
-          use:narrative={{
-            effect: activeTestOneShot,
-            enabled: narrativeEffectsEnabled,
-            onComplete: () => {
-              activeTestOneShot = null;
-            },
-          }}
-        >
-          <p>
-            The corridor stretched on for what felt like hours. Every few steps
-            the overhead lights would buzz and settle, buzz and settle, casting
-            long unsteady shadows across the concrete floor. There was no sound
-            except the distant hum of ventilation and the quiet percussion of
-            their own footsteps echoing off bare walls.
-          </p>
-          <p>
-            At the far end a heavy blast door stood half-open, a sliver of pale
-            blue light spilling through the gap. Beyond it they could see a
-            chamber — vast, empty, its ceiling lost in darkness. The floor was
-            polished stone, cracked in places, with hairline fractures radiating
-            out from a central point like the memory of an impact.
-          </p>
-          <p>
-            She pressed her palm flat against the door and pushed. The metal
-            groaned, reluctant, then gave way with a low shudder that traveled
-            up through her arm and into her teeth. The sound rolled through the
-            chamber and came back changed — deeper, longer, as if the room
-            itself had answered.
-          </p>
-          <p>
-            Something was different about the air in here. It tasted of ozone
-            and old copper, the kind of atmosphere that settles into places
-            where energy has been spent violently and never quite dissipated.
-            The cracks in the floor glowed faintly, a dull amber that pulsed
-            once and faded.
-          </p>
-          <p>
-            They stood at the threshold for a long time, neither speaking, both
-            aware that whatever had happened in this room was not finished. The
-            silence was not empty — it was patient. It was waiting for the next
-            sentence to arrive.
-          </p>
+        <div class="surface-sunk narrative-test-scroll">
+          <div
+            class="flex flex-col gap-md"
+            use:narrative={{
+              effect: activeTestOneShot,
+              enabled: narrativeEffectsEnabled,
+              onComplete: () => {
+                activeTestOneShot = null;
+              },
+            }}
+          >
+            <p>
+              The corridor stretched on for what felt like hours. Every few
+              steps the overhead lights would buzz and settle, buzz and settle,
+              casting long unsteady shadows across the concrete floor. There was
+              no sound except the distant hum of ventilation and the quiet
+              percussion of their own footsteps echoing off bare walls.
+            </p>
+            <p>
+              At the far end a heavy blast door stood half-open, a sliver of
+              pale blue light spilling through the gap. Beyond it they could see
+              a chamber — vast, empty, its ceiling lost in darkness. The floor
+              was polished stone, cracked in places, with hairline fractures
+              radiating out from a central point like the memory of an impact.
+            </p>
+            <p>
+              She pressed her palm flat against the door and pushed. The metal
+              groaned, reluctant, then gave way with a low shudder that traveled
+              up through her arm and into her teeth. The sound rolled through
+              the chamber and came back changed — deeper, longer, as if the room
+              itself had answered.
+            </p>
+            <p>
+              Something was different about the air in here. It tasted of ozone
+              and old copper, the kind of atmosphere that settles into places
+              where energy has been spent violently and never quite dissipated.
+              The cracks in the floor glowed faintly, a dull amber that pulsed
+              once and faded.
+            </p>
+            <p>
+              They stood at the threshold for a long time, neither speaking,
+              both aware that whatever had happened in this room was not
+              finished. The silence was not empty — it was patient. It was
+              waiting for the next sentence to arrive.
+            </p>
+          </div>
         </div>
       </div>
 
@@ -587,59 +589,162 @@
           />
         </div>
 
-        <div
-          class="surface-sunk narrative-test-scroll"
-          use:narrative={{
-            effect: testContinuousActive ? testContinuousEffect : null,
-            enabled: narrativeEffectsEnabled,
-          }}
-        >
-          <p>
-            The lake had no edges that she could see. It simply went on, silver
-            and flat, until it became indistinguishable from the low-hanging
-            sky. The boat rocked gently beneath her — not from wind, there was
-            no wind, but from some deep slow rhythm in the water itself, as if
-            the lake were breathing.
-          </p>
-          <p>
-            A lantern hung from the prow on a rusted hook, its flame barely
-            moving. The light it cast was warm and small, touching only the
-            nearest few inches of water before surrendering to the grey. She
-            trailed her fingers over the side and watched the ripples spread
-            outward in perfect circles that never came back.
-          </p>
-          <p>
-            Somewhere beneath the surface, very far down, something luminous
-            drifted. It was too deep to have a shape — just a slow greenish glow
-            that moved like a thought trying to surface. She watched it for a
-            long time, and it watched her back, and neither of them blinked.
-          </p>
-          <p>
-            The silence here was not the silence of absence. It was thick,
-            textured, full of tiny sounds folded into one another: the creak of
-            old wood, the soft lap of water against the hull, a distant tone
-            that might have been a bell or might have been her own pulse
-            amplified by the stillness.
-          </p>
-          <p>
-            She closed her eyes and let the boat carry her. There was no current
-            but the boat moved anyway, slow and sure, as if it knew where she
-            needed to go even when she did not. The lantern flickered once, then
-            steadied. The glow beneath the water followed like a companion.
-          </p>
+        <div class="surface-sunk narrative-test-scroll">
+          <div
+            class="flex flex-col gap-md"
+            use:narrative={{
+              effect: testContinuousActive ? testContinuousEffect : null,
+              enabled: narrativeEffectsEnabled,
+            }}
+          >
+            <p>
+              The lake had no edges that she could see. It simply went on,
+              silver and flat, until it became indistinguishable from the
+              low-hanging sky. The boat rocked gently beneath her — not from
+              wind, there was no wind, but from some deep slow rhythm in the
+              water itself, as if the lake were breathing.
+            </p>
+            <p>
+              A lantern hung from the prow on a rusted hook, its flame barely
+              moving. The light it cast was warm and small, touching only the
+              nearest few inches of water before surrendering to the grey. She
+              trailed her fingers over the side and watched the ripples spread
+              outward in perfect circles that never came back.
+            </p>
+            <p>
+              Somewhere beneath the surface, very far down, something luminous
+              drifted. It was too deep to have a shape — just a slow greenish
+              glow that moved like a thought trying to surface. She watched it
+              for a long time, and it watched her back, and neither of them
+              blinked.
+            </p>
+            <p>
+              The silence here was not the silence of absence. It was thick,
+              textured, full of tiny sounds folded into one another: the creak
+              of old wood, the soft lap of water against the hull, a distant
+              tone that might have been a bell or might have been her own pulse
+              amplified by the stillness.
+            </p>
+            <p>
+              She closed her eyes and let the boat carry her. There was no
+              current but the boat moved anyway, slow and sure, as if it knew
+              where she needed to go even when she did not. The lantern
+              flickered once, then steadied. The glow beneath the water followed
+              like a companion.
+            </p>
+          </div>
         </div>
       </div>
     </div>
   </div>
+
+  <details>
+    <summary>Reference</summary>
+    <div class="p-md flex flex-col gap-lg">
+      <div class="flex flex-col gap-md">
+        <h6 class="text-dim">One-Shot Effects</h6>
+        <p class="text-caption text-mute">
+          Fire once after text is fully revealed. Use for punctuation moments.
+        </p>
+        <dl class="flex flex-col gap-md">
+          <div>
+            <dt><code>shake</code> — Physical Impact</dt>
+            <dd class="text-small text-mute">
+              Rapid horizontal jitter, decaying to rest. Door slams, collisions,
+              nearby explosions, heavy objects crashing.
+            </dd>
+          </div>
+          <div>
+            <dt><code>quake</code> — Massive Force</dt>
+            <dd class="text-small text-mute">
+              Violent two-axis displacement with a rolling settle. Building
+              collapses, close detonations, structural failure, the ground
+              splitting open.
+            </dd>
+          </div>
+          <div>
+            <dt><code>jolt</code> — Sudden Shock</dt>
+            <dd class="text-small text-mute">
+              Single sharp displacement with an elastic snap-back. Jump scares,
+              sudden grabs, betrayals revealed, waking from nightmares.
+            </dd>
+          </div>
+          <div>
+            <dt><code>glitch</code> — Digital Corruption</dt>
+            <dd class="text-small text-mute">
+              Choppy skewed displacement with stepped timing. Simulation
+              malfunctions, memory rewrites, hacking, signal failure, reality
+              fractures.
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <div class="flex flex-col gap-md">
+        <h6 class="text-dim">Continuous Effects</h6>
+        <p class="text-caption text-mute">
+          Loop from the moment the step starts, sustaining atmosphere
+          throughout.
+        </p>
+        <dl class="flex flex-col gap-md">
+          <div>
+            <dt><code>drift</code> — Weightlessness</dt>
+            <dd class="text-small text-mute">
+              Slow vertical sine wave. Underwater scenes, dreaming, zero
+              gravity, fog, meditative calm after intense action.
+            </dd>
+          </div>
+          <div>
+            <dt><code>flicker</code> — Unstable Environment</dt>
+            <dd class="text-small text-mute">
+              Irregular opacity drops with hard cuts. Failing lights, unstable
+              power, haunted spaces, fading transmissions, phasing presence.
+            </dd>
+          </div>
+          <div>
+            <dt><code>breathe</code> — Held Tension</dt>
+            <dd class="text-small text-mute">
+              Slow rhythmic scale pulse. Suspense, centering before action,
+              emotional weight (grief, awe), meditation, charged stillness.
+            </dd>
+          </div>
+          <div>
+            <dt><code>tremble</code> — Fragile Vulnerability</dt>
+            <dd class="text-small text-mute">
+              Fast micro-vibration, deliberately small. Freezing cold, bodily
+              fear, physical fragility, suppressed emotion about to overflow.
+            </dd>
+          </div>
+          <div>
+            <dt><code>pulse</code> — Building Pressure</dt>
+            <dd class="text-small text-mute">
+              Heartbeat-tempo scale with sharp attack. Audible heartbeat, ritual
+              energy charging, countdowns, approaching something powerful.
+            </dd>
+          </div>
+          <div>
+            <dt><code>whisper</code> — Fading Presence</dt>
+            <dd class="text-small text-mute">
+              Opacity and scale recede together. Ghosts speaking, fading
+              memories, telepathy, secrets shared in near-silence, dying words.
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <p class="text-caption text-mute">
+        Most steps should have no effect. Effects are seasoning — contrast and
+        restraint make them land. Full AI reference with detailed scenario
+        triggers available in <code>NARRATIVE-EFFECTS.md</code>.
+      </p>
+    </div>
+  </details>
 </div>
 
 <style lang="scss">
   .narrative-test-scroll {
     max-height: 320px; // void-ignore
     overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
     padding: var(--space-md);
     flex: 1;
   }
