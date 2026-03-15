@@ -3555,7 +3555,7 @@ Physics-aware visual effects for loading states and skeleton loaders.
 
 #### Narrative Effects — Post-reveal text animations
 
-**Description:** Block-level CSS animations triggered after Kinetic text reveal completes. Four one-shot effects (punctuation moments) and six continuous loops (sustained atmosphere). The JS engine sets `data-narrative="<effect>"` on the container element; SCSS owns all keyframes and visual tuning. Designed for AI-powered interactive storytelling — the backend sends a simple effect name per story step, the frontend owns all motion.
+**Description:** Block-level CSS animations triggered after Kinetic text reveal completes. Six one-shot effects (punctuation moments) and twelve continuous loops (sustained atmosphere). The JS engine sets `data-narrative="<effect>"` on the container element; SCSS owns all keyframes and visual tuning. Designed for AI-powered interactive storytelling — the backend sends a simple effect name per story step, the frontend owns all motion.
 **Action:** [src/actions/narrative.ts](src/actions/narrative.ts)
 **CSS:** `[data-narrative]` attribute selectors ([src/styles/components/\_narrative.scss](src/styles/components/_narrative.scss))
 **Types:** [src/types/narrative.d.ts](src/types/narrative.d.ts)
@@ -3576,20 +3576,28 @@ Physics-aware visual effects for loading states and skeleton loaders.
 | `quake` | One-shot | 800ms | X+Y jitter, heavier | Earthquake, explosion, thunder |
 | `jolt` | One-shot | 300ms | Single elastic snap | Jump scare, electric shock |
 | `glitch` | One-shot | 600ms | Choppy translate + skew | Reality break, hacking, corruption |
+| `surge` | One-shot | 500ms | Scale overshoot + brightness | Magic cast, power activation, epiphany |
+| `warp` | One-shot | 600ms | ScaleX oscillation + skew | Teleportation, portal, dimension shift |
 | `drift` | Continuous | 3s/cycle | Gentle vertical sine | Underwater, floating, dreaming |
 | `flicker` | Continuous | 2s/cycle | Irregular opacity drops | Failing lights, haunted spaces |
 | `breathe` | Continuous | 4s/cycle | Subtle scale pulse | Tension, calm focus, meditation |
 | `tremble` | Continuous | 100ms/cycle | Fast micro-vibration | Fear, cold, fragility |
 | `pulse` | Continuous | 1s/cycle | Heartbeat-tempo scale | Ritual energy, countdown |
 | `whisper` | Continuous | 3s/cycle | Scale + opacity recede | Secrets, ghosts, fading memory |
+| `fade` | Continuous | 5s/cycle | Gradual opacity drift | Losing consciousness, drugged, time skip |
+| `freeze` | Continuous | 5s/cycle | Micro contraction + dim | Ice magic, paralysis, stasis |
+| `burn` | Continuous | 1.5s/cycle | Vertical wobble + skew | Fire, desert heat, rage, fever |
+| `static` | Continuous | 200ms+2s | Rapid jitter + opacity flicker | Radio noise, broken comms, interference |
+| `distort` | Continuous | 3.5s/cycle | Rotation + asymmetric scale | Drunk, poisoned, hallucinating, vertigo |
+| `sway` | Continuous | 2.5s/cycle | Horizontal sine wave | Ship travel, storms, unstable footing |
 
 **Physics Adaptation:**
 
 | Physics | Treatment |
 | --- | --- |
-| **Glass** | Motion blur (`filter: blur(0.5px)`) on displacement effects (shake, quake, jolt) |
+| **Glass** | Motion blur (`filter: blur(0.5px)`) on displacement effects (shake, quake, jolt, warp, burn, static, sway) |
 | **Flat** | Default keyframes — clean curves, no embellishment |
-| **Retro** | Per-effect stepped timing (CRT feel). Glitch and tremble keep their native timing; others get `steps(3-8)` |
+| **Retro** | Per-effect stepped timing (CRT feel). Glitch, tremble, burn, and static keep their native timing; others get `steps(3-8)` |
 
 **Lifecycle:**
 - **One-shot:** Plays once → `animationend` guard cleans up `data-narrative` → `onComplete` fires
@@ -5454,7 +5462,7 @@ All charts are pure SVG, fluid-width, and adapt to atmosphere/physics/mode. Pass
 {/key}
 ```
 
-One-shot effects (`shake`, `quake`, `jolt`, `glitch`) auto-clear after `animationend`. Continuous effects (`drift`, `flicker`, `breathe`, `tremble`, `pulse`, `whisper`) loop until `effect` is set to `null`. When chaining with kinetic reveal: **continuous effects start immediately** (ambient atmosphere during reveal), **one-shot effects wait** for `onComplete` (punctuation on full text). Use `isOneShotEffect()` to branch. The effect can also arrive late (e.g. from API) — setting it mid-reveal activates the animation immediately. The `enabled` flag gates all animation via `voidEngine.userConfig.narrativeEffects`. See the Narrative Effects action entry for the full chaining pattern and lifecycle rules.
+One-shot effects (`shake`, `quake`, `jolt`, `glitch`, `surge`, `warp`) auto-clear after `animationend`. Continuous effects (`drift`, `flicker`, `breathe`, `tremble`, `pulse`, `whisper`, `fade`, `freeze`, `burn`, `static`, `distort`, `sway`) loop until `effect` is set to `null`. When chaining with kinetic reveal: **continuous effects start immediately** (ambient atmosphere during reveal), **one-shot effects wait** for `onComplete` (punctuation on full text). Use `isOneShotEffect()` to branch. The effect can also arrive late (e.g. from API) — setting it mid-reveal activates the animation immediately. The `enabled` flag gates all animation via `voidEngine.userConfig.narrativeEffects`. See the Narrative Effects action entry for the full chaining pattern and lifecycle rules.
 
 ---
 
@@ -5920,22 +5928,22 @@ Block-level CSS animations applied to a container element via the `data-narrativ
 | `enabled` | `boolean` | `true` | Master kill switch — when `false`, stops any running animation |
 | `onComplete` | `() => void` | — | Fires when a one-shot finishes or is skipped; not called for continuous |
 
-`NarrativeEffect` = `'shake' | 'quake' | 'jolt' | 'glitch' | 'drift' | 'flicker' | 'breathe' | 'tremble' | 'pulse' | 'whisper'`
+`NarrativeEffect` = `'shake' | 'quake' | 'jolt' | 'glitch' | 'surge' | 'warp' | 'drift' | 'flicker' | 'breathe' | 'tremble' | 'pulse' | 'whisper' | 'fade' | 'freeze' | 'burn' | 'static' | 'distort' | 'sway'`
 
 #### Effect Types
 
 | Category | Effects | Behavior |
 | --- | --- | --- |
-| **One-shot** | shake, quake, jolt, glitch | Play once → `animationend` cleanup → `onComplete` fires |
-| **Continuous** | drift, flicker, breathe, tremble, pulse, whisper | Loop indefinitely until `effect` is set to `null` |
+| **One-shot** | shake, quake, jolt, glitch, surge, warp | Play once → `animationend` cleanup → `onComplete` fires |
+| **Continuous** | drift, flicker, breathe, tremble, pulse, whisper, fade, freeze, burn, static, distort, sway | Loop indefinitely until `effect` is set to `null` |
 
 #### Physics Profiles
 
 | Physics | Treatment |
 | --- | --- |
-| **Glass** | Motion blur (`filter: blur(0.5px)`) on shake, quake, jolt |
+| **Glass** | Motion blur (`filter: blur(0.5px)`) on shake, quake, jolt, warp, burn, static, sway |
 | **Flat** | Default keyframes — no embellishment |
-| **Retro** | Per-effect stepped timing (CRT). Glitch/tremble keep native timing |
+| **Retro** | Per-effect stepped timing (CRT). Glitch, tremble, burn, static keep native timing |
 
 #### Usage (Action)
 
@@ -5962,8 +5970,8 @@ Block-level CSS animations applied to a container element via the `data-narrativ
 
 The primary use case: text is revealed with kinetic typography while narrative effects set the mood. The two effect categories have different timing:
 
-- **Continuous effects** (drift, flicker, breathe, tremble, pulse, whisper) — start **immediately**. They are ambient atmosphere that plays during the kinetic reveal, setting the mood from the first word.
-- **One-shot effects** (shake, quake, jolt, glitch) — wait for kinetic to **finish**. They are punctuation moments that only make sense once the full text is visible.
+- **Continuous effects** (drift, flicker, breathe, tremble, pulse, whisper, fade, freeze, burn, static, distort, sway) — start **immediately**. They are ambient atmosphere that plays during the kinetic reveal, setting the mood from the first word.
+- **One-shot effects** (shake, quake, jolt, glitch, surge, warp) — wait for kinetic to **finish**. They are punctuation moments that only make sense once the full text is visible.
 
 Use `isOneShotEffect()` to branch the timing.
 

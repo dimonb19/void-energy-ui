@@ -2,13 +2,21 @@ type NarrativeEffect =
   | 'shake'
   | 'quake'
   | 'jolt'
-  | 'glitch' // one-shot
+  | 'glitch'
+  | 'surge'
+  | 'warp' // one-shot
   | 'drift'
   | 'flicker'
   | 'breathe'
-  | 'tremble' // continuous
+  | 'tremble'
   | 'pulse'
-  | 'whisper'; // continuous
+  | 'whisper'
+  | 'fade'
+  | 'freeze'
+  | 'burn'
+  | 'static'
+  | 'distort'
+  | 'sway'; // continuous
 
 interface NarrativeConfig {
   /** The effect to apply, or null to clear */

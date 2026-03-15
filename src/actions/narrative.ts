@@ -15,6 +15,8 @@
 //     quake  — heavy X+Y jitter, longer settle (800ms)
 //     jolt   — single sharp displacement, elastic snap-back (300ms)
 //     glitch — choppy offset + skew, stepped timing (600ms)
+//     surge  — ascending power buildup with scale overshoot (500ms)
+//     warp   — spatial scaleX oscillation with subtle skew (600ms)
 //
 //   Continuous (loop until cleared):
 //     drift   — gentle vertical sine wave (3s)
@@ -23,6 +25,12 @@
 //     tremble — fast micro-shake vibration (100ms)
 //     pulse   — heartbeat-tempo scale, sharp attack (1s)
 //     whisper — shrink + fade, fragile presence (3s)
+//     fade    — slow consciousness dissolve, opacity drift (5s)
+//     freeze  — cold stillness, micro contraction + dim (5s)
+//     burn    — heat distortion, vertical micro-wobble + skew (1.5s)
+//     static  — persistent signal noise, rapid jitter + opacity flicker (200ms)
+//     distort — woozy perception warp, rotation + asymmetric scale (3.5s)
+//     sway    — lateral oscillation, horizontal sine wave (2.5s)
 //
 // ── Usage as Svelte action ─────────────────────────────────
 //
@@ -45,11 +53,11 @@
 // The two effect categories behave differently during reveal:
 //
 //   Continuous effects (drift, flicker, breathe, tremble,
-//   pulse, whisper) — start IMMEDIATELY. They are ambient
+//   pulse, whisper, fade, freeze, burn, static, distort, sway) — start IMMEDIATELY. They are ambient
 //   atmosphere: the text drifts or flickers as it streams in,
 //   setting the mood from the first word.
 //
-//   One-shot effects (shake, quake, jolt, glitch) — wait for
+//   One-shot effects (shake, quake, jolt, glitch, surge, warp) — wait for
 //   kinetic to FINISH. They are punctuation: a jolt only makes
 //   sense once the full sentence is visible.
 //
@@ -159,6 +167,8 @@ const ONE_SHOT_EFFECTS: ReadonlySet<NarrativeEffect> = new Set([
   'quake',
   'jolt',
   'glitch',
+  'surge',
+  'warp',
 ]);
 
 /** Check whether an effect is one-shot (plays once) vs continuous (loops). */

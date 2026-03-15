@@ -7,8 +7,8 @@
  * on the container element; this file owns all keyframes and animation rules.
  *
  * EFFECT TYPES:
- * - One-shot: shake, quake, jolt, glitch (play once, auto-complete)
- * - Continuous: drift, flicker, breathe, tremble, pulse, whisper (loop)
+ * - One-shot: shake, quake, jolt, glitch, surge, warp (play once, auto-complete)
+ * - Continuous: drift, flicker, breathe, tremble, pulse, whisper, fade, freeze, burn, static, distort (loop)
  *
  * PHYSICS VARIANTS:
  * - Glass: motion blur on displacement effects
@@ -150,6 +150,55 @@
   }
 }
 
+// ── Surge: ascending power buildup with brightness flash ──
+@keyframes narrative-surge {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  30% {
+    transform: scale(1.05); // void-ignore — power peak overshoot
+    filter: brightness(1.15); // void-ignore — brightness flash at peak
+  }
+  50% {
+    transform: scale(1.02); // void-ignore — settling
+    filter: brightness(1);
+  }
+  70% {
+    transform: scale(1.005); // void-ignore
+    filter: brightness(1);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+// ── Warp: spatial distortion via scaleX oscillation + subtle skew ──
+@keyframes narrative-warp {
+  0% {
+    transform: scaleX(1) skewX(0deg);
+  }
+  15% {
+    transform: scaleX(0.97) skewX(-1.5deg); // void-ignore
+  }
+  30% {
+    transform: scaleX(1.03) skewX(1deg); // void-ignore
+  }
+  45% {
+    transform: scaleX(0.98) skewX(-0.5deg); // void-ignore
+  }
+  60% {
+    transform: scaleX(1.02) skewX(0.5deg); // void-ignore
+  }
+  75% {
+    transform: scaleX(0.99) skewX(0deg); // void-ignore
+  }
+  100% {
+    transform: scaleX(1) skewX(0deg);
+  }
+}
+
 // ==========================================================================
 // KEYFRAMES — CONTINUOUS
 // ==========================================================================
@@ -251,6 +300,122 @@
   }
 }
 
+// ── Fade: slow consciousness dissolve ──
+@keyframes narrative-fade {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5; // void-ignore — consciousness dissolve floor
+  }
+}
+
+// ── Freeze: cold stillness / paralysis ──
+@keyframes narrative-freeze {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.995); // void-ignore — micro contraction
+    opacity: 0.85; // void-ignore — cold dim
+  }
+}
+
+// ── Burn: heat distortion / thermal haze ──
+@keyframes narrative-burn {
+  0% {
+    transform: translateY(0) skewX(0deg);
+  }
+  25% {
+    transform: translateY(-1.5px) skewX(0.3deg); // void-ignore
+  }
+  50% {
+    transform: translateY(0) skewX(-0.2deg); // void-ignore
+  }
+  75% {
+    transform: translateY(1.5px) skewX(0.3deg); // void-ignore
+  }
+  100% {
+    transform: translateY(0) skewX(0deg);
+  }
+}
+
+// ── Static: persistent signal noise (jitter cycle) ──
+@keyframes narrative-static-jitter {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(0.5px, -0.5px); // void-ignore
+  }
+  50% {
+    transform: translate(-1px, 0.5px); // void-ignore
+  }
+  75% {
+    transform: translate(0.5px, 0.5px); // void-ignore
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+// ── Static: overlapping opacity flicker ──
+@keyframes narrative-static-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  15% {
+    opacity: 0.7; // void-ignore
+  }
+  30% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.8; // void-ignore
+  }
+  75% {
+    opacity: 0.6; // void-ignore
+  }
+  85% {
+    opacity: 1;
+  }
+}
+
+// ── Distort: woozy perception warp (drunk, poisoned, hallucinating) ──
+@keyframes narrative-distort {
+  0%,
+  100% {
+    transform: rotate(-0.4deg) scaleX(0.998) scaleY(1.003); // void-ignore
+  }
+  20% {
+    transform: rotate(0deg) scaleX(1) scaleY(1);
+  }
+  40% {
+    transform: rotate(0.4deg) scaleX(1.008) scaleY(0.995); // void-ignore
+  }
+  60% {
+    transform: rotate(-0.3deg) scaleX(0.995) scaleY(1.005); // void-ignore
+  }
+  80% {
+    transform: rotate(0.2deg) scaleX(1.005) scaleY(0.998); // void-ignore
+  }
+}
+
+// ── Sway: lateral oscillation (ship travel, storms, unstable footing) ──
+@keyframes narrative-sway {
+  0%,
+  100% {
+    transform: translateX(-4px); // void-ignore
+  }
+  50% {
+    transform: translateX(4px); // void-ignore
+  }
+}
+
 // ==========================================================================
 // ANIMATION RULES
 // ==========================================================================
@@ -267,6 +432,12 @@
 }
 [data-narrative='glitch'] {
   animation: narrative-glitch 600ms steps(8); // void-ignore
+}
+[data-narrative='surge'] {
+  animation: narrative-surge 500ms ease-out; // void-ignore
+}
+[data-narrative='warp'] {
+  animation: narrative-warp 600ms ease-in-out; // void-ignore
 }
 
 // ── Continuous ──
@@ -287,6 +458,27 @@
 }
 [data-narrative='whisper'] {
   animation: narrative-whisper 3s ease-in-out infinite; // void-ignore
+}
+[data-narrative='fade'] {
+  animation: narrative-fade 5s ease-in-out infinite; // void-ignore
+}
+[data-narrative='freeze'] {
+  animation: narrative-freeze 5s ease-in-out infinite; // void-ignore
+}
+[data-narrative='burn'] {
+  animation: narrative-burn 1.5s linear infinite; // void-ignore
+}
+[data-narrative='static'] {
+  animation:
+    narrative-static-jitter 200ms linear infinite,
+    // void-ignore
+    narrative-static-flicker 2s steps(1) infinite; // void-ignore
+}
+[data-narrative='distort'] {
+  animation: narrative-distort 3.5s linear infinite; // void-ignore
+}
+[data-narrative='sway'] {
+  animation: narrative-sway 2.5s ease-in-out infinite; // void-ignore
 }
 
 // ==========================================================================
@@ -314,6 +506,32 @@
   }
 }
 
+// surge uses filter: brightness() in its keyframes — glass blur would conflict,
+// so we skip it. warp gets blur for its spatial displacement.
+[data-narrative='warp'] {
+  @include when-glass {
+    filter: blur(0.5px); // void-ignore — spatial distortion blur
+  }
+}
+
+[data-narrative='burn'] {
+  @include when-glass {
+    filter: blur(0.5px); // void-ignore — heat haze blur
+  }
+}
+
+[data-narrative='static'] {
+  @include when-glass {
+    filter: blur(0.3px); // void-ignore — signal noise blur
+  }
+}
+
+[data-narrative='sway'] {
+  @include when-glass {
+    filter: blur(0.5px); // void-ignore — lateral displacement blur
+  }
+}
+
 // ── Flat: default keyframes are appropriate — no embellishment needed ──
 
 // ── Retro: per-effect CRT-style stepped timing ──
@@ -332,6 +550,18 @@
 }
 
 // glitch already uses steps(8) — leave it alone
+
+[data-narrative='surge'] {
+  @include when-retro {
+    animation-timing-function: steps(4);
+  }
+}
+
+[data-narrative='warp'] {
+  @include when-retro {
+    animation-timing-function: steps(5);
+  }
+}
 
 // Continuous: CRT-appropriate stepped timing
 [data-narrative='drift'] {
@@ -358,5 +588,31 @@
   }
 }
 
+[data-narrative='fade'] {
+  @include when-retro {
+    animation-timing-function: steps(8);
+  }
+}
+
+[data-narrative='freeze'] {
+  @include when-retro {
+    animation-timing-function: steps(6);
+  }
+}
+
+[data-narrative='distort'] {
+  @include when-retro {
+    animation-timing-function: steps(6);
+  }
+}
+
+[data-narrative='sway'] {
+  @include when-retro {
+    animation-timing-function: steps(6);
+  }
+}
+
 // flicker already uses steps(1) — leave it alone
 // tremble stays linear — high-frequency vibration needs smooth interpolation even on CRT
+// burn stays linear — heat wobble needs smooth interpolation (same reasoning as tremble)
+// static jitter stays linear — rapid noise needs smooth interpolation; flicker layer already uses steps(1)

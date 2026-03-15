@@ -12,14 +12,26 @@
 
   // ── Types ────────────────────────────────────────────────────────────────
 
-  type OneShotNarrativeEffect = 'shake' | 'quake' | 'jolt' | 'glitch';
+  type OneShotNarrativeEffect =
+    | 'shake'
+    | 'quake'
+    | 'jolt'
+    | 'glitch'
+    | 'surge'
+    | 'warp';
   type ContinuousNarrativeEffect =
     | 'drift'
     | 'flicker'
     | 'breathe'
     | 'tremble'
     | 'pulse'
-    | 'whisper';
+    | 'whisper'
+    | 'fade'
+    | 'freeze'
+    | 'burn'
+    | 'static'
+    | 'distort'
+    | 'sway';
 
   interface NarrativeDemo<T extends NarrativeEffect> {
     effect: T;
@@ -59,6 +71,20 @@
       context: 'Reality corruption, hacking, signal failure',
       text: 'For one breath, the memory fractured into static and rewrote itself.',
       note: 'Choppy skewed displacement tuned for digital instability.',
+    },
+    {
+      effect: 'surge',
+      label: 'Surge',
+      context: 'Magic cast, transformation, power activation, epiphany',
+      text: 'Light gathered in her palms and erupted skyward, burning through the dark like a second dawn.',
+      note: 'Ascending power buildup with scale overshoot and brightness flash.',
+    },
+    {
+      effect: 'warp',
+      label: 'Warp',
+      context: 'Teleportation, portal entry, dimensional shift, time warp',
+      text: 'The doorway stretched sideways, pulled itself thin, and snapped her through before she could scream.',
+      note: 'Horizontal scaleX oscillation with subtle skew for spatial distortion.',
     },
   ] satisfies NarrativeDemo<OneShotNarrativeEffect>[];
 
@@ -105,6 +131,49 @@
       text: 'A voice slipped past her ear so softly it felt borrowed from another room.',
       note: 'Opacity and scale recede together for a fragile presence.',
     },
+    {
+      effect: 'fade',
+      label: 'Fade',
+      context: 'Losing consciousness, drugged, time skip, falling asleep',
+      text: 'The edges of the room softened and blurred away. Her thoughts dissolved one by one until only the dark remained.',
+      note: 'Gradual opacity drift. Pure visibility change, no scale or position.',
+    },
+    {
+      effect: 'freeze',
+      label: 'Freeze',
+      context: 'Ice magic, paralysis, time freeze, petrification, stasis',
+      text: 'The frost crept up her fingers and locked every joint in place. Even her breath hung motionless in the air.',
+      note: 'Micro contraction and brightness reduction. Extremely subtle, reads as stillness.',
+    },
+    {
+      effect: 'burn',
+      label: 'Burn',
+      context: 'Fire scenes, desert heat, rage, fever, volcanic environments',
+      text: 'Heat rolled off the sand in visible waves, warping the horizon into a shimmering ribbon of light.',
+      note: 'Vertical micro-wobble with skew oscillation. Faster rhythm than drift.',
+    },
+    {
+      effect: 'static',
+      label: 'Static',
+      context:
+        'Radio transmission, broken comms, digital interference, corrupted data',
+      text: 'The signal dissolved into noise. Fragments of a voice fought through the interference, barely holding shape.',
+      note: 'Rapid micro-jitter layered with opacity flicker. Tighter than tremble.',
+    },
+    {
+      effect: 'distort',
+      label: 'Distort',
+      context: 'Drunk, poisoned, hallucinating, vertigo, psychic influence',
+      text: 'The walls bent without moving. Every surface tilted just enough to be wrong, and her own hands looked like they belonged to someone standing in a different room.',
+      note: 'Subtle rotation + asymmetric scale. Perception unreliable but still conscious.',
+    },
+    {
+      effect: 'sway',
+      label: 'Sway',
+      context: 'Ship travel, storms, unstable footing, earthquake aftermath',
+      text: 'The deck rolled beneath her feet and every step became a negotiation with gravity. The horizon tilted left, then right, then left again.',
+      note: 'Lateral translateX sine wave. Distinct from drift (vertical) and burn (vertical+skew).',
+    },
   ] satisfies NarrativeDemo<ContinuousNarrativeEffect>[];
 
   // ── One-shot / continuous toggle state ──────────────────────────────────
@@ -116,6 +185,8 @@
     quake: null,
     jolt: null,
     glitch: null,
+    surge: null,
+    warp: null,
   });
 
   let activeContinuousEffects = $state<
@@ -127,6 +198,12 @@
     tremble: null,
     pulse: null,
     whisper: null,
+    fade: null,
+    freeze: null,
+    burn: null,
+    static: null,
+    distort: null,
+    sway: null,
   });
 
   const narrativeEffectsEnabled = $derived(
@@ -160,6 +237,8 @@
     { value: 'quake', label: 'Quake' },
     { value: 'jolt', label: 'Jolt' },
     { value: 'glitch', label: 'Glitch' },
+    { value: 'surge', label: 'Surge' },
+    { value: 'warp', label: 'Warp' },
   ];
 
   const continuousOptions = [
@@ -169,6 +248,12 @@
     { value: 'tremble', label: 'Tremble' },
     { value: 'pulse', label: 'Pulse' },
     { value: 'whisper', label: 'Whisper' },
+    { value: 'fade', label: 'Fade' },
+    { value: 'freeze', label: 'Freeze' },
+    { value: 'burn', label: 'Burn' },
+    { value: 'static', label: 'Static' },
+    { value: 'distort', label: 'Distort' },
+    { value: 'sway', label: 'Sway' },
   ];
 
   async function playTestOneShot() {
@@ -200,6 +285,14 @@
       text: 'The console screen tore itself apart. Characters bled sideways, reforming into words that had no business being there — coordinates she had never entered, names she had never spoken aloud.',
       narrativeEffect: 'glitch' as NarrativeEffect,
     },
+    {
+      text: 'Light gathered in her palms and erupted skyward. The air itself buckled and sang, and for one bright instant she was the source of everything.',
+      narrativeEffect: 'surge' as NarrativeEffect,
+    },
+    {
+      text: 'The doorway stretched sideways and pulled itself thin. She felt her edges dissolve, scatter across impossible distance, and reassemble somewhere that smelled of copper and static.',
+      narrativeEffect: 'warp' as NarrativeEffect,
+    },
     // ── Continuous effects ──
     {
       text: 'The lantern drifted beside her, its flame barely stirring. Every sound arrived late, softened, as if the water between them and the surface had swallowed the sharp edges of the world.',
@@ -224,6 +317,30 @@
     {
       text: 'A voice slipped past her ear so softly it felt borrowed from another room. The words dissolved before she could hold them, leaving only the shape of a warning.',
       narrativeEffect: 'whisper' as NarrativeEffect,
+    },
+    {
+      text: 'The room grew distant, each detail retreating behind a thickening veil. She tried to hold onto the lamplight but it slid through her awareness like water through open fingers.',
+      narrativeEffect: 'fade' as NarrativeEffect,
+    },
+    {
+      text: 'The frost arrived without warning. One breath she was warm, the next her joints locked and the air itself turned brittle around her. Even sound seemed to slow.',
+      narrativeEffect: 'freeze' as NarrativeEffect,
+    },
+    {
+      text: 'Heat poured from the cracked ground in visible waves. The air trembled and the edges of everything shimmered as if reality itself was sweating.',
+      narrativeEffect: 'burn' as NarrativeEffect,
+    },
+    {
+      text: 'The broadcast fractured into noise. Words surfaced and drowned in rapid succession — coordinates, a name, a warning — each one clawing for coherence before the static swallowed it whole.',
+      narrativeEffect: 'static' as NarrativeEffect,
+    },
+    {
+      text: "The potion hit her bloodstream and the room tilted. Walls leaned at angles that couldn't exist, her own hands rippled at the edges, and every thought arrived sideways.",
+      narrativeEffect: 'distort' as NarrativeEffect,
+    },
+    {
+      text: 'The deck pitched hard to starboard and she grabbed the railing with both hands. Every step was a guess, every surface a betrayal, and the sea had no intention of holding still.',
+      narrativeEffect: 'sway' as NarrativeEffect,
     },
   ];
 
@@ -307,13 +424,16 @@
         physically reacts once it is on screen.
       </p>
       <p>
-        The four one-shot effects (<code>shake</code>, <code>quake</code>,
-        <code>jolt</code>, <code>glitch</code>) auto-clean through the
-        action&apos;s <code>animationend</code> guard. The six continuous
-        effects (<code>drift</code>, <code>flicker</code>,
-        <code>breathe</code>,
-        <code>tremble</code>, <code>pulse</code>, <code>whisper</code>) loop
-        until the consumer clears them or disables the system.
+        The six one-shot effects (<code>shake</code>, <code>quake</code>,
+        <code>jolt</code>, <code>glitch</code>, <code>surge</code>,
+        <code>warp</code>) auto-clean through the action&apos;s
+        <code>animationend</code> guard. The twelve continuous effects (<code
+          >drift</code
+        >, <code>flicker</code>, <code>breathe</code>,
+        <code>tremble</code>, <code>pulse</code>, <code>whisper</code>,
+        <code>fade</code>, <code>freeze</code>, <code>burn</code>,
+        <code>static</code>, <code>distort</code>, <code>sway</code>) loop until
+        the consumer clears them or disables the system.
       </p>
       <p>
         Physics styling lives entirely in SCSS. Glass adds motion blur on
@@ -507,7 +627,7 @@
             options={oneShotOptions}
             bind:value={testOneShotEffect}
             onchange={() => {
-              activeTestOneShot = null;
+              playTestOneShot();
             }}
             class="flex-1"
           />
@@ -574,7 +694,7 @@
             options={continuousOptions}
             bind:value={testContinuousEffect}
             onchange={() => {
-              testContinuousActive = false;
+              testContinuousActive = true;
             }}
             class="flex-1"
           />
@@ -677,6 +797,20 @@
               fractures.
             </dd>
           </div>
+          <div>
+            <dt><code>surge</code> — Power Activation</dt>
+            <dd class="text-small text-mute">
+              Ascending scale with brightness flash. Magic cast, transformation,
+              divine intervention, power activation, epiphany.
+            </dd>
+          </div>
+          <div>
+            <dt><code>warp</code> — Spatial Distortion</dt>
+            <dd class="text-small text-mute">
+              Horizontal scaleX oscillation with subtle skew. Teleportation,
+              portal entry, dimensional shift, time warp, gravity anomaly.
+            </dd>
+          </div>
         </dl>
       </div>
 
@@ -727,6 +861,48 @@
             <dd class="text-small text-mute">
               Opacity and scale recede together. Ghosts speaking, fading
               memories, telepathy, secrets shared in near-silence, dying words.
+            </dd>
+          </div>
+          <div>
+            <dt><code>fade</code> — Consciousness Dissolve</dt>
+            <dd class="text-small text-mute">
+              Gradual opacity drift to half visibility. Losing consciousness,
+              drugged, time skip, memory dissolving, falling asleep.
+            </dd>
+          </div>
+          <div>
+            <dt><code>freeze</code> — Cold Stillness</dt>
+            <dd class="text-small text-mute">
+              Micro scale contraction with brightness reduction. Ice magic,
+              paralysis, time freeze, petrification, stasis.
+            </dd>
+          </div>
+          <div>
+            <dt><code>burn</code> — Heat Distortion</dt>
+            <dd class="text-small text-mute">
+              Vertical micro-wobble with skew at fast rhythm. Fire scenes,
+              desert heat, rage, fever, volcanic environments.
+            </dd>
+          </div>
+          <div>
+            <dt><code>static</code> — Signal Noise</dt>
+            <dd class="text-small text-mute">
+              Rapid micro-jitter layered with opacity flicker. Radio
+              transmission, broken comms, digital interference, corrupted data.
+            </dd>
+          </div>
+          <div>
+            <dt><code>distort</code> — Woozy Perception</dt>
+            <dd class="text-small text-mute">
+              Subtle rotation with asymmetric scale oscillation. Drunk,
+              poisoned, hallucinating, vertigo, psychic influence, concussion.
+            </dd>
+          </div>
+          <div>
+            <dt><code>sway</code> — Lateral Oscillation</dt>
+            <dd class="text-small text-mute">
+              Horizontal sine wave. Ship travel, storms, unstable footing,
+              earthquake aftermath, rope bridges, moving vehicles.
             </dd>
           </div>
         </dl>

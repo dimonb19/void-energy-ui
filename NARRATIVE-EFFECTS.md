@@ -4,7 +4,7 @@ Structured reference for the AI that generates CoNexus story steps. Each entry d
 
 ## Schema
 
-Each story step may include a `narrativeEffect` field. The value is one of the 10 effect names below, or `null` (no effect). The field is optional — omitting it is equivalent to `null`.
+Each story step may include a `narrativeEffect` field. The value is one of the 18 effect names below, or `null` (no effect). The field is optional — omitting it is equivalent to `null`.
 
 ```ts
 interface StoryStep {
@@ -14,8 +14,11 @@ interface StoryStep {
 
 type NarrativeEffect =
   | 'shake' | 'quake' | 'jolt' | 'glitch'       // one-shot
+  | 'surge' | 'warp'                              // one-shot
   | 'drift' | 'flicker' | 'breathe' | 'tremble'  // continuous
-  | 'pulse' | 'whisper';                          // continuous
+  | 'pulse' | 'whisper'                           // continuous
+  | 'fade' | 'freeze' | 'burn' | 'static'         // continuous
+  | 'distort' | 'sway';                            // continuous
 ```
 
 ---
@@ -110,6 +113,48 @@ type NarrativeEffect =
     "do_not_use_when": [
       "The disruption is physical (impact, explosion) — use shake/quake",
       "The moment is purely emotional shock — use jolt"
+    ]
+  },
+
+  {
+    "effect": "surge",
+    "category": "one-shot",
+    "intensity": "pronounced",
+    "duration": "500ms",
+    "motion": "Ascending scale with brightness overshoot, then settle.",
+    "emotion": "Power awakening. Something has been unleashed or realized.",
+    "use_when": [
+      "A spell or magical ability activates, erupts, or detonates",
+      "A character transforms, evolves, or ascends",
+      "Divine intervention — a god responds, a blessing manifests",
+      "A sudden epiphany or breakthrough — clarity hits like a wave",
+      "An artifact or power source activates for the first time"
+    ],
+    "do_not_use_when": [
+      "The force is destructive or violent — use quake/shake",
+      "The moment is digital corruption — use glitch",
+      "The power is sustained rather than a single moment — use pulse (continuous)"
+    ]
+  },
+
+  {
+    "effect": "warp",
+    "category": "one-shot",
+    "intensity": "medium",
+    "duration": "600ms",
+    "motion": "Horizontal scaleX oscillation with subtle skew. Spatial distortion.",
+    "emotion": "Space itself is bending. The rules of geometry are briefly wrong.",
+    "use_when": [
+      "Teleportation — a character is moved instantaneously",
+      "Portal entry or exit — crossing dimensional boundaries",
+      "A time warp, time skip, or temporal anomaly",
+      "Gravity fails or inverts briefly",
+      "Space folds, compresses, or stretches around a character"
+    ],
+    "do_not_use_when": [
+      "The distortion is digital/data — use glitch",
+      "The spatial effect is sustained — use drift (continuous)",
+      "The moment is a physical impact — use jolt or shake"
     ]
   },
 
@@ -246,6 +291,136 @@ type NarrativeEffect =
       "The voice is confident or commanding",
       "The instability is environmental — use flicker instead",
       "The fragility is physical (shaking body) — use tremble"
+    ]
+  },
+
+  {
+    "effect": "fade",
+    "category": "continuous",
+    "intensity": "heavy",
+    "cycle": "5s",
+    "motion": "Gradual opacity drift to half visibility and back. Pure opacity, no position or scale.",
+    "emotion": "Slipping away. The world is receding or consciousness is failing.",
+    "use_when": [
+      "A character is losing consciousness — injury, poison, exhaustion",
+      "Drugged or sedated — perception dissolving involuntarily",
+      "A time skip — the present moment is fading into the next",
+      "A memory dissolving on inspection — trying to hold a dream",
+      "Falling asleep — the scene grows distant as awareness leaves"
+    ],
+    "do_not_use_when": [
+      "The fading is supernatural or ghostly — use whisper instead",
+      "The instability is environmental (lights) — use flicker instead",
+      "The character is alert but the voice is fragile — use whisper"
+    ]
+  },
+
+  {
+    "effect": "freeze",
+    "category": "continuous",
+    "intensity": "subtle",
+    "cycle": "5s",
+    "motion": "Very slight scale contraction and brightness reduction. Almost imperceptible.",
+    "emotion": "Complete stillness. Time or body or will has stopped.",
+    "use_when": [
+      "Ice magic encasing, spreading, or locking a character in place",
+      "Paralysis — magical, chemical, or fear-induced",
+      "Time freeze — the world pauses around a character",
+      "Petrification — turning to stone, crystal, or ice",
+      "Stasis — suspended animation, cryo sleep, magical preservation"
+    ],
+    "do_not_use_when": [
+      "The cold is felt as shivering — use tremble instead",
+      "The stillness is meditative or chosen — use breathe instead",
+      "The scene involves any kind of movement or action"
+    ]
+  },
+
+  {
+    "effect": "burn",
+    "category": "continuous",
+    "intensity": "medium",
+    "cycle": "1.5s",
+    "motion": "Vertical micro-wobble with slight skew oscillation. Faster rhythm than drift.",
+    "emotion": "Heat is distorting perception. The air itself is unstable.",
+    "use_when": [
+      "A fire scene — burning buildings, campfires with supernatural heat",
+      "Desert heat — sun-baked landscapes, mirages, heat stroke",
+      "Rage — internal heat manifesting as physical distortion",
+      "Fever — a character burning up, delirious with temperature",
+      "Volcanic or magmatic environments — lava, geothermal vents"
+    ],
+    "do_not_use_when": [
+      "The scene is cold — use freeze or tremble instead",
+      "The distortion is digital — use glitch (one-shot) or static",
+      "The wobble would read as floating — use drift for underwater/dreams"
+    ]
+  },
+
+  {
+    "effect": "static",
+    "category": "continuous",
+    "intensity": "pronounced",
+    "cycle": "200ms",
+    "motion": "Rapid micro-jitter combined with overlapping opacity flicker drops.",
+    "emotion": "The signal is breaking. Something is fighting through interference.",
+    "use_when": [
+      "Radio or comms transmission — receiving a damaged broadcast",
+      "Broken communications — a voice cutting in and out",
+      "Digital interference — data corruption on a persistent channel",
+      "A corrupted data stream — text rendered through a bad connection",
+      "Psychic noise — telepathic contact through a hostile medium"
+    ],
+    "do_not_use_when": [
+      "The corruption is a single momentary event — use glitch (one-shot)",
+      "The opacity instability is environmental (lights) — use flicker",
+      "The vibration is physical/bodily — use tremble"
+    ]
+  },
+
+  {
+    "effect": "distort",
+    "category": "continuous",
+    "intensity": "medium",
+    "cycle": "3.5s",
+    "motion": "Subtle rotation oscillation with asymmetric scaleX/scaleY breathing. The text looks slightly wrong.",
+    "emotion": "Perception is unreliable. The character is conscious but reality is warped.",
+    "use_when": [
+      "A character is drunk or intoxicated — the world tilts and sways",
+      "Poisoned — perception warping involuntarily, things look wrong",
+      "Hallucinating — seeing things that shift and bend",
+      "Vertigo or disorientation — after a fall, a blow to the head, spinning",
+      "Under psychic influence — mind being manipulated, thoughts distorted",
+      "Concussion or head trauma — the room won't hold still"
+    ],
+    "do_not_use_when": [
+      "The character is losing consciousness — use fade instead",
+      "The distortion is heat-related — use burn instead",
+      "The spatial warping is a one-time event (teleport) — use warp (one-shot)",
+      "The instability is environmental, not perceptual — use flicker or tremble"
+    ]
+  },
+
+  {
+    "effect": "sway",
+    "category": "continuous",
+    "intensity": "medium",
+    "cycle": "2.5s",
+    "motion": "Horizontal translateX sine wave. The text rocks side to side like a ship in heavy seas.",
+    "emotion": "The ground cannot be trusted. Balance is a constant negotiation.",
+    "use_when": [
+      "A character is on a ship, boat, or raft in rough water",
+      "An earthquake or tremor — the ground itself is moving laterally",
+      "Walking across a rope bridge, narrow beam, or unstable surface",
+      "Inside a vehicle that is rocking or swaying — train, bus, aircraft in turbulence",
+      "Storm winds pushing a character or environment sideways",
+      "Aftermath of a blast — the character is on their feet but the world won't hold still"
+    ],
+    "do_not_use_when": [
+      "The motion is vertical (floating, sinking) — use drift instead",
+      "The instability is perceptual/internal (drunk, poisoned) — use distort instead",
+      "The shaking is from a single impact — use shake or quake (one-shot)",
+      "The character is trembling from fear or cold — use tremble instead"
     ]
   }
 ]
