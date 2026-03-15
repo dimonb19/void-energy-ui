@@ -205,6 +205,17 @@
     }
   }
 
+  function toggleNarrativeEffects(value?: boolean) {
+    const newValue = value ?? !voidEngine.userConfig.narrativeEffects;
+    voidEngine.setPreferences({ narrativeEffects: newValue });
+
+    if (newValue) {
+      toast.show('Narrative effects enabled', 'success');
+    } else {
+      toast.show('Narrative effects disabled');
+    }
+  }
+
   function handleThemeKeydown(event: KeyboardEvent, index: number) {
     if (allAtmospheres.length === 0) return;
 
@@ -426,7 +437,7 @@
   <hr />
   <SettingsRow label="Preferences">
     <div
-      class="surface-sunk p-md flex flex-col items-center justify-center gap-md large-desktop:flex-row"
+      class="surface-sunk p-md flex flex-col items-center justify-center gap-md"
     >
       <span class="flex flex-col items-center gap-xs">
         <Toggle
@@ -446,6 +457,16 @@
         />
         <p class="text-caption text-mute">
           (Temporary themes can override your preference)
+        </p>
+      </span>
+      <span class="flex flex-col items-center gap-xs">
+        <Toggle
+          bind:checked={voidEngine.userConfig.narrativeEffects}
+          label="Narrative effects"
+          onchange={toggleNarrativeEffects}
+        />
+        <p class="text-caption text-mute">
+          (Animated text reactions for dramatic moments)
         </p>
       </span>
     </div>

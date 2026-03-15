@@ -25,6 +25,7 @@ function defaultUserConfig(): UserConfig {
     density: 'standard',
     adaptAtmosphere: true,
     fixedNav: false,
+    narrativeEffects: true,
   };
 }
 

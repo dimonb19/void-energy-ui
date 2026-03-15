@@ -24,6 +24,7 @@
    - [Gestures](#d-gestures)
    - [Icons](#e-icons)
    - [Effects](#f-effects)
+   - [Narrative Effects](#narrative-effects-post-reveal-text-animations)
    - [State Patterns](#g-state-patterns)
    - [Charts & Data Visualization](#h-charts--data-visualization)
 5. [Mixin Reference](#5-mixin-reference)
@@ -3552,6 +3553,109 @@ Physics-aware visual effects for loading states and skeleton loaders.
 
 ---
 
+#### Narrative Effects — Post-reveal text animations
+
+**Description:** Block-level CSS animations triggered after Kinetic text reveal completes. Four one-shot effects (punctuation moments) and six continuous loops (sustained atmosphere). The JS engine sets `data-narrative="<effect>"` on the container element; SCSS owns all keyframes and visual tuning. Designed for AI-powered interactive storytelling — the backend sends a simple effect name per story step, the frontend owns all motion.
+**Action:** [src/actions/narrative.ts](src/actions/narrative.ts)
+**CSS:** `[data-narrative]` attribute selectors ([src/styles/components/\_narrative.scss](src/styles/components/_narrative.scss))
+**Types:** [src/types/narrative.d.ts](src/types/narrative.d.ts)
+
+**Config:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `effect` | `NarrativeEffect \| null` | — | Effect to apply, or `null` to clear |
+| `enabled` | `boolean` | `true` | Master kill switch — `false` stops any running animation |
+| `onComplete` | `() => void` | — | Fires when a one-shot finishes or is skipped; not called for continuous |
+
+**Effect Catalog:**
+
+| Effect | Type | Duration | Motion | Story Use |
+| --- | --- | --- | --- | --- |
+| `shake` | One-shot | 500ms | Horizontal jitter, decaying | Door slam, impact, collision |
+| `quake` | One-shot | 800ms | X+Y jitter, heavier | Earthquake, explosion, thunder |
+| `jolt` | One-shot | 300ms | Single elastic snap | Jump scare, electric shock |
+| `glitch` | One-shot | 600ms | Choppy translate + skew | Reality break, hacking, corruption |
+| `drift` | Continuous | 3s/cycle | Gentle vertical sine | Underwater, floating, dreaming |
+| `flicker` | Continuous | 2s/cycle | Irregular opacity drops | Failing lights, haunted spaces |
+| `breathe` | Continuous | 4s/cycle | Subtle scale pulse | Tension, calm focus, meditation |
+| `tremble` | Continuous | 100ms/cycle | Fast micro-vibration | Fear, cold, fragility |
+| `pulse` | Continuous | 1s/cycle | Heartbeat-tempo scale | Ritual energy, countdown |
+| `whisper` | Continuous | 3s/cycle | Scale + opacity recede | Secrets, ghosts, fading memory |
+
+**Physics Adaptation:**
+
+| Physics | Treatment |
+| --- | --- |
+| **Glass** | Motion blur (`filter: blur(0.5px)`) on displacement effects (shake, quake, jolt) |
+| **Flat** | Default keyframes — clean curves, no embellishment |
+| **Retro** | Per-effect stepped timing (CRT feel). Glitch and tremble keep their native timing; others get `steps(3-8)` |
+
+**Lifecycle:**
+- **One-shot:** Plays once → `animationend` guard cleans up `data-narrative` → `onComplete` fires
+- **Continuous:** Loops until `effect` is set to `null` or `enabled` flips to `false` → no `onComplete`
+- **Skipped** (reduced motion or `enabled: false`): `onComplete` fires synchronously for one-shots (consistent control flow); continuous effects are silently skipped
+
+**Usage (standalone):**
+
+```svelte
+<script lang="ts">
+  import { narrative } from '@actions/narrative';
+  import { voidEngine } from '@adapters/void-engine.svelte';
+</script>
+
+<!-- One-shot: plays once and auto-clears -->
+<p use:narrative={{ effect: 'shake', onComplete: () => console.log('done') }}>
+  The blast door slammed shut.
+</p>
+
+<!-- Continuous: loops until cleared -->
+<p use:narrative={{ effect: 'breathe', enabled: voidEngine.userConfig.narrativeEffects }}>
+  She steadied herself before the answer came.
+</p>
+```
+
+**Chaining with Kinetic reveal:**
+
+When used with kinetic typography, the two effect categories have different timing:
+- **Continuous effects** start **immediately** — ambient atmosphere that plays during the kinetic reveal
+- **One-shot effects** wait for kinetic to **finish** — punctuation moments on the fully visible text
+
+Use `isOneShotEffect()` to branch. The effect can also arrive late (from API, game event) — setting it mid-reveal activates the animation immediately.
+
+```svelte
+<script lang="ts">
+  import { kinetic } from '@actions/kinetic';
+  import { narrative, isOneShotEffect } from '@actions/narrative';
+
+  function startStep() {
+    const effect = step.narrativeEffect;
+    narrativeEffect = isOneShotEffect(effect) ? null : effect;
+  }
+
+  function onKineticDone() {
+    if (isOneShotEffect(step.narrativeEffect)) {
+      narrativeEffect = step.narrativeEffect;
+    }
+  }
+</script>
+
+{#key step.id}
+  <p
+    use:kinetic={{ text: step.text, mode: 'word', chunk: 'sentence', onComplete: onKineticDone }}
+    use:narrative={{ effect: narrativeEffect, enabled }}
+  ></p>
+{/key}
+```
+
+**Accessibility:** Dual-layer reduced motion protection — the engine checks `prefers-reduced-motion` before starting, and SCSS applies `animation: none !important` as a CSS safety net.
+
+**User Preference:** Persisted `narrativeEffects` boolean in `UserConfig`. Consumer passes `enabled` derived from `voidEngine.userConfig.narrativeEffects`. Toggle lives in the Themes modal Preferences section.
+
+**Showcase:** [/conexus → Narrative Effects](src/components/CoNexus.svelte)
+
+---
+
 ### G. State Patterns
 
 Reactive singletons for app-wide state. Each store uses `$state` + `$derived` and hydrates from localStorage synchronously before first render.
@@ -5312,6 +5416,48 @@ All charts are pure SVG, fluid-width, and adapt to atmosphere/physics/mode. Pass
 
 ---
 
+### Z. Narrative Effects (Post-Reveal Text Animations)
+
+```svelte
+<script lang="ts">
+  import { narrative, isOneShotEffect } from '@actions/narrative';
+  import { kinetic } from '@actions/kinetic';
+  import { voidEngine } from '@adapters/void-engine.svelte';
+
+  let activeEffect = $state<NarrativeEffect | null>(null);
+  const enabled = $derived(voidEngine.userConfig.narrativeEffects);
+</script>
+
+<!-- One-shot: plays once and auto-clears via onComplete -->
+<p use:narrative={{
+  effect: activeEffect,
+  enabled,
+  onComplete: () => (activeEffect = null)
+}}>
+  The blast door slammed shut.
+</p>
+<button class="btn-ghost" onclick={() => (activeEffect = 'shake')}>
+  Play Shake
+</button>
+
+<!-- Continuous: loops until toggled off -->
+<p use:narrative={{ effect: 'breathe', enabled }}>
+  The room inhaled with her.
+</p>
+
+<!-- Chained with Kinetic reveal (story step pattern) -->
+{#key step.id}
+  <p
+    use:kinetic={{ text: step.text, mode: 'word', chunk: 'sentence', onComplete: onKineticDone }}
+    use:narrative={{ effect: narrativeEffect, enabled }}
+  ></p>
+{/key}
+```
+
+One-shot effects (`shake`, `quake`, `jolt`, `glitch`) auto-clear after `animationend`. Continuous effects (`drift`, `flicker`, `breathe`, `tremble`, `pulse`, `whisper`) loop until `effect` is set to `null`. When chaining with kinetic reveal: **continuous effects start immediately** (ambient atmosphere during reveal), **one-shot effects wait** for `onComplete` (punctuation on full text). Use `isOneShotEffect()` to branch. The effect can also arrive late (e.g. from API) — setting it mid-reveal activates the animation immediately. The `enabled` flag gates all animation via `voidEngine.userConfig.narrativeEffects`. See the Narrative Effects action entry for the full chaining pattern and lifecycle rules.
+
+---
+
 ## 7. Svelte Actions
 
 Reusable behaviors attached to elements via `use:action` directive.
@@ -5754,6 +5900,129 @@ Cards are both draggable and sortable drop targets (`mode: 'between'`). Zone con
 #### Integration with `animate:live`
 
 The drag system does **not** move DOM elements during drag. On drop, the consumer updates a reactive array → Svelte's keyed `{#each}` + `animate:live` handles smooth FLIP reflow. The ghost fades out automatically, and sortable lists should reorder from emitted data rather than querying hover classes out of the DOM.
+
+---
+
+### F. Narrative Effects (`use:narrative`)
+
+**Purpose:** Post-reveal ambient text animations for interactive storytelling
+**Location:** [src/actions/narrative.ts](src/actions/narrative.ts)
+**CSS:** `[data-narrative]` attribute selectors ([src/styles/components/\_narrative.scss](src/styles/components/_narrative.scss))
+**Showcase:** [/conexus → Narrative Effects](src/components/CoNexus.svelte)
+
+Block-level CSS animations applied to a container element via the `data-narrative` attribute. Provides both a Svelte action (`use:narrative`) and a standalone class (`NarrativeEngine`) for programmatic use. The action starts on mount, re-evaluates on config change, and cleans up on destroy. A `WeakMap` ensures only one engine per element — constructing a new engine auto-stops the previous one.
+
+#### Config
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `effect` | `NarrativeEffect \| null` | — | Effect to apply, or `null` to clear |
+| `enabled` | `boolean` | `true` | Master kill switch — when `false`, stops any running animation |
+| `onComplete` | `() => void` | — | Fires when a one-shot finishes or is skipped; not called for continuous |
+
+`NarrativeEffect` = `'shake' | 'quake' | 'jolt' | 'glitch' | 'drift' | 'flicker' | 'breathe' | 'tremble' | 'pulse' | 'whisper'`
+
+#### Effect Types
+
+| Category | Effects | Behavior |
+| --- | --- | --- |
+| **One-shot** | shake, quake, jolt, glitch | Play once → `animationend` cleanup → `onComplete` fires |
+| **Continuous** | drift, flicker, breathe, tremble, pulse, whisper | Loop indefinitely until `effect` is set to `null` |
+
+#### Physics Profiles
+
+| Physics | Treatment |
+| --- | --- |
+| **Glass** | Motion blur (`filter: blur(0.5px)`) on shake, quake, jolt |
+| **Flat** | Default keyframes — no embellishment |
+| **Retro** | Per-effect stepped timing (CRT). Glitch/tremble keep native timing |
+
+#### Usage (Action)
+
+```svelte
+<script lang="ts">
+  import { narrative, isOneShotEffect } from '@actions/narrative';
+  import { voidEngine } from '@adapters/void-engine.svelte';
+
+  const enabled = $derived(voidEngine.userConfig.narrativeEffects);
+</script>
+
+<!-- One-shot: auto-clears after animation -->
+<p use:narrative={{ effect: 'shake', enabled, onComplete: () => console.log('done') }}>
+  The corridor lurched sideways.
+</p>
+
+<!-- Continuous: loops until cleared -->
+<p use:narrative={{ effect: 'breathe', enabled }}>
+  She steadied herself.
+</p>
+```
+
+#### Chaining with Kinetic Reveal (Story Step Pattern)
+
+The primary use case: text is revealed with kinetic typography while narrative effects set the mood. The two effect categories have different timing:
+
+- **Continuous effects** (drift, flicker, breathe, tremble, pulse, whisper) — start **immediately**. They are ambient atmosphere that plays during the kinetic reveal, setting the mood from the first word.
+- **One-shot effects** (shake, quake, jolt, glitch) — wait for kinetic to **finish**. They are punctuation moments that only make sense once the full text is visible.
+
+Use `isOneShotEffect()` to branch the timing.
+
+```svelte
+<script lang="ts">
+  import { kinetic } from '@actions/kinetic';
+  import { narrative, isOneShotEffect } from '@actions/narrative';
+  import { voidEngine } from '@adapters/void-engine.svelte';
+
+  let step = $state({ id: 0, text: '', narrativeEffect: 'drift' as NarrativeEffect });
+  let narrativeEffect = $state<NarrativeEffect | null>(null);
+  const enabled = $derived(voidEngine.userConfig.narrativeEffects);
+
+  function startStep() {
+    const effect = step.narrativeEffect;
+    // Continuous → starts now (atmosphere during reveal)
+    // One-shot  → null (waits for kinetic onComplete)
+    narrativeEffect = isOneShotEffect(effect) ? null : effect;
+  }
+
+  function onKineticDone() {
+    // One-shot fires now that the full text is visible
+    if (isOneShotEffect(step.narrativeEffect)) {
+      narrativeEffect = step.narrativeEffect;
+    }
+  }
+</script>
+
+{#key step.id}
+  <p
+    use:kinetic={{
+      text: step.text,
+      mode: 'word',
+      chunk: 'sentence',
+      onComplete: onKineticDone,
+    }}
+    use:narrative={{ effect: narrativeEffect, enabled }}
+  ></p>
+{/key}
+```
+
+**`{#key}` block:** When `step.id` changes, Svelte destroys the old element (both actions clean up — kinetic aborts, narrative removes `data-narrative`) and creates a fresh one. Both actions start from scratch on the new element.
+
+**Late-arriving effects:** The narrative action is fully reactive — you can start kinetic reveal with `effect: null`, then set the effect later when it arrives (from an API response, a delayed game event, etc.). No restart or re-mount needed. The action's `update()` fires whenever the config reference changes, activating the CSS animation mid-reveal or after.
+
+#### Usage (Standalone)
+
+```ts
+import { NarrativeEngine } from '@actions/narrative';
+
+const engine = new NarrativeEngine(el, { effect: 'tremble' });
+engine.start();   // sets data-narrative="tremble"
+engine.stop();    // removes data-narrative, cleans up listeners
+engine.destroy(); // alias for stop()
+```
+
+**Accessibility:** Dual-layer reduced motion — engine checks `prefers-reduced-motion` before starting; SCSS applies `animation: none !important` as CSS safety net. Skipped one-shots still fire `onComplete` synchronously for consistent control flow.
+
+**User Preference:** `voidEngine.userConfig.narrativeEffects` (persisted boolean, default `true`). Toggle in Themes modal → Preferences.
 
 ---
 

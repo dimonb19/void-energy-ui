@@ -362,6 +362,7 @@ import { morph } from '@actions/morph'          use:morph={{ width, height, thre
 import { tooltip } from '@actions/tooltip'      use:tooltip={{ content, placement }}
 import { navlink } from '@actions/navlink'      use:navlink (no options — click sets loading state)
 import { kinetic } from '@actions/kinetic'      use:kinetic={{ text, mode, speed, charSpeed, cursor }}
+import { narrative, isOneShotEffect } from '@actions/narrative'  use:narrative={{ effect, enabled, onComplete }}
 import { draggable, dropTarget, reorderByDrop } from '@actions/drag'
   use:draggable={{ id, data, group, axis, handle, disabled, onDragStart, onDragMove, onDragEnd }}
   use:dropTarget={{ id, group, mode, axis, accepts, onDragEnter, onDragLeave, onDrop, disabled }}
@@ -426,5 +427,5 @@ Auth visibility utilities (FOUC-safe, set before first paint):
 - **`btn-icon` vs `btn-ghost`:** If a button contains **only an icon** (no text), use `btn-icon` — it provides square hit targets (`var(--control-height)`), centered flex layout, and icon-appropriate hover feedback. `btn-ghost` is for **text-based** secondary actions (Cancel, Dismiss, Skip). Never use `btn-ghost` on an icon-only button.
 - **Icon-backed actions:** If a labeled action would benefit from an icon, default to `ActionBtn` with a custom interactive icon instead of hand-rolling `<button><Icon />Label</button>`. AI/generation actions should default to `Sparkle` unless a more specific interactive icon already exists.
 - **`// void-ignore` annotation:** Some raw values in SCSS are intentional physical necessities (shimmer highlights, readability floors, scrollbar constants). These carry a `// void-ignore` comment and are exempt from Token Law enforcement by `npm run scan`. Do not replace them with tokens — they have been reviewed and confirmed as intentional.
-- **Existing docs:** `CHEAT-SHEET.md` (component catalog), `THEME-GUIDE.md` (theme creation), `CONTRIBUTING.md` (PR process).
+- **Existing docs:** `CHEAT-SHEET.md` (component and action catalog, including narrative effects), `THEME-GUIDE.md` (theme creation), `README.md` (project overview), `CONTRIBUTING.md` (PR process).
 - **Never guess patterns.** If you haven't read the analog component and its SCSS, stop and read them first. Inventing patterns that "seem right" is the most common source of system inconsistency.

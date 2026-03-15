@@ -9,6 +9,15 @@
 //   cycle   — Rotates through a word list (loading states)
 //   decode  — Scramble → resolve effect (sci-fi terminal feel)
 //
+// Word-mode chunks:
+//   'word'           — reveal one word at a time (default)
+//   'sentence'       — reveal one sentence at a time
+//   'sentence-pair'  — reveal two sentences at a time
+//
+//   Each chunk is internally revealed char-by-char at `charSpeed`
+//   (default 8ms), with `speed` (default 40ms) pause between chunks.
+//   This creates a streaming-burst feel like AI text generation.
+//
 // Usage as Svelte action:
 //   <span use:kinetic={{ text: 'Hello world', mode: 'char', speed: 40 }} />
 //   <span use:kinetic={{ words: ['Synthesizing…', 'Calibrating…'], mode: 'cycle' }} />
@@ -17,6 +26,19 @@
 //   const k = new KineticEngine(el, { text: 'Hello', mode: 'decode' });
 //   k.start();
 //   k.abort();
+//
+// ── Chaining with Narrative effects ────────────────────────
+//
+// Kinetic reveals text; narrative reacts to it.
+// Continuous narrative effects (drift, breathe, etc.) start
+// immediately as ambient atmosphere during reveal.
+// One-shot effects (shake, jolt, etc.) fire from onComplete
+// after kinetic finishes. See narrative.ts for the full pattern
+// and isOneShotEffect() helper.
+//
+//   use:kinetic={{ text, mode: 'word', chunk: 'sentence', onComplete }}
+//   use:narrative={{ effect: narrativeEffect, enabled }}
+//
 // ─────────────────────────────────────────────────────────────
 
 // ── Physics Profile ─────────────────────────────────────────
