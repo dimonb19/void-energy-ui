@@ -644,3 +644,81 @@
     @include shimmer;
   }
 }
+
+// ==========================================================================
+// 6. TILE REORDER (DnD Wrapper + Addon Bar)
+// ==========================================================================
+// Wraps a standard Tile with a reorder addon bar below. The Tile component
+// itself is NOT modified — the wrapper pattern keeps reorder concerns
+// entirely in the consumer.
+//
+// MARKUP PATTERN (consumer):
+// ```svelte
+// <div class="tile-reorder"
+//   aria-label={story.title}
+//   use:draggable={{ id: story.id, group: 'reorder', data: story, handle: '[data-drag-handle]' }}
+//   use:dropTarget={{ id: story.id, group: 'reorder', mode: 'between', axis: 'horizontal', onDrop }}
+//   animate:live
+// >
+//   <Tile title={story.title} href={story.href} ... />
+//   <div class="tile-reorder-bar">
+//     <button class="btn-icon" data-drag-handle ...><GripVertical /></button>
+//     <div class="inline-flex items-center gap-xs">
+//       <button class="btn-icon" ...><ChevronLeft /></button>
+//       <button class="btn-icon" ...><ChevronRight /></button>
+//     </div>
+//   </div>
+// </div>
+// ```
+//
+// KEY DETAILS:
+// - handle: '[data-drag-handle]' is REQUIRED — without it, dragging fights
+//   the tile's stretched link (Tile.svelte .tile-link::after covers the card).
+// - .tile-reorder owns scroll-snap-align and overrides the inner .tile's snap
+//   so the wrapper (tile + bar together) snaps as a unit.
+// - The bar's bottom border-radius matches the tile's radius (1.5 × radius-base)
+//   so the wrapper reads as one continuous card.
+// - Retro physics: bar gets a visible top border (since glass/flat use
+//   border-top: none to fuse with the tile above).
+//
+// DRAG VISUAL STATES:
+// Handled by _drag.scss — the wrapper receives data-drag-state attributes
+// automatically. The horizontal drop indicator (::before pseudo-element) is
+// already supported for [data-drop-axis='horizontal'] targets.
+//
+// ANATOMY:
+// ┌──────────────────────────────────────────┐
+// │              <Tile />                    │
+// ├──────────────────────────────────────────┤
+// │  ⠿ (grip)                      [◀]  [▶]  │  ← .tile-reorder-bar
+// └──────────────────────────────────────────┘
+//
+// @see /src/components/CoNexus.svelte — reorder showcase usage
+// @see /src/styles/components/_drag.scss — drag state visual feedback
+// --------------------------------------------------------------------------
+.tile-reorder {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  scroll-snap-align: start;
+
+  background: var(--bg-sunk);
+  border: var(--physics-border-width) solid var(--border-color);
+  border-radius: calc(var(--radius-base) * 1.5);
+
+  // Override internal tile's snap — wrapper owns snap now.
+  .tile {
+    scroll-snap-align: none;
+  }
+}
+
+// Addon bar: sunk surface below the tile with move controls.
+// Layout: grip handle anchored left, arrow buttons grouped right.
+// Fitts's Law: separating modalities maximizes hit zones and prevents
+// accidental arrow taps when grabbing the grip handle.
+.tile-reorder-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-xs);
+}

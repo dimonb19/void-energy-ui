@@ -472,7 +472,9 @@ export function draggable(node: HTMLElement, options: DraggableOptions) {
   }
 
   function syncStaticAttributes(): void {
-    if (!node.getAttribute('tabindex') && node.tabIndex < 0) {
+    // When a handle selector is provided, the handle element is the keyboard
+    // target — don't make the wrapper focusable (avoids a dead tab stop).
+    if (!opts.handle && !node.getAttribute('tabindex') && node.tabIndex < 0) {
       node.setAttribute('tabindex', '0');
     }
 

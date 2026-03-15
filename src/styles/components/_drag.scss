@@ -97,8 +97,8 @@
     0 0 0 1px alpha(var(--energy-primary), 25%),
     0 0 14px alpha(var(--energy-primary), 22%);
   pointer-events: none;
-  top: 0;
-  transform: translateY(-50%);
+  top: calc(var(--space-xs) * -1);
+  animation: drop-indicator-in var(--speed-fast) var(--ease-spring-snappy) both;
 
   @include when-flat {
     box-shadow: 0 0 0 1px alpha(var(--energy-primary), 30%);
@@ -106,48 +106,56 @@
 
   @include when-retro {
     box-shadow: none;
-    transform: none;
-    top: calc(var(--space-xs) * -1);
+    animation: none;
+  }
+}
+
+@keyframes drop-indicator-in {
+  from {
+    opacity: 0;
+    transform: scaleX(0.5);
+    filter: blur(4px); // void-ignore: materialize blur (physics constant)
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+    filter: blur(0);
   }
 }
 
 [data-drag-state='drop-hover'][data-drop-position='after']::before {
   top: auto;
-  bottom: 0;
-  transform: translateY(50%);
-
-  @include when-retro {
-    bottom: calc(var(--space-xs) * -1);
-    transform: none;
-  }
+  bottom: calc(var(--space-xs) * -1);
 }
 
 [data-drop-axis='horizontal'][data-drag-state='drop-hover'][data-drop-position]::before {
   top: var(--space-md);
   bottom: var(--space-md);
-  left: 0;
+  left: calc(var(--space-xs) * -1);
   right: auto;
   width: max(2px, var(--physics-border-width));
   height: auto;
-  transform: translateX(-50%);
+  animation-name: drop-indicator-in-vertical;
+}
 
-  @include when-retro {
-    top: var(--space-sm);
-    bottom: var(--space-sm);
-    left: calc(var(--space-xs) * -1);
-    transform: none;
+@keyframes drop-indicator-in-vertical {
+  from {
+    opacity: 0;
+    transform: scaleY(0.5);
+    filter: blur(4px); // void-ignore: materialize blur (physics constant)
+  }
+
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+    filter: blur(0);
   }
 }
 
 [data-drop-axis='horizontal'][data-drag-state='drop-hover'][data-drop-position='after']::before {
   left: auto;
-  right: 0;
-  transform: translateX(50%);
-
-  @include when-retro {
-    right: calc(var(--space-xs) * -1);
-    transform: none;
-  }
+  right: calc(var(--space-xs) * -1);
 }
 
 // Incompatible drag hovering — rejection feedback
@@ -214,6 +222,19 @@
 }
 
 // ==========================================================================
+// FOCUS RING (keyboard-accessible draggables)
+// ==========================================================================
+// Draggable elements with tabindex="0" are divs — they don't inherit the
+// reset's focus-visible rule (scoped to a, button, input, etc.).
+
+[data-drag-id]:focus-visible {
+  outline: none;
+  border-color: var(--energy-primary);
+  box-shadow: var(--focus-ring);
+  z-index: z('base');
+}
+
+// ==========================================================================
 // HANDLES + PRIMITIVE INTERNALS
 // ==========================================================================
 
@@ -268,10 +289,10 @@
     transition: none;
     filter: none;
     transform: none;
+    animation: none;
   }
 
-  [data-drag-state='drop-hover'][data-drop-position='after']::before,
-  [data-drag-state='drop-hover'][data-drop-position='before']::before {
-    transform: none;
+  [data-drag-state='drop-hover'][data-drop-position]::before {
+    animation: none;
   }
 }
