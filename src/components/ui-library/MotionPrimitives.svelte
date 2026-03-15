@@ -67,7 +67,7 @@
 
       <!-- Morph -->
       <div class="flex flex-col gap-xs">
-        <h6 class="text-small text-dim">use:morph</h6>
+        <h6>use:morph</h6>
         <p class="text-small text-mute">
           Content-driven resize animation. Watches a container via
           <code>ResizeObserver</code> and smoothly animates
@@ -102,7 +102,7 @@
 
       <!-- Navlink -->
       <div class="flex flex-col gap-xs">
-        <h6 class="text-small text-dim">use:navlink</h6>
+        <h6>use:navlink</h6>
         <p class="text-small text-mute">
           Sets <code>data-status="loading"</code> and
           <code>aria-busy="true"</code> on click for MPA navigation links. The DOM
@@ -155,7 +155,7 @@
 
       <!-- emerge / dissolve -->
       <div class="flex flex-col gap-xs">
-        <h6 class="text-small text-dim">in:emerge &amp; out:dissolve</h6>
+        <h6>in:emerge &amp; out:dissolve</h6>
         <p class="text-small text-mute">
           Layout-aware entry/exit pair. Animates height, padding, and margin
           alongside blur, scale, and Y-translate &mdash; surrounding content
@@ -185,9 +185,7 @@
 
       <!-- materialize / dematerialize -->
       <div class="flex flex-col gap-xs">
-        <h6 class="text-small text-dim">
-          in:materialize &amp; out:dematerialize
-        </h6>
+        <h6>in:materialize &amp; out:dematerialize</h6>
         <p class="text-small text-mute">
           Visual-only entry/exit pair for positioned or overlaid elements
           (modals, tooltips, toasts). No layout animation &mdash; just opacity,
@@ -221,7 +219,7 @@
 
       <!-- implode + live -->
       <div class="flex flex-col gap-xs">
-        <h6 class="text-small text-dim">out:implode &amp; animate:live</h6>
+        <h6>out:implode &amp; animate:live</h6>
         <p class="text-small text-mute">
           <code>out:implode</code> collapses a removed element horizontally
           (width, padding, margin &rarr; zero) with blur dissolution.

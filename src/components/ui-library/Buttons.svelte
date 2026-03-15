@@ -447,7 +447,7 @@
         inform without dominating the primary content.
       </p>
 
-      <h6 class="text-small text-dim">Status List</h6>
+      <h6>Status List</h6>
       <div class="surface-sunk p-md flex flex-col gap-md">
         <div class="flex items-center justify-between gap-md">
           <div class="flex flex-col">
@@ -493,7 +493,7 @@
         </div>
       </div>
 
-      <h6 class="text-small text-dim">Table Column</h6>
+      <h6>Table Column</h6>
       <div class="surface-sunk p-md">
         <div class="table-responsive">
           <table>

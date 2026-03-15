@@ -20,6 +20,7 @@ $letter-spacings: generated.$letter-spacings;
   --font-size-h3: #{map.get($font-scale, 'h3')};
   --font-size-h4: #{map.get($font-scale, 'h4')};
   --font-size-h5: #{map.get($font-scale, 'h5')};
+  --font-size-h6: #{map.get($font-scale, 'h6')};
   --font-size-body: #{map.get($font-scale, 'body')};
   --font-size-small: #{map.get($font-scale, 'small')};
   --font-size-caption: #{map.get($font-scale, 'caption')};
@@ -30,6 +31,7 @@ $letter-spacings: generated.$letter-spacings;
   --line-height-h3: #{map.get($line-heights, 'h3')};
   --line-height-h4: #{map.get($line-heights, 'h4')};
   --line-height-h5: #{map.get($line-heights, 'h5')};
+  --line-height-h6: #{map.get($line-heights, 'h6')};
   --line-height-body: #{map.get($line-heights, 'body')};
   --line-height-small: #{map.get($line-heights, 'small')};
   --line-height-caption: #{map.get($line-heights, 'caption')};
@@ -47,6 +49,7 @@ $letter-spacings: generated.$letter-spacings;
   --letter-spacing-h3: #{map.get($letter-spacings, 'h3')};
   --letter-spacing-h4: #{map.get($letter-spacings, 'h4')};
   --letter-spacing-h5: #{map.get($letter-spacings, 'h5')};
+  --letter-spacing-h6: #{map.get($letter-spacings, 'h6')};
   --letter-spacing-body: #{map.get($letter-spacings, 'body')};
   --letter-spacing-small: #{map.get($letter-spacings, 'small')};
   --letter-spacing-caption: #{map.get($letter-spacings, 'caption')};
@@ -69,7 +72,9 @@ $letter-spacings: generated.$letter-spacings;
         $level ==
         'h4' or
         $level ==
-        'h5'
+        'h5' or
+        $level ==
+        'h6'
     ) {
       font-family: var(--font-heading);
       font-weight: map.get($font-weights, $level);
@@ -142,6 +147,10 @@ h5 {
   @include typography('h5');
   color: var(--text-dim);
 }
+h6 {
+  @include typography('h6');
+  color: var(--text-dim);
+}
 
 p,
 ul,
@@ -192,6 +201,9 @@ textarea {
 }
 .text-h5 {
   @include typography('h5');
+}
+.text-h6 {
+  @include typography('h6');
 }
 
 // SINGLE LINE (Headings / Usernames)

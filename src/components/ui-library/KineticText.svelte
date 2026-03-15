@@ -30,7 +30,7 @@
     <!-- ─── TYPEWRITER ──────────────────────────────────────────────── -->
     <div class="flex flex-col gap-xs">
       <div class="flex items-center justify-between">
-        <h6 class="text-small text-dim">Typewriter</h6>
+        <h6>Typewriter</h6>
         <button class="btn-icon" onclick={() => replayChar++}>
           <RotateCcw class="icon" data-size="sm" />
         </button>
@@ -54,7 +54,7 @@
     <!-- ─── PARAGRAPH ───────────────────────────────────────────────── -->
     <div class="flex flex-col gap-xs">
       <div class="flex items-center justify-between">
-        <h6 class="text-small text-dim">Paragraph</h6>
+        <h6>Paragraph</h6>
         <button class="btn-icon" onclick={() => replayWord++}>
           <RotateCcw class="icon" data-size="sm" />
         </button>
@@ -80,7 +80,7 @@
     <!-- ─── SENTENCE CHUNK ──────────────────────────────────────────── -->
     <div class="flex flex-col gap-xs">
       <div class="flex items-center justify-between">
-        <h6 class="text-small text-dim">Sentence Chunk</h6>
+        <h6>Sentence Chunk</h6>
         <button class="btn-icon" onclick={() => replaySentence++}>
           <RotateCcw class="icon" data-size="sm" />
         </button>
@@ -107,7 +107,7 @@
     <!-- ─── SENTENCE PAIR CHUNK ─────────────────────────────────────── -->
     <div class="flex flex-col gap-xs">
       <div class="flex items-center justify-between">
-        <h6 class="text-small text-dim">Sentence Pair Chunk</h6>
+        <h6>Sentence Pair Chunk</h6>
         <button class="btn-icon" onclick={() => replaySentencePair++}>
           <RotateCcw class="icon" data-size="sm" />
         </button>
@@ -134,7 +134,7 @@
     <!-- ─── DECODE ──────────────────────────────────────────────────── -->
     <div class="flex flex-col gap-xs">
       <div class="flex items-center justify-between">
-        <h6 class="text-small text-dim">Decode</h6>
+        <h6>Decode</h6>
         <button class="btn-icon" onclick={() => replayDecode++}>
           <RotateCcw class="icon" data-size="sm" />
         </button>
@@ -154,7 +154,7 @@
     <!-- ─── SPEED COMPARISON ────────────────────────────────────────── -->
     <div class="flex flex-col gap-xs">
       <div class="flex items-center justify-between">
-        <h6 class="text-small text-dim">Speed Comparison</h6>
+        <h6>Speed Comparison</h6>
         <button class="btn-icon" onclick={() => replaySpeed++}>
           <RotateCcw class="icon" data-size="sm" />
         </button>
@@ -185,7 +185,7 @@
     <!-- ─── CURSOR ──────────────────────────────────────────────────── -->
     <div class="flex flex-col gap-xs">
       <div class="flex items-center justify-between">
-        <h6 class="text-small text-dim">Cursor</h6>
+        <h6>Cursor</h6>
         <button class="btn-icon" onclick={() => replayCursor++}>
           <RotateCcw class="icon" data-size="sm" />
         </button>
@@ -212,7 +212,7 @@
     <!-- ─── CYCLE ───────────────────────────────────────────────────── -->
     <div class="flex flex-col gap-xs">
       <div class="flex items-center justify-between">
-        <h6 class="text-small text-dim">Cycle</h6>
+        <h6>Cycle</h6>
         <button class="btn-icon" onclick={() => replayCycle++}>
           <RotateCcw class="icon" data-size="sm" />
         </button>

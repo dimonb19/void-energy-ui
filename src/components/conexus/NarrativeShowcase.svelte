@@ -463,7 +463,7 @@
         <div class="surface-sunk p-md flex flex-col gap-md h-full">
           <div class="flex items-start justify-between gap-md">
             <div class="flex flex-col gap-xs">
-              <h6 class="text-small text-dim">{demo.label}</h6>
+              <h6>{demo.label}</h6>
               <p class="text-caption text-mute">{demo.context}</p>
             </div>
 
@@ -504,7 +504,7 @@
         <div class="surface-sunk p-md flex flex-col gap-md h-full">
           <div class="flex items-start justify-between gap-md">
             <div class="flex flex-col gap-xs">
-              <h6 class="text-small text-dim">{demo.label}</h6>
+              <h6>{demo.label}</h6>
               <p class="text-caption text-mute">{demo.context}</p>
             </div>
 
@@ -762,7 +762,7 @@
     <summary>Reference</summary>
     <div class="p-md flex flex-col gap-lg">
       <div class="flex flex-col gap-md">
-        <h6 class="text-dim">One-Shot Effects</h6>
+        <h6>One-Shot Effects</h6>
         <p class="text-caption text-mute">
           Fire once after text is fully revealed. Use for punctuation moments.
         </p>
@@ -815,7 +815,7 @@
       </div>
 
       <div class="flex flex-col gap-md">
-        <h6 class="text-dim">Continuous Effects</h6>
+        <h6>Continuous Effects</h6>
         <p class="text-caption text-mute">
           Loop from the moment the step starts, sustaining atmosphere
           throughout.

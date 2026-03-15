@@ -4459,7 +4459,7 @@ Pure SVG chart components for dashboards and metrics. All charts adapt to atmosp
 
 #### `@include typography('scale-name')`
 
-**Scales:** `caption`, `small`, `body`, `h5`, `h4`, `h3`, `h2`, `h1`
+**Scales:** `caption`, `small`, `body`, `h6`, `h5`, `h4`, `h3`, `h2`, `h1`
 **Auto-applies:** font-size (fluid with clamp), line-height, font-weight
 
 **Usage:**

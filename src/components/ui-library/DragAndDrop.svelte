@@ -363,7 +363,7 @@
             }}
           >
             <div class="flex items-center justify-between gap-sm">
-              <h6 class="text-small text-dim">To Do</h6>
+              <h6>To Do</h6>
               <span class="text-caption text-mute">{zoneA.length} cards</span>
             </div>
 
@@ -414,7 +414,7 @@
             }}
           >
             <div class="flex items-center justify-between gap-sm">
-              <h6 class="text-small text-dim">Done</h6>
+              <h6>Done</h6>
               <span class="text-caption text-mute">{zoneB.length} cards</span>
             </div>
 

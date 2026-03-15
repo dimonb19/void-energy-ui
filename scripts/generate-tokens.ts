@@ -88,6 +88,7 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
   scss += `  'h3': ${VOID_TYPOGRAPHY.weights.semibold},\n`;
   scss += `  'h4': ${VOID_TYPOGRAPHY.weights.semibold},\n`;
   scss += `  'h5': ${VOID_TYPOGRAPHY.weights.medium},\n`;
+  scss += `  'h6': ${VOID_TYPOGRAPHY.weights.medium},\n`;
   scss += `  'body': ${VOID_TYPOGRAPHY.weights.regular},\n`;
   scss += `  'small': ${VOID_TYPOGRAPHY.weights.regular},\n`;
   scss += `  'caption': ${VOID_TYPOGRAPHY.weights.regular},\n`;

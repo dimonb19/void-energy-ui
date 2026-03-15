@@ -47,7 +47,7 @@ sunk(-1)  floor(0)  base(1)  decorate(2)  float(10)  sticky(20)  header(40)  dro
 
 ## Typography
 ```
-Scales:   text-caption  text-small  text-body  text-h5  text-h4  text-h3  text-h2  text-h1
+Scales:   text-caption  text-small  text-body  text-h6  text-h5  text-h4  text-h3  text-h2  text-h1
 Weights:  --font-weight-regular(400)  --font-weight-medium(500)  --font-weight-semibold(600)  --font-weight-bold(700)
 Families: --font-heading  --font-body  --font-code
 ```

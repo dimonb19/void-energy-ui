@@ -299,6 +299,12 @@ export const VOID_TYPOGRAPHY = {
       lineHeight: 1.5,
       letterSpacing: '0.005em',
     },
+    // Mobile: 14px -> Desktop: 18px (heading-weight body size)
+    h6: {
+      fontSize: 'clamp(0.875rem, 0.8rem + 0.5vw, 1.125rem)',
+      lineHeight: 1.45,
+      letterSpacing: '0.005em',
+    },
     // Mobile: 16px -> Desktop: 20px
     h5: {
       fontSize: 'clamp(1rem, 0.95rem + 0.5vw, 1.25rem)',
