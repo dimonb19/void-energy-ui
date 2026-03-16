@@ -244,8 +244,9 @@
   // Smooth spring return when releasing
   transition: transform var(--speed-base) var(--ease-spring-gentle);
 
-  // Allow native vertical scroll (locked during pull to prevent browser takeover)
-  touch-action: pan-y;
+  // Allow native vertical scroll + pinch-zoom; browser PTR is already blocked
+  // globally via overscroll-behavior-y: none on <html>.
+  touch-action: pan-y pinch-zoom;
 
   // Disable transition during active pull for immediate response
   [data-state='pulling'] > &,

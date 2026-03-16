@@ -392,6 +392,12 @@
     const touch = findTrackedTouch(e.changedTouches);
     if (!touch) return;
 
+    // Multi-touch (pinch-to-zoom) — abort pull and let the browser handle it
+    if (e.touches.length > 1) {
+      releaseTouchPull();
+      return;
+    }
+
     const deltaY = touch.clientY - touchStartY;
 
     // Handle pending activation (before threshold crossed)

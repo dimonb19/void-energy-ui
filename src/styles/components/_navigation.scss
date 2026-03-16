@@ -345,6 +345,60 @@
     white-space: nowrap;
     font-size: var(--font-size-h3);
     border-radius: var(--radius-full);
+    z-index: z('base'); // Sit above the sliding indicator
+
+    // The sliding indicator handles active state — no bg change on tab
+    @include when-state('active') {
+      background-color: transparent;
+    }
+
+    // Suppress navlink loading shimmer — pill slide is the feedback on mobile
+    @include when-state('loading') {
+      &::after {
+        display: none;
+      }
+    }
+  }
+}
+
+// --------------------------------------------------------------------------
+// BOTTOM NAV SLIDING INDICATOR
+// --------------------------------------------------------------------------
+// Pill-shaped element that slides behind the active tab.
+// Positioned via CSS custom properties set by JS (same pattern as Tabs).
+// --------------------------------------------------------------------------
+.bottom-nav-indicator {
+  position: absolute;
+  left: var(--_indicator-left, 0);
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--_indicator-width, 0);
+  height: var(--_indicator-height, 0);
+  border-radius: var(--radius-full);
+  background: alpha(var(--energy-secondary), 12%);
+  pointer-events: none;
+
+  // Hidden until JS positions it and adds data-ready
+  opacity: 0;
+
+  transition:
+    left var(--speed-base) var(--ease-spring-snappy),
+    width var(--speed-base) var(--ease-spring-snappy),
+    height var(--speed-base) var(--ease-spring-snappy);
+
+  // --- Entry: fade + blur in after JS positions the indicator ---
+  &[data-ready] {
+    animation: bottom-nav-materialize var(--speed-base) var(--ease-flow) both;
+  }
+
+  // --- Retro: solid fill, no rounding ---
+  @include when-retro {
+    background: alpha(var(--energy-primary), 15%);
+  }
+
+  // --- Light mode: slightly stronger fill ---
+  @include when-light {
+    background: alpha(var(--energy-primary), 10%);
   }
 }
 

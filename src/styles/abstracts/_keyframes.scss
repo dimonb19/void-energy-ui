@@ -69,3 +69,16 @@
     transform: translateY(0) scale(1);
   }
 }
+
+// F. BOTTOM NAV MATERIALIZE (Indicator entry)
+// Used by: .bottom-nav-indicator — fade + blur in, no transform.
+@keyframes bottom-nav-materialize {
+  0% {
+    opacity: 0;
+    filter: blur(var(--physics-blur));
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+  }
+}

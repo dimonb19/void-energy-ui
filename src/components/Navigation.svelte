@@ -63,6 +63,70 @@
   // svelte-ignore state_referenced_locally
   let activeTab = $state<string>(resolveTab(pathname));
   let navHidden = $state<boolean>(false);
+
+  // ─────────────────────────────────────────────────────────────────────────────
+  // Bottom Nav Sliding Indicator (same pattern as Tabs component)
+  // ─────────────────────────────────────────────────────────────────────────────
+
+  let bottomNavEl = $state<HTMLElement>();
+  let bottomNavMounted = false;
+
+  function updateBottomIndicator() {
+    if (!bottomNavEl) return;
+
+    const activeEl = bottomNavEl.querySelector<HTMLElement>(
+      `[data-state="active"]`,
+    );
+    if (!activeEl) {
+      bottomNavEl.style.setProperty('--_indicator-width', '0');
+      return;
+    }
+
+    const indicator = bottomNavEl.querySelector<HTMLElement>(
+      '.bottom-nav-indicator',
+    );
+    if (!indicator) return;
+
+    // First paint: position instantly, then trigger fade-in animation
+    if (!bottomNavMounted) {
+      indicator.style.transition = 'none';
+      bottomNavMounted = true;
+      // Schedule data-ready after position is applied so animation plays visibly
+      requestAnimationFrame(() => {
+        indicator.style.transition = '';
+        indicator.dataset.ready = '';
+      });
+    } else {
+      indicator.style.transition = '';
+    }
+
+    const navRect = bottomNavEl.getBoundingClientRect();
+    const tabRect = activeEl.getBoundingClientRect();
+    bottomNavEl.style.setProperty(
+      '--_indicator-left',
+      `${tabRect.left - navRect.left}px`,
+    );
+    bottomNavEl.style.setProperty('--_indicator-width', `${tabRect.width}px`);
+    bottomNavEl.style.setProperty('--_indicator-height', `${tabRect.height}px`);
+  }
+
+  // Recompute on active tab change
+  $effect(() => {
+    void activeTab;
+    requestAnimationFrame(() => requestAnimationFrame(updateBottomIndicator));
+  });
+
+  // Recompute on layout shifts
+  $effect(() => {
+    if (!bottomNavEl) return;
+    const ro = new ResizeObserver(updateBottomIndicator);
+    ro.observe(bottomNavEl);
+    for (const tab of bottomNavEl.querySelectorAll<HTMLElement>('.tab')) {
+      ro.observe(tab);
+    }
+    return () => ro.disconnect();
+  });
+
   const clamp = 64; // px after which hiding can kick in
   let lastY = 0;
   let ticking = false;
@@ -388,6 +452,7 @@
 <nav
   class="bottom-nav flex flex-row items-center justify-center tablet:hidden"
   aria-label="Mobile navigation"
+  bind:this={bottomNavEl}
 >
   {#each navItems as tab}
     <a
@@ -400,10 +465,11 @@
       use:navlink
     >
       {#if tab.icon}
-        <tab.icon />
+        <tab.icon class="icon" />
       {/if}
     </a>
   {/each}
+  <span class="bottom-nav-indicator" aria-hidden="true"></span>
 </nav>
 
 <!-- Breadcrumbs -->
