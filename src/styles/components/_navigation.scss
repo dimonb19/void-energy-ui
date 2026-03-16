@@ -394,6 +394,7 @@
 
   // --- C. Visual union with nav-bar ---
   background: var(--bg-surface);
+  box-shadow: var(--shadow-float);
 
   // --- D. Hide-on-scroll transition (synced with nav-bar) ---
   transition: transform var(--speed-base) var(--ease-spring-bounce);
@@ -423,8 +424,8 @@
     transition-duration: 0.3s; // void-ignore (Stepped retro transition)
   }
 
-  @include when-light {
-    box-shadow: var(--shadow-float);
+  @include when-dark {
+    background: var(--bg-sunk);
   }
 
   // --- G. List reset ---

@@ -54,6 +54,7 @@ $focus-ring:
 // │ shadow-lift-depth │ 35%   │ Deep ambient pool (risen surface depth)     │
 // │ shadow-lift-glow  │ 50%   │ Visible but not overwhelming hover glow     │
 // │ shadow-flat-*     │ 5-10% │ Minimal shadows for flat/paper aesthetics   │
+// │ shadow-flat-dark  │25-40% │ Elevated opacity for visibility on dark bg  │
 // │ retro-offset      │ 50%   │ Pixel shadow visibility on CRT-style        │
 // └───────────────────┴───────┴─────────────────────────────────────────────┘
 //
@@ -123,6 +124,17 @@ $physics-presets: (
         --#{$key}: #{$val};
       }
     }
+  }
+
+  // Flat dark: increase shadow opacity for visibility on dark surfaces.
+  // Flat light values (0.05-0.1) are invisible against dark backgrounds;
+  // these overrides provide visible depth without changing the flat aesthetic.
+  [data-physics='flat'][data-mode='dark'] {
+    --shadow-sunk: inset 0 1px 3px rgba(0, 0, 0, 0.4); // void-ignore
+    --shadow-float:
+      0 1px 4px rgba(0, 0, 0, 0.3), 0 4px 12px -2px rgba(0, 0, 0, 0.25); // void-ignore
+    --shadow-lift:
+      0 4px 16px rgba(0, 0, 0, 0.4), 0 8px 24px -4px rgba(0, 0, 0, 0.3); // void-ignore
   }
 
   // Force square borders in retro physics.
