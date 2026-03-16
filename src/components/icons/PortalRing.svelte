@@ -552,6 +552,7 @@
     height: auto;
     color: var(--energy-primary);
     overflow: visible;
+    touch-action: none;
 
     // ── Layer groups ──
     .ring-outer-system,

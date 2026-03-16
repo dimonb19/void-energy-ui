@@ -339,7 +339,7 @@
             >
               <span>{atm.label}</span>
               {#if atm.tagline}
-                <span class="text-caption">{atm.tagline}</span>
+                <span class="text-caption text-right">{atm.tagline}</span>
               {/if}
             </span>
           </button>

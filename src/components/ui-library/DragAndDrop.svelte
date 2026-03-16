@@ -290,7 +290,7 @@
 
                 <div class="min-w-0 flex flex-col gap-xs">
                   <span class="text-small font-medium">{item.label}</span>
-                  <span class="text-caption text-mute">
+                  <span class="text-caption text-mute hidden tablet:inline">
                     Enter to pick up, arrows to choose a destination, Enter to
                     drop.
                   </span>

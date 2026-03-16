@@ -90,22 +90,14 @@
   position: absolute;
   left: var(--space-md);
   right: var(--space-md);
-  height: max(2px, var(--physics-border-width));
+  height: calc(var(--space-xs) / 2);
   border-radius: var(--radius-full);
-  background: var(--energy-primary);
-  box-shadow:
-    0 0 0 1px alpha(var(--energy-primary), 25%),
-    0 0 14px alpha(var(--energy-primary), 22%);
+  background: var(--color-system);
   pointer-events: none;
   top: calc(var(--space-xs) * -1);
   animation: drop-indicator-in var(--speed-fast) var(--ease-spring-snappy) both;
 
-  @include when-flat {
-    box-shadow: 0 0 0 1px alpha(var(--energy-primary), 30%);
-  }
-
   @include when-retro {
-    box-shadow: none;
     animation: none;
   }
 }
@@ -134,7 +126,7 @@
   bottom: var(--space-md);
   left: calc(var(--space-xs) * -1);
   right: auto;
-  width: max(2px, var(--physics-border-width));
+  width: calc(var(--space-xs) / 2);
   height: auto;
   animation-name: drop-indicator-in-vertical;
 }
@@ -241,6 +233,7 @@
 [data-drag-handle] {
   cursor: grab;
   touch-action: none;
+  user-select: none;
 
   &:active {
     cursor: grabbing;
@@ -256,11 +249,13 @@
 .drag-zone {
   min-height: calc(var(--control-height) * 6);
   border: var(--physics-border-width) solid alpha(var(--energy-primary), 18%);
+  user-select: none;
 }
 
 // Zone card — physics border (layout via Tailwind in consumer markup)
 .drag-zone-card {
   border: var(--physics-border-width) solid alpha(var(--energy-secondary), 30%);
+  user-select: none;
 }
 
 // Empty zone placeholder
