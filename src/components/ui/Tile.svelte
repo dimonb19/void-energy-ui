@@ -24,7 +24,7 @@
   - genres: string[] — genre labels rendered as comma-separated text
   - image: Cover image URL (optional — falls back to sunk surface)
   - mark: 'resume' | 'complete' | 'replay' — state badge (optional)
-  - gated: boolean — premium/NFT-locked tile (lock icon + premium styling)
+  - gate: TileGate[] — token gate requirements (lock icon + premium styling + tooltip)
   - loading: boolean — renders a shimmer skeleton instead of content
   - class: Additional CSS classes
 
@@ -37,6 +37,7 @@
 <script lang="ts">
   import PlayPause from '@components/icons/PlayPause.svelte';
   import Undo from '@components/icons/Undo.svelte';
+  import { tooltip } from '@actions/tooltip';
   import { dematerialize, materialize } from '@lib/transitions.svelte';
   import { Lock } from '@lucide/svelte';
 
@@ -53,7 +54,7 @@
     genres?: string[];
     image?: string;
     mark?: 'resume' | 'complete' | 'replay';
-    gated?: boolean;
+    gate?: TileGate[];
     loading?: boolean;
     class?: string;
   }
@@ -76,7 +77,7 @@
     genres = [],
     image,
     mark,
-    gated = false,
+    gate,
     loading = false,
     class: className = '',
   }: TileProps = $props();
@@ -86,6 +87,25 @@
 
   /** First letter of author name for PFP fallback. */
   const authorInitial = $derived(author?.name.charAt(0).toUpperCase() ?? '');
+
+  /** Human-readable label for a single gate requirement. */
+  function formatGateLabel(g: TileGate): string {
+    switch (g.type) {
+      case 'nft-collection':
+        return `${g.name} NFT`;
+      case 'nft-id':
+        if ('ids' in g)
+          return `${g.collection} ${g.ids.map((id) => `#${id}`).join(', ')}`;
+        return `${g.collection} #${g.range[0]}–#${g.range[1]}`;
+      case 'fungible':
+        return `${g.amount.toLocaleString()} $${g.token}`;
+    }
+  }
+
+  const isGated = $derived(gate && gate.length > 0);
+  const gateTooltip = $derived(
+    isGated ? `Requires ${gate!.map(formatGateLabel).join(' or ')}` : '',
+  );
 </script>
 
 {#snippet authorInner()}
@@ -101,7 +121,7 @@
   class="tile {className}"
   data-state={loading ? 'loading' : undefined}
   aria-busy={loading || undefined}
-  data-gated={gated || undefined}
+  data-gated={isGated || undefined}
   onpointerenter={() => {
     if (!loading) hovered = true;
   }}
@@ -129,14 +149,17 @@
       </div>
     {/if}
 
-    {#if gated}
-      <div
-        class="tile-gate"
+    {#if isGated}
+      <button
+        type="button"
+        class="tile-gate btn-void"
+        aria-label={gateTooltip}
         in:materialize={{ y: 0 }}
         out:dematerialize={{ y: 0 }}
+        use:tooltip={gateTooltip}
       >
         <Lock class="icon" data-size="sm" />
-      </div>
+      </button>
     {/if}
 
     <div class="tile-content" in:materialize={{ y: 0 }}>

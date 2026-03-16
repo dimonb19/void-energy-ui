@@ -84,7 +84,7 @@
       },
       genres: ['Cyberpunk', 'Culinary'],
       image: 'https://picsum.photos/seed/queue3/400/600',
-      gated: true,
+      gate: [{ type: 'nft-collection', name: 'Potentials' }],
     },
     {
       id: 'q4',
@@ -154,7 +154,7 @@
       },
       genres: ['Hard Sci-Fi', 'Philosophical'],
       image: 'https://picsum.photos/seed/later3/400/600',
-      gated: true,
+      gate: [{ type: 'fungible', token: 'SOL', amount: 100 }],
     },
     {
       id: 'wl4',
@@ -367,7 +367,7 @@
           genres={story.genres}
           image={story.image}
           mark={story.mark}
-          gated={story.gated}
+          gate={story.gate}
         />
         <div class="tile-reorder-bar">
           <button
@@ -449,7 +449,7 @@
           genres={story.genres}
           image={story.image}
           mark={story.mark}
-          gated={story.gated}
+          gate={story.gate}
         />
         <div class="tile-reorder-bar">
           <button

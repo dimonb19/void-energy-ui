@@ -1645,7 +1645,7 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 
 **Description:** A 3:2 landscape card for the CoNexus storytelling platform. Shows a cover image (left ~40%), title, author with profile picture, and genre labels (right ~60%). Uses the **stretched link** pattern: the title `<a>` has a `::after` pseudo-element covering the full card, making the entire tile clickable. The author link sits above via `z-index` and remains independently clickable. State marks (resume, complete, replay) hang from the top-center as positioned badges.
 **Location:** [src/components/ui/Tile.svelte](src/components/ui/Tile.svelte)
-**CSS:** `.tile`, `.tile-image`, `.tile-content`, `.tile-link`, `.tile-author`, `.tile-pfp`, `.tile-genres`, `.tile-mark` ([src/styles/components/_tiles.scss](src/styles/components/_tiles.scss))
+**CSS:** `.tile`, `.tile-image`, `.tile-content`, `.tile-link`, `.tile-author`, `.tile-pfp`, `.tile-genres`, `.tile-mark`, `.tile-gate` ([src/styles/components/_tiles.scss](src/styles/components/_tiles.scss))
 
 **Props:**
 
@@ -1657,6 +1657,7 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 | `genres` | `string[]` | `[]` | Genre labels rendered as comma-separated text |
 | `image` | `string` | — | Cover image URL (falls back to sunk surface) |
 | `mark` | `'resume' \| 'complete' \| 'replay'` | — | State badge at top-center |
+| `gate` | `TileGate[]` | — | Token gate requirements (lock icon + premium styling + tooltip) |
 | `loading` | `boolean` | `false` | Renders a shimmer skeleton instead of content |
 | `class` | `string` | `''` | Additional CSS classes |
 
@@ -1668,6 +1669,9 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 | Resume mark | `data-mark="resume"` | Pennant/bookmark shape in `--energy-primary` |
 | Complete mark | `data-mark="complete"` | Flat-top pill in `--bg-spotlight` / `--energy-secondary` |
 | Replay mark | `data-mark="replay"` | Flat-top pill in `--energy-secondary` |
+| Gated | `data-gated` | Premium border (`--color-premium`), lock badge with tooltip, premium-colored title |
+
+**Token Gating:** The `gate` prop accepts an array of `TileGate` requirements (defined in [src/types/story.d.ts](src/types/story.d.ts)). Gate types: `nft-collection` (any NFT in collection), `nft-id` (specific IDs or range), `fungible` (minimum token balance). The lock badge is a `<button>` with `use:tooltip` showing a human-readable requirement summary (e.g., "Requires CyberApes NFT or 1,000 $VOID"). Multiple gates are joined with "or".
 
 **Responsive widths:** Viewport-based on mobile (with peek of next tile), unit-based on tablet+ (72→80→88 units scaling with `--density`). Add `.tile-fluid` class for 100% width in grid layouts.
 
@@ -1685,6 +1689,13 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 
 <!-- Loading skeleton -->
 <Tile loading />
+
+<!-- Gated tile (NFT-locked) -->
+<Tile
+  title="Exclusive Story"
+  href="/story/789"
+  gate={[{ type: 'nft-collection', name: 'CyberApes' }]}
+/>
 
 <!-- Fluid width (fills container) -->
 <Tile title="Story" href="#" class="tile-fluid" />
@@ -2239,9 +2250,11 @@ const pv = createPasswordValidation(() => password);
 
 | Class | Description |
 | --- | --- |
-| `.tile` | Fixed-width story card with 2:3 aspect ratio, density-scaled |
+| `.tile` | Fixed-width story card with 3:2 aspect ratio, density-scaled |
 | `.tile-fluid` | Grid-responsive variant (fills column, min-width: 0) |
 | `data-state="loading"` | Skeleton state with shimmer animation (use `<Tile loading />`) |
+| `data-gated` | Premium tile — `--color-premium` border + title, lock badge at top-right |
+| `.tile-gate` | Lock icon badge (`<button>`) with tooltip — `pointer-events: auto`, sits above stretched link |
 | `.tiles-collection` | Horizontal scroll container for tiles |
 
 **Usage:**
@@ -2312,6 +2325,26 @@ const pv = createPasswordValidation(() => password);
 - **Retro:** Same as flat (instant transitions, hard edges)
 
 **How to enable:** Follow the 9-step recipe in `Navigation.svelte` (bottom of `<script>` block). Steps cover imports, types, data, state, functions, burger button markup, and the full dropdown template. All SCSS already exists — no style changes needed.
+
+---
+
+#### Mobile Bottom Nav — Sliding Pill Indicator
+
+**Description:** The mobile bottom navigation bar (`.bottom-nav`, visible below `tablet:`) uses a sliding pill indicator behind the active tab, following the same pattern as the `<Tabs>` component. The pill slides between tabs on navigation and fades in with a blur-to-clear animation on first paint.
+**Location:** [src/components/Navigation.svelte](src/components/Navigation.svelte) (JS positioning logic) + [src/styles/components/\_navigation.scss](src/styles/components/_navigation.scss) (`.bottom-nav-indicator`)
+
+**How it works:**
+- JS measures the active tab's position via `getBoundingClientRect()` and sets `--_indicator-left`, `--_indicator-width`, `--_indicator-height` custom properties on the nav container
+- A `ResizeObserver` recomputes on layout shifts
+- On first paint, the indicator positions instantly (no transition), then animates in via `bottom-nav-materialize` keyframe (fade + blur clear)
+- Active tab `background-color` is overridden to `transparent` so the sliding pill is the sole active indicator
+- Navlink loading shimmer is suppressed on mobile — the pill slide is the navigation feedback
+
+**Physics:**
+- **Glass:** `alpha(--energy-secondary, 12%)` fill, full pill rounding
+- **Flat:** Same as glass (inherits)
+- **Retro:** `alpha(--energy-primary, 15%)` fill
+- **Light:** `alpha(--energy-primary, 10%)` fill
 
 ---
 
@@ -3093,7 +3126,7 @@ async function handleRefresh() {
 
 **Interaction Model:**
 
-- **Touch:** Pull down → release at threshold → triggers refresh
+- **Touch:** Pull down → release at threshold → triggers refresh. Multi-touch (pinch-to-zoom) aborts the pull gesture and hands control back to the browser. `touch-action: pan-y pinch-zoom` on the content wrapper allows native scroll and zoom.
 - **Wheel:** Scroll up at top → instant trigger when threshold crossed (normalized for Firefox line-mode deltas)
 - **Haptic:** Vibration pulse at threshold crossing (touch only)
 

@@ -515,6 +515,8 @@
 // A. Gate Badge (Lock Icon)
 // --------------------------------------------------------------------------
 .tile-gate {
+  @include btn-reset;
+
   position: absolute;
   top: var(--space-xs);
   right: var(--space-xs);
@@ -531,8 +533,10 @@
   background: var(--bg-sunk);
   border: var(--physics-border-width) solid var(--color-premium-subtle);
   border-radius: var(--radius-full);
+  cursor: default;
 
-  pointer-events: none;
+  // Sits above the stretched link so tooltip + future interactions work.
+  pointer-events: auto;
 
   transition:
     border-color var(--speed-base) var(--ease-spring-snappy),
@@ -541,6 +545,11 @@
 
   @include when-retro {
     border-color: var(--color-premium);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
   }
 
   @include when-light {

@@ -148,7 +148,7 @@
       genres: ['Mystery', 'Historical'],
       image: 'https://picsum.photos/seed/hot2/400/600',
       mark: 'complete' as const,
-      gated: true,
+      gate: [{ type: 'nft-collection', name: 'Potentials' }],
     },
     {
       title: 'Neon Requiem',
@@ -168,7 +168,7 @@
       genres: ['Fantasy'],
       image: 'https://picsum.photos/seed/hot4/400/600',
       mark: 'replay' as const,
-      gated: true,
+      gate: [{ type: 'fungible', token: 'SOL', amount: 50 }],
     },
     {
       title: 'Crimson Meridian',
@@ -203,7 +203,7 @@
       genres: ['Espionage', 'Historical Fiction'],
       image: 'https://picsum.photos/seed/hot7/400/600',
       mark: 'resume' as const,
-      gated: true,
+      gate: [{ type: 'nft-id', collection: 'Mad Lads', ids: ['4521'] }],
     },
     {
       title: 'Bone Garden',
@@ -313,7 +313,7 @@
       },
       genres: ['Techno-Thriller', 'Conspiracy'],
       image: 'https://picsum.photos/seed/hot18/400/600',
-      gated: true,
+      gate: [{ type: 'nft-collection', name: 'DeGods' }],
     },
     {
       title: 'The Porcelain Saint',
@@ -352,7 +352,7 @@
       genres: ['Atlantean', 'Epic'],
       image: 'https://picsum.photos/seed/hot22/400/600',
       mark: 'resume' as const,
-      gated: true,
+      gate: [{ type: 'fungible', token: 'BONK', amount: 50000 }],
     },
     {
       title: 'Bitter Seasons',
@@ -397,7 +397,7 @@
       },
       genres: ['Sci-Fi', 'Puzzle'],
       image: 'https://picsum.photos/seed/begin3/400/600',
-      gated: true,
+      gate: [{ type: 'nft-collection', name: 'Potentials' }],
     },
     {
       title: 'Echoes of Stone',
@@ -436,7 +436,7 @@
       author: { name: 'CoNexus Team', href: '#' },
       genres: ['Comedy', 'Meta'],
       image: 'https://picsum.photos/seed/begin7/400/600',
-      gated: true,
+      gate: [{ type: 'fungible', token: 'USDC', amount: 5 }],
     },
     {
       title: 'Letters from Nowhere',
@@ -567,7 +567,13 @@
       author: { name: 'Marisol Vargas', href: '#' },
       genres: ['Mythology', 'Mesoamerican'],
       image: 'https://picsum.photos/seed/staff3/400/600',
-      gated: true,
+      gate: [
+        {
+          type: 'nft-id',
+          collection: 'Potentials',
+          ids: ['127', '340'],
+        },
+      ],
     },
     {
       title: 'Glass Ceiling',
@@ -591,7 +597,7 @@
       },
       genres: ['Epic Fantasy', 'Tragedy'],
       image: 'https://picsum.photos/seed/staff5/400/600',
-      gated: true,
+      gate: [{ type: 'nft-collection', name: 'Claynosaurz' }],
     },
     {
       title: 'Foxfire',
@@ -682,7 +688,7 @@
       },
       genres: ['Body Horror', 'Sci-Fi'],
       image: 'https://picsum.photos/seed/staff14/400/600',
-      gated: true,
+      gate: [{ type: 'fungible', token: 'SOL', amount: 10 }],
     },
     {
       title: 'The Seventh Season',
@@ -785,7 +791,7 @@
       },
       genres: ['Origami Magic', 'Immigrant Story'],
       image: 'https://picsum.photos/seed/staff24/400/600',
-      gated: true,
+      gate: [{ type: 'nft-collection', name: 'Mad Lads' }],
     },
   ];
 
@@ -830,7 +836,7 @@
       },
       genres: ['Alchemy', 'Low Fantasy'],
       image: 'https://picsum.photos/seed/rise4/400/600',
-      gated: true,
+      gate: [{ type: 'nft-id', collection: 'DeGods', ids: ['8834'] }],
     },
     {
       title: 'Frostline',
@@ -873,7 +879,7 @@
       },
       genres: ['Wuxia', 'Court Intrigue'],
       image: 'https://picsum.photos/seed/rise8/400/600',
-      gated: true,
+      gate: [{ type: 'fungible', token: 'BONK', amount: 100000 }],
     },
     {
       title: 'Bleach & Bloom',
@@ -934,7 +940,7 @@
       },
       genres: ['Cartography', 'Adventure'],
       image: 'https://picsum.photos/seed/rise14/400/600',
-      gated: true,
+      gate: [{ type: 'nft-collection', name: 'Potentials' }],
     },
     {
       title: 'Switchboard',
@@ -1017,7 +1023,7 @@
       },
       genres: ['Hard Sci-Fi', 'Colonization'],
       image: 'https://picsum.photos/seed/world3/400/600',
-      gated: true,
+      gate: [{ type: 'fungible', token: 'SOL', amount: 25 }],
     },
     {
       title: 'The Broken Concordance',
@@ -1067,7 +1073,7 @@
       author: { name: 'Fintan McCarthy', href: '#' },
       genres: ['Mycelial Network', 'Bio-Fantasy'],
       image: 'https://picsum.photos/seed/world8/400/600',
-      gated: true,
+      gate: [{ type: 'nft-collection', name: 'Tensorians' }],
     },
     {
       title: 'The Sovereignty Engine',
@@ -1140,7 +1146,13 @@
       },
       genres: ['Physics Fiction', 'Space Station'],
       image: 'https://picsum.photos/seed/world15/400/600',
-      gated: true,
+      gate: [
+        {
+          type: 'nft-id',
+          collection: 'Potentials',
+          ids: ['501', '502', '503'],
+        },
+      ],
     },
     {
       title: 'Obsidian Tide',
@@ -1191,7 +1203,7 @@
       genres: ['Necromancy', 'Exploration'],
       image: 'https://picsum.photos/seed/world20/400/600',
       mark: 'replay' as const,
-      gated: true,
+      gate: [{ type: 'fungible', token: 'USDC', amount: 10 }],
     },
     {
       title: 'Ferrous',
@@ -1290,7 +1302,7 @@
             genres={story.genres}
             image={story.image}
             mark={story.mark}
-            gated={story.gated}
+            gate={story.gate}
           />
         {/each}
       </StoryCategory>
