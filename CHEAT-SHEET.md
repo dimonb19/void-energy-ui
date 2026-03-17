@@ -5418,7 +5418,7 @@ Plain text with muted color, centered, generous padding. No italic — italic is
 
 ---
 
-### Y. Charts & Data Viz
+### Y. Charts & Data Visualization
 
 ```svelte
 <script lang="ts">

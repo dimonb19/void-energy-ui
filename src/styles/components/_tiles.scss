@@ -434,10 +434,10 @@
       var(--energy-primary) 30%
     );
     color: var(--bg-canvas);
-    padding-bottom: var(--space-md);
+    padding-bottom: var(--space-sm);
 
     // Pennant: flat top, angled V-notch at bottom.
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 68%, 0 100%);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
   }
 
   // ── Complete: Flat-top pill ─────────────────────────────────────────────
