@@ -43,12 +43,6 @@
   import Sparkle from '@components/icons/Sparkle.svelte';
   import LoadingQuill from '@components/icons/LoadingQuill.svelte';
 
-  interface GenerateContext {
-    currentValue: string;
-    instructions?: string;
-    signal: AbortSignal;
-  }
-
   interface GenerateFieldProps
     extends Omit<HTMLInputAttributes, 'type' | 'value'> {
     value: string;
@@ -56,7 +50,7 @@
     placeholder?: string;
     disabled?: boolean;
     instructions?: string;
-    ongenerate: (context: GenerateContext) => Promise<string>;
+    ongenerate: (context: GenerateFieldContext) => Promise<string>;
     class?: string;
   }
 

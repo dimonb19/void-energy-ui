@@ -37,14 +37,7 @@
   @see /_tabs.scss for physics-aware styling
 -->
 <script lang="ts">
-  import type { Component, Snippet } from 'svelte';
-
-  interface TabItem {
-    id: string;
-    label: string;
-    icon?: string | Component;
-    disabled?: boolean;
-  }
+  import type { Snippet } from 'svelte';
 
   interface TabsProps {
     tabs: TabItem[];

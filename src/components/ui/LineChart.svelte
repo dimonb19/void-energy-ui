@@ -29,17 +29,6 @@
   const SHOULD_WARN_INVALID =
     import.meta.env.DEV || import.meta.env.MODE === 'test';
 
-  interface LineChartPoint {
-    label: string;
-    value: number;
-  }
-
-  interface LineChartSeries {
-    name: string;
-    data: LineChartPoint[];
-    series?: number;
-  }
-
   interface LineChartProps {
     /** Single-series data points */
     data?: LineChartPoint[];
@@ -62,7 +51,7 @@
     /** Selection callback (fires on dot click or Enter/Space) */
     onselect?: (item: LineChartPoint, index: number) => void;
     /** Horizontal reference lines */
-    referenceLines?: { value: number; label?: string; series?: number }[];
+    referenceLines?: ChartReferenceLine[];
     /** X-axis label */
     xLabel?: string;
     /** Y-axis label */

@@ -32,14 +32,9 @@
 <script lang="ts">
   import type { HTMLSelectAttributes } from 'svelte/elements';
 
-  interface SwitcherOption {
-    value: string | number | null;
-    label: string;
-  }
-
   interface SelectorProps
     extends Omit<HTMLSelectAttributes, 'value' | 'onchange'> {
-    options: SwitcherOption[];
+    options: SelectorOption[];
     value?: string | number | null;
     onchange?: (value: string | number | null) => void;
     label?: string;

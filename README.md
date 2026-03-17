@@ -8,10 +8,13 @@ It combines the performance of **Tailwind CSS** (for Layout) with a bespoke **SC
 ## 📚 Documentation
 
 - **[CHEAT-SHEET.md](./CHEAT-SHEET.md)** — Quick reference for developers (components, mixins, tokens)
+- **[AI-PLAYBOOK.md](./AI-PLAYBOOK.md)** — Compact operating guide for AI page-building
+- **[COMPOSITION-RECIPES.md](./COMPOSITION-RECIPES.md)** — Page archetypes built from shipped primitives
 - **[THEME-GUIDE.md](./THEME-GUIDE.md)** — Step-by-step guide to creating custom themes
 - **[CONTRIBUTING.md](./CONTRIBUTING.md)** — Contribution guidelines and PR process
 - **[CLAUDE.md](./CLAUDE.md)** — AI assistant instructions and design system laws
 - **[.claude/README.md](./.claude/README.md)** — Claude Code setup, skills, hooks, and agents
+- **[templates/starter/README.md](./templates/starter/README.md)** — Starter-handoff assets for the future composition-only repo
 
 ---
 

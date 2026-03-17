@@ -18,12 +18,6 @@
 <script lang="ts">
   import { tooltip } from '@actions/tooltip';
 
-  interface ChartDataPoint {
-    label: string;
-    value: number;
-    series?: number;
-  }
-
   interface DonutChartProps {
     /** Data segments */
     data: ChartDataPoint[];
@@ -34,7 +28,7 @@
     /** Ring thickness as fraction of radius (0–1) */
     thickness?: number;
     /** Center metric display */
-    centerMetric?: { label: string; value: string };
+    centerMetric?: DonutCenterMetric;
     /** Show legend below chart */
     showLegend?: boolean;
     /** Accessible chart title */

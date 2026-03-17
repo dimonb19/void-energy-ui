@@ -45,12 +45,6 @@
   import Sparkle from '@components/icons/Sparkle.svelte';
   import LoadingQuill from '@components/icons/LoadingQuill.svelte';
 
-  interface GenerateContext {
-    currentValue: string;
-    instructions?: string;
-    signal: AbortSignal;
-  }
-
   interface GenerateTextareaProps
     extends Omit<HTMLTextareaAttributes, 'value'> {
     value: string;
@@ -59,7 +53,7 @@
     rows?: number;
     disabled?: boolean;
     instructions?: string;
-    ongenerate: (context: GenerateContext) => Promise<string>;
+    ongenerate: (context: GenerateFieldContext) => Promise<string>;
     class?: string;
   }
 

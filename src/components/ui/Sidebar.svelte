@@ -9,16 +9,6 @@
   // Types
   // ─────────────────────────────────────────────────────────────────────────
 
-  interface SidebarItem {
-    id: string;
-    label: string;
-  }
-
-  interface SidebarSection {
-    label?: string;
-    items: SidebarItem[];
-  }
-
   interface SidebarProps {
     sections: SidebarSection[];
     activeId?: string;

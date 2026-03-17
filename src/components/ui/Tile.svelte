@@ -41,12 +41,6 @@
   import { dematerialize, materialize } from '@lib/transitions.svelte';
   import { Lock } from '@lucide/svelte';
 
-  interface TileAuthor {
-    name: string;
-    avatar?: string;
-    href?: string;
-  }
-
   interface TileProps {
     title?: string;
     href?: string;

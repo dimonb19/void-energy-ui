@@ -1,3 +1,9 @@
+interface TileAuthor {
+  name: string;
+  avatar?: string;
+  href?: string;
+}
+
 /** Gate requiring ownership of any NFT in a collection. */
 interface TileGateCollection {
   type: 'nft-collection';
@@ -34,7 +40,7 @@ type TileGate =
 interface StoryData {
   title: string;
   href: string;
-  author: { name: string; avatar?: string; href?: string };
+  author: TileAuthor;
   genres: string[];
   image: string;
   mark?: 'resume' | 'complete' | 'replay';

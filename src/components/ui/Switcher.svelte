@@ -35,15 +35,7 @@
   @see /_inputs.scss for physics-aware styling
 -->
 <script lang="ts">
-  import type { Component } from 'svelte';
   import { toNativeControlState } from '@lib/native-control-foundation';
-
-  interface SwitcherOption {
-    value: string | number | null;
-    label: string;
-    icon?: string | Component;
-    disabled?: boolean;
-  }
 
   interface SwitcherProps {
     options: SwitcherOption[];

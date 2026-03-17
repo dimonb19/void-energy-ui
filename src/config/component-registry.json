@@ -1,9 +1,12 @@
 {
   "meta": {
-    "description": "Authoritative AI-facing registry for Void Energy UI primitives, controllers, and class recipes.",
+    "description": "Authoritative AI-facing registry for Void Energy UI primitives, actions, controllers, utilities, and class recipes.",
     "propsNote": "props lists explicit Svelte props. ...rest:* means native element attributes forwarded by spread.",
+    "propTypesNote": "propTypes appears only when a prop name is not enough for autonomous use. Shared shapes are defined in the top-level types map.",
     "slotsNote": "slots lists Svelte 5 snippet props or child content expected by the entry.",
-    "contractsNote": "controllers and utilities add methods/contracts when a flat signature string is not enough for autonomous use.",
+    "contractsNote": "controllers, actions, and utilities add methods/contracts when a flat signature string is not enough for autonomous use.",
+    "typesNote": "types is the compact source index for object unions, callback payloads, and controller state shapes. source points to the canonical local definition.",
+    "stateNote": "controller state lists reactive fields/getters that consumers may read directly.",
     "rules": [
       "There is no generic Button.svelte. Use native <button> with btn-* classes for text-only actions; prefer ActionBtn/IconBtn when an action benefits from an interactive icon.",
       "AI and generation actions should default to Sparkle via ActionBtn/IconBtn unless a more specific interactive icon is a better semantic match.",
@@ -12,6 +15,306 @@
       "Prefer native HTML when the platform already provides the right semantics. A missing wrapper does not imply a missing capability."
     ],
     "spacing": ["xs=8px", "sm=16px", "md=24px", "lg=32px", "xl=48px"]
+  },
+  "types": {
+    "BreadcrumbItem": {
+      "source": "src/types/void-ui.d.ts",
+      "shape": ["label: string", "href?: string", "active?: boolean"]
+    },
+    "ComboboxOption": {
+      "source": "src/types/combobox.d.ts",
+      "shape": [
+        "value: string | number | null",
+        "label: string",
+        "description?: string",
+        "disabled?: boolean"
+      ]
+    },
+    "SelectorOption": {
+      "source": "src/types/selection.d.ts",
+      "shape": ["value: string | number | null", "label: string"]
+    },
+    "SwitcherOption": {
+      "source": "src/types/selection.d.ts",
+      "shape": [
+        "value: string | number | null",
+        "label: string",
+        "icon?: string | Component",
+        "disabled?: boolean"
+      ]
+    },
+    "SliderFieldPreset": {
+      "source": "src/types/slider-field.d.ts",
+      "shape": ["label: string", "value: number"]
+    },
+    "GenerateFieldContext": {
+      "source": "src/types/generation.d.ts",
+      "shape": [
+        "currentValue: string",
+        "instructions?: string",
+        "signal: AbortSignal"
+      ]
+    },
+    "SidebarItem": {
+      "source": "src/types/navigation.d.ts",
+      "shape": ["id: string", "label: string"]
+    },
+    "SidebarSection": {
+      "source": "src/types/navigation.d.ts",
+      "shape": ["label?: string", "items: SidebarItem[]"]
+    },
+    "TabItem": {
+      "source": "src/types/navigation.d.ts",
+      "shape": [
+        "id: string",
+        "label: string",
+        "icon?: string | Component",
+        "disabled?: boolean"
+      ]
+    },
+    "TileAuthor": {
+      "source": "src/types/story.d.ts",
+      "shape": ["name: string", "avatar?: string", "href?: string"]
+    },
+    "TileGate": {
+      "source": "src/types/story.d.ts",
+      "shape": [
+        "{ type: 'nft-collection', name: string }",
+        "{ type: 'nft-id', collection: string, ids: string[] }",
+        "{ type: 'nft-id', collection: string, range: [number, number] }",
+        "{ type: 'fungible', token: string, amount: number }"
+      ],
+      "note": "Tile accepts TileGate[]. Multiple entries use OR logic."
+    },
+    "ChartDataPoint": {
+      "source": "src/types/charts.d.ts",
+      "shape": ["label: string", "value: number", "series?: number"]
+    },
+    "ChartReferenceLine": {
+      "source": "src/types/charts.d.ts",
+      "shape": ["value: number", "label?: string", "series?: number"]
+    },
+    "BarChartGroup": {
+      "source": "src/types/charts.d.ts",
+      "shape": ["label: string", "values: BarChartGroupValue[]"],
+      "note": "BarChartGroupValue = { name: string, value: number, series?: number }."
+    },
+    "DonutCenterMetric": {
+      "source": "src/types/charts.d.ts",
+      "shape": ["label: string", "value: string"]
+    },
+    "LineChartPoint": {
+      "source": "src/types/charts.d.ts",
+      "shape": ["label: string", "value: number"]
+    },
+    "LineChartSeries": {
+      "source": "src/types/charts.d.ts",
+      "shape": ["name: string", "data: LineChartPoint[]", "series?: number"]
+    },
+    "PasswordValidationState": {
+      "source": "src/types/void-ui.d.ts",
+      "shape": [
+        "error: string",
+        "isValid: boolean",
+        "rules: PasswordRule[]",
+        "score: number",
+        "level: 'weak' | 'fair' | 'good' | 'strong'",
+        "hasLower: boolean",
+        "hasUpper: boolean",
+        "hasDigit: boolean",
+        "hasSpecial: boolean",
+        "hasRestrictedChars: boolean",
+        "hasValidLength: boolean",
+        "passwordsMatch: boolean"
+      ],
+      "note": "Getter-backed reactive object returned by createPasswordValidation(); do not destructure."
+    },
+    "VoidTooltipOptions": {
+      "source": "src/types/void-ui.d.ts",
+      "shape": [
+        "content: string",
+        "placement?: import('@floating-ui/dom').Placement",
+        "delay?: number",
+        "offset?: number"
+      ]
+    },
+    "MorphOptions": {
+      "source": "src/types/void-ui.d.ts",
+      "shape": [
+        "width?: boolean",
+        "height?: boolean",
+        "threshold?: number",
+        "onStart?: () => void",
+        "onComplete?: () => void"
+      ]
+    },
+    "KineticConfig": {
+      "source": "src/types/kinetic.d.ts",
+      "shape": [
+        "text?: string",
+        "words?: string[]",
+        "mode?: 'char' | 'word' | 'cycle' | 'decode'",
+        "speed?: number",
+        "delay?: number",
+        "cursor?: boolean",
+        "cursorChar?: string",
+        "cursorRemoveOnComplete?: boolean",
+        "chunk?: 'word' | 'sentence' | 'sentence-pair'",
+        "charSpeed?: number",
+        "pauseDuration?: number",
+        "loop?: boolean",
+        "cycleTransition?: 'type' | 'fade' | 'decode'",
+        "fadeDuration?: number",
+        "scrambleChars?: string",
+        "scramblePasses?: number",
+        "onComplete?: () => void",
+        "onCycle?: (index: number, word: string) => void"
+      ]
+    },
+    "NarrativeConfig": {
+      "source": "src/types/narrative.d.ts",
+      "shape": [
+        "effect: NarrativeEffect | null",
+        "enabled?: boolean",
+        "onComplete?: () => void"
+      ]
+    },
+    "NarrativeEffect": {
+      "source": "src/types/narrative.d.ts",
+      "shape": [
+        "'shake' | 'quake' | 'jolt' | 'glitch' | 'surge' | 'warp' | 'drift' | 'flicker' | 'breathe' | 'tremble' | 'pulse' | 'whisper' | 'fade' | 'freeze' | 'burn' | 'static' | 'distort' | 'sway'"
+      ]
+    },
+    "DraggableOptions": {
+      "source": "src/types/drag.d.ts",
+      "shape": [
+        "id: string",
+        "data?: unknown",
+        "group?: string",
+        "axis?: 'both' | 'x' | 'y'",
+        "handle?: string",
+        "disabled?: boolean",
+        "onDragStart?: (detail: DragDetail) => void",
+        "onDragMove?: (detail: DragDetail) => void",
+        "onDragEnd?: (detail: DragEndDetail) => void"
+      ]
+    },
+    "DropTargetOptions": {
+      "source": "src/types/drag.d.ts",
+      "shape": [
+        "id?: string",
+        "group?: string",
+        "mode?: 'inside' | 'between'",
+        "axis?: 'vertical' | 'horizontal'",
+        "accepts?: (data: unknown, sourceId: string) => boolean",
+        "onDragEnter?: (detail: HoverDetail) => void",
+        "onDragLeave?: (detail: HoverDetail) => void",
+        "onDrop?: (detail: DropDetail) => void",
+        "disabled?: boolean"
+      ]
+    },
+    "ReorderChange<T>": {
+      "source": "src/types/drag.d.ts",
+      "shape": [
+        "items: T[]",
+        "item: T",
+        "request: { id, targetId, position, fromIndex, toIndex, previousId, nextId, orderedIds }"
+      ]
+    },
+    "VoidShortcutEntry": {
+      "source": "src/types/void-ui.d.ts",
+      "shape": [
+        "key: string",
+        "modifier?: 'meta' | 'alt'",
+        "label: string",
+        "group: string",
+        "action: () => void"
+      ]
+    },
+    "VoidUser": {
+      "source": "src/types/void-ui.d.ts",
+      "shape": [
+        "id: string",
+        "name: string",
+        "email: string",
+        "avatar: string | null",
+        "role_name: 'Admin' | 'Creator' | 'Player' | 'Guest'",
+        "approved_tester: boolean"
+      ]
+    },
+    "BoundaryError": {
+      "source": "src/types/boundary.d.ts",
+      "shape": [
+        "code: 'invalid_json' | 'invalid_shape' | 'network' | 'http_error' | 'preference_mismatch'",
+        "source: string",
+        "message: string",
+        "issues?: string[]",
+        "status?: number"
+      ]
+    },
+    "VoidResult<T, E>": {
+      "source": "src/types/void-result.d.ts",
+      "shape": ["{ ok: true, data: T }", "{ ok: false, error: E }"]
+    },
+    "UserConfig": {
+      "source": "src/types/void-ui.d.ts",
+      "shape": [
+        "fontHeading: string | null",
+        "fontBody: string | null",
+        "scale: number",
+        "density: 'high' | 'standard' | 'low'",
+        "adaptAtmosphere: boolean",
+        "fixedNav: boolean",
+        "narrativeEffects: boolean"
+      ]
+    },
+    "VoidThemeDefinition": {
+      "source": "src/types/void-ui.d.ts",
+      "shape": [
+        "mode: 'light' | 'dark'",
+        "physics: 'glass' | 'flat' | 'retro'",
+        "palette: VoidPalette",
+        "label?: string",
+        "tagline?: string",
+        "fonts?: { name: string, url: string }[]"
+      ]
+    },
+    "VoidToastItem": {
+      "source": "src/types/void-ui.d.ts",
+      "shape": [
+        "id: number",
+        "message: string",
+        "type: 'info' | 'success' | 'error' | 'warning' | 'loading'",
+        "action?: { label: string, onclick: () => void }"
+      ]
+    },
+    "PartialThemeDefinition": {
+      "source": "src/types/void-ui.d.ts",
+      "shape": [
+        "Partial<VoidThemeDefinition> except palette",
+        "palette?: Partial<VoidPalette>"
+      ],
+      "note": "VoidEngine normalizes and safety-merges missing keys against a mode-compatible base theme."
+    },
+    "VoidLoadingToastController": {
+      "source": "src/types/void-ui.d.ts",
+      "shape": [
+        "readonly id: number",
+        "update(message: string): void",
+        "success(message?: string, duration?: number): void",
+        "error(message?: string, duration?: number): void",
+        "warning(message?: string, duration?: number): void",
+        "close(): void"
+      ]
+    },
+    "VoidPromiseMessages<T>": {
+      "source": "src/types/void-ui.d.ts",
+      "shape": [
+        "loading: string",
+        "success: string | ((data: T) => string)",
+        "error: string | ((err: unknown) => string)"
+      ]
+    }
   },
   "components": {
     "search-field": {
@@ -68,6 +371,10 @@
         "class",
         "...rest:input"
       ],
+      "propTypes": {
+        "value": "string",
+        "ongenerate": "(context: GenerateFieldContext) => Promise<string>"
+      },
       "slots": [],
       "related": ["generate-textarea", "search-field", "edit-field"],
       "compose": "Provide an async ongenerate handler that returns the final string. Escape aborts generation.",
@@ -143,6 +450,11 @@
         "disabled",
         "class"
       ],
+      "propTypes": {
+        "value": "number",
+        "presets": "SliderFieldPreset[]",
+        "onchange": "(value: number) => void"
+      },
       "slots": [],
       "related": ["selector", "switcher", "media-slider"],
       "compose": "Use presets for snap-point selection; without presets it behaves like a labeled native range input.",
@@ -166,6 +478,12 @@
         "class",
         "...rest:input"
       ],
+      "propTypes": {
+        "checked": "boolean",
+        "iconOn": "string | Component",
+        "iconOff": "string | Component",
+        "onchange": "(checked?: boolean) => void"
+      },
       "slots": [],
       "related": ["switcher", "selector", "media-slider"],
       "compose": "Use for boolean state. Native checkbox semantics and focus handling are already built in.",
@@ -187,6 +505,11 @@
         "disabled",
         "class"
       ],
+      "propTypes": {
+        "options": "SwitcherOption[]",
+        "value": "string | number | null",
+        "onchange": "(value: string | number | null) => void"
+      },
       "slots": [],
       "related": ["selector", "tabs", "toggle"],
       "compose": "Use when choices are few and mutually exclusive. It renders native radio inputs for form submission.",
@@ -209,6 +532,11 @@
         "class",
         "...rest:select"
       ],
+      "propTypes": {
+        "options": "SelectorOption[]",
+        "value": "string | number | null",
+        "onchange": "(value: string | number | null) => void"
+      },
       "slots": [],
       "related": ["switcher", "combobox", "slider-field"],
       "compose": "Use when you want native select semantics or a long option list without filtering.",
@@ -236,6 +564,13 @@
         "id",
         "...rest:input"
       ],
+      "propTypes": {
+        "options": "ComboboxOption[]",
+        "value": "string | number | null",
+        "open": "boolean",
+        "onchange": "(value: string | number | null) => void",
+        "oninput": "(query: string) => void"
+      },
       "slots": [],
       "related": ["selector", "search-field", "dropdown"],
       "compose": "Wrap in FormField for label or validation. Use bind:value for committed selection and oninput for async filtering.",
@@ -329,6 +664,10 @@
         "class",
         "...rest:textarea"
       ],
+      "propTypes": {
+        "value": "string",
+        "ongenerate": "(context: GenerateFieldContext) => Promise<string>"
+      },
       "slots": [],
       "related": ["generate-field", "edit-textarea"],
       "compose": "Provide an async ongenerate handler that returns the final string. Escape aborts generation while loading.",
@@ -347,6 +686,12 @@
         "btn-ghost"
       ],
       "props": ["icon", "text", "class", "size", "disabled", "...rest:button"],
+      "propTypes": {
+        "icon": "Component",
+        "text": "string",
+        "size": "string",
+        "disabled": "boolean"
+      },
       "slots": [],
       "related": ["icon-button", "button-native"],
       "compose": "Use when you need a styled button with an animated icon and optional label. Prefer this over hand-rolled <button><Icon />Label</button> markup for generate, retry, confirm, undo, and auth actions. Variant classes go on class.",
@@ -365,6 +710,12 @@
         "disabled",
         "...rest:button"
       ],
+      "propTypes": {
+        "icon": "Component",
+        "size": "string",
+        "iconProps": "Record<string, unknown>",
+        "disabled": "boolean"
+      },
       "slots": [],
       "related": ["action-button", "themes-button", "profile-button"],
       "compose": "Use for toolbar or inline icon actions. iconProps can override hover-driven data-state for toggles and timers.",
@@ -403,6 +754,12 @@
         "onchange",
         "class"
       ],
+      "propTypes": {
+        "open": "boolean",
+        "placement": "import('@floating-ui/dom').Placement",
+        "offset": "number",
+        "onchange": "(open: boolean) => void"
+      },
       "slots": ["trigger()", "children()"],
       "related": ["combobox", "profile-button", "sidebar"],
       "compose": "Use a trigger snippet for the button content and arbitrary panel markup in children. Escape and click-outside handling are built in.",
@@ -413,6 +770,11 @@
       "component": "Tabs",
       "import": "@components/ui/Tabs.svelte",
       "props": ["tabs", "value:bindable", "onchange", "class"],
+      "propTypes": {
+        "tabs": "TabItem[]",
+        "value": "string",
+        "onchange": "(id: string) => void"
+      },
       "slots": ["panel(tab)"],
       "related": ["switcher", "pagination", "sidebar"],
       "compose": "Pass tab metadata and render content through the panel snippet. Keyboard and roving-tabindex behavior are already implemented.",
@@ -460,6 +822,10 @@
       "component": "Breadcrumbs",
       "import": "@components/ui/Breadcrumbs.svelte",
       "props": ["items", "hidden", "class"],
+      "propTypes": {
+        "items": "BreadcrumbItem[]",
+        "hidden": "boolean"
+      },
       "slots": [],
       "related": ["sidebar", "tabs"],
       "compose": "Pass BreadcrumbItem[] with label, href?, and active?. Any active item switches separators to peer-mode slashes.",
@@ -477,6 +843,13 @@
         "onclose",
         "class"
       ],
+      "propTypes": {
+        "sections": "SidebarSection[]",
+        "activeId": "string",
+        "open": "boolean",
+        "trackScroll": "boolean",
+        "onclose": "() => void"
+      },
       "slots": [],
       "related": ["tabs", "breadcrumbs", "dropdown"],
       "compose": "Use for section navigation. It can sync activeId from the URL hash and IntersectionObserver and behaves as an overlay on smaller screens.",
@@ -652,6 +1025,12 @@
         "id",
         "class"
       ],
+      "propTypes": {
+        "data": "ChartDataPoint[]",
+        "centerMetric": "DonutCenterMetric",
+        "formatValue": "(value: number) => string",
+        "onselect": "(item: ChartDataPoint, index: number) => void"
+      },
       "slots": [],
       "related": ["progress-ring", "stat-card", "bar-chart"],
       "compose": "Use for share or distribution views. Pair with a surrounding surface-raised card.",
@@ -680,6 +1059,13 @@
         "id",
         "class"
       ],
+      "propTypes": {
+        "data": "LineChartPoint[]",
+        "series": "LineChartSeries[]",
+        "formatValue": "(value: number) => string",
+        "referenceLines": "ChartReferenceLine[]",
+        "onselect": "(item: LineChartPoint, index: number) => void"
+      },
       "slots": [],
       "related": ["sparkline", "bar-chart", "donut-chart"],
       "compose": "Use data for a single series or series for multi-series. All series must share labels in the same order.",
@@ -700,6 +1086,12 @@
         "loading",
         "class"
       ],
+      "propTypes": {
+        "author": "TileAuthor",
+        "genres": "string[]",
+        "gate": "TileGate[]",
+        "loading": "boolean"
+      },
       "slots": [],
       "related": ["story-category"],
       "compose": "Use inside a StoryCategory scroll strip. Supports mark states (resume, complete, replay) and gate prop (TileGate[]) for token-gated tiles with lock icon, premium styling, and requirement tooltip (NFT collection, specific NFT IDs, or fungible token balance). Multiple gates use OR logic. Uses the stretched-link pattern for full-tile clickability with an independent author link. Use loading prop for skeleton state.",
@@ -745,6 +1137,14 @@
         "id",
         "class"
       ],
+      "propTypes": {
+        "data": "ChartDataPoint[]",
+        "groups": "BarChartGroup[]",
+        "orientation": "'vertical' | 'horizontal'",
+        "formatValue": "(value: number) => string",
+        "referenceLines": "ChartReferenceLine[]",
+        "onselect": "(item: ChartDataPoint, index: number) => void"
+      },
       "slots": [],
       "related": ["line-chart", "donut-chart", "stat-card"],
       "compose": "Use data for simple bars or groups for clustered bars. Negative values are not supported.",
@@ -770,6 +1170,139 @@
       "related": ["password-field", "password-meter", "password-checklist"],
       "compose": "Create once at component top level and pass the returned object directly into PasswordMeter and PasswordChecklist. Use requireConfirm when the confirm field must match.",
       "example": "import { createPasswordValidation } from '@lib/password-validation.svelte'; const pv = createPasswordValidation(() => password, () => confirm, { requireConfirm: true });"
+    },
+    "typewrite": {
+      "category": "motion",
+      "symbol": "typewrite",
+      "import": "@actions/kinetic",
+      "signature": "typewrite(el, text, options?)",
+      "args": [
+        "el: HTMLElement",
+        "text: string",
+        "options?: Omit<KineticConfig, 'text' | 'words'>"
+      ],
+      "returns": ["KineticHandle (Promise<void> with abort())"],
+      "related": ["kinetic", "kinetic-text"],
+      "compose": "Use when you need imperative, abortable typing outside Svelte markup or want a promise that resolves when the reveal completes.",
+      "example": "const handle = typewrite(node, 'Loading...', { speed: 30 }); handle.abort();"
+    },
+    "is-one-shot-effect": {
+      "category": "motion",
+      "symbol": "isOneShotEffect",
+      "import": "@actions/narrative",
+      "signature": "isOneShotEffect(effect)",
+      "args": ["effect: NarrativeEffect"],
+      "returns": ["boolean"],
+      "related": ["narrative", "kinetic"],
+      "compose": "Use to split one-shot narrative punctuation from continuous ambient effects when pairing narrative with kinetic text reveals.",
+      "example": "const ambient = isOneShotEffect(effect) ? null : effect;"
+    },
+    "reorder-by-drop": {
+      "category": "drag",
+      "symbol": "reorderByDrop",
+      "import": "@actions/drag",
+      "signature": "reorderByDrop(items, detail)",
+      "args": [
+        "items: T[] where T extends { id: string }",
+        "detail: { id, targetId?, position? }"
+      ],
+      "returns": ["T[]"],
+      "related": ["draggable", "drop-target", "resolve-reorder-by-drop"],
+      "compose": "Use after dropTarget between-mode drops when you only need the reordered collection and not the backend payload.",
+      "example": "items = reorderByDrop(items, detail);"
+    },
+    "resolve-reorder-by-drop": {
+      "category": "drag",
+      "symbol": "resolveReorderByDrop",
+      "import": "@actions/drag",
+      "signature": "resolveReorderByDrop(items, detail)",
+      "args": [
+        "items: T[] where T extends { id: string }",
+        "detail: { id, targetId?, position? }"
+      ],
+      "returns": ["ReorderChange<T> | null"],
+      "related": ["draggable", "drop-target", "reorder-by-drop"],
+      "compose": "Use when a sortable drop must also produce a backend-ready payload describing the move.",
+      "example": "const change = resolveReorderByDrop(items, detail); if (change) save(change.request);"
+    }
+  },
+  "actions": {
+    "tooltip": {
+      "category": "overlay",
+      "symbol": "tooltip",
+      "import": "@actions/tooltip",
+      "signature": "tooltip(node, params)",
+      "args": ["params: string | VoidTooltipOptions"],
+      "returns": ["{ update(newParams), destroy() }"],
+      "related": ["dropdown", "tile"],
+      "compose": "Use string shorthand for plain text or VoidTooltipOptions when placement, delay, or offset must change.",
+      "example": "<button use:tooltip=\"Open settings\">...</button>"
+    },
+    "morph": {
+      "category": "motion",
+      "symbol": "morph",
+      "import": "@actions/morph",
+      "signature": "morph(node, options?)",
+      "args": ["options?: MorphOptions"],
+      "returns": ["{ update(newOptions), destroy() }"],
+      "related": ["dropdown", "line-chart"],
+      "compose": "Apply to inner containers whose dimensions change with content. Avoid pairing it with CSS width/height transitions on the same node.",
+      "example": "<div use:morph>{#if expanded}<LargeContent />{:else}<SmallContent />{/if}</div>"
+    },
+    "kinetic": {
+      "category": "motion",
+      "symbol": "kinetic",
+      "import": "@actions/kinetic",
+      "signature": "kinetic(node, config)",
+      "args": ["config: KineticConfig"],
+      "returns": ["{ update(newConfig), destroy() }"],
+      "related": ["kinetic-text", "typewrite", "narrative"],
+      "compose": "Use for declarative text reveal effects in markup. The action restarts whenever the config object reference changes.",
+      "example": "<span use:kinetic={{ text: 'SYSTEM ONLINE', mode: 'decode' }} />"
+    },
+    "narrative": {
+      "category": "motion",
+      "symbol": "narrative",
+      "import": "@actions/narrative",
+      "signature": "narrative(node, config)",
+      "args": ["config: NarrativeConfig"],
+      "returns": ["{ update(newConfig), destroy() }"],
+      "related": ["kinetic", "is-one-shot-effect"],
+      "compose": "Use for post-reveal ambient text physics. Pair with isOneShotEffect when only punctuation effects should wait for kinetic completion.",
+      "example": "<p use:narrative={{ effect: 'breathe', enabled: voidEngine.userConfig.narrativeEffects }} />"
+    },
+    "navlink": {
+      "category": "nav",
+      "symbol": "navlink",
+      "import": "@actions/navlink",
+      "signature": "navlink(node)",
+      "args": [],
+      "returns": ["{ destroy() }"],
+      "related": ["sidebar", "tile"],
+      "compose": "Use on links or navigational surfaces that should expose loading state immediately on primary-button navigation.",
+      "example": "<a href='/components' use:navlink>Components</a>"
+    },
+    "draggable": {
+      "category": "drag",
+      "symbol": "draggable",
+      "import": "@actions/drag",
+      "signature": "draggable(node, options)",
+      "args": ["options: DraggableOptions"],
+      "returns": ["{ update(newOptions), destroy() }"],
+      "related": ["drop-target", "reorder-by-drop"],
+      "compose": "Use with dropTarget for pointer + keyboard drag interactions. Keep IDs stable and group names consistent across the draggable/drop-target pair.",
+      "example": "<div use:draggable={{ id: item.id, group: 'stories', data: item }}>...</div>"
+    },
+    "drop-target": {
+      "category": "drag",
+      "symbol": "dropTarget",
+      "import": "@actions/drag",
+      "signature": "dropTarget(node, options)",
+      "args": ["options: DropTargetOptions"],
+      "returns": ["{ update(newOptions), destroy() }"],
+      "related": ["draggable", "resolve-reorder-by-drop"],
+      "compose": "Use mode='between' for sortable lists and mode='inside' for zone drops. between-mode pairs naturally with reorderByDrop/resolveReorderByDrop.",
+      "example": "<div use:dropTarget={{ id: item.id, group: 'stories', mode: 'between', onDrop: handleDrop }}>...</div>"
     }
   },
   "controllers": {
@@ -786,6 +1319,9 @@
         "themes()",
         "shortcuts()",
         "palette()"
+      ],
+      "state": [
+        "state: { key: 'alert' | 'confirm' | 'palette' | 'settings' | 'shortcuts' | 'themes' | null, props: object, size: 'sm' | 'md' | 'lg' | 'full' }"
       ],
       "keys": [
         "alert",
@@ -826,6 +1362,22 @@
             ],
             "shortcuts": [],
             "themes": []
+          },
+          "contractsByKey": {
+            "alert": [
+              "{ title: string, body: string }",
+              "{ title: string, bodyHtml: string } // trusted HTML only"
+            ],
+            "confirm": [
+              "{ title: string, body: string, onConfirm: () => void, onCancel?: () => void, cost?: number }",
+              "{ title: string, bodyHtml: string, onConfirm: () => void, onCancel?: () => void, cost?: number } // trusted HTML only"
+            ],
+            "palette": ["{}"],
+            "settings": [
+              "{ initialLayout?, initialNotifications?, initialRemember?, onSave?, onRememberChange? }"
+            ],
+            "shortcuts": ["{}"],
+            "themes": ["{}"]
           }
         },
         "close": {
@@ -877,6 +1429,7 @@
         "close(id)",
         "clearAll()"
       ],
+      "state": ["items: VoidToastItem[]"],
       "types": ["info", "success", "error", "warning", "loading"],
       "methods": {
         "show": {
@@ -919,6 +1472,177 @@
       "related": ["portal-loader", "skeleton"],
       "compose": "Do not render a new toast region. Use the toast store; the global Toast.svelte host renders items and handles timing.",
       "example": "import { toast } from '@stores/toast.svelte'; toast.promise(save(), { loading: 'Saving...', success: 'Saved', error: 'Save failed' });"
+    },
+    "void-engine": {
+      "category": "theme",
+      "component": "voidEngine",
+      "import": "@adapters/void-engine.svelte",
+      "api": [
+        "setAtmosphere(name)",
+        "setPreferences(prefs)",
+        "registerTheme(id, definition)",
+        "registerEphemeralTheme(id, definition)",
+        "unregisterTheme(id)",
+        "unregisterEphemeralTheme(id)",
+        "loadExternalTheme(url)",
+        "applyTemporaryTheme(themeId, label?)",
+        "restoreUserTheme()"
+      ],
+      "state": [
+        "atmosphere: string",
+        "currentTheme: VoidThemeDefinition",
+        "registry: Record<string, VoidThemeDefinition>",
+        "userConfig: UserConfig",
+        "availableAtmospheres: string[]",
+        "builtInAtmospheres: string[]",
+        "customAtmospheres: string[]",
+        "hasTemporaryTheme: boolean",
+        "temporaryThemeInfo: { id, label, returnTo } | null"
+      ],
+      "methods": {
+        "setAtmosphere": {
+          "args": ["name"],
+          "note": "User-initiated theme switch. Clears any active temporary theme context."
+        },
+        "setPreferences": {
+          "args": ["prefs"],
+          "prefs": ["Partial<UserConfig>"]
+        },
+        "registerTheme": {
+          "args": ["id", "definition"],
+          "definition": ["PartialThemeDefinition"],
+          "note": "Persists the normalized theme into the runtime registry and theme cache."
+        },
+        "registerEphemeralTheme": {
+          "args": ["id", "definition"],
+          "definition": ["PartialThemeDefinition"],
+          "note": "Registers a non-persistent runtime theme intended for previews or story scopes."
+        },
+        "unregisterTheme": {
+          "args": ["id"]
+        },
+        "unregisterEphemeralTheme": {
+          "args": ["id"]
+        },
+        "loadExternalTheme": {
+          "args": ["url"],
+          "returns": ["Promise<VoidResult<{ id: string }, BoundaryError>>"]
+        },
+        "applyTemporaryTheme": {
+          "args": ["themeId", "label='Custom theme'"],
+          "returns": ["boolean"],
+          "note": "Respects userConfig.adaptAtmosphere. Uses the temporary theme stack for restore semantics."
+        },
+        "restoreUserTheme": {
+          "args": []
+        }
+      },
+      "slots": [],
+      "related": ["themes-button", "modal", "narrative"],
+      "compose": "Import the singleton; never instantiate your own engine. Prefer setAtmosphere/setPreferences for normal user flows and the temporary-theme API for previews or story-scoped overrides.",
+      "example": "import { voidEngine } from '@adapters/void-engine.svelte'; voidEngine.setAtmosphere('paper');"
+    },
+    "layer-stack": {
+      "category": "overlay",
+      "component": "layerStack",
+      "import": "@lib/layer-stack.svelte",
+      "api": ["push(dismiss)", "remove(id)", "clear()"],
+      "state": ["hasLayers: boolean"],
+      "methods": {
+        "push": {
+          "args": ["dismiss"],
+          "returns": ["id:number"]
+        },
+        "remove": {
+          "args": ["id"]
+        },
+        "clear": {
+          "args": [],
+          "note": "Clears the stack without calling dismiss callbacks."
+        }
+      },
+      "slots": [],
+      "related": ["modal", "dropdown", "sidebar", "shortcut-registry"],
+      "compose": "Prefer higher-level primitives first. Use layerStack only when building a new dismissible surface that must participate in global Escape handling.",
+      "example": "const id = layerStack.push(close); return () => layerStack.remove(id);"
+    },
+    "shortcut-registry": {
+      "category": "input",
+      "component": "shortcutRegistry",
+      "import": "@lib/shortcut-registry.svelte",
+      "api": ["register(entry)", "unregister(key, modifier?)", "clear()"],
+      "state": [
+        "entries: VoidShortcutEntry[]",
+        "grouped: { group: string, items: VoidShortcutEntry[] }[]"
+      ],
+      "methods": {
+        "register": {
+          "args": ["entry"],
+          "entry": ["VoidShortcutEntry"]
+        },
+        "unregister": {
+          "args": ["key", "modifier?"]
+        },
+        "clear": {
+          "args": []
+        }
+      },
+      "slots": [],
+      "related": ["modal", "layer-stack"],
+      "compose": "Register shortcuts from always-mounted components. The shortcuts modal reads shortcutRegistry.grouped automatically, so new entries show up without extra wiring.",
+      "example": "shortcutRegistry.register({ key: 'k', modifier: 'meta', label: 'Command palette', group: 'General', action: () => modal.palette() });"
+    },
+    "user": {
+      "category": "auth",
+      "component": "user",
+      "import": "@stores/user.svelte",
+      "api": [
+        "login(userData)",
+        "logout()",
+        "update(partial)",
+        "refresh(fetcher)",
+        "toggleDeveloperMode()"
+      ],
+      "state": [
+        "current: VoidUser | null",
+        "loading: boolean",
+        "developerMode: boolean",
+        "isAuthenticated: boolean",
+        "isAdmin: boolean",
+        "isCreator: boolean",
+        "isPlayer: boolean",
+        "isGuest: boolean",
+        "approvedTester: boolean"
+      ],
+      "methods": {
+        "login": {
+          "args": ["userData"],
+          "userData": ["VoidUser"],
+          "returns": ["VoidResult<VoidUser, BoundaryError>"]
+        },
+        "logout": {
+          "args": []
+        },
+        "update": {
+          "args": ["partial"],
+          "partial": ["Partial<VoidUser>"],
+          "returns": ["VoidResult<VoidUser, BoundaryError>"]
+        },
+        "refresh": {
+          "args": ["fetcher"],
+          "fetcher": [
+            "() => Promise<VoidResult<VoidUser | null, BoundaryError>>"
+          ],
+          "returns": ["Promise<VoidResult<VoidUser | null, BoundaryError>>"]
+        },
+        "toggleDeveloperMode": {
+          "args": []
+        }
+      },
+      "slots": [],
+      "related": ["profile-button"],
+      "compose": "Import the singleton; never create a second user store. It owns auth hydration, local persistence, and the root data-auth DOM contract.",
+      "example": "import { user } from '@stores/user.svelte'; if (user.isAuthenticated) console.log(user.current?.name);"
     }
   },
   "patterns": {
@@ -977,8 +1701,8 @@
       "note": "Standard top-level page column used by the homepage and component docs."
     },
     "section-stack": {
-      "usage": "class='flex flex-col gap-lg'",
-      "note": "Default vertical section grouping."
+      "usage": "class='flex flex-col gap-xl'",
+      "note": "Default vertical section grouping with generous page rhythm."
     },
     "surface-stack-lg": {
       "usage": "class='surface-raised p-lg flex flex-col gap-lg'",

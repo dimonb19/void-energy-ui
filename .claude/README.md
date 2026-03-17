@@ -6,6 +6,8 @@
 .claude/
   commands/                  On-demand skills (invoke with /name)
     document.md              Document recent changes
+    build-page.md            Compose a page with shipped primitives
+    new-page.md              Scaffold a new route + page-level screen
     new-component.md         Scaffold a new component
     migrate.md               Migrate legacy → Void Energy
     review.md                Check design system compliance
@@ -21,6 +23,11 @@
     a11y-checker.md          Accessibility (WCAG 2.1 AA) checker
 
   rules/                     Context loaded on-demand by file type
+    page-composition.md      Astro route-shell and spacing rules
+    component-usage.md       Registry-first usage rules for `.svelte` files
+    styling.md               Starter styling and hybrid protocol guardrails
+    read-only-system.md      Hard stop for shipped system files
+    new-page.md              Copy-paste page scaffold for new routes
     tokens-reference.md      Token dictionary (when editing .scss/.svelte/.ts)
     scss-reference.md        SCSS toolkit (when editing styles/components)
     spacing-protocol.md      Spacing rules (when editing .svelte/.scss/.ts/.astro)
@@ -32,6 +39,34 @@
 ---
 
 ## Skills
+
+### `/build-page`
+
+Builds a page or app screen by composing existing Void Energy primitives and documented recipes.
+
+```
+/build-page "creator dashboard with charts, filters, and recent activity"
+```
+
+How it works:
+1. Reads the component registry, AI playbook, and composition recipes
+2. Maps the brief onto shipped primitives, native-first patterns, and existing page analogs
+3. Implements the page in consumer files without inventing new design-system primitives
+4. Reports any real system gaps that remain
+
+### `/new-page`
+
+Creates a new route using the standard starter pattern: thin `.astro` shell plus page-level `.svelte` screen.
+
+```
+/new-page "account settings page"
+```
+
+How it works:
+1. Reads the registry, playbook, recipes, and page scaffold rules
+2. Creates a route file that imports `Layout` and a page-level Svelte screen
+3. Builds the page screen from shipped primitives instead of inventing new ones
+4. Leaves the system files untouched
 
 ### `/new-component ComponentName`
 
@@ -132,6 +167,11 @@ These load automatically when Claude edits matching file types. No action needed
 
 | Rule | Loads when editing | Content |
 |------|-------------------|---------|
+| `page-composition.md` | `src/pages/**/*.astro`, `src/layouts/**/*.astro` | Thin route-shell pattern and spacing defaults |
+| `component-usage.md` | all `.svelte` files | Registry-first component reuse and state rules |
+| `styling.md` | all `.scss` files | Starter styling guardrails and hybrid protocol |
+| `read-only-system.md` | `src/components/ui/**/*`, `src/components/icons/**/*`, `src/components/core/**/*`, `src/styles/**/*`, `src/types/**/*`, `src/config/design-tokens.ts` | Hard stop for shipped system files |
+| `new-page.md` | `src/pages/**/*.astro` | Copy-paste scaffold for new routes |
 | `tokens-reference.md` | `.scss`, `.svelte`, `.ts`, `tailwind.config.mjs` | Full token dictionary (spacing, colors, physics, z-index, typography) |
 | `scss-reference.md` | `src/styles/**/*.scss`, `src/components/**/*.svelte` | SCSS toolkit (mixins, functions, state selectors) |
 | `spacing-protocol.md` | `.svelte`, `.scss`, `.ts`, `.astro` | Spacing floors, layout gaps, common mistakes, page scaffold |

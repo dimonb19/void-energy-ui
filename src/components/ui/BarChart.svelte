@@ -27,23 +27,6 @@
   const SHOULD_WARN_INVALID =
     import.meta.env.DEV || import.meta.env.MODE === 'test';
 
-  interface ChartDataPoint {
-    label: string;
-    value: number;
-    series?: number;
-  }
-
-  interface BarChartGroupValue {
-    name: string;
-    value: number;
-    series?: number;
-  }
-
-  interface BarChartGroup {
-    label: string;
-    values: BarChartGroupValue[];
-  }
-
   interface BarChartProps {
     /** Data points (one bar per point) */
     data?: ChartDataPoint[];
@@ -62,7 +45,7 @@
     /** Selection callback (fires on bar click or Enter/Space) */
     onselect?: (item: ChartDataPoint, index: number) => void;
     /** Horizontal reference lines */
-    referenceLines?: { value: number; label?: string; series?: number }[];
+    referenceLines?: ChartReferenceLine[];
     /** X-axis label */
     xLabel?: string;
     /** Y-axis label */

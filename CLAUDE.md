@@ -105,6 +105,18 @@ npm run format         Prettier format all files
 npm run preview        Preview production build locally
 ```
 
+## 2A. AI-BUILD ORDER
+
+When the task is page or app composition rather than design-system work, read in this order:
+
+1. `src/config/component-registry.json`
+2. `AI-PLAYBOOK.md`
+3. `COMPOSITION-RECIPES.md`
+4. nearest local analog in `src/pages/`, `src/layouts/`, or app-level `src/components/`
+5. relevant `.claude/rules/*.md`
+
+Default to editing consumer files. Do not edit `src/components/ui/`, `src/components/icons/`, `src/components/core/`, `src/styles/`, `src/types/`, or `src/config/design-tokens.ts` unless the user explicitly asks for system-level work.
+
 ---
 
 ## 3. FILE STRUCTURE

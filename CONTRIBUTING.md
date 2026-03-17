@@ -155,6 +155,12 @@ Verify the component registry is in sync with source files:
 npm run check:registry
 ```
 
+For AI-facing composition guidance and starter handoff material, see:
+
+- `AI-PLAYBOOK.md`
+- `COMPOSITION-RECIPES.md`
+- `templates/starter/README.md`
+
 Format code:
 
 ```bash
