@@ -22,7 +22,7 @@
  * - Section 3: Tile Mark (state badge)
  *   - .tile-mark             : Positioned badge at top-center
  *   - data-mark="resume"     : Bookmark/pennant shape (energy-primary)
- *   - data-mark="complete"   : Flat-top pill (energy-secondary)
+ *   - data-mark="completed"   : Flat-top pill (energy-secondary)
  *   - data-mark="replay"     : Flat-top pill (energy-secondary)
  *
  * - Section 4: Gated Tile (premium/NFT-locked)
@@ -442,9 +442,9 @@
     clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
   }
 
-  // ── Complete: Flat-top pill ─────────────────────────────────────────────
+  // ── Completed: Flat-top pill ────────────────────────────────────────────
   // Hangs from top edge with rounded bottom corners.
-  &[data-mark='complete'] {
+  &[data-mark='completed'] {
     background: linear-gradient(
       to bottom,
       tint(var(--color-system), 30%),
@@ -455,7 +455,7 @@
   }
 
   // ── Replay: Flat-top pill ───────────────────────────────────────────────
-  // Same shape as complete, different semantic color.
+  // Same shape as completed, different semantic color.
   &[data-mark='replay'] {
     background: linear-gradient(
       to bottom,
@@ -473,7 +473,7 @@
       background: var(--energy-primary);
     }
 
-    &[data-mark='complete'] {
+    &[data-mark='completed'] {
       background: var(--color-system);
     }
 
@@ -493,7 +493,7 @@
       padding-bottom: var(--space-xs);
     }
 
-    &[data-mark='complete'] {
+    &[data-mark='completed'] {
       border-radius: 0;
       color: var(--color-success);
     }

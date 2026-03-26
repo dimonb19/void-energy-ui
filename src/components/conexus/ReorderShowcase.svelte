@@ -105,7 +105,7 @@
       author: { name: 'Oleg Petrov', href: '#' },
       genres: ['Espionage', 'Cold War'],
       image: 'https://picsum.photos/seed/queue5/400/600',
-      mark: 'complete' as const,
+      mark: 'completed' as const,
     },
     {
       id: 'q6',

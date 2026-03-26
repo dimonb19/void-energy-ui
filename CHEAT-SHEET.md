@@ -1656,7 +1656,7 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 | `author` | `{ name, avatar?, href? }` | — | Author info with optional PFP and profile link |
 | `genres` | `string[]` | `[]` | Genre labels rendered as comma-separated text |
 | `image` | `string` | — | Cover image URL (falls back to sunk surface) |
-| `mark` | `'resume' \| 'complete' \| 'replay'` | — | State badge at top-center |
+| `mark` | `'resume' \| 'completed' \| 'replay'` | — | State badge at top-center |
 | `gate` | `TileGate[]` | — | Token gate requirements (lock icon + premium styling + tooltip) |
 | `loading` | `boolean` | `false` | Renders a shimmer skeleton instead of content |
 | `class` | `string` | `''` | Additional CSS classes |
@@ -1667,7 +1667,7 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 | --- | --- | --- |
 | Loading | `data-state="loading"` | Shimmer skeleton matching tile anatomy |
 | Resume mark | `data-mark="resume"` | Pennant/bookmark shape in `--energy-primary` |
-| Complete mark | `data-mark="complete"` | Flat-top pill in `--bg-spotlight` / `--energy-secondary` |
+| Completed mark | `data-mark="completed"` | Flat-top pill in `--bg-spotlight` / `--energy-secondary` |
 | Replay mark | `data-mark="replay"` | Flat-top pill in `--energy-secondary` |
 | Gated | `data-gated` | Premium border (`--color-premium`), lock badge with tooltip, premium-colored title |
 

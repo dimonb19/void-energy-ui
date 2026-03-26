@@ -23,7 +23,7 @@
   - author: { name, avatar?, href? } — author info with optional PFP and profile link
   - genres: string[] — genre labels rendered as comma-separated text
   - image: Cover image URL (optional — falls back to sunk surface)
-  - mark: 'resume' | 'complete' | 'replay' — state badge (optional)
+  - mark: 'resume' | 'completed' | 'replay' — state badge (optional)
   - gate: TileGate[] — token gate requirements (lock icon + premium styling + tooltip)
   - loading: boolean — renders a shimmer skeleton instead of content
   - class: Additional CSS classes
@@ -47,7 +47,7 @@
     author?: TileAuthor;
     genres?: string[];
     image?: string;
-    mark?: 'resume' | 'complete' | 'replay';
+    mark?: 'resume' | 'completed' | 'replay';
     gate?: TileGate[];
     loading?: boolean;
     class?: string;
@@ -55,7 +55,7 @@
 
   const MARK_LABELS: Record<string, string> = {
     resume: 'Resume',
-    complete: 'Complete',
+    completed: 'Completed',
     replay: 'Replay',
   };
 

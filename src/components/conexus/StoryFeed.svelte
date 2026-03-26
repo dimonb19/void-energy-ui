@@ -147,7 +147,7 @@
       },
       genres: ['Mystery', 'Historical'],
       image: 'https://picsum.photos/seed/hot2/400/600',
-      mark: 'complete' as const,
+      mark: 'completed' as const,
       gate: [{ type: 'nft-collection', name: 'Potentials' }],
     },
     {
@@ -222,7 +222,7 @@
       },
       genres: ['Space Opera', 'Military Sci-Fi'],
       image: 'https://picsum.photos/seed/hot9/400/600',
-      mark: 'complete' as const,
+      mark: 'completed' as const,
     },
     {
       title: 'The Butcher of Calais',
@@ -301,7 +301,7 @@
       author: { name: 'Sian Ashworth', href: '#' },
       genres: ['Dark Fantasy', 'Grimdark'],
       image: 'https://picsum.photos/seed/hot17/400/600',
-      mark: 'complete' as const,
+      mark: 'completed' as const,
     },
     {
       title: 'Frequency Zero',
@@ -385,7 +385,7 @@
       },
       genres: ['Fantasy', 'Relaxing'],
       image: 'https://picsum.photos/seed/begin2/400/600',
-      mark: 'complete' as const,
+      mark: 'completed' as const,
     },
     {
       title: 'Signal Lost',
@@ -428,7 +428,7 @@
       },
       genres: ['Cozy Mystery', 'Coastal'],
       image: 'https://picsum.photos/seed/begin6/400/600',
-      mark: 'complete' as const,
+      mark: 'completed' as const,
     },
     {
       title: 'Pixel Quest',
@@ -466,7 +466,7 @@
       },
       genres: ["Children's", 'Mystery'],
       image: 'https://picsum.photos/seed/begin10/400/600',
-      mark: 'complete' as const,
+      mark: 'completed' as const,
     },
     {
       title: 'Sunset Rodeo',
@@ -522,7 +522,7 @@
       },
       genres: ['Coming of Age', 'Friendship'],
       image: 'https://picsum.photos/seed/begin16/400/600',
-      mark: 'complete' as const,
+      mark: 'completed' as const,
     },
     {
       title: "A Dragon's Grocery List",
@@ -585,7 +585,7 @@
       },
       genres: ['Corporate Thriller', 'Satire'],
       image: 'https://picsum.photos/seed/staff4/400/600',
-      mark: 'complete' as const,
+      mark: 'completed' as const,
     },
     {
       title: 'The Vagrant King',
@@ -676,7 +676,7 @@
       },
       genres: ['Arabian Nights', 'Adventure'],
       image: 'https://picsum.photos/seed/staff13/400/600',
-      mark: 'complete' as const,
+      mark: 'completed' as const,
     },
     {
       title: 'Neurovore',
@@ -760,7 +760,7 @@
       },
       genres: ['Magical Realism', 'Persian'],
       image: 'https://picsum.photos/seed/staff21/400/600',
-      mark: 'complete' as const,
+      mark: 'completed' as const,
     },
     {
       title: 'The Vermillion Circuit',
@@ -844,7 +844,7 @@
       author: { name: 'Vigdís Arnarsdóttir', href: '#' },
       genres: ['Nordic Noir', 'Survival'],
       image: 'https://picsum.photos/seed/rise5/400/600',
-      mark: 'complete' as const,
+      mark: 'completed' as const,
     },
     {
       title: 'Spool',
@@ -917,7 +917,7 @@
       author: { name: 'Idris Conteh', href: '#' },
       genres: ['Anthropological', 'Mystery'],
       image: 'https://picsum.photos/seed/rise12/400/600',
-      mark: 'complete' as const,
+      mark: 'completed' as const,
     },
     {
       title: 'Venom Season',
@@ -1035,7 +1035,7 @@
       },
       genres: ['Political Fantasy', 'Diplomacy'],
       image: 'https://picsum.photos/seed/world4/400/600',
-      mark: 'complete' as const,
+      mark: 'completed' as const,
     },
     {
       title: 'Pelagic',
@@ -1104,7 +1104,7 @@
       author: { name: 'Farid Al-Rashid', href: '#' },
       genres: ['Desert Fantasy', 'Nomadic'],
       image: 'https://picsum.photos/seed/world11/400/600',
-      mark: 'complete' as const,
+      mark: 'completed' as const,
     },
     {
       title: 'Spore',
@@ -1183,7 +1183,7 @@
       },
       genres: ['Time-Weaving', 'Multi-Era'],
       image: 'https://picsum.photos/seed/world18/400/600',
-      mark: 'complete' as const,
+      mark: 'completed' as const,
     },
     {
       title: 'Canopy',

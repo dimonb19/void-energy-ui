@@ -43,7 +43,7 @@ interface StoryData {
   author: TileAuthor;
   genres: string[];
   image: string;
-  mark?: 'resume' | 'complete' | 'replay';
+  mark?: 'resume' | 'completed' | 'replay';
   gate?: TileGate[];
 }
 

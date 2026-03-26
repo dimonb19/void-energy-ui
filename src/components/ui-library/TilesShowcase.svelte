@@ -14,7 +14,7 @@
   const markOptions = [
     { value: '', label: 'No mark' },
     { value: 'resume', label: 'Resume' },
-    { value: 'complete', label: 'Complete' },
+    { value: 'completed', label: 'Completed' },
     { value: 'replay', label: 'Replay' },
   ];
 
@@ -22,7 +22,7 @@
   const activeMark = $derived(
     selectedMark === ''
       ? undefined
-      : (selectedMark as 'resume' | 'complete' | 'replay'),
+      : (selectedMark as 'resume' | 'completed' | 'replay'),
   );
 
   const gateExamples: { title: string; author: string; gate: TileGate[] }[] = [
@@ -85,7 +85,7 @@
         </p>
         <p>
           <strong>State marks</strong> hang from the top-center of the tile.
-          Resume uses a pennant/bookmark <code>clip-path</code>; Complete and
+          Resume uses a pennant/bookmark <code>clip-path</code>; Completed and
           Replay use a flat-top pill with rounded bottom. Colors are semantic
           tokens (<code>--energy-primary</code>,
           <code>--energy-secondary</code>).
@@ -240,7 +240,7 @@
       <code>author</code> (&#123; name, avatar?, href? &#125;),
       <code>genres</code> (string[]),
       <code>image</code> (cover URL),
-      <code>mark</code> ('resume' | 'complete' | 'replay'),
+      <code>mark</code> ('resume' | 'completed' | 'replay'),
       <code>gate</code> (TileGate[]),
       <code>loading</code> (boolean),
       <code>class</code>.
