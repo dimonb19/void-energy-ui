@@ -214,6 +214,8 @@
 
   @include surface-raised($interactive: true);
   overflow: hidden;
+  user-select: none;
+  -webkit-touch-callout: none;
 
   // Larger radius for card feel (same as previous tile implementation).
   border-radius: calc(var(--radius-base) * 1.5);
