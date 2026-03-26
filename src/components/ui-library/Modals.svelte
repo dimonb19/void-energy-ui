@@ -53,6 +53,7 @@
           Alert
         </button>
         <button
+          class="btn-premium"
           onclick={() =>
             modal.open(
               MODAL_KEYS.ALERT,
@@ -102,7 +103,11 @@
                 title: 'Delete Module',
                 bodyHtml:
                   'This action is <strong>irreversible</strong>. The module and all associated data will be permanently removed.',
-                onConfirm: () => toast.show('Module deleted', 'success'),
+                onConfirm: () => {
+                  toast.show('Module deleted', 'success');
+                  modal.close();
+                },
+                onCancel: () => modal.close(),
                 cost: 150,
               },
               'md',

@@ -126,13 +126,15 @@ class ShortcutRegistry {
     if (typeof document === 'undefined') return;
 
     if (this.map.size > 0 && !this.listening) {
-      document.addEventListener('keydown', this.boundHandle);
+      document.addEventListener('keydown', this.boundHandle, { capture: true });
       this.listening = true;
       return;
     }
 
     if (this.map.size === 0 && this.listening) {
-      document.removeEventListener('keydown', this.boundHandle);
+      document.removeEventListener('keydown', this.boundHandle, {
+        capture: true,
+      });
       this.listening = false;
     }
   }

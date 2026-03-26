@@ -59,9 +59,18 @@ export class VoidTooltip {
 
   private showTimer: ReturnType<typeof setTimeout> | null = null;
 
+  // Touch long-press guard: suppress text selection on non-editable triggers.
+  // Editable elements (input, textarea, contenteditable) are skipped so the
+  // native paste/select menu is preserved.
+  private touchGuarded = false;
+  private savedUserSelect = '';
+  private savedTouchCallout = '';
+
   // Bound handlers for proper cleanup
   private boundShow: () => void;
   private boundHide: () => void;
+  private boundTouchStart: () => void;
+  private boundTouchEnd: () => void;
 
   constructor(node: Element, options: VoidTooltipOptions) {
     this.trigger = node;
@@ -70,8 +79,40 @@ export class VoidTooltip {
     // Bind handlers once for consistent reference
     this.boundShow = this.show.bind(this);
     this.boundHide = this.hide.bind(this);
+    this.boundTouchStart = this.onTouchStart.bind(this);
+    this.boundTouchEnd = this.onTouchEnd.bind(this);
 
     this.init();
+  }
+
+  private static isEditable(el: Element): boolean {
+    const tag = el.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return true;
+    if (el instanceof HTMLElement && el.isContentEditable) return true;
+    return false;
+  }
+
+  private onTouchStart() {
+    if (this.touchGuarded) return;
+    if (VoidTooltip.isEditable(this.trigger)) return;
+    const el = this.trigger as HTMLElement;
+    this.savedUserSelect = el.style.userSelect;
+    this.savedTouchCallout = el.style.getPropertyValue('-webkit-touch-callout');
+    el.style.userSelect = 'none';
+    el.style.setProperty('-webkit-touch-callout', 'none');
+    this.touchGuarded = true;
+  }
+
+  private onTouchEnd() {
+    if (!this.touchGuarded) return;
+    const el = this.trigger as HTMLElement;
+    el.style.userSelect = this.savedUserSelect;
+    if (this.savedTouchCallout) {
+      el.style.setProperty('-webkit-touch-callout', this.savedTouchCallout);
+    } else {
+      el.style.removeProperty('-webkit-touch-callout');
+    }
+    this.touchGuarded = false;
   }
 
   private init() {
@@ -84,6 +125,13 @@ export class VoidTooltip {
     hideEvents.forEach((evt) =>
       this.trigger.addEventListener(evt, this.boundHide),
     );
+
+    // Suppress long-press text selection on touch devices (non-editable only)
+    this.trigger.addEventListener('touchstart', this.boundTouchStart, {
+      passive: true,
+    });
+    this.trigger.addEventListener('touchend', this.boundTouchEnd);
+    this.trigger.addEventListener('touchcancel', this.boundTouchEnd);
   }
 
   private show() {
@@ -278,6 +326,11 @@ export class VoidTooltip {
     hideEvents.forEach((evt) =>
       this.trigger.removeEventListener(evt, this.boundHide),
     );
+
+    this.trigger.removeEventListener('touchstart', this.boundTouchStart);
+    this.trigger.removeEventListener('touchend', this.boundTouchEnd);
+    this.trigger.removeEventListener('touchcancel', this.boundTouchEnd);
+    this.onTouchEnd();
 
     this.hide();
   }

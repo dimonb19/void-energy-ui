@@ -128,7 +128,13 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
     border-right: none;
     box-shadow: none;
 
-    // Auto-hide scrollbar — appears on hover only (physics-aware)
+    // Auto-hide scrollbar — appears on hover only (physics-aware).
+    // Each physics block must repeat `transparent transparent` to beat
+    // the higher-specificity rules from the laser-scrollbar mixin
+    // (which use [data-physics] selectors). Without this, Windows
+    // classic scrollbars stay visible in flat/retro because the mixin
+    // colors win on specificity. macOS overlay scrollbars hide natively
+    // so the issue is invisible there.
     scrollbar-color: transparent transparent;
 
     &::-webkit-scrollbar-thumb {
@@ -152,6 +158,12 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
 
     // Flat: solid thumb, subtle track
     @include when-flat {
+      scrollbar-color: transparent transparent;
+
+      &::-webkit-scrollbar-thumb {
+        background: transparent;
+      }
+
       &:hover {
         scrollbar-color: var(--energy-secondary) var(--bg-sunk);
 
@@ -175,14 +187,20 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
     // Retro: chunky thumb, visible track border, hard edges
     @include when-retro {
       scrollbar-width: auto;
+      scrollbar-color: transparent transparent;
+
+      &::-webkit-scrollbar-thumb {
+        background: transparent;
+        transition: none;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
 
       &::-webkit-scrollbar {
         width: calc(var(--scrollbar-width) * 2);
         height: calc(var(--scrollbar-width) * 2);
-      }
-
-      &::-webkit-scrollbar-thumb {
-        transition: none;
       }
 
       &:hover {
