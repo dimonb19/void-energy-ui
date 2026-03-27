@@ -14,7 +14,49 @@
       "Modal and toast are manager-driven. Their shells are mounted globally; use the modal/toast APIs instead of rendering new instances.",
       "Prefer native HTML when the platform already provides the right semantics. A missing wrapper does not imply a missing capability."
     ],
-    "spacing": ["xs=8px", "sm=16px", "md=24px", "lg=32px", "xl=48px"]
+    "spacing": ["xs=8px", "sm=16px", "md=24px", "lg=32px", "xl=48px"],
+    "showcase": "https://void-energy-ui.vercel.app",
+    "_categories": {
+      "field": [
+        "search-field",
+        "edit-field",
+        "generate-field",
+        "password-field",
+        "color-field",
+        "copy-field",
+        "slider-field",
+        "toggle",
+        "switcher",
+        "selector",
+        "combobox",
+        "drop-zone",
+        "edit-textarea",
+        "generate-textarea",
+        "media-slider"
+      ],
+      "form": ["form-field", "password-meter", "password-checklist"],
+      "action": [
+        "action-button",
+        "icon-button",
+        "themes-button",
+        "profile-button"
+      ],
+      "overlay": ["dropdown"],
+      "nav": ["tabs", "pagination", "load-more", "breadcrumbs", "sidebar"],
+      "layout": ["settings-row"],
+      "interaction": ["pull-refresh"],
+      "feedback": ["skeleton", "portal-loader"],
+      "motion": ["loading-text-cycler", "kinetic-text"],
+      "chart": [
+        "progress-ring",
+        "sparkline",
+        "stat-card",
+        "donut-chart",
+        "line-chart",
+        "bar-chart"
+      ],
+      "content": ["tile", "story-category"]
+    }
   },
   "types": {
     "BreadcrumbItem": {
@@ -318,6 +360,7 @@
   },
   "components": {
     "search-field": {
+      "description": "Text input with a magnifying-glass icon, optional zoom-expand animation, and debounced input. Submits on Enter.",
       "category": "field",
       "component": "SearchField",
       "import": "@components/ui/SearchField.svelte",
@@ -340,6 +383,7 @@
       "example": "<SearchField bind:value={query} placeholder='Search...' />"
     },
     "edit-field": {
+      "description": "Single-line inline-edit input with confirm/cancel/undo icon buttons that appear on focus. Renders as plain text when idle.",
       "category": "field",
       "component": "EditField",
       "import": "@components/ui/EditField.svelte",
@@ -358,6 +402,7 @@
       "example": "<EditField bind:value={name} onconfirm={saveName} />"
     },
     "generate-field": {
+      "description": "Single-line text input with an AI sparkle button that triggers async generation. Shows a loading spinner during generation; Escape aborts.",
       "category": "field",
       "component": "GenerateField",
       "import": "@components/ui/GenerateField.svelte",
@@ -381,6 +426,7 @@
       "example": "<GenerateField bind:value={title} instructions='Generate a project title' ongenerate={generateTitle} />"
     },
     "password-field": {
+      "description": "Password input with a show/hide eye toggle button. Pairs with PasswordMeter and PasswordChecklist for strength feedback.",
       "category": "field",
       "component": "PasswordField",
       "import": "@components/ui/PasswordField.svelte",
@@ -406,6 +452,7 @@
       "example": "<PasswordField id={fieldId} bind:value={password} describedby={descriptionId} {invalid} autocomplete='new-password' />"
     },
     "color-field": {
+      "description": "Native color picker input rendered as a circular swatch with a hex label. Opens the OS color dialog on click.",
       "category": "field",
       "component": "ColorField",
       "import": "@components/ui/ColorField.svelte",
@@ -425,6 +472,7 @@
       "example": "<ColorField bind:value={brandColor} />"
     },
     "copy-field": {
+      "description": "Readonly text input with a copy-to-clipboard icon button. Shows brief success feedback after copying.",
       "category": "field",
       "component": "CopyField",
       "import": "@components/ui/CopyField.svelte",
@@ -435,6 +483,7 @@
       "example": "<CopyField value={apiKey} class='w-full' />"
     },
     "slider-field": {
+      "description": "Labeled range slider with optional snap-point preset buttons above the track. Displays the current numeric value.",
       "category": "field",
       "component": "SliderField",
       "import": "@components/ui/SliderField.svelte",
@@ -461,6 +510,7 @@
       "example": "<SliderField bind:value={quality} presets={qualityPresets} label='Quality' />"
     },
     "toggle": {
+      "description": "iOS-style on/off switch with optional custom icons inside the thumb. Renders a native checkbox for form semantics.",
       "category": "field",
       "component": "Toggle",
       "import": "@components/ui/Toggle.svelte",
@@ -490,6 +540,7 @@
       "example": "<Toggle bind:checked={enabled} label='Auto-play' />"
     },
     "switcher": {
+      "description": "Segmented pill-bar where one option is highlighted with an animated sliding indicator. Renders native radio inputs for form submission.",
       "category": "field",
       "component": "Switcher",
       "import": "@components/ui/Switcher.svelte",
@@ -516,6 +567,7 @@
       "example": "<Switcher options={densityOptions} bind:value={density} label='Density' />"
     },
     "selector": {
+      "description": "Styled native <select> dropdown with an optional label. Caret icon indicates expandability. Best for long option lists without filtering.",
       "category": "field",
       "component": "Selector",
       "import": "@components/ui/Selector.svelte",
@@ -543,6 +595,7 @@
       "example": "<Selector options={fontOptions} bind:value={font} label='Heading Font' placeholder='Select a font...' />"
     },
     "combobox": {
+      "description": "Text input with a floating filtered dropdown list. Supports keyboard navigation, custom values, and async filtering. Floating UI positions the panel.",
       "category": "field",
       "component": "Combobox",
       "import": "@components/ui/Combobox.svelte",
@@ -577,6 +630,7 @@
       "example": "<Combobox options={assignees} bind:value={assignee} placeholder='Select assignee...' clearable />"
     },
     "drop-zone": {
+      "description": "Dashed-border drop area that accepts dragged files or click-to-browse. Shows file type and size validation feedback via toast.",
       "category": "field",
       "component": "DropZone",
       "import": "@components/ui/DropZone.svelte",
@@ -594,6 +648,7 @@
       "example": "<DropZone accept='.json,.csv' maxSize={5 * 1024 * 1024} onfiles={handleFiles} />"
     },
     "form-field": {
+      "description": "Label + hint + error wrapper that generates stable IDs and ARIA wiring. The actual input is passed through a children snippet.",
       "category": "form",
       "component": "FormField",
       "import": "@components/ui/FormField.svelte",
@@ -604,6 +659,7 @@
       "example": "<FormField label='Email'>{#snippet children({ fieldId, descriptionId, invalid })}<input id={fieldId} aria-describedby={descriptionId} aria-invalid={invalid} />{/snippet}</FormField>"
     },
     "password-meter": {
+      "description": "Horizontal strength bar that fills and changes color (weak to strong) based on password validation score. Hides when empty.",
       "category": "form",
       "component": "PasswordMeter",
       "import": "@components/ui/PasswordMeter.svelte",
@@ -618,6 +674,7 @@
       "example": "<PasswordMeter password={password} validation={pv} />"
     },
     "password-checklist": {
+      "description": "Vertical list of password rules with check/cross icons that update in real-time as the user types.",
       "category": "form",
       "component": "PasswordChecklist",
       "import": "@components/ui/PasswordChecklist.svelte",
@@ -632,6 +689,7 @@
       "example": "<PasswordChecklist password={password} validation={pv} />"
     },
     "edit-textarea": {
+      "description": "Multiline inline-edit textarea with confirm/cancel/undo icon buttons. Ctrl/Cmd+Enter confirms; Escape cancels.",
       "category": "field",
       "component": "EditTextarea",
       "import": "@components/ui/EditTextarea.svelte",
@@ -650,6 +708,7 @@
       "example": "<EditTextarea bind:value={bio} rows={5} onconfirm={saveBio} />"
     },
     "generate-textarea": {
+      "description": "Multiline textarea with an AI sparkle button for async text generation. Shows loading state during generation; Escape aborts.",
       "category": "field",
       "component": "GenerateTextarea",
       "import": "@components/ui/GenerateTextarea.svelte",
@@ -674,6 +733,7 @@
       "example": "<GenerateTextarea bind:value={bio} rows={5} instructions='Write a short bio' ongenerate={generateBio} />"
     },
     "action-button": {
+      "description": "Button with an animated icon and optional text label. Icon animates on hover/focus. Use for primary actions like generate, save, or confirm.",
       "category": "action",
       "component": "ActionBtn",
       "import": "@components/ui/ActionBtn.svelte",
@@ -698,6 +758,7 @@
       "example": "<ActionBtn icon={Sparkle} text='Generate' class='btn-cta' onclick={generate} />"
     },
     "icon-button": {
+      "description": "Compact icon-only button for toolbars and inline actions. Icon animates on hover. Always provide an aria-label.",
       "category": "action",
       "component": "IconBtn",
       "import": "@components/ui/IconBtn.svelte",
@@ -722,6 +783,7 @@
       "example": "<IconBtn icon={Undo} aria-label='Reset' onclick={reset} />"
     },
     "themes-button": {
+      "description": "Button that opens the themes modal. Can render as a full button with label or as a compact icon-only variant.",
       "category": "action",
       "component": "ThemesBtn",
       "import": "@components/ui/ThemesBtn.svelte",
@@ -732,6 +794,7 @@
       "example": "<ThemesBtn class='btn-cta' />"
     },
     "profile-button": {
+      "description": "Circular avatar button showing the user's photo or role-based fallback icon. Reads auth state from the user store automatically.",
       "category": "action",
       "component": "ProfileBtn",
       "import": "@components/ui/ProfileBtn.svelte",
@@ -742,6 +805,7 @@
       "example": "<ProfileBtn onclick={toggleMenu} aria-expanded={menuOpen} />"
     },
     "dropdown": {
+      "description": "Floating panel anchored to a trigger button. Positioned via Floating UI. Closes on Escape and click-outside.",
       "category": "overlay",
       "component": "Dropdown",
       "import": "@components/ui/Dropdown.svelte",
@@ -766,6 +830,7 @@
       "example": "<Dropdown label='Profile'>{#snippet trigger()}<ProfileBtn />{/snippet}<div class='surface-raised p-md'>Menu</div></Dropdown>"
     },
     "tabs": {
+      "description": "Horizontal tab bar with an animated underline indicator. Supports keyboard arrow navigation and roving tabindex. Content rendered via panel snippet.",
       "category": "nav",
       "component": "Tabs",
       "import": "@components/ui/Tabs.svelte",
@@ -781,6 +846,7 @@
       "example": "<Tabs tabs={tabs} bind:value={activeTab}>{#snippet panel(tab)}<p>{tab.label}</p>{/snippet}</Tabs>"
     },
     "pagination": {
+      "description": "Page number row with prev/next arrows and ellipsis collapsing. Hides when totalPages <= 1. Compact mobile indicator on small screens.",
       "category": "nav",
       "component": "Pagination",
       "import": "@components/ui/Pagination.svelte",
@@ -800,6 +866,7 @@
       "example": "<Pagination bind:currentPage={page} totalPages={totalPages} />"
     },
     "load-more": {
+      "description": "Intersection-observer trigger that auto-loads the next page when scrolled into view, with a manual 'Load more' button fallback.",
       "category": "nav",
       "component": "LoadMore",
       "import": "@components/ui/LoadMore.svelte",
@@ -818,6 +885,7 @@
       "example": "<LoadMore loading={loading} hasMore={hasMore} onloadmore={fetchNextPage} />"
     },
     "breadcrumbs": {
+      "description": "Horizontal breadcrumb trail with chevron separators. Active items switch to slash separators for peer-mode navigation.",
       "category": "nav",
       "component": "Breadcrumbs",
       "import": "@components/ui/Breadcrumbs.svelte",
@@ -832,6 +900,7 @@
       "example": "<Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Components', href: '/components' }, { label: 'Buttons' }]} />"
     },
     "sidebar": {
+      "description": "Vertical section nav with grouped items and an active highlight. Supports scroll-spy via IntersectionObserver. Renders as a slide-over overlay on small screens.",
       "category": "nav",
       "component": "Sidebar",
       "import": "@components/ui/Sidebar.svelte",
@@ -856,6 +925,7 @@
       "example": "<Sidebar sections={sections} bind:activeId bind:open={sidebarOpen} onclose={closeSidebar} />"
     },
     "settings-row": {
+      "description": "Two-column row with a label on the left and arbitrary controls on the right. Use inside settings screens for consistent alignment.",
       "category": "layout",
       "component": "SettingsRow",
       "import": "@components/ui/SettingsRow.svelte",
@@ -866,6 +936,7 @@
       "example": "<SettingsRow label='Density'><Switcher options={densityOptions} bind:value={density} /></SettingsRow>"
     },
     "pull-refresh": {
+      "description": "Pull-to-refresh wrapper supporting touch, pointer, and mouse wheel inputs. Pulling down reveals a spinner and triggers an async refresh callback. Features rubber-band physics and cooldown.",
       "category": "interaction",
       "component": "PullRefresh",
       "import": "@components/ui/PullRefresh.svelte",
@@ -876,6 +947,7 @@
       "example": "<PullRefresh onrefresh={refreshPage}><div class='container py-2xl'>...</div></PullRefresh>"
     },
     "skeleton": {
+      "description": "Shimmer placeholder blocks for loading states. Variants: text (single line), avatar (circle), card (rectangle), paragraph (multiple lines).",
       "category": "feedback",
       "component": "Skeleton",
       "import": "@components/ui/Skeleton.svelte",
@@ -887,6 +959,7 @@
       "example": "<Skeleton variant='paragraph' lines={3} />"
     },
     "portal-loader": {
+      "description": "Branded full-page loading state with an animated quill icon and cycling text messages. Use for initial app or portal loading gates.",
       "category": "feedback",
       "component": "PortalLoader",
       "import": "@components/ui/PortalLoader.svelte",
@@ -897,6 +970,7 @@
       "example": "<PortalLoader status='loading' class='mx-auto' />"
     },
     "loading-text-cycler": {
+      "description": "Rotating text label that cycles through an array of words with a typewriter effect. Use for loading states with dynamic copy.",
       "category": "motion",
       "component": "LoadingTextCycler",
       "import": "@components/ui/LoadingTextCycler.svelte",
@@ -907,6 +981,7 @@
       "example": "<LoadingTextCycler words={['Loading', 'Syncing', 'Compiling']} />"
     },
     "kinetic-text": {
+      "description": "Text reveal component with animated modes: char-by-char typing, word-by-word, cycling between words (configurable pause), or scramble-decode. Optional cursor, completion callback, and custom HTML tag.",
       "category": "motion",
       "component": "KineticText",
       "import": "@components/ui/KineticText.svelte",
@@ -931,6 +1006,7 @@
       "example": "<KineticText text='SYSTEM ONLINE' mode='decode' />"
     },
     "media-slider": {
+      "description": "Horizontal volume/playback control bar with mute toggle, play/pause, and optional replay button. Icons animate between states.",
       "category": "field",
       "component": "MediaSlider",
       "import": "@components/ui/MediaSlider.svelte",
@@ -954,6 +1030,7 @@
       "example": "<MediaSlider bind:volume bind:muted playback bind:paused icon='music' />"
     },
     "progress-ring": {
+      "description": "Circular SVG progress indicator with optional center value label. Themed via series color channels. Animates on mount.",
       "category": "chart",
       "component": "ProgressRing",
       "import": "@components/ui/ProgressRing.svelte",
@@ -977,6 +1054,7 @@
       "example": "<ProgressRing value={75} showValue scale='lg' />"
     },
     "sparkline": {
+      "description": "Tiny inline SVG line chart showing trend shape without axes or labels. Optional fill area beneath the line. Use inside stat cards or table rows.",
       "category": "chart",
       "component": "Sparkline",
       "import": "@components/ui/Sparkline.svelte",
@@ -998,6 +1076,7 @@
       "example": "<Sparkline data={weeklyTrend} filled series={2} />"
     },
     "stat-card": {
+      "description": "KPI card showing label, large value, color-coded trend arrow (up/down/flat), delta percentage, and optional sparkline. Use in dashboard metric grids.",
       "category": "chart",
       "component": "StatCard",
       "import": "@components/ui/StatCard.svelte",
@@ -1008,6 +1087,7 @@
       "example": "<StatCard label='Revenue' value='$12,450' trend='up' delta='+12.5%' sparkline={weeklyRevenue} />"
     },
     "donut-chart": {
+      "description": "Ring chart with clickable segments (keyboard + mouse), optional center metric, legend, tooltips, and series color theming. Segments animate on mount and highlight on hover. Includes accessible data table.",
       "category": "chart",
       "component": "DonutChart",
       "import": "@components/ui/DonutChart.svelte",
@@ -1037,6 +1117,7 @@
       "example": "<DonutChart data={trafficSources} centerMetric={{ label: 'Total', value: '1,250' }} />"
     },
     "line-chart": {
+      "description": "SVG line chart with axes, grid, tooltips, and optional fill area. Supports single/multi-series data, reference lines, smooth Catmull-Rom curves, data point dots, entry animations, legend, and accessible data table.",
       "category": "chart",
       "component": "LineChart",
       "import": "@components/ui/LineChart.svelte",
@@ -1072,6 +1153,7 @@
       "example": "<LineChart data={revenueSeries} filled showDots />"
     },
     "tile": {
+      "description": "Content card with cover image, title, author link, comma-separated genre text, state mark (resume/completed/replay), and optional token-gate lock overlay. Full-tile click via stretched link.",
       "category": "content",
       "component": "Tile",
       "import": "@components/ui/Tile.svelte",
@@ -1094,10 +1176,11 @@
       },
       "slots": [],
       "related": ["story-category"],
-      "compose": "Use inside a StoryCategory scroll strip. Supports mark states (resume, complete, replay) and gate prop (TileGate[]) for token-gated tiles with lock icon, premium styling, and requirement tooltip (NFT collection, specific NFT IDs, or fungible token balance). Multiple gates use OR logic. Uses the stretched-link pattern for full-tile clickability with an independent author link. Use loading prop for skeleton state.",
+      "compose": "Use inside a StoryCategory scroll strip. Supports mark states (resume, completed, replay) and gate prop (TileGate[]) for token-gated tiles with lock icon, premium styling, and requirement tooltip (NFT collection, specific NFT IDs, or fungible token balance). Multiple gates use OR logic. Uses the stretched-link pattern for full-tile clickability with an independent author link. Use loading prop for skeleton state.",
       "example": "<Tile title='Machine Rebellion' href='/story/123' author={{ name: 'Ada', href: '/user/1' }} genres={['Sci-Fi']} image='/covers/img.jpg' gate={[{ type: 'nft-collection', name: 'Potentials' }]} />"
     },
     "story-category": {
+      "description": "Horizontal scroll strip with category header (title + tagline) and always-visible scroll arrows on tablet+. Designed to hold Tile children. Supports infinite scroll pagination.",
       "category": "content",
       "component": "StoryCategory",
       "import": "@components/ui/StoryCategory.svelte",
@@ -1116,6 +1199,7 @@
       "example": "<StoryCategory title='Hottest right now' tagline='Most played this week.' loading={pageLoading} hasMore={hasNext} onloadmore={fetchPage}><Tile ... /><Tile ... /></StoryCategory>"
     },
     "bar-chart": {
+      "description": "SVG bar chart with axes, grid, tooltips, optional value labels, and reference lines. Supports vertical/horizontal orientation, grouped (clustered) bars, entry animations, legend, and accessible data table.",
       "category": "chart",
       "component": "BarChart",
       "import": "@components/ui/BarChart.svelte",
@@ -1153,6 +1237,7 @@
   },
   "utilities": {
     "create-password-validation": {
+      "description": "Factory that returns a reactive password validation object with strength score, rule checks, and optional confirm-match. Feed into PasswordMeter and PasswordChecklist.",
       "category": "form",
       "symbol": "createPasswordValidation",
       "import": "@lib/password-validation.svelte",
@@ -1172,6 +1257,7 @@
       "example": "import { createPasswordValidation } from '@lib/password-validation.svelte'; const pv = createPasswordValidation(() => password, () => confirm, { requireConfirm: true });"
     },
     "typewrite": {
+      "description": "Imperative function that types text into a DOM element character-by-character. Returns an abortable promise.",
       "category": "motion",
       "symbol": "typewrite",
       "import": "@actions/kinetic",
@@ -1187,6 +1273,7 @@
       "example": "const handle = typewrite(node, 'Loading...', { speed: 30 }); handle.abort();"
     },
     "is-one-shot-effect": {
+      "description": "Predicate that returns true for narrative effects that fire once (shake, jolt, glitch) vs. continuous ambient effects (breathe, pulse).",
       "category": "motion",
       "symbol": "isOneShotEffect",
       "import": "@actions/narrative",
@@ -1198,6 +1285,7 @@
       "example": "const ambient = isOneShotEffect(effect) ? null : effect;"
     },
     "reorder-by-drop": {
+      "description": "Pure function that returns a new array with the dropped item moved to its target position. Use after a between-mode drop event.",
       "category": "drag",
       "symbol": "reorderByDrop",
       "import": "@actions/drag",
@@ -1212,6 +1300,7 @@
       "example": "items = reorderByDrop(items, detail);"
     },
     "resolve-reorder-by-drop": {
+      "description": "Like reorderByDrop but also returns a backend-ready payload with fromIndex, toIndex, previousId, nextId, and orderedIds.",
       "category": "drag",
       "symbol": "resolveReorderByDrop",
       "import": "@actions/drag",
@@ -1228,6 +1317,7 @@
   },
   "actions": {
     "tooltip": {
+      "description": "Svelte action that shows a floating text tooltip on hover/focus. Positioned via Floating UI with configurable placement and delay.",
       "category": "overlay",
       "symbol": "tooltip",
       "import": "@actions/tooltip",
@@ -1239,6 +1329,7 @@
       "example": "<button use:tooltip=\"Open settings\">...</button>"
     },
     "morph": {
+      "description": "Svelte action that animates an element's width/height when its content changes size. Uses ResizeObserver internally.",
       "category": "motion",
       "symbol": "morph",
       "import": "@actions/morph",
@@ -1250,6 +1341,7 @@
       "example": "<div use:morph>{#if expanded}<LargeContent />{:else}<SmallContent />{/if}</div>"
     },
     "kinetic": {
+      "description": "Svelte action for declarative text reveal animations: typing, word-by-word, cycling, or scramble-decode. Restarts on config change.",
       "category": "motion",
       "symbol": "kinetic",
       "import": "@actions/kinetic",
@@ -1261,6 +1353,7 @@
       "example": "<span use:kinetic={{ text: 'SYSTEM ONLINE', mode: 'decode' }} />"
     },
     "narrative": {
+      "description": "Svelte action for ambient text physics effects: shake, glitch, breathe, pulse, drift, and more. One-shot or continuous loop.",
       "category": "motion",
       "symbol": "narrative",
       "import": "@actions/narrative",
@@ -1272,6 +1365,7 @@
       "example": "<p use:narrative={{ effect: 'breathe', enabled: voidEngine.userConfig.narrativeEffects }} />"
     },
     "navlink": {
+      "description": "Svelte action that adds a loading data-attribute to links during navigation, enabling CSS loading indicators on click.",
       "category": "nav",
       "symbol": "navlink",
       "import": "@actions/navlink",
@@ -1283,6 +1377,7 @@
       "example": "<a href='/components' use:navlink>Components</a>"
     },
     "draggable": {
+      "description": "Svelte action that makes an element draggable via pointer and keyboard. Supports axis constraints, handle selectors, and drag groups.",
       "category": "drag",
       "symbol": "draggable",
       "import": "@actions/drag",
@@ -1294,6 +1389,7 @@
       "example": "<div use:draggable={{ id: item.id, group: 'stories', data: item }}>...</div>"
     },
     "drop-target": {
+      "description": "Svelte action that makes an element a drop zone for draggable items. Supports 'inside' (zone drop) and 'between' (sortable reorder) modes.",
       "category": "drag",
       "symbol": "dropTarget",
       "import": "@actions/drag",
@@ -1307,6 +1403,7 @@
   },
   "controllers": {
     "modal": {
+      "description": "Global modal manager singleton. Opens confirm, alert, settings, themes, shortcuts, and command palette dialogs. The modal shell is already mounted in Layout.",
       "category": "overlay",
       "component": "modal",
       "import": "@lib/modal-manager.svelte",
@@ -1422,6 +1519,7 @@
       "example": "import { modal } from '@lib/modal-manager.svelte'; modal.confirm('Delete?', 'This cannot be undone.', { onConfirm: removeItem });"
     },
     "toast": {
+      "description": "Global toast notification store. Shows info, success, error, warning, and loading toasts. Supports undo actions, promise tracking, and loading controllers.",
       "category": "feedback",
       "component": "toast",
       "import": "@stores/toast.svelte",
@@ -1478,6 +1576,7 @@
       "example": "import { toast } from '@stores/toast.svelte'; toast.promise(save(), { loading: 'Saving...', success: 'Saved', error: 'Save failed' });"
     },
     "void-engine": {
+      "description": "Runtime theme engine singleton. Manages atmosphere switching, density scaling, user preferences, custom theme registration, and temporary theme previews.",
       "category": "theme",
       "component": "voidEngine",
       "import": "@adapters/void-engine.svelte",
@@ -1547,6 +1646,7 @@
       "example": "import { voidEngine } from '@adapters/void-engine.svelte'; voidEngine.setAtmosphere('paper');"
     },
     "layer-stack": {
+      "description": "Global escape-key dismissal stack. Tracks open overlays (modals, dropdowns, sidebars) so Escape closes the topmost layer first.",
       "category": "overlay",
       "component": "layerStack",
       "import": "@lib/layer-stack.svelte",
@@ -1571,6 +1671,7 @@
       "example": "const id = layerStack.push(close); return () => layerStack.remove(id);"
     },
     "shortcut-registry": {
+      "description": "Global keyboard shortcut manager. Registered shortcuts auto-appear in the shortcuts modal. Supports meta and alt modifiers.",
       "category": "input",
       "component": "shortcutRegistry",
       "import": "@lib/shortcut-registry.svelte",
@@ -1597,6 +1698,7 @@
       "example": "shortcutRegistry.register({ key: 'k', modifier: 'meta', label: 'Command palette', group: 'General', action: () => modal.palette() });"
     },
     "user": {
+      "description": "Auth state singleton with login/logout/refresh, role-based helpers (isAdmin, isCreator, etc.), and local persistence. Drives ProfileBtn automatically.",
       "category": "auth",
       "component": "user",
       "import": "@stores/user.svelte",
