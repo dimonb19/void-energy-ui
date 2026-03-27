@@ -269,6 +269,18 @@ function isValidCssColor(value: string): boolean {
   return CSS.supports('color', value);
 }
 
+/**
+ * Generate OKLCH tint/shade/subtle variants for a semantic color.
+ * Returns an object with `-light`, `-dark`, and `-subtle` keys.
+ */
+function semanticVariants(name: string, hex: string): Record<string, string> {
+  return {
+    [`${name}-light`]: `oklch(from ${hex} calc(l * 1.25) c h)`,
+    [`${name}-dark`]: `oklch(from ${hex} calc(l * 0.75) c h)`,
+    [`${name}-subtle`]: `oklch(from ${hex} l c h / 0.15)`,
+  };
+}
+
 /** Resolve a font key to its CSS family string, with role-appropriate fallback. */
 function resolveFontKey(
   key: string,
@@ -403,10 +415,12 @@ function parseResponse(
     fullPalette[key] = parsed.palette[key];
   }
 
-  // Pass through semantic color overrides if Claude provided them
+  // Pass through semantic color overrides if Claude provided them,
+  // and regenerate OKLCH variants so -light/-dark/-subtle match the new base
   for (const key of ['color-premium', 'color-system'] as const) {
     if (parsed.palette[key] && isValidCssColor(parsed.palette[key])) {
       fullPalette[key] = parsed.palette[key];
+      Object.assign(fullPalette, semanticVariants(key, parsed.palette[key]));
     }
   }
 
@@ -439,6 +453,9 @@ interface ManualAtmosphereInput {
   fontHeadingKey: string;
   fontBodyKey: string;
   existingIds: ReadonlySet<string>;
+  /** Optional semantic color overrides to avoid energy↔premium/system collisions. */
+  colorPremium?: string;
+  colorSystem?: string;
 }
 
 /**
@@ -482,6 +499,18 @@ export function buildManualAtmosphere(
   // Overlay user's core palette
   for (const key of CORE_PALETTE_KEYS) {
     fullPalette[key] = input.palette[key];
+  }
+
+  // Apply semantic color overrides + regenerate OKLCH variants
+  for (const [prop, name] of [
+    ['colorPremium', 'color-premium'],
+    ['colorSystem', 'color-system'],
+  ] as const) {
+    const hex = input[prop];
+    if (hex && isValidCssColor(hex)) {
+      fullPalette[name] = hex;
+      Object.assign(fullPalette, semanticVariants(name, hex));
+    }
   }
 
   const label = input.label || 'Custom Atmosphere';

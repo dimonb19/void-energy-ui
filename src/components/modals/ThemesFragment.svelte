@@ -4,11 +4,7 @@
   import { toast } from '@stores/toast.svelte';
   import { dissolve, materialize } from '@lib/transitions.svelte';
   import { morph } from '@actions/morph';
-  import {
-    FONTS,
-    FONT_FAMILY_TO_KEY,
-    VOID_TOKENS,
-  } from '@config/design-tokens';
+  import { FONTS, FONT_FAMILY_TO_KEY } from '@config/design-tokens';
 
   import Switcher from '../ui/Switcher.svelte';
   import SliderField from '../ui/SliderField.svelte';
@@ -52,9 +48,16 @@
       .filter((id: string) => voidEngine.registry[id]?.mode === activeMode)
       .map((id: string) => {
         const meta = voidEngine.registry[id];
-        const style = Object.entries(meta.palette)
-          .map(([key, value]) => `--${key}: ${value}`)
-          .join('; ');
+        const pairs = Object.entries(meta.palette).map(
+          ([key, value]) => `--${key}: ${value}`,
+        );
+        // Add font-heading/font-body wrappers so typography inherits correctly
+        // (built-in themes get these from generated SCSS; custom themes need them inline)
+        const heading = meta.palette['font-atmos-heading'];
+        const body = meta.palette['font-atmos-body'];
+        if (heading) pairs.push(`--font-heading: ${heading}`);
+        if (body) pairs.push(`--font-body: ${body}`);
+        const style = pairs.join('; ');
         return {
           id,
           label: meta.label ?? capitalize(id),
@@ -67,24 +70,17 @@
       }),
   ]);
 
-  // Get current atmosphere's theme definition (single lookup, used by both font keys)
-  let currentThemeDef = $derived(
-    VOID_TOKENS.themes[
-      voidEngine.atmosphere as keyof typeof VOID_TOKENS.themes
-    ],
-  );
-
   // Get current atmosphere's font keys for dynamic "System Default" labels
   let currentHeadingKey = $derived.by(() => {
-    if (!currentThemeDef) return 'Unknown';
-    const family = currentThemeDef.palette['font-atmos-heading'];
+    const family = voidEngine.currentTheme?.palette['font-atmos-heading'];
+    if (!family) return 'Unknown';
     const key = FONT_FAMILY_TO_KEY[family];
     return key ? capitalize(key) : 'Unknown';
   });
 
   let currentBodyKey = $derived.by(() => {
-    if (!currentThemeDef) return 'Unknown';
-    const family = currentThemeDef.palette['font-atmos-body'];
+    const family = voidEngine.currentTheme?.palette['font-atmos-body'];
+    if (!family) return 'Unknown';
     const key = FONT_FAMILY_TO_KEY[family];
     return key ? capitalize(key) : 'Unknown';
   });

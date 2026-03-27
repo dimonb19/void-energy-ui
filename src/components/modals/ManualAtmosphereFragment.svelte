@@ -17,7 +17,7 @@
   import { emerge, dissolve } from '@lib/transitions.svelte';
   import { morph } from '@actions/morph';
   import { buildManualAtmosphere } from '@lib/atmosphere-generator';
-  import { FONTS } from '@config/design-tokens';
+  import { FONTS, SEMANTIC_DARK, SEMANTIC_LIGHT } from '@config/design-tokens';
 
   import FormField from '../ui/FormField.svelte';
   import ColorField from '../ui/ColorField.svelte';
@@ -38,32 +38,32 @@
 
   let label = $state('');
   let tagline = $state('');
-  let selectedPhysics = $state<PhysicsPreference>('glass');
+  let selectedPhysics = $state<PhysicsPreference>('flat');
   let selectedMode = $state<ModePreference>('dark');
 
-  // Core palette — default to Void theme colors as starting point
+  // Core palette — default to Slate atmosphere as starting point
   let palette = $state<Record<string, string>>({
-    'bg-canvas': '#010020',
-    'bg-spotlight': '#0a0c2b',
-    'bg-surface': '#161e5f',
-    'bg-sunk': '#000229',
-    'energy-primary': '#33e2e6',
-    'energy-secondary': '#3875fa',
-    'border-color': '#3875fa',
-    'text-main': '#ffffff',
-    'text-dim': '#d9d9de',
-    'text-mute': '#9999a6',
+    'bg-canvas': '#111118',
+    'bg-spotlight': '#1c1c26',
+    'bg-surface': '#1e1e2a',
+    'bg-sunk': '#0c0c12',
+    'energy-primary': '#6ea1ff',
+    'energy-secondary': '#8b8fa3',
+    'border-color': '#6ea1ff',
+    'text-main': '#e8e8ed',
+    'text-dim': '#a0a0b0',
+    'text-mute': '#64647a',
   });
 
-  let fontHeadingKey = $state('tech');
-  let fontBodyKey = $state('tech');
+  let fontHeadingKey = $state('clean');
+  let fontBodyKey = $state('clean');
 
   // Opacity (0–100%) for tokens that need transparency per physics preset.
   // border-color: all physics. bg-surface + bg-sunk: glass and retro only.
   let opacity = $state<Record<string, number>>({
-    'bg-surface': 40,
-    'bg-sunk': 60,
-    'border-color': 20,
+    'bg-surface': 60,
+    'bg-sunk': 40,
+    'border-color': 25,
   });
 
   /** Which palette keys show an opacity slider for the current physics. */
@@ -83,6 +83,74 @@
     const a = +(opacityPercent / 100).toFixed(2);
     return `rgba(${r}, ${g}, ${b}, ${a})`;
   }
+
+  // ── Semantic Color Overrides ────────────────────────────────────────
+
+  /** Extract hue (0–360) from a 6-digit hex string. */
+  function hexToHue(hex: string): number {
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+    const d = max - min;
+    if (d === 0) return 0;
+    let h = 0;
+    if (max === r) h = ((g - b) / d + 6) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    return h * 60;
+  }
+
+  /** Check if a hue falls within a range (handles wrap-around). */
+  function hueInRange(hue: number, lo: number, hi: number): boolean {
+    return lo <= hi ? hue >= lo && hue <= hi : hue >= lo || hue <= hi;
+  }
+
+  // Mode-appropriate stock defaults for the pickers
+  const semanticDefaults = $derived(
+    selectedMode === 'light'
+      ? {
+          premium: SEMANTIC_LIGHT['color-premium'],
+          system: SEMANTIC_LIGHT['color-system'],
+        }
+      : {
+          premium: SEMANTIC_DARK['color-premium'],
+          system: SEMANTIC_DARK['color-system'],
+        },
+  );
+
+  // User overrides — initialized to stock defaults, reset when mode changes
+  let colorPremium = $state(SEMANTIC_DARK['color-premium']);
+  let colorSystem = $state(SEMANTIC_DARK['color-system']);
+
+  // Sync defaults when mode changes
+  $effect(() => {
+    colorPremium = semanticDefaults.premium;
+    colorSystem = semanticDefaults.system;
+  });
+
+  /** True when the user has changed the override from the mode default. */
+  const hasPremiumOverride = $derived(
+    colorPremium !== semanticDefaults.premium,
+  );
+  const hasSystemOverride = $derived(colorSystem !== semanticDefaults.system);
+
+  // Collision detection: check both energy-primary and energy-secondary hues
+  const premiumCollision = $derived.by(() => {
+    const hues = [
+      hexToHue(palette['energy-primary']),
+      hexToHue(palette['energy-secondary']),
+    ];
+    return hues.some((h) => hueInRange(h, 20, 55)) && !hasPremiumOverride;
+  });
+  const systemCollision = $derived.by(() => {
+    const hues = [
+      hexToHue(palette['energy-primary']),
+      hexToHue(palette['energy-secondary']),
+    ];
+    return hues.some((h) => hueInRange(h, 260, 310)) && !hasSystemOverride;
+  });
 
   // ── Preview State ────────────────────────────────────────────────────
 
@@ -284,6 +352,8 @@
       fontHeadingKey,
       fontBodyKey,
       existingIds: new Set(voidEngine.availableAtmospheres),
+      colorPremium: hasPremiumOverride ? colorPremium : undefined,
+      colorSystem: hasSystemOverride ? colorSystem : undefined,
     });
 
     if (!result.ok) {
@@ -450,6 +520,50 @@
       </div>
     </SettingsRow>
   {/each}
+
+  <hr />
+
+  <!-- ── Semantic Colors ────────────────────────────────────────────── -->
+  <SettingsRow label="Semantic Colors">
+    <div class="surface-sunk p-md flex flex-col gap-md">
+      <div
+        class="flex flex-col tablet:flex-row tablet:flex-wrap gap-md tablet:justify-center"
+      >
+        <div class="flex flex-col items-stretch tablet:items-center gap-xs">
+          <span class="text-caption text-dim tablet:text-center">Premium</span>
+          <ColorField bind:value={colorPremium} class="w-full tablet:w-auto" />
+          <span class="text-caption text-mute tablet:text-center">
+            Credits, badges, caution
+          </span>
+        </div>
+        <div class="flex flex-col items-stretch tablet:items-center gap-xs">
+          <span class="text-caption text-dim tablet:text-center">System</span>
+          <ColorField bind:value={colorSystem} class="w-full tablet:w-auto" />
+          <span class="text-caption text-mute tablet:text-center">
+            AI features, platform alerts
+          </span>
+        </div>
+      </div>
+      {#if premiumCollision || systemCollision}
+        <p
+          class="text-caption text-center text-premium"
+          in:emerge={{ y: -8 }}
+          out:dissolve={{ y: -8 }}
+        >
+          {#if premiumCollision && systemCollision}
+            Your energy colors overlap with both premium and system defaults.
+            Pick distinct overrides to keep badges visible.
+          {:else if premiumCollision}
+            Your energy colors are in the gold/amber range and may blend with
+            premium badges. Pick a non-amber premium color.
+          {:else}
+            Your energy colors are in the purple range and may blend with system
+            indicators. Pick a non-purple system color.
+          {/if}
+        </p>
+      {/if}
+    </div>
+  </SettingsRow>
 
   <hr />
 
