@@ -1326,6 +1326,7 @@
       "keys": [
         "alert",
         "confirm",
+        "manual-atmosphere",
         "palette",
         "settings",
         "shortcuts",
@@ -1337,6 +1338,7 @@
           "keys": [
             "alert",
             "confirm",
+            "manual-atmosphere",
             "palette",
             "settings",
             "shortcuts",
@@ -1352,6 +1354,7 @@
               "onCancel?",
               "cost?"
             ],
+            "manual-atmosphere": [],
             "palette": [],
             "settings": [
               "initialLayout?",
@@ -1372,6 +1375,7 @@
               "{ title: string, body: string, onConfirm: () => void, onCancel?: () => void, cost?: number }",
               "{ title: string, bodyHtml: string, onConfirm: () => void, onCancel?: () => void, cost?: number } // trusted HTML only"
             ],
+            "manual-atmosphere": ["{}"],
             "palette": ["{}"],
             "settings": [
               "{ initialLayout?, initialNotifications?, initialRemember?, onSave?, onRememberChange? }"

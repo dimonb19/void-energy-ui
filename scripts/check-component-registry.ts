@@ -621,8 +621,8 @@ function extractTopLevelModalContractKeys(source: string): string[] {
   const blockMatch = source.match(/type ModalContract = \{([\s\S]*?)^\};/m);
   if (!blockMatch) return [];
 
-  return [...blockMatch[1].matchAll(/^\s{2}([a-z]+):/gm)].map(
-    (match) => match[1],
+  return [...blockMatch[1].matchAll(/^\s{2}(?:'([a-z-]+)'|([a-z]+)):/gm)].map(
+    (match) => match[1] ?? match[2],
   );
 }
 

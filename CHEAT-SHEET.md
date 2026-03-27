@@ -3833,7 +3833,7 @@ Temporary themes override the user's selected atmosphere without persisting. The
 **Location:** [src/components/AtmosphereGenerator.svelte](src/components/AtmosphereGenerator.svelte)
 **Engine:** [src/lib/atmosphere-generator.ts](src/lib/atmosphere-generator.ts)
 
-Generates complete `VoidThemeDefinition` palettes from natural language descriptions using the Claude API (client-side, user's own key). Lives in `src/components/` (not `ui/`) because it's a landing-page feature, not a registered primitive.
+Generates complete `VoidThemeDefinition` palettes from natural language descriptions using the Claude API (client-side, `PUBLIC_ANTHROPIC_API_KEY` env variable). Lives in `src/components/` (not `ui/`) because it's a landing-page feature, not a registered primitive.
 
 **Lifecycle:**
 
@@ -3844,7 +3844,7 @@ Generates complete `VoidThemeDefinition` palettes from natural language descript
 | Keep | `unregisterEphemeralTheme` → `registerTheme` → `setAtmosphere` | 1 (`setAtmosphere` clears stack without restoring) |
 | Revert | `releaseTemporaryTheme` → `unregisterEphemeralTheme` | 1 (restores previous) |
 
-**API key handling:** Session-first (`$state`). Opt-in "Remember on this device" toggle persists to `localStorage` via `STORAGE_KEYS.CLAUDE_API_KEY`. Key is trimmed at request time.
+**API key handling:** Server-configured via `PUBLIC_ANTHROPIC_API_KEY` environment variable (exposed to client by Astro's `PUBLIC_` prefix). No user-facing key input or localStorage persistence.
 
 **Generation contract:** Claude returns `{ mode, physics, tagline, label, fontHeadingKey, fontBodyKey, palette }` with 10 core tokens. The parser auto-fills 12 semantic variant tokens from `SEMANTIC_DARK`/`SEMANTIC_LIGHT` and resolves font keys to CSS family strings.
 

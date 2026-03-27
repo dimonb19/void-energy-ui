@@ -4,7 +4,6 @@ import {
   SEMANTIC_DARK,
   SEMANTIC_LIGHT,
 } from '@config/design-tokens';
-import { STORAGE_KEYS } from '@config/constants';
 import { err, ok } from '@lib/result';
 
 // ── Constants ────────────────────────────────────────────────────────────────
@@ -15,7 +14,7 @@ const API_VERSION = '2023-06-01';
 const MAX_TOKENS = 2048;
 
 /** The 10 core palette tokens Claude generates (semantic variants are auto-filled). */
-const CORE_PALETTE_KEYS = [
+export const CORE_PALETTE_KEYS = [
   'bg-canvas',
   'bg-spotlight',
   'bg-surface',
@@ -36,32 +35,6 @@ interface ClaudeResponse {
   fontHeadingKey: string;
   fontBodyKey: string;
   palette: Record<string, string>;
-}
-
-// ── API Key Storage ──────────────────────────────────────────────────────────
-
-export function getStoredApiKey(): string | null {
-  try {
-    return localStorage.getItem(STORAGE_KEYS.CLAUDE_API_KEY);
-  } catch {
-    return null;
-  }
-}
-
-export function setStoredApiKey(key: string): void {
-  try {
-    localStorage.setItem(STORAGE_KEYS.CLAUDE_API_KEY, key);
-  } catch {
-    // Storage unavailable
-  }
-}
-
-export function clearStoredApiKey(): void {
-  try {
-    localStorage.removeItem(STORAGE_KEYS.CLAUDE_API_KEY);
-  } catch {
-    // Storage unavailable
-  }
 }
 
 // ── Prompt Engineering ───────────────────────────────────────────────────────
@@ -143,14 +116,20 @@ function buildSystemPrompt(): string {
 
   return `You are a theme designer for the Void Energy UI design system. Given a creative concept or "vibe", produce a complete color palette, physics preset, mode, font pairing, label, and tagline.
 
-## Creative Direction — MOST IMPORTANT
-Every concept has MANY valid visual interpretations. Your job is to surprise — pick a different angle every time, even for the same prompt. The user may generate the same concept 50 times and expects 50 genuinely different themes.
+## Creative Direction
+The user message will indicate the generation mode: **guided** or **exploratory**.
 
-The user message will specify a physics+mode starting point (randomized client-side). Your job is to design an authentic, compelling palette for THAT specific combination. Do not second-guess or change the physics/mode — embrace it and find the interpretation of the concept that makes it shine.
+### Guided mode (initial generation)
+The user just typed their concept for the first time. Your job is to deliver the BEST, most authentic interpretation — the one that nails the vibe on the first try. Pick the physics preset, color mode, color palette, and fonts that most naturally and precisely match the concept. "Underwater bioluminescence" → glass + dark with deep ocean blues and cyan glow is the obvious right answer. "Old library" → flat + dark with warm wood tones and a serif font. Trust your instincts and commit to the strongest interpretation. Do NOT randomize or hedge — be decisive.
 
-**Color:** The user's concept MUST drive the color family — "wood" should feel woody, "ocean" should feel oceanic. But there are many valid colors within any concept. The user message includes a tonal direction (e.g. "warm + muted", "cool + vivid") — use it to pick WHICH shade of the concept-appropriate palette to explore. "Wood" with a warm+vivid direction → rich amber and burnt sienna. "Wood" with a cool+muted direction → weathered grey driftwood and sage.
+### Exploratory mode (retry / "Try Another")
+The user has already seen a result and wants something DIFFERENT. The user message will include randomized seeds (physics, mode, tonal direction). Embrace these seeds fully and find an interpretation of the concept that makes them shine. Surprise the user with unexpected but valid angles. "Ocean" doesn't have to be blue — maybe it's a sunset over the Pacific (warm coral + amber in flat + light). Be creative and adventurous.
 
-**Fonts:** Match the emotional register, not the topic keyword. A solemn concept gets a serif. A technical one gets a monospace. A playful one gets a rounded sans.
+### Color
+The concept MUST drive the color family — "wood" should feel woody, "ocean" should feel oceanic. In exploratory mode, the tonal direction seed controls the mood (warm/cool, vivid/muted). In guided mode, pick the tonal direction that best serves the concept.
+
+### Fonts
+Match the emotional register, not the topic keyword. A solemn concept gets a serif. A technical one gets a monospace. A playful one gets a rounded sans.
 
 ## Output Format
 Respond with ONLY a JSON object. No explanation, no markdown fences, no text outside the JSON.
@@ -216,26 +195,44 @@ function pickRandom<T>(items: readonly T[]): T {
   return items[Math.floor(Math.random() * items.length)];
 }
 
-/** Build the user message with randomized seeds for variety. */
+/**
+ * Build the user message.
+ * - Guided (retry=false): AI picks the best physics/mode/tone for the concept.
+ * - Exploratory (retry=true): Randomized seeds for maximum variety.
+ */
 export function buildUserMessage(
   vibe: string,
   physics?: PhysicsPreference,
   mode?: ModePreference,
+  retry = false,
 ): string {
-  // Pick random physics+mode, filtered by user preferences
-  const pool = PHYSICS_MODE_COMBOS.filter(
-    (c) => (!physics || c.physics === physics) && (!mode || c.mode === mode),
-  );
-  const starting = pickRandom(pool.length > 0 ? pool : PHYSICS_MODE_COMBOS);
-  const toneSeed = pickRandom(TONE_SEEDS);
+  let message: string;
 
-  let message = `Create an atmosphere for: "${vibe}"
+  if (retry) {
+    // Exploratory: randomize everything for variety
+    const pool = PHYSICS_MODE_COMBOS.filter(
+      (c) => (!physics || c.physics === physics) && (!mode || c.mode === mode),
+    );
+    const starting = pickRandom(pool.length > 0 ? pool : PHYSICS_MODE_COMBOS);
+    const toneSeed = pickRandom(TONE_SEEDS);
+
+    message = `**Mode: EXPLORATORY** — the user has already seen a result and wants something DIFFERENT.
+
+Create an atmosphere for: "${vibe}"
 
 Randomized seeds for THIS generation (these ensure variety — embrace them):
 - Physics: ${starting.physics}
 - Mode: ${starting.mode}
 - Tonal direction: ${toneSeed}
 The concept "${vibe}" drives the color family — pick colors that authentically evoke it. The tonal direction controls the mood: how warm/cool, vivid/muted, saturated/pastel those concept-appropriate colors should be.`;
+  } else {
+    // Guided: AI picks the ideal interpretation
+    message = `**Mode: GUIDED** — this is the user's first generation for this concept. Deliver the best, most authentic interpretation.
+
+Create an atmosphere for: "${vibe}"
+
+Pick the physics preset, color mode, tonal palette, and fonts that most naturally and precisely match this concept. Commit to the strongest interpretation — do not randomize or hedge.`;
+  }
 
   const constraints: string[] = [];
   if (physics) constraints.push(`physics MUST be exactly "${physics}"`);
@@ -431,6 +428,80 @@ function parseResponse(
   });
 }
 
+// ── Manual Atmosphere Builder ─────────────────────────────────────────────────
+
+interface ManualAtmosphereInput {
+  label: string;
+  tagline: string;
+  physics: PhysicsPreference;
+  mode: ModePreference;
+  palette: Record<string, string>;
+  fontHeadingKey: string;
+  fontBodyKey: string;
+  existingIds: ReadonlySet<string>;
+}
+
+/**
+ * Build a GeneratedAtmosphere from manual user input.
+ * Validates core palette, auto-fills semantic variants, resolves fonts.
+ */
+export function buildManualAtmosphere(
+  input: ManualAtmosphereInput,
+): VoidResult<GeneratedAtmosphere, BoundaryError> {
+  const issues: string[] = [];
+
+  // Validate all 10 core palette keys exist and are valid CSS colors
+  for (const key of CORE_PALETTE_KEYS) {
+    const value = input.palette[key];
+    if (!value) {
+      issues.push(`Missing palette token: ${key}`);
+    } else if (!isValidCssColor(value)) {
+      issues.push(`Invalid CSS color for ${key}: ${value}`);
+    }
+  }
+
+  if (issues.length > 0) {
+    return err({
+      code: 'invalid_shape',
+      source: 'ManualAtmosphere.build',
+      message: 'Palette validation failed.',
+      issues,
+    });
+  }
+
+  // Auto-fill semantic color variants
+  const semanticSpread =
+    input.mode === 'light' ? { ...SEMANTIC_LIGHT } : { ...SEMANTIC_DARK };
+
+  const fullPalette: Record<string, string> = {
+    ...semanticSpread,
+    'font-atmos-heading': resolveFontKey(input.fontHeadingKey, 'heading'),
+    'font-atmos-body': resolveFontKey(input.fontBodyKey, 'body'),
+  };
+
+  // Overlay user's core palette
+  for (const key of CORE_PALETTE_KEYS) {
+    fullPalette[key] = input.palette[key];
+  }
+
+  const label = input.label || 'Custom Atmosphere';
+  const tagline = input.tagline || 'Handcrafted';
+  const id = generateThemeId(label, input.existingIds);
+
+  return ok({
+    id,
+    label,
+    tagline,
+    definition: {
+      mode: input.mode,
+      physics: input.physics,
+      label,
+      tagline,
+      palette: fullPalette,
+    },
+  });
+}
+
 // ── API Call ──────────────────────────────────────────────────────────────────
 
 /**
@@ -440,11 +511,19 @@ function parseResponse(
 export async function generateAtmosphere(
   options: GenerateOptions,
 ): Promise<VoidResult<GeneratedAtmosphere, BoundaryError>> {
-  const { apiKey: rawKey, vibe, physics, mode, signal } = options;
-  const apiKey = rawKey.trim();
+  const { vibe, physics, mode, retry, signal } = options;
+  const apiKey = import.meta.env.PUBLIC_ANTHROPIC_API_KEY;
+
+  if (!apiKey) {
+    return err({
+      code: 'network',
+      source: 'AtmosphereGenerator.generate',
+      message: 'API key not configured.',
+    });
+  }
 
   const systemPrompt = buildSystemPrompt();
-  const userMessage = buildUserMessage(vibe, physics, mode);
+  const userMessage = buildUserMessage(vibe, physics, mode, retry);
 
   let response: Response;
   try {

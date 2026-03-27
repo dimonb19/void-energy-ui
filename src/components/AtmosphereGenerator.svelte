@@ -2,7 +2,7 @@
   ATMOSPHERE GENERATOR
   "Type a vibe → get a complete atmosphere" — AI theme generation demo.
 
-  Uses the Claude API (client-side, user's own key) to generate complete
+  Uses the Claude API (client-side, PUBLIC_ env key) to generate complete
   VoidThemeDefinitions from creative concept descriptions.
 
   LIFECYCLE:
@@ -18,72 +18,24 @@
 <script lang="ts">
   import { voidEngine } from '@adapters/void-engine.svelte';
   import { toast } from '@stores/toast.svelte';
-  import {
-    generateAtmosphere,
-    getStoredApiKey,
-    setStoredApiKey,
-    clearStoredApiKey,
-  } from '@lib/atmosphere-generator';
+  import { modal } from '@lib/modal-manager.svelte';
+  import { generateAtmosphere } from '@lib/atmosphere-generator';
 
   import { emerge, dissolve } from '@lib/transitions.svelte';
 
-  import PasswordField from './ui/PasswordField.svelte';
   import ActionBtn from './ui/ActionBtn.svelte';
-  import Toggle from './ui/Toggle.svelte';
   import Switcher from './ui/Switcher.svelte';
   import Sparkle from './icons/Sparkle.svelte';
-  import Contract from './icons/Contract.svelte';
   import Refresh from './icons/Refresh.svelte';
   import Undo from './icons/Undo.svelte';
-  import Remove from './icons/Remove.svelte';
   import LoadingQuill from './icons/LoadingQuill.svelte';
-  import { KeyRound } from '@lucide/svelte';
+  import { Palette } from '@lucide/svelte';
 
   interface AtmosphereGeneratorProps {
     class?: string;
   }
 
   let { class: className = '' }: AtmosphereGeneratorProps = $props();
-
-  // ── API Key State ──────────────────────────────────────────────────────
-
-  let apiKey = $state('');
-  let rememberKey = $state(false);
-  let keyReady = $state(false);
-
-  // Hydrate from localStorage on mount
-  $effect(() => {
-    const stored = getStoredApiKey();
-    if (stored) {
-      apiKey = stored;
-      rememberKey = true;
-      keyReady = true;
-    }
-  });
-
-  function saveKey() {
-    if (!apiKey.trim()) return;
-    keyReady = true;
-    if (rememberKey) {
-      setStoredApiKey(apiKey.trim());
-    }
-  }
-
-  function forgetKey() {
-    apiKey = '';
-    keyReady = false;
-    rememberKey = false;
-    clearStoredApiKey();
-  }
-
-  // Sync remember preference: persist or clear when toggled
-  $effect(() => {
-    if (keyReady && rememberKey && apiKey) {
-      setStoredApiKey(apiKey);
-    } else if (!rememberKey) {
-      clearStoredApiKey();
-    }
-  });
 
   // ── Generation State ───────────────────────────────────────────────────
 
@@ -95,6 +47,17 @@
   let previewId = $state<string | null>(null);
   let previewHandle = $state<number | null>(null);
   let previewResult = $state<GeneratedAtmosphere | null>(null);
+
+  // Detect when our preview was cleaned up externally (e.g., manual
+  // fragment activated its own preview via the onPreviewActivated callback).
+  // Reset local UI so stale controls don't linger.
+  $effect(() => {
+    if (previewId && !voidEngine.availableAtmospheres.includes(previewId)) {
+      previewId = null;
+      previewHandle = null;
+      previewResult = null;
+    }
+  });
 
   // ── Preference State ──────────────────────────────────────────────────
 
@@ -148,7 +111,7 @@
     }
   });
 
-  let canGenerate = $derived(keyReady && vibe.trim().length > 0 && !generating);
+  let canGenerate = $derived(vibe.trim().length > 0 && !generating);
 
   // ── Abort on Escape ────────────────────────────────────────────────────
 
@@ -238,7 +201,7 @@
 
   // ── Actions ────────────────────────────────────────────────────────────
 
-  async function generate() {
+  async function generate(retry = false) {
     if (!canGenerate) return;
 
     generating = true;
@@ -249,10 +212,10 @@
     );
 
     const result = await generateAtmosphere({
-      apiKey,
       vibe: vibe.trim(),
       physics: selectedPhysics ?? undefined,
       mode: selectedMode ?? undefined,
+      retry,
       signal: controller.signal,
       existingIds: new Set(voidEngine.availableAtmospheres),
     });
@@ -264,10 +227,6 @@
       if (result.error.message === 'Generation cancelled.') {
         loadingToast.close();
         return;
-      }
-
-      if (result.error.status === 401) {
-        forgetKey();
       }
 
       loadingToast.error(result.error.message);
@@ -312,144 +271,105 @@
     e.preventDefault();
     generate();
   }
-
-  function handleKeySubmit(e: SubmitEvent) {
-    e.preventDefault();
-    saveKey();
-  }
 </script>
 
 <div class="surface-raised p-lg flex flex-col gap-lg {className}">
-  <!-- ── API Key Section ──────────────────────────────────────────────── -->
-  {#if !keyReady}
-    <form
-      class="flex flex-col gap-md"
-      in:emerge
-      out:dissolve
-      onsubmit={handleKeySubmit}
-    >
-      <div class="flex flex-row gap-sm items-center">
-        <KeyRound class="icon text-mute" />
-        <h4>Claude API Key</h4>
-      </div>
-      <PasswordField
-        bind:value={apiKey}
-        placeholder="sk-ant-..."
-        autocomplete="off"
+  <!-- ── Vibe Input ─────────────────────────────────────────────────── -->
+  <form class="flex flex-col gap-md items-center" onsubmit={handleSubmit}>
+    <div class="w-full flex flex-col tablet:flex-row gap-sm">
+      <input
+        type="text"
+        bind:value={vibe}
+        placeholder="Describe a vibe... (e.g., 'underwater bioluminescence')"
+        disabled={generating}
+        class="flex-1"
       />
-      <div class="flex flex-row gap-md items-center justify-between">
-        <Toggle bind:checked={rememberKey} label="Remember on this device" />
-        <ActionBtn
-          icon={Contract}
-          class="btn-success"
-          text="Save Key"
-          type="submit"
-          disabled={!apiKey.trim()}
-        />
-      </div>
-      <p class="text-caption text-mute">
-        Your key is stored locally and sent directly to Anthropic. It never
-        touches our servers.
-      </p>
-    </form>
-  {:else}
-    <div
-      class="flex flex-row gap-md items-center justify-between"
-      in:emerge
-      out:dissolve
-    >
-      <div class="flex flex-row gap-sm items-center">
-        <KeyRound class="icon text-success" />
-        <span class="text-small text-dim">API key ready</span>
-      </div>
       <ActionBtn
-        icon={Remove}
-        text="Clear Key"
-        type="button"
-        class="btn-ghost btn-error"
-        onclick={forgetKey}
+        icon={generating ? LoadingQuill : Sparkle}
+        text={generating ? 'Generating...' : 'Generate'}
+        type="submit"
+        disabled={!canGenerate}
+        class="shrink-0"
       />
     </div>
 
-    <!-- ── Vibe Input ───────────────────────────────────────────────── -->
-    <form class="flex flex-col gap-md" onsubmit={handleSubmit}>
-      <div class="flex flex-row gap-sm">
-        <input
-          type="text"
-          bind:value={vibe}
-          placeholder="Describe a vibe... (e.g., 'underwater bioluminescence')"
+    <!-- ── Optional Preferences ──────────────────────────────────────── -->
+    <div
+      class="w-full flex flex-row gap-md flex-wrap justify-center small-desktop:gap-xl"
+    >
+      <Switcher
+        options={physicsOptions}
+        bind:value={selectedPhysics}
+        label="Physics"
+        disabled={generating}
+        class="items-center small-desktop:items-baseline"
+      />
+      <Switcher
+        options={modeOptions}
+        bind:value={selectedMode}
+        label="Mode"
+        disabled={generating}
+        class="items-center small-desktop:items-baseline"
+      />
+    </div>
+    <p class="text-caption text-mute text-center">
+      Glass and Retro require dark mode. Leave on Auto to let the AI decide.
+    </p>
+
+    <ActionBtn
+      icon={Palette}
+      text="Pick Colors Manually"
+      type="button"
+      class="btn-ghost"
+      disabled={generating}
+      onclick={() =>
+        modal.open(
+          'manual-atmosphere',
+          { onPreviewActivated: () => cleanupPreview() },
+          'lg',
+        )}
+    />
+  </form>
+
+  <!-- ── Preview Controls ───────────────────────────────────────────── -->
+  {#if previewResult && previewHandle !== null}
+    <div
+      class="surface-sunk p-md flex flex-col-reverse small-desktop:flex-col gap-md items-center"
+      in:emerge
+      out:dissolve
+    >
+      <div class="flex flex-row flex-wrap gap-md justify-center">
+        <button class="btn-premium" onclick={keep} disabled={generating}>
+          Keep This Atmosphere
+        </button>
+        <ActionBtn
+          icon={Refresh}
+          text="Try Another"
+          type="button"
+          class="btn-ghost btn-system"
+          onclick={() => generate(true)}
           disabled={generating}
-          class="flex-1"
         />
         <ActionBtn
-          icon={generating ? LoadingQuill : Sparkle}
-          text={generating ? 'Generating...' : 'Generate'}
-          type="submit"
-          disabled={!canGenerate}
-          class="shrink-0"
-        />
-      </div>
-
-      <!-- ── Optional Preferences ──────────────────────────────────── -->
-      <div class="flex flex-row gap-lg flex-wrap items-start">
-        <Switcher
-          options={physicsOptions}
-          bind:value={selectedPhysics}
-          label="Physics"
-          disabled={generating}
-        />
-        <Switcher
-          options={modeOptions}
-          bind:value={selectedMode}
-          label="Mode"
+          icon={Undo}
+          text="Revert"
+          type="button"
+          class="btn-ghost btn-error"
+          onclick={revert}
           disabled={generating}
         />
       </div>
-      <p class="text-caption text-mute">
-        Glass and Retro require dark mode. Leave on Auto to let the AI decide.
-      </p>
-    </form>
 
-    <!-- ── Preview Controls ─────────────────────────────────────────── -->
-    {#if previewResult && previewHandle !== null}
-      <div
-        class="surface-sunk p-md flex flex-col-reverse small-desktop:flex-col gap-md items-center"
-        in:emerge
-        out:dissolve
-      >
-        <div class="flex flex-row flex-wrap gap-md justify-center">
-          <button class="btn-premium" onclick={keep} disabled={generating}>
-            Keep This Atmosphere
-          </button>
-          <ActionBtn
-            icon={Refresh}
-            text="Try Another"
-            type="button"
-            class="btn-ghost btn-system"
-            onclick={generate}
-            disabled={generating}
-          />
-          <ActionBtn
-            icon={Undo}
-            text="Revert"
-            type="button"
-            class="btn-ghost btn-error"
-            onclick={revert}
-            disabled={generating}
-          />
+      <div class="flex flex-row flex-wrap gap-md justify-center">
+        <div class="flex flex-row gap-md">
+          <span class="text-small text-main">{previewResult.label}</span>
+          <span class="text-small text-mute">{previewResult.tagline}</span>
         </div>
-
-        <div class="flex flex-row flex-wrap gap-md justify-center">
-          <div class="flex flex-row gap-md">
-            <span class="text-small text-main">{previewResult.label}</span>
-            <span class="text-small text-mute">{previewResult.tagline}</span>
-          </div>
-          <div class="flex flex-row gap-sm">
-            <span class="badge">{previewResult.definition.physics}</span>
-            <span class="badge">{previewResult.definition.mode}</span>
-          </div>
+        <div class="flex flex-row gap-sm">
+          <span class="badge">{previewResult.definition.physics}</span>
+          <span class="badge">{previewResult.definition.mode}</span>
         </div>
       </div>
-    {/if}
+    </div>
   {/if}
 </div>

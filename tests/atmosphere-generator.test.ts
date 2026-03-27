@@ -7,14 +7,31 @@ import {
 // ── buildUserMessage ────────────────────────────────────────────────────────
 
 describe('buildUserMessage', () => {
-  it('includes the vibe and randomized seeds when no prefs are set', () => {
+  it('uses guided mode by default (no random seeds)', () => {
     const msg = buildUserMessage('deep space');
     expect(msg).toContain('Create an atmosphere for: "deep space"');
+    expect(msg).toContain('GUIDED');
+    expect(msg).not.toContain('Randomized seeds');
+    expect(msg).not.toContain('Tonal direction');
+    expect(msg).not.toContain('MUST');
+  });
+
+  it('uses exploratory mode with random seeds when retry=true', () => {
+    const msg = buildUserMessage('deep space', undefined, undefined, true);
+    expect(msg).toContain('Create an atmosphere for: "deep space"');
+    expect(msg).toContain('EXPLORATORY');
     expect(msg).toContain('Randomized seeds');
     expect(msg).toContain('Physics:');
     expect(msg).toContain('Mode:');
     expect(msg).toContain('Tonal direction');
-    expect(msg).not.toContain('MUST');
+  });
+
+  it('guided mode produces consistent output (no randomization)', () => {
+    const messages = new Set<string>();
+    for (let i = 0; i < 20; i++) {
+      messages.add(buildUserMessage('test'));
+    }
+    expect(messages.size).toBe(1);
   });
 
   it('includes physics constraint when physics is set', () => {
@@ -33,11 +50,10 @@ describe('buildUserMessage', () => {
     expect(msg).toContain('mode MUST be exactly "light"');
   });
 
-  it('produces varied output across multiple calls', () => {
+  it('produces varied output across multiple retry calls', () => {
     const messages = new Set<string>();
-    // Generate enough calls that randomness should produce at least 2 unique messages
     for (let i = 0; i < 20; i++) {
-      messages.add(buildUserMessage('test'));
+      messages.add(buildUserMessage('test', undefined, undefined, true));
     }
     expect(messages.size).toBeGreaterThan(1);
   });
@@ -79,6 +95,7 @@ describe('generateAtmosphere preference enforcement', () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
+    vi.stubEnv('PUBLIC_ANTHROPIC_API_KEY', 'sk-test');
   });
 
   it('passes physics and mode into the request body', async () => {
@@ -86,7 +103,6 @@ describe('generateAtmosphere preference enforcement', () => {
     vi.stubGlobal('fetch', fetchSpy);
 
     await generateAtmosphere({
-      apiKey: 'sk-test',
       vibe: 'deep space',
       physics: 'glass',
       mode: 'dark',
@@ -102,7 +118,6 @@ describe('generateAtmosphere preference enforcement', () => {
     vi.stubGlobal('fetch', mockFetchWith(validGlassResponse));
 
     const result = await generateAtmosphere({
-      apiKey: 'sk-test',
       vibe: 'deep space',
       physics: 'flat', // requested flat, AI returned glass
     });
@@ -119,7 +134,6 @@ describe('generateAtmosphere preference enforcement', () => {
     vi.stubGlobal('fetch', mockFetchWith(validGlassResponse));
 
     const result = await generateAtmosphere({
-      apiKey: 'sk-test',
       vibe: 'deep space',
       mode: 'light', // requested light, AI returned dark
     });
@@ -136,7 +150,6 @@ describe('generateAtmosphere preference enforcement', () => {
     vi.stubGlobal('fetch', mockFetchWith(validGlassResponse));
 
     const result = await generateAtmosphere({
-      apiKey: 'sk-test',
       vibe: 'deep space',
       physics: 'glass',
       mode: 'dark',
@@ -153,7 +166,6 @@ describe('generateAtmosphere preference enforcement', () => {
     vi.stubGlobal('fetch', mockFetchWith(validGlassResponse));
 
     const result = await generateAtmosphere({
-      apiKey: 'sk-test',
       vibe: 'deep space',
     });
 

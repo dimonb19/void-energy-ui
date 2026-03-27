@@ -408,12 +408,12 @@ voidEngine.setAtmosphere('brand');`}</code
     <div class="flex flex-col gap-sm items-center text-center">
       <h2>Create Your Own</h2>
       <p class="text-dim max-w-2xl">
-        Type a vibe, get a complete atmosphere. Powered by Claude &mdash; uses
-        your own API key, runs entirely in your browser.
+        Type a vibe, get a complete atmosphere. Powered by Claude &mdash; runs
+        entirely in your browser.
       </p>
     </div>
 
-    <AtmosphereGenerator class="max-w-3xl mx-auto w-full" />
+    <AtmosphereGenerator class="max-w-4xl mx-auto w-full" />
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
