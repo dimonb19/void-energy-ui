@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { tooltip } from '@actions/tooltip';
-
   import { TriangleAlert } from '@lucide/svelte';
 
   let {
@@ -52,12 +50,7 @@
       {cancelText}
     </button>
     <!-- svelte-ignore a11y_autofocus -- Dialog primary action; focus is already trapped by showModal() -->
-    <button
-      class="btn-success"
-      onclick={onConfirm}
-      use:tooltip={'Click to execute'}
-      autofocus
-    >
+    <button class="btn-success" onclick={onConfirm} autofocus>
       {confirmText}
     </button>
   </div>
