@@ -100,7 +100,65 @@
       });
     }
   }
+
+  // ── Email capture (Google Form) ──────────────────────────────────────
+  const GOOGLE_FORM_ACTION =
+    'https://docs.google.com/forms/d/e/1FAIpQLSfh3WDAQeCnAoS9w2zC-cQ3SyMeft5fDwUSqGC_t7-oGPHUSQ/formResponse';
+  const GOOGLE_FORM_FIELD = 'entry.1607901425';
+
+  let waitlistEmail = $state('');
+  let waitlistSubmitting = $state(false);
+
+  async function submitWaitlist(e: SubmitEvent) {
+    e.preventDefault();
+    if (!waitlistEmail || waitlistSubmitting) return;
+
+    waitlistSubmitting = true;
+    const body = new FormData();
+    body.append(GOOGLE_FORM_FIELD, waitlistEmail);
+
+    try {
+      await fetch(GOOGLE_FORM_ACTION, {
+        method: 'POST',
+        body,
+        mode: 'no-cors',
+      });
+    } catch {
+      // no-cors won't return a readable response — assume success
+    }
+
+    toast.show("You're on the list — we'll be in touch!", 'success');
+    waitlistEmail = '';
+    waitlistSubmitting = false;
+  }
 </script>
+
+{#snippet waitlistForm(message: string)}
+  <form
+    class="surface-raised p-lg flex flex-col gap-md items-center max-w-md mx-auto w-full"
+    onsubmit={submitWaitlist}
+  >
+    <p class="text-dim text-center text-small">
+      {message}
+    </p>
+    <div class="flex flex-col small-desktop:flex-row gap-sm w-full">
+      <input
+        type="email"
+        placeholder="you@example.com"
+        required
+        bind:value={waitlistEmail}
+      />
+      <button type="submit" class="shrink-0" disabled={waitlistSubmitting}>
+        Join Waitlist
+      </button>
+    </div>
+    <p class="text-caption text-mute">
+      Building a platform? <a href="mailto:biz@dgrslabs.ink" class="link"
+        >biz@dgrslabs.ink</a
+      >
+    </p>
+  </form>
+{/snippet}
 
 <div class="container flex flex-col gap-2xl py-2xl">
   <!-- ═══════════════════════════════════════════════════════════════════ -->
@@ -110,14 +168,13 @@
     <h1 class="text-primary">Void Energy</h1>
 
     <p class="text-h3 max-w-3xl">
-      Atmospheres, physics, and density for any UI.
+      Every AI-built app looks the same. This is the fix.
     </p>
 
     <p class="text-body text-dim max-w-3xl">
-      Not just theming. Void Energy changes how surfaces feel &mdash;
-      translucent glass, clean flat, or hard-pixel retro &mdash; while scaling
-      every spacing value through a single density coefficient. One codebase,
-      zero rebuilds.
+      40+ components, 3 physics presets, 12 atmospheres, density scaling &mdash;
+      one codebase, zero rebuilds. Drop in the token layer and every surface
+      adapts.
     </p>
 
     <div class="flex flex-row flex-wrap gap-md justify-center">
@@ -135,7 +192,24 @@
   </header>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- 2. LIVE PROOF                                                     -->
+  <!-- 2. CREATE YOUR OWN (AI Generator)                                 -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <section class="flex flex-col gap-lg">
+    <div class="flex flex-col gap-sm items-center text-center">
+      <h2>Create Your Own</h2>
+      <p class="text-dim max-w-4xl">
+        Type a vibe, get a complete atmosphere. Powered by Claude &mdash; runs
+        entirely in your browser.
+      </p>
+    </div>
+
+    <AtmosphereGenerator class="max-w-4xl mx-auto w-full" />
+
+    {@render waitlistForm('Get early access to the full system.')}
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- 3. LIVE PROOF                                                     -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="flex flex-col gap-lg">
     <div class="flex flex-col gap-sm items-center text-center">
@@ -226,7 +300,7 @@
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- 3. DENSITY SCALING                                                -->
+  <!-- 4. DENSITY SCALING                                                -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="flex flex-col gap-lg">
     <div class="flex flex-col gap-sm items-center text-center">
@@ -290,7 +364,7 @@
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- 4. HOW IT WORKS                                                   -->
+  <!-- 5. HOW IT WORKS                                                   -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="flex flex-col gap-lg">
     <h2 class="text-center">How It Works</h2>
@@ -396,50 +470,6 @@ voidEngine.setAtmosphere('brand');`}</code
               identity using the token contract</span
             >
           </li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- 4.5. AI ATMOSPHERE GENERATOR                                      -->
-  <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <section class="flex flex-col gap-lg">
-    <div class="flex flex-col gap-sm items-center text-center">
-      <h2>Create Your Own</h2>
-      <p class="text-dim max-w-2xl">
-        Type a vibe, get a complete atmosphere. Powered by Claude &mdash; runs
-        entirely in your browser.
-      </p>
-    </div>
-
-    <AtmosphereGenerator class="max-w-4xl mx-auto w-full" />
-  </section>
-
-  <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- 5. BEST FOR                                                       -->
-  <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <section class="flex flex-col gap-lg">
-    <h2 class="text-center">Is Void Energy Right For You?</h2>
-
-    <div class="surface-raised p-lg flex flex-col tablet:flex-row gap-lg">
-      <div class="flex-1 flex flex-col gap-sm">
-        <h4 class="text-success">Best For</h4>
-        <ul class="flex flex-col gap-sm text-dim text-small">
-          <li>White-label platforms and multi-tenant products</li>
-          <li>Narrative or immersive experiences</li>
-          <li>Multi-brand apps where visual identity is a feature</li>
-          <li>Products that need runtime theme customization</li>
-        </ul>
-      </div>
-      <div class="flex-1 flex flex-col gap-sm">
-        <h4 class="text-mute">Not Needed When</h4>
-        <ul class="flex flex-col gap-sm text-dim text-small">
-          <li>
-            Your product has one fixed brand and one theme is fine forever
-          </li>
-          <li>You need a massive component library out of the box</li>
-          <li>You prefer copy-paste component ownership (see shadcn)</li>
         </ul>
       </div>
     </div>
@@ -589,13 +619,20 @@ voidEngine.setAtmosphere('brand');`}</code
   </section>
 
   <!-- ═══════════════════════════════════════════════════════════════════ -->
-  <!-- 7. CTA                                                            -->
+  <!-- 7. EMAIL CAPTURE — spot 2                                         -->
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  {@render waitlistForm(
+    "For developers and teams. We'll notify you when it's ready.",
+  )}
+
+  <!-- ═══════════════════════════════════════════════════════════════════ -->
+  <!-- 8. CTA & ORIGIN                                                    -->
   <!-- ═══════════════════════════════════════════════════════════════════ -->
   <section class="flex flex-col gap-md items-center text-center">
-    <p class="text-dim max-w-2xl">
-      One codebase. Zero rebuilds. Every component adapts across 12 atmospheres,
-      3 physics presets, and 2 color modes &mdash; without touching a single
-      line of component code.
+    <p class="text-dim text-center text-small max-w-2xl mx-auto">
+      From the makers of <a href="https://conexus.ink" class="link">CoNexus</a>
+      &mdash; an AI-powered interactive storytelling platform where the UI adapts
+      to the mood of the story.
     </p>
     <a href="/components" class="btn" use:navlink>
       Explore the Component Library
