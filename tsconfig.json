@@ -8,6 +8,7 @@
       "@components/*": ["./src/components/*"],
       "@config/*": ["./src/config/*"],
       "@lib/*": ["./src/lib/*"],
+      "@service/*": ["./src/service/*"],
       "@stores/*": ["./src/stores/*"],
       "@styles/*": ["./src/styles/*"]
     }

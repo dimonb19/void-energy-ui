@@ -3833,7 +3833,7 @@ Temporary themes override the user's selected atmosphere without persisting. The
 **Location:** [src/components/AtmosphereGenerator.svelte](src/components/AtmosphereGenerator.svelte)
 **Engine:** [src/lib/atmosphere-generator.ts](src/lib/atmosphere-generator.ts)
 
-Generates complete `VoidThemeDefinition` palettes from natural language descriptions using the Claude API (client-side, `PUBLIC_ANTHROPIC_API_KEY` env variable). Lives in `src/components/` (not `ui/`) because it's a landing-page feature, not a registered primitive.
+Generates complete `VoidThemeDefinition` palettes from natural language descriptions via the server-side AI pipeline (`/api/generate-atmosphere`). Provider-agnostic — supports Anthropic, OpenAI, and any OpenAI-compatible API. Lives in `src/components/` (not `ui/`) because it's a landing-page feature, not a registered primitive.
 
 **Lifecycle:**
 
@@ -3844,9 +3844,9 @@ Generates complete `VoidThemeDefinition` palettes from natural language descript
 | Keep | `unregisterEphemeralTheme` → `registerTheme` → `setAtmosphere` | 1 (`setAtmosphere` clears stack without restoring) |
 | Revert | `releaseTemporaryTheme` → `unregisterEphemeralTheme` | 1 (restores previous) |
 
-**API key handling:** Server-configured via `PUBLIC_ANTHROPIC_API_KEY` environment variable (exposed to client by Astro's `PUBLIC_` prefix). No user-facing key input or localStorage persistence.
+**API key handling:** Server-side only. The key never reaches the browser — requests go through `/api/generate-atmosphere` which proxies to the configured AI provider. Set `ANTHROPIC_API_KEY` (or `AI_API_KEY` for OpenAI-compatible providers) in your `.env` or hosting dashboard. See [AI-PIPELINES.md](./AI-PIPELINES.md) for full configuration.
 
-**Generation contract:** Claude returns `{ mode, physics, tagline, label, fontHeadingKey, fontBodyKey, palette }` with 10 core tokens. The parser auto-fills 12 semantic variant tokens from `SEMANTIC_DARK`/`SEMANTIC_LIGHT` and resolves font keys to CSS family strings.
+**Generation contract:** The AI returns `{ mode, physics, tagline, label, fontHeadingKey, fontBodyKey, palette }` with 10 core tokens. The route normalizes the response to `{ text, provider, model }`. The client-side parser auto-fills 12 semantic variant tokens from `SEMANTIC_DARK`/`SEMANTIC_LIGHT` and resolves font keys to CSS family strings.
 
 **Edge cases:**
 - `pushTemporaryTheme` returns `null` when `adaptAtmosphere` is off — promotes directly via `registerTheme` + `setAtmosphere`

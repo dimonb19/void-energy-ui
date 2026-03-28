@@ -198,8 +198,7 @@
     <div class="flex flex-col gap-sm items-center text-center">
       <h2>Create Your Own</h2>
       <p class="text-dim max-w-4xl">
-        Type a vibe, get a complete atmosphere. Powered by Claude &mdash; runs
-        entirely in your browser.
+        Type a vibe, get a complete atmosphere. AI-powered theme generation.
       </p>
     </div>
 

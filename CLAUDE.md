@@ -136,6 +136,7 @@ src/
   layouts/          Astro layouts
   lib/              Modal manager, layer stack, transitions, tooltip logic, void-boot, password-validation, shortcut-registry, timing
   pages/            Astro pages
+  service/          Server-side API service layer (Anthropic, etc.)
   stores/           Reactive state (toast, user)
   styles/
     abstracts/      SCSS engine, mixins, functions, keyframes
@@ -382,7 +383,7 @@ import { draggable, dropTarget, reorderByDrop } from '@actions/drag'
 
 ### Path Aliases (tsconfig.json)
 ```
-@actions/*  @adapters/*  @components/*  @config/*  @lib/*  @stores/*  @styles/*
+@actions/*  @adapters/*  @components/*  @config/*  @lib/*  @service/*  @stores/*  @styles/*
 ```
 
 ---

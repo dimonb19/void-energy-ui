@@ -2,8 +2,8 @@
   ATMOSPHERE GENERATOR
   "Type a vibe → get a complete atmosphere" — AI theme generation demo.
 
-  Uses the Claude API (client-side, PUBLIC_ env key) to generate complete
-  VoidThemeDefinitions from creative concept descriptions.
+  Uses the AI pipeline (server-side proxy at /api/generate-atmosphere)
+  to generate complete VoidThemeDefinitions from creative concept descriptions.
 
   LIFECYCLE:
   Generate → validate → registerEphemeralTheme → pushTemporaryTheme → preview

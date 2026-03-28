@@ -88,17 +88,18 @@ describe('generateAtmosphere preference enforcement', () => {
       ok: true,
       json: () =>
         Promise.resolve({
-          content: [{ type: 'text', text: responseText }],
+          text: responseText,
+          provider: 'anthropic',
+          model: 'claude-sonnet-4-6',
         }),
     });
   }
 
   beforeEach(() => {
     vi.restoreAllMocks();
-    vi.stubEnv('PUBLIC_ANTHROPIC_API_KEY', 'sk-test');
   });
 
-  it('passes physics and mode into the request body', async () => {
+  it('passes physics and mode into the request body via proxy', async () => {
     const fetchSpy = mockFetchWith(validGlassResponse);
     vi.stubGlobal('fetch', fetchSpy);
 
@@ -108,10 +109,13 @@ describe('generateAtmosphere preference enforcement', () => {
       mode: 'dark',
     });
 
+    expect(fetchSpy.mock.calls[0][0]).toBe('/api/generate-atmosphere');
     const body = JSON.parse(fetchSpy.mock.calls[0][1].body);
-    const userMsg = body.messages[0].content;
-    expect(userMsg).toContain('physics MUST be exactly "glass"');
-    expect(userMsg).toContain('mode MUST be exactly "dark"');
+    expect(body).toMatchObject({
+      vibe: 'deep space',
+      physics: 'glass',
+      mode: 'dark',
+    });
   });
 
   it('rejects when AI returns wrong physics', async () => {

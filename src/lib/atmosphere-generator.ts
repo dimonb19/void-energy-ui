@@ -8,10 +8,7 @@ import { err, ok } from '@lib/result';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const API_URL = 'https://api.anthropic.com/v1/messages';
-const MODEL_ID = 'claude-sonnet-4-6';
-const API_VERSION = '2023-06-01';
-const MAX_TOKENS = 2048;
+const PROXY_URL = '/api/generate-atmosphere';
 
 /** The 10 core palette tokens Claude generates (semantic variants are auto-filled). */
 export const CORE_PALETTE_KEYS = [
@@ -54,7 +51,7 @@ const fontCatalog = Object.entries(FONTS).map(([key, def]) => {
  * Builds the system prompt dynamically from VOID_TOKENS and FONTS.
  * No hardcoded theme data — everything is derived from the source of truth.
  */
-function buildSystemPrompt(): string {
+export function buildSystemPrompt(): string {
   // Serialize themes as compact few-shot examples (core palette only)
   const themeExamples = Object.entries(VOID_TOKENS.themes).map(
     ([id, theme]) => {
@@ -534,47 +531,26 @@ export function buildManualAtmosphere(
 // ── API Call ──────────────────────────────────────────────────────────────────
 
 /**
- * Generate an atmosphere from a vibe description using the Claude API.
+ * Generate an atmosphere from a vibe description using the AI pipeline.
+ * The server-side route handles provider selection and returns normalized text.
  * Returns a validated, ready-to-register theme definition.
  */
 export async function generateAtmosphere(
   options: GenerateOptions,
 ): Promise<VoidResult<GeneratedAtmosphere, BoundaryError>> {
   const { vibe, physics, mode, retry, signal } = options;
-  const apiKey = import.meta.env.PUBLIC_ANTHROPIC_API_KEY;
-
-  if (!apiKey) {
-    return err({
-      code: 'network',
-      source: 'AtmosphereGenerator.generate',
-      message: 'API key not configured.',
-    });
-  }
-
-  const systemPrompt = buildSystemPrompt();
-  const userMessage = buildUserMessage(vibe, physics, mode, retry);
 
   let response: Response;
   try {
-    response = await fetch(API_URL, {
+    response = await fetch(PROXY_URL, {
       method: 'POST',
       signal,
-      headers: {
-        'content-type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': API_VERSION,
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
+      headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
-        model: MODEL_ID,
-        max_tokens: MAX_TOKENS,
-        system: systemPrompt,
-        messages: [
-          {
-            role: 'user',
-            content: userMessage,
-          },
-        ],
+        vibe,
+        physics,
+        mode,
+        retry,
       }),
     });
   } catch (e: unknown) {
@@ -603,8 +579,20 @@ export async function generateAtmosphere(
       case 429:
         message = 'Rate limited — try again in a moment.';
         break;
+      case 500:
+        message = 'Server error — AI provider may not be configured.';
+        break;
+      case 502:
+        message = 'AI provider could not be reached — try again in a moment.';
+        break;
+      case 503:
+        message = 'Generation is temporarily unavailable.';
+        break;
+      case 504:
+        message = 'AI provider took too long to respond — try again.';
+        break;
       case 529:
-        message = 'Claude is busy — try again shortly.';
+        message = 'AI provider is busy — try again shortly.';
         break;
       default:
         message = `API error (${status}).`;
@@ -618,7 +606,7 @@ export async function generateAtmosphere(
     });
   }
 
-  let body: { content?: Array<{ type: string; text?: string }> };
+  let body: { text?: string; error?: string };
   try {
     body = await response.json();
   } catch {
@@ -629,8 +617,15 @@ export async function generateAtmosphere(
     });
   }
 
-  const textBlock = body.content?.find((b) => b.type === 'text');
-  if (!textBlock?.text) {
+  if (body.error) {
+    return err({
+      code: 'http_error',
+      source: 'AtmosphereGenerator.generate',
+      message: body.error,
+    });
+  }
+
+  if (!body.text) {
     return err({
       code: 'invalid_shape',
       source: 'AtmosphereGenerator.generate',
@@ -639,7 +634,7 @@ export async function generateAtmosphere(
   }
 
   return parseResponse(
-    textBlock.text,
+    body.text,
     vibe,
     options.existingIds ?? new Set(),
     physics,

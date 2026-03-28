@@ -2,6 +2,7 @@
 import { defineConfig } from 'astro/config';
 import svelte from '@astrojs/svelte';
 import tailwind from '@astrojs/tailwind';
+import vercel from '@astrojs/vercel';
 // import { execSync } from 'node:child_process';
 
 // 🤖 Optional design-token watcher (disabled).
@@ -34,8 +35,24 @@ import tailwind from '@astrojs/tailwind';
 //   };
 // };
 
-// https://astro.build/config
+// ── Output Mode & Adapter ────────────────────────────────────────────────────
+// output: 'server' — all pages and API routes render on demand (SSR) by default.
+//   This is the simplest mode when the app ships server endpoints like
+//   /api/generate-atmosphere (see AI-PIPELINES.md).
+//
+// The alternative is output: 'static' — pages prerender at build time by default,
+//   but individual pages/endpoints can opt into on-demand rendering with
+//   `export const prerender = false`. Use this if most of your site is static
+//   and only a few routes need server execution.
+//
+// adapter: vercel() — deployment target for server-rendered routes.
+//   Swap for @astrojs/node, @astrojs/cloudflare, etc. for other hosts.
+//   Only needed when any route runs on demand (either 'server' mode or
+//   'static' mode with prerender=false routes).
+// ─────────────────────────────────────────────────────────────────────────────
 export default defineConfig({
+  output: 'server',
+  adapter: vercel(),
   integrations: [
     svelte(),
     // Loads Tailwind and Autoprefixer; ensures Sass runs first.
