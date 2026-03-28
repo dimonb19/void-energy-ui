@@ -72,14 +72,14 @@
 
   // Get current atmosphere's font keys for dynamic "System Default" labels
   let currentHeadingKey = $derived.by(() => {
-    const family = voidEngine.currentTheme?.palette['font-atmos-heading'];
+    const family = voidEngine.currentTheme?.palette?.['font-atmos-heading'];
     if (!family) return 'Unknown';
     const key = FONT_FAMILY_TO_KEY[family];
     return key ? capitalize(key) : 'Unknown';
   });
 
   let currentBodyKey = $derived.by(() => {
-    const family = voidEngine.currentTheme?.palette['font-atmos-body'];
+    const family = voidEngine.currentTheme?.palette?.['font-atmos-body'];
     if (!family) return 'Unknown';
     const key = FONT_FAMILY_TO_KEY[family];
     return key ? capitalize(key) : 'Unknown';
