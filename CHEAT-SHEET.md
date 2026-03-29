@@ -3473,80 +3473,11 @@ Physics-aware visual effects for loading states and skeleton loaders.
 
 ---
 
-#### `<KineticText>` — Physics-aware kinetic typography
+#### `<KineticText>` — REMOVED
 
-**Description:** Thin wrapper around the `use:kinetic` action with four animation modes: typewriter (char), word-by-word (word), scramble-to-resolve (decode), and rotating word list (cycle). Animation logic lives in the action; SCSS owns cursor appearance. Adapts cursor glow and timing to all physics presets. Supports reduced motion (instant reveal).
-**Location:** [src/components/ui/KineticText.svelte](src/components/ui/KineticText.svelte)
-**Action:** [src/actions/kinetic.ts](src/actions/kinetic.ts)
-**CSS:** `.kinetic-text`, `.kinetic-cursor` ([src/styles/components/\_kinetic.scss](src/styles/components/_kinetic.scss))
+**Status:** Removed. Replaced by `@dgrslabs/void-energy-kinetic-text` (premium package with character-level DOM, scoped effects, cue system). For simple loading cyclers, use `<LoadingTextCycler>`. The `use:kinetic` action remains available for direct usage.
 
-**Props:**
-
-| Prop | Type | Default | Description |
-| --- | --- | --- | --- |
-| `text` | `string` | — | Single text to animate (char, word, decode modes) |
-| `words` | `string[]` | — | Word list to cycle through (cycle mode) |
-| `mode` | `'char' \| 'word' \| 'cycle' \| 'decode'` | `'char'` | Animation mode |
-| `chunk` | `'word' \| 'sentence' \| 'sentence-pair'` | `'word'` | Chunk size for word mode — determines grouping for streaming bursts |
-| `charSpeed` | `number` | `8` | Per-character speed (ms) for smooth chunk reveal in word mode — controls the rapid char-by-char animation within each chunk |
-| `speed` | `number` | `40` | Ms per animation unit — in word mode this is the pause between chunks (streaming burst gap) |
-| `pauseDuration` | `number` | `1800` | Pause between cycled words (ms) |
-| `cycleTransition` | `'type' \| 'fade' \| 'decode'` | `'type'` | Transition style for cycle mode |
-| `cursor` | `boolean` | `false` | Show blinking cursor during animation |
-| `loop` | `boolean` | `true` | Loop cycle mode indefinitely |
-| `tag` | `string` | `'span'` | HTML tag to render |
-| `oncomplete` | `() => void` | — | Completion callback |
-| `class` | `string` | `''` | CSS passthrough (layout/geometry only) |
-
-**States:**
-
-| State | Attribute | Visual |
-| --- | --- | --- |
-| Animating | `data-state="animating"` | Text progressively revealed |
-| Complete | (no attribute) | Full text visible, cursor removed |
-
-**Modes:**
-
-| Mode | Behavior |
-| --- | --- |
-| `char` | Classic typewriter, character by character |
-| `word` | Smooth char-by-char reveal within each chunk (word/sentence/sentence-pair), with a `speed`-controlled pause between chunks to simulate streaming bursts |
-| `decode` | Scramble → resolve effect (sci-fi terminal feel) |
-| `cycle` | Rotates through a word list with configurable transitions |
-
-**Usage:**
-
-```svelte
-<script lang="ts">
-  import KineticText from '@components/ui/KineticText.svelte';
-</script>
-
-<!-- Typewriter -->
-<KineticText text="Hello world" mode="char" cursor />
-
-<!-- Word-by-word paragraph -->
-<KineticText tag="p" text="Long paragraph..." mode="word" speed={80} cursor />
-
-<!-- Sentence-by-sentence (AI streaming) -->
-<KineticText tag="p" text="First sentence. Second sentence." mode="word" chunk="sentence" speed={400} cursor />
-
-<!-- Two sentences at a time -->
-<KineticText tag="p" text="First. Second. Third. Fourth." mode="word" chunk="sentence-pair" speed={600} cursor />
-
-<!-- Decode reveal -->
-<KineticText text="ACCESS GRANTED" mode="decode" speed={30} />
-
-<!-- Loading word cycler -->
-<KineticText words={['Synthesizing…', 'Calibrating…']} mode="cycle" cycleTransition="decode" />
-```
-
-**Physics:**
-- **Glass:** Smooth cursor glow via `--energy-primary`, `ease-in-out` blink timing
-- **Flat:** Clean `steps(2)` blink, `--text-main` cursor, 0.8x speed multiplier
-- **Retro:** Hard `steps(1)` block blink, `--energy-primary` cursor, ±30% per-tick timing jitter, uppercase-only scramble charset
-- **Light:** Neutral `--text-main` cursor, `steps(2)` blink
-
-**Showcase:** [/components → Effects](src/components/ui-library/Effects.svelte)
+**Showcase:** [/kinetic-text](src/pages/kinetic-text.astro)
 
 ---
 
@@ -5315,40 +5246,21 @@ No manual body padding or scroll offset adjustments needed — `data-has-breadcr
 
 ---
 
-### U. Kinetic Text (Typewriter / Decode / Cycle)
+### U. Kinetic Text
+
+**Premium package:** `@dgrslabs/void-energy-kinetic-text` — character-level DOM, 5 reveal modes, 6 reveal styles, 18 narrative effects with scope targeting, cue system for TTS sync. See [/kinetic-text](src/pages/kinetic-text.astro) for full showcase.
+
+**Loading cycler** (still available as a shipped primitive):
 
 ```svelte
 <script lang="ts">
-  import KineticText from '@components/ui/KineticText.svelte';
   import LoadingTextCycler from '@components/ui/LoadingTextCycler.svelte';
 </script>
 
-<!-- Typewriter with cursor -->
-<KineticText text="System online." mode="char" speed={65} cursor />
-
-<!-- Word-by-word paragraph -->
-<KineticText tag="p" text="Long paragraph content here..." mode="word" speed={80} cursor />
-
-<!-- Sentence-by-sentence (AI streaming) -->
-<KineticText tag="p" text="First sentence. Second sentence." mode="word" chunk="sentence" speed={400} cursor />
-
-<!-- Two sentences at a time -->
-<KineticText tag="p" text="First. Second. Third. Fourth." mode="word" chunk="sentence-pair" speed={600} cursor />
-
-<!-- Decode reveal (sci-fi cipher) -->
-<KineticText text="ACCESS GRANTED" mode="decode" speed={30} />
-
-<!-- Cycle through words with decode transition -->
-<KineticText
-  words={['Synthesizing…', 'Calibrating…', 'Traversing…']}
-  mode="cycle"
-  cycleTransition="decode"
-  speed={30}
-/>
-
-<!-- Pre-configured loading cycler -->
 <LoadingTextCycler />
 ```
+
+The `use:kinetic` action remains available for direct usage (cycle mode for loading states).
 
 ---
 

@@ -4,7 +4,6 @@
   import StoryFeed from './conexus/StoryFeed.svelte';
   import ReorderShowcase from './conexus/ReorderShowcase.svelte';
   import PortalLoaderDemo from './conexus/PortalLoaderDemo.svelte';
-  import NarrativeShowcase from './conexus/NarrativeShowcase.svelte';
 
   function interceptDemoLink(e: MouseEvent | KeyboardEvent) {
     if (e instanceof KeyboardEvent && e.key !== 'Enter') return;
@@ -41,9 +40,6 @@
   <hr />
 
   <div class="container py-2xl">
-    <div class="flex flex-col gap-2xl">
-      <PortalLoaderDemo />
-      <NarrativeShowcase />
-    </div>
+    <PortalLoaderDemo />
   </div>
 </PullRefresh>

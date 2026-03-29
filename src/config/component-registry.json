@@ -46,7 +46,7 @@
       "layout": ["settings-row"],
       "interaction": ["pull-refresh"],
       "feedback": ["skeleton", "portal-loader"],
-      "motion": ["loading-text-cycler", "kinetic-text"],
+      "motion": ["loading-text-cycler"],
       "chart": [
         "progress-ring",
         "sparkline",
@@ -976,35 +976,9 @@
       "import": "@components/ui/LoadingTextCycler.svelte",
       "props": ["words", "interval", "cursor", "speed", "class"],
       "slots": [],
-      "related": ["kinetic-text", "portal-loader"],
+      "related": ["kinetic", "portal-loader"],
       "compose": "Use when you need rotating loading copy without building a custom kinetic config.",
       "example": "<LoadingTextCycler words={['Loading', 'Syncing', 'Compiling']} />"
-    },
-    "kinetic-text": {
-      "description": "DEPRECATED — Legacy text reveal wrapper around the kinetic action. For new work, use @dgrslabs/void-energy-kinetic-text (premium package) which provides character-level DOM, scoped effects, and cue system.",
-      "category": "motion",
-      "component": "KineticText",
-      "import": "@components/ui/KineticText.svelte",
-      "deprecated": true,
-      "props": [
-        "text",
-        "words",
-        "mode",
-        "chunk",
-        "charSpeed",
-        "speed",
-        "pauseDuration",
-        "cycleTransition",
-        "cursor",
-        "loop",
-        "tag",
-        "oncomplete",
-        "class"
-      ],
-      "slots": [],
-      "related": ["loading-text-cycler"],
-      "compose": "Legacy wrapper. Prefer @dgrslabs/void-energy-kinetic-text for new implementations.",
-      "example": "<KineticText text='SYSTEM ONLINE' mode='decode' />"
     },
     "media-slider": {
       "description": "Horizontal volume/playback control bar with mute toggle, play/pause, and optional replay button. Icons animate between states.",
@@ -1269,7 +1243,7 @@
         "options?: Omit<KineticConfig, 'text' | 'words'>"
       ],
       "returns": ["KineticHandle (Promise<void> with abort())"],
-      "related": ["kinetic", "kinetic-text"],
+      "related": ["kinetic", "loading-text-cycler"],
       "compose": "Use when you need imperative, abortable typing outside Svelte markup or want a promise that resolves when the reveal completes.",
       "example": "const handle = typewrite(node, 'Loading...', { speed: 30 }); handle.abort();"
     },
@@ -1349,8 +1323,8 @@
       "signature": "kinetic(node, config)",
       "args": ["config: KineticConfig"],
       "returns": ["{ update(newConfig), destroy() }"],
-      "related": ["kinetic-text", "typewrite", "narrative"],
-      "compose": "Use for declarative text reveal effects in markup. The action restarts whenever the config object reference changes.",
+      "related": ["typewrite", "narrative", "loading-text-cycler"],
+      "compose": "Use for declarative text reveal effects in markup. The action restarts whenever the config object reference changes. For premium character-level reveals, use @dgrslabs/void-energy-kinetic-text instead.",
       "example": "<span use:kinetic={{ text: 'SYSTEM ONLINE', mode: 'decode' }} />"
     },
     "narrative": {
