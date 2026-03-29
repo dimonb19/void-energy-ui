@@ -120,6 +120,12 @@ export class RevealTimeline {
   // animationend tracking for completion cues
   private pendingCompletionAnimations = 0;
 
+  // animationend tracking for reveal animations (non-instant styles)
+  private pendingRevealAnimations = 0;
+
+  // Guard against double-firing oneffectscomplete
+  private effectsCompleteFired = false;
+
   // Fallback timer IDs for revealing → visible transition
   private fallbackTimers: Map<number, number> = new Map();
 
@@ -272,6 +278,7 @@ export class RevealTimeline {
     }
     this.revealedCount = this.totalUnits;
     this.lastRevealedIndex = this.totalUnits - 1;
+    this.pendingRevealAnimations = 0;
 
     this.completeReveal();
   }
@@ -352,10 +359,15 @@ export class RevealTimeline {
       this.renderer.moveCursorAfter(this.lastRevealedIndex);
     }
 
-    // Check completion
+    // Check completion — stop RAF but defer completeReveal until
+    // all reveal animations have settled (non-instant styles)
     if (this.revealedCount >= this.totalUnits && this.state === 'running') {
       this._finalElapsed = elapsed;
-      this.completeReveal();
+      if (this.rafId !== null) {
+        cancelAnimationFrame(this.rafId);
+        this.rafId = null;
+      }
+      this.checkRevealComplete();
     }
   }
 
@@ -518,6 +530,7 @@ export class RevealTimeline {
       // Instant: skip revealing state, go straight to visible
       this.renderer.setGlyphState(index, 'visible');
     } else {
+      this.pendingRevealAnimations++;
       this.renderer.setGlyphState(index, 'revealing');
       this.scheduleVisibleTransition(index);
     }
@@ -543,9 +556,15 @@ export class RevealTimeline {
       }
     };
 
+    const settle = () => {
+      this.renderer.setGlyphState(index, 'visible');
+      this.pendingRevealAnimations--;
+      this.checkRevealComplete();
+    };
+
     const onEnd = () => {
       cleanup();
-      this.renderer.setGlyphState(index, 'visible');
+      settle();
     };
 
     glyph.addEventListener('animationend', onEnd, { once: true });
@@ -554,7 +573,7 @@ export class RevealTimeline {
     const timerId = window.setTimeout(() => {
       this.fallbackTimers.delete(index);
       glyph.removeEventListener('animationend', onEnd);
-      this.renderer.setGlyphState(index, 'visible');
+      settle();
     }, fallbackDelay);
     this.fallbackTimers.set(index, timerId);
   }
@@ -579,9 +598,15 @@ export class RevealTimeline {
       if (this.firedCues.has(cue.id)) continue;
       if (cue.atMs !== undefined && elapsed >= cue.atMs) {
         this.firedCues.add(cue.id);
-        fireOneShotEffect(this.renderer, cue, this.positions, () => {
-          // Time-triggered one-shot completed — no tracking needed
-        });
+        fireOneShotEffect(
+          this.renderer,
+          cue,
+          this.positions,
+          () => {
+            // Time-triggered one-shot completed — no tracking needed
+          },
+          this.config.reducedMotion,
+        );
       }
     }
   }
@@ -592,16 +617,35 @@ export class RevealTimeline {
       if (this.firedCues.has(cue.id)) continue;
       this.firedCues.add(cue.id);
       this.pendingCompletionAnimations++;
-      fireOneShotEffect(this.renderer, cue, this.positions, () => {
-        this.pendingCompletionAnimations--;
-        if (this.pendingCompletionAnimations <= 0) {
-          this.config.oneffectscomplete?.();
-        }
-      });
+      fireOneShotEffect(
+        this.renderer,
+        cue,
+        this.positions,
+        () => {
+          this.pendingCompletionAnimations--;
+          if (
+            this.pendingCompletionAnimations <= 0 &&
+            !this.effectsCompleteFired
+          ) {
+            this.effectsCompleteFired = true;
+            this.config.oneffectscomplete?.();
+          }
+        },
+        this.config.reducedMotion,
+      );
     }
   }
 
   // ── Completion sequence ───────────────────────────────────
+
+  private checkRevealComplete(): void {
+    if (
+      this.revealedCount >= this.totalUnits &&
+      this.pendingRevealAnimations <= 0
+    ) {
+      this.completeReveal();
+    }
+  }
 
   private completeReveal(): void {
     if (this.state === 'complete' || this.state === 'aborted') return;
@@ -632,7 +676,8 @@ export class RevealTimeline {
     // If no completion cues exist (or all already finished synchronously),
     // fire immediately. Otherwise, the last one-shot's onComplete callback
     // (in fireCompletionCues) handles this.
-    if (this.pendingCompletionAnimations <= 0) {
+    if (this.pendingCompletionAnimations <= 0 && !this.effectsCompleteFired) {
+      this.effectsCompleteFired = true;
       this.config.oneffectscomplete?.();
     }
   }

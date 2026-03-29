@@ -981,10 +981,11 @@
       "example": "<LoadingTextCycler words={['Loading', 'Syncing', 'Compiling']} />"
     },
     "kinetic-text": {
-      "description": "Text reveal component with animated modes: char-by-char typing, word-by-word, cycling between words (configurable pause), or scramble-decode. Optional cursor, completion callback, and custom HTML tag.",
+      "description": "DEPRECATED — Legacy text reveal wrapper around the kinetic action. For new work, use @dgrslabs/void-energy-kinetic-text (premium package) which provides character-level DOM, scoped effects, and cue system.",
       "category": "motion",
       "component": "KineticText",
       "import": "@components/ui/KineticText.svelte",
+      "deprecated": true,
       "props": [
         "text",
         "words",
@@ -1002,7 +1003,7 @@
       ],
       "slots": [],
       "related": ["loading-text-cycler"],
-      "compose": "Use text for char, word, or decode modes and words for cycle mode. It is a thin wrapper around the kinetic action.",
+      "compose": "Legacy wrapper. Prefer @dgrslabs/void-energy-kinetic-text for new implementations.",
       "example": "<KineticText text='SYSTEM ONLINE' mode='decode' />"
     },
     "media-slider": {

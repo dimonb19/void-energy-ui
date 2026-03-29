@@ -23,6 +23,8 @@ export function applyContinuousEffect(
       applyLine(renderer, effect, positions);
       break;
     case 'word':
+      applyWord(renderer, effect, positions);
+      break;
     case 'glyph':
       applyGlyph(renderer, effect, positions);
       break;
@@ -55,7 +57,12 @@ export function clearContinuousEffect(
     }
   }
 
-  // Clear glyph/word/range scope
+  // Clear word scope
+  for (const word of renderer.getAllWordElements()) {
+    word.removeAttribute('data-kt-effect');
+  }
+
+  // Clear glyph/range scope
   for (let i = 0; i < renderer.length; i++) {
     renderer.setUnitEffect(i, null);
   }
@@ -85,6 +92,16 @@ function applyLine(
     if (line) {
       line.setAttribute('data-kt-effect', effect);
     }
+  }
+}
+
+function applyWord(
+  renderer: CharacterRenderer,
+  effect: KineticTextEffect,
+  _positions: { isSpace: boolean }[],
+): void {
+  for (const word of renderer.getAllWordElements()) {
+    word.setAttribute('data-kt-effect', effect);
   }
 }
 

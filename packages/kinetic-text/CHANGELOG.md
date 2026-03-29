@@ -8,7 +8,7 @@ Initial release of the kinetic text package.
 
 - **Pretext-based layout engine** — wraps `@chenglou/pretext` for font-aware text measurement, line breaking, and per-grapheme position computation with single-entry caching.
 - **Character renderer** — builds a two-layer DOM (visual + semantic) with per-unit reveal and effect animation targets. Supports resize-aware re-rendering with state preservation.
-- **6 reveal modes** — `char`, `word`, `sentence`, `sentence-pair`, `decode`, `cycle` (skeleton).
+- **5 reveal modes** — `char`, `word`, `sentence`, `sentence-pair`, `decode`.
 - **5 reveal styles** — `fade`, `rise`, `drop`, `scale`, `blur`, plus `instant` binary flip.
 - **4 stagger patterns** — `sequential`, `wave`, `cascade`, `random` with seeded PRNG.
 - **18 narrative effects** — 6 one-shot (`shake`, `quake`, `jolt`, `glitch`, `surge`, `warp`) and 12 continuous (`drift`, `flicker`, `breathe`, `tremble`, `pulse`, `whisper`, `fade`, `freeze`, `burn`, `static`, `distort`, `sway`).

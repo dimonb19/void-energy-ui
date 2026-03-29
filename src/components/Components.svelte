@@ -16,7 +16,6 @@
   import Inputs from './ui-library/Inputs.svelte';
   // Composites
   import Composites from './ui-library/Composites.svelte';
-  import TilesShowcase from './ui-library/TilesShowcase.svelte';
   import UserState from './ui-library/UserState.svelte';
   import TabsShowcase from './ui-library/TabsShowcase.svelte';
   import PaginationShowcase from './ui-library/PaginationShowcase.svelte';
@@ -26,7 +25,6 @@
   import Modals from './ui-library/Modals.svelte';
   // Effects & Motion
   import Effects from './ui-library/Effects.svelte';
-  import KineticTextShowcase from './ui-library/KineticText.svelte';
   import MotionPrimitives from './ui-library/MotionPrimitives.svelte';
   import DragAndDrop from './ui-library/DragAndDrop.svelte';
   import PortalRingShowcase from './ui-library/PortalRing.svelte';
@@ -59,7 +57,6 @@
       label: 'Composites',
       items: [
         { id: 'composites', label: 'Composites' },
-        { id: 'tiles', label: 'Tiles' },
         { id: 'tabs', label: 'Tabs' },
         { id: 'pagination', label: 'Pagination' },
         { id: 'user-state', label: 'User State' },
@@ -77,7 +74,6 @@
       label: 'Effects & Motion',
       items: [
         { id: 'loading-states', label: 'Loading States' },
-        { id: 'kinetic-text', label: 'Kinetic Text' },
         { id: 'motion-primitives', label: 'Motion Primitives' },
         { id: 'drag-and-drop', label: 'Drag & Drop' },
         { id: 'portal-ring', label: 'Portal Ring' },
@@ -255,7 +251,6 @@
             </p>
           </div>
           <Composites />
-          <TilesShowcase />
           <TabsShowcase />
           <PaginationShowcase />
           <UserState />
@@ -282,11 +277,10 @@
           >
             <h3 class="text-dim">Effects & Motion</h3>
             <p class="text-small text-mute">
-              Loading indicators, kinetic typography, and motion primitives.
+              Loading indicators and motion primitives.
             </p>
           </div>
           <Effects />
-          <KineticTextShowcase />
           <MotionPrimitives />
           <DragAndDrop />
           <PortalRingShowcase />

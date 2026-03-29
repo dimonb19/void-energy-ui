@@ -3,21 +3,27 @@ import type { CharPosition, UnitState, RenderOptions } from '../../types';
 /**
  * CharacterRenderer: builds and manages the DOM tree for the visual and semantic layers.
  *
- * DOM structure (from 01-architecture.md):
- *   kt-visual (aria-hidden) > kt-line > kt-unit > kt-glyph
+ * DOM structure:
+ *   kt-visual (aria-hidden) > kt-line > kt-word > kt-unit > kt-glyph
  *   kt-semantic (sr-only, aria-live)
  *
- * kt-unit (outer) = effect animation target
+ * kt-word (word wrapper) = word-scope effect target
+ * kt-unit (outer) = glyph-scope effect target
  * kt-glyph (inner) = reveal animation target, holds text content
+ *
+ * Spaces are placed directly in kt-line (not inside kt-word).
  */
 export class CharacterRenderer {
   private visual: HTMLSpanElement | null = null;
   private semantic: HTMLSpanElement | null = null;
   private lines: HTMLSpanElement[] = [];
+  private words: HTMLSpanElement[] = [];
   private units: HTMLSpanElement[] = [];
   private glyphs: HTMLSpanElement[] = [];
   private cursorEl: HTMLSpanElement | null = null;
   private collapsed = false;
+  /** Maps unit index → index into this.words (-1 for spaces) */
+  private unitToWord: number[] = [];
 
   constructor(
     private container: HTMLElement,
@@ -59,9 +65,15 @@ export class CharacterRenderer {
     // Set container min-height to prevent layout shift
     container.style.minHeight = `${lineCount * options.lineHeight}px`;
 
-    // Create units and glyphs
+    // Create units, glyphs, and word wrappers
     this.units = new Array(totalUnits);
     this.glyphs = new Array(totalUnits);
+    this.words = [];
+    this.unitToWord = new Array(totalUnits).fill(-1);
+
+    let currentWord: HTMLSpanElement | null = null;
+    let currentWordIndex = -1;
+    let currentWordLine = -1;
 
     for (let i = 0; i < totalUnits; i++) {
       const pos = positions[i];
@@ -81,7 +93,25 @@ export class CharacterRenderer {
       glyph.textContent = pos.char;
 
       unit.appendChild(glyph);
-      this.lines[pos.lineIndex].appendChild(unit);
+
+      if (pos.isSpace) {
+        // Spaces go directly in the line, closing any open word
+        currentWord = null;
+        this.lines[pos.lineIndex].appendChild(unit);
+        this.unitToWord[i] = -1;
+      } else {
+        // Non-space: start or continue a word wrapper
+        if (!currentWord || currentWordLine !== pos.lineIndex) {
+          currentWord = document.createElement('span');
+          currentWord.className = 'kt-word';
+          currentWordIndex = this.words.length;
+          currentWordLine = pos.lineIndex;
+          this.words.push(currentWord);
+          this.lines[pos.lineIndex].appendChild(currentWord);
+        }
+        currentWord.appendChild(unit);
+        this.unitToWord[i] = currentWordIndex;
+      }
 
       this.units[i] = unit;
       this.glyphs[i] = glyph;
@@ -176,6 +206,37 @@ export class CharacterRenderer {
       result.push(this.units[i]);
     }
     return result;
+  }
+
+  /**
+   * Get the kt-word wrapper element for a given unit index.
+   * Returns null for spaces or out-of-range indices.
+   */
+  getWordElement(unitIndex: number): HTMLSpanElement | null {
+    const wordIdx = this.unitToWord[unitIndex];
+    if (wordIdx === undefined || wordIdx < 0) return null;
+    return this.words[wordIdx] ?? null;
+  }
+
+  /**
+   * Get all kt-word wrapper elements.
+   */
+  getAllWordElements(): HTMLSpanElement[] {
+    return this.words;
+  }
+
+  /**
+   * Set effect attribute on a word wrapper element.
+   */
+  setWordEffect(wordIndex: number, effect: string | null): void {
+    const word = this.words[wordIndex];
+    if (word) {
+      if (effect) {
+        word.setAttribute('data-kt-effect', effect);
+      } else {
+        word.removeAttribute('data-kt-effect');
+      }
+    }
   }
 
   /**
@@ -282,6 +343,8 @@ export class CharacterRenderer {
     }
     this.units = [];
     this.glyphs = [];
+    this.words = [];
+    this.unitToWord = [];
     this.collapsed = true;
   }
 
@@ -305,12 +368,59 @@ export class CharacterRenderer {
         (glyph?.getAttribute('data-kt-state') as UnitState) ?? 'hidden';
     }
 
+    // Capture unit-level effect attributes
+    const unitEffects: (string | null)[] = [];
+    for (let i = 0; i < this.units.length; i++) {
+      unitEffects[i] = this.units[i]?.getAttribute('data-kt-effect') ?? null;
+    }
+
+    // Capture block-level effect
+    const visualEffect = this.visual?.getAttribute('data-kt-effect') ?? null;
+
+    // Capture line-level effects
+    const lineEffects: (string | null)[] = [];
+    for (let i = 0; i < this.lines.length; i++) {
+      lineEffects[i] = this.lines[i]?.getAttribute('data-kt-effect') ?? null;
+    }
+
+    // Capture word-level effects
+    const wordEffects: (string | null)[] = [];
+    for (let i = 0; i < this.words.length; i++) {
+      wordEffects[i] = this.words[i]?.getAttribute('data-kt-effect') ?? null;
+    }
+
     this.positions = positions;
     this.render();
 
-    // Restore states (indices may shift if line breaks changed, but globalIndex is stable)
+    // Restore glyph states
     for (let i = 0; i < Math.min(states.length, this.glyphs.length); i++) {
       this.setGlyphState(i, states[i]);
+    }
+
+    // Restore unit effects
+    for (let i = 0; i < Math.min(unitEffects.length, this.units.length); i++) {
+      if (unitEffects[i]) {
+        this.units[i].setAttribute('data-kt-effect', unitEffects[i]!);
+      }
+    }
+
+    // Restore block effect
+    if (visualEffect && this.visual) {
+      this.visual.setAttribute('data-kt-effect', visualEffect);
+    }
+
+    // Restore line effects
+    for (let i = 0; i < Math.min(lineEffects.length, this.lines.length); i++) {
+      if (lineEffects[i] && this.lines[i]) {
+        this.lines[i].setAttribute('data-kt-effect', lineEffects[i]!);
+      }
+    }
+
+    // Restore word effects
+    for (let i = 0; i < Math.min(wordEffects.length, this.words.length); i++) {
+      if (wordEffects[i] && this.words[i]) {
+        this.words[i].setAttribute('data-kt-effect', wordEffects[i]!);
+      }
     }
   }
 
@@ -327,8 +437,10 @@ export class CharacterRenderer {
       this.semantic = null;
     }
     this.lines = [];
+    this.words = [];
     this.units = [];
     this.glyphs = [];
+    this.unitToWord = [];
     this.cursorEl = null;
     this.collapsed = false;
   }

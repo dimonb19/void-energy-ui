@@ -198,29 +198,8 @@
 
 // ── Reduced motion ───────────────────────────────────────────────
 
-// Auto mode: respect OS preference
-[data-reduced-motion='auto'] {
-  @media (prefers-reduced-motion: reduce) {
-    .kt-glyph {
-      animation: none !important;
-      opacity: 1 !important;
-      visibility: visible !important;
-      transform: none !important;
-      filter: none !important;
-    }
-
-    .kt-cursor {
-      animation: none !important;
-    }
-
-    .kt-unit {
-      animation: none !important;
-    }
-  }
-}
-
-// Always mode: force reduced motion regardless of OS
-[data-reduced-motion='always'] {
+// Shared reduced-motion reset — suppresses all animations on every target
+@mixin kt-reduced-motion {
   .kt-glyph {
     animation: none !important;
     opacity: 1 !important;
@@ -233,9 +212,27 @@
     animation: none !important;
   }
 
-  .kt-unit {
+  .kt-unit,
+  .kt-word,
+  .kt-line,
+  .kt-visual,
+  [data-kt-effect] {
     animation: none !important;
+    transform: none !important;
+    filter: none !important;
   }
+}
+
+// Auto mode: respect OS preference
+[data-reduced-motion='auto'] {
+  @media (prefers-reduced-motion: reduce) {
+    @include kt-reduced-motion;
+  }
+}
+
+// Always mode: force reduced motion regardless of OS
+[data-reduced-motion='always'] {
+  @include kt-reduced-motion;
 }
 
 // ═══════════════════════════════════════════════════════════════════

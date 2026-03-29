@@ -7,7 +7,8 @@
  *
  * ```svelte
  * <script lang="ts">
- *   import { KineticText, createVoidEnergyTextStyleSnapshot } from '@dgrslabs/void-energy-kinetic-text';
+ *   import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
+ *   import { createVoidEnergyTextStyleSnapshot } from '@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host';
  *   let el = $state<HTMLElement>();
  *   const snapshot = $derived(el ? createVoidEnergyTextStyleSnapshot(el) : null);
  * </script>
@@ -40,7 +41,6 @@ export { createVoidEnergyTextStyleSnapshot } from './adapters/void-energy-host';
 
 export type {
   CueTrigger,
-  CycleConfig,
   EffectScope,
   ModePreset,
   PhysicsPreset,

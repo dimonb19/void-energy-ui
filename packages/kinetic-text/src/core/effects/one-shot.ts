@@ -19,9 +19,16 @@ export function fireOneShotEffect(
   cue: KineticCue,
   positions: { lineIndex: number }[],
   onComplete: () => void,
+  reducedMotion: boolean = false,
 ): void {
   const def = getEffectDefinition(cue.effect);
   if (!def) {
+    onComplete();
+    return;
+  }
+
+  // Reduced motion: skip animation entirely, complete synchronously
+  if (reducedMotion) {
     onComplete();
     return;
   }
@@ -109,7 +116,9 @@ function collectTargetElements(
       }
       return lines;
     }
-    case 'word':
+    case 'word': {
+      return renderer.getAllWordElements();
+    }
     case 'glyph': {
       const units: HTMLElement[] = [];
       for (let i = 0; i < renderer.length; i++) {

@@ -108,7 +108,7 @@ export function createVoidEnergyTextStyleSnapshot(
   const mode = (root.dataset.mode ?? 'dark') as ModePreset;
 
   const fontFamily = computed.fontFamily;
-  const font = `${computed.fontSize} ${fontFamily}`;
+  const font = `${computed.fontStyle} ${computed.fontWeight} ${computed.fontSize} ${fontFamily}`;
   const lineHeight =
     parseFloat(computed.lineHeight) || parseFloat(computed.fontSize) * 1.5;
 

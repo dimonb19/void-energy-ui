@@ -26,7 +26,8 @@ Use the built-in adapter to resolve styles from the live DOM:
 
 ```svelte
 <script lang="ts">
-  import { KineticText, createVoidEnergyTextStyleSnapshot } from '@dgrslabs/void-energy-kinetic-text';
+  import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
+  import { createVoidEnergyTextStyleSnapshot } from '@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host';
   import '@dgrslabs/void-energy-kinetic-text/styles';
 
   let el = $state<HTMLElement>();
@@ -48,7 +49,7 @@ Construct `TextStyleSnapshot` manually — no adapter needed:
 
 ```svelte
 <script lang="ts">
-  import { KineticText } from '@dgrslabs/void-energy-kinetic-text';
+  import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
   import '@dgrslabs/void-energy-kinetic-text/styles';
 
   const snapshot = {
@@ -81,7 +82,7 @@ This provides all reveal keyframes, effect animations, physics-variant easing, c
 |------|------|---------|-------------|
 | `text` | `string` | — | **Required.** The text to render and reveal. |
 | `styleSnapshot` | `TextStyleSnapshot` | — | **Required.** Font, lineHeight, physics, mode, and CSS variables. |
-| `revealMode` | `RevealMode` | `'char'` | How text is revealed: `char`, `word`, `sentence`, `sentence-pair`, `decode`, `cycle`. |
+| `revealMode` | `RevealMode` | `'char'` | How text is revealed: `char`, `word`, `sentence`, `sentence-pair`, `decode`. |
 | `revealStyle` | `RevealStyle` | `'instant'` | Visual style of the reveal animation: `instant`, `fade`, `rise`, `drop`, `scale`, `blur`. |
 | `staggerPattern` | `StaggerPattern` | `'sequential'` | Timing pattern: `sequential`, `wave`, `cascade`, `random`. |
 | `stagger` | `number` | `40` (char) / `30` (other) | Milliseconds between reveal units. |
@@ -97,7 +98,6 @@ This provides all reveal keyframes, effect animations, physics-variant easing, c
 | `speed` | `number` | `200` (char) / `80` (word) | Base speed for grouped reveal modes (ms per group). |
 | `charSpeed` | `number` | `8` | Inner character speed within word/sentence groups (ms). |
 | `scramblePasses` | `number` | `4` | Number of scramble cycles per character in decode mode. |
-| `cycle` | `CycleConfig` | — | Configuration for cycle reveal mode. |
 | `onrevealcomplete` | `() => void` | — | Callback fired when all units are revealed. |
 | `oneffectscomplete` | `() => void` | — | Callback fired when all one-shot effects finish. |
 | `as` | `string` | `'span'` | HTML element tag for the root container. |

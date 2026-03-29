@@ -32,7 +32,6 @@
     speed,
     charSpeed,
     scramblePasses,
-    cycle,
     onrevealcomplete,
     oneffectscomplete,
     as = 'span',
@@ -103,9 +102,10 @@
     const effect = activeEffect;
     const scope = effectScope;
     const positions = currentPositions;
+    const reduced = isReducedMotion;
     if (!r || positions.length === 0) return;
 
-    if (effect) {
+    if (effect && !reduced) {
       clearContinuousEffect(r, positions);
       applyContinuousEffect(r, effect, scope, positions);
     } else {
@@ -149,14 +149,6 @@
     );
     renderer.render();
 
-    // Cycle mode uses a lightweight path — skip Pretext-based timeline
-    if (revealMode === 'cycle') {
-      // Phase 3 does not implement cycle — it reuses the timeline clock
-      // but needs a separate rendering path. Cycle support is functional
-      // but limited to the timeline skeleton.
-      return;
-    }
-
     // Create and start timeline
     const config: TimelineConfig = {
       revealMode,
@@ -199,6 +191,7 @@
     );
 
     renderer?.rerender(result.positions);
+    currentPositions = result.positions;
   }
 
   // ── Mount / update / unmount ─────────────────────────────────

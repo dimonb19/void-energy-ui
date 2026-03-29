@@ -6,7 +6,6 @@ export type RevealMode =
   | 'word'
   | 'sentence'
   | 'sentence-pair'
-  | 'cycle'
   | 'decode';
 
 export type RevealStyle =
@@ -116,13 +115,6 @@ export interface KineticCue {
   durationMs?: number;
 }
 
-export interface CycleConfig {
-  words: string[];
-  pauseDuration?: number;
-  loop?: boolean;
-  cycleTransition?: 'type' | 'fade' | 'decode';
-}
-
 // ── Internal types (not exported from package index) ──────────────
 
 export type UnitState = 'hidden' | 'revealing' | 'visible';
@@ -215,7 +207,6 @@ export interface KineticTextProps {
   speed?: number;
   charSpeed?: number;
   scramblePasses?: number;
-  cycle?: CycleConfig;
   onrevealcomplete?: () => void;
   oneffectscomplete?: () => void;
   as?: string;

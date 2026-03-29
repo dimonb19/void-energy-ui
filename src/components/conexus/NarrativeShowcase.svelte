@@ -2,12 +2,8 @@
   import { tick } from 'svelte';
   import { voidEngine } from '@adapters/void-engine.svelte';
   import { narrative, isOneShotEffect } from '@actions/narrative';
-  import { kinetic } from '@actions/kinetic';
-  import { morph } from '@actions/morph';
   import Selector from '@components/ui/Selector.svelte';
   import IconBtn from '@components/ui/IconBtn.svelte';
-  import Restart from '@components/icons/Restart.svelte';
-  import Switch from '@components/icons/Switch.svelte';
   import PlayPause from '@components/icons/PlayPause.svelte';
 
   // ── Types ────────────────────────────────────────────────────────────────
@@ -265,137 +261,6 @@
   function toggleTestContinuous() {
     testContinuousActive = !testContinuousActive;
   }
-
-  // ── Kinetic + Narrative chained demo ──────────────────────────────────
-  const chainedSteps = [
-    // ── One-shot effects ──
-    {
-      text: 'The blast door slammed shut behind them. For a moment the corridor was nothing but ringing silence and the faint taste of iron in the air.',
-      narrativeEffect: 'shake' as NarrativeEffect,
-    },
-    {
-      text: 'Stone dust rained from the ceiling as the chamber buckled under the shockwave. The floor split in two places and the far wall folded inward like wet paper.',
-      narrativeEffect: 'quake' as NarrativeEffect,
-    },
-    {
-      text: 'A cold hand brushed the back of her neck and every muscle snapped awake. The corridor was empty, but the air where the touch had been was still warm.',
-      narrativeEffect: 'jolt' as NarrativeEffect,
-    },
-    {
-      text: 'The console screen tore itself apart. Characters bled sideways, reforming into words that had no business being there — coordinates she had never entered, names she had never spoken aloud.',
-      narrativeEffect: 'glitch' as NarrativeEffect,
-    },
-    {
-      text: 'Light gathered in her palms and erupted skyward. The air itself buckled and sang, and for one bright instant she was the source of everything.',
-      narrativeEffect: 'surge' as NarrativeEffect,
-    },
-    {
-      text: 'The doorway stretched sideways and pulled itself thin. She felt her edges dissolve, scatter across impossible distance, and reassemble somewhere that smelled of copper and static.',
-      narrativeEffect: 'warp' as NarrativeEffect,
-    },
-    // ── Continuous effects ──
-    {
-      text: 'The lantern drifted beside her, its flame barely stirring. Every sound arrived late, softened, as if the water between them and the surface had swallowed the sharp edges of the world.',
-      narrativeEffect: 'drift' as NarrativeEffect,
-    },
-    {
-      text: 'Something flickered at the edge of her vision — not light, but the absence of it. A shape that existed only in the gaps between blinks, patient and watching.',
-      narrativeEffect: 'flicker' as NarrativeEffect,
-    },
-    {
-      text: 'She steadied herself and let the room inhale with her before the answer came. The walls seemed to expand and contract in time with her breathing, slow and deliberate.',
-      narrativeEffect: 'breathe' as NarrativeEffect,
-    },
-    {
-      text: 'His confession arrived in a shiver, barely held together by breath. Every word trembled at the edges, threatening to break apart before it reached her.',
-      narrativeEffect: 'tremble' as NarrativeEffect,
-    },
-    {
-      text: 'The seal under the altar throbbed once, then again, brighter every time. She could feel it in her ribs now — not sound, but pressure, rhythmic and patient and getting closer.',
-      narrativeEffect: 'pulse' as NarrativeEffect,
-    },
-    {
-      text: 'A voice slipped past her ear so softly it felt borrowed from another room. The words dissolved before she could hold them, leaving only the shape of a warning.',
-      narrativeEffect: 'whisper' as NarrativeEffect,
-    },
-    {
-      text: 'The room grew distant, each detail retreating behind a thickening veil. She tried to hold onto the lamplight but it slid through her awareness like water through open fingers.',
-      narrativeEffect: 'fade' as NarrativeEffect,
-    },
-    {
-      text: 'The frost arrived without warning. One breath she was warm, the next her joints locked and the air itself turned brittle around her. Even sound seemed to slow.',
-      narrativeEffect: 'freeze' as NarrativeEffect,
-    },
-    {
-      text: 'Heat poured from the cracked ground in visible waves. The air trembled and the edges of everything shimmered as if reality itself was sweating.',
-      narrativeEffect: 'burn' as NarrativeEffect,
-    },
-    {
-      text: 'The broadcast fractured into noise. Words surfaced and drowned in rapid succession — coordinates, a name, a warning — each one clawing for coherence before the static swallowed it whole.',
-      narrativeEffect: 'static' as NarrativeEffect,
-    },
-    {
-      text: "The potion hit her bloodstream and the room tilted. Walls leaned at angles that couldn't exist, her own hands rippled at the edges, and every thought arrived sideways.",
-      narrativeEffect: 'distort' as NarrativeEffect,
-    },
-    {
-      text: 'The deck pitched hard to starboard and she grabbed the railing with both hands. Every step was a guess, every surface a betrayal, and the sea had no intention of holding still.',
-      narrativeEffect: 'sway' as NarrativeEffect,
-    },
-  ];
-
-  const chainedRevealOptions = [
-    { value: 'char', label: 'Char' },
-    { value: 'word', label: 'Word' },
-    { value: 'sentence', label: 'Sentence' },
-  ];
-
-  let chainedStepIndex = $state(0);
-  let chainedKey = $state(0);
-  let chainedRevealing = $state(true);
-  let chainedRevealMode = $state<string>('sentence');
-
-  // First step: continuous starts immediately, one-shot waits
-  const firstEffect = chainedSteps[0].narrativeEffect;
-  let chainedNarrativeEffect = $state<NarrativeEffect | null>(
-    isOneShotEffect(firstEffect) ? null : firstEffect,
-  );
-
-  const chainedStep = $derived(chainedSteps[chainedStepIndex]);
-
-  function startChainedStep() {
-    chainedRevealing = true;
-    // Continuous effects start immediately (ambient atmosphere during reveal).
-    // One-shot effects wait for kinetic to finish (punctuation on full text).
-    const effect = chainedSteps[chainedStepIndex].narrativeEffect;
-    chainedNarrativeEffect = isOneShotEffect(effect) ? null : effect;
-  }
-
-  function chainedNext() {
-    chainedStepIndex = (chainedStepIndex + 1) % chainedSteps.length;
-    chainedKey++;
-    startChainedStep();
-  }
-
-  function chainedPrev() {
-    chainedStepIndex =
-      (chainedStepIndex - 1 + chainedSteps.length) % chainedSteps.length;
-    chainedKey++;
-    startChainedStep();
-  }
-
-  function chainedReplay() {
-    chainedKey++;
-    startChainedStep();
-  }
-
-  function onChainedKineticDone() {
-    chainedRevealing = false;
-    // Continuous effects are already active; one-shot effects fire now.
-    if (isOneShotEffect(chainedStep.narrativeEffect)) {
-      chainedNarrativeEffect = chainedStep.narrativeEffect;
-    }
-  }
 </script>
 
 <!-- ─── NARRATIVE EFFECTS ─────────────────────────────────────── -->
@@ -535,78 +400,6 @@
           <p class="text-caption text-mute">{demo.note}</p>
         </div>
       {/each}
-    </div>
-  </div>
-
-  <div class="flex flex-col gap-md">
-    <div class="flex flex-col gap-xs">
-      <h5>Kinetic Reveal + Narrative Effect</h5>
-      <p class="text-caption text-mute">
-        The real-world pattern: text is revealed with kinetic typography while
-        narrative effects set the mood. Continuous effects (drift, flicker,
-        etc.) run during the reveal as ambient atmosphere; one-shot effects
-        (shake, jolt, etc.) fire once the text is fully visible. Switch the
-        reveal mode and navigate between steps to compare.
-      </p>
-    </div>
-
-    <div
-      class="surface-sunk p-lg flex flex-col gap-lg"
-      use:morph={{ width: false }}
-    >
-      <div class="flex items-end justify-center gap-md flex-wrap">
-        <Selector
-          label="Reveal"
-          options={chainedRevealOptions}
-          bind:value={chainedRevealMode}
-          onchange={() => {
-            chainedKey++;
-            startChainedStep();
-          }}
-        />
-
-        <div class="w-full flex gap-xs items-center flex-1">
-          <p class="text-caption text-mute mr-auto">
-            Step {chainedStepIndex + 1} of {chainedSteps.length}
-          </p>
-          <IconBtn icon={Restart} aria-label="Replay" onclick={chainedReplay} />
-          <IconBtn icon={Switch} aria-label="Previous" onclick={chainedPrev} />
-          <IconBtn
-            icon={Switch}
-            aria-label="Next"
-            onclick={chainedNext}
-            class="rotate-180"
-          />
-        </div>
-      </div>
-
-      {#key chainedKey}
-        <p
-          class="text-body"
-          use:kinetic={{
-            text: chainedStep.text,
-            mode: chainedRevealMode === 'char' ? 'char' : 'word',
-            chunk: chainedRevealMode === 'sentence' ? 'sentence' : 'word',
-            speed: chainedRevealMode === 'char' ? 25 : 40,
-            cursor: chainedRevealMode === 'char',
-            onComplete: onChainedKineticDone,
-          }}
-          use:narrative={{
-            effect: chainedNarrativeEffect,
-            enabled: narrativeEffectsEnabled,
-          }}
-        ></p>
-      {/key}
-
-      <p class="text-caption text-mute">
-        {#if chainedRevealing && chainedNarrativeEffect}
-          Revealing with <code>{chainedNarrativeEffect}</code>
-        {:else if chainedRevealing}
-          Revealing text…
-        {:else if chainedNarrativeEffect}
-          Narrative effect <code>{chainedNarrativeEffect}</code> active
-        {/if}
-      </p>
     </div>
   </div>
 

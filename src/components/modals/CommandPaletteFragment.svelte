@@ -30,6 +30,13 @@
       action: () => navigate('/components'),
     },
     {
+      id: 'page-kinetic-text',
+      label: 'Kinetic Text',
+      group: 'Pages',
+      hint: '/kinetic-text',
+      action: () => navigate('/kinetic-text'),
+    },
+    {
       id: 'page-conexus',
       label: 'CoNexus',
       group: 'Pages',

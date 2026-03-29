@@ -11,7 +11,7 @@
   import { navlink } from '@actions/navlink';
   import LogoDGRS from './icons/LogoDGRS.svelte';
   import Quill from './icons/Quill.svelte';
-  import { LayoutGrid } from '@lucide/svelte';
+  import { LayoutGrid, Type } from '@lucide/svelte';
 
   // ─────────────────────────────────────────────────────────────────────────────
   // Navigation Data Structure
@@ -28,6 +28,12 @@
   // Main navigation tabs (desktop header + mobile bottom nav)
   const navItems: NavItem[] = [
     { id: 'conexus', label: 'CoNexus', href: '/conexus', icon: Quill },
+    {
+      id: 'kinetic-text',
+      label: 'Kinetic Text',
+      href: '/kinetic-text',
+      icon: Type,
+    },
     {
       id: 'components',
       label: 'Components',
