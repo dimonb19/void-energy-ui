@@ -80,13 +80,17 @@
     },
   ]);
 
+  const darkOnlyPhysics = $derived(
+    selectedPhysics === 'glass' || selectedPhysics === 'retro',
+  );
+
   const modeOptions = $derived([
-    { value: null, label: 'Auto' },
+    { value: null, label: 'Auto', disabled: darkOnlyPhysics },
     { value: 'dark' as const, label: 'Dark' },
     {
       value: 'light' as const,
       label: 'Light',
-      disabled: selectedPhysics === 'glass' || selectedPhysics === 'retro',
+      disabled: darkOnlyPhysics,
     },
   ]);
 
@@ -103,11 +107,8 @@
     }
   });
   $effect(() => {
-    if (
-      (selectedPhysics === 'glass' || selectedPhysics === 'retro') &&
-      selectedMode === 'light'
-    ) {
-      selectedMode = null;
+    if (selectedPhysics === 'glass' || selectedPhysics === 'retro') {
+      selectedMode = 'dark';
     }
   });
 
