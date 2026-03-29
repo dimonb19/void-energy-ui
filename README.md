@@ -15,6 +15,7 @@ It combines the performance of **Tailwind CSS** (for Layout) with a bespoke **SC
 - **[CLAUDE.md](./CLAUDE.md)** — AI assistant instructions and design system laws
 - **[.claude/README.md](./.claude/README.md)** — Claude Code setup, skills, hooks, and agents
 - **[templates/starter/README.md](./templates/starter/README.md)** — Starter-handoff assets for the future composition-only repo
+- **[plans/premium-story-text/README.md](./plans/premium-story-text/README.md)** — Phase-gated implementation plan for the premium `pretext` story text package
 
 ---
 

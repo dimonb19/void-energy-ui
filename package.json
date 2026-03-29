@@ -3,6 +3,9 @@
   "type": "module",
   "version": "0.0.1",
   "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
     "dev": "tsx scripts/local-dev.ts",
     "build": "npm run build:tokens && astro build",
@@ -10,6 +13,7 @@
     "build:tokens": "tsx scripts/generate-tokens.ts",
     "scan": "tsx scripts/scan-physics.ts",
     "check:registry": "tsx scripts/check-component-registry.ts",
+    "check:story-text-premium": "npm --workspace @dgrslabs/void-energy-story-text run check",
     "check": "npm run check:registry && svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",
     "format": "prettier --write ."
