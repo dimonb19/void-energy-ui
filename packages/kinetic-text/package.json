@@ -1,0 +1,41 @@
+{
+  "name": "@dgrslabs/void-energy-kinetic-text",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "UNLICENSED",
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/svelte/KineticText.svelte",
+      "default": "./dist/index.js"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "default": "./dist/types.js"
+    },
+    "./adapters/void-energy-host": {
+      "types": "./dist/adapters/void-energy-host.d.ts",
+      "default": "./dist/adapters/void-energy-host.js"
+    },
+    "./styles": "./dist/styles/kinetic-text.css"
+  },
+  "dependencies": {
+    "@chenglou/pretext": "0.0.3"
+  },
+  "peerDependencies": {
+    "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "sass-embedded": "^1.93.0",
+    "typescript": "^5.8.0"
+  },
+  "scripts": {
+    "build": "node scripts/build.js",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
+  }
+}

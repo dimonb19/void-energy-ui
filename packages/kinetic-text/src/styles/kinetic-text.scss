@@ -1,0 +1,817 @@
+// ═══════════════════════════════════════════════════════════════════
+// Kinetic Text — Package-Scoped Styles
+// ═══════════════════════════════════════════════════════════════════
+// This file is self-contained. It does NOT @use the host app's
+// abstracts — all values come from TextStyleSnapshot.vars forwarded
+// as inline CSS variables on the component root.
+
+// ── Root ──────────────────────────────────────────────────────────
+
+.kinetic-text {
+  display: block;
+  position: relative;
+}
+
+// ── Visual layer ─────────────────────────────────────────────────
+
+.kt-visual {
+  display: block;
+  user-select: none;
+}
+
+.kt-line {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.kt-unit {
+  display: inline;
+  position: relative;
+}
+
+.kt-glyph {
+  display: inline;
+}
+
+.kt-space {
+  // Whitespace units — targeted for effects that should skip spaces
+  // (e.g., scale effect should not scale a space character).
+}
+
+// ── Reveal states on kt-glyph ────────────────────────────────────
+
+.kt-glyph[data-kt-state='hidden'] {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.kt-glyph[data-kt-state='revealing'] {
+  visibility: visible;
+  animation-duration: var(--kt-reveal-duration, 300ms);
+  animation-timing-function: var(--kt-easing, ease-out);
+  animation-fill-mode: both;
+}
+
+.kt-glyph[data-kt-state='visible'] {
+  opacity: 1;
+  visibility: visible;
+}
+
+// ── Reveal style keyframes ───────────────────────────────────────
+
+// fade: opacity 0 → 1
+[data-reveal-style='fade'] .kt-glyph[data-kt-state='revealing'] {
+  animation-name: kt-reveal-fade;
+}
+
+// rise: translateY(0.3em) + opacity → 0, 0
+[data-reveal-style='rise'] .kt-glyph[data-kt-state='revealing'] {
+  animation-name: kt-reveal-rise;
+}
+
+// drop: translateY(-0.3em) + opacity → 0, 0
+[data-reveal-style='drop'] .kt-glyph[data-kt-state='revealing'] {
+  animation-name: kt-reveal-drop;
+}
+
+// scale: scale(0) + opacity → 1, 1
+[data-reveal-style='scale'] .kt-glyph[data-kt-state='revealing'] {
+  animation-name: kt-reveal-scale;
+}
+
+// blur: filter blur(4px) + opacity → 0, 0
+[data-reveal-style='blur'] .kt-glyph[data-kt-state='revealing'] {
+  animation-name: kt-reveal-blur;
+}
+
+// instant: binary visibility flip (no animation)
+[data-reveal-style='instant'] .kt-glyph[data-kt-state='revealing'] {
+  opacity: 1;
+  animation: none;
+}
+
+@keyframes kt-reveal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes kt-reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(0.3em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes kt-reveal-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-0.3em);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes kt-reveal-scale {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes kt-reveal-blur {
+  from {
+    opacity: 0;
+    filter: blur(4px); // void-ignore — physical constant for reveal blur
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+// ── Physics-variant easing ───────────────────────────────────────
+
+[data-physics='glass'] .kt-glyph[data-kt-state='revealing'] {
+  --kt-easing: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[data-physics='flat'] .kt-glyph[data-kt-state='revealing'] {
+  --kt-easing: ease-out;
+}
+
+[data-physics='retro'] .kt-glyph[data-kt-state='revealing'] {
+  --kt-easing: steps(4);
+}
+
+// ── Semantic layer ───────────────────────────────────────────────
+
+.kt-semantic {
+  // sr-only class handles visual hiding on the consumer side.
+  // This selector exists for package-internal targeting if needed.
+}
+
+// ── Cursor ───────────────────────────────────────────────────────
+
+.kt-cursor {
+  display: inline;
+  animation: kt-cursor-blink 1s infinite;
+  color: var(--energy-primary, var(--text-main, currentColor));
+}
+
+@keyframes kt-cursor-blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+// Physics-variant cursor blink
+[data-physics='glass'] .kt-cursor {
+  animation-timing-function: ease-in-out;
+}
+
+[data-physics='flat'] .kt-cursor {
+  animation-timing-function: steps(2);
+}
+
+[data-physics='retro'] .kt-cursor {
+  animation-timing-function: steps(1);
+}
+
+// ── Reduced motion ───────────────────────────────────────────────
+
+// Auto mode: respect OS preference
+[data-reduced-motion='auto'] {
+  @media (prefers-reduced-motion: reduce) {
+    .kt-glyph {
+      animation: none !important;
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: none !important;
+      filter: none !important;
+    }
+
+    .kt-cursor {
+      animation: none !important;
+    }
+
+    .kt-unit {
+      animation: none !important;
+    }
+  }
+}
+
+// Always mode: force reduced motion regardless of OS
+[data-reduced-motion='always'] {
+  .kt-glyph {
+    animation: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .kt-cursor {
+    animation: none !important;
+  }
+
+  .kt-unit {
+    animation: none !important;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EFFECT KEYFRAMES — ONE-SHOT
+// ═══════════════════════════════════════════════════════════════════
+
+// ── Shake: horizontal jitter with decaying amplitude ──
+@keyframes kt-effect-shake {
+  0% {
+    transform: translateX(0);
+  }
+  10% {
+    transform: translateX(-4px); // void-ignore
+  }
+  20% {
+    transform: translateX(4px); // void-ignore
+  }
+  30% {
+    transform: translateX(-3px); // void-ignore
+  }
+  40% {
+    transform: translateX(3px); // void-ignore
+  }
+  50% {
+    transform: translateX(-2px); // void-ignore
+  }
+  60% {
+    transform: translateX(2px); // void-ignore
+  }
+  70% {
+    transform: translateX(-1px); // void-ignore
+  }
+  80% {
+    transform: translateX(1px); // void-ignore
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+// ── Quake: heavier X+Y jitter ──
+@keyframes kt-effect-quake {
+  0% {
+    transform: translate(0, 0);
+  }
+  8% {
+    transform: translate(-6px, 3px); // void-ignore
+  }
+  16% {
+    transform: translate(5px, -4px); // void-ignore
+  }
+  24% {
+    transform: translate(-4px, 2px); // void-ignore
+  }
+  32% {
+    transform: translate(4px, -3px); // void-ignore
+  }
+  40% {
+    transform: translate(-3px, 2px); // void-ignore
+  }
+  50% {
+    transform: translate(3px, -1px); // void-ignore
+  }
+  60% {
+    transform: translate(-2px, 1px); // void-ignore
+  }
+  70% {
+    transform: translate(2px, -1px); // void-ignore
+  }
+  80% {
+    transform: translate(-1px, 0); // void-ignore
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+// ── Jolt: single sharp displacement + elastic snap-back ──
+@keyframes kt-effect-jolt {
+  0% {
+    transform: translate(0, 0);
+  }
+  15% {
+    transform: translate(-8px, -2px); // void-ignore
+  }
+  30% {
+    transform: translate(3px, 1px); // void-ignore
+  }
+  45% {
+    transform: translate(-1px, 0); // void-ignore
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+// ── Glitch: choppy positional offset + skew ──
+@keyframes kt-effect-glitch {
+  0% {
+    transform: translate(0, 0) skewX(0deg);
+  }
+  10% {
+    transform: translate(-3px, 1px) skewX(-2deg); // void-ignore
+  }
+  20% {
+    transform: translate(2px, -1px) skewX(1deg); // void-ignore
+  }
+  30% {
+    transform: translate(-1px, 0) skewX(-1deg); // void-ignore
+  }
+  40% {
+    transform: translate(3px, 1px) skewX(2deg); // void-ignore
+  }
+  50% {
+    transform: translate(-2px, -1px) skewX(0deg); // void-ignore
+  }
+  60% {
+    transform: translate(1px, 0) skewX(-2deg); // void-ignore
+  }
+  70% {
+    transform: translate(-3px, 1px) skewX(1deg); // void-ignore
+  }
+  80% {
+    transform: translate(0, 0) skewX(0deg);
+  }
+  100% {
+    transform: translate(0, 0) skewX(0deg);
+  }
+}
+
+// ── Surge: ascending power buildup with brightness flash ──
+@keyframes kt-effect-surge {
+  0% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  30% {
+    transform: scale(1.05); // void-ignore
+    filter: brightness(1.15); // void-ignore
+  }
+  50% {
+    transform: scale(1.02); // void-ignore
+    filter: brightness(1);
+  }
+  70% {
+    transform: scale(1.005); // void-ignore
+    filter: brightness(1);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
+// ── Warp: spatial distortion via scaleX oscillation + subtle skew ──
+@keyframes kt-effect-warp {
+  0% {
+    transform: scaleX(1) skewX(0deg);
+  }
+  15% {
+    transform: scaleX(0.97) skewX(-1.5deg); // void-ignore
+  }
+  30% {
+    transform: scaleX(1.03) skewX(1deg); // void-ignore
+  }
+  45% {
+    transform: scaleX(0.98) skewX(-0.5deg); // void-ignore
+  }
+  60% {
+    transform: scaleX(1.02) skewX(0.5deg); // void-ignore
+  }
+  75% {
+    transform: scaleX(0.99) skewX(0deg); // void-ignore
+  }
+  100% {
+    transform: scaleX(1) skewX(0deg);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EFFECT KEYFRAMES — CONTINUOUS
+// ═══════════════════════════════════════════════════════════════════
+
+// ── Drift: gentle vertical sine wave ──
+@keyframes kt-effect-drift {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px); // void-ignore
+  }
+}
+
+// ── Flicker: irregular opacity stutters ──
+@keyframes kt-effect-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  10% {
+    opacity: 0.4; // void-ignore
+  }
+  25% {
+    opacity: 1;
+  }
+  35% {
+    opacity: 0.7; // void-ignore
+  }
+  50% {
+    opacity: 1;
+  }
+  65% {
+    opacity: 0.85; // void-ignore
+  }
+  75% {
+    opacity: 0.4; // void-ignore
+  }
+  85% {
+    opacity: 1;
+  }
+}
+
+// ── Breathe: slow rhythmic scale pulse ──
+@keyframes kt-effect-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.015); // void-ignore
+  }
+}
+
+// ── Tremble: fast micro-shake ──
+@keyframes kt-effect-tremble {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(-1px, 0.5px); // void-ignore
+  }
+  50% {
+    transform: translate(1px, -0.5px); // void-ignore
+  }
+  75% {
+    transform: translate(-1px, -0.5px); // void-ignore
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+// ── Pulse: heartbeat-tempo scale with sharper attack ──
+@keyframes kt-effect-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  20% {
+    transform: scale(1.03); // void-ignore
+  }
+  40% {
+    transform: scale(1);
+  }
+}
+
+// ── Whisper: shrink + fade, fragile presence ──
+@keyframes kt-effect-whisper {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.98); // void-ignore
+    opacity: 0.7; // void-ignore
+  }
+}
+
+// ── Fade: slow consciousness dissolve ──
+@keyframes kt-effect-fade {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5; // void-ignore
+  }
+}
+
+// ── Freeze: cold stillness / paralysis ──
+@keyframes kt-effect-freeze {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(0.995); // void-ignore
+    opacity: 0.85; // void-ignore
+  }
+}
+
+// ── Burn: heat distortion / thermal haze ──
+@keyframes kt-effect-burn {
+  0% {
+    transform: translateY(0) skewX(0deg);
+  }
+  25% {
+    transform: translateY(-1.5px) skewX(0.3deg); // void-ignore
+  }
+  50% {
+    transform: translateY(0) skewX(-0.2deg); // void-ignore
+  }
+  75% {
+    transform: translateY(1.5px) skewX(0.3deg); // void-ignore
+  }
+  100% {
+    transform: translateY(0) skewX(0deg);
+  }
+}
+
+// ── Static: persistent signal noise (jitter + flicker) ──
+@keyframes kt-effect-static-jitter {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(0.5px, -0.5px); // void-ignore
+  }
+  50% {
+    transform: translate(-1px, 0.5px); // void-ignore
+  }
+  75% {
+    transform: translate(0.5px, 0.5px); // void-ignore
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+@keyframes kt-effect-static-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  15% {
+    opacity: 0.7; // void-ignore
+  }
+  30% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0.8; // void-ignore
+  }
+  75% {
+    opacity: 0.6; // void-ignore
+  }
+  85% {
+    opacity: 1;
+  }
+}
+
+// ── Distort: woozy perception warp ──
+@keyframes kt-effect-distort {
+  0%,
+  100% {
+    transform: rotate(-0.4deg) scaleX(0.998) scaleY(1.003); // void-ignore
+  }
+  20% {
+    transform: rotate(0deg) scaleX(1) scaleY(1);
+  }
+  40% {
+    transform: rotate(0.4deg) scaleX(1.008) scaleY(0.995); // void-ignore
+  }
+  60% {
+    transform: rotate(-0.3deg) scaleX(0.995) scaleY(1.005); // void-ignore
+  }
+  80% {
+    transform: rotate(0.2deg) scaleX(1.005) scaleY(0.998); // void-ignore
+  }
+}
+
+// ── Sway: lateral oscillation ──
+@keyframes kt-effect-sway {
+  0%,
+  100% {
+    transform: translateX(-4px); // void-ignore
+  }
+  50% {
+    transform: translateX(4px); // void-ignore
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EFFECT ANIMATION RULES — ONE-SHOT
+// ═══════════════════════════════════════════════════════════════════
+
+[data-kt-effect='shake'][data-kt-effect-type='one-shot'] {
+  animation: kt-effect-shake var(--kt-effect-duration, 500ms) ease-out; // void-ignore
+}
+[data-kt-effect='quake'][data-kt-effect-type='one-shot'] {
+  animation: kt-effect-quake var(--kt-effect-duration, 800ms) ease-out; // void-ignore
+}
+[data-kt-effect='jolt'][data-kt-effect-type='one-shot'] {
+  animation: kt-effect-jolt var(--kt-effect-duration, 300ms)
+    cubic-bezier(0.36, 0.07, 0.19, 0.97); // void-ignore
+}
+[data-kt-effect='glitch'][data-kt-effect-type='one-shot'] {
+  animation: kt-effect-glitch var(--kt-effect-duration, 600ms) steps(8); // void-ignore
+}
+[data-kt-effect='surge'][data-kt-effect-type='one-shot'] {
+  animation: kt-effect-surge var(--kt-effect-duration, 500ms) ease-out; // void-ignore
+}
+[data-kt-effect='warp'][data-kt-effect-type='one-shot'] {
+  animation: kt-effect-warp var(--kt-effect-duration, 600ms) ease-in-out; // void-ignore
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EFFECT ANIMATION RULES — CONTINUOUS
+// ═══════════════════════════════════════════════════════════════════
+
+// Block/line-scope continuous effects (applied on kt-visual or kt-line)
+[data-kt-effect='drift']:not([data-kt-effect-type]) {
+  animation: kt-effect-drift 3s ease-in-out infinite; // void-ignore
+}
+[data-kt-effect='flicker']:not([data-kt-effect-type]) {
+  animation: kt-effect-flicker 2s steps(1) infinite; // void-ignore
+}
+[data-kt-effect='breathe']:not([data-kt-effect-type]) {
+  animation: kt-effect-breathe 4s ease-in-out infinite; // void-ignore
+}
+[data-kt-effect='tremble']:not([data-kt-effect-type]) {
+  animation: kt-effect-tremble 100ms linear infinite; // void-ignore
+}
+[data-kt-effect='pulse']:not([data-kt-effect-type]) {
+  animation: kt-effect-pulse 1s ease-in-out infinite; // void-ignore
+}
+[data-kt-effect='whisper']:not([data-kt-effect-type]) {
+  animation: kt-effect-whisper 3s ease-in-out infinite; // void-ignore
+}
+[data-kt-effect='fade']:not([data-kt-effect-type]) {
+  animation: kt-effect-fade 5s ease-in-out infinite; // void-ignore
+}
+[data-kt-effect='freeze']:not([data-kt-effect-type]) {
+  animation: kt-effect-freeze 5s ease-in-out infinite; // void-ignore
+}
+[data-kt-effect='burn']:not([data-kt-effect-type]) {
+  animation: kt-effect-burn 1.5s linear infinite; // void-ignore
+}
+[data-kt-effect='static']:not([data-kt-effect-type]) {
+  animation:
+    kt-effect-static-jitter 200ms linear infinite,
+    // void-ignore
+    kt-effect-static-flicker 2s steps(1) infinite; // void-ignore
+}
+[data-kt-effect='distort']:not([data-kt-effect-type]) {
+  animation: kt-effect-distort 3.5s linear infinite; // void-ignore
+}
+[data-kt-effect='sway']:not([data-kt-effect-type]) {
+  animation: kt-effect-sway 2.5s ease-in-out infinite; // void-ignore
+}
+
+// ── Per-unit phase offset for glyph-scope continuous effects ─────
+// Uses --kt-phase (set on kt-unit during render) as negative delay
+// so each character starts at a different point in the animation cycle.
+
+.kt-unit[data-kt-effect='drift']:not([data-kt-effect-type]) {
+  animation: kt-effect-drift 3s ease-in-out infinite; // void-ignore
+  animation-delay: calc(var(--kt-phase, 0) * -3s); // void-ignore
+}
+.kt-unit[data-kt-effect='flicker']:not([data-kt-effect-type]) {
+  animation: kt-effect-flicker 2s steps(1) infinite; // void-ignore
+  animation-delay: calc(var(--kt-phase, 0) * -2s); // void-ignore
+}
+.kt-unit[data-kt-effect='tremble']:not([data-kt-effect-type]) {
+  animation: kt-effect-tremble 100ms linear infinite; // void-ignore
+  animation-delay: calc(var(--kt-phase, 0) * -100ms); // void-ignore
+}
+.kt-unit[data-kt-effect='whisper']:not([data-kt-effect-type]) {
+  animation: kt-effect-whisper 3s ease-in-out infinite; // void-ignore
+  animation-delay: calc(var(--kt-phase, 0) * -3s); // void-ignore
+}
+.kt-unit[data-kt-effect='fade']:not([data-kt-effect-type]) {
+  animation: kt-effect-fade 5s ease-in-out infinite; // void-ignore
+  animation-delay: calc(var(--kt-phase, 0) * -5s); // void-ignore
+}
+.kt-unit[data-kt-effect='burn']:not([data-kt-effect-type]) {
+  animation: kt-effect-burn 1.5s linear infinite; // void-ignore
+  animation-delay: calc(var(--kt-phase, 0) * -1.5s); // void-ignore
+}
+.kt-unit[data-kt-effect='static']:not([data-kt-effect-type]) {
+  animation:
+    kt-effect-static-jitter 200ms linear infinite,
+    // void-ignore
+    kt-effect-static-flicker 2s steps(1) infinite; // void-ignore
+  animation-delay:
+    calc(var(--kt-phase, 0) * -200ms),
+    // void-ignore
+    calc(var(--kt-phase, 0) * -2s); // void-ignore
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// EFFECT PHYSICS VARIANTS
+// ═══════════════════════════════════════════════════════════════════
+
+// ── Glass: motion blur on displacement effects ──
+[data-physics='glass'] [data-kt-effect='shake'],
+[data-physics='glass'] [data-kt-effect='quake'],
+[data-physics='glass'] [data-kt-effect='jolt'] {
+  filter: blur(0.5px); // void-ignore
+}
+
+// surge uses filter: brightness() in its keyframes — glass blur would conflict
+[data-physics='glass'] [data-kt-effect='warp'] {
+  filter: blur(0.5px); // void-ignore
+}
+
+[data-physics='glass'] [data-kt-effect='burn'] {
+  filter: blur(0.5px); // void-ignore
+}
+
+[data-physics='glass'] [data-kt-effect='static'] {
+  filter: blur(0.3px); // void-ignore
+}
+
+[data-physics='glass'] [data-kt-effect='sway'] {
+  filter: blur(0.5px); // void-ignore
+}
+
+// ── Retro: per-effect CRT-style stepped timing ──
+// One-shot retro overrides
+[data-physics='retro'] [data-kt-effect='shake'] {
+  animation-timing-function: steps(4);
+}
+[data-physics='retro'] [data-kt-effect='quake'] {
+  animation-timing-function: steps(4);
+}
+[data-physics='retro'] [data-kt-effect='jolt'] {
+  animation-timing-function: steps(3);
+}
+// glitch already uses steps(8) — leave it alone
+[data-physics='retro'] [data-kt-effect='surge'] {
+  animation-timing-function: steps(4);
+}
+[data-physics='retro'] [data-kt-effect='warp'] {
+  animation-timing-function: steps(5);
+}
+
+// Continuous retro overrides
+[data-physics='retro'] [data-kt-effect='drift'] {
+  animation-timing-function: steps(8);
+}
+[data-physics='retro'] [data-kt-effect='breathe'] {
+  animation-timing-function: steps(6);
+}
+[data-physics='retro'] [data-kt-effect='pulse'] {
+  animation-timing-function: steps(4);
+}
+[data-physics='retro'] [data-kt-effect='whisper'] {
+  animation-timing-function: steps(6);
+}
+[data-physics='retro'] [data-kt-effect='fade'] {
+  animation-timing-function: steps(8);
+}
+[data-physics='retro'] [data-kt-effect='freeze'] {
+  animation-timing-function: steps(6);
+}
+[data-physics='retro'] [data-kt-effect='distort'] {
+  animation-timing-function: steps(6);
+}
+[data-physics='retro'] [data-kt-effect='sway'] {
+  animation-timing-function: steps(6);
+}
+// flicker already uses steps(1) — leave it alone
+// tremble stays linear — high-frequency vibration needs smooth interpolation
+// burn stays linear — heat wobble needs smooth interpolation
+// static jitter stays linear — rapid noise needs smooth interpolation
