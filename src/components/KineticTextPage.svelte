@@ -49,8 +49,6 @@
   const SAMPLE_SENTENCE =
     'The ancient door groaned open. Light spilled across the stone floor. Something moved in the shadows beyond.';
   const SAMPLE_DECODE = 'VOID ENERGY :: PREMIUM KINETIC TEXT';
-  const SAMPLE_EFFECT =
-    'The darkness crept closer, whispering promises of forgotten power.';
   const SAMPLE_STAGGER =
     'Every character arrives on its own schedule, creating rhythm from timing alone.';
 
@@ -61,67 +59,8 @@
   let replaySentence = $state(0);
   let replaySentencePair = $state(0);
   let replayDecode = $state(0);
-  let replayStyles = $state(0);
-  let replayEffects = $state(0);
   let replayStagger = $state(0);
-  let replayCues = $state(0);
   let replayPlayground = $state(0);
-
-  // ── Reveal styles demo ───────────────────────────────────────────
-
-  const revealStyleOptions: SelectorOption[] = [
-    { value: 'instant', label: 'Instant' },
-    { value: 'fade', label: 'Fade' },
-    { value: 'rise', label: 'Rise' },
-    { value: 'drop', label: 'Drop' },
-    { value: 'scale', label: 'Scale' },
-    { value: 'blur', label: 'Blur' },
-  ];
-
-  let selectedRevealStyle: string | number | null = $state('fade');
-
-  // ── Effects demo ─────────────────────────────────────────────────
-
-  const oneShotEffects: KineticTextEffect[] = [
-    'shake',
-    'quake',
-    'jolt',
-    'glitch',
-    'surge',
-    'warp',
-  ];
-  const continuousEffects: KineticTextEffect[] = [
-    'drift',
-    'flicker',
-    'breathe',
-    'tremble',
-    'pulse',
-    'whisper',
-    'fade',
-    'freeze',
-    'burn',
-    'static',
-    'distort',
-    'sway',
-  ];
-
-  const effectOptions: SelectorOption[] = [
-    { value: '', label: 'None' },
-    ...continuousEffects.map((e) => ({
-      value: e,
-      label: e.charAt(0).toUpperCase() + e.slice(1),
-    })),
-  ];
-
-  const scopeOptions: SelectorOption[] = [
-    { value: 'block', label: 'Block' },
-    { value: 'line', label: 'Line' },
-    { value: 'word', label: 'Word' },
-    { value: 'glyph', label: 'Glyph' },
-  ];
-
-  let selectedEffect: string | number | null = $state('drift');
-  let selectedScope: string | number | null = $state('block');
 
   // ── Stagger demo ─────────────────────────────────────────────────
 
@@ -132,26 +71,39 @@
     'random',
   ];
 
-  // ── Cue demo ─────────────────────────────────────────────────────
+  // ── Interactive playground ───────────────────────────────────────
 
-  const cueDemoText = 'The ground shook. Thunder rolled across the sky!';
-  const cueDemoCues: KineticCue[] = [
-    {
-      id: 'shake-ground',
-      effect: 'shake',
-      scope: 'block',
-      trigger: 'at-time',
-      atMs: 800,
-    },
-    {
-      id: 'end-surge',
-      effect: 'surge',
-      scope: 'block',
-      trigger: 'on-complete',
-    },
+  const revealStyleOptions: SelectorOption[] = [
+    { value: 'instant', label: 'Instant' },
+    { value: 'fade', label: 'Fade' },
+    { value: 'rise', label: 'Rise' },
+    { value: 'drop', label: 'Drop' },
+    { value: 'scale', label: 'Scale' },
+    { value: 'blur', label: 'Blur' },
   ];
 
-  // ── Interactive playground ───────────────────────────────────────
+  const effectOptions: SelectorOption[] = [
+    { value: '', label: 'None' },
+    { value: 'drift', label: 'Drift' },
+    { value: 'flicker', label: 'Flicker' },
+    { value: 'breathe', label: 'Breathe' },
+    { value: 'tremble', label: 'Tremble' },
+    { value: 'pulse', label: 'Pulse' },
+    { value: 'whisper', label: 'Whisper' },
+    { value: 'fade', label: 'Fade' },
+    { value: 'freeze', label: 'Freeze' },
+    { value: 'burn', label: 'Burn' },
+    { value: 'static', label: 'Static' },
+    { value: 'distort', label: 'Distort' },
+    { value: 'sway', label: 'Sway' },
+  ];
+
+  const scopeOptions: SelectorOption[] = [
+    { value: 'block', label: 'Block' },
+    { value: 'line', label: 'Line' },
+    { value: 'word', label: 'Word' },
+    { value: 'glyph', label: 'Glyph' },
+  ];
 
   const modeOptions: SelectorOption[] = [
     { value: 'char', label: 'Character' },
@@ -439,37 +391,19 @@
 
 <div class="container flex flex-col gap-2xl py-2xl" bind:this={snapshotEl}>
   <!-- ─── HERO ─────────────────────────────────────────────────────── -->
-  <section class="flex flex-col gap-xl">
-    <div class="surface-raised p-lg flex flex-col gap-lg">
-      <div class="flex flex-col gap-xs">
-        <p class="text-caption text-mute">@dgrslabs/void-energy-kinetic-text</p>
-        <h1>Kinetic Text</h1>
-        <p class="text-dim max-w-3xl">
-          Premium character-level kinetic typography for Void Energy hosts.
-          Per-character DOM rendering, 5 reveal modes, 6 reveal styles, 18
-          narrative effects with granular scope targeting, physics-aware
-          animations, and a cue system for TTS synchronization.
-        </p>
-      </div>
+  <header class="flex flex-col gap-lg items-center text-center">
+    <h1 class="text-primary">Kinetic Text</h1>
 
-      {#if snapshot}
-        <div class="surface-sunk p-lg">
-          {#key replayChar}
-            <KineticText
-              text="The void engine awakens. Every character, every word, alive with purpose."
-              styleSnapshot={snapshot}
-              revealMode="char"
-              revealStyle="fade"
-              activeEffect="drift"
-              effectScope="glyph"
-              cursor
-              speed={55}
-            />
-          {/key}
-        </div>
-      {/if}
-    </div>
-  </section>
+    <p class="text-h3 max-w-3xl">
+      Premium character-level kinetic typography for Void Energy hosts.
+    </p>
+
+    <p class="text-body text-dim max-w-3xl">
+      Per-character DOM rendering, 5 reveal modes, 18 narrative effects with
+      granular scope targeting, physics-aware animations, and a cue system for
+      TTS synchronization.
+    </p>
+  </header>
 
   <!-- ─── REVEAL MODES ─────────────────────────────────────────────── -->
   <section class="flex flex-col gap-xl">
@@ -615,131 +549,6 @@
     </div>
   </section>
 
-  <!-- ─── REVEAL STYLES ────────────────────────────────────────────── -->
-  <section class="flex flex-col gap-xl">
-    <div class="surface-raised p-lg flex flex-col gap-lg">
-      <div class="flex flex-col gap-xs">
-        <h2>Reveal Styles</h2>
-        <p class="text-dim">
-          Each character's entrance animation. Combine with any reveal mode.
-        </p>
-      </div>
-
-      <Selector
-        label="Reveal Style"
-        options={revealStyleOptions}
-        bind:value={selectedRevealStyle}
-        onchange={() => replayStyles++}
-      />
-
-      {#if snapshot}
-        <div class="surface-sunk p-lg">
-          {#key replayStyles}
-            <KineticText
-              text="Watch how each character enters the scene with its own animation."
-              styleSnapshot={snapshot}
-              revealMode="char"
-              revealStyle={selectedRevealStyle as RevealStyle}
-              speed={40}
-              cursor
-            />
-          {/key}
-        </div>
-      {/if}
-
-      <p class="text-caption text-mute px-xs">
-        Styles: <code>instant</code> (no animation), <code>fade</code>
-        (opacity), <code>rise</code> (slide up), <code>drop</code> (fall down),
-        <code>scale</code> (grow in), <code>blur</code> (focus in). Each adapts easing
-        per physics preset.
-      </p>
-    </div>
-  </section>
-
-  <!-- ─── CHARACTER-LEVEL EFFECTS ──────────────────────────────────── -->
-  <section class="flex flex-col gap-xl">
-    <div class="surface-raised p-lg flex flex-col gap-lg">
-      <div class="flex flex-col gap-xs">
-        <h2>Character-Level Effects</h2>
-        <p class="text-dim">
-          The premium package applies effects at granular scopes: block, line,
-          word, or individual glyph. Select a continuous effect and scope to see
-          how per-character DOM enables fine-grained animation targeting.
-        </p>
-      </div>
-
-      <div class="flex flex-wrap gap-md">
-        <Selector
-          label="Continuous Effect"
-          options={effectOptions}
-          bind:value={selectedEffect}
-        />
-        <Selector
-          label="Scope"
-          options={scopeOptions}
-          bind:value={selectedScope}
-        />
-      </div>
-
-      {#if snapshot}
-        <div class="surface-sunk p-lg">
-          <KineticText
-            text={SAMPLE_EFFECT}
-            styleSnapshot={snapshot}
-            revealMode="char"
-            revealStyle="instant"
-            speed={0}
-            activeEffect={selectedEffect
-              ? (selectedEffect as KineticTextEffect)
-              : null}
-            effectScope={selectedScope as EffectScope}
-          />
-        </div>
-      {/if}
-
-      <details>
-        <summary>One-Shot Effects</summary>
-        <div class="p-lg flex flex-col gap-md">
-          <p class="text-dim">
-            One-shot effects play once and auto-cleanup via
-            <code>animationend</code>. Typically triggered by the cue system on
-            reveal completion.
-          </p>
-          <div class="flex flex-wrap gap-sm">
-            {#each oneShotEffects as effect}
-              <span class="surface-sunk p-sm text-caption font-mono">
-                {effect}
-              </span>
-            {/each}
-          </div>
-        </div>
-      </details>
-
-      <details>
-        <summary>Continuous Effects</summary>
-        <div class="p-lg flex flex-col gap-md">
-          <p class="text-dim">
-            Continuous effects loop indefinitely as ambient atmosphere. Applied
-            via the <code>activeEffect</code> prop.
-          </p>
-          <div class="flex flex-wrap gap-sm">
-            {#each continuousEffects as effect}
-              <span class="surface-sunk p-sm text-caption font-mono">
-                {effect}
-              </span>
-            {/each}
-          </div>
-        </div>
-      </details>
-
-      <p class="text-caption text-mute px-xs">
-        Scopes: <code>block</code> (entire text), <code>line</code> (per line),
-        <code>word</code> (per word, skips spaces), <code>glyph</code> (per
-        character), <code>range</code> (arbitrary character range via cues).
-      </p>
-    </div>
-  </section>
-
   <!-- ─── STAGGER PATTERNS ─────────────────────────────────────────── -->
   <section class="flex flex-col gap-xl">
     <div class="surface-raised p-lg flex flex-col gap-lg">
@@ -783,72 +592,6 @@
         distribution), <code>cascade</code> (center-out), <code>random</code>
         (seeded PRNG with retro jitter).
       </p>
-    </div>
-  </section>
-
-  <!-- ─── CUE SYSTEM ──────────────────────────────────────────────── -->
-  <section class="flex flex-col gap-xl">
-    <div class="surface-raised p-lg flex flex-col gap-lg">
-      <div class="flex flex-col gap-xs">
-        <h2>Cue System</h2>
-        <p class="text-dim">
-          Fire one-shot effects at specific times or on reveal completion.
-          Designed for TTS synchronization where word timestamps drive per-word
-          effects as speech progresses.
-        </p>
-      </div>
-
-      {#if snapshot}
-        <div class="flex flex-col gap-xs">
-          <div class="flex items-center justify-between">
-            <h6>Time + Completion Cues</h6>
-            <button class="btn-icon" onclick={() => replayCues++}>
-              <RotateCcw class="icon" data-size="sm" />
-            </button>
-          </div>
-          <div class="surface-sunk p-lg">
-            {#key replayCues}
-              <KineticText
-                text={cueDemoText}
-                styleSnapshot={snapshot}
-                revealMode="word"
-                revealStyle="fade"
-                cues={cueDemoCues}
-                speed={100}
-                charSpeed={6}
-              />
-            {/key}
-          </div>
-          <p class="text-caption text-mute px-xs">
-            <code>shake</code> fires at 800ms (time cue) while text is still
-            revealing. <code>surge</code> fires on completion.
-          </p>
-        </div>
-      {/if}
-
-      <details>
-        <summary>Cue Configuration</summary>
-        <div class="p-lg flex flex-col gap-md">
-          <pre
-            class="surface-sunk p-md text-caption font-mono overflow-x-auto"><code
-              >{`const cues: KineticCue[] = [
-  {
-    id: 'shake-ground',
-    effect: 'shake',
-    scope: 'block',
-    trigger: 'at-time',
-    atMs: 800,
-  },
-  {
-    id: 'end-surge',
-    effect: 'surge',
-    scope: 'block',
-    trigger: 'on-complete',
-  },
-];`}</code
-            ></pre>
-        </div>
-      </details>
     </div>
   </section>
 
