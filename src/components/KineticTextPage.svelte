@@ -1,20 +1,17 @@
 <script lang="ts">
-  import { tick } from 'svelte';
   import { RotateCcw } from '@lucide/svelte';
-  import { voidEngine } from '@adapters/void-engine.svelte';
-  import { narrative } from '@actions/narrative';
   import Selector from '@components/ui/Selector.svelte';
+  import Switcher from '@components/ui/Switcher.svelte';
   import SliderField from '@components/ui/SliderField.svelte';
+  import Toggle from '@components/ui/Toggle.svelte';
   import IconBtn from '@components/ui/IconBtn.svelte';
   import PlayPause from '@components/icons/PlayPause.svelte';
   import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
   import { createVoidEnergyTextStyleSnapshot } from '@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host';
   import type {
     KineticTextEffect,
-    EffectScope,
     RevealMode,
     RevealStyle,
-    StaggerPattern,
     KineticCue,
     TextStyleSnapshot,
   } from '@dgrslabs/void-energy-kinetic-text/types';
@@ -49,8 +46,14 @@
   const SAMPLE_SENTENCE =
     'The ancient door groaned open. Light spilled across the stone floor. Something moved in the shadows beyond.';
   const SAMPLE_DECODE = 'VOID ENERGY :: PREMIUM KINETIC TEXT';
-  const SAMPLE_STAGGER =
-    'Every character arrives on its own schedule, creating rhythm from timing alone.';
+  const SAMPLE_SCRAMBLE =
+    'Letters scattered across dimensions reassemble into meaning.';
+  const SAMPLE_RISE =
+    'From the depths below, each letter climbs toward the light.';
+  const SAMPLE_DROP =
+    'Gravity pulls every word into place, heavy and deliberate.';
+  const SAMPLE_RANDOM =
+    'Chaos snaps into order. Every glyph finds its home in an instant.';
 
   // ── Replay counters ──────────────────────────────────────────────
 
@@ -59,30 +62,37 @@
   let replaySentence = $state(0);
   let replaySentencePair = $state(0);
   let replayDecode = $state(0);
-  let replayStagger = $state(0);
-  let replayPlayground = $state(0);
+  let replayRevealStyle = $state(0);
+  let replayRevealScramble = $state(0);
+  let replayRevealRise = $state(0);
+  let replayRevealDrop = $state(0);
+  let replayRevealRandom = $state(0);
 
-  // ── Stagger demo ─────────────────────────────────────────────────
+  // ── Interactive Sandbox ──────────────────────────────────────────
 
-  const staggerPatterns: StaggerPattern[] = [
-    'sequential',
-    'wave',
-    'cascade',
-    'random',
+  const SANDBOX_TEXT =
+    'There is a place between the signal and the silence where light forgets its name. Columns of pale geometry rise from nothing, casting shadows that fall upward into a sky made entirely of distance. The air does not move but somehow carries the memory of motion — a low hum, a half-breath, the faintest pressure of something vast deciding whether to arrive. Surfaces shift without changing. Edges soften and re-harden in cycles too slow to watch but too fast to ignore. Somewhere beneath the visible layer, a rhythm persists: not sound, not quite vibration, but the kind of presence that makes dust pause mid-fall. Time here is not broken — it is simply optional. Things happen in the order they choose, and the space between moments stretches wide enough to walk through. Nothing begins. Nothing ends. Everything is already in the middle of becoming something it will never finish being.';
+
+  const sandboxModeOptions: SelectorOption[] = [
+    { value: 'char', label: 'Character' },
+    { value: 'word', label: 'Word' },
+    { value: 'sentence', label: 'Sentence' },
+    { value: 'sentence-pair', label: 'Sentence Pair' },
+    { value: 'decode', label: 'Decode' },
   ];
 
-  // ── Interactive playground ───────────────────────────────────────
-
-  const revealStyleOptions: SelectorOption[] = [
-    { value: 'instant', label: 'Instant' },
-    { value: 'fade', label: 'Fade' },
+  const sandboxRevealStyleOptions: SelectorOption[] = [
+    { value: 'auto', label: 'Auto (Physics)' },
+    { value: 'blur', label: 'Blur' },
+    { value: 'scale', label: 'Scale' },
+    { value: 'scramble', label: 'Scramble' },
     { value: 'rise', label: 'Rise' },
     { value: 'drop', label: 'Drop' },
-    { value: 'scale', label: 'Scale' },
-    { value: 'blur', label: 'Blur' },
+    { value: 'random', label: 'Random' },
+    { value: 'instant', label: 'Instant' },
   ];
 
-  const effectOptions: SelectorOption[] = [
+  const sandboxContinuousOptions: SelectorOption[] = [
     { value: '', label: 'None' },
     { value: 'drift', label: 'Drift' },
     { value: 'flicker', label: 'Flicker' },
@@ -96,51 +106,82 @@
     { value: 'static', label: 'Static' },
     { value: 'distort', label: 'Distort' },
     { value: 'sway', label: 'Sway' },
+    { value: 'glow', label: 'Glow' },
+    { value: 'wave', label: 'Wave' },
+    { value: 'float', label: 'Float' },
+    { value: 'wobble', label: 'Wobble' },
+    { value: 'sparkle', label: 'Sparkle' },
+    { value: 'drip', label: 'Drip' },
+    { value: 'stretch', label: 'Stretch' },
+    { value: 'vibrate', label: 'Vibrate' },
+    { value: 'haunt', label: 'Haunt' },
   ];
 
-  const scopeOptions: SelectorOption[] = [
-    { value: 'block', label: 'Block' },
-    { value: 'line', label: 'Line' },
-    { value: 'word', label: 'Word' },
-    { value: 'glyph', label: 'Glyph' },
+  const sandboxOneShotOptions: SelectorOption[] = [
+    { value: '', label: 'None' },
+    { value: 'shake', label: 'Shake' },
+    { value: 'quake', label: 'Quake' },
+    { value: 'jolt', label: 'Jolt' },
+    { value: 'glitch', label: 'Glitch' },
+    { value: 'surge', label: 'Surge' },
+    { value: 'warp', label: 'Warp' },
+    { value: 'explode', label: 'Explode' },
+    { value: 'collapse', label: 'Collapse' },
+    { value: 'scatter', label: 'Scatter' },
+    { value: 'spin', label: 'Spin' },
+    { value: 'bounce', label: 'Bounce' },
+    { value: 'flash', label: 'Flash' },
+    { value: 'shatter', label: 'Shatter' },
+    { value: 'vortex', label: 'Vortex' },
+    { value: 'ripple', label: 'Ripple' },
+    { value: 'slam', label: 'Slam' },
   ];
 
-  const modeOptions: SelectorOption[] = [
-    { value: 'char', label: 'Character' },
-    { value: 'word', label: 'Word' },
-    { value: 'sentence', label: 'Sentence' },
-    { value: 'sentence-pair', label: 'Sentence Pair' },
-    { value: 'decode', label: 'Decode' },
-  ];
+  let sbMode: string | number | null = $state('word');
+  let sbRevealStyle: string | number | null = $state('auto');
+  let sbContinuous: string | number | null = $state('');
+  let sbOneShot: string | number | null = $state('');
+  let sbSpeed = $state(80);
+  let sbCursor = $state(false);
+  let sbPaused = $state(false);
+  let sbReplay = $state(0);
+  let sbOneShotFire = $state(0);
 
-  let pgMode: string | number | null = $state('char');
-  let pgStyle: string | number | null = $state('fade');
-  let pgEffect: string | number | null = $state('');
-  let pgScope: string | number | null = $state('block');
-  let pgStagger: string | number | null = $state('sequential');
-  let pgSpeed = $state(200);
-  let pgCharSpeed = $state(8);
-  let pgRevealDuration = $state(300);
-  let pgCursor = $state(true);
+  function fireOneShot() {
+    if (!sbOneShot) return;
+    sbOneShotFire++;
+  }
 
-  const staggerOptions: SelectorOption[] = staggerPatterns.map((p) => ({
-    value: p,
-    label: p.charAt(0).toUpperCase() + p.slice(1),
-  }));
+  function replaySandbox() {
+    sbPaused = false;
+    sbOneShotFire = 0;
+    sbReplay++;
+  }
 
-  const PLAYGROUND_TEXT =
-    'In the depths of the void, energy pulses through crystalline networks. Each node hums with purpose, carrying data across infinite dark. The system breathes. The system lives.';
+  function togglePause() {
+    sbPaused = !sbPaused;
+  }
 
   // ── Narrative effects demo data ────────────────────────────────
 
-  type OneShotNarrativeEffect =
+  type OneShotEffect =
     | 'shake'
     | 'quake'
     | 'jolt'
     | 'glitch'
     | 'surge'
-    | 'warp';
-  type ContinuousNarrativeEffect =
+    | 'warp'
+    | 'explode'
+    | 'collapse'
+    | 'scatter'
+    | 'spin'
+    | 'bounce'
+    | 'flash'
+    | 'shatter'
+    | 'vortex'
+    | 'ripple'
+    | 'slam';
+  type ContinuousEffect =
     | 'drift'
     | 'flicker'
     | 'breathe'
@@ -154,7 +195,7 @@
     | 'distort'
     | 'sway';
 
-  interface NarrativeDemo<T extends NarrativeEffect> {
+  interface EffectDemo<T extends KineticTextEffect> {
     effect: T;
     label: string;
     context: string;
@@ -205,7 +246,79 @@
       text: 'The doorway stretched sideways, pulled itself thin, and snapped her through before she could scream.',
       note: 'Horizontal scaleX oscillation with subtle skew for spatial distortion.',
     },
-  ] satisfies NarrativeDemo<OneShotNarrativeEffect>[];
+    {
+      effect: 'explode',
+      label: 'Explode',
+      context: 'Detonation, supernova, rage unleashed, catastrophic failure',
+      text: 'The reactor core breached and the entire deck erupted outward in a bloom of white fire.',
+      note: 'Radial blast — each character flies outward from center with full rotation, then reassembles.',
+    },
+    {
+      effect: 'collapse',
+      label: 'Collapse',
+      context: 'Building demolition, cave-in, defeat, structural failure',
+      text: 'The ceiling gave way in slow sections, each beam dragging the next down into rubble.',
+      note: 'Gravity-driven fall with tumbling rotation. Characters drop and spring back.',
+    },
+    {
+      effect: 'scatter',
+      label: 'Scatter',
+      context:
+        'Wind dispersal, crowd fleeing, memory fragmenting, ash drifting',
+      text: 'The ashes caught the wind and drifted apart, each fragment carrying a piece of what was.',
+      note: 'Gentle drift in random directions with slow rotation and fade. Softer than explode.',
+    },
+    {
+      effect: 'spin',
+      label: 'Spin',
+      context:
+        'Vertigo, tornado, magical transformation, mechanical activation',
+      text: 'The lock mechanism turned and every gear in the vault door began to spin in sequence.',
+      note: 'Full 360° rotation per character with scale pulse at midpoint. Staggered domino wave.',
+    },
+    {
+      effect: 'bounce',
+      label: 'Bounce',
+      context: 'Landing impact, playful energy, rubber physics, ground pound',
+      text: 'She hit the trampoline and the whole surface launched her three stories into the air.',
+      note: 'Characters drop, hit a floor, and bounce with decreasing amplitude. Elastic timing.',
+    },
+    {
+      effect: 'flash',
+      label: 'Flash',
+      context: 'Lightning, camera flash, revelation, energy discharge',
+      text: 'Lightning split the sky and for one instant everything was visible — every face, every weapon, every lie.',
+      note: 'Quick scale-up pulse with brightness burst rippling across characters. Short and punchy.',
+    },
+    {
+      effect: 'shatter',
+      label: 'Shatter',
+      context: 'Glass breaking, reality cracking, shield failure, ice fracture',
+      text: 'The barrier cracked along invisible fault lines and fell apart like a dropped mirror.',
+      note: 'Sharp angular displacement with skew — like broken glass pieces flying apart and reforming.',
+    },
+    {
+      effect: 'vortex',
+      label: 'Vortex',
+      context: 'Black hole, whirlpool, summoning ritual, dimensional tear',
+      text: 'The air began to spiral inward, pulling sound and light and breath toward a single impossible point.',
+      note: 'Characters spiral inward with accelerating rotation and scale-down, then release back.',
+    },
+    {
+      effect: 'ripple',
+      label: 'Ripple',
+      context: 'Shockwave, water surface, sonic boom, psychic wave',
+      text: 'The impact sent a visible wave through the ground that reached them two heartbeats later.',
+      note: 'Vertical wave propagating left-to-right through text. Phase-based delay creates traveling motion.',
+    },
+    {
+      effect: 'slam',
+      label: 'Slam',
+      context: 'Heavy impact, dramatic entrance, gavel strike, boss landing',
+      text: 'The creature landed from impossible height and the stone crater beneath it spread in every direction.',
+      note: 'Characters scale up huge then slam to normal with downward overshoot. Heavy, impactful.',
+    },
+  ] satisfies EffectDemo<OneShotEffect>[];
 
   const narrativeContinuousDemos = [
     {
@@ -293,21 +406,31 @@
       text: 'The deck rolled beneath her feet and every step became a negotiation with gravity. The horizon tilted left, then right, then left again.',
       note: 'Lateral translateX sine wave. Distinct from drift (vertical) and burn (vertical+skew).',
     },
-  ] satisfies NarrativeDemo<ContinuousNarrativeEffect>[];
+  ] satisfies EffectDemo<ContinuousEffect>[];
 
-  // ── Narrative effects state (KineticText-driven) ────────────────
+  // ── Effects state (KineticText per-character) ────────────────────
 
-  let oneShotReplay = $state<Record<OneShotNarrativeEffect, number>>({
+  let oneShotReplay = $state<Record<OneShotEffect, number>>({
     shake: 0,
     quake: 0,
     jolt: 0,
     glitch: 0,
     surge: 0,
     warp: 0,
+    explode: 0,
+    collapse: 0,
+    scatter: 0,
+    spin: 0,
+    bounce: 0,
+    flash: 0,
+    shatter: 0,
+    vortex: 0,
+    ripple: 0,
+    slam: 0,
   });
 
   let activeContinuousEffects = $state<
-    Record<ContinuousNarrativeEffect, ContinuousNarrativeEffect | null>
+    Record<ContinuousEffect, ContinuousEffect | null>
   >({
     drift: null,
     flicker: null,
@@ -323,87 +446,138 @@
     sway: null,
   });
 
-  const narrativeEffectsEnabled = $derived(
-    voidEngine.userConfig.narrativeEffects,
-  );
-
-  let oneShotScope = $state<string | number | null>('block');
-  let continuousScope = $state<string | number | null>('glyph');
-
-  function toggleNarrativeLoop(effect: ContinuousNarrativeEffect) {
+  function toggleContinuousLoop(effect: ContinuousEffect) {
     activeContinuousEffects[effect] = activeContinuousEffects[effect]
       ? null
       : effect;
   }
 
-  function buildOneShotCue(effect: OneShotNarrativeEffect): KineticCue[] {
+  function buildOneShotCue(effect: OneShotEffect): KineticCue[] {
     return [
       {
         id: `${effect}-punch`,
         effect,
-        scope: oneShotScope as EffectScope,
         trigger: 'on-complete',
       },
     ];
   }
-
-  // ── Narrative test container state ─────────────────────────────
-
-  let testOneShotEffect = $state<OneShotNarrativeEffect>('shake');
-  let activeTestOneShot = $state<OneShotNarrativeEffect | null>(null);
-  let testContinuousEffect = $state<ContinuousNarrativeEffect>('drift');
-  let testContinuousActive = $state(false);
-
-  const narrativeOneShotOptions: SelectorOption[] = [
-    { value: 'shake', label: 'Shake' },
-    { value: 'quake', label: 'Quake' },
-    { value: 'jolt', label: 'Jolt' },
-    { value: 'glitch', label: 'Glitch' },
-    { value: 'surge', label: 'Surge' },
-    { value: 'warp', label: 'Warp' },
-  ];
-
-  const narrativeContinuousOptions: SelectorOption[] = [
-    { value: 'drift', label: 'Drift' },
-    { value: 'flicker', label: 'Flicker' },
-    { value: 'breathe', label: 'Breathe' },
-    { value: 'tremble', label: 'Tremble' },
-    { value: 'pulse', label: 'Pulse' },
-    { value: 'whisper', label: 'Whisper' },
-    { value: 'fade', label: 'Fade' },
-    { value: 'freeze', label: 'Freeze' },
-    { value: 'burn', label: 'Burn' },
-    { value: 'static', label: 'Static' },
-    { value: 'distort', label: 'Distort' },
-    { value: 'sway', label: 'Sway' },
-  ];
-
-  async function playTestOneShot() {
-    activeTestOneShot = null;
-    await tick();
-    activeTestOneShot = testOneShotEffect;
-  }
-
-  function toggleTestContinuous() {
-    testContinuousActive = !testContinuousActive;
-  }
 </script>
 
 <div class="container flex flex-col gap-2xl py-2xl" bind:this={snapshotEl}>
-  <!-- ─── HERO ─────────────────────────────────────────────────────── -->
-  <header class="flex flex-col gap-lg items-center text-center">
-    <h1 class="text-primary">Kinetic Text</h1>
+  <!-- ─── INTERACTIVE SANDBOX ──────────────────────────────────────── -->
+  <section class="flex flex-col gap-xl">
+    <header class="flex flex-col gap-xs items-center text-center">
+      <h1 class="text-primary">Kinetic Text</h1>
+      <p class="text-body text-dim max-w-3xl">
+        Premium character-level kinetic typography. 5 reveal modes, 7 reveal
+        styles, 34 effects, physics-aware motion, and per-character animation
+        parameters.
+      </p>
+    </header>
 
-    <p class="text-h3 max-w-3xl">
-      Premium character-level kinetic typography for Void Energy hosts.
-    </p>
+    <div class="surface-raised p-lg flex flex-col gap-lg">
+      {#if snapshot}
+        <div class="surface-sunk p-lg">
+          {#key sbReplay}
+            <KineticText
+              text={SANDBOX_TEXT}
+              styleSnapshot={snapshot}
+              revealMode={sbMode as RevealMode}
+              revealStyle={sbRevealStyle === 'auto'
+                ? undefined
+                : (sbRevealStyle as RevealStyle)}
+              activeEffect={sbContinuous
+                ? (sbContinuous as KineticTextEffect)
+                : null}
+              speed={sbSpeed}
+              cursor={sbCursor}
+              paused={sbPaused}
+              oneShotEffect={sbOneShot
+                ? (sbOneShot as KineticTextEffect)
+                : null}
+              oneShotTrigger={sbOneShotFire}
+            />
+          {/key}
+        </div>
+      {/if}
 
-    <p class="text-body text-dim max-w-3xl">
-      Per-character DOM rendering, 5 reveal modes, 18 narrative effects with
-      granular scope targeting, physics-aware animations, and a cue system for
-      TTS synchronization.
-    </p>
-  </header>
+      <!-- Reveal settings -->
+      <div class="flex flex-col gap-xs">
+        <h6 class="text-mute">Reveal</h6>
+        <div class="flex flex-wrap items-end gap-md">
+          <Selector
+            label="Mode"
+            options={sandboxModeOptions}
+            bind:value={sbMode}
+            onchange={() => replaySandbox()}
+          />
+          <Selector
+            label="Reveal Style"
+            options={sandboxRevealStyleOptions}
+            bind:value={sbRevealStyle}
+            onchange={() => replaySandbox()}
+          />
+          <SliderField
+            label="Speed"
+            bind:value={sbSpeed}
+            min={10}
+            max={500}
+            step={10}
+            presets={[
+              { value: 40, label: 'Fast' },
+              { value: 80, label: 'Normal' },
+              { value: 400, label: 'Slow' },
+            ]}
+          />
+          <Toggle label="Cursor" bind:checked={sbCursor} hideIcons />
+        </div>
+      </div>
+
+      <!-- Effects -->
+      <div class="flex flex-col gap-xs">
+        <h6 class="text-mute">Effects</h6>
+        <div class="flex flex-wrap items-end gap-md">
+          <Selector
+            label="Continuous"
+            options={sandboxContinuousOptions}
+            bind:value={sbContinuous}
+          />
+          <div class="flex items-end gap-sm">
+            <Selector
+              label="One-Shot"
+              options={sandboxOneShotOptions}
+              bind:value={sbOneShot}
+            />
+            <IconBtn
+              aria-label="Fire one-shot effect"
+              icon={PlayPause}
+              onclick={fireOneShot}
+              disabled={!sbOneShot}
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Playback controls -->
+      <div class="flex items-center gap-md">
+        <IconBtn
+          aria-label={sbPaused ? 'Resume' : 'Pause'}
+          icon={PlayPause}
+          onclick={togglePause}
+          iconProps={{
+            'data-paused': sbPaused ? undefined : 'true',
+          }}
+        />
+        <button
+          class="btn-icon"
+          aria-label="Replay from beginning"
+          onclick={replaySandbox}
+        >
+          <RotateCcw class="icon" data-size="sm" />
+        </button>
+      </div>
+    </div>
+  </section>
 
   <!-- ─── REVEAL MODES ─────────────────────────────────────────────── -->
   <section class="flex flex-col gap-xl">
@@ -431,8 +605,6 @@
                 text={SAMPLE_CHAR}
                 styleSnapshot={snapshot}
                 revealMode="char"
-                revealStyle="instant"
-                cursor
                 speed={55}
               />
             {/key}
@@ -457,7 +629,6 @@
                 text={SAMPLE_WORD}
                 styleSnapshot={snapshot}
                 revealMode="word"
-                revealStyle="fade"
                 speed={80}
                 charSpeed={8}
               />
@@ -483,7 +654,6 @@
                 text={SAMPLE_SENTENCE}
                 styleSnapshot={snapshot}
                 revealMode="sentence"
-                revealStyle="rise"
                 speed={200}
                 charSpeed={6}
               />
@@ -509,7 +679,6 @@
                 text={SAMPLE_SENTENCE}
                 styleSnapshot={snapshot}
                 revealMode="sentence-pair"
-                revealStyle="fade"
                 speed={300}
                 charSpeed={6}
               />
@@ -549,49 +718,145 @@
     </div>
   </section>
 
-  <!-- ─── STAGGER PATTERNS ─────────────────────────────────────────── -->
+  <!-- ─── REVEAL STYLES ─────────────────────────────────────────────── -->
   <section class="flex flex-col gap-xl">
     <div class="surface-raised p-lg flex flex-col gap-lg">
       <div class="flex flex-col gap-xs">
-        <h2>Stagger Patterns</h2>
+        <h2>Reveal Styles</h2>
         <p class="text-dim">
-          Control the timing distribution across characters. Each pattern
-          creates a different visual rhythm.
+          Seven visual transitions for how characters enter the viewport. Each
+          style uses per-character parameters for organic, unique motion.
+          Physics presets auto-select blur (glass), scale (flat), or instant
+          (retro) — or override explicitly.
         </p>
       </div>
 
       {#if snapshot}
-        <div class="flex flex-col gap-lg">
-          {#each staggerPatterns as pattern}
-            <div class="flex flex-col gap-xs">
-              <div class="flex items-center justify-between">
-                <h6 class="capitalize">{pattern}</h6>
-                <button class="btn-icon" onclick={() => replayStagger++}>
-                  <RotateCcw class="icon" data-size="sm" />
-                </button>
-              </div>
-              <div class="surface-sunk p-lg">
-                {#key replayStagger}
-                  <KineticText
-                    text={SAMPLE_STAGGER}
-                    styleSnapshot={snapshot}
-                    revealMode="char"
-                    revealStyle="fade"
-                    staggerPattern={pattern}
-                    speed={30}
-                  />
-                {/key}
-              </div>
-            </div>
-          {/each}
+        <!-- Auto (physics default) -->
+        <div class="flex flex-col gap-xs">
+          <div class="flex items-center justify-between">
+            <h6>Auto (Physics Default)</h6>
+            <button class="btn-icon" onclick={() => replayRevealStyle++}>
+              <RotateCcw class="icon" data-size="sm" />
+            </button>
+          </div>
+          <div class="surface-sunk p-lg">
+            {#key replayRevealStyle}
+              <KineticText
+                text="Physics chooses the reveal. Glass uses blur, flat uses scale, retro is instant."
+                styleSnapshot={snapshot}
+                revealMode="char"
+                speed={45}
+              />
+            {/key}
+          </div>
+          <p class="text-caption text-mute px-xs">
+            Glass = blur dissipation, Flat = scale up, Retro = instant. The
+            default when no <code>revealStyle</code> is set.
+          </p>
+        </div>
+
+        <!-- Scramble -->
+        <div class="flex flex-col gap-xs">
+          <div class="flex items-center justify-between">
+            <h6>Scramble</h6>
+            <button class="btn-icon" onclick={() => replayRevealScramble++}>
+              <RotateCcw class="icon" data-size="sm" />
+            </button>
+          </div>
+          <div class="surface-sunk p-lg">
+            {#key replayRevealScramble}
+              <KineticText
+                text={SAMPLE_SCRAMBLE}
+                styleSnapshot={snapshot}
+                revealStyle="scramble"
+                revealMode="char"
+                speed={45}
+              />
+            {/key}
+          </div>
+          <p class="text-caption text-mute px-xs">
+            Each character flies in from a random position and rotation,
+            settling with spring overshoot. Wide radius, heavy rotation.
+          </p>
+        </div>
+
+        <!-- Rise -->
+        <div class="flex flex-col gap-xs">
+          <div class="flex items-center justify-between">
+            <h6>Rise</h6>
+            <button class="btn-icon" onclick={() => replayRevealRise++}>
+              <RotateCcw class="icon" data-size="sm" />
+            </button>
+          </div>
+          <div class="surface-sunk p-lg">
+            {#key replayRevealRise}
+              <KineticText
+                text={SAMPLE_RISE}
+                styleSnapshot={snapshot}
+                revealStyle="rise"
+                revealMode="char"
+                speed={45}
+              />
+            {/key}
+          </div>
+          <p class="text-caption text-mute px-xs">
+            Characters ascend from below with slight rotation and scale. Glass
+            adds blur trail during ascent. Elegant, uplifting entrance.
+          </p>
+        </div>
+
+        <!-- Drop -->
+        <div class="flex flex-col gap-xs">
+          <div class="flex items-center justify-between">
+            <h6>Drop</h6>
+            <button class="btn-icon" onclick={() => replayRevealDrop++}>
+              <RotateCcw class="icon" data-size="sm" />
+            </button>
+          </div>
+          <div class="surface-sunk p-lg">
+            {#key replayRevealDrop}
+              <KineticText
+                text={SAMPLE_DROP}
+                styleSnapshot={snapshot}
+                revealStyle="drop"
+                revealMode="char"
+                speed={45}
+              />
+            {/key}
+          </div>
+          <p class="text-caption text-mute px-xs">
+            Characters fall from above with gravity feel. Overshoots on landing
+            with a subtle bounce. Heavy, deliberate entrance.
+          </p>
+        </div>
+
+        <!-- Random -->
+        <div class="flex flex-col gap-xs">
+          <div class="flex items-center justify-between">
+            <h6>Random</h6>
+            <button class="btn-icon" onclick={() => replayRevealRandom++}>
+              <RotateCcw class="icon" data-size="sm" />
+            </button>
+          </div>
+          <div class="surface-sunk p-lg">
+            {#key replayRevealRandom}
+              <KineticText
+                text={SAMPLE_RANDOM}
+                styleSnapshot={snapshot}
+                revealStyle="random"
+                revealMode="char"
+                speed={30}
+              />
+            {/key}
+          </div>
+          <p class="text-caption text-mute px-xs">
+            Characters pop in from random offsets — fast, chaotic entrance.
+            Tighter radius and faster duration than scramble. Snappy and
+            energetic.
+          </p>
         </div>
       {/if}
-
-      <p class="text-caption text-mute px-xs">
-        <code>sequential</code> (left to right), <code>wave</code> (sine
-        distribution), <code>cascade</code> (center-out), <code>random</code>
-        (seeded PRNG with retro jitter).
-      </p>
     </div>
   </section>
 
@@ -599,13 +864,12 @@
   <section class="flex flex-col gap-xl">
     <div class="surface-raised p-lg flex flex-col gap-lg">
       <div class="flex flex-col gap-xs">
-        <h2>Narrative Effects</h2>
+        <h2>Per-Character Effects</h2>
         <p class="text-dim">
-          18 narrative effects rendered through per-character DOM. One-shot
-          effects fire via the cue system after reveal completes; continuous
-          effects loop at any scope — block, line, word, or individual glyph.
-          Switch scopes to see how character-level targeting transforms each
-          effect.
+          28 effects with unique per-character animation parameters. Every
+          character gets its own displacement, rotation, and timing — creating
+          organic, alive motion. One-shot effects fire via the cue system after
+          reveal completes; continuous effects loop immediately.
         </p>
       </div>
 
@@ -621,38 +885,30 @@
             <code>activeEffect</code> prop with instant reveal.
           </p>
           <p>
-            The scope selector controls targeting granularity. At
-            <strong>glyph</strong> scope, each character animates independently
-            — drift becomes a wave of individually floating letters, tremble
-            gives each glyph its own micro-vibration. At
-            <strong>block</strong> scope, the entire text moves as one unit.
-            <strong>Line</strong> and <strong>word</strong> scopes fall between the
-            two.
+            Every character receives unique CSS custom properties (<code
+              >--kt-dx</code
+            >, <code>--kt-dy</code>,
+            <code>--kt-rotate</code>, <code>--kt-scale</code>, etc.) computed by
+            a seeded PRNG. Parametric keyframes read these variables, so the
+            same animation produces different motion per character — shake makes
+            each letter jitter with its own amplitude, drift floats each
+            character at a different height.
           </p>
           <p>
             Physics styling adapts automatically. Glass adds motion blur on
             displacement-heavy effects, flat keeps the raw curves clean, and
-            retro applies per-effect stepped timing. The long-form test
-            containers below use the <code>use:narrative</code> action for block-level
-            comparison.
+            retro applies per-effect stepped timing.
           </p>
         </div>
       </details>
 
       <div class="flex flex-col gap-md">
-        <div class="flex items-end justify-between gap-md">
-          <div class="flex flex-col gap-xs">
-            <h5>One-Shot Effects</h5>
-            <p class="text-caption text-mute">
-              Punctuation moments. Text reveals word-by-word, then the effect
-              fires via the cue system on completion.
-            </p>
-          </div>
-          <Selector
-            label="Scope"
-            options={scopeOptions}
-            bind:value={oneShotScope}
-          />
+        <div class="flex flex-col gap-xs">
+          <h5>One-Shot Effects</h5>
+          <p class="text-caption text-mute">
+            Punctuation moments. Text reveals word-by-word, then each character
+            animates independently via the cue system on completion.
+          </p>
         </div>
 
         {#if snapshot}
@@ -676,10 +932,9 @@
                   <KineticText
                     text={demo.text}
                     styleSnapshot={snapshot}
-                    revealMode="word"
-                    revealStyle="rise"
-                    speed={80}
-                    charSpeed={8}
+                    revealMode="char"
+                    revealStyle="instant"
+                    stagger={0}
                     cues={buildOneShotCue(demo.effect)}
                   />
                 {/key}
@@ -692,20 +947,12 @@
       </div>
 
       <div class="flex flex-col gap-md">
-        <div class="flex items-end justify-between gap-md">
-          <div class="flex flex-col gap-xs">
-            <h5>Continuous Effects</h5>
-            <p class="text-caption text-mute">
-              Sustained atmosphere loops at character level. Toggle each effect
-              to see per-glyph motion — compare with block scope via the
-              selector.
-            </p>
-          </div>
-          <Selector
-            label="Scope"
-            options={scopeOptions}
-            bind:value={continuousScope}
-          />
+        <div class="flex flex-col gap-xs">
+          <h5>Continuous Effects</h5>
+          <p class="text-caption text-mute">
+            Sustained atmosphere loops. Each character animates independently
+            with unique parameters — toggle to see per-character motion.
+          </p>
         </div>
 
         {#if snapshot}
@@ -724,7 +971,7 @@
                       ? 'Stop'
                       : 'Start'}
                     aria-pressed={Boolean(activeContinuousEffects[demo.effect])}
-                    onclick={() => toggleNarrativeLoop(demo.effect)}
+                    onclick={() => toggleContinuousLoop(demo.effect)}
                     iconProps={{
                       'data-paused': activeContinuousEffects[demo.effect]
                         ? 'true'
@@ -737,10 +984,8 @@
                   text={demo.text}
                   styleSnapshot={snapshot}
                   revealMode="char"
-                  revealStyle="instant"
                   speed={0}
                   activeEffect={activeContinuousEffects[demo.effect]}
-                  effectScope={continuousScope as EffectScope}
                 />
 
                 <p class="text-caption text-mute">{demo.note}</p>
@@ -748,157 +993,6 @@
             {/each}
           </div>
         {/if}
-      </div>
-
-      <div class="flex flex-col gap-md">
-        <div class="flex flex-col gap-xs">
-          <h5>Long-Form Test</h5>
-          <p class="text-caption text-mute">
-            Scrollable text containers for testing effects on longer passages.
-            Pick an effect, then scroll through to see how it reads at scale.
-          </p>
-        </div>
-
-        <div class="grid gap-lg large-desktop:grid-cols-2">
-          <div class="flex flex-col gap-md">
-            <div class="flex items-end gap-sm">
-              <Selector
-                label="One-Shot"
-                options={narrativeOneShotOptions}
-                bind:value={testOneShotEffect}
-                onchange={() => {
-                  playTestOneShot();
-                }}
-                class="flex-1"
-              />
-              <IconBtn
-                aria-label="Play"
-                icon={PlayPause}
-                onclick={playTestOneShot}
-              />
-            </div>
-
-            <div class="surface-sunk narrative-test-scroll">
-              <div
-                class="flex flex-col gap-md"
-                use:narrative={{
-                  effect: activeTestOneShot,
-                  enabled: narrativeEffectsEnabled,
-                  onComplete: () => {
-                    activeTestOneShot = null;
-                  },
-                }}
-              >
-                <p>
-                  The corridor stretched on for what felt like hours. Every few
-                  steps the overhead lights would buzz and settle, buzz and
-                  settle, casting long unsteady shadows across the concrete
-                  floor. There was no sound except the distant hum of
-                  ventilation and the quiet percussion of their own footsteps
-                  echoing off bare walls.
-                </p>
-                <p>
-                  At the far end a heavy blast door stood half-open, a sliver of
-                  pale blue light spilling through the gap. Beyond it they could
-                  see a chamber — vast, empty, its ceiling lost in darkness. The
-                  floor was polished stone, cracked in places, with hairline
-                  fractures radiating out from a central point like the memory
-                  of an impact.
-                </p>
-                <p>
-                  She pressed her palm flat against the door and pushed. The
-                  metal groaned, reluctant, then gave way with a low shudder
-                  that traveled up through her arm and into her teeth. The sound
-                  rolled through the chamber and came back changed — deeper,
-                  longer, as if the room itself had answered.
-                </p>
-                <p>
-                  Something was different about the air in here. It tasted of
-                  ozone and old copper, the kind of atmosphere that settles into
-                  places where energy has been spent violently and never quite
-                  dissipated. The cracks in the floor glowed faintly, a dull
-                  amber that pulsed once and faded.
-                </p>
-                <p>
-                  They stood at the threshold for a long time, neither speaking,
-                  both aware that whatever had happened in this room was not
-                  finished. The silence was not empty — it was patient. It was
-                  waiting for the next sentence to arrive.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-md">
-            <div class="flex items-end gap-sm">
-              <Selector
-                label="Continuous"
-                options={narrativeContinuousOptions}
-                bind:value={testContinuousEffect}
-                onchange={() => {
-                  testContinuousActive = true;
-                }}
-                class="flex-1"
-              />
-              <IconBtn
-                icon={PlayPause}
-                aria-label={testContinuousActive ? 'Stop' : 'Start'}
-                aria-pressed={testContinuousActive}
-                onclick={toggleTestContinuous}
-                iconProps={{
-                  'data-paused': testContinuousActive ? 'true' : undefined,
-                }}
-              />
-            </div>
-
-            <div class="surface-sunk narrative-test-scroll">
-              <div
-                class="flex flex-col gap-md"
-                use:narrative={{
-                  effect: testContinuousActive ? testContinuousEffect : null,
-                  enabled: narrativeEffectsEnabled,
-                }}
-              >
-                <p>
-                  The lake had no edges that she could see. It simply went on,
-                  silver and flat, until it became indistinguishable from the
-                  low-hanging sky. The boat rocked gently beneath her — not from
-                  wind, there was no wind, but from some deep slow rhythm in the
-                  water itself, as if the lake were breathing.
-                </p>
-                <p>
-                  A lantern hung from the prow on a rusted hook, its flame
-                  barely moving. The light it cast was warm and small, touching
-                  only the nearest few inches of water before surrendering to
-                  the grey. She trailed her fingers over the side and watched
-                  the ripples spread outward in perfect circles that never came
-                  back.
-                </p>
-                <p>
-                  Somewhere beneath the surface, very far down, something
-                  luminous drifted. It was too deep to have a shape — just a
-                  slow greenish glow that moved like a thought trying to
-                  surface. She watched it for a long time, and it watched her
-                  back, and neither of them blinked.
-                </p>
-                <p>
-                  The silence here was not the silence of absence. It was thick,
-                  textured, full of tiny sounds folded into one another: the
-                  creak of old wood, the soft lap of water against the hull, a
-                  distant tone that might have been a bell or might have been
-                  her own pulse amplified by the stillness.
-                </p>
-                <p>
-                  She closed her eyes and let the boat carry her. There was no
-                  current but the boat moved anyway, slow and sure, as if it
-                  knew where she needed to go even when she did not. The lantern
-                  flickered once, then steadied. The glow beneath the water
-                  followed like a companion.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <details>
@@ -955,6 +1049,77 @@
                 <dd class="text-small text-mute">
                   Horizontal scaleX oscillation with subtle skew. Teleportation,
                   portal entry, dimensional shift, time warp, gravity anomaly.
+                </dd>
+              </div>
+              <div>
+                <dt><code>explode</code> — Radial Blast</dt>
+                <dd class="text-small text-mute">
+                  Characters fly outward from center with full rotation and
+                  scale-to-zero, then reassemble. Detonations, supernovae,
+                  catastrophic failure.
+                </dd>
+              </div>
+              <div>
+                <dt><code>collapse</code> — Gravity Fall</dt>
+                <dd class="text-small text-mute">
+                  Characters fall downward with tumbling rotation, then spring
+                  back. Building demolition, cave-ins, structural failure.
+                </dd>
+              </div>
+              <div>
+                <dt><code>scatter</code> — Gentle Dispersal</dt>
+                <dd class="text-small text-mute">
+                  Characters drift apart in random directions with slow rotation
+                  and fade. Wind dispersal, memory fragmenting, ash drifting.
+                </dd>
+              </div>
+              <div>
+                <dt><code>spin</code> — Full Rotation</dt>
+                <dd class="text-small text-mute">
+                  Each character does a full 360° rotation with scale pulse.
+                  Staggered domino wave. Vertigo, mechanical activation.
+                </dd>
+              </div>
+              <div>
+                <dt><code>bounce</code> — Elastic Impact</dt>
+                <dd class="text-small text-mute">
+                  Characters drop, hit a floor, and bounce with decreasing
+                  amplitude. Landing impacts, playful energy, ground pounds.
+                </dd>
+              </div>
+              <div>
+                <dt><code>flash</code> — Brightness Burst</dt>
+                <dd class="text-small text-mute">
+                  Quick scale-up pulse with brightness burst rippling across
+                  characters. Lightning, camera flash, energy discharge.
+                </dd>
+              </div>
+              <div>
+                <dt><code>shatter</code> — Fragmentation</dt>
+                <dd class="text-small text-mute">
+                  Sharp angular displacement with skew, like broken glass
+                  pieces. Glass breaking, reality cracking, shield failure.
+                </dd>
+              </div>
+              <div>
+                <dt><code>vortex</code> — Spiral Collapse</dt>
+                <dd class="text-small text-mute">
+                  Characters spiral inward with accelerating rotation and
+                  scale-down. Black holes, whirlpools, summoning rituals.
+                </dd>
+              </div>
+              <div>
+                <dt><code>ripple</code> — Traveling Wave</dt>
+                <dd class="text-small text-mute">
+                  Vertical wave propagating left-to-right through text.
+                  Shockwaves, water surfaces, sonic booms.
+                </dd>
+              </div>
+              <div>
+                <dt><code>slam</code> — Heavy Impact</dt>
+                <dd class="text-small text-mute">
+                  Characters scale up huge then slam to normal with overshoot.
+                  Heavy impacts, dramatic entrances, boss landings.
                 </dd>
               </div>
             </dl>
@@ -1069,129 +1234,4 @@
       </details>
     </div>
   </section>
-
-  <!-- ─── INTERACTIVE PLAYGROUND ───────────────────────────────────── -->
-  <section class="flex flex-col gap-xl">
-    <div class="surface-raised p-lg flex flex-col gap-lg">
-      <div class="flex flex-col gap-xs">
-        <h2>Interactive Playground</h2>
-        <p class="text-dim">
-          Combine any reveal mode, style, effect, and stagger pattern. All props
-          adapt to the current atmosphere automatically.
-        </p>
-      </div>
-
-      <div class="flex flex-wrap gap-md">
-        <Selector
-          label="Mode"
-          options={modeOptions}
-          bind:value={pgMode}
-          onchange={() => replayPlayground++}
-        />
-        <Selector
-          label="Style"
-          options={revealStyleOptions}
-          bind:value={pgStyle}
-          onchange={() => replayPlayground++}
-        />
-        <Selector
-          label="Effect"
-          options={effectOptions}
-          bind:value={pgEffect}
-        />
-        <Selector label="Scope" options={scopeOptions} bind:value={pgScope} />
-        <Selector
-          label="Stagger"
-          options={staggerOptions}
-          bind:value={pgStagger}
-          onchange={() => replayPlayground++}
-        />
-      </div>
-
-      <div class="flex flex-wrap gap-md">
-        <SliderField
-          label="Speed"
-          bind:value={pgSpeed}
-          min={10}
-          max={500}
-          step={10}
-          presets={[
-            { value: 40, label: 'Fast' },
-            { value: 200, label: 'Normal' },
-            { value: 400, label: 'Slow' },
-          ]}
-        />
-        <SliderField
-          label="Reveal Duration"
-          bind:value={pgRevealDuration}
-          min={100}
-          max={1000}
-          step={50}
-          presets={[
-            { value: 150, label: 'Quick' },
-            { value: 300, label: 'Normal' },
-            { value: 600, label: 'Long' },
-          ]}
-        />
-      </div>
-
-      <div class="flex items-center gap-md">
-        <label class="flex items-center gap-xs">
-          <input type="checkbox" bind:checked={pgCursor} />
-          <span class="text-small">Cursor</span>
-        </label>
-        <button class="btn-ghost" onclick={() => replayPlayground++}>
-          Replay
-        </button>
-      </div>
-
-      {#if snapshot}
-        <div class="surface-sunk p-lg">
-          {#key replayPlayground}
-            <KineticText
-              text={PLAYGROUND_TEXT}
-              styleSnapshot={snapshot}
-              revealMode={pgMode as RevealMode}
-              revealStyle={pgStyle as RevealStyle}
-              staggerPattern={pgStagger as StaggerPattern}
-              activeEffect={pgEffect ? (pgEffect as KineticTextEffect) : null}
-              effectScope={pgScope as EffectScope}
-              speed={pgSpeed}
-              charSpeed={pgCharSpeed}
-              revealDuration={pgRevealDuration}
-              cursor={pgCursor}
-            />
-          {/key}
-        </div>
-      {/if}
-
-      <details>
-        <summary>Current Props</summary>
-        <div class="p-lg">
-          <pre
-            class="surface-sunk p-md text-caption font-mono overflow-x-auto"><code
-              >{`<KineticText
-  text="..."
-  styleSnapshot={snapshot}
-  revealMode="${pgMode}"
-  revealStyle="${pgStyle}"
-  staggerPattern="${pgStagger}"${pgEffect ? `\n  activeEffect="${pgEffect}"` : ''}${pgEffect ? `\n  effectScope="${pgScope}"` : ''}
-  speed={${pgSpeed}}
-  charSpeed={${pgCharSpeed}}
-  revealDuration={${pgRevealDuration}}${pgCursor ? '\n  cursor' : ''}
-/>`}</code
-            ></pre>
-        </div>
-      </details>
-    </div>
-  </section>
 </div>
-
-<style lang="scss">
-  .narrative-test-scroll {
-    max-height: 320px; // void-ignore
-    overflow-y: auto;
-    padding: var(--space-md);
-    flex: 1;
-  }
-</style>

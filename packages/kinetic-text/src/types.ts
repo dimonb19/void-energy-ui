@@ -8,15 +8,30 @@ export type RevealMode =
   | 'sentence-pair'
   | 'decode';
 
+/**
+ * Reveal style controls the visual transition from hidden → visible per glyph.
+ *
+ * - `'blur'` — Glass physics default: fade in with blur dissipation.
+ * - `'scale'` — Flat physics default: scale up from zero.
+ * - `'instant'` — Retro physics default: no animation.
+ * - `'scramble'` — Characters fly in from random positions/rotations and settle.
+ * - `'rise'` — Characters ascend from below into position.
+ * - `'drop'` — Characters fall from above into position with gravity feel.
+ * - `'random'` — Characters pop in from random offsets very fast, chaotic entrance.
+ *
+ * When `revealStyle` is not specified on the component, it is auto-derived
+ * from the active physics preset via `revealStyleForPhysics()`.
+ */
 export type RevealStyle =
   | 'instant'
-  | 'fade'
+  | 'scale'
+  | 'blur'
+  | 'scramble'
   | 'rise'
   | 'drop'
-  | 'scale'
-  | 'blur';
+  | 'random';
 
-export type StaggerPattern = 'sequential' | 'wave' | 'cascade' | 'random';
+export type StaggerPattern = 'sequential';
 
 export type KineticTextEffect =
   | 'shake'
@@ -25,6 +40,16 @@ export type KineticTextEffect =
   | 'glitch'
   | 'surge'
   | 'warp'
+  | 'explode'
+  | 'collapse'
+  | 'scatter'
+  | 'spin'
+  | 'bounce'
+  | 'flash'
+  | 'shatter'
+  | 'vortex'
+  | 'ripple'
+  | 'slam'
   | 'drift'
   | 'flicker'
   | 'breathe'
@@ -36,9 +61,24 @@ export type KineticTextEffect =
   | 'burn'
   | 'static'
   | 'distort'
-  | 'sway';
+  | 'sway'
+  | 'glow'
+  | 'wave'
+  | 'float'
+  | 'wobble'
+  | 'sparkle'
+  | 'drip'
+  | 'stretch'
+  | 'vibrate'
+  | 'haunt';
 
-export type EffectScope = 'block' | 'line' | 'word' | 'glyph' | 'range';
+/** Derive the reveal style from the active physics preset. */
+export function revealStyleForPhysics(physics: PhysicsPreset): RevealStyle {
+  if (physics === 'glass') return 'blur';
+  if (physics === 'flat') return 'scale';
+  return 'instant';
+}
+
 export type ReducedMotionMode = 'auto' | 'always' | 'never';
 export type CueTrigger = 'at-time' | 'on-complete';
 
@@ -104,7 +144,6 @@ export interface TextStyleSnapshotOverrides {
 export interface KineticCue {
   id: string;
   effect: KineticTextEffect;
-  scope: EffectScope;
   trigger: CueTrigger;
   /** Milliseconds from reveal start. Required when `trigger: 'at-time'`. */
   atMs?: number;
@@ -174,7 +213,7 @@ export interface TimelineConfig {
  * ```
  * step.text           → text
  * step.seed (or hash) → seed
- * atmosphere-derived  → revealMode, revealStyle, staggerPattern
+ * atmosphere-derived  → revealMode, staggerPattern (revealStyle auto-derived from physics)
  * VoidEngine state    → styleSnapshot (via createVoidEnergyTextStyleSnapshot)
  * step.narrativeEffect → activeEffect (continuous) or → cues (one-shot)
  * TTS word boundaries → cues with atMs timestamps
@@ -197,7 +236,6 @@ export interface KineticTextProps {
   stagger?: number;
   revealDuration?: number;
   activeEffect?: KineticTextEffect | null;
-  effectScope?: EffectScope;
   cues?: KineticCue[];
   seed?: number;
   reducedMotion?: ReducedMotionMode;
@@ -207,6 +245,11 @@ export interface KineticTextProps {
   speed?: number;
   charSpeed?: number;
   scramblePasses?: number;
+  paused?: boolean;
+  /** Fire a one-shot effect imperatively on the current render. Increment to re-fire. */
+  oneShotEffect?: KineticTextEffect | null;
+  /** Counter — increment to trigger the one-shot. Value of 0 is ignored. */
+  oneShotTrigger?: number;
   onrevealcomplete?: () => void;
   oneffectscomplete?: () => void;
   as?: string;

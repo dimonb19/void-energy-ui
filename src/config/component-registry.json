@@ -213,20 +213,6 @@
         "onCycle?: (index: number, word: string) => void"
       ]
     },
-    "NarrativeConfig": {
-      "source": "src/types/narrative.d.ts",
-      "shape": [
-        "effect: NarrativeEffect | null",
-        "enabled?: boolean",
-        "onComplete?: () => void"
-      ]
-    },
-    "NarrativeEffect": {
-      "source": "src/types/narrative.d.ts",
-      "shape": [
-        "'shake' | 'quake' | 'jolt' | 'glitch' | 'surge' | 'warp' | 'drift' | 'flicker' | 'breathe' | 'tremble' | 'pulse' | 'whisper' | 'fade' | 'freeze' | 'burn' | 'static' | 'distort' | 'sway'"
-      ]
-    },
     "DraggableOptions": {
       "source": "src/types/drag.d.ts",
       "shape": [
@@ -306,8 +292,7 @@
         "scale: number",
         "density: 'high' | 'standard' | 'low'",
         "adaptAtmosphere: boolean",
-        "fixedNav: boolean",
-        "narrativeEffects: boolean"
+        "fixedNav: boolean"
       ]
     },
     "VoidThemeDefinition": {
@@ -1247,18 +1232,6 @@
       "compose": "Use when you need imperative, abortable typing outside Svelte markup or want a promise that resolves when the reveal completes.",
       "example": "const handle = typewrite(node, 'Loading...', { speed: 30 }); handle.abort();"
     },
-    "is-one-shot-effect": {
-      "description": "Predicate that returns true for narrative effects that fire once (shake, jolt, glitch) vs. continuous ambient effects (breathe, pulse).",
-      "category": "motion",
-      "symbol": "isOneShotEffect",
-      "import": "@actions/narrative",
-      "signature": "isOneShotEffect(effect)",
-      "args": ["effect: NarrativeEffect"],
-      "returns": ["boolean"],
-      "related": ["narrative", "kinetic"],
-      "compose": "Use to split one-shot narrative punctuation from continuous ambient effects when pairing narrative with kinetic text reveals.",
-      "example": "const ambient = isOneShotEffect(effect) ? null : effect;"
-    },
     "reorder-by-drop": {
       "description": "Pure function that returns a new array with the dropped item moved to its target position. Use after a between-mode drop event.",
       "category": "drag",
@@ -1323,21 +1296,9 @@
       "signature": "kinetic(node, config)",
       "args": ["config: KineticConfig"],
       "returns": ["{ update(newConfig), destroy() }"],
-      "related": ["typewrite", "narrative", "loading-text-cycler"],
+      "related": ["typewrite", "loading-text-cycler"],
       "compose": "Use for declarative text reveal effects in markup. The action restarts whenever the config object reference changes. For premium character-level reveals, use @dgrslabs/void-energy-kinetic-text instead.",
       "example": "<span use:kinetic={{ text: 'SYSTEM ONLINE', mode: 'decode' }} />"
-    },
-    "narrative": {
-      "description": "Svelte action for ambient text physics effects: shake, glitch, breathe, pulse, drift, and more. One-shot or continuous loop.",
-      "category": "motion",
-      "symbol": "narrative",
-      "import": "@actions/narrative",
-      "signature": "narrative(node, config)",
-      "args": ["config: NarrativeConfig"],
-      "returns": ["{ update(newConfig), destroy() }"],
-      "related": ["kinetic", "is-one-shot-effect"],
-      "compose": "Use for post-reveal ambient text physics. Pair with isOneShotEffect when only punctuation effects should wait for kinetic completion.",
-      "example": "<p use:narrative={{ effect: 'breathe', enabled: voidEngine.userConfig.narrativeEffects }} />"
     },
     "navlink": {
       "description": "Svelte action that adds a loading data-attribute to links during navigation, enabling CSS loading indicators on click.",
@@ -1616,7 +1577,7 @@
         }
       },
       "slots": [],
-      "related": ["themes-button", "modal", "narrative"],
+      "related": ["themes-button", "modal"],
       "compose": "Import the singleton; never instantiate your own engine. Prefer setAtmosphere/setPreferences for normal user flows and the temporary-theme API for previews or story-scoped overrides.",
       "example": "import { voidEngine } from '@adapters/void-engine.svelte'; voidEngine.setAtmosphere('paper');"
     },

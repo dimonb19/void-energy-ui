@@ -66,7 +66,6 @@ export { createVoidEnergyTextStyleSnapshot } from './adapters/void-energy-host.j
 
 export type {
   CueTrigger,
-  EffectScope,
   ModePreset,
   PhysicsPreset,
   ReducedMotionMode,

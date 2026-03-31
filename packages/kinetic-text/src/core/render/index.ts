@@ -4,11 +4,12 @@ import type { CharPosition, UnitState, RenderOptions } from '../../types';
  * CharacterRenderer: builds and manages the DOM tree for the visual and semantic layers.
  *
  * DOM structure:
- *   kt-visual (aria-hidden) > kt-line > kt-word > kt-unit > kt-glyph
+ *   kt-visual (aria-hidden) > kt-line > kt-word > kt-unit > kt-oneshot > kt-glyph
  *   kt-semantic (sr-only, aria-live)
  *
  * kt-word (word wrapper) = word-scope effect target
- * kt-unit (outer) = glyph-scope effect target
+ * kt-unit (outer) = continuous effect target
+ * kt-oneshot (middle) = one-shot effect target (isolates from continuous layer)
  * kt-glyph (inner) = reveal animation target, holds text content
  *
  * Spaces are placed directly in kt-line (not inside kt-word).
@@ -19,6 +20,7 @@ export class CharacterRenderer {
   private lines: HTMLSpanElement[] = [];
   private words: HTMLSpanElement[] = [];
   private units: HTMLSpanElement[] = [];
+  private oneshots: HTMLSpanElement[] = [];
   private glyphs: HTMLSpanElement[] = [];
   private cursorEl: HTMLSpanElement | null = null;
   private collapsed = false;
@@ -33,7 +35,7 @@ export class CharacterRenderer {
   ) {}
 
   /**
-   * Build the full DOM tree: kt-visual > kt-line > kt-unit > kt-glyph, plus kt-semantic.
+   * Build the full DOM tree: kt-visual > kt-line > kt-unit > kt-oneshot > kt-glyph, plus kt-semantic.
    */
   render(): void {
     this.destroy();
@@ -65,8 +67,9 @@ export class CharacterRenderer {
     // Set container min-height to prevent layout shift
     container.style.minHeight = `${lineCount * options.lineHeight}px`;
 
-    // Create units, glyphs, and word wrappers
+    // Create units, oneshots, glyphs, and word wrappers
     this.units = new Array(totalUnits);
+    this.oneshots = new Array(totalUnits);
     this.glyphs = new Array(totalUnits);
     this.words = [];
     this.unitToWord = new Array(totalUnits).fill(-1);
@@ -79,11 +82,15 @@ export class CharacterRenderer {
       const pos = positions[i];
       const phase = totalUnits > 1 ? i / (totalUnits - 1) : 0;
 
-      // Outer: kt-unit (effect layer)
+      // Outer: kt-unit (continuous effect layer)
       const unit = document.createElement('span');
       unit.className = pos.isSpace ? 'kt-unit kt-space' : 'kt-unit';
       unit.setAttribute('data-kt-index', String(i));
       unit.style.setProperty('--kt-phase', phase.toFixed(4));
+
+      // Middle: kt-oneshot (one-shot effect layer)
+      const oneshot = document.createElement('span');
+      oneshot.className = 'kt-oneshot';
 
       // Inner: kt-glyph (reveal layer)
       const glyph = document.createElement('span');
@@ -92,7 +99,8 @@ export class CharacterRenderer {
       glyph.style.setProperty('--kt-delay', '0ms');
       glyph.textContent = pos.char;
 
-      unit.appendChild(glyph);
+      oneshot.appendChild(glyph);
+      unit.appendChild(oneshot);
 
       if (pos.isSpace) {
         // Spaces go directly in the line, closing any open word
@@ -114,6 +122,7 @@ export class CharacterRenderer {
       }
 
       this.units[i] = unit;
+      this.oneshots[i] = oneshot;
       this.glyphs[i] = glyph;
     }
 
@@ -152,6 +161,13 @@ export class CharacterRenderer {
    */
   getGlyph(index: number): HTMLSpanElement | null {
     return this.glyphs[index] ?? null;
+  }
+
+  /**
+   * Get the one-shot effect span at a global character index.
+   */
+  getOneShotEl(index: number): HTMLSpanElement | null {
+    return this.oneshots[index] ?? null;
   }
 
   /**
@@ -237,6 +253,14 @@ export class CharacterRenderer {
         word.removeAttribute('data-kt-effect');
       }
     }
+  }
+
+  /**
+   * Get the current reveal state of a glyph.
+   */
+  getGlyphState(index: number): UnitState {
+    const glyph = this.glyphs[index];
+    return (glyph?.getAttribute('data-kt-state') as UnitState) ?? 'hidden';
   }
 
   /**
@@ -342,6 +366,7 @@ export class CharacterRenderer {
       line.appendChild(document.createTextNode(text));
     }
     this.units = [];
+    this.oneshots = [];
     this.glyphs = [];
     this.words = [];
     this.unitToWord = [];
@@ -368,25 +393,12 @@ export class CharacterRenderer {
         (glyph?.getAttribute('data-kt-state') as UnitState) ?? 'hidden';
     }
 
-    // Capture unit-level effect attributes
+    // Capture unit-level effect attributes (per-char effects are recomputed
+    // by the continuous effect $effect() after positions change, so we only
+    // need to preserve the effect name for the brief re-render window)
     const unitEffects: (string | null)[] = [];
     for (let i = 0; i < this.units.length; i++) {
       unitEffects[i] = this.units[i]?.getAttribute('data-kt-effect') ?? null;
-    }
-
-    // Capture block-level effect
-    const visualEffect = this.visual?.getAttribute('data-kt-effect') ?? null;
-
-    // Capture line-level effects
-    const lineEffects: (string | null)[] = [];
-    for (let i = 0; i < this.lines.length; i++) {
-      lineEffects[i] = this.lines[i]?.getAttribute('data-kt-effect') ?? null;
-    }
-
-    // Capture word-level effects
-    const wordEffects: (string | null)[] = [];
-    for (let i = 0; i < this.words.length; i++) {
-      wordEffects[i] = this.words[i]?.getAttribute('data-kt-effect') ?? null;
     }
 
     this.positions = positions;
@@ -401,25 +413,6 @@ export class CharacterRenderer {
     for (let i = 0; i < Math.min(unitEffects.length, this.units.length); i++) {
       if (unitEffects[i]) {
         this.units[i].setAttribute('data-kt-effect', unitEffects[i]!);
-      }
-    }
-
-    // Restore block effect
-    if (visualEffect && this.visual) {
-      this.visual.setAttribute('data-kt-effect', visualEffect);
-    }
-
-    // Restore line effects
-    for (let i = 0; i < Math.min(lineEffects.length, this.lines.length); i++) {
-      if (lineEffects[i] && this.lines[i]) {
-        this.lines[i].setAttribute('data-kt-effect', lineEffects[i]!);
-      }
-    }
-
-    // Restore word effects
-    for (let i = 0; i < Math.min(wordEffects.length, this.words.length); i++) {
-      if (wordEffects[i] && this.words[i]) {
-        this.words[i].setAttribute('data-kt-effect', wordEffects[i]!);
       }
     }
   }
@@ -439,6 +432,7 @@ export class CharacterRenderer {
     this.lines = [];
     this.words = [];
     this.units = [];
+    this.oneshots = [];
     this.glyphs = [];
     this.unitToWord = [];
     this.cursorEl = null;

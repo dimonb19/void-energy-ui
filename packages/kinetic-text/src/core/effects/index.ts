@@ -1,12 +1,10 @@
-import type { KineticTextEffect, EffectScope } from '../../types';
+import type { KineticTextEffect } from '../../types';
 
 // ── Effect definition ────────────────────────────────────────────
 
 export interface EffectDefinition {
   name: KineticTextEffect;
   category: 'one-shot' | 'continuous';
-  defaultScope: EffectScope;
-  supportedScopes: EffectScope[];
   cssAnimationName: string;
   defaultDuration: number; // ms
 }
@@ -19,170 +17,267 @@ function register(def: EffectDefinition): void {
   EFFECT_REGISTRY.set(def.name, def);
 }
 
-// ── One-shot effects (6) ─────────────────────────────────────────
+// ── One-shot effects (16) ────────────────────────────────────────
 
 register({
   name: 'shake',
   category: 'one-shot',
-  defaultScope: 'block',
-  supportedScopes: ['block', 'line'],
   cssAnimationName: 'kt-effect-shake',
-  defaultDuration: 500,
+  defaultDuration: 600,
 });
 
 register({
   name: 'quake',
   category: 'one-shot',
-  defaultScope: 'block',
-  supportedScopes: ['block'],
   cssAnimationName: 'kt-effect-quake',
-  defaultDuration: 800,
+  defaultDuration: 850,
 });
 
 register({
   name: 'jolt',
   category: 'one-shot',
-  defaultScope: 'block',
-  supportedScopes: ['block'],
   cssAnimationName: 'kt-effect-jolt',
-  defaultDuration: 300,
+  defaultDuration: 500,
 });
 
 register({
   name: 'glitch',
   category: 'one-shot',
-  defaultScope: 'block',
-  supportedScopes: ['block', 'line', 'glyph'],
   cssAnimationName: 'kt-effect-glitch',
-  defaultDuration: 600,
+  defaultDuration: 700,
 });
 
 register({
   name: 'surge',
   category: 'one-shot',
-  defaultScope: 'block',
-  supportedScopes: ['block'],
   cssAnimationName: 'kt-effect-surge',
-  defaultDuration: 500,
+  defaultDuration: 550,
 });
 
 register({
   name: 'warp',
   category: 'one-shot',
-  defaultScope: 'block',
-  supportedScopes: ['block', 'line'],
   cssAnimationName: 'kt-effect-warp',
-  defaultDuration: 600,
+  defaultDuration: 700,
 });
 
-// ── Continuous effects (12) ──────────────────────────────────────
+register({
+  name: 'explode',
+  category: 'one-shot',
+  cssAnimationName: 'kt-effect-explode',
+  defaultDuration: 1000,
+});
+
+register({
+  name: 'collapse',
+  category: 'one-shot',
+  cssAnimationName: 'kt-effect-collapse',
+  defaultDuration: 800,
+});
+
+register({
+  name: 'scatter',
+  category: 'one-shot',
+  cssAnimationName: 'kt-effect-scatter',
+  defaultDuration: 1100,
+});
+
+register({
+  name: 'spin',
+  category: 'one-shot',
+  cssAnimationName: 'kt-effect-spin',
+  defaultDuration: 650,
+});
+
+register({
+  name: 'bounce',
+  category: 'one-shot',
+  cssAnimationName: 'kt-effect-bounce',
+  defaultDuration: 800,
+});
+
+register({
+  name: 'flash',
+  category: 'one-shot',
+  cssAnimationName: 'kt-effect-flash',
+  defaultDuration: 500,
+});
+
+register({
+  name: 'shatter',
+  category: 'one-shot',
+  cssAnimationName: 'kt-effect-shatter',
+  defaultDuration: 900,
+});
+
+register({
+  name: 'vortex',
+  category: 'one-shot',
+  cssAnimationName: 'kt-effect-vortex',
+  defaultDuration: 1000,
+});
+
+register({
+  name: 'ripple',
+  category: 'one-shot',
+  cssAnimationName: 'kt-effect-ripple',
+  defaultDuration: 700,
+});
+
+register({
+  name: 'slam',
+  category: 'one-shot',
+  cssAnimationName: 'kt-effect-slam',
+  defaultDuration: 650,
+});
+
+// ── Continuous effects (21) ──────────────────────────────────────
 
 register({
   name: 'drift',
   category: 'continuous',
-  defaultScope: 'block',
-  supportedScopes: ['block', 'line', 'glyph', 'word', 'range'],
   cssAnimationName: 'kt-effect-drift',
-  defaultDuration: 3000,
+  defaultDuration: 4500,
 });
 
 register({
   name: 'flicker',
   category: 'continuous',
-  defaultScope: 'block',
-  supportedScopes: ['block', 'line', 'glyph', 'word', 'range'],
   cssAnimationName: 'kt-effect-flicker',
-  defaultDuration: 2000,
+  defaultDuration: 3000,
 });
 
 register({
   name: 'breathe',
   category: 'continuous',
-  defaultScope: 'block',
-  supportedScopes: ['block', 'line'],
   cssAnimationName: 'kt-effect-breathe',
-  defaultDuration: 4000,
+  defaultDuration: 5000,
 });
 
 register({
   name: 'tremble',
   category: 'continuous',
-  defaultScope: 'block',
-  supportedScopes: ['block', 'line', 'glyph', 'word', 'range'],
   cssAnimationName: 'kt-effect-tremble',
-  defaultDuration: 100,
+  defaultDuration: 180,
 });
 
 register({
   name: 'pulse',
   category: 'continuous',
-  defaultScope: 'block',
-  supportedScopes: ['block', 'line'],
   cssAnimationName: 'kt-effect-pulse',
-  defaultDuration: 1000,
+  defaultDuration: 1500,
 });
 
 register({
   name: 'whisper',
   category: 'continuous',
-  defaultScope: 'block',
-  supportedScopes: ['block', 'line', 'glyph', 'word', 'range'],
   cssAnimationName: 'kt-effect-whisper',
-  defaultDuration: 3000,
+  defaultDuration: 4000,
 });
 
 register({
   name: 'fade',
   category: 'continuous',
-  defaultScope: 'block',
-  supportedScopes: ['block', 'line', 'glyph', 'word', 'range'],
   cssAnimationName: 'kt-effect-fade',
-  defaultDuration: 5000,
+  defaultDuration: 6000,
 });
 
 register({
   name: 'freeze',
   category: 'continuous',
-  defaultScope: 'block',
-  supportedScopes: ['block', 'line'],
   cssAnimationName: 'kt-effect-freeze',
-  defaultDuration: 5000,
+  defaultDuration: 7000,
 });
 
 register({
   name: 'burn',
   category: 'continuous',
-  defaultScope: 'block',
-  supportedScopes: ['block', 'line', 'glyph', 'word', 'range'],
   cssAnimationName: 'kt-effect-burn',
-  defaultDuration: 1500,
+  defaultDuration: 2200,
 });
 
 register({
   name: 'static',
   category: 'continuous',
-  defaultScope: 'block',
-  supportedScopes: ['block', 'line', 'glyph', 'word', 'range'],
   cssAnimationName: 'kt-effect-static',
-  defaultDuration: 200,
+  defaultDuration: 180,
 });
 
 register({
   name: 'distort',
   category: 'continuous',
-  defaultScope: 'block',
-  supportedScopes: ['block', 'line'],
   cssAnimationName: 'kt-effect-distort',
-  defaultDuration: 3500,
+  defaultDuration: 4500,
 });
 
 register({
   name: 'sway',
   category: 'continuous',
-  defaultScope: 'block',
-  supportedScopes: ['block', 'line'],
   cssAnimationName: 'kt-effect-sway',
+  defaultDuration: 3500,
+});
+
+register({
+  name: 'glow',
+  category: 'continuous',
+  cssAnimationName: 'kt-effect-glow',
+  defaultDuration: 4000,
+});
+
+register({
+  name: 'wave',
+  category: 'continuous',
+  cssAnimationName: 'kt-effect-wave',
+  defaultDuration: 3500,
+});
+
+register({
+  name: 'float',
+  category: 'continuous',
+  cssAnimationName: 'kt-effect-float',
+  defaultDuration: 6000,
+});
+
+register({
+  name: 'wobble',
+  category: 'continuous',
+  cssAnimationName: 'kt-effect-wobble',
+  defaultDuration: 2000,
+});
+
+register({
+  name: 'sparkle',
+  category: 'continuous',
+  cssAnimationName: 'kt-effect-sparkle',
   defaultDuration: 2500,
+});
+
+register({
+  name: 'drip',
+  category: 'continuous',
+  cssAnimationName: 'kt-effect-drip',
+  defaultDuration: 4000,
+});
+
+register({
+  name: 'stretch',
+  category: 'continuous',
+  cssAnimationName: 'kt-effect-stretch',
+  defaultDuration: 2800,
+});
+
+register({
+  name: 'vibrate',
+  category: 'continuous',
+  cssAnimationName: 'kt-effect-vibrate',
+  defaultDuration: 600,
+});
+
+register({
+  name: 'haunt',
+  category: 'continuous',
+  cssAnimationName: 'kt-effect-haunt',
+  defaultDuration: 7000,
 });
 
 // ── Lookup helpers ───────────────────────────────────────────────
@@ -191,18 +286,4 @@ export function getEffectDefinition(
   name: KineticTextEffect,
 ): EffectDefinition | undefined {
   return EFFECT_REGISTRY.get(name);
-}
-
-/**
- * Resolve effective scope: if the requested scope is not supported,
- * fall back to the effect's default scope.
- */
-export function resolveScope(
-  name: KineticTextEffect,
-  requestedScope: EffectScope,
-): EffectScope {
-  const def = EFFECT_REGISTRY.get(name);
-  if (!def) return requestedScope;
-  if (def.supportedScopes.includes(requestedScope)) return requestedScope;
-  return def.defaultScope;
 }

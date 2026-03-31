@@ -727,7 +727,6 @@ const registry = readJson<Registry>(PATHS.registry);
 const EXPECTED_UTILITY_SYMBOLS = [
   'createPasswordValidation',
   'typewrite',
-  'isOneShotEffect',
   'reorderByDrop',
   'resolveReorderByDrop',
 ];
@@ -735,7 +734,6 @@ const EXPECTED_ACTION_SYMBOLS = [
   'tooltip',
   'morph',
   'kinetic',
-  'narrative',
   'navlink',
   'draggable',
   'dropTarget',

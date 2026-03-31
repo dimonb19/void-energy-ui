@@ -6,6 +6,14 @@ import type {
 } from '../../types';
 import type { CharacterRenderer } from '../render/index';
 import { fireOneShotEffect } from '../effects/one-shot';
+import {
+  computeScrambleParams,
+  computeRiseParams,
+  computeDropParams,
+  computeRandomRevealParams,
+  applyCharParams,
+  clearCharParams,
+} from '../effects/params';
 import { createPRNG, hashSeed } from './prng';
 import { computeStaggerDelays } from './stagger';
 
@@ -530,6 +538,30 @@ export class RevealTimeline {
       // Instant: skip revealing state, go straight to visible
       this.renderer.setGlyphState(index, 'visible');
     } else {
+      // Parametric reveal styles: set per-character starting transform on kt-glyph
+      // (not kt-unit) so vars don't conflict with continuous effect vars on kt-unit
+      const style = this.config.revealStyle;
+      if (
+        style === 'scramble' ||
+        style === 'rise' ||
+        style === 'drop' ||
+        style === 'random'
+      ) {
+        const glyph = this.renderer.getGlyph(index);
+        if (glyph) {
+          const computeFn =
+            style === 'scramble'
+              ? computeScrambleParams
+              : style === 'rise'
+                ? computeRiseParams
+                : style === 'drop'
+                  ? computeDropParams
+                  : computeRandomRevealParams;
+          const params = computeFn(index, this.totalUnits, this.config.seed);
+          applyCharParams(glyph, params);
+        }
+      }
+
       this.pendingRevealAnimations++;
       this.renderer.setGlyphState(index, 'revealing');
       this.scheduleVisibleTransition(index);
@@ -557,6 +589,17 @@ export class RevealTimeline {
     };
 
     const settle = () => {
+      // Clear parametric CSS vars from kt-glyph (where they were set)
+      const style = this.config.revealStyle;
+      if (
+        style === 'scramble' ||
+        style === 'rise' ||
+        style === 'drop' ||
+        style === 'random'
+      ) {
+        const glyph = this.renderer.getGlyph(index);
+        if (glyph) clearCharParams(glyph);
+      }
       this.renderer.setGlyphState(index, 'visible');
       this.pendingRevealAnimations--;
       this.checkRevealComplete();
@@ -601,7 +644,6 @@ export class RevealTimeline {
         fireOneShotEffect(
           this.renderer,
           cue,
-          this.positions,
           () => {
             // Time-triggered one-shot completed — no tracking needed
           },
@@ -620,7 +662,6 @@ export class RevealTimeline {
       fireOneShotEffect(
         this.renderer,
         cue,
-        this.positions,
         () => {
           this.pendingCompletionAnimations--;
           if (

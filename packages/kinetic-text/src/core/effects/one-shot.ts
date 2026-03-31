@@ -1,23 +1,20 @@
-import type {
-  KineticTextEffect,
-  EffectScope,
-  KineticCue,
-  TextRange,
-} from '../../types';
+import type { KineticCue, TextRange } from '../../types';
 import type { CharacterRenderer } from '../render/index';
-import { getEffectDefinition, resolveScope } from './index';
+import { getEffectDefinition } from './index';
+import { computeCharParams, applyCharParams, clearCharParams } from './params';
 
 /**
- * Fire a one-shot effect for a cue. Sets data attributes, listens for
- * animationend, cleans up, and calls onComplete when finished.
+ * Fire a one-shot effect for a cue. Sets per-character CSS custom properties
+ * and data attributes on each kt-oneshot element, listens for animationend,
+ * cleans up, and calls onComplete when all characters finish.
  *
- * For glyph-scope one-shots, uses event delegation on the container
- * to avoid hundreds of individual listeners.
+ * One-shot effects run on the kt-oneshot layer (between kt-unit and kt-glyph)
+ * so they compose naturally with continuous effects on kt-unit and reveal
+ * animations on kt-glyph via CSS transform nesting.
  */
 export function fireOneShotEffect(
   renderer: CharacterRenderer,
   cue: KineticCue,
-  positions: { lineIndex: number }[],
   onComplete: () => void,
   reducedMotion: boolean = false,
 ): void {
@@ -27,118 +24,99 @@ export function fireOneShotEffect(
     return;
   }
 
-  // Reduced motion: skip animation entirely, complete synchronously
   if (reducedMotion) {
     onComplete();
     return;
   }
 
-  const resolved = resolveScope(cue.effect, cue.scope);
-  const elements = collectTargetElements(
-    renderer,
-    resolved,
-    positions,
-    cue.range,
-  );
+  // Determine target range
+  const start = cue.range ? Math.max(0, cue.range.start) : 0;
+  const end = cue.range
+    ? Math.min(renderer.length, cue.range.end)
+    : renderer.length;
 
-  if (elements.length === 0) {
+  if (start >= end) {
     onComplete();
     return;
   }
 
   const duration = cue.durationMs ?? def.defaultDuration;
-  const fallbackDelay = duration * 2;
 
-  // Track how many elements need to finish their animation
-  let pending = elements.length;
+  // Find the max delay offset so fallback timer accounts for stagger
+  let maxDelay = 0;
+  let pending = 0;
 
-  const finish = () => {
-    pending--;
-    if (pending <= 0) {
-      onComplete();
-    }
-  };
+  for (let i = start; i < end; i++) {
+    const el = renderer.getOneShotEl(i);
+    if (!el) continue;
 
-  for (const el of elements) {
-    el.setAttribute('data-kt-effect', cue.effect);
-    el.setAttribute('data-kt-effect-type', 'one-shot');
+    // Skip characters that haven't been revealed yet — one-shot effects
+    // should only animate visible characters, never break the reveal flow
+    const glyphState = renderer.getGlyphState(i);
+    if (glyphState === 'hidden') continue;
 
-    // If a custom duration was specified, override it inline
+    const params = computeCharParams(
+      cue.effect,
+      i,
+      renderer.length,
+      cue.seed ?? 0,
+    );
+    applyCharParams(el, params);
+    el.setAttribute('data-kt-oneshot', cue.effect);
+
     if (cue.durationMs !== undefined) {
       el.style.setProperty('--kt-effect-duration', `${cue.durationMs}ms`);
     }
 
-    const cleanup = () => {
-      el.removeAttribute('data-kt-effect');
-      el.removeAttribute('data-kt-effect-type');
+    if (params.delayOffset > maxDelay) maxDelay = params.delayOffset;
+    pending++;
+  }
+
+  if (pending === 0) {
+    onComplete();
+    return;
+  }
+
+  // Fallback timer covers max delay + animation duration + margin
+  const fallbackDelay = maxDelay + duration * 2;
+  let completed = false;
+
+  const finish = () => {
+    if (completed) return;
+    completed = true;
+    clearTimeout(fallbackTimer);
+
+    // Clean up all target elements
+    for (let i = start; i < end; i++) {
+      const el = renderer.getOneShotEl(i);
+      if (!el) continue;
+      el.removeAttribute('data-kt-oneshot');
       el.style.removeProperty('--kt-effect-duration');
-      el.removeEventListener('animationend', onEnd);
-      clearTimeout(timerId);
-      finish();
-    };
+      clearCharParams(el);
+    }
+
+    onComplete();
+  };
+
+  // Track individual animationend events
+  let finishedCount = 0;
+
+  for (let i = start; i < end; i++) {
+    const el = renderer.getOneShotEl(i);
+    if (!el) continue;
 
     const onEnd = (e: AnimationEvent) => {
-      // Guard: only respond to our effect animation, not nested animations
-      if (e.animationName === def.cssAnimationName || e.target === el) {
-        cleanup();
+      if (e.target !== el) return;
+      el.removeEventListener('animationend', onEnd);
+      finishedCount++;
+      if (finishedCount >= pending) {
+        finish();
       }
     };
 
     el.addEventListener('animationend', onEnd);
-
-    // Fallback timer in case animationend doesn't fire
-    const timerId = window.setTimeout(cleanup, fallbackDelay);
   }
-}
 
-// ── Target element collection ────────────────────────────────────
-
-function collectTargetElements(
-  renderer: CharacterRenderer,
-  scope: EffectScope,
-  positions: { lineIndex: number }[],
-  range?: TextRange,
-): HTMLElement[] {
-  switch (scope) {
-    case 'block': {
-      const visual = renderer.getVisual();
-      return visual ? [visual] : [];
-    }
-    case 'line': {
-      const lineCount =
-        positions.length > 0
-          ? positions[positions.length - 1].lineIndex + 1
-          : 0;
-      const lines: HTMLElement[] = [];
-      for (let i = 0; i < lineCount; i++) {
-        const line = renderer.getLineElement(i);
-        if (line) lines.push(line);
-      }
-      return lines;
-    }
-    case 'word': {
-      return renderer.getAllWordElements();
-    }
-    case 'glyph': {
-      const units: HTMLElement[] = [];
-      for (let i = 0; i < renderer.length; i++) {
-        const unit = renderer.getUnit(i);
-        if (unit) units.push(unit);
-      }
-      return units;
-    }
-    case 'range': {
-      if (!range) return [];
-      const start = Math.max(0, range.start);
-      const end = Math.min(renderer.length, range.end);
-      const units: HTMLElement[] = [];
-      for (let i = start; i < end; i++) {
-        const unit = renderer.getUnit(i);
-        if (unit) units.push(unit);
-      }
-      return units;
-    }
-    default:
-      return [];
-  }
+  // Fallback timer in case animationend doesn't fire for all elements
+  const fallbackTimer = window.setTimeout(finish, fallbackDelay);
 }

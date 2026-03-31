@@ -4,6 +4,7 @@
     TimelineConfig,
     CharPosition,
   } from '../types';
+  import { revealStyleForPhysics } from '../types';
   import { PretextLayout } from '../core/layout/index';
   import { CharacterRenderer } from '../core/render/index';
   import { RevealTimeline } from '../core/timeline/index';
@@ -12,17 +13,17 @@
     applyContinuousEffect,
     clearContinuousEffect,
   } from '../core/effects/continuous';
+  import { fireOneShotEffect } from '../core/effects/one-shot';
 
   let {
     text,
     styleSnapshot,
     revealMode = 'char',
-    revealStyle = 'instant',
+    revealStyle: revealStyleProp,
     staggerPattern = 'sequential',
     stagger,
     revealDuration,
     activeEffect = null,
-    effectScope = 'block',
     cues = [],
     seed,
     reducedMotion = 'auto',
@@ -32,6 +33,9 @@
     speed,
     charSpeed,
     scramblePasses,
+    paused = false,
+    oneShotEffect = null,
+    oneShotTrigger = 0,
     onrevealcomplete,
     oneffectscomplete,
     as = 'span',
@@ -41,12 +45,26 @@
   const cueCount = $derived(cues.length);
 
   // ── Defaults per mode ──────────────────────────────────────────
+  const resolvedRevealStyle = $derived(
+    revealStyleProp ?? revealStyleForPhysics(styleSnapshot.physics),
+  );
   const resolvedStagger = $derived(
     stagger ?? (revealMode === 'char' ? 40 : 30),
   );
   const resolvedSpeed = $derived(speed ?? (revealMode === 'word' ? 80 : 200));
   const resolvedCharSpeed = $derived(charSpeed ?? 8);
-  const resolvedRevealDuration = $derived(revealDuration ?? 300);
+  const resolvedRevealDuration = $derived(
+    revealDuration ??
+      (resolvedRevealStyle === 'scramble'
+        ? 500
+        : resolvedRevealStyle === 'rise'
+          ? 400
+          : resolvedRevealStyle === 'drop'
+            ? 450
+            : resolvedRevealStyle === 'random'
+              ? 250
+              : 300),
+  );
   const resolvedScramblePasses = $derived(scramblePasses ?? 4);
   const resolvedSeed = $derived(seed ?? hashSeed(text + revealMode));
   const resolvedCursor = $derived(cursor ?? revealMode === 'char');
@@ -100,17 +118,51 @@
   $effect(() => {
     const r = renderer;
     const effect = activeEffect;
-    const scope = effectScope;
     const positions = currentPositions;
     const reduced = isReducedMotion;
+    const seed = resolvedSeed;
     if (!r || positions.length === 0) return;
 
     if (effect && !reduced) {
-      clearContinuousEffect(r, positions);
-      applyContinuousEffect(r, effect, scope, positions);
+      clearContinuousEffect(r);
+      applyContinuousEffect(r, effect, seed);
     } else {
-      clearContinuousEffect(r, positions);
+      clearContinuousEffect(r);
     }
+  });
+
+  // ── Imperative one-shot firing ──────────────────────────────
+  let prevOneShotTrigger = 0;
+
+  $effect(() => {
+    const trigger = oneShotTrigger;
+    const effect = oneShotEffect;
+    const r = renderer;
+    const reduced = isReducedMotion;
+    if (!r || !effect || trigger === 0 || trigger === prevOneShotTrigger)
+      return;
+    prevOneShotTrigger = trigger;
+
+    fireOneShotEffect(
+      r,
+      {
+        id: `imperative-${trigger}`,
+        effect,
+        trigger: 'at-time',
+        atMs: 0,
+        seed: resolvedSeed,
+      },
+      () => {},
+      reduced,
+    );
+  });
+
+  // ── Pause / resume reactivity ──────────────────────────────
+  $effect(() => {
+    const tl = timeline;
+    if (!tl) return;
+    if (paused && !tl.isPaused) tl.pause();
+    else if (!paused && tl.isPaused) tl.resume();
   });
 
   // ── Layout pipeline ──────────────────────────────────────────
@@ -139,7 +191,7 @@
       result.positions,
       {
         lineHeight: styleSnapshot.lineHeight,
-        revealStyle,
+        revealStyle: resolvedRevealStyle,
         physics: styleSnapshot.physics,
         mode: styleSnapshot.mode,
         cursor: resolvedCursor,
@@ -152,7 +204,7 @@
     // Create and start timeline
     const config: TimelineConfig = {
       revealMode,
-      revealStyle,
+      revealStyle: resolvedRevealStyle,
       staggerPattern,
       stagger: resolvedStagger,
       revealDuration: resolvedRevealDuration,
@@ -235,10 +287,9 @@
   style={inlineVars}
   data-kinetic-text
   data-reveal-mode={revealMode}
-  data-reveal-style={revealStyle}
+  data-reveal-style={resolvedRevealStyle}
   data-stagger-pattern={staggerPattern}
   data-effect={activeEffect ?? undefined}
-  data-effect-scope={effectScope}
   data-physics={styleSnapshot.physics}
   data-mode={styleSnapshot.mode}
   data-reduced-motion={reducedMotion}
