@@ -1,291 +1,190 @@
 # 08 — Open Decisions
 
-> Decisions that need resolution before or during execution. Track status and reasoning here.
+> Decisions tracking for the Void Energy enterprise decomposition. Most decisions are now resolved.
 
-**Last updated:** 2026-03-29
-
----
-
-## Decision Format
-
-Each decision includes:
-- **Status:** Open / Decided / Deferred
-- **Owner:** Who makes this call
-- **Deadline:** When it needs to be decided (if any)
-- **Options:** What's on the table
-- **Recommendation:** Claude's recommendation based on analysis
-- **Resolution:** Final decision once made
+**Last updated:** 2026-03-31
 
 ---
 
 ## D1: Private NPM Registry — GitHub Packages vs Verdaccio
 
-**Status:** Open
+**Status:** Decided
 **Owner:** Dima + Backend Lead
-**Deadline:** Before premium packages need distribution
-**Impact:** Affects customer onboarding, CI/CD setup, infrastructure
-
-### Options
-
-| | GitHub Packages | Verdaccio |
-|---|---|---|
-| **Cost** | Free | Server hosting |
-| **Setup** | Minimal | Docker + HTTPS + domain |
-| **Customer UX** | Needs GitHub account + PAT | Standard npm auth |
-| **Maintenance** | Zero | Ongoing (updates, backups) |
-| **Scalability** | Good for <50 users | Unlimited |
-| **Control** | GitHub owns it | Full control |
-| **Migration** | Can migrate away later | Already self-hosted |
-
-### Recommendation
-Start with GitHub Packages. Migrate to Verdaccio when customer base grows beyond ~20 or when non-GitHub customers need access.
+**Timeline:** Wave 3 (not needed until premium packages ship)
 
 ### Resolution
-_Pending discussion with backend lead._
+**GitHub Packages to start.** Zero cost, zero infrastructure, integrated with GitHub. Adequate for the first 6-12 months. Migrate to Verdaccio when customer base grows beyond ~20 or when non-GitHub customers need access. Migration is non-breaking — just change `.npmrc` registry URLs and re-publish.
 
 ---
 
 ## D2: Narrative Action + Drag Action — Public or Premium?
 
-**Status:** Open
+**Status:** Decided
 **Owner:** Dima
-**Deadline:** Before public repo extraction
-**Impact:** Affects what the public system can do out of the box
-
-### Options
-
-**Option A: Keep both public**
-- Narrative effects (18 effects) showcase the physics system beautifully
-- Drag-and-drop is a general-purpose utility useful for any app
-- More value in the free tier → more adoption → more premium conversions
-- CoNexus's value is the story ENGINE that orchestrates these, not the effects themselves
-
-**Option B: Move to premium**
-- Narrative effects are a differentiator (no other design system ships these)
-- Drag system is complex and valuable (33KB of code)
-- Premium tier has more exclusive value
-
-**Option C: Narrative public, drag premium**
-- Effects drive adoption (visual wow factor)
-- Drag is more of a "power user" feature
-
-### Recommendation
-**Option A: Keep both public.** The narrative effects are the best demo of Void Energy's physics system — they'll generate GitHub stars and adoption. CoNexus's competitive advantage is the story engine and content platform, not the individual effects. Making them premium would weaken the public system without meaningfully protecting CoNexus.
 
 ### Resolution
-_Pending._
+**Both stay public (free).** Narrative effects (18 effects) are the best demo of Void Energy's physics system — they generate GitHub stars and adoption. Drag-and-drop is a general-purpose utility useful for any app. CoNexus's competitive advantage is the story engine that orchestrates these, not the individual effects.
 
 ---
 
 ## D3: AI Atmosphere Generator — Public or Premium?
 
-**Status:** Open
+**Status:** Decided
 **Owner:** Dima
-**Deadline:** Before public repo extraction
-**Impact:** Whether free users can generate custom themes via AI
-
-### Options
-
-**Option A: Public (free)**
-- Incredible demo feature — users generate themes and see them live
-- Drives engagement and viral sharing ("look at this theme I made")
-- Low cost to DGRS Labs (uses the consumer's API key)
-- The generator already requires users to provide their own Claude API key
-
-**Option B: Premium**
-- Keeps AI features as a premium differentiator
-- But: the consumer provides their own API key, so there's no cost to you
-
-**Option C: Public with rate limit**
-- Free tier gets N generations per session
-- Premium gets unlimited
-- Adds complexity for questionable benefit
-
-### Recommendation
-**Option A: Public.** The generator uses the consumer's own API key — there's no cost to DGRS Labs. It's one of the most impressive features for driving adoption. Keeping it free makes the public system feel genuinely generous, which builds goodwill and trust that leads to premium conversions.
 
 ### Resolution
-_Pending._
+**Public (free).** Uses the consumer's own API key — zero cost to DGRS Labs. Combined with only 4 free atmospheres, it lets anyone create unlimited custom themes, making the free tier feel genuinely generous. Drives viral sharing ("look at this theme I made").
 
 ---
 
-## D4: Starter Atmosphere Selection
+## D4: Free Atmosphere Selection
 
-**Status:** Open (recommended set proposed, needs confirmation)
+**Status:** Decided — all 4 atmospheres already created
 **Owner:** Dima
-**Deadline:** Before atmosphere split implementation
-**Impact:** What the public system ships with out of the box
-
-### Proposed Selection
-
-| Atmosphere | Physics | Mode | Rationale |
-|-----------|---------|------|-----------|
-| **void** | glass | dark | System default, signature experience |
-| **terminal** | retro | dark | Only retro theme, unique physics demo |
-| **paper** | flat | light | Primary light theme, broadest appeal |
-| **focus** | flat | light | Minimal alternative, distraction-free |
-
-### Coverage Analysis
-- Glass: void (1)
-- Flat: paper, focus (2)
-- Retro: terminal (1)
-- Dark: void, terminal (2)
-- Light: paper, focus (2)
-- All 3 physics: covered
-- Both modes: covered
-
-### Alternative Considerations
-- **Replace focus with onyx?** — Would give flat-dark representation, but focus is more universally appealing
-- **Replace focus with laboratory?** — Lab is more distinctive but focus is more useful
-- **5 starters instead of 4?** — Could add onyx for flat-dark coverage, but 4 is a cleaner number
 
 ### Resolution
-_Pending confirmation._
+
+| Atmosphere | Physics | Mode | Status | Rationale |
+|-----------|---------|------|--------|-----------|
+| **Slate** | flat | dark | Created | Dima's daily driver, default VE experience |
+| **Terminal** | retro | dark | Existing | Only retro theme, essential for physics demo |
+| **Meridian** | flat | light | Created | Created for showcases, neutral, broad appeal |
+| **Ember** | glass | dark | Existing | Fan favorite from testing, strong glass showcase |
+
+**Coverage:** All 3 physics (glass, flat, retro) + both modes (light, dark). Each has distinct personality.
+
+**Why Ember over Void:** Ember was the most praised by testers. Void is the DGRS signature — keeping it private preserves brand identity.
+
+**12 DGRS-private atmospheres** stay in CoNexus. Key reasons: Paper (boss's favorite, brand identity), Laboratory (DGRS Labs blue), Void (original signature). All are brand assets, not products for sale.
 
 ---
 
 ## D5: BSL License Parameters
 
-**Status:** Open (needs lawyer review)
+**Status:** Decided (approach) — lawyer review still needed for final language
 **Owner:** Dima + Lawyer
-**Deadline:** Before public launch
-**Impact:** Legal terms for all public repo users
+**Timeline:** AI-draft ships with Wave 1; lawyer finalizes before Wave 2
 
-### Parameters to Define
+### Resolution — Two-Step Approach
 
-1. **Additional Use Grant** — What free usage looks like
-   - Revenue threshold for commercial use (e.g., $100K, $500K, $1M annual revenue?)
-   - Internal tools exception?
-   - Open-source project exception?
+**Step 1 (Wave 1 launch):** AI-drafted BSL 1.1 with proposed parameters:
+- **Revenue threshold:** $1M annual revenue (gross)
+- **Change date:** 4 years from each release
+- **Change license:** Apache 2.0 (patent grant valuable for enterprise)
+- **Additional Use Grant:** Personal, evaluation, education, open-source, and commercial projects under threshold
+- Include visible note: "These terms are pending final legal review and may be updated"
 
-2. **Change Date** — How long before auto-conversion
-   - Proposed: 4 years from each release
-   - Industry standard: 3-4 years
+**Step 2 (before Wave 2):** Boss sends draft to lawyer immediately after Wave 1 launch. Lawyer finalizes:
+- Revenue threshold precision (gross vs net, per product vs per company)
+- "Commercial use" definition (internal tools, SaaS, agency work)
+- Change date mechanics (per-release vs initial release)
+- Swap with a single commit — clean git history
 
-3. **Change License** — What it converts to
-   - Apache 2.0 (more permissive, corporate-friendly)
-   - MIT (simpler, more familiar)
-   - Recommendation: Apache 2.0 (patent grant is valuable for enterprise)
-
-### Resolution
-_Pending lawyer review. See [project_licensing.md](../memory/project_licensing.md)._
+**Why not wait:** Risk window is minimal. No $1M revenue customers in week one. "Pending review" note signals good faith. Don't let legal perfection delay engineering momentum.
 
 ---
 
 ## D6: Eric Jordan Rive Package Timeline
 
-**Status:** Deferred
+**Status:** Deferred — decoupled from wave timeline
 **Owner:** Eric Jordan
-**Deadline:** No hard deadline
-**Impact:** When `@dgrslabs/void-energy-rive` becomes available
+**Timeline:** No hard deadline — ships whenever Eric delivers
 
 ### Context
-Eric is evaluating Rive glass effects for the system. Package scope is limited to Void Energy visual assets (not CoNexus content). See [project_eric_deal.md](../memory/project_eric_deal.md).
+Eric is evaluating Rive glass effects. Package scope = Void Energy visual assets only (not CoNexus content). Present deal after Wave 1 launch. Rive is the second premium package (after Ambience Layers) — it joins the premium repo whenever Eric is ready.
 
 ### What's Needed
 - Eric delivers `.riv` files + Svelte wrapper components
 - Assets must respond to physics presets (glass/flat/retro)
-- Must follow the PACKAGE.md interface spec
+- Must follow PACKAGE.md interface spec
 - Must declare `void-energy` as peer dependency
-
-### Resolution
-_Deferred until Eric delivers initial assets._
 
 ---
 
 ## D7: Ambience Layers Scope
 
-**Status:** Open
+**Status:** Decided — Wave 3 (first premium package)
 **Owner:** Dima
-**Deadline:** No hard deadline (future feature)
-**Impact:** What visual effects CoNexus ships for story immersion
-
-### Proposed Layers
-
-| Layer | Effect | Physics Adaptation |
-|-------|--------|-------------------|
-| Blood | Dripping/pooling from edges | Glass: blur + glow / Flat: opacity / Retro: pixel |
-| Snow | Falling particles with wind | Glass: soft glow / Flat: clean dots / Retro: pixel blocks |
-| Rain | Streaming rain with direction | Glass: motion blur / Flat: lines / Retro: dashes |
-| Fog | Volumetric overlay | Glass: gaussian blur / Flat: gradient / Retro: dither |
-
-### Implementation Approach Options
-- **CSS-only** — Animations + pseudo-elements. Simplest, most performant.
-- **Canvas** — `<canvas>` overlay. More control, slightly heavier.
-- **SVG filters** — Combine with physics SCSS. Most consistent with VE patterns.
-
-### Where It Lives
-- **Start in CoNexus repo** (exclusive feature)
-- **Move to `@dgrslabs/void-energy-ambience` later** if there's demand from other consumers
 
 ### Resolution
-_Pending. Dima will implement when ready._
+**Build as the first premium package (`@dgrslabs/void-energy-ambience`) in Wave 3.** Not CoNexus-exclusive — it's a real product in the premium tier.
+
+Planned layers: Blood, Snow, Rain, Fog — each with physics adaptation (glass: blur+glow, flat: opacity, retro: pixel/dither). CoNexus installs it as a dependency. Anyone else who wants it can contact DGRS Labs.
+
+**Rationale for premium (not CoNexus-private):** The private CoNexus UI (tiles, portal loader) is already enough "private" to differentiate CoNexus. Keeping Ambience Layers as a premium package gives the premium tier something tangible from day one instead of an empty shell waiting for Eric's Rive delivery. Realistic expectation: very niche use case, but it's real and available.
+
+**Wave 3 announcement angle:** "First premium package built on Void Energy — Ambience Layers." Shows the extension model in action.
 
 ---
 
 ## D8: Monorepo Decommission Timeline
 
-**Status:** Open
+**Status:** Decided — no rush
 **Owner:** Dima
-**Deadline:** No hard deadline
-**Impact:** When the current `void-energy-ui` monorepo stops being the primary workspace
-
-### Phases
-
-1. **Now:** Monorepo is the primary workspace. All development happens here.
-2. **After extraction:** Monorepo serves as reference/archive. New development starts in the three repos.
-3. **After verification:** Monorepo is archived (read-only) on GitHub.
-4. **Eventually:** Monorepo is deleted or kept as historical reference.
-
-### Key Milestone
-The monorepo can be decommissioned when:
-- [ ] Public repo builds and passes all checks
-- [ ] All premium packages build independently
-- [ ] CoNexus repo builds with imported packages
-- [ ] No developer is actively using the monorepo for new work
 
 ### Resolution
-_No rush. The monorepo continues to serve as the development environment during transition._
+The monorepo continues as the development environment indefinitely. It's working — don't fix it. Decommission when all 3 repos are stable and no one is actively using the monorepo for new work. Natural transition: primary workspace → reference/archive → read-only.
 
 ---
 
 ## D9: Public Component Tier — What Ships Free
 
-**Status:** Open (full inventory proposed in 03-public-repo.md)
+**Status:** Decided
 **Owner:** Dima
-**Deadline:** Before public repo extraction
-**Impact:** Value proposition of the free tier
-
-### Summary of Proposed Split
-
-**Public (free):** All current UI primitives except CoNexus-specific ones. ~50 components, all actions, all icons, all modals, AI generator.
-
-**Removed from public:** Tile, StoryCategory, PortalLoader, LoadingTextCycler, StoryFeed, PortalLoaderDemo, ReorderShowcase.
-
-### Question
-Should any additional components be premium? Candidates:
-- **Charts** (StatCard, ProgressRing, Sparkline, DonutChart, LineChart, BarChart) — could be premium
-- **GenerateField / GenerateTextarea** — AI-powered generation fields
-- **MediaSlider** — Advanced media component
-
-### Recommendation
-Keep everything public except CoNexus-specific components. A generous free tier drives adoption. Premium value comes from packages (atmospheres, kinetic text, rive), not from withholding basic components.
 
 ### Resolution
-_Pending confirmation._
+**All components stay public except CoNexus-specific ones.** Generous free tier drives adoption.
+
+**Public (free):** ~50 components (all fields, buttons, navigation, overlays, charts, layout, icons, modals), all actions (narrative, drag, morph, tooltip, kinetic, navlink), Kinetic Text package, AI atmosphere generator, 4 atmospheres.
+
+**Removed from public:** Tile, StoryCategory, PortalLoader, LoadingTextCycler, StoryFeed, PortalLoaderDemo, ReorderShowcase (CoNexus-specific → CoNexus repo).
+
+Premium value comes from collaborator packages (Rive, Ambience Layers), not from withholding basic components.
+
+---
+
+## D10: Eric Jordan Deal Structure
+
+**Status:** Open — decide before presenting deal to Eric
+**Owner:** Dima + Boss
+**Timeline:** Present after Wave 1 launch
+
+### Options
+
+| | Revenue Share Only | Hybrid (Equity + Revenue) | Equity Only |
+|---|---|---|---|
+| **Structure** | 25-30% of Rive package revenue | 2-3% equity (vested) + 20-25% revenue share | 5% equity (vested) |
+| **Dilution** | None | Minimal | High precedent risk |
+| **Scalability** | Every collaborator gets same model | Works but complex | 3 collaborators = 15% gone |
+| **Eric's incentive** | Direct: his package sells, he earns | Both platform + package | Platform only |
+| **Complexity** | Simple | Moderate | Simple |
+
+### Recommendation
+**Revenue share (Option A) or hybrid (Option B).** Equity is forever. Revenue share is proportional to contribution. For a package contributor — even a legendary one — revenue share is the cleaner instrument.
+
+Key points:
+- Dima has 5% — giving the same to a package contributor feels disproportionate
+- Revenue share sets a sustainable template for every future collaborator
+- If equity matters for signaling, keep it to 2-3% with milestones = shipped .riv files passing PACKAGE.md spec
+- Creative ownership stays with Eric; DGRS owns distribution rights
+- If partnership ends, revenue share continues on shipped assets; vested equity stays
+
+### Resolution
+_Pending discussion between Dima and Boss._
 
 ---
 
 ## Decision Log
 
-| # | Decision | Status | Date Decided | Outcome |
-|---|----------|--------|-------------|---------|
-| D1 | Private NPM registry | Open | — | — |
-| D2 | Narrative + drag public/premium | Open | — | — |
-| D3 | AI generator public/premium | Open | — | — |
-| D4 | Starter atmosphere selection | Open | — | — |
-| D5 | BSL license parameters | Open | — | — |
-| D6 | Rive package timeline | Deferred | — | — |
-| D7 | Ambience layers scope | Open | — | — |
-| D8 | Monorepo decommission | Open | — | — |
-| D9 | Public component tier | Open | — | — |
+| # | Decision | Status | Date | Outcome |
+|---|----------|--------|------|---------|
+| D1 | Private NPM registry | **Decided** | 2026-03-31 | GitHub Packages → Verdaccio later |
+| D2 | Narrative + drag | **Decided** | 2026-03-31 | Both public (free) |
+| D3 | AI generator | **Decided** | 2026-03-31 | Public (free, consumer's API key) |
+| D4 | Free atmospheres | **Decided** | 2026-03-31 | Slate, Terminal, Meridian, Ember (all ready) |
+| D5 | BSL license | **Decided** (approach) | 2026-03-31 | AI draft → lawyer swap |
+| D6 | Rive timeline | Deferred | — | Decoupled from waves, ships when Eric delivers |
+| D7 | Ambience layers | **Decided** | 2026-03-31 | First premium package (Wave 3), CoNexus consumes it |
+| D8 | Monorepo decommission | **Decided** | 2026-03-31 | No rush, keep as dev environment |
+| D9 | Public component tier | **Decided** | 2026-03-31 | All primitives + Kinetic Text free |
+| D10 | Eric Jordan deal | **Open** | — | Revenue share recommended |

@@ -2,9 +2,9 @@
 
 > Publishing strategy for public and private packages across the Void Energy ecosystem.
 
-**Status:** Planning (private registry choice pending backend discussion)
-**Depends on:** 03-public-repo, 04-premium-repo
-**Blocks:** Launch
+**Status:** Planning — Wave 1 (public npm) / Wave 3 (private registry)
+**Depends on:** 03-public-repo (Wave 1)
+**Blocks:** Launch (public npm only needed for Wave 1; private registry deferred to Wave 3)
 
 ---
 
@@ -273,19 +273,17 @@ The migration is non-breaking — just change `.npmrc` registry URLs and re-publ
 
 ## Package Naming Convention
 
-All premium packages follow this pattern:
+Premium collaborator packages follow this pattern:
 ```
 @dgrslabs/void-energy-{feature}
 ```
 
-| Package | Name |
-|---------|------|
-| Kinetic text | `@dgrslabs/void-energy-kinetic-text` |
-| Premium atmospheres | `@dgrslabs/void-energy-atmospheres` |
-| CoNexus UI | `@dgrslabs/void-energy-conexus` |
-| Rive assets | `@dgrslabs/void-energy-rive` |
-| Ambience layers | `@dgrslabs/void-energy-ambience` |
-| Pro components | `@dgrslabs/void-energy-components-pro` |
+| Package | Name | Status |
+|---------|------|--------|
+| Rive assets (Eric Jordan) | `@dgrslabs/void-energy-rive` | First package, pending delivery |
+| Future collaborator packages | `@dgrslabs/void-energy-{name}` | As collaborators onboard |
+
+**Note:** Kinetic Text now ships free with `void-energy` (not a premium package). Atmospheres are not sold — the 12 originals are DGRS-private. CoNexus UI components live in the CoNexus repo (not published as a package).
 
 ---
 
@@ -335,7 +333,7 @@ Use a compatibility matrix in the premium repo README:
 - [ ] `@dgrslabs` npm scope is claimed (either npm org or GitHub org)
 - [ ] Premium packages publish to chosen private registry
 - [ ] Consumer can `npm install void-energy` from fresh project
-- [ ] Consumer with auth can `npm install @dgrslabs/void-energy-kinetic-text`
+- [ ] Consumer with auth can `npm install @dgrslabs/void-energy-rive`
 - [ ] Consumer without auth gets a clear error (not a confusing 404)
 - [ ] CI/CD pipelines publish on tagged releases
 - [ ] Version coordination documented in premium repo

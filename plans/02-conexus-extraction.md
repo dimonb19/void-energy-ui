@@ -1,20 +1,22 @@
 # 02 — CoNexus Extraction
 
-> Extract all CoNexus-specific components, actions, styles, and types from the monorepo into the `@dgrslabs/void-energy-conexus` premium package.
+> Extract all CoNexus-specific components, actions, styles, and types from the monorepo into a private CoNexus UI package.
 
-**Status:** Planning
-**Depends on:** Nothing (can start immediately, parallel with 01)
-**Blocks:** 03-public-repo, 04-premium-repo
+**Status:** Planning — Wave 2 (after public repo launch)
+**Depends on:** 03-public-repo (Wave 1 must ship first)
+**Blocks:** 05-conexus-repo (Wave 4)
 
 ---
 
 ## Goal
 
-Cleanly separate CoNexus-specific code from the public Void Energy core. After extraction:
+Cleanly separate CoNexus-specific code from the public Void Energy core into a private package. This is **Wave 2 work** — it happens after the public repo launches.
+
+After extraction:
 - The public repo contains zero CoNexus references
-- CoNexus UI lives in `@dgrslabs/void-energy-conexus` as a premium package
-- The CoNexus app imports this package as a dependency
-- The current monorepo showcase keeps working during transition
+- CoNexus UI lives in a private package that CoNexus imports alongside `void-energy`
+- The current monorepo continues to work during transition
+- CoNexus frontend migration (Wave 4) happens later — this wave is just the extraction
 
 ---
 
@@ -101,12 +103,14 @@ StoryFeed.svelte
 
 **Key question:** Do any CoNexus components import from each other in ways that create circular dependencies with core? Map this first.
 
-### Step 2: Create the package structure
+### Step 2: Move files to CoNexus repo
+
+CoNexus components move directly into the `conexus` repo as local components (not a published package):
 
 ```
-@dgrslabs/void-energy-conexus/
+conexus/
   src/
-    components/
+    conexus-ui/
       Tile.svelte
       StoryCategory.svelte
       PortalLoader.svelte
@@ -114,49 +118,28 @@ StoryFeed.svelte
       StoryFeed.svelte
       PortalLoaderDemo.svelte
       ReorderShowcase.svelte
-    styles/
-      _tiles.scss
+      styles/
+        _tiles.scss
     types/
       story.ts               ← converted from ambient .d.ts to exported types
       story-engine.ts
-    index.ts                  ← main entry, re-exports all components
-  package.json
-  README.md
 ```
 
-### Step 3: Package configuration
+### Step 3: Update imports in extracted components
 
-```json
-{
-  "name": "@dgrslabs/void-energy-conexus",
-  "version": "0.1.0",
-  "private": true,
-  "type": "module",
-  "exports": {
-    ".": "./src/index.ts",
-    "./components/*": "./src/components/*.svelte",
-    "./styles": "./src/styles/_tiles.scss",
-    "./types": "./src/types/index.ts"
-  },
-  "peerDependencies": {
-    "void-energy": ">=0.1.0",
-    "svelte": "^5.0.0"
-  }
-}
-```
-
-### Step 4: Update imports in extracted components
-
-All extracted components currently use path aliases (`@components/`, `@styles/`, etc.) that resolve within the monorepo. After extraction, these need to reference the public `void-energy` package:
+All extracted components currently use path aliases (`@components/`, `@styles/`, etc.) that resolve within the monorepo. After extraction, core imports reference the public `void-energy` package, and CoNexus-internal imports use local paths:
 
 ```typescript
 // BEFORE (monorepo)
 import { Pagination } from '@components/ui/Pagination.svelte';
 import { toast } from '@stores/toast.svelte';
 
-// AFTER (package)
+// AFTER (CoNexus repo)
 import { Pagination } from 'void-energy/components/Pagination';
 import { toast } from 'void-energy/stores/toast';
+
+// CoNexus-internal imports stay local
+import Tile from '../conexus-ui/Tile.svelte';
 ```
 
 **This is the most labor-intensive part.** Every import in every extracted file needs updating.
@@ -219,11 +202,12 @@ export interface TileAuthor { ... }
 
 ## Transition Strategy
 
-During the monorepo development period:
-1. Create the package structure in `packages/conexus/` (alongside `packages/kinetic-text/`)
-2. Move files there but keep the monorepo working via workspace resolution
-3. The showcase pages import from the local package
-4. When the premium repo is ready, move the package there
+This extraction happens during **Wave 2** (after the public repo launches):
+1. Wave 1 ships the public `void-energy` repo — CoNexus components are simply excluded (not shipped)
+2. Extract CoNexus-specific files into a private package
+3. CoNexus UI becomes an importable package that the CoNexus app (Wave 4) will consume
+4. The monorepo stays available as reference during migration
+5. CoNexus frontend migration is **Wave 4** — not part of this wave. This wave is extraction only.
 
 ---
 

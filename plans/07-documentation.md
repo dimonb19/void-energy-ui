@@ -2,7 +2,7 @@
 
 > Documentation strategy, licensing implementation, and developer-facing content across all three repos.
 
-**Status:** Planning
+**Status:** Planning — Wave 1
 **Depends on:** 03-public-repo
 **Blocks:** Launch
 
@@ -67,8 +67,9 @@ npm install void-energy
 ## Features
 
 - **3 Physics Engines** — Glass (blur + glow), Flat (borders + clean), Retro (pixel-perfect)
-- **4 Starter Atmospheres** — Void, Terminal, Paper, Focus
+- **4 Free Atmospheres** — Slate, Terminal, Meridian, Ember
 - **50+ Components** — Form fields, navigation, overlays, charts, icons
+- **Kinetic Text** — Pretext-powered text animations, included free
 - **AI Theme Generator** — Create custom atmospheres with Claude
 - **Semantic Tokens** — Zero raw values, full customization
 - **Svelte 5 Runes** — Modern reactivity, no legacy patterns
@@ -83,10 +84,9 @@ npm install void-energy
 
 ## Premium
 
-Extend with premium packages:
-- **@dgrslabs/void-energy-atmospheres** — 8 additional atmospheres
-- **@dgrslabs/void-energy-kinetic-text** — Pretext-powered text animations
-- More packages available. [Contact us / Visit premium docs]
+Extend with premium collaborator packages:
+- **@dgrslabs/void-energy-rive** — Interactive Rive animations by Eric Jordan (2Advanced Studios)
+- More packages coming. [Contact us / Visit premium docs]
 
 ## Documentation
 
@@ -166,7 +166,13 @@ Contact [email] for premium licensing.
 Contact licensing@dgrslabs.com for clarification or custom licensing arrangements.
 ```
 
-**IMPORTANT:** Have a lawyer review both LICENSE and LICENSING.md before public launch. The revenue threshold, Additional Use Grant wording, and conversion terms need legal precision.
+**License approach (decided):** AI-draft the LICENSE and LICENSING.md for Wave 1 launch. Include a visible note: "These terms are pending final legal review and may be updated." Boss sends draft to lawyer immediately. When lawyer returns final terms, swap with a single commit. The risk window is minimal — there won't be $1M revenue customers in week one.
+
+**What the lawyer MUST nail down:**
+- Revenue threshold — gross or net? Per product or per company? Annual or lifetime?
+- "Commercial use" definition — internal tools? SaaS? Agency client work?
+- Change date — 4 years from each release (not from initial release)
+- Change license — Apache 2.0 recommended (patent grant matters for enterprise)
 
 ---
 
@@ -266,8 +272,8 @@ These files already exist and need updating for the public repo:
 
 | File | Updates Needed |
 |------|---------------|
-| **CHEAT-SHEET.md** | Remove CoNexus components (Tile, StoryCategory, PortalLoader). Remove premium atmosphere names. |
-| **THEME-GUIDE.md** | Update to reference only 4 starter atmospheres. Add note about premium atmospheres. |
+| **CHEAT-SHEET.md** | Remove CoNexus components (Tile, StoryCategory, PortalLoader). Reference only 4 free atmospheres. |
+| **THEME-GUIDE.md** | Update to reference only 4 free atmospheres (Slate, Terminal, Meridian, Ember). No "premium atmospheres" mention — just note that users can create unlimited custom themes with the AI generator. |
 | **AI-PLAYBOOK.md** | Remove CoNexus-specific recipes. |
 | **COMPOSITION-RECIPES.md** | Remove CoNexus page archetypes. |
 | **NARRATIVE-EFFECTS.md** | No changes needed (narrative effects stay public). |

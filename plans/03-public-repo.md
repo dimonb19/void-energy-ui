@@ -2,9 +2,10 @@
 
 > The public, BSL-licensed starter system. What people fork, star, and install. A complete, working design system on its own.
 
-**Status:** Planning
-**Depends on:** 01-atmosphere-split, 02-conexus-extraction
-**Blocks:** 04-premium-repo, 05-conexus-repo, 06-npm-distribution
+**Status:** Planning — Wave 1 (ship in 2-3 weeks)
+**Updated:** 2026-03-31
+**Depends on:** 01-atmosphere-split (all 4 atmospheres ready)
+**Blocks:** 05-conexus-repo (Wave 2), 06-npm-distribution
 
 ---
 
@@ -12,11 +13,14 @@
 
 Create `github.com/dgrslabs/void-energy` as a standalone, polished open-source (BSL) design system that:
 - Is installable via `npm install void-energy`
-- Ships with 4 starter atmospheres covering all physics modes
-- Includes enough components to build real production apps
+- Ships with 4 free atmospheres (Slate, Terminal, Meridian, Ember) covering all physics modes
+- Includes Kinetic Text package (key marketing differentiator, rides the Pretext hype wave)
+- Includes 50+ components to build real production apps
 - Has an AI atmosphere generator for creating custom themes
 - Has professional documentation worthy of GitHub stars
-- Makes it obvious that premium packages exist (without being obnoxious)
+- Tastefully mentions premium collaborator packages without being obnoxious
+
+**Wave 1 priority:** Ship fast. The public repo does NOT depend on CoNexus extraction being complete. CoNexus-specific files are simply excluded during repo creation. Clean git: init commit + license.
 
 ---
 
@@ -41,19 +45,33 @@ void-energy/
 │   │   ├── _retro.scss
 │   │   └── _index.scss
 │   │
-│   ├── atmospheres/                 ← 4 starter atmospheres
-│   │   ├── void.ts                  ← glass/dark (default)
+│   ├── atmospheres/                 ← 4 free atmospheres
+│   │   ├── slate.ts                 ← flat/dark (default)
 │   │   ├── terminal.ts              ← retro/dark
-│   │   ├── paper.ts                 ← flat/light
-│   │   ├── focus.ts                 ← flat/light
+│   │   ├── meridian.ts              ← flat/light
+│   │   ├── ember.ts                 ← glass/dark
 │   │   └── index.ts
 │   │
 │   ├── styles/
 │   │   ├── abstracts/               ← SCSS engine (mixins, functions)
 │   │   ├── base/                    ← Reset, typography, accessibility
 │   │   ├── components/              ← Component SCSS (buttons, inputs, etc.)
-│   │   ├── config/                  ← Generated themes (4 starter only)
+│   │   ├── config/                  ← Generated themes (4 free only)
 │   │   └── global.scss              ← Main entry + density system
+│   │
+│   ├── packages/
+│   │   └── kinetic-text/            ← Kinetic Text package (ships FREE with void-energy)
+│   │       ├── src/
+│   │       │   ├── svelte/
+│   │       │   │   └── KineticText.svelte
+│   │       │   ├── core/
+│   │       │   ├── adapters/
+│   │       │   ├── types.ts
+│   │       │   ├── index.ts
+│   │       │   └── styles/
+│   │       ├── dist/
+│   │       ├── package.json
+│   │       └── README.md
 │   │
 │   ├── components/
 │   │   ├── core/                    ← AtmosphereScope, ThemeScript
@@ -91,7 +109,7 @@ void-energy/
 │   │   ├── font-registry.ts         ← Only starter fonts
 │   │   ├── modal-registry.ts
 │   │   ├── ui-geometry.ts
-│   │   ├── void-registry.json       ← 4 starter themes
+│   │   ├── void-registry.json       ← 4 free themes
 │   │   ├── void-physics.json
 │   │   └── component-registry.json  ← Public components only
 │   │
@@ -254,10 +272,11 @@ gh repo create dgrslabs/void-energy --public --description "Enterprise design sy
 ### Step 2: Initialize from monorepo
 - Copy the file structure above
 - Remove all CoNexus-specific files (per 02-conexus-extraction)
-- Remove premium atmosphere definitions (per 01-atmosphere-split)
-- Update `_generated-themes.scss` to contain only 4 starter themes
-- Update `void-registry.json` to list only 4 starter themes
-- Update `font-registry.ts` to include only starter fonts
+- Remove DGRS-private atmosphere definitions (per 01-atmosphere-split)
+- Update `_generated-themes.scss` to contain only 4 free themes (Slate, Terminal, Meridian, Ember)
+- Update `void-registry.json` to list only 4 free themes
+- Update `font-registry.ts` to include only free-tier fonts
+- Include Kinetic Text package in `packages/kinetic-text/`
 - Update `component-registry.json` to list only public components
 
 ### Step 3: Clean imports
@@ -265,9 +284,12 @@ gh repo create dgrslabs/void-energy --public --description "Enterprise design sy
 - Update Navigation to remove CoNexus tab
 - Update showcase pages to remove CoNexus demos
 
-### Step 4: Add BSL license
-- `LICENSE` file with BSL 1.1 text
+### Step 4: Add BSL license (AI-drafted placeholder)
+- `LICENSE` file with BSL 1.1 text — AI-drafted, clearly marked as "pending legal review"
 - `LICENSING.md` with human-readable explanation
+- Boss sends draft to lawyer immediately after Wave 1 launch
+- When lawyer returns final terms, swap with a single commit (clean git history)
+- Include a note: "These terms are pending final legal review and may be updated"
 - License header in key source files (optional but professional)
 
 ### Step 5: Polish README
@@ -320,27 +342,29 @@ jobs:
 
 ---
 
-## Premium Upsell Strategy
+## Premium Mention Strategy
 
-The public repo should tastefully acknowledge premium:
-- README: "Extended with premium packages for advanced features" section
-- ThemesFragment: "More atmospheres available with @dgrslabs/void-energy-atmospheres"
+The public repo should tastefully acknowledge premium collaborator packages:
+- README: "Extend with premium packages" section (Rive animations, future add-ons)
+- No "premium atmospheres" upsell — the 4 free atmospheres are complete, and the AI generator lets anyone create more
 - No feature degradation — the public system is complete and useful on its own
-- The AI generator works fully in the public tier (anyone can create custom atmospheres)
+- The AI generator works fully in the free tier (anyone can create custom atmospheres)
+- Kinetic Text ships free — it's a marketing tool, not a premium gate
 
 ---
 
 ## Verification Checklist
 
 - [ ] Repo builds from clean clone (`npm ci && npm run build`)
-- [ ] All 4 starter atmospheres work (void, terminal, paper, focus)
-- [ ] All physics modes demonstrated (glass, flat, retro)
-- [ ] Both color modes work (light, dark)
+- [ ] All 4 free atmospheres work (Slate, Terminal, Meridian, Ember)
+- [ ] All physics modes demonstrated (glass via Ember, flat via Slate/Meridian, retro via Terminal)
+- [ ] Both color modes work (dark via Slate/Terminal/Ember, light via Meridian)
+- [ ] Kinetic Text package builds and works
 - [ ] `npm run check` passes (zero type errors)
 - [ ] `npm run test` passes
 - [ ] `npm run check:registry` passes
 - [ ] No CoNexus references in any file
-- [ ] No premium atmosphere definitions in generated SCSS
+- [ ] No DGRS-private atmosphere definitions in generated SCSS
 - [ ] AI atmosphere generator works
 - [ ] Documentation site renders correctly
 - [ ] README is professional and complete
