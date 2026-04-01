@@ -1,26 +1,39 @@
 export type PhysicsPreset = 'glass' | 'flat' | 'retro';
 export type ModePreset = 'light' | 'dark';
 
-export type RevealMode =
-  | 'char'
-  | 'word'
-  | 'sentence'
-  | 'sentence-pair'
-  | 'decode';
+export type RevealMode = 'char' | 'word' | 'decode';
+
+/**
+ * Named speed presets. Current "fast" is the floor — all presets are fast.
+ * - `'fast'`    — speed: 40ms, charSpeed: 8ms  (previous default)
+ * - `'rapid'`   — speed: 20ms, charSpeed: 4ms  (2× faster)
+ * - `'instant'` — speed: 8ms,  charSpeed: 2ms  (near-instant)
+ */
+export type KineticSpeedPreset = 'fast' | 'rapid' | 'instant';
+
+export const SPEED_PRESETS: Record<
+  KineticSpeedPreset,
+  { speed: number; charSpeed: number }
+> = {
+  fast: { speed: 40, charSpeed: 8 },
+  rapid: { speed: 20, charSpeed: 4 },
+  instant: { speed: 8, charSpeed: 2 },
+};
 
 /**
  * Reveal style controls the visual transition from hidden → visible per glyph.
  *
- * - `'blur'` — Glass physics default: fade in with blur dissipation.
- * - `'scale'` — Flat physics default: scale up from zero.
- * - `'instant'` — Retro physics default: no animation.
+ * - `'pop'` — Universal default: characters pop in from random offsets, fast and light.
+ * - `'blur'` — Fade in with blur dissipation.
+ * - `'scale'` — Scale up from zero.
  * - `'scramble'` — Characters fly in from random positions/rotations and settle.
  * - `'rise'` — Characters ascend from below into position.
  * - `'drop'` — Characters fall from above into position with gravity feel.
- * - `'random'` — Characters pop in from random offsets very fast, chaotic entrance.
+ * - `'random'` — Characters appear in randomized ORDER with a simple fade.
+ * - `'instant'` — No animation.
  *
- * When `revealStyle` is not specified on the component, it is auto-derived
- * from the active physics preset via `revealStyleForPhysics()`.
+ * All reveal styles work on all physics presets. When `revealStyle` is not
+ * specified on the component, it defaults to `'pop'` via `revealStyleForPhysics()`.
  */
 export type RevealStyle =
   | 'instant'
@@ -29,6 +42,7 @@ export type RevealStyle =
   | 'scramble'
   | 'rise'
   | 'drop'
+  | 'pop'
   | 'random';
 
 export type StaggerPattern = 'sequential';
@@ -73,10 +87,8 @@ export type KineticTextEffect =
   | 'haunt';
 
 /** Derive the reveal style from the active physics preset. */
-export function revealStyleForPhysics(physics: PhysicsPreset): RevealStyle {
-  if (physics === 'glass') return 'blur';
-  if (physics === 'flat') return 'scale';
-  return 'instant';
+export function revealStyleForPhysics(_physics: PhysicsPreset): RevealStyle {
+  return 'pop';
 }
 
 export type ReducedMotionMode = 'auto' | 'always' | 'never';
@@ -232,6 +244,8 @@ export interface KineticTextProps {
   styleSnapshot: TextStyleSnapshot;
   revealMode?: RevealMode;
   revealStyle?: RevealStyle;
+  /** Named speed preset. Overridden by explicit speed/charSpeed values. */
+  speedPreset?: KineticSpeedPreset;
   staggerPattern?: StaggerPattern;
   stagger?: number;
   revealDuration?: number;
@@ -245,7 +259,6 @@ export interface KineticTextProps {
   speed?: number;
   charSpeed?: number;
   scramblePasses?: number;
-  paused?: boolean;
   /** Fire a one-shot effect imperatively on the current render. Increment to re-fire. */
   oneShotEffect?: KineticTextEffect | null;
   /** Counter — increment to trigger the one-shot. Value of 0 is ignored. */

@@ -4,7 +4,7 @@
     TimelineConfig,
     CharPosition,
   } from '../types';
-  import { revealStyleForPhysics } from '../types';
+  import { revealStyleForPhysics, SPEED_PRESETS } from '../types';
   import { PretextLayout } from '../core/layout/index';
   import { CharacterRenderer } from '../core/render/index';
   import { RevealTimeline } from '../core/timeline/index';
@@ -20,6 +20,7 @@
     styleSnapshot,
     revealMode = 'char',
     revealStyle: revealStyleProp,
+    speedPreset,
     staggerPattern = 'sequential',
     stagger,
     revealDuration,
@@ -33,7 +34,6 @@
     speed,
     charSpeed,
     scramblePasses,
-    paused = false,
     oneShotEffect = null,
     oneShotTrigger = 0,
     onrevealcomplete,
@@ -51,19 +51,26 @@
   const resolvedStagger = $derived(
     stagger ?? (revealMode === 'char' ? 40 : 30),
   );
-  const resolvedSpeed = $derived(speed ?? (revealMode === 'word' ? 80 : 200));
-  const resolvedCharSpeed = $derived(charSpeed ?? 8);
+  const presetValues = $derived(
+    speedPreset ? SPEED_PRESETS[speedPreset] : null,
+  );
+  const resolvedSpeed = $derived(
+    speed ?? presetValues?.speed ?? (revealMode === 'word' ? 80 : 200),
+  );
+  const resolvedCharSpeed = $derived(charSpeed ?? presetValues?.charSpeed ?? 8);
   const resolvedRevealDuration = $derived(
     revealDuration ??
       (resolvedRevealStyle === 'scramble'
         ? 500
-        : resolvedRevealStyle === 'rise'
-          ? 400
-          : resolvedRevealStyle === 'drop'
-            ? 450
-            : resolvedRevealStyle === 'random'
+        : resolvedRevealStyle === 'drop'
+          ? 450
+          : resolvedRevealStyle === 'rise'
+            ? 400
+            : resolvedRevealStyle === 'pop'
               ? 250
-              : 300),
+              : resolvedRevealStyle === 'random'
+                ? 200
+                : 300),
   );
   const resolvedScramblePasses = $derived(scramblePasses ?? 4);
   const resolvedSeed = $derived(seed ?? hashSeed(text + revealMode));
@@ -93,7 +100,7 @@
   let pretextLayout = new PretextLayout();
   let renderer: CharacterRenderer | null = $state(null);
   let timeline: RevealTimeline | null = null;
-  let containerWidth = $state(0);
+  let containerWidth = 0;
   let resizeObserver: ResizeObserver | null = null;
   let currentPositions: CharPosition[] = $state([]);
   let currentPrepared:
@@ -155,14 +162,6 @@
       () => {},
       reduced,
     );
-  });
-
-  // ── Pause / resume reactivity ──────────────────────────────
-  $effect(() => {
-    const tl = timeline;
-    if (!tl) return;
-    if (paused && !tl.isPaused) tl.pause();
-    else if (!paused && tl.isPaused) tl.resume();
   });
 
   // ── Layout pipeline ──────────────────────────────────────────

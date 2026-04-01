@@ -81,6 +81,7 @@
 }
 
 // ── Physics-driven reveal keyframes ─────────────────────────────
+// These are fallbacks when no explicit data-reveal-style is set.
 // Glass → blur, Flat → scale, Retro → instant (no animation).
 
 [data-physics='glass'] .kt-glyph[data-kt-state='revealing'] {
@@ -118,10 +119,39 @@
   }
 }
 
+// ── Explicit blur selector ──────────────────────────────────────
+// Overrides physics defaults when blur is explicitly chosen on any physics.
+
+[data-reveal-style='blur'] .kt-glyph[data-kt-state='revealing'] {
+  animation-name: kt-reveal-blur;
+}
+
+[data-reveal-style='blur'][data-physics='retro']
+  .kt-glyph[data-kt-state='revealing'] {
+  animation-name: kt-reveal-blur;
+  animation-duration: 200ms; // void-ignore — snappy retro
+  animation-timing-function: steps(3); // void-ignore
+  opacity: unset;
+}
+
+// ── Explicit scale selector ─────────────────────────────────────
+// Overrides physics defaults when scale is explicitly chosen on any physics.
+
+[data-reveal-style='scale'] .kt-glyph[data-kt-state='revealing'] {
+  animation-name: kt-reveal-scale;
+}
+
+[data-reveal-style='scale'][data-physics='retro']
+  .kt-glyph[data-kt-state='revealing'] {
+  animation-name: kt-reveal-scale;
+  animation-duration: 200ms; // void-ignore — snappy retro
+  animation-timing-function: steps(3); // void-ignore
+  opacity: unset;
+}
+
 // ── Scramble reveal ─────────────────────────────────────────────
 // Characters fly in from random positions (set via --kt-dx/dy/rotate/scale
 // CSS vars on each kt-unit by JS) and settle into their final position.
-// Overrides physics-default reveal when data-reveal-style="scramble".
 
 [data-reveal-style='scramble'] .kt-glyph[data-kt-state='revealing'] {
   animation-name: kt-reveal-scramble;
@@ -293,11 +323,12 @@
   opacity: unset;
 }
 
-// ── Random reveal ───────────────────────────────────────────────
+// ── Pop reveal ──────────────────────────────────────────────────
 // Characters pop in from random offsets — fast, chaotic entrance.
+// Universal default for all physics presets.
 
-[data-reveal-style='random'] .kt-glyph[data-kt-state='revealing'] {
-  animation-name: kt-reveal-random;
+[data-reveal-style='pop'] .kt-glyph[data-kt-state='revealing'] {
+  animation-name: kt-reveal-pop;
   animation-duration: 250ms; // void-ignore — intentionally fast for chaotic feel
   animation-timing-function: cubic-bezier(
     0.22,
@@ -307,7 +338,7 @@
   ); // void-ignore — fast decel, no overshoot
 }
 
-@keyframes kt-reveal-random {
+@keyframes kt-reveal-pop {
   from {
     opacity: 0;
     transform: translate(var(--kt-dx, 0px), var(--kt-dy, 0px))
@@ -319,13 +350,13 @@
   }
 }
 
-// Random glass: add blur snap
-[data-reveal-style='random'][data-physics='glass']
+// Pop glass: add blur snap
+[data-reveal-style='pop'][data-physics='glass']
   .kt-glyph[data-kt-state='revealing'] {
-  animation-name: kt-reveal-random-glass;
+  animation-name: kt-reveal-pop-glass;
 }
 
-@keyframes kt-reveal-random-glass {
+@keyframes kt-reveal-pop-glass {
   from {
     opacity: 0;
     filter: blur(2px); // void-ignore
@@ -339,11 +370,39 @@
   }
 }
 
-// Random retro: always animates with stepped timing
+// Pop retro: always animates with stepped timing
+[data-reveal-style='pop'][data-physics='retro']
+  .kt-glyph[data-kt-state='revealing'] {
+  animation-name: kt-reveal-pop;
+  animation-duration: 150ms; // void-ignore — ultra-fast for retro pop
+  animation-timing-function: steps(2); // void-ignore
+  opacity: unset;
+}
+
+// ── Random reveal (order) ───────────────────────────────────────
+// Characters appear in randomized ORDER with a simple fade-in.
+// The ORDER is randomized by JS (shuffled stagger delays), not the animation.
+
+@keyframes kt-reveal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+[data-reveal-style='random'] .kt-glyph[data-kt-state='revealing'] {
+  animation-name: kt-reveal-fade;
+  animation-duration: 200ms; // void-ignore — simple fade
+  animation-timing-function: ease-out;
+}
+
+// Random retro: stepped fade
 [data-reveal-style='random'][data-physics='retro']
   .kt-glyph[data-kt-state='revealing'] {
-  animation-name: kt-reveal-random;
-  animation-duration: 150ms; // void-ignore — ultra-fast for retro random
+  animation-name: kt-reveal-fade;
+  animation-duration: 120ms; // void-ignore
   animation-timing-function: steps(2); // void-ignore
   opacity: unset;
 }
@@ -405,7 +464,8 @@
   .kt-line,
   .kt-visual,
   [data-kt-effect],
-  [data-kt-oneshot] {
+  [data-kt-oneshot],
+  [data-kt-secondary] {
     animation: none !important;
     transform: none !important;
     filter: none !important;
@@ -948,20 +1008,36 @@
   }
 }
 
-// ── Ripple: vertical wave propagating through text ──
+// ── Ripple: asymmetric wave — sharper up-peak, broader down-valley ──
 @keyframes kt-effect-ripple {
   0% {
     transform: translateY(0) rotate(0deg);
   }
-  25% {
-    transform: translateY(calc(var(--kt-dy) * -1))
-      rotate(calc(var(--kt-rotate) * -1)); // void-ignore
+  12% {
+    transform: translateY(calc(var(--kt-dy) * -0.7))
+      rotate(calc(var(--kt-rotate) * -0.6)); // void-ignore — fast rise
   }
-  50% {
-    transform: translateY(0) rotate(0deg);
+  20% {
+    transform: translateY(calc(var(--kt-dy) * -1.06))
+      rotate(calc(var(--kt-rotate) * -1)); // void-ignore — overshoot peak
   }
-  75% {
-    transform: translateY(var(--kt-dy)) rotate(var(--kt-rotate)); // void-ignore
+  30% {
+    transform: translateY(calc(var(--kt-dy) * -0.8))
+      rotate(calc(var(--kt-rotate) * -0.7)); // void-ignore — settle from peak
+  }
+  48% {
+    transform: translateY(0) rotate(0deg); // void-ignore — center crossing
+  }
+  62% {
+    transform: translateY(calc(var(--kt-dy) * 0.75))
+      rotate(calc(var(--kt-rotate) * 0.7)); // void-ignore — slower descent
+  }
+  74% {
+    transform: translateY(var(--kt-dy)) rotate(var(--kt-rotate)); // void-ignore — broader valley
+  }
+  88% {
+    transform: translateY(calc(var(--kt-dy) * 0.3))
+      rotate(calc(var(--kt-rotate) * 0.2)); // void-ignore — return
   }
   100% {
     transform: translateY(0) rotate(0deg);
@@ -1010,20 +1086,37 @@
 // PARAMETRIC EFFECT KEYFRAMES — CONTINUOUS
 // ═══════════════════════════════════════════════════════════════════
 
-// ── Drift: asymmetric vertical float, kelp-like ──
+// ── Drift: asymmetric vertical float — fast lift, long hang at top, gentle settle ──
 @keyframes kt-effect-drift {
   0%,
   100% {
     transform: translateY(0);
   }
-  35% {
-    transform: translateY(var(--kt-dy)); // void-ignore
+  12% {
+    transform: translateY(
+      calc(var(--kt-dy) * 0.65)
+    ); // void-ignore — quick initial lift
   }
-  55% {
-    transform: translateY(calc(var(--kt-dy) * 0.85)); // void-ignore
+  30% {
+    transform: translateY(
+      calc(var(--kt-dy) * 1.03)
+    ); // void-ignore — slight overshoot
   }
-  80% {
-    transform: translateY(calc(var(--kt-dy) * 0.15)); // void-ignore
+  42% {
+    transform: translateY(var(--kt-dy)); // void-ignore — settle at peak
+  }
+  58% {
+    transform: translateY(
+      calc(var(--kt-dy) * 0.9)
+    ); // void-ignore — linger at top
+  }
+  75% {
+    transform: translateY(
+      calc(var(--kt-dy) * 0.35)
+    ); // void-ignore — begin descent
+  }
+  88% {
+    transform: translateY(calc(var(--kt-dy) * 0.08)); // void-ignore — ease home
   }
 }
 
@@ -1406,26 +1499,52 @@
   }
 }
 
-// ── Sway: asymmetric pendulum, lingers at extremes ──
+// ── Sway: physical pendulum — accelerates through center, hangs at extremes ──
 @keyframes kt-effect-sway {
   0%,
   100% {
-    transform: translateX(calc(var(--kt-dx) * -1)); // void-ignore
+    transform: translateX(
+      calc(var(--kt-dx) * -1)
+    ); // void-ignore — left extreme
   }
-  15% {
-    transform: translateX(calc(var(--kt-dx) * -0.85)); // void-ignore
+  8% {
+    transform: translateX(
+      calc(var(--kt-dx) * -0.97)
+    ); // void-ignore — slow start (hang)
   }
-  35% {
-    transform: translateX(0);
+  18% {
+    transform: translateX(
+      calc(var(--kt-dx) * -0.6)
+    ); // void-ignore — accelerating
   }
-  50% {
-    transform: translateX(var(--kt-dx)); // void-ignore
+  30% {
+    transform: translateX(0); // void-ignore — fastest through center
   }
-  65% {
-    transform: translateX(calc(var(--kt-dx) * 0.85)); // void-ignore
+  42% {
+    transform: translateX(
+      calc(var(--kt-dx) * 0.6)
+    ); // void-ignore — decelerating
   }
-  85% {
-    transform: translateX(0);
+  52% {
+    transform: translateX(
+      calc(var(--kt-dx) * 0.97)
+    ); // void-ignore — approaching extreme
+  }
+  58% {
+    transform: translateX(var(--kt-dx)); // void-ignore — right extreme (hang)
+  }
+  68% {
+    transform: translateX(
+      calc(var(--kt-dx) * 0.6)
+    ); // void-ignore — accelerating back
+  }
+  80% {
+    transform: translateX(0); // void-ignore — center again
+  }
+  90% {
+    transform: translateX(
+      calc(var(--kt-dx) * -0.6)
+    ); // void-ignore — decelerating
   }
 }
 
@@ -1454,14 +1573,36 @@
   }
 }
 
-// ── Wave: smooth sine-wave — positive-only dy, wave from phase stagger ──
+// ── Wave: asymmetric ocean wave — faster rise, slower fall, micro-overshoot ──
 @keyframes kt-effect-wave {
   0%,
   100% {
     transform: translateY(0);
   }
+  18% {
+    transform: translateY(
+      calc(var(--kt-dy) * -0.85)
+    ); // void-ignore — fast rise
+  }
+  38% {
+    transform: translateY(
+      calc(var(--kt-dy) * -1.04)
+    ); // void-ignore — overshoot peak
+  }
   50% {
-    transform: translateY(calc(var(--kt-dy) * -1)); // void-ignore
+    transform: translateY(
+      calc(var(--kt-dy) * -1)
+    ); // void-ignore — settle at peak
+  }
+  68% {
+    transform: translateY(
+      calc(var(--kt-dy) * -0.55)
+    ); // void-ignore — slower descent
+  }
+  85% {
+    transform: translateY(
+      calc(var(--kt-dy) * -0.1)
+    ); // void-ignore — ease into rest
   }
 }
 
@@ -1489,26 +1630,38 @@
   }
 }
 
-// ── Wobble: pure rotation oscillation — jelly-like ──
+// ── Wobble: damped rotation — fast initial swing, non-uniform settle ──
 @keyframes kt-effect-wobble {
   0%,
   100% {
     transform: rotate(0deg);
   }
-  15% {
-    transform: rotate(var(--kt-rotate)); // void-ignore
+  8% {
+    transform: rotate(var(--kt-rotate)); // void-ignore — sharp initial swing
   }
-  35% {
-    transform: rotate(calc(var(--kt-rotate) * -0.7)); // void-ignore
+  22% {
+    transform: rotate(
+      calc(var(--kt-rotate) * -0.72)
+    ); // void-ignore — overshoot return
   }
-  50% {
-    transform: rotate(calc(var(--kt-rotate) * 0.5)); // void-ignore
+  38% {
+    transform: rotate(calc(var(--kt-rotate) * 0.45)); // void-ignore
   }
-  65% {
-    transform: rotate(calc(var(--kt-rotate) * -0.3)); // void-ignore
+  52% {
+    transform: rotate(
+      calc(var(--kt-rotate) * -0.25)
+    ); // void-ignore — slowing down
   }
-  80% {
-    transform: rotate(calc(var(--kt-rotate) * 0.1)); // void-ignore
+  66% {
+    transform: rotate(calc(var(--kt-rotate) * 0.12)); // void-ignore
+  }
+  78% {
+    transform: rotate(
+      calc(var(--kt-rotate) * -0.04)
+    ); // void-ignore — micro-jitter
+  }
+  88% {
+    transform: rotate(calc(var(--kt-rotate) * 0.01)); // void-ignore — settling
   }
 }
 
@@ -1533,26 +1686,42 @@
   }
 }
 
-// ── Drip: downward gravity sag with slight tilt ──
+// ── Drip: gravity sag — accelerating fall, micro-bounce at bottom, slow return ──
 @keyframes kt-effect-drip {
   0%,
   100% {
     transform: translateY(0) rotate(0deg);
   }
-  30% {
-    transform: translateY(calc(var(--kt-dy) * 0.4))
-      rotate(calc(var(--kt-rotate) * 0.3)); // void-ignore
+  10% {
+    transform: translateY(calc(var(--kt-dy) * 0.08))
+      rotate(calc(var(--kt-rotate) * 0.05)); // void-ignore — slow initial sag
   }
-  55% {
-    transform: translateY(var(--kt-dy)) rotate(var(--kt-rotate)); // void-ignore
+  22% {
+    transform: translateY(calc(var(--kt-dy) * 0.35))
+      rotate(calc(var(--kt-rotate) * 0.25)); // void-ignore — accelerating
   }
-  70% {
-    transform: translateY(calc(var(--kt-dy) * 0.85))
-      rotate(calc(var(--kt-rotate) * 0.7)); // void-ignore
+  35% {
+    transform: translateY(calc(var(--kt-dy) * 0.78))
+      rotate(calc(var(--kt-rotate) * 0.7)); // void-ignore — fast now
   }
-  85% {
-    transform: translateY(calc(var(--kt-dy) * 0.2))
-      rotate(calc(var(--kt-rotate) * 0.1)); // void-ignore
+  42% {
+    transform: translateY(calc(var(--kt-dy) * 1.04))
+      rotate(calc(var(--kt-rotate) * 1.02)); // void-ignore — overshoot bottom
+  }
+  50% {
+    transform: translateY(calc(var(--kt-dy) * 0.92))
+      rotate(calc(var(--kt-rotate) * 0.85)); // void-ignore — micro-bounce
+  }
+  58% {
+    transform: translateY(var(--kt-dy)) rotate(var(--kt-rotate)); // void-ignore — settle at bottom
+  }
+  72% {
+    transform: translateY(calc(var(--kt-dy) * 0.65))
+      rotate(calc(var(--kt-rotate) * 0.5)); // void-ignore — slow return
+  }
+  86% {
+    transform: translateY(calc(var(--kt-dy) * 0.15))
+      rotate(calc(var(--kt-rotate) * 0.08)); // void-ignore — easing home
   }
 }
 
@@ -1738,139 +1907,401 @@
 // ═══════════════════════════════════════════════════════════════════
 // EFFECT ANIMATION RULES — CONTINUOUS (per-character on .kt-unit)
 // ═══════════════════════════════════════════════════════════════════
-// animation-delay combines --kt-phase (position in text) with
-// --kt-delay-offset (per-char randomization) for organic motion.
+// animation-duration scales by --kt-duration-mult (0.85–1.15 per char)
+// so each character runs at a slightly different speed, creating
+// organic phase drift — characters naturally move in and out of sync.
+// animation-delay combines phase position with per-char randomization.
 
 .kt-unit[data-kt-effect='drift'] {
-  animation: kt-effect-drift 4.5s cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
+  animation: kt-effect-drift calc(4.5s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -4.5s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-4.5s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='flicker'] {
-  animation: kt-effect-flicker 3s linear infinite; // void-ignore
+  animation: kt-effect-flicker calc(3s * var(--kt-duration-mult, 1)) linear
+    infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -3s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-3s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='breathe'] {
-  animation: kt-effect-breathe 5s cubic-bezier(0.4, 0, 0.6, 1) infinite; // void-ignore
+  animation: kt-effect-breathe calc(5s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.4, 0, 0.6, 1) infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -5s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-5s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='tremble'] {
-  animation: kt-effect-tremble 180ms linear infinite; // void-ignore
+  animation: kt-effect-tremble calc(180ms * var(--kt-duration-mult, 1)) linear
+    infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -180ms + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-180ms * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='pulse'] {
-  animation: kt-effect-pulse 1.5s cubic-bezier(0.22, 1, 0.36, 1) infinite; // void-ignore
+  animation: kt-effect-pulse calc(1.5s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.22, 1, 0.36, 1) infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -1.5s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-1.5s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='whisper'] {
-  animation: kt-effect-whisper 4s cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
+  animation: kt-effect-whisper calc(4s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -4s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-4s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='fade'] {
-  animation: kt-effect-fade 6s ease-in-out infinite; // void-ignore
+  animation: kt-effect-fade calc(6s * var(--kt-duration-mult, 1)) ease-in-out
+    infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -6s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-6s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='freeze'] {
-  animation: kt-effect-freeze 7s cubic-bezier(0.4, 0, 0.6, 1) infinite; // void-ignore
+  animation: kt-effect-freeze calc(7s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.4, 0, 0.6, 1) infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -7s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-7s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='burn'] {
-  animation: kt-effect-burn 2.2s cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
+  animation: kt-effect-burn calc(2.2s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -2.2s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-2.2s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='static'] {
   animation:
-    kt-effect-static-jitter 180ms linear infinite,
+    kt-effect-static-jitter calc(180ms * var(--kt-duration-mult, 1)) linear
+      infinite,
     // void-ignore
-    kt-effect-static-flicker 2s linear infinite; // void-ignore
+    kt-effect-static-flicker calc(2s * var(--kt-duration-mult, 1)) linear
+      infinite; // void-ignore
   animation-delay:
-    calc(var(--kt-phase, 0) * -180ms + var(--kt-delay-offset, 0ms)),
+    calc(
+      var(--kt-phase, 0) * calc(-180ms * var(--kt-duration-mult, 1)) +
+        var(--kt-delay-offset, 0ms)
+    ),
     // void-ignore
-    calc(var(--kt-phase, 0) * -2s + var(--kt-delay-offset, 0ms)); // void-ignore
+    calc(
+        var(--kt-phase, 0) * calc(-2s * var(--kt-duration-mult, 1)) +
+          var(--kt-delay-offset, 0ms)
+      ); // void-ignore
 }
 .kt-unit[data-kt-effect='distort'] {
-  animation: kt-effect-distort 4.5s cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
+  animation: kt-effect-distort calc(4.5s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -4.5s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-4.5s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='sway'] {
-  animation: kt-effect-sway 3.5s cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
+  animation: kt-effect-sway calc(3.5s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -3.5s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-3.5s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='glow'] {
-  animation: kt-effect-glow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite; // void-ignore
+  animation: kt-effect-glow calc(4s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.4, 0, 0.6, 1) infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -4s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-4s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='wave'] {
-  animation: kt-effect-wave 3.5s cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
+  animation: kt-effect-wave calc(3.5s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -3.5s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-3.5s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='float'] {
-  animation: kt-effect-float 6s cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
+  animation: kt-effect-float calc(6s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -6s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-6s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='wobble'] {
-  animation: kt-effect-wobble 2s cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
+  animation: kt-effect-wobble calc(2s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -2s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-2s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='sparkle'] {
-  animation: kt-effect-sparkle 2.5s cubic-bezier(0.22, 1, 0.36, 1) infinite; // void-ignore
+  animation: kt-effect-sparkle calc(2.5s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.22, 1, 0.36, 1) infinite; // void-ignore
   animation-delay: var(
     --kt-delay-offset,
     0ms
   ); // void-ignore — fully random, not phase-based
 }
 .kt-unit[data-kt-effect='drip'] {
-  animation: kt-effect-drip 4s cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
+  animation: kt-effect-drip calc(4s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -4s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-4s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='stretch'] {
-  animation: kt-effect-stretch 2.8s cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
+  animation: kt-effect-stretch calc(2.8s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -2.8s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-2.8s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='vibrate'] {
-  animation: kt-effect-vibrate 600ms linear infinite; // void-ignore
+  animation: kt-effect-vibrate calc(600ms * var(--kt-duration-mult, 1)) linear
+    infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -600ms + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-600ms * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
 }
 .kt-unit[data-kt-effect='haunt'] {
-  animation: kt-effect-haunt 7s cubic-bezier(0.4, 0, 0.6, 1) infinite; // void-ignore
+  animation: kt-effect-haunt calc(7s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.4, 0, 0.6, 1) infinite; // void-ignore
   animation-delay: calc(
-    var(--kt-phase, 0) * -7s + var(--kt-delay-offset, 0ms)
+    var(--kt-phase, 0) * calc(-7s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
   ); // void-ignore
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// SECONDARY HARMONIC ANIMATION LAYERS (on .kt-word)
+// ═══════════════════════════════════════════════════════════════════
+// Applied on the kt-word wrapper element, which sits ABOVE kt-unit in
+// the DOM tree. CSS transforms nest naturally: kt-word transform composes
+// with kt-unit transform, creating two independent motion layers that
+// combine into organic, non-repetitive movement.
+//
+// Coprime duration pairs ensure the combined motion never exactly repeats:
+//   breathe:  primary 5s    / secondary 7.3s
+//   drift:    primary 4.5s  / secondary 6.7s
+//   wave:     primary 3.5s  / secondary 5.3s
+//   float:    primary 6s    / secondary 8.7s
+//   pulse:    primary 1.5s  / secondary 2.3s
+//   tremble:  primary 180ms / secondary 270ms
+//   haunt:    primary 7s    / secondary 10.3s
+
+// ── Secondary keyframes ─────────────────────────────────────────
+
+@keyframes kt-secondary-breathe {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  30% {
+    transform: translateY(var(--kt-dy2, 0px)) rotate(var(--kt-rotate2, 0deg)); // void-ignore
+  }
+  65% {
+    transform: translateY(calc(var(--kt-dy2, 0px) * -0.7))
+      rotate(calc(var(--kt-rotate2, 0deg) * -0.6)); // void-ignore
+  }
+}
+
+@keyframes kt-secondary-drift {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(var(--kt-dx2, 0px)) rotate(var(--kt-rotate2, 0deg)); // void-ignore
+  }
+  55% {
+    transform: translateX(calc(var(--kt-dx2, 0px) * -0.8))
+      rotate(calc(var(--kt-rotate2, 0deg) * -0.5)); // void-ignore
+  }
+  80% {
+    transform: translateX(calc(var(--kt-dx2, 0px) * 0.3))
+      rotate(calc(var(--kt-rotate2, 0deg) * 0.2)); // void-ignore
+  }
+}
+
+@keyframes kt-secondary-wave {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  35% {
+    transform: translateX(var(--kt-dx2, 0px)) rotate(var(--kt-rotate2, 0deg)); // void-ignore
+  }
+  70% {
+    transform: translateX(calc(var(--kt-dx2, 0px) * -0.6))
+      rotate(calc(var(--kt-rotate2, 0deg) * -0.5)); // void-ignore
+  }
+}
+
+@keyframes kt-secondary-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  22% {
+    transform: translateY(var(--kt-dy2, 0px)) rotate(var(--kt-rotate2, 0deg)); // void-ignore
+  }
+  48% {
+    transform: translateY(calc(var(--kt-dy2, 0px) * -0.5))
+      rotate(calc(var(--kt-rotate2, 0deg) * -0.8)); // void-ignore
+  }
+  72% {
+    transform: translateY(calc(var(--kt-dy2, 0px) * 0.3))
+      rotate(calc(var(--kt-rotate2, 0deg) * 0.4)); // void-ignore
+  }
+}
+
+@keyframes kt-secondary-pulse {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  15% {
+    transform: translateY(var(--kt-dy2, 0px)) rotate(var(--kt-rotate2, 0deg)); // void-ignore
+  }
+  40% {
+    transform: translateY(calc(var(--kt-dy2, 0px) * -0.5))
+      rotate(calc(var(--kt-rotate2, 0deg) * -0.3)); // void-ignore
+  }
+}
+
+@keyframes kt-secondary-tremble {
+  0% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(var(--kt-rotate2, 0deg)); // void-ignore
+  }
+  45% {
+    transform: rotate(calc(var(--kt-rotate2, 0deg) * -0.8)); // void-ignore
+  }
+  70% {
+    transform: rotate(calc(var(--kt-rotate2, 0deg) * 0.5)); // void-ignore
+  }
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes kt-secondary-haunt {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  20% {
+    transform: translateX(calc(var(--kt-dx2, 0px) * 0.6))
+      rotate(calc(var(--kt-rotate2, 0deg) * 0.4)); // void-ignore
+  }
+  45% {
+    transform: translateX(var(--kt-dx2, 0px)) rotate(var(--kt-rotate2, 0deg)); // void-ignore
+  }
+  70% {
+    transform: translateX(calc(var(--kt-dx2, 0px) * -0.3))
+      rotate(calc(var(--kt-rotate2, 0deg) * -0.5)); // void-ignore
+  }
+}
+
+// ── Secondary animation rules on .kt-word ───────────────────────
+
+.kt-word[data-kt-secondary='breathe'] {
+  animation: kt-secondary-breathe calc(7.3s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
+  animation-delay: calc(
+    var(--kt-phase, 0) * calc(-7.3s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
+  ); // void-ignore
+}
+.kt-word[data-kt-secondary='drift'] {
+  animation: kt-secondary-drift calc(6.7s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
+  animation-delay: calc(
+    var(--kt-phase, 0) * calc(-6.7s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
+  ); // void-ignore
+}
+.kt-word[data-kt-secondary='wave'] {
+  animation: kt-secondary-wave calc(5.3s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
+  animation-delay: calc(
+    var(--kt-phase, 0) * calc(-5.3s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
+  ); // void-ignore
+}
+.kt-word[data-kt-secondary='float'] {
+  animation: kt-secondary-float calc(8.7s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.37, 0, 0.63, 1) infinite; // void-ignore
+  animation-delay: calc(
+    var(--kt-phase, 0) * calc(-8.7s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
+  ); // void-ignore
+}
+.kt-word[data-kt-secondary='pulse'] {
+  animation: kt-secondary-pulse calc(2.3s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.22, 1, 0.36, 1) infinite; // void-ignore
+  animation-delay: calc(
+    var(--kt-phase, 0) * calc(-2.3s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
+  ); // void-ignore
+}
+.kt-word[data-kt-secondary='tremble'] {
+  animation: kt-secondary-tremble calc(270ms * var(--kt-duration-mult, 1))
+    linear infinite; // void-ignore
+  animation-delay: calc(
+    var(--kt-phase, 0) * calc(-270ms * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
+  ); // void-ignore
+}
+.kt-word[data-kt-secondary='haunt'] {
+  animation: kt-secondary-haunt calc(10.3s * var(--kt-duration-mult, 1))
+    cubic-bezier(0.4, 0, 0.6, 1) infinite; // void-ignore
+  animation-delay: calc(
+    var(--kt-phase, 0) * calc(-10.3s * var(--kt-duration-mult, 1)) +
+      var(--kt-delay-offset, 0ms)
+  ); // void-ignore
+}
+
+// ── Secondary retro overrides ───────────────────────────────────
+[data-physics='retro'] .kt-word[data-kt-secondary='breathe'] {
+  animation-timing-function: steps(6);
+}
+[data-physics='retro'] .kt-word[data-kt-secondary='drift'] {
+  animation-timing-function: steps(8);
+}
+[data-physics='retro'] .kt-word[data-kt-secondary='wave'] {
+  animation-timing-function: steps(6);
+}
+[data-physics='retro'] .kt-word[data-kt-secondary='float'] {
+  animation-timing-function: steps(8);
+}
+[data-physics='retro'] .kt-word[data-kt-secondary='pulse'] {
+  animation-timing-function: steps(4);
+}
+// tremble secondary stays linear — high-frequency needs smooth interpolation
+[data-physics='retro'] .kt-word[data-kt-secondary='haunt'] {
+  animation-timing-function: steps(8);
 }
 
 // ═══════════════════════════════════════════════════════════════════

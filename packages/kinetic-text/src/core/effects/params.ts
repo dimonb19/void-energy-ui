@@ -11,6 +11,11 @@ export interface CharEffectParams {
   skew: number; // --kt-skew (deg)
   opacityMin: number; // --kt-opacity-min (0-1)
   delayOffset: number; // --kt-delay-offset (ms)
+  durationMult: number; // --kt-duration-mult (factor, default 1)
+  // Secondary layer params (applied on kt-word for harmonic motion)
+  dx2: number; // --kt-dx2 (px)
+  dy2: number; // --kt-dy2 (px)
+  rotate2: number; // --kt-rotate2 (deg)
 }
 
 const DEFAULTS: CharEffectParams = {
@@ -21,6 +26,10 @@ const DEFAULTS: CharEffectParams = {
   skew: 0,
   opacityMin: 1,
   delayOffset: 0,
+  durationMult: 1,
+  dx2: 0,
+  dy2: 0,
+  rotate2: 0,
 };
 
 // ── PRNG helpers ────────────────────────────────────────────────
@@ -144,6 +153,7 @@ function shakeParams(rng: () => number, phase: number): CharEffectParams {
     dy: signedRange(rng, 0.5, 1.5),
     rotate: signedRange(rng, 1.5, 4),
     delayOffset: phase * 50 + range(rng, 0, 8),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -154,6 +164,7 @@ function quakeParams(rng: () => number, phase: number): CharEffectParams {
     dy: signedRange(rng, 2, 5),
     rotate: signedRange(rng, 2, 6),
     delayOffset: phase * 30 + range(rng, 0, 8),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -194,6 +205,7 @@ function surgeParams(rng: () => number, phase: number): CharEffectParams {
     dy: -range(rng, 1.5, 4),
     scale: range(rng, 1.03, 1.08),
     delayOffset: phase * 50 + range(rng, 0, 8),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -203,6 +215,7 @@ function warpParams(rng: () => number, phase: number): CharEffectParams {
     scale: range(rng, 0.82, 1.18),
     skew: signedRange(rng, 4, 10),
     delayOffset: phase * 45 + range(rng, 0, 8),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -219,6 +232,7 @@ function explodeParams(rng: () => number, phase: number): CharEffectParams {
     scale: range(rng, 0.4, 0.7),
     opacityMin: range(rng, 0.05, 0.2),
     delayOffset: phase * 50 + range(rng, 0, 10),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -231,6 +245,7 @@ function collapseParams(rng: () => number, phase: number): CharEffectParams {
     rotate: signedRange(rng, 10, 35),
     scale: range(rng, 0.85, 0.95),
     delayOffset: phase * 55 + range(rng, 0, 10),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -245,6 +260,7 @@ function scatterParams(rng: () => number, phase: number): CharEffectParams {
     rotate: signedRange(rng, 4, 15),
     opacityMin: range(rng, 0.35, 0.6),
     delayOffset: phase * 70 + range(rng, 0, 12),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -257,6 +273,7 @@ function spinParams(rng: () => number, phase: number): CharEffectParams {
     scale: range(rng, 0.92, 1.08),
     dy: signedRange(rng, 1, 3),
     delayOffset: phase * 45 + range(rng, 0, 10),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -268,6 +285,7 @@ function bounceParams(rng: () => number, phase: number): CharEffectParams {
     rotate: signedRange(rng, 2, 5),
     scale: range(rng, 0.95, 1.0),
     delayOffset: phase * 40 + range(rng, 0, 8),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -293,6 +311,7 @@ function shatterParams(rng: () => number, phase: number): CharEffectParams {
     skew: signedRange(rng, 4, 12),
     scale: range(rng, 0.8, 0.95),
     delayOffset: phase * 35 + range(rng, 0, 8),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -310,6 +329,7 @@ function vortexParams(rng: () => number, phase: number): CharEffectParams {
     scale: range(rng, 0.6, 0.85),
     opacityMin: range(rng, 0.3, 0.5),
     delayOffset: centerDist * 60 + range(rng, 0, 10),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -320,6 +340,7 @@ function rippleParams(rng: () => number, phase: number): CharEffectParams {
     dy: signedRange(rng, 3, 6),
     rotate: signedRange(rng, 1, 3),
     delayOffset: phase * 150 + range(rng, 0, 5),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -331,6 +352,7 @@ function slamParams(rng: () => number, phase: number): CharEffectParams {
     dy: range(rng, 3, 8),
     rotate: signedRange(rng, 1, 3),
     delayOffset: phase * 40 + range(rng, 0, 8),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -341,6 +363,9 @@ function driftParams(rng: () => number, phase: number): CharEffectParams {
     ...DEFAULTS,
     dy: -range(rng, 1.5, 4),
     delayOffset: phase * 400 + range(rng, 0, 60),
+    durationMult: range(rng, 0.85, 1.15),
+    dx2: signedRange(rng, 0.5, 1.5),
+    rotate2: signedRange(rng, 0.3, 0.8),
   };
 }
 
@@ -349,6 +374,7 @@ function flickerParams(rng: () => number, phase: number): CharEffectParams {
     ...DEFAULTS,
     opacityMin: range(rng, 0.35, 0.7),
     delayOffset: phase * 200 + range(rng, 0, 80),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -358,6 +384,9 @@ function breatheParams(rng: () => number, phase: number): CharEffectParams {
     scale: range(rng, 1.1, 1.2),
     opacityMin: range(rng, 0.85, 0.92),
     delayOffset: phase * 500 + range(rng, 0, 80),
+    durationMult: range(rng, 0.85, 1.15),
+    dy2: signedRange(rng, 0.5, 1.5),
+    rotate2: signedRange(rng, 0.3, 1),
   };
 }
 
@@ -367,6 +396,8 @@ function trembleParams(rng: () => number, _phase: number): CharEffectParams {
     dx: signedRange(rng, 0.3, 1.2),
     dy: signedRange(rng, 0.3, 1.2),
     delayOffset: range(rng, 0, 40),
+    durationMult: range(rng, 0.85, 1.15),
+    rotate2: signedRange(rng, 0.5, 1.5),
   };
 }
 
@@ -376,6 +407,9 @@ function pulseParams(rng: () => number, phase: number): CharEffectParams {
     ...DEFAULTS,
     scale: range(rng, 1.15, 1.25),
     delayOffset: phase * 200 + range(rng, 0, 30),
+    durationMult: range(rng, 0.85, 1.15),
+    dy2: signedRange(rng, 0.3, 0.8),
+    rotate2: signedRange(rng, 0.2, 0.5),
   };
 }
 
@@ -387,6 +421,7 @@ function whisperParams(rng: () => number, phase: number): CharEffectParams {
     scale: range(rng, 0.88, 0.94),
     opacityMin: range(rng, 0.3, 0.55),
     delayOffset: phase * 400 + range(rng, 0, 60),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -395,6 +430,7 @@ function fadeParams(rng: () => number, phase: number): CharEffectParams {
     ...DEFAULTS,
     opacityMin: range(rng, 0.15, 0.4),
     delayOffset: phase * 600 + range(rng, 0, 80),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -406,6 +442,7 @@ function freezeParams(rng: () => number, phase: number): CharEffectParams {
     scale: range(rng, 0.95, 0.98),
     opacityMin: range(rng, 0.6, 0.75),
     delayOffset: phase * 400 + range(rng, 0, 60),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -415,6 +452,7 @@ function burnParams(rng: () => number, phase: number): CharEffectParams {
     dy: range(rng, 1, 3),
     skew: signedRange(rng, 1, 3),
     delayOffset: phase * 180 + range(rng, 0, 30),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -428,6 +466,7 @@ function staticParams(rng: () => number, _phase: number): CharEffectParams {
     scale: range(rng, 0.98, 1.02),
     opacityMin: range(rng, 0.35, 0.65),
     delayOffset: range(rng, 0, 40),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -439,6 +478,7 @@ function distortParams(rng: () => number, phase: number): CharEffectParams {
     scale: range(rng, 0.82, 1.18),
     skew: signedRange(rng, 3, 8),
     delayOffset: phase * 350 + range(rng, 0, 50),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -447,6 +487,7 @@ function swayParams(rng: () => number, phase: number): CharEffectParams {
     ...DEFAULTS,
     dx: signedRange(rng, 0.8, 2),
     delayOffset: phase * 300 + range(rng, 0, 40),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -456,6 +497,7 @@ function glowParams(rng: () => number, phase: number): CharEffectParams {
     ...DEFAULTS,
     scale: range(rng, 1.03, 1.08),
     delayOffset: phase * 400 + range(rng, 0, 60),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -465,6 +507,9 @@ function waveParams(rng: () => number, phase: number): CharEffectParams {
     ...DEFAULTS,
     dy: range(rng, 2, 3.5),
     delayOffset: phase * 350 + range(rng, 0, 10),
+    durationMult: range(rng, 0.85, 1.15),
+    dx2: signedRange(rng, 0.3, 0.8),
+    rotate2: signedRange(rng, 0.2, 0.6),
   };
 }
 
@@ -476,6 +521,9 @@ function floatParams(rng: () => number, phase: number): CharEffectParams {
     dy: -range(rng, 1.5, 3.5),
     rotate: signedRange(rng, 0.5, 1.5),
     delayOffset: phase * 500 + range(rng, 0, 80),
+    durationMult: range(rng, 0.85, 1.15),
+    rotate2: signedRange(rng, 0.5, 1.2),
+    dy2: signedRange(rng, 0.3, 0.8),
   };
 }
 
@@ -485,6 +533,7 @@ function wobbleParams(rng: () => number, phase: number): CharEffectParams {
     ...DEFAULTS,
     rotate: signedRange(rng, 3, 7),
     delayOffset: phase * 200 + range(rng, 0, 40),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -494,6 +543,7 @@ function sparkleParams(rng: () => number, _phase: number): CharEffectParams {
     ...DEFAULTS,
     scale: range(rng, 1.05, 1.12),
     delayOffset: range(rng, 0, 2500),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -504,6 +554,7 @@ function dripParams(rng: () => number, phase: number): CharEffectParams {
     dy: range(rng, 1.5, 4),
     rotate: signedRange(rng, 0.5, 2),
     delayOffset: phase * 350 + range(rng, 0, 60),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -513,6 +564,7 @@ function stretchParams(rng: () => number, phase: number): CharEffectParams {
     ...DEFAULTS,
     scale: range(rng, 1.08, 1.2),
     delayOffset: phase * 250 + range(rng, 0, 40),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -522,6 +574,7 @@ function vibrateParams(rng: () => number, phase: number): CharEffectParams {
     ...DEFAULTS,
     dx: signedRange(rng, 1, 3),
     delayOffset: phase * 150 + range(rng, 0, 30),
+    durationMult: range(rng, 0.85, 1.15),
   };
 }
 
@@ -533,6 +586,9 @@ function hauntParams(rng: () => number, phase: number): CharEffectParams {
     rotate: signedRange(rng, 1.5, 4),
     opacityMin: range(rng, 0.25, 0.5),
     delayOffset: phase * 600 + range(rng, 0, 100),
+    durationMult: range(rng, 0.85, 1.15),
+    dx2: signedRange(rng, 0.3, 1),
+    rotate2: signedRange(rng, 0.5, 1.5),
   };
 }
 
@@ -611,11 +667,11 @@ export function computeDropParams(
 }
 
 /**
- * Compute per-character starting transform for the random reveal style.
+ * Compute per-character starting transform for the pop reveal style.
  * Characters pop in from random offsets/rotations — fast, chaotic entrance.
  * Similar to scramble but with tighter radius and less rotation for speed.
  */
-export function computeRandomRevealParams(
+export function computePopRevealParams(
   index: number,
   totalUnits: number,
   seed: number,
@@ -646,6 +702,10 @@ const PARAM_KEYS: [keyof CharEffectParams, string, string][] = [
   ['skew', '--kt-skew', 'deg'],
   ['opacityMin', '--kt-opacity-min', ''],
   ['delayOffset', '--kt-delay-offset', 'ms'],
+  ['durationMult', '--kt-duration-mult', ''],
+  ['dx2', '--kt-dx2', 'px'],
+  ['dy2', '--kt-dy2', 'px'],
+  ['rotate2', '--kt-rotate2', 'deg'],
 ];
 
 export function applyCharParams(

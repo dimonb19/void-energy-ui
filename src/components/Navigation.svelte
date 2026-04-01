@@ -27,19 +27,19 @@
 
   // Main navigation tabs (desktop header + mobile bottom nav)
   const navItems: NavItem[] = [
-    { id: 'conexus', label: 'CoNexus', href: '/conexus', icon: Quill },
-    {
-      id: 'kinetic-text',
-      label: 'Kinetic Text',
-      href: '/kinetic-text',
-      icon: Type,
-    },
     {
       id: 'components',
       label: 'Components',
       href: '/components',
       icon: LayoutGrid,
     },
+    {
+      id: 'kinetic-text',
+      label: 'Kinetic Text',
+      href: '/kinetic-text',
+      icon: Type,
+    },
+    { id: 'conexus', label: 'CoNexus', href: '/conexus', icon: Quill },
   ];
 
   // ─────────────────────────────────────────────────────────────────────────────

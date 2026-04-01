@@ -201,7 +201,7 @@
         "cursor?: boolean",
         "cursorChar?: string",
         "cursorRemoveOnComplete?: boolean",
-        "chunk?: 'word' | 'sentence' | 'sentence-pair'",
+        "speedPreset?: 'fast' | 'rapid' | 'instant'",
         "charSpeed?: number",
         "pauseDuration?: number",
         "loop?: boolean",

@@ -3614,7 +3614,7 @@ Use `isOneShotEffect()` to branch. The effect can also arrive late (from API, ga
 
 {#key step.id}
   <p
-    use:kinetic={{ text: step.text, mode: 'word', chunk: 'sentence', onComplete: onKineticDone }}
+    use:kinetic={{ text: step.text, mode: 'word', onComplete: onKineticDone }}
     use:narrative={{ effect: narrativeEffect, enabled }}
   ></p>
 {/key}
@@ -5401,7 +5401,7 @@ All charts are pure SVG, fluid-width, and adapt to atmosphere/physics/mode. Pass
 <!-- Chained with Kinetic reveal (story step pattern) -->
 {#key step.id}
   <p
-    use:kinetic={{ text: step.text, mode: 'word', chunk: 'sentence', onComplete: onKineticDone }}
+    use:kinetic={{ text: step.text, mode: 'word', onComplete: onKineticDone }}
     use:narrative={{ effect: narrativeEffect, enabled }}
   ></p>
 {/key}
@@ -5586,8 +5586,8 @@ Provides both a Svelte action (`use:kinetic`) and a standalone class (`KineticEn
 | `text` | `string` | — | Text to animate (char, word, decode modes) |
 | `words` | `string[]` | — | Word list (cycle mode) |
 | `mode` | `'char' \| 'word' \| 'cycle' \| 'decode'` | `'char'` | Animation mode |
-| `chunk` | `'word' \| 'sentence' \| 'sentence-pair'` | `'word'` | Chunk size for word mode — determines grouping for streaming bursts |
-| `charSpeed` | `number` | `8` | Per-character speed (ms) for smooth chunk reveal within each word/sentence |
+| `speedPreset` | `'fast' \| 'rapid' \| 'instant'` | `'fast'` | Named speed preset. Overridden by explicit `speed`/`charSpeed`. |
+| `charSpeed` | `number` | `8` | Per-character speed (ms) for smooth chunk reveal within each word group |
 | `speed` | `number` | `40` | Ms per animation unit — in word mode this is the pause between chunks |
 | `delay` | `number` | `0` | Initial delay before animation starts (ms) |
 | `cursor` | `boolean` | `false` | Show blinking cursor |
@@ -5950,7 +5950,6 @@ Use `isOneShotEffect()` to branch the timing.
     use:kinetic={{
       text: step.text,
       mode: 'word',
-      chunk: 'sentence',
       onComplete: onKineticDone,
     }}
     use:narrative={{ effect: narrativeEffect, enabled }}

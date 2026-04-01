@@ -9,17 +9,15 @@
 //   cycle   — Rotates through a word list (loading states)
 //   decode  — Scramble → resolve effect (sci-fi terminal feel)
 //
-// Word-mode chunks:
-//   'word'           — reveal one word at a time (default)
-//   'sentence'       — reveal one sentence at a time
-//   'sentence-pair'  — reveal two sentences at a time
+// Speed presets:
+//   'fast'    — speed: 40ms, charSpeed: 8ms  (floor — previous default)
+//   'rapid'   — speed: 20ms, charSpeed: 4ms  (2× faster)
+//   'instant' — speed: 8ms,  charSpeed: 2ms  (near-instant)
 //
-//   Each chunk is internally revealed char-by-char at `charSpeed`
-//   (default 8ms), with `speed` (default 40ms) pause between chunks.
-//   This creates a streaming-burst feel like AI text generation.
+//   Explicit speed/charSpeed values override any preset.
 //
 // Usage as Svelte action:
-//   <span use:kinetic={{ text: 'Hello world', mode: 'char', speed: 40 }} />
+//   <span use:kinetic={{ text: 'Hello world', mode: 'char', speedPreset: 'rapid' }} />
 //   <span use:kinetic={{ words: ['Synthesizing…', 'Calibrating…'], mode: 'cycle' }} />
 //
 // Usage as standalone:
@@ -36,7 +34,7 @@
 // after kinetic finishes. See narrative.ts for the full pattern
 // and isOneShotEffect() helper.
 //
-//   use:kinetic={{ text, mode: 'word', chunk: 'sentence', onComplete }}
+//   use:kinetic={{ text, mode: 'word', onComplete }}
 //   use:narrative={{ effect: narrativeEffect, enabled }}
 //
 // ─────────────────────────────────────────────────────────────
@@ -90,13 +88,37 @@ function getPhysicsProfile(): PhysicsProfile {
   }
 }
 
+// ── Speed Presets ───────────────────────────────────────────
+
+const SPEED_PRESETS: Record<
+  KineticSpeedPreset,
+  { speed: number; charSpeed: number }
+> = {
+  fast: { speed: 40, charSpeed: 8 },
+  rapid: { speed: 20, charSpeed: 4 },
+  instant: { speed: 8, charSpeed: 2 },
+};
+
+function resolveSpeedPreset(config: KineticConfig): {
+  speed: number;
+  charSpeed: number;
+} {
+  const preset = SPEED_PRESETS[config.speedPreset ?? 'fast'];
+  return {
+    speed: config.speed ?? preset.speed,
+    charSpeed: config.charSpeed ?? preset.charSpeed,
+  };
+}
+
 // ── Defaults ────────────────────────────────────────────────
 
 const DEFAULTS: Required<
-  Omit<KineticConfig, 'text' | 'words' | 'onComplete' | 'onCycle'>
+  Omit<
+    KineticConfig,
+    'text' | 'words' | 'onComplete' | 'onCycle' | 'speedPreset'
+  >
 > = {
   mode: 'char',
-  chunk: 'word' as KineticWordChunk,
   charSpeed: 8,
   speed: 40,
   delay: 0,
@@ -124,26 +146,6 @@ function randomChar(chars: string): string {
   return chars[Math.floor(Math.random() * chars.length)];
 }
 
-// ── Sentence splitting ───────────────────────────────────────
-
-function splitSentences(text: string): string[] {
-  const pattern = /.*?[.!?](?:\s+|$)/g;
-  const chunks: string[] = [];
-  let match: RegExpExecArray | null;
-  let lastIndex = 0;
-
-  while ((match = pattern.exec(text)) !== null) {
-    chunks.push(match[0]);
-    lastIndex = pattern.lastIndex;
-  }
-
-  if (lastIndex < text.length) {
-    chunks.push(text.slice(lastIndex));
-  }
-
-  return chunks.length > 0 ? chunks : [text];
-}
-
 // ── Active instances (cleanup / abort) ──────────────────────
 
 const activeInstances = new WeakMap<HTMLElement, KineticEngine>();
@@ -155,7 +157,10 @@ const activeInstances = new WeakMap<HTMLElement, KineticEngine>();
 export class KineticEngine {
   private el: HTMLElement;
   private config: Required<
-    Omit<KineticConfig, 'text' | 'words' | 'onComplete' | 'onCycle'>
+    Omit<
+      KineticConfig,
+      'text' | 'words' | 'onComplete' | 'onCycle' | 'speedPreset'
+    >
   > &
     Pick<KineticConfig, 'text' | 'words' | 'onComplete' | 'onCycle'>;
 
@@ -172,11 +177,18 @@ export class KineticEngine {
     this.el = el;
     this.physics = getPhysicsProfile();
 
-    // Merge: DEFAULTS → physics overrides → user config (user wins)
+    // Resolve speed preset first (explicit speed/charSpeed override preset)
+    const presetSpeeds = resolveSpeedPreset(config);
+
+    // Merge: DEFAULTS → preset speeds → physics overrides → user config (user wins)
     const physicsDefaults: Partial<KineticConfig> = {};
 
-    // Physics speed adjustment (only if user didn't explicitly set speed)
-    if (config.speed === undefined && this.physics.speedMultiplier !== 1) {
+    // Physics speed adjustment (only if user didn't explicitly set speed and no preset override)
+    if (
+      config.speed === undefined &&
+      config.speedPreset === undefined &&
+      this.physics.speedMultiplier !== 1
+    ) {
       physicsDefaults.speed = Math.round(
         DEFAULTS.speed * this.physics.speedMultiplier,
       );
@@ -206,7 +218,12 @@ export class KineticEngine {
       physicsDefaults.cycleTransition = this.physics.forceCycleTransition;
     }
 
-    this.config = { ...DEFAULTS, ...physicsDefaults, ...config };
+    this.config = {
+      ...DEFAULTS,
+      ...presetSpeeds,
+      ...physicsDefaults,
+      ...config,
+    };
     activeInstances.set(el, this);
   }
 
@@ -359,22 +376,7 @@ export class KineticEngine {
     const text = this.config.text ?? '';
     if (!text) return resolve();
 
-    const { chunk } = this.config;
-
-    let tokens: string[];
-    if (chunk === 'sentence' || chunk === 'sentence-pair') {
-      const sentences = splitSentences(text);
-      if (chunk === 'sentence-pair') {
-        tokens = [];
-        for (let s = 0; s < sentences.length; s += 2) {
-          tokens.push(sentences[s] + (sentences[s + 1] ?? ''));
-        }
-      } else {
-        tokens = sentences;
-      }
-    } else {
-      tokens = text.split(/(\s+)/); // preserve whitespace
-    }
+    const tokens = text.split(/(\s+)/); // preserve whitespace
 
     this.el.textContent = '';
     this.showCursor();

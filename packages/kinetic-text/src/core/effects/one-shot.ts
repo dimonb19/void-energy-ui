@@ -64,9 +64,9 @@ export function fireOneShotEffect(
     applyCharParams(el, params);
     el.setAttribute('data-kt-oneshot', cue.effect);
 
-    if (cue.durationMs !== undefined) {
-      el.style.setProperty('--kt-effect-duration', `${cue.durationMs}ms`);
-    }
+    // Per-character duration: base × durationMult for organic timing variation
+    const charDuration = Math.round(duration * params.durationMult);
+    el.style.setProperty('--kt-effect-duration', `${charDuration}ms`);
 
     if (params.delayOffset > maxDelay) maxDelay = params.delayOffset;
     pending++;
@@ -77,8 +77,8 @@ export function fireOneShotEffect(
     return;
   }
 
-  // Fallback timer covers max delay + animation duration + margin
-  const fallbackDelay = maxDelay + duration * 2;
+  // Fallback timer covers max delay + longest possible char duration + margin
+  const fallbackDelay = maxDelay + Math.round(duration * 1.15) * 2;
   let completed = false;
 
   const finish = () => {

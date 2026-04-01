@@ -1,5 +1,12 @@
 type KineticMode = 'char' | 'word' | 'cycle' | 'decode';
-type KineticWordChunk = 'word' | 'sentence' | 'sentence-pair';
+
+/**
+ * Named speed presets. Current "fast" is the floor — all presets are fast.
+ * - `'fast'`    — speed: 40ms, charSpeed: 8ms (previous default)
+ * - `'rapid'`   — speed: 20ms, charSpeed: 4ms (2× faster)
+ * - `'instant'` — speed: 8ms,  charSpeed: 2ms (near-instant)
+ */
+type KineticSpeedPreset = 'fast' | 'rapid' | 'instant';
 
 interface KineticConfig {
   /** Single text string (for char, word, decode modes) */
@@ -8,6 +15,8 @@ interface KineticConfig {
   words?: string[];
   /** Animation mode — defaults to 'char' */
   mode?: KineticMode;
+  /** Named speed preset. Overridden by explicit speed/charSpeed values. Default: 'fast' */
+  speedPreset?: KineticSpeedPreset;
   /** Milliseconds per unit: per-char, per-word, or per-scramble tick. Default: 40 */
   speed?: number;
   /** Initial delay before animation starts (ms). Default: 0 */
@@ -20,9 +29,7 @@ interface KineticConfig {
   cursorRemoveOnComplete?: boolean;
 
   // ── Word mode ──
-  /** Chunk size for word mode reveal. Default: 'word' */
-  chunk?: KineticWordChunk;
-  /** Per-character speed (ms) for smooth chunk reveal in sentence modes. Default: 8 */
+  /** Per-character speed (ms) for word-by-word chunk reveal. Default: 8 */
   charSpeed?: number;
 
   // ── Cycle mode ──

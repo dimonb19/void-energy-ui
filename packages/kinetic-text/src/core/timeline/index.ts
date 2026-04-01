@@ -10,11 +10,11 @@ import {
   computeScrambleParams,
   computeRiseParams,
   computeDropParams,
-  computeRandomRevealParams,
+  computePopRevealParams,
   applyCharParams,
   clearCharParams,
 } from '../effects/params';
-import { createPRNG, hashSeed } from './prng';
+import { createPRNG, hashSeed, seededShuffle } from './prng';
 import { computeStaggerDelays } from './stagger';
 
 // ── Decode charsets ──────────────────────────────────────────────
@@ -25,44 +25,6 @@ const DECODE_CHARSET_RETRO = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
 function getDecodeCharset(physics: PhysicsPreset): string {
   return physics === 'retro' ? DECODE_CHARSET_RETRO : DECODE_CHARSET_FULL;
-}
-
-// ── Sentence boundary detection ──────────────────────────────────
-
-const SENTENCE_END_RE = /[.!?]/;
-
-/**
- * Group positions into sentence-sized chunks.
- * A sentence ends at `.!?` followed by whitespace (or end of text).
- * Returns arrays of global indices, one per sentence.
- */
-function splitSentences(positions: CharPosition[]): number[][] {
-  const sentences: number[][] = [];
-  let current: number[] = [];
-
-  for (let i = 0; i < positions.length; i++) {
-    current.push(i);
-    const ch = positions[i].char;
-    const nextIsSpaceOrEnd =
-      i === positions.length - 1 || positions[i + 1].isSpace;
-
-    if (SENTENCE_END_RE.test(ch) && nextIsSpaceOrEnd) {
-      // Include trailing space in this sentence
-      if (i + 1 < positions.length && positions[i + 1].isSpace) {
-        current.push(i + 1);
-        i++; // skip the space in outer loop
-      }
-      sentences.push(current);
-      current = [];
-    }
-  }
-
-  // Remaining text is the last sentence
-  if (current.length > 0) {
-    sentences.push(current);
-  }
-
-  return sentences;
 }
 
 /**
@@ -349,11 +311,7 @@ export class RevealTimeline {
     if (mode === 'decode') {
       this.processDecodeTick(elapsed);
     } else if (mode === 'word') {
-      this.processGroupedTick(elapsed, 'word');
-    } else if (mode === 'sentence') {
-      this.processGroupedTick(elapsed, 'sentence');
-    } else if (mode === 'sentence-pair') {
-      this.processGroupedTick(elapsed, 'sentence-pair');
+      this.processGroupedTick(elapsed);
     } else {
       // char mode (default)
       this.processCharTick(elapsed);
@@ -390,20 +348,30 @@ export class RevealTimeline {
     }
   }
 
-  // ── Grouped modes (word, sentence, sentence-pair) ─────────
+  // ── Grouped mode (word) ────────────────────────────────────
 
   private _wordGroups: number[][] | null = null;
-  private _sentenceGroups: number[][] | null = null;
   private _groupedSchedule:
     | { groupIndices: number[]; startMs: number }[]
     | null = null;
 
-  private processGroupedTick(
-    elapsed: number,
-    mode: 'word' | 'sentence' | 'sentence-pair',
-  ): void {
+  private processGroupedTick(elapsed: number): void {
     if (!this._groupedSchedule) {
-      this._groupedSchedule = this.buildGroupSchedule(mode);
+      if (!this._wordGroups) this._wordGroups = splitWords(this.positions);
+
+      const speed = this.config.speed;
+      let groups = this._wordGroups;
+
+      // Random reveal style: shuffle word group order
+      if (this.config.revealStyle === 'random') {
+        const rng = createPRNG(this.config.seed + 31337);
+        groups = seededShuffle(groups, rng);
+      }
+
+      this._groupedSchedule = groups.map((indices, groupIdx) => ({
+        groupIndices: indices,
+        startMs: groupIdx * speed,
+      }));
     }
 
     for (const entry of this._groupedSchedule) {
@@ -419,7 +387,7 @@ export class RevealTimeline {
       }
       if (allRevealed) continue;
 
-      // Reveal each unit in the group, optionally with inner charSpeed stagger
+      // Reveal each unit in the group, with inner charSpeed stagger
       const charSpeed = this.config.charSpeed;
       for (let j = 0; j < entry.groupIndices.length; j++) {
         const idx = entry.groupIndices[j];
@@ -431,44 +399,6 @@ export class RevealTimeline {
         }
       }
     }
-  }
-
-  private buildGroupSchedule(
-    mode: 'word' | 'sentence' | 'sentence-pair',
-  ): { groupIndices: number[]; startMs: number }[] {
-    let groups: number[][];
-
-    if (mode === 'word') {
-      if (!this._wordGroups) this._wordGroups = splitWords(this.positions);
-      groups = this._wordGroups;
-    } else {
-      if (!this._sentenceGroups)
-        this._sentenceGroups = splitSentences(this.positions);
-
-      if (mode === 'sentence-pair') {
-        // Merge pairs of sentences
-        const merged: number[][] = [];
-        for (let i = 0; i < this._sentenceGroups.length; i += 2) {
-          if (i + 1 < this._sentenceGroups.length) {
-            merged.push([
-              ...this._sentenceGroups[i],
-              ...this._sentenceGroups[i + 1],
-            ]);
-          } else {
-            merged.push(this._sentenceGroups[i]);
-          }
-        }
-        groups = merged;
-      } else {
-        groups = this._sentenceGroups;
-      }
-    }
-
-    const speed = this.config.speed;
-    return groups.map((indices, groupIdx) => ({
-      groupIndices: indices,
-      startMs: groupIdx * speed,
-    }));
   }
 
   // ── Decode mode ───────────────────────────────────────────
@@ -530,6 +460,7 @@ export class RevealTimeline {
 
   private revealUnit(index: number): void {
     if (this.revealed[index]) return;
+
     this.revealed[index] = true;
     this.revealedCount++;
     if (index > this.lastRevealedIndex) this.lastRevealedIndex = index;
@@ -545,7 +476,7 @@ export class RevealTimeline {
         style === 'scramble' ||
         style === 'rise' ||
         style === 'drop' ||
-        style === 'random'
+        style === 'pop'
       ) {
         const glyph = this.renderer.getGlyph(index);
         if (glyph) {
@@ -556,7 +487,7 @@ export class RevealTimeline {
                 ? computeRiseParams
                 : style === 'drop'
                   ? computeDropParams
-                  : computeRandomRevealParams;
+                  : computePopRevealParams;
           const params = computeFn(index, this.totalUnits, this.config.seed);
           applyCharParams(glyph, params);
         }
@@ -595,7 +526,7 @@ export class RevealTimeline {
         style === 'scramble' ||
         style === 'rise' ||
         style === 'drop' ||
-        style === 'random'
+        style === 'pop'
       ) {
         const glyph = this.renderer.getGlyph(index);
         if (glyph) clearCharParams(glyph);
@@ -630,6 +561,7 @@ export class RevealTimeline {
       this.config.stagger,
       this.config.physics,
       this.config.seed,
+      this.config.revealStyle,
     );
   }
 

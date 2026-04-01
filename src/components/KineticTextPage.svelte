@@ -43,8 +43,6 @@
   const SAMPLE_CHAR = 'System initializing... all modules online.';
   const SAMPLE_WORD =
     'The void engine adapts to every atmosphere. Glass physics create translucent surfaces with depth and glow. Flat physics produce clean, minimal interfaces. Retro physics channel the warmth of CRT phosphor.';
-  const SAMPLE_SENTENCE =
-    'The ancient door groaned open. Light spilled across the stone floor. Something moved in the shadows beyond.';
   const SAMPLE_DECODE = 'VOID ENERGY :: PREMIUM KINETIC TEXT';
   const SAMPLE_SCRAMBLE =
     'Letters scattered across dimensions reassemble into meaning.';
@@ -52,20 +50,21 @@
     'From the depths below, each letter climbs toward the light.';
   const SAMPLE_DROP =
     'Gravity pulls every word into place, heavy and deliberate.';
-  const SAMPLE_RANDOM =
+  const SAMPLE_POP =
     'Chaos snaps into order. Every glyph finds its home in an instant.';
+  const SAMPLE_RANDOM =
+    'Positions fill at random, each letter finding its place unpredictably.';
 
   // ── Replay counters ──────────────────────────────────────────────
 
   let replayChar = $state(0);
   let replayWord = $state(0);
-  let replaySentence = $state(0);
-  let replaySentencePair = $state(0);
   let replayDecode = $state(0);
   let replayRevealStyle = $state(0);
   let replayRevealScramble = $state(0);
   let replayRevealRise = $state(0);
   let replayRevealDrop = $state(0);
+  let replayRevealPop = $state(0);
   let replayRevealRandom = $state(0);
 
   // ── Interactive Sandbox ──────────────────────────────────────────
@@ -73,16 +72,15 @@
   const SANDBOX_TEXT =
     'There is a place between the signal and the silence where light forgets its name. Columns of pale geometry rise from nothing, casting shadows that fall upward into a sky made entirely of distance. The air does not move but somehow carries the memory of motion — a low hum, a half-breath, the faintest pressure of something vast deciding whether to arrive. Surfaces shift without changing. Edges soften and re-harden in cycles too slow to watch but too fast to ignore. Somewhere beneath the visible layer, a rhythm persists: not sound, not quite vibration, but the kind of presence that makes dust pause mid-fall. Time here is not broken — it is simply optional. Things happen in the order they choose, and the space between moments stretches wide enough to walk through. Nothing begins. Nothing ends. Everything is already in the middle of becoming something it will never finish being.';
 
-  const sandboxModeOptions: SelectorOption[] = [
-    { value: 'char', label: 'Character' },
-    { value: 'word', label: 'Word' },
-    { value: 'sentence', label: 'Sentence' },
-    { value: 'sentence-pair', label: 'Sentence Pair' },
-    { value: 'decode', label: 'Decode' },
+  const speedPresetOptions: SelectorOption[] = [
+    { value: 'fast', label: 'Fast' },
+    { value: 'rapid', label: 'Rapid' },
+    { value: 'instant', label: 'Instant' },
   ];
 
   const sandboxRevealStyleOptions: SelectorOption[] = [
-    { value: 'auto', label: 'Auto (Physics)' },
+    { value: 'auto', label: 'Auto (Pop)' },
+    { value: 'pop', label: 'Pop' },
     { value: 'blur', label: 'Blur' },
     { value: 'scale', label: 'Scale' },
     { value: 'scramble', label: 'Scramble' },
@@ -137,15 +135,16 @@
     { value: 'slam', label: 'Slam' },
   ];
 
-  let sbMode: string | number | null = $state('word');
   let sbRevealStyle: string | number | null = $state('auto');
   let sbContinuous: string | number | null = $state('');
   let sbOneShot: string | number | null = $state('');
-  let sbSpeed = $state(80);
-  let sbCursor = $state(false);
-  let sbPaused = $state(false);
+  let sbSpeed = $state(40);
   let sbReplay = $state(0);
   let sbOneShotFire = $state(0);
+
+  // ── Reveal Modes section state ───────────────────────────────────
+  let rmSpeedPreset: string | number | null = $state('fast');
+  let rmCursor = $state(false);
 
   function fireOneShot() {
     if (!sbOneShot) return;
@@ -153,13 +152,8 @@
   }
 
   function replaySandbox() {
-    sbPaused = false;
     sbOneShotFire = 0;
     sbReplay++;
-  }
-
-  function togglePause() {
-    sbPaused = !sbPaused;
   }
 
   // ── Narrative effects demo data ────────────────────────────────
@@ -469,9 +463,9 @@
     <header class="flex flex-col gap-xs items-center text-center">
       <h1 class="text-primary">Kinetic Text</h1>
       <p class="text-body text-dim max-w-3xl">
-        Premium character-level kinetic typography. 5 reveal modes, 7 reveal
-        styles, 34 effects, physics-aware motion, and per-character animation
-        parameters.
+        Premium character-level kinetic typography. 3 reveal modes, 7 reveal
+        styles, 3 speed presets, 34 effects, physics-aware motion, and
+        per-character animation parameters.
       </p>
     </header>
 
@@ -482,7 +476,7 @@
             <KineticText
               text={SANDBOX_TEXT}
               styleSnapshot={snapshot}
-              revealMode={sbMode as RevealMode}
+              revealMode="word"
               revealStyle={sbRevealStyle === 'auto'
                 ? undefined
                 : (sbRevealStyle as RevealStyle)}
@@ -490,8 +484,6 @@
                 ? (sbContinuous as KineticTextEffect)
                 : null}
               speed={sbSpeed}
-              cursor={sbCursor}
-              paused={sbPaused}
               oneShotEffect={sbOneShot
                 ? (sbOneShot as KineticTextEffect)
                 : null}
@@ -506,12 +498,6 @@
         <h6 class="text-mute">Reveal</h6>
         <div class="flex flex-wrap items-end gap-md">
           <Selector
-            label="Mode"
-            options={sandboxModeOptions}
-            bind:value={sbMode}
-            onchange={() => replaySandbox()}
-          />
-          <Selector
             label="Reveal Style"
             options={sandboxRevealStyleOptions}
             bind:value={sbRevealStyle}
@@ -520,16 +506,15 @@
           <SliderField
             label="Speed"
             bind:value={sbSpeed}
-            min={10}
-            max={500}
-            step={10}
+            min={4}
+            max={80}
+            step={2}
             presets={[
               { value: 40, label: 'Fast' },
-              { value: 80, label: 'Normal' },
-              { value: 400, label: 'Slow' },
+              { value: 20, label: 'Rapid' },
+              { value: 8, label: 'Instant' },
             ]}
           />
-          <Toggle label="Cursor" bind:checked={sbCursor} hideIcons />
         </div>
       </div>
 
@@ -560,14 +545,6 @@
 
       <!-- Playback controls -->
       <div class="flex items-center gap-md">
-        <IconBtn
-          aria-label={sbPaused ? 'Resume' : 'Pause'}
-          icon={PlayPause}
-          onclick={togglePause}
-          iconProps={{
-            'data-paused': sbPaused ? undefined : 'true',
-          }}
-        />
         <button
           class="btn-icon"
           aria-label="Replay from beginning"
@@ -585,9 +562,23 @@
       <div class="flex flex-col gap-xs">
         <h2>Reveal Modes</h2>
         <p class="text-dim">
-          Five modes control how text enters the viewport. Each mode adapts its
+          Three modes control how text enters the viewport. Each mode adapts its
           timing, cursor behavior, and physics response automatically.
         </p>
+      </div>
+
+      <div class="flex flex-wrap items-end gap-md">
+        <Selector
+          label="Speed"
+          options={speedPresetOptions}
+          bind:value={rmSpeedPreset}
+          onchange={() => {
+            replayChar++;
+            replayWord++;
+            replayDecode++;
+          }}
+        />
+        <Toggle label="Cursor" bind:checked={rmCursor} hideIcons />
       </div>
 
       {#if snapshot}
@@ -605,7 +596,8 @@
                 text={SAMPLE_CHAR}
                 styleSnapshot={snapshot}
                 revealMode="char"
-                speed={55}
+                speedPreset={rmSpeedPreset as 'fast' | 'rapid' | 'instant'}
+                cursor={rmCursor}
               />
             {/key}
           </div>
@@ -629,64 +621,14 @@
                 text={SAMPLE_WORD}
                 styleSnapshot={snapshot}
                 revealMode="word"
-                speed={80}
-                charSpeed={8}
+                speedPreset={rmSpeedPreset as 'fast' | 'rapid' | 'instant'}
+                cursor={rmCursor}
               />
             {/key}
           </div>
           <p class="text-caption text-mute px-xs">
             Word-by-word with fast internal character reveal. Creates an
             AI-generation streaming feel.
-          </p>
-        </div>
-
-        <!-- Sentence -->
-        <div class="flex flex-col gap-xs">
-          <div class="flex items-center justify-between">
-            <h6>Sentence</h6>
-            <button class="btn-icon" onclick={() => replaySentence++}>
-              <RotateCcw class="icon" data-size="sm" />
-            </button>
-          </div>
-          <div class="surface-sunk p-lg">
-            {#key replaySentence}
-              <KineticText
-                text={SAMPLE_SENTENCE}
-                styleSnapshot={snapshot}
-                revealMode="sentence"
-                speed={200}
-                charSpeed={6}
-              />
-            {/key}
-          </div>
-          <p class="text-caption text-mute px-xs">
-            Sentence-by-sentence reveal. Each sentence appears as a burst, with
-            characters flowing in rapidly.
-          </p>
-        </div>
-
-        <!-- Sentence Pair -->
-        <div class="flex flex-col gap-xs">
-          <div class="flex items-center justify-between">
-            <h6>Sentence Pair</h6>
-            <button class="btn-icon" onclick={() => replaySentencePair++}>
-              <RotateCcw class="icon" data-size="sm" />
-            </button>
-          </div>
-          <div class="surface-sunk p-lg">
-            {#key replaySentencePair}
-              <KineticText
-                text={SAMPLE_SENTENCE}
-                styleSnapshot={snapshot}
-                revealMode="sentence-pair"
-                speed={300}
-                charSpeed={6}
-              />
-            {/key}
-          </div>
-          <p class="text-caption text-mute px-xs">
-            Two sentences at a time. Useful for dialogue pacing in narrative
-            contexts.
           </p>
         </div>
 
@@ -704,8 +646,10 @@
                 text={SAMPLE_DECODE}
                 styleSnapshot={snapshot}
                 revealMode="decode"
+                speedPreset={rmSpeedPreset as 'fast' | 'rapid' | 'instant'}
                 stagger={30}
                 scramblePasses={6}
+                cursor={rmCursor}
               />
             {/key}
           </div>
@@ -732,10 +676,10 @@
       </div>
 
       {#if snapshot}
-        <!-- Auto (physics default) -->
+        <!-- Auto (default = Pop) -->
         <div class="flex flex-col gap-xs">
           <div class="flex items-center justify-between">
-            <h6>Auto (Physics Default)</h6>
+            <h6>Auto (Default)</h6>
             <button class="btn-icon" onclick={() => replayRevealStyle++}>
               <RotateCcw class="icon" data-size="sm" />
             </button>
@@ -743,7 +687,7 @@
           <div class="surface-sunk p-lg">
             {#key replayRevealStyle}
               <KineticText
-                text="Physics chooses the reveal. Glass uses blur, flat uses scale, retro is instant."
+                text="Pop is the universal default. Characters snap into place from random offsets on every physics preset."
                 styleSnapshot={snapshot}
                 revealMode="char"
                 speed={45}
@@ -751,8 +695,8 @@
             {/key}
           </div>
           <p class="text-caption text-mute px-xs">
-            Glass = blur dissipation, Flat = scale up, Retro = instant. The
-            default when no <code>revealStyle</code> is set.
+            Pop is used for all physics presets by default. The reveal style is
+            physics-agnostic — same animation on glass, flat, and retro.
           </p>
         </div>
 
@@ -831,6 +775,31 @@
           </p>
         </div>
 
+        <!-- Pop -->
+        <div class="flex flex-col gap-xs">
+          <div class="flex items-center justify-between">
+            <h6>Pop</h6>
+            <button class="btn-icon" onclick={() => replayRevealPop++}>
+              <RotateCcw class="icon" data-size="sm" />
+            </button>
+          </div>
+          <div class="surface-sunk p-lg">
+            {#key replayRevealPop}
+              <KineticText
+                text={SAMPLE_POP}
+                styleSnapshot={snapshot}
+                revealStyle="pop"
+                revealMode="char"
+                speed={30}
+              />
+            {/key}
+          </div>
+          <p class="text-caption text-mute px-xs">
+            Characters pop in from random offsets — fast, chaotic entrance.
+            Universal default for all physics presets. Snappy and energetic.
+          </p>
+        </div>
+
         <!-- Random -->
         <div class="flex flex-col gap-xs">
           <div class="flex items-center justify-between">
@@ -851,9 +820,9 @@
             {/key}
           </div>
           <p class="text-caption text-mute px-xs">
-            Characters pop in from random offsets — fast, chaotic entrance.
-            Tighter radius and faster duration than scramble. Snappy and
-            energetic.
+            Characters appear in randomized order with a simple fade. The reveal
+            order is shuffled — positions fill unpredictably rather than
+            left-to-right.
           </p>
         </div>
       {/if}

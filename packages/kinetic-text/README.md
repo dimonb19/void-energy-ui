@@ -82,7 +82,8 @@ This provides all reveal keyframes, effect animations, physics-variant easing, c
 |------|------|---------|-------------|
 | `text` | `string` | — | **Required.** The text to render and reveal. |
 | `styleSnapshot` | `TextStyleSnapshot` | — | **Required.** Font, lineHeight, physics, mode, and CSS variables. |
-| `revealMode` | `RevealMode` | `'char'` | How text is revealed: `char`, `word`, `sentence`, `sentence-pair`, `decode`. |
+| `revealMode` | `RevealMode` | `'char'` | How text is revealed: `char`, `word`, `decode`. |
+| `speedPreset` | `'fast' \| 'rapid' \| 'instant'` | `'fast'` | Named speed preset. `fast` = 40/8ms, `rapid` = 20/4ms, `instant` = 8/2ms. Overridden by explicit `speed`/`charSpeed`. |
 | `revealStyle` | `RevealStyle` | `'instant'` | Visual style of the reveal animation: `instant`, `fade`, `rise`, `drop`, `scale`, `blur`. |
 | `staggerPattern` | `StaggerPattern` | `'sequential'` | Timing pattern: `sequential`, `wave`, `cascade`, `random`. |
 | `stagger` | `number` | `40` (char) / `30` (other) | Milliseconds between reveal units. |

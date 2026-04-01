@@ -39,8 +39,11 @@
 export { default as KineticText } from './svelte/KineticText.svelte';
 export { createVoidEnergyTextStyleSnapshot } from './adapters/void-energy-host';
 
+export { SPEED_PRESETS } from './types';
+
 export type {
   CueTrigger,
+  KineticSpeedPreset,
   ModePreset,
   PhysicsPreset,
   ReducedMotionMode,
