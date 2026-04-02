@@ -10,14 +10,14 @@
 //   decode  — Scramble → resolve effect (sci-fi terminal feel)
 //
 // Speed presets:
-//   'fast'    — speed: 40ms, charSpeed: 8ms  (floor — previous default)
-//   'rapid'   — speed: 20ms, charSpeed: 4ms  (2× faster)
-//   'instant' — speed: 8ms,  charSpeed: 2ms  (near-instant)
+//   'slow'    — speed: 40ms, charSpeed: 8ms  (deliberate, visible typing)
+//   'default' — speed: 20ms, charSpeed: 4ms  (standard baseline)
+//   'fast'    — speed: 8ms,  charSpeed: 2ms  (near-instant)
 //
 //   Explicit speed/charSpeed values override any preset.
 //
 // Usage as Svelte action:
-//   <span use:kinetic={{ text: 'Hello world', mode: 'char', speedPreset: 'rapid' }} />
+//   <span use:kinetic={{ text: 'Hello world', mode: 'char', speedPreset: 'fast' }} />
 //   <span use:kinetic={{ words: ['Synthesizing…', 'Calibrating…'], mode: 'cycle' }} />
 //
 // Usage as standalone:
@@ -94,16 +94,16 @@ const SPEED_PRESETS: Record<
   KineticSpeedPreset,
   { speed: number; charSpeed: number }
 > = {
-  fast: { speed: 40, charSpeed: 8 },
-  rapid: { speed: 20, charSpeed: 4 },
-  instant: { speed: 8, charSpeed: 2 },
+  slow: { speed: 40, charSpeed: 8 },
+  default: { speed: 20, charSpeed: 4 },
+  fast: { speed: 8, charSpeed: 2 },
 };
 
 function resolveSpeedPreset(config: KineticConfig): {
   speed: number;
   charSpeed: number;
 } {
-  const preset = SPEED_PRESETS[config.speedPreset ?? 'fast'];
+  const preset = SPEED_PRESETS[config.speedPreset ?? 'default'];
   return {
     speed: config.speed ?? preset.speed,
     charSpeed: config.charSpeed ?? preset.charSpeed,
@@ -122,9 +122,6 @@ const DEFAULTS: Required<
   charSpeed: 8,
   speed: 40,
   delay: 0,
-  cursor: false,
-  cursorChar: '▍',
-  cursorRemoveOnComplete: true,
   pauseDuration: 1800,
   loop: true,
   cycleTransition: 'type',
@@ -168,7 +165,6 @@ export class KineticEngine {
   private aborted = false;
   private timeouts = new Set<ReturnType<typeof setTimeout>>();
   private frameId: number | null = null;
-  private cursorEl: HTMLSpanElement | null = null;
 
   constructor(el: HTMLElement, config: KineticConfig = {}) {
     // Abort any existing instance on this element
@@ -272,7 +268,6 @@ export class KineticEngine {
       cancelAnimationFrame(this.frameId);
       this.frameId = null;
     }
-    this.removeCursor();
   }
 
   /** Immediately show final text, no animation */
@@ -289,38 +284,10 @@ export class KineticEngine {
     return Promise.resolve();
   }
 
-  // ── Text & Cursor helpers ─────────────────────────────────
+  // ── Text helpers ───────────────────────────────────────────
 
   private setText(value: string): void {
-    // Preserve cursor if active
-    if (this.cursorEl && this.el.contains(this.cursorEl)) {
-      const textNode = this.el.firstChild;
-      if (textNode && textNode.nodeType === Node.TEXT_NODE) {
-        textNode.textContent = value;
-      } else {
-        this.el.insertBefore(document.createTextNode(value), this.cursorEl);
-      }
-    } else {
-      this.el.textContent = value;
-    }
-  }
-
-  private showCursor(): void {
-    if (!this.config.cursor || this.cursorEl) return;
-
-    this.cursorEl = document.createElement('span');
-    this.cursorEl.textContent = this.config.cursorChar;
-    this.cursorEl.className = 'kinetic-cursor';
-    this.cursorEl.setAttribute('aria-hidden', 'true');
-
-    this.el.appendChild(this.cursorEl);
-  }
-
-  private removeCursor(): void {
-    if (this.cursorEl && this.el.contains(this.cursorEl)) {
-      this.el.removeChild(this.cursorEl);
-    }
-    this.cursorEl = null;
+    this.el.textContent = value;
   }
 
   private setTimeout(
@@ -353,7 +320,6 @@ export class KineticEngine {
     if (!text) return resolve();
 
     this.el.textContent = '';
-    this.showCursor();
     let i = 0;
 
     const tick = () => {
@@ -379,7 +345,6 @@ export class KineticEngine {
     const tokens = text.split(/(\s+)/); // preserve whitespace
 
     this.el.textContent = '';
-    this.showCursor();
     let i = 0;
     let built = '';
 
@@ -477,8 +442,6 @@ export class KineticEngine {
   private cycleType(word: string, done: () => void): void {
     let i = 0;
     this.el.textContent = '';
-    this.cursorEl = null; // textContent = '' detached it from DOM
-    this.showCursor();
 
     const tick = () => {
       if (this.aborted) return done();
@@ -565,8 +528,6 @@ export class KineticEngine {
     let tick = 0;
     const totalTicks = text.length * passes;
 
-    this.showCursor();
-
     const frame = () => {
       if (this.aborted) return resolve();
 
@@ -601,9 +562,6 @@ export class KineticEngine {
   // ── Completion ────────────────────────────────────────────
 
   private onAnimationEnd(resolve: () => void): void {
-    if (this.config.cursorRemoveOnComplete) {
-      this.removeCursor();
-    }
     this.config.onComplete?.();
     resolve();
   }

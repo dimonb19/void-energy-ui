@@ -23,112 +23,112 @@ register({
   name: 'shake',
   category: 'one-shot',
   cssAnimationName: 'kt-effect-shake',
-  defaultDuration: 600,
+  defaultDuration: 1400,
 });
 
 register({
   name: 'quake',
   category: 'one-shot',
   cssAnimationName: 'kt-effect-quake',
-  defaultDuration: 850,
+  defaultDuration: 2000,
 });
 
 register({
   name: 'jolt',
   category: 'one-shot',
   cssAnimationName: 'kt-effect-jolt',
-  defaultDuration: 500,
+  defaultDuration: 900,
 });
 
 register({
   name: 'glitch',
   category: 'one-shot',
   cssAnimationName: 'kt-effect-glitch',
-  defaultDuration: 700,
+  defaultDuration: 1400,
 });
 
 register({
   name: 'surge',
   category: 'one-shot',
   cssAnimationName: 'kt-effect-surge',
-  defaultDuration: 550,
+  defaultDuration: 1100,
 });
 
 register({
   name: 'warp',
   category: 'one-shot',
   cssAnimationName: 'kt-effect-warp',
-  defaultDuration: 700,
+  defaultDuration: 1400,
 });
 
 register({
   name: 'explode',
   category: 'one-shot',
   cssAnimationName: 'kt-effect-explode',
-  defaultDuration: 1000,
+  defaultDuration: 2000,
 });
 
 register({
   name: 'collapse',
   category: 'one-shot',
   cssAnimationName: 'kt-effect-collapse',
-  defaultDuration: 800,
+  defaultDuration: 1600,
 });
 
 register({
   name: 'scatter',
   category: 'one-shot',
   cssAnimationName: 'kt-effect-scatter',
-  defaultDuration: 1100,
+  defaultDuration: 2200,
 });
 
 register({
   name: 'spin',
   category: 'one-shot',
   cssAnimationName: 'kt-effect-spin',
-  defaultDuration: 650,
+  defaultDuration: 1100,
 });
 
 register({
   name: 'bounce',
   category: 'one-shot',
   cssAnimationName: 'kt-effect-bounce',
-  defaultDuration: 800,
+  defaultDuration: 1600,
 });
 
 register({
   name: 'flash',
   category: 'one-shot',
   cssAnimationName: 'kt-effect-flash',
-  defaultDuration: 500,
+  defaultDuration: 900,
 });
 
 register({
   name: 'shatter',
   category: 'one-shot',
   cssAnimationName: 'kt-effect-shatter',
-  defaultDuration: 900,
+  defaultDuration: 1600,
 });
 
 register({
   name: 'vortex',
   category: 'one-shot',
   cssAnimationName: 'kt-effect-vortex',
-  defaultDuration: 1000,
+  defaultDuration: 2000,
 });
 
 register({
   name: 'ripple',
   category: 'one-shot',
   cssAnimationName: 'kt-effect-ripple',
-  defaultDuration: 700,
+  defaultDuration: 1300,
 });
 
 register({
   name: 'slam',
   category: 'one-shot',
   cssAnimationName: 'kt-effect-slam',
-  defaultDuration: 650,
+  defaultDuration: 1100,
 });
 
 // ── Continuous effects (21) ──────────────────────────────────────

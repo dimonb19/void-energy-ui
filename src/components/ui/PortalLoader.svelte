@@ -37,7 +37,7 @@
     {#if status === 'loading'}
       <LoadingQuill {status} data-size="4xl" />
       <span class="portal-label hidden tablet:block">
-        <LoadingTextCycler cursor={false} />
+        <LoadingTextCycler />
       </span>
     {/if}
   </div>

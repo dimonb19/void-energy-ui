@@ -1,9 +1,10 @@
 <script lang="ts">
   import { RotateCcw } from '@lucide/svelte';
+  import Restart from '@components/icons/Restart.svelte';
   import Selector from '@components/ui/Selector.svelte';
   import Switcher from '@components/ui/Switcher.svelte';
-  import SliderField from '@components/ui/SliderField.svelte';
-  import Toggle from '@components/ui/Toggle.svelte';
+
+  import ActionBtn from '@components/ui/ActionBtn.svelte';
   import IconBtn from '@components/ui/IconBtn.svelte';
   import PlayPause from '@components/icons/PlayPause.svelte';
   import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
@@ -15,6 +16,7 @@
     KineticCue,
     TextStyleSnapshot,
   } from '@dgrslabs/void-energy-kinetic-text/types';
+  import { emerge, dissolve } from '@lib/transitions.svelte';
 
   // ── Snapshot ─────────────────────────────────────────────────────
   let snapshotEl: HTMLElement | undefined = $state();
@@ -40,121 +42,159 @@
 
   // ── Sample text ──────────────────────────────────────────────────
 
-  const SAMPLE_CHAR = 'System initializing... all modules online.';
+  const SAMPLE_CHAR =
+    'System initializing... scanning environment. All modules online. Reactor stable at nominal output. Navigation locked. Awaiting command input.';
   const SAMPLE_WORD =
-    'The void engine adapts to every atmosphere. Glass physics create translucent surfaces with depth and glow. Flat physics produce clean, minimal interfaces. Retro physics channel the warmth of CRT phosphor.';
-  const SAMPLE_DECODE = 'VOID ENERGY :: PREMIUM KINETIC TEXT';
+    'The void engine adapts to every atmosphere. Glass physics create translucent surfaces with depth and glow — layers of light stacked behind frosted panes. Flat physics produce clean, minimal interfaces where geometry speaks louder than ornament. Retro physics channel the warmth of CRT phosphor, every edge hard-cut, every transition instant, every surface lit from within by a memory of analog light.';
+  const SAMPLE_DECODE =
+    'VOID ENERGY :: PREMIUM KINETIC TEXT :: DECODE SEQUENCE ACTIVE';
   const SAMPLE_SCRAMBLE =
-    'Letters scattered across dimensions reassemble into meaning.';
+    'Letters scattered across dimensions reassemble into meaning. Each glyph tumbles through space, spinning from impossible angles, converging on the exact coordinate where language begins to make sense again.';
   const SAMPLE_RISE =
-    'From the depths below, each letter climbs toward the light.';
+    'From the depths below, each letter climbs toward the light. They rise one after another, buoyant and unhurried, ascending through invisible layers of atmosphere until they settle into the sentence they were always meant to form.';
   const SAMPLE_DROP =
-    'Gravity pulls every word into place, heavy and deliberate.';
+    'Gravity pulls every word into place, heavy and deliberate. Each character falls from somewhere above the frame, accelerating downward with the weight of certainty, landing with just enough force to know it belongs exactly where it stopped.';
   const SAMPLE_POP =
-    'Chaos snaps into order. Every glyph finds its home in an instant.';
+    'Chaos snaps into order. Every glyph finds its home in an instant — a burst of motion collapsing into stillness. One moment the space is empty, the next a complete thought exists, assembled from nothing in a single frame of controlled disorder.';
   const SAMPLE_RANDOM =
-    'Positions fill at random, each letter finding its place unpredictably.';
+    'Positions fill at random, each letter finding its place unpredictably. The sequence defies expectation — a character from the middle appears first, then one from the end, then the start. Order emerges not from left to right but from chance itself.';
 
   // ── Replay counters ──────────────────────────────────────────────
 
   let replayChar = $state(0);
   let replayWord = $state(0);
   let replayDecode = $state(0);
-  let replayRevealStyle = $state(0);
   let replayRevealScramble = $state(0);
   let replayRevealRise = $state(0);
   let replayRevealDrop = $state(0);
   let replayRevealPop = $state(0);
   let replayRevealRandom = $state(0);
 
-  // ── Interactive Sandbox ──────────────────────────────────────────
+  // ── Hero Showcase Scenes ──────────────────────────────────────────
 
-  const SANDBOX_TEXT =
-    'There is a place between the signal and the silence where light forgets its name. Columns of pale geometry rise from nothing, casting shadows that fall upward into a sky made entirely of distance. The air does not move but somehow carries the memory of motion — a low hum, a half-breath, the faintest pressure of something vast deciding whether to arrive. Surfaces shift without changing. Edges soften and re-harden in cycles too slow to watch but too fast to ignore. Somewhere beneath the visible layer, a rhythm persists: not sound, not quite vibration, but the kind of presence that makes dust pause mid-fall. Time here is not broken — it is simply optional. Things happen in the order they choose, and the space between moments stretches wide enough to walk through. Nothing begins. Nothing ends. Everything is already in the middle of becoming something it will never finish being.';
+  interface HeroScene {
+    id: string;
+    label: string;
+    description: string;
+    text: string;
+    revealMode: RevealMode;
+    revealStyle: RevealStyle;
+    continuous: KineticTextEffect | null;
+    oneShot: KineticTextEffect;
+    cues: KineticCue[];
+    speed: number;
+  }
+
+  const heroScenes: HeroScene[] = [
+    {
+      id: 'digital-corruption',
+      label: 'Corruption',
+      description: 'Distort continuous · Spin on demand · Scramble reveal',
+      text: "The signal fractured into static and rebuilt itself from noise. Every fragment carried a different version of the truth, reassembling into something that looked correct but felt borrowed from a parallel transmission. She disconnected the feed, reconnected — and heard her own voice reading back the log entry she hadn't written yet. The timestamp was three hours ahead. The words described a corridor she hadn't entered and a door she hadn't opened. She deleted the log, but the next morning it was back, longer this time, written in a hand she almost recognized as her own.",
+      revealMode: 'word',
+      revealStyle: 'scramble',
+      continuous: 'distort',
+      oneShot: 'spin',
+
+      cues: [],
+      speed: 40,
+    },
+    {
+      id: 'signal-interference',
+      label: 'Interference',
+      description: 'Static continuous · Glitch on demand · Rise reveal',
+      text: 'The transmission broke apart three hundred kilometers from the relay tower. What arrived was half language, half noise — consonants sheared off mid-syllable, vowels stretched into tones no human mouth could hold. Buried in the interference she could almost hear a rhythm, something that repeated every eleven seconds like a heartbeat made of broken glass. The technician ran the recording backward and found words nested inside the static — coordinates, a name, a date six weeks from now. The signal was not failing. It was answering a question nobody had asked yet.',
+      revealMode: 'word',
+      revealStyle: 'rise',
+      continuous: 'static',
+      oneShot: 'glitch',
+      cues: [],
+      speed: 35,
+    },
+    {
+      id: 'heartbeat-protocol',
+      label: 'Heartbeat',
+      description: 'Pulse continuous · Surge on demand · Drop reveal',
+      text: 'The seal beneath the altar began to glow in a slow, deliberate rhythm — bright enough to cast shadows on the vaulted ceiling above. Each pulse traveled outward through the stone floor in concentric rings. At pulse sixty the light shifted from amber to deep arterial red and the temperature dropped by exactly four degrees. Nobody moved. The priest counted under his breath, matching each beat. At pulse ninety the walls began to hum, a low vibration that climbed through the soles of their boots and settled behind their teeth. The light was no longer pulsing. It was breathing.',
+      revealMode: 'word',
+      revealStyle: 'drop',
+      continuous: 'pulse',
+      oneShot: 'surge',
+      cues: [],
+      speed: 40,
+    },
+    {
+      id: 'ghost-frequency',
+      label: 'Ghost',
+      description: 'Whisper continuous · Ripple on demand · Blur reveal',
+      text: 'The voice arrived so quietly that she mistook it for the building settling. It came again — not through her ears but somewhere behind them, a presence that occupied the space between sounds. Words formed at the edge of recognition: fragments of a conversation she had never had, spoken in a cadence that matched her own breathing. She held perfectly still and let it continue. The voice described the room she was standing in — the cracked tile near the window, the water stain on the ceiling, the exact number of steps between the door and the place where she stood listening to a ghost describe her own silence.',
+      revealMode: 'word',
+      revealStyle: 'blur',
+      continuous: 'whisper',
+      oneShot: 'ripple',
+      cues: [],
+      speed: 45,
+    },
+    {
+      id: 'thermal-overload',
+      label: 'Thermal',
+      description: 'Burn continuous · Quake on demand · Scale reveal',
+      text: 'Heat rolled off the sand in visible waves, warping the horizon into a shimmering ribbon of light. The thermometer read sixty-three degrees and was still climbing. The asphalt had gone viscous, holding bootprints like wet clay. Somewhere to the south the fire line advanced at walking pace, consuming everything it touched with a patience that felt almost deliberate. Metal fences ticked and pinged as they expanded. The air tasted of copper and burnt resin. By noon the sky had turned the color of old paper and the shadows had disappeared entirely, swallowed by a light so total it erased depth itself.',
+      revealMode: 'word',
+      revealStyle: 'scale',
+      continuous: 'burn',
+      oneShot: 'quake',
+      cues: [],
+      speed: 35,
+    },
+  ];
+
+  const heroSceneOptions: SwitcherOption[] = heroScenes.map((s) => ({
+    value: s.id,
+    label: s.label,
+  }));
+
+  let activeSceneId: string | number | null = $state('digital-corruption');
+  let heroReplay = $state(0);
+  let heroOneShotTrigger = $state(0);
+
+  const activeScene = $derived(
+    heroScenes.find((s) => s.id === activeSceneId) ?? heroScenes[0],
+  );
+
+  function replayHero() {
+    heroOneShotTrigger = 0;
+    heroReplay++;
+  }
+
+  function fireHeroOneShot() {
+    heroOneShotTrigger++;
+  }
 
   const speedPresetOptions: SelectorOption[] = [
+    { value: 'slow', label: 'Slow' },
+    { value: 'default', label: 'Default' },
     { value: 'fast', label: 'Fast' },
-    { value: 'rapid', label: 'Rapid' },
     { value: 'instant', label: 'Instant' },
   ];
 
-  const sandboxRevealStyleOptions: SelectorOption[] = [
-    { value: 'auto', label: 'Auto (Pop)' },
-    { value: 'pop', label: 'Pop' },
-    { value: 'blur', label: 'Blur' },
-    { value: 'scale', label: 'Scale' },
-    { value: 'scramble', label: 'Scramble' },
-    { value: 'rise', label: 'Rise' },
-    { value: 'drop', label: 'Drop' },
-    { value: 'random', label: 'Random' },
-    { value: 'instant', label: 'Instant' },
-  ];
-
-  const sandboxContinuousOptions: SelectorOption[] = [
-    { value: '', label: 'None' },
-    { value: 'drift', label: 'Drift' },
-    { value: 'flicker', label: 'Flicker' },
-    { value: 'breathe', label: 'Breathe' },
-    { value: 'tremble', label: 'Tremble' },
-    { value: 'pulse', label: 'Pulse' },
-    { value: 'whisper', label: 'Whisper' },
-    { value: 'fade', label: 'Fade' },
-    { value: 'freeze', label: 'Freeze' },
-    { value: 'burn', label: 'Burn' },
-    { value: 'static', label: 'Static' },
-    { value: 'distort', label: 'Distort' },
-    { value: 'sway', label: 'Sway' },
-    { value: 'glow', label: 'Glow' },
-    { value: 'wave', label: 'Wave' },
-    { value: 'float', label: 'Float' },
-    { value: 'wobble', label: 'Wobble' },
-    { value: 'sparkle', label: 'Sparkle' },
-    { value: 'drip', label: 'Drip' },
-    { value: 'stretch', label: 'Stretch' },
-    { value: 'vibrate', label: 'Vibrate' },
-    { value: 'haunt', label: 'Haunt' },
-  ];
-
-  const sandboxOneShotOptions: SelectorOption[] = [
-    { value: '', label: 'None' },
-    { value: 'shake', label: 'Shake' },
-    { value: 'quake', label: 'Quake' },
-    { value: 'jolt', label: 'Jolt' },
-    { value: 'glitch', label: 'Glitch' },
-    { value: 'surge', label: 'Surge' },
-    { value: 'warp', label: 'Warp' },
-    { value: 'explode', label: 'Explode' },
-    { value: 'collapse', label: 'Collapse' },
-    { value: 'scatter', label: 'Scatter' },
-    { value: 'spin', label: 'Spin' },
-    { value: 'bounce', label: 'Bounce' },
-    { value: 'flash', label: 'Flash' },
-    { value: 'shatter', label: 'Shatter' },
-    { value: 'vortex', label: 'Vortex' },
-    { value: 'ripple', label: 'Ripple' },
-    { value: 'slam', label: 'Slam' },
-  ];
-
-  let sbRevealStyle: string | number | null = $state('auto');
-  let sbContinuous: string | number | null = $state('');
-  let sbOneShot: string | number | null = $state('');
-  let sbSpeed = $state(40);
-  let sbReplay = $state(0);
-  let sbOneShotFire = $state(0);
+  // Word mode: `speed` = inter-word delay, `charSpeed` = within-word stagger.
+  // Char/Decode modes: `stagger` drives all timing (speed prop is ignored).
+  const REVEAL_SPEEDS: Record<
+    string,
+    { wordSpeed: number; wordCharSpeed: number; charStagger: number }
+  > = {
+    slow: { wordSpeed: 120, wordCharSpeed: 12, charStagger: 80 },
+    default: { wordSpeed: 60, wordCharSpeed: 6, charStagger: 40 },
+    fast: { wordSpeed: 25, wordCharSpeed: 2, charStagger: 15 },
+    instant: { wordSpeed: 8, wordCharSpeed: 0, charStagger: 4 },
+  };
 
   // ── Reveal Modes section state ───────────────────────────────────
-  let rmSpeedPreset: string | number | null = $state('fast');
-  let rmCursor = $state(false);
-
-  function fireOneShot() {
-    if (!sbOneShot) return;
-    sbOneShotFire++;
-  }
-
-  function replaySandbox() {
-    sbOneShotFire = 0;
-    sbReplay++;
-  }
+  let revealSpeedPreset: string | number | null = $state('default');
+  const revealSpeeds = $derived(
+    REVEAL_SPEEDS[String(revealSpeedPreset)] ?? REVEAL_SPEEDS.default,
+  );
 
   // ── Narrative effects demo data ────────────────────────────────
 
@@ -426,18 +466,18 @@
   let activeContinuousEffects = $state<
     Record<ContinuousEffect, ContinuousEffect | null>
   >({
-    drift: null,
-    flicker: null,
-    breathe: null,
-    tremble: null,
-    pulse: null,
-    whisper: null,
-    fade: null,
-    freeze: null,
-    burn: null,
-    static: null,
-    distort: null,
-    sway: null,
+    drift: 'drift',
+    flicker: 'flicker',
+    breathe: 'breathe',
+    tremble: 'tremble',
+    pulse: 'pulse',
+    whisper: 'whisper',
+    fade: 'fade',
+    freeze: 'freeze',
+    burn: 'burn',
+    static: 'static',
+    distort: 'distort',
+    sway: 'sway',
   });
 
   function toggleContinuousLoop(effect: ContinuousEffect) {
@@ -445,400 +485,119 @@
       ? null
       : effect;
   }
-
-  function buildOneShotCue(effect: OneShotEffect): KineticCue[] {
-    return [
-      {
-        id: `${effect}-punch`,
-        effect,
-        trigger: 'on-complete',
-      },
-    ];
-  }
 </script>
 
 <div class="container flex flex-col gap-2xl py-2xl" bind:this={snapshotEl}>
-  <!-- ─── INTERACTIVE SANDBOX ──────────────────────────────────────── -->
-  <section class="flex flex-col gap-xl">
-    <header class="flex flex-col gap-xs items-center text-center">
-      <h1 class="text-primary">Kinetic Text</h1>
-      <p class="text-body text-dim max-w-3xl">
-        Premium character-level kinetic typography. 3 reveal modes, 7 reveal
-        styles, 3 speed presets, 34 effects, physics-aware motion, and
-        per-character animation parameters.
-      </p>
-    </header>
+  <!-- ─── HERO ─────────────────────────────────────────────────────── -->
+  <header class="flex flex-col gap-lg items-center text-center">
+    <h1 class="text-primary">Kinetic Text</h1>
+    <p class="text-body text-dim max-w-3xl">
+      Character-level kinetic typography. Every letter is an independent element
+      — revealed, animated, and reactive in real time.
+    </p>
+  </header>
 
+  <!-- ─── SHOWCASE ────────────────────────────────────────────────── -->
+  <section class="flex flex-col gap-xl">
     <div class="surface-raised p-lg flex flex-col gap-lg">
+      <p class="text-dim">
+        Three effect layers run simultaneously and compose together.
+        <strong>Reveal</strong> controls how text first appears — typewriter,
+        word-by-word, decode, scramble, rise, drop.
+        <strong>Continuous</strong> effects keep text alive after reveal —
+        drift, breathe, flicker, burn, distort.
+        <strong>One-shot</strong> effects fire on demand for dramatic punctuation
+        — shake, explode, shatter, surge, glitch. A single block of text can be revealing
+        with one style, settling into a living continuous rhythm, and reacting to
+        one-shot events — all at the same time.
+      </p>
+
       {#if snapshot}
-        <div class="surface-sunk p-lg">
-          {#key sbReplay}
+        <div class="surface-sunk p-lg" in:emerge out:dissolve>
+          {#key `${activeScene.id}-${heroReplay}`}
             <KineticText
-              text={SANDBOX_TEXT}
+              text={activeScene.text}
               styleSnapshot={snapshot}
-              revealMode="word"
-              revealStyle={sbRevealStyle === 'auto'
-                ? undefined
-                : (sbRevealStyle as RevealStyle)}
-              activeEffect={sbContinuous
-                ? (sbContinuous as KineticTextEffect)
-                : null}
-              speed={sbSpeed}
-              oneShotEffect={sbOneShot
-                ? (sbOneShot as KineticTextEffect)
-                : null}
-              oneShotTrigger={sbOneShotFire}
+              revealMode={activeScene.revealMode}
+              revealStyle={activeScene.revealStyle}
+              activeEffect={activeScene.continuous}
+              speed={activeScene.speed}
+              cues={activeScene.cues}
+              oneShotEffect={activeScene.oneShot}
+              oneShotTrigger={heroOneShotTrigger}
             />
           {/key}
         </div>
       {/if}
 
-      <!-- Reveal settings -->
-      <div class="flex flex-col gap-xs">
-        <h6 class="text-mute">Reveal</h6>
-        <div class="flex flex-wrap items-end gap-md">
-          <Selector
-            label="Reveal Style"
-            options={sandboxRevealStyleOptions}
-            bind:value={sbRevealStyle}
-            onchange={() => replaySandbox()}
-          />
-          <SliderField
-            label="Speed"
-            bind:value={sbSpeed}
-            min={4}
-            max={80}
-            step={2}
-            presets={[
-              { value: 40, label: 'Fast' },
-              { value: 20, label: 'Rapid' },
-              { value: 8, label: 'Instant' },
-            ]}
-          />
-        </div>
-      </div>
-
-      <!-- Effects -->
-      <div class="flex flex-col gap-xs">
-        <h6 class="text-mute">Effects</h6>
-        <div class="flex flex-wrap items-end gap-md">
-          <Selector
-            label="Continuous"
-            options={sandboxContinuousOptions}
-            bind:value={sbContinuous}
-          />
-          <div class="flex items-end gap-sm">
-            <Selector
-              label="One-Shot"
-              options={sandboxOneShotOptions}
-              bind:value={sbOneShot}
-            />
-            <IconBtn
-              aria-label="Fire one-shot effect"
-              icon={PlayPause}
-              onclick={fireOneShot}
-              disabled={!sbOneShot}
-            />
-          </div>
-        </div>
-      </div>
-
-      <!-- Playback controls -->
-      <div class="flex items-center gap-md">
-        <button
-          class="btn-icon"
-          aria-label="Replay from beginning"
-          onclick={replaySandbox}
-        >
-          <RotateCcw class="icon" data-size="sm" />
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- ─── REVEAL MODES ─────────────────────────────────────────────── -->
-  <section class="flex flex-col gap-xl">
-    <div class="surface-raised p-lg flex flex-col gap-lg">
-      <div class="flex flex-col gap-xs">
-        <h2>Reveal Modes</h2>
-        <p class="text-dim">
-          Three modes control how text enters the viewport. Each mode adapts its
-          timing, cursor behavior, and physics response automatically.
-        </p>
-      </div>
-
-      <div class="flex flex-wrap items-end gap-md">
-        <Selector
-          label="Speed"
-          options={speedPresetOptions}
-          bind:value={rmSpeedPreset}
-          onchange={() => {
-            replayChar++;
-            replayWord++;
-            replayDecode++;
-          }}
+      <div class="flex items-center justify-center gap-md">
+        <ActionBtn
+          class="btn-system"
+          icon={Restart}
+          text="Replay"
+          onclick={replayHero}
         />
-        <Toggle label="Cursor" bind:checked={rmCursor} hideIcons />
+        <ActionBtn
+          class="btn-premium"
+          icon={PlayPause}
+          text="Fire {activeScene.oneShot}"
+          onclick={fireHeroOneShot}
+        />
       </div>
 
-      {#if snapshot}
-        <!-- Character -->
-        <div class="flex flex-col gap-xs">
-          <div class="flex items-center justify-between">
-            <h6>Character</h6>
-            <button class="btn-icon" onclick={() => replayChar++}>
-              <RotateCcw class="icon" data-size="sm" />
-            </button>
-          </div>
-          <div class="surface-sunk p-lg">
-            {#key replayChar}
-              <KineticText
-                text={SAMPLE_CHAR}
-                styleSnapshot={snapshot}
-                revealMode="char"
-                speedPreset={rmSpeedPreset as 'fast' | 'rapid' | 'instant'}
-                cursor={rmCursor}
-              />
-            {/key}
-          </div>
-          <p class="text-caption text-mute px-xs">
-            One character at a time with blinking cursor. Classic typewriter
-            feel. Retro physics adds per-tick timing jitter.
-          </p>
-        </div>
-
-        <!-- Word -->
-        <div class="flex flex-col gap-xs">
-          <div class="flex items-center justify-between">
-            <h6>Word</h6>
-            <button class="btn-icon" onclick={() => replayWord++}>
-              <RotateCcw class="icon" data-size="sm" />
-            </button>
-          </div>
-          <div class="surface-sunk p-lg">
-            {#key replayWord}
-              <KineticText
-                text={SAMPLE_WORD}
-                styleSnapshot={snapshot}
-                revealMode="word"
-                speedPreset={rmSpeedPreset as 'fast' | 'rapid' | 'instant'}
-                cursor={rmCursor}
-              />
-            {/key}
-          </div>
-          <p class="text-caption text-mute px-xs">
-            Word-by-word with fast internal character reveal. Creates an
-            AI-generation streaming feel.
-          </p>
-        </div>
-
-        <!-- Decode -->
-        <div class="flex flex-col gap-xs">
-          <div class="flex items-center justify-between">
-            <h6>Decode</h6>
-            <button class="btn-icon" onclick={() => replayDecode++}>
-              <RotateCcw class="icon" data-size="sm" />
-            </button>
-          </div>
-          <div class="surface-sunk p-lg">
-            {#key replayDecode}
-              <KineticText
-                text={SAMPLE_DECODE}
-                styleSnapshot={snapshot}
-                revealMode="decode"
-                speedPreset={rmSpeedPreset as 'fast' | 'rapid' | 'instant'}
-                stagger={30}
-                scramblePasses={6}
-                cursor={rmCursor}
-              />
-            {/key}
-          </div>
-          <p class="text-caption text-mute px-xs">
-            All characters visible immediately as scrambled glyphs, then resolve
-            left-to-right. Retro physics uses a limited uppercase charset.
-          </p>
-        </div>
-      {/if}
-    </div>
-  </section>
-
-  <!-- ─── REVEAL STYLES ─────────────────────────────────────────────── -->
-  <section class="flex flex-col gap-xl">
-    <div class="surface-raised p-lg flex flex-col gap-lg">
       <div class="flex flex-col gap-xs">
-        <h2>Reveal Styles</h2>
-        <p class="text-dim">
-          Seven visual transitions for how characters enter the viewport. Each
-          style uses per-character parameters for organic, unique motion.
-          Physics presets auto-select blur (glass), scale (flat), or instant
-          (retro) — or override explicitly.
+        <Switcher
+          options={heroSceneOptions}
+          bind:value={activeSceneId}
+          onchange={() => replayHero()}
+        />
+        <p class="text-caption text-mute text-center">
+          {activeScene.description}
         </p>
       </div>
 
-      {#if snapshot}
-        <!-- Auto (default = Pop) -->
-        <div class="flex flex-col gap-xs">
-          <div class="flex items-center justify-between">
-            <h6>Auto (Default)</h6>
-            <button class="btn-icon" onclick={() => replayRevealStyle++}>
-              <RotateCcw class="icon" data-size="sm" />
-            </button>
-          </div>
-          <div class="surface-sunk p-lg">
-            {#key replayRevealStyle}
-              <KineticText
-                text="Pop is the universal default. Characters snap into place from random offsets on every physics preset."
-                styleSnapshot={snapshot}
-                revealMode="char"
-                speed={45}
-              />
-            {/key}
-          </div>
-          <p class="text-caption text-mute px-xs">
-            Pop is used for all physics presets by default. The reveal style is
-            physics-agnostic — same animation on glass, flat, and retro.
+      <!-- ─── Technical Context ──────────────────────────────────────── -->
+      <details>
+        <summary class="text-dim">How it works</summary>
+        <div class="p-md flex flex-col gap-md">
+          <p>
+            Kinetic Text is built on <a
+              href="https://github.com/chenglou/pretext"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-link">Pretext</a
+            > — Cheng Lou's zero-DOM text measurement engine. Pretext solves the
+            hard problem of measuring and laying out text without triggering browser
+            reflow, using pure arithmetic over the browser's font engine. Kinetic
+            Text uses Pretext to compute per-character positions, then animates every
+            glyph independently.
+          </p>
+          <p class="text-caption text-mute">
+            Pretext is MIT-licensed open source. Kinetic Text bundles it as a
+            direct dependency.
           </p>
         </div>
-
-        <!-- Scramble -->
-        <div class="flex flex-col gap-xs">
-          <div class="flex items-center justify-between">
-            <h6>Scramble</h6>
-            <button class="btn-icon" onclick={() => replayRevealScramble++}>
-              <RotateCcw class="icon" data-size="sm" />
-            </button>
-          </div>
-          <div class="surface-sunk p-lg">
-            {#key replayRevealScramble}
-              <KineticText
-                text={SAMPLE_SCRAMBLE}
-                styleSnapshot={snapshot}
-                revealStyle="scramble"
-                revealMode="char"
-                speed={45}
-              />
-            {/key}
-          </div>
-          <p class="text-caption text-mute px-xs">
-            Each character flies in from a random position and rotation,
-            settling with spring overshoot. Wide radius, heavy rotation.
-          </p>
-        </div>
-
-        <!-- Rise -->
-        <div class="flex flex-col gap-xs">
-          <div class="flex items-center justify-between">
-            <h6>Rise</h6>
-            <button class="btn-icon" onclick={() => replayRevealRise++}>
-              <RotateCcw class="icon" data-size="sm" />
-            </button>
-          </div>
-          <div class="surface-sunk p-lg">
-            {#key replayRevealRise}
-              <KineticText
-                text={SAMPLE_RISE}
-                styleSnapshot={snapshot}
-                revealStyle="rise"
-                revealMode="char"
-                speed={45}
-              />
-            {/key}
-          </div>
-          <p class="text-caption text-mute px-xs">
-            Characters ascend from below with slight rotation and scale. Glass
-            adds blur trail during ascent. Elegant, uplifting entrance.
-          </p>
-        </div>
-
-        <!-- Drop -->
-        <div class="flex flex-col gap-xs">
-          <div class="flex items-center justify-between">
-            <h6>Drop</h6>
-            <button class="btn-icon" onclick={() => replayRevealDrop++}>
-              <RotateCcw class="icon" data-size="sm" />
-            </button>
-          </div>
-          <div class="surface-sunk p-lg">
-            {#key replayRevealDrop}
-              <KineticText
-                text={SAMPLE_DROP}
-                styleSnapshot={snapshot}
-                revealStyle="drop"
-                revealMode="char"
-                speed={45}
-              />
-            {/key}
-          </div>
-          <p class="text-caption text-mute px-xs">
-            Characters fall from above with gravity feel. Overshoots on landing
-            with a subtle bounce. Heavy, deliberate entrance.
-          </p>
-        </div>
-
-        <!-- Pop -->
-        <div class="flex flex-col gap-xs">
-          <div class="flex items-center justify-between">
-            <h6>Pop</h6>
-            <button class="btn-icon" onclick={() => replayRevealPop++}>
-              <RotateCcw class="icon" data-size="sm" />
-            </button>
-          </div>
-          <div class="surface-sunk p-lg">
-            {#key replayRevealPop}
-              <KineticText
-                text={SAMPLE_POP}
-                styleSnapshot={snapshot}
-                revealStyle="pop"
-                revealMode="char"
-                speed={30}
-              />
-            {/key}
-          </div>
-          <p class="text-caption text-mute px-xs">
-            Characters pop in from random offsets — fast, chaotic entrance.
-            Universal default for all physics presets. Snappy and energetic.
-          </p>
-        </div>
-
-        <!-- Random -->
-        <div class="flex flex-col gap-xs">
-          <div class="flex items-center justify-between">
-            <h6>Random</h6>
-            <button class="btn-icon" onclick={() => replayRevealRandom++}>
-              <RotateCcw class="icon" data-size="sm" />
-            </button>
-          </div>
-          <div class="surface-sunk p-lg">
-            {#key replayRevealRandom}
-              <KineticText
-                text={SAMPLE_RANDOM}
-                styleSnapshot={snapshot}
-                revealStyle="random"
-                revealMode="char"
-                speed={30}
-              />
-            {/key}
-          </div>
-          <p class="text-caption text-mute px-xs">
-            Characters appear in randomized order with a simple fade. The reveal
-            order is shuffled — positions fill unpredictably rather than
-            left-to-right.
-          </p>
-        </div>
-      {/if}
+      </details>
     </div>
   </section>
 
-  <!-- ─── NARRATIVE EFFECTS ─────────────────────────────────────────── -->
+  <!-- ─── PER-CHARACTER EFFECTS ──────────────────────────────────────── -->
   <section class="flex flex-col gap-xl">
     <div class="surface-raised p-lg flex flex-col gap-lg">
       <div class="flex flex-col gap-xs">
         <h2>Per-Character Effects</h2>
         <p class="text-dim">
-          28 effects with unique per-character animation parameters. Every
-          character gets its own displacement, rotation, and timing — creating
-          organic, alive motion. One-shot effects fire via the cue system after
-          reveal completes; continuous effects loop immediately.
+          Kinetic Text runs three independent effect layers in parallel on every
+          block of text. <strong>Reveal</strong> controls how text first appears
+          — the entrance animation covered above. <strong>Continuous</strong>
+          effects loop after reveal completes, sustaining mood and atmosphere throughout
+          a scene — drift, breathe, flicker, burn, distort.
+          <strong>One-shot</strong> effects fire on demand for dramatic punctuation
+          — shake, explode, shatter, surge, glitch. All three compose simultaneously:
+          text can be revealing word-by-word while a continuous pulse loop runs,
+          and a one-shot slam fires mid-scene. For TTS-driven narrative, one-shots
+          pair naturally with speech events — fire a glitch when the voice falters,
+          a surge when tension peaks.
         </p>
       </div>
 
@@ -846,12 +605,14 @@
         <summary>Technical Details</summary>
         <div class="p-md flex flex-col gap-md">
           <p>
-            Every demo below uses the <code>KineticText</code> component with
-            per-character DOM. One-shot effects are triggered via the
-            <strong>cue system</strong> (<code>on-complete</code> trigger) —
-            text reveals word-by-word, then the effect fires on the fully
-            visible text. Continuous effects are applied via the
-            <code>activeEffect</code> prop with instant reveal.
+            The three layers are fully independent. Reveal is driven by the
+            tick-based reveal engine. Continuous effects are applied via the
+            <code>activeEffect</code> prop — an infinite CSS animation that
+            starts immediately and persists until the prop changes. One-shot
+            effects fire through the <strong>cue system</strong>
+            (<code>on-complete</code> trigger after reveal, or imperative
+            <code>oneShotTrigger</code> counter at any time). Swapping one layer
+            does not interrupt the others.
           </p>
           <p>
             Every character receives unique CSS custom properties (<code
@@ -875,15 +636,19 @@
         <div class="flex flex-col gap-xs">
           <h5>One-Shot Effects</h5>
           <p class="text-caption text-mute">
-            Punctuation moments. Text reveals word-by-word, then each character
-            animates independently via the cue system on completion.
+            Punctuation moments. Hover a card to fire the effect, or click the
+            button to replay.
           </p>
         </div>
 
         {#if snapshot}
           <div class="grid gap-lg tablet:grid-cols-2">
             {#each narrativeOneShotDemos as demo}
-              <div class="surface-sunk p-md flex flex-col gap-md h-full">
+              <div
+                class="surface-sunk p-md flex flex-col gap-md h-full"
+                role="group"
+                onpointerenter={() => oneShotReplay[demo.effect]++}
+              >
                 <div class="flex items-start justify-between gap-md">
                   <div class="flex flex-col gap-xs">
                     <h6>{demo.label}</h6>
@@ -891,22 +656,19 @@
                   </div>
 
                   <IconBtn
-                    aria-label="Replay"
+                    aria-label="Replay {demo.label}"
                     icon={PlayPause}
                     onclick={() => oneShotReplay[demo.effect]++}
                   />
                 </div>
 
-                {#key oneShotReplay[demo.effect]}
-                  <KineticText
-                    text={demo.text}
-                    styleSnapshot={snapshot}
-                    revealMode="char"
-                    revealStyle="instant"
-                    stagger={0}
-                    cues={buildOneShotCue(demo.effect)}
-                  />
-                {/key}
+                <KineticText
+                  text={demo.text}
+                  styleSnapshot={snapshot}
+                  preRevealed
+                  oneShotEffect={demo.effect}
+                  oneShotTrigger={oneShotReplay[demo.effect]}
+                />
 
                 <p class="text-caption text-mute">{demo.note}</p>
               </div>
@@ -920,7 +682,7 @@
           <h5>Continuous Effects</h5>
           <p class="text-caption text-mute">
             Sustained atmosphere loops. Each character animates independently
-            with unique parameters — toggle to see per-character motion.
+            with unique parameters. Pause any effect to compare.
           </p>
         </div>
 
@@ -937,9 +699,8 @@
                   <IconBtn
                     icon={PlayPause}
                     aria-label={activeContinuousEffects[demo.effect]
-                      ? 'Stop'
-                      : 'Start'}
-                    aria-pressed={Boolean(activeContinuousEffects[demo.effect])}
+                      ? 'Pause'
+                      : 'Play'}
                     onclick={() => toggleContinuousLoop(demo.effect)}
                     iconProps={{
                       'data-paused': activeContinuousEffects[demo.effect]
@@ -952,8 +713,7 @@
                 <KineticText
                   text={demo.text}
                   styleSnapshot={snapshot}
-                  revealMode="char"
-                  speed={0}
+                  preRevealed
                   activeEffect={activeContinuousEffects[demo.effect]}
                 />
 
@@ -1201,6 +961,316 @@
           </p>
         </div>
       </details>
+    </div>
+  </section>
+
+  <!-- ─── REVEAL STYLES ─────────────────────────────────────────────── -->
+  <section class="flex flex-col gap-xl">
+    <div class="surface-raised p-lg flex flex-col gap-lg">
+      <div class="flex flex-col gap-xs">
+        <h2>Reveal Styles</h2>
+        <p class="text-dim">
+          Reveal styles control the visual entrance animation — how each
+          character physically arrives at its target position. While reveal mode
+          sets granularity (word vs character), reveal style sets the motion:
+          characters can scramble in from random positions, rise from below,
+          drop with gravity, pop into place, or appear in shuffled order. Every
+          style generates unique per-character parameters so no two letters move
+          identically.
+        </p>
+      </div>
+
+      <details>
+        <summary>Technical Details</summary>
+        <div class="p-md flex flex-col gap-md">
+          <p>
+            Each reveal style computes per-character CSS custom properties (<code
+              >--kt-dx</code
+            >, <code>--kt-dy</code>,
+            <code>--kt-rotate</code>, <code>--kt-scale</code>) from a seeded
+            PRNG. The same keyframe animation reads these variables, producing
+            different motion per character from a single animation definition.
+            Spring-based easing controls the settle — overshoot and bounce are
+            tuned per style.
+          </p>
+          <p>
+            Physics presets adapt the entrance automatically: glass adds motion
+            blur during displacement-heavy moves, flat keeps curves clean and
+            mechanical, retro uses stepped timing with instant snaps. The
+            <code>revealStyle</code> prop overrides the default — or omit it to get
+            Pop on all presets.
+          </p>
+        </div>
+      </details>
+
+      {#if snapshot}
+        <!-- Pop (default) -->
+        <div class="flex flex-col gap-xs">
+          <div class="flex items-center justify-between">
+            <h6>Pop <span class="text-caption text-mute">— default</span></h6>
+            <button class="btn-icon" onclick={() => replayRevealPop++}>
+              <RotateCcw class="icon" data-size="sm" />
+            </button>
+          </div>
+          <div class="surface-sunk p-lg">
+            {#key replayRevealPop}
+              <KineticText
+                text={SAMPLE_POP}
+                styleSnapshot={snapshot}
+                revealStyle="pop"
+                revealMode="char"
+                speed={30}
+              />
+            {/key}
+          </div>
+          <p class="text-caption text-mute px-xs">
+            Characters snap in from random offsets — fast, chaotic entrance.
+            Universal default for all physics presets. Physics-agnostic: same
+            animation on glass, flat, and retro.
+          </p>
+        </div>
+
+        <!-- Scramble -->
+        <div class="flex flex-col gap-xs">
+          <div class="flex items-center justify-between">
+            <h6>Scramble</h6>
+            <button class="btn-icon" onclick={() => replayRevealScramble++}>
+              <RotateCcw class="icon" data-size="sm" />
+            </button>
+          </div>
+          <div class="surface-sunk p-lg">
+            {#key replayRevealScramble}
+              <KineticText
+                text={SAMPLE_SCRAMBLE}
+                styleSnapshot={snapshot}
+                revealStyle="scramble"
+                revealMode="char"
+                speed={45}
+              />
+            {/key}
+          </div>
+          <p class="text-caption text-mute px-xs">
+            Each character flies in from a random position and rotation,
+            settling with spring overshoot. Wide radius, heavy rotation.
+          </p>
+        </div>
+
+        <!-- Rise -->
+        <div class="flex flex-col gap-xs">
+          <div class="flex items-center justify-between">
+            <h6>Rise</h6>
+            <button class="btn-icon" onclick={() => replayRevealRise++}>
+              <RotateCcw class="icon" data-size="sm" />
+            </button>
+          </div>
+          <div class="surface-sunk p-lg">
+            {#key replayRevealRise}
+              <KineticText
+                text={SAMPLE_RISE}
+                styleSnapshot={snapshot}
+                revealStyle="rise"
+                revealMode="char"
+                speed={45}
+              />
+            {/key}
+          </div>
+          <p class="text-caption text-mute px-xs">
+            Characters ascend from below with slight rotation and scale. Glass
+            adds blur trail during ascent. Elegant, uplifting entrance.
+          </p>
+        </div>
+
+        <!-- Drop -->
+        <div class="flex flex-col gap-xs">
+          <div class="flex items-center justify-between">
+            <h6>Drop</h6>
+            <button class="btn-icon" onclick={() => replayRevealDrop++}>
+              <RotateCcw class="icon" data-size="sm" />
+            </button>
+          </div>
+          <div class="surface-sunk p-lg">
+            {#key replayRevealDrop}
+              <KineticText
+                text={SAMPLE_DROP}
+                styleSnapshot={snapshot}
+                revealStyle="drop"
+                revealMode="char"
+                speed={45}
+              />
+            {/key}
+          </div>
+          <p class="text-caption text-mute px-xs">
+            Characters fall from above with gravity feel. Overshoots on landing
+            with a subtle bounce. Heavy, deliberate entrance.
+          </p>
+        </div>
+
+        <!-- Random -->
+        <div class="flex flex-col gap-xs">
+          <div class="flex items-center justify-between">
+            <h6>Random</h6>
+            <button class="btn-icon" onclick={() => replayRevealRandom++}>
+              <RotateCcw class="icon" data-size="sm" />
+            </button>
+          </div>
+          <div class="surface-sunk p-lg">
+            {#key replayRevealRandom}
+              <KineticText
+                text={SAMPLE_RANDOM}
+                styleSnapshot={snapshot}
+                revealStyle="random"
+                revealMode="char"
+                speed={30}
+              />
+            {/key}
+          </div>
+          <p class="text-caption text-mute px-xs">
+            Characters appear in randomized order with a simple fade. The reveal
+            order is shuffled — positions fill unpredictably rather than
+            left-to-right.
+          </p>
+        </div>
+      {/if}
+    </div>
+  </section>
+
+  <!-- ─── REVEAL MODES ─────────────────────────────────────────────── -->
+  <section class="flex flex-col gap-xl">
+    <div class="surface-raised p-lg flex flex-col gap-lg">
+      <div class="flex flex-col gap-xs">
+        <h2>Reveal Modes</h2>
+        <p class="text-dim">
+          Reveal mode sets the granularity of how text enters the viewport. Word
+          mode is the default — it reveals whole words at a time and is the mode
+          used with all narrative effects. Character mode reveals one letter at
+          a time for a classic typewriter feel, with Decode as a character-level
+          variant where all glyphs appear immediately as scrambled noise and
+          resolve left-to-right.
+        </p>
+      </div>
+
+      <details>
+        <summary>Technical Details</summary>
+        <div class="p-md flex flex-col gap-md">
+          <p>
+            Each mode uses <a
+              href="https://github.com/chenglou/pretext"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-link">Pretext</a
+            >
+            to compute per-character target positions up front. The reveal engine
+            then steps through characters according to the mode's granularity — one
+            character per tick (<code>char</code>), one word per tick (<code
+              >word</code
+            >), or all characters simultaneously with staggered decode passes (<code
+              >decode</code
+            >).
+          </p>
+          <p>
+            Timing adapts to physics automatically: glass uses smooth spring
+            easing with motion blur on fast reveals, flat uses clean linear
+            curves, and retro adds per-tick jitter and stepped timing for a
+            mechanical feel. The <code>speed</code> and
+            <code>speedPreset</code> props control base tick interval — character
+            mode exposes a speed selector below for testing.
+          </p>
+        </div>
+      </details>
+
+      <Selector
+        label="Speed"
+        options={speedPresetOptions}
+        bind:value={revealSpeedPreset}
+        onchange={() => {
+          replayWord++;
+          replayChar++;
+          replayDecode++;
+        }}
+      />
+
+      {#if snapshot}
+        <!-- Word (default) -->
+        <div class="flex flex-col gap-xs">
+          <div class="flex items-center justify-between">
+            <h5>Word <span class="text-caption text-mute">— default</span></h5>
+            <button class="btn-icon" onclick={() => replayWord++}>
+              <RotateCcw class="icon" data-size="sm" />
+            </button>
+          </div>
+          <div class="surface-sunk p-lg">
+            {#key `${replayWord}-${revealSpeedPreset}`}
+              <KineticText
+                text={SAMPLE_WORD}
+                styleSnapshot={snapshot}
+                revealMode="word"
+                speed={revealSpeeds.wordSpeed}
+                charSpeed={revealSpeeds.wordCharSpeed}
+              />
+            {/key}
+          </div>
+          <p class="text-caption text-mute px-xs">
+            Word-by-word with fast internal character reveal. This is the
+            primary mode — it creates a natural reading pace similar to AI
+            streaming output and pairs with all continuous and one-shot effects.
+          </p>
+        </div>
+
+        <!-- Character -->
+        <div class="flex flex-col gap-xs">
+          <div class="flex items-center justify-between">
+            <h5>Character</h5>
+            <button class="btn-icon" onclick={() => replayChar++}>
+              <RotateCcw class="icon" data-size="sm" />
+            </button>
+          </div>
+          <div class="surface-sunk p-lg">
+            {#key `${replayChar}-${revealSpeedPreset}`}
+              <KineticText
+                text={SAMPLE_CHAR}
+                styleSnapshot={snapshot}
+                revealMode="char"
+                stagger={revealSpeeds.charStagger}
+              />
+            {/key}
+          </div>
+          <p class="text-caption text-mute px-xs">
+            One character at a time. Classic typewriter feel. Retro physics adds
+            per-tick timing jitter.
+          </p>
+        </div>
+
+        <!-- Decode (Character variant) -->
+        <div
+          class="flex flex-col gap-xs ml-lg border-0 border-l border-solid border-primary pl-md"
+        >
+          <div class="flex items-center justify-between">
+            <h6>
+              Decode
+              <span class="text-caption text-mute">— character variant</span>
+            </h6>
+            <button class="btn-icon" onclick={() => replayDecode++}>
+              <RotateCcw class="icon" data-size="sm" />
+            </button>
+          </div>
+          <div class="surface-sunk p-lg">
+            {#key `${replayDecode}-${revealSpeedPreset}`}
+              <KineticText
+                text={SAMPLE_DECODE}
+                styleSnapshot={snapshot}
+                revealMode="decode"
+                stagger={revealSpeeds.charStagger}
+                scramblePasses={6}
+              />
+            {/key}
+          </div>
+          <p class="text-caption text-mute px-xs">
+            All characters visible immediately as scrambled glyphs, then resolve
+            left-to-right. Same character-level timing as above. Retro physics
+            uses a limited uppercase charset for the scramble pass.
+          </p>
+        </div>
+      {/if}
     </div>
   </section>
 </div>

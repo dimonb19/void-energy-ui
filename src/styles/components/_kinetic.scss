@@ -4,16 +4,9 @@
  *
  * Physics-aware kinetic typography styling.
  * Animation behavior lives in the kinetic action (src/actions/kinetic.ts).
- * This file owns the visual treatment: cursor appearance, glow, blink style.
  *
  * ANATOMY:
  * - .kinetic-text       : Wrapper element (inherits font from parent)
- * - .kinetic-cursor      : Blinking cursor element (inserted/removed by engine)
- *
- * PHYSICS VARIANTS:
- * - Glass: smooth opacity blink, energy glow on cursor
- * - Flat:  clean steps(2) blink, no glow
- * - Retro: hard steps(1) on/off, energy-primary color
  *
  * @see src/actions/kinetic.ts for animation engine
  * ==========================================================================
@@ -27,50 +20,4 @@
 
 .kinetic-text {
   font: inherit;
-}
-
-// ==========================================================================
-// CURSOR
-// ==========================================================================
-
-.kinetic-cursor {
-  user-select: none;
-  font-weight: var(--font-weight-regular);
-  color: var(--text-main);
-  animation: kinetic-blink 0.8s steps(2) infinite;
-
-  // ── Glass: smooth glow cursor ──
-  @include when-glass {
-    color: var(--energy-primary);
-    animation-timing-function: ease-in-out;
-  }
-
-  // ── Flat: clean steps blink, no glow ──
-  @include when-flat {
-    color: var(--text-main);
-    animation-timing-function: steps(2);
-  }
-
-  // ── Retro: hard block blink ──
-  @include when-retro {
-    color: var(--energy-primary);
-    animation-timing-function: steps(1);
-  }
-
-  // ── Light: neutral cursor, clean blink ──
-  @include when-light {
-    color: var(--text-main);
-    animation-timing-function: steps(2);
-  }
-}
-
-// ── Blink keyframe ──
-@keyframes kinetic-blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
 }

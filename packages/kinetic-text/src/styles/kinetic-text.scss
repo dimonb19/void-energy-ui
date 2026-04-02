@@ -413,36 +413,6 @@
   // sr-only class handles visual hiding on the consumer side.
 }
 
-// ── Cursor ───────────────────────────────────────────────────────
-
-.kt-cursor {
-  display: inline;
-  animation: kt-cursor-blink 1s infinite;
-  color: var(--energy-primary, var(--text-main, currentColor));
-}
-
-@keyframes kt-cursor-blink {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0;
-  }
-}
-
-[data-physics='glass'] .kt-cursor {
-  animation-timing-function: ease-in-out;
-}
-
-[data-physics='flat'] .kt-cursor {
-  animation-timing-function: steps(2);
-}
-
-[data-physics='retro'] .kt-cursor {
-  animation-timing-function: steps(1);
-}
-
 // ── Reduced motion ───────────────────────────────────────────────
 
 @mixin kt-reduced-motion {
@@ -452,10 +422,6 @@
     visibility: visible !important;
     transform: none !important;
     filter: none !important;
-  }
-
-  .kt-cursor {
-    animation: none !important;
   }
 
   .kt-unit,
@@ -1824,83 +1790,82 @@
 // ═══════════════════════════════════════════════════════════════════
 
 .kt-oneshot[data-kt-oneshot='shake'] {
-  animation: kt-effect-shake var(--kt-effect-duration, 600ms)
-    cubic-bezier(0.22, 1, 0.36, 1) both; // void-ignore
+  animation: kt-effect-shake var(--kt-effect-duration, 1400ms)
+    cubic-bezier(0.22, 1, 0.36, 1); // void-ignore
   animation-delay: var(--kt-delay-offset, 0ms); // void-ignore
 }
 .kt-oneshot[data-kt-oneshot='quake'] {
-  animation: kt-effect-quake var(--kt-effect-duration, 850ms)
-    cubic-bezier(0.16, 1, 0.3, 1) both; // void-ignore
+  animation: kt-effect-quake var(--kt-effect-duration, 2000ms)
+    cubic-bezier(0.16, 1, 0.3, 1); // void-ignore
   animation-delay: var(--kt-delay-offset, 0ms); // void-ignore
 }
 .kt-oneshot[data-kt-oneshot='jolt'] {
-  animation: kt-effect-jolt var(--kt-effect-duration, 500ms)
-    cubic-bezier(0.34, 1.56, 0.64, 1) both; // void-ignore
+  animation: kt-effect-jolt var(--kt-effect-duration, 900ms)
+    cubic-bezier(0.34, 1.56, 0.64, 1); // void-ignore
   animation-delay: var(--kt-delay-offset, 0ms); // void-ignore
 }
 .kt-oneshot[data-kt-oneshot='glitch'] {
-  animation: kt-effect-glitch var(--kt-effect-duration, 700ms) steps(1, end)
-    both; // void-ignore
+  animation: kt-effect-glitch var(--kt-effect-duration, 1400ms) steps(1, end); // void-ignore
   animation-delay: var(--kt-delay-offset, 0ms); // void-ignore
 }
 .kt-oneshot[data-kt-oneshot='surge'] {
-  animation: kt-effect-surge var(--kt-effect-duration, 550ms)
-    cubic-bezier(0.34, 1.56, 0.64, 1) both; // void-ignore
+  animation: kt-effect-surge var(--kt-effect-duration, 1100ms)
+    cubic-bezier(0.34, 1.56, 0.64, 1); // void-ignore
   animation-delay: var(--kt-delay-offset, 0ms); // void-ignore
 }
 .kt-oneshot[data-kt-oneshot='warp'] {
-  animation: kt-effect-warp var(--kt-effect-duration, 700ms)
-    cubic-bezier(0.22, 1, 0.36, 1) both; // void-ignore
+  animation: kt-effect-warp var(--kt-effect-duration, 1400ms)
+    cubic-bezier(0.22, 1, 0.36, 1); // void-ignore
   animation-delay: var(--kt-delay-offset, 0ms); // void-ignore
 }
 .kt-oneshot[data-kt-oneshot='explode'] {
-  animation: kt-effect-explode var(--kt-effect-duration, 1000ms)
-    cubic-bezier(0.16, 1, 0.3, 1) both; // void-ignore
+  animation: kt-effect-explode var(--kt-effect-duration, 2000ms)
+    cubic-bezier(0.16, 1, 0.3, 1); // void-ignore
   animation-delay: var(--kt-delay-offset, 0ms); // void-ignore
 }
 .kt-oneshot[data-kt-oneshot='collapse'] {
-  animation: kt-effect-collapse var(--kt-effect-duration, 800ms)
-    cubic-bezier(0.22, 1, 0.36, 1) both; // void-ignore
+  animation: kt-effect-collapse var(--kt-effect-duration, 1600ms)
+    cubic-bezier(0.22, 1, 0.36, 1); // void-ignore
   animation-delay: var(--kt-delay-offset, 0ms); // void-ignore
 }
 .kt-oneshot[data-kt-oneshot='scatter'] {
-  animation: kt-effect-scatter var(--kt-effect-duration, 1100ms)
-    cubic-bezier(0.4, 0, 0.2, 1) both; // void-ignore
+  animation: kt-effect-scatter var(--kt-effect-duration, 2200ms)
+    cubic-bezier(0.4, 0, 0.2, 1); // void-ignore
   animation-delay: var(--kt-delay-offset, 0ms); // void-ignore
 }
 .kt-oneshot[data-kt-oneshot='spin'] {
-  animation: kt-effect-spin var(--kt-effect-duration, 650ms)
-    cubic-bezier(0.4, 0, 0.2, 1) both; // void-ignore
+  animation: kt-effect-spin var(--kt-effect-duration, 1100ms)
+    cubic-bezier(0.4, 0, 0.2, 1); // void-ignore
   animation-delay: var(--kt-delay-offset, 0ms); // void-ignore
 }
 .kt-oneshot[data-kt-oneshot='bounce'] {
-  animation: kt-effect-bounce var(--kt-effect-duration, 800ms)
-    cubic-bezier(0.22, 1, 0.36, 1) both; // void-ignore
+  animation: kt-effect-bounce var(--kt-effect-duration, 1600ms)
+    cubic-bezier(0.22, 1, 0.36, 1); // void-ignore
   animation-delay: var(--kt-delay-offset, 0ms); // void-ignore
 }
 .kt-oneshot[data-kt-oneshot='flash'] {
-  animation: kt-effect-flash var(--kt-effect-duration, 500ms)
-    cubic-bezier(0.16, 1, 0.3, 1) both; // void-ignore
+  animation: kt-effect-flash var(--kt-effect-duration, 900ms)
+    cubic-bezier(0.16, 1, 0.3, 1); // void-ignore
   animation-delay: var(--kt-delay-offset, 0ms); // void-ignore
 }
 .kt-oneshot[data-kt-oneshot='shatter'] {
-  animation: kt-effect-shatter var(--kt-effect-duration, 900ms)
-    cubic-bezier(0.16, 1, 0.3, 1) both; // void-ignore
+  animation: kt-effect-shatter var(--kt-effect-duration, 1600ms)
+    cubic-bezier(0.16, 1, 0.3, 1); // void-ignore
   animation-delay: var(--kt-delay-offset, 0ms); // void-ignore
 }
 .kt-oneshot[data-kt-oneshot='vortex'] {
-  animation: kt-effect-vortex var(--kt-effect-duration, 1000ms)
-    cubic-bezier(0.22, 1, 0.36, 1) both; // void-ignore
+  animation: kt-effect-vortex var(--kt-effect-duration, 2000ms)
+    cubic-bezier(0.22, 1, 0.36, 1); // void-ignore
   animation-delay: var(--kt-delay-offset, 0ms); // void-ignore
 }
 .kt-oneshot[data-kt-oneshot='ripple'] {
-  animation: kt-effect-ripple var(--kt-effect-duration, 700ms)
-    cubic-bezier(0.37, 0, 0.63, 1) both; // void-ignore
+  animation: kt-effect-ripple var(--kt-effect-duration, 1300ms)
+    cubic-bezier(0.37, 0, 0.63, 1); // void-ignore
   animation-delay: var(--kt-delay-offset, 0ms); // void-ignore
 }
 .kt-oneshot[data-kt-oneshot='slam'] {
-  animation: kt-effect-slam var(--kt-effect-duration, 650ms)
-    cubic-bezier(0.34, 1.56, 0.64, 1) both; // void-ignore
+  animation: kt-effect-slam var(--kt-effect-duration, 1100ms)
+    cubic-bezier(0.34, 1.56, 0.64, 1); // void-ignore
   animation-delay: var(--kt-delay-offset, 0ms); // void-ignore
 }
 
@@ -2307,49 +2272,6 @@
 // ═══════════════════════════════════════════════════════════════════
 // EFFECT PHYSICS VARIANTS
 // ═══════════════════════════════════════════════════════════════════
-
-// ── Glass: motion blur on one-shot displacement effects ──
-[data-physics='glass'] .kt-oneshot[data-kt-oneshot='shake'],
-[data-physics='glass'] .kt-oneshot[data-kt-oneshot='quake'],
-[data-physics='glass'] .kt-oneshot[data-kt-oneshot='jolt'] {
-  filter: blur(0.5px); // void-ignore
-}
-
-[data-physics='glass'] .kt-oneshot[data-kt-oneshot='warp'] {
-  filter: blur(0.5px); // void-ignore
-}
-
-[data-physics='glass'] .kt-oneshot[data-kt-oneshot='explode'] {
-  filter: blur(0.8px); // void-ignore
-}
-
-[data-physics='glass'] .kt-oneshot[data-kt-oneshot='collapse'] {
-  filter: blur(0.5px); // void-ignore
-}
-
-[data-physics='glass'] .kt-oneshot[data-kt-oneshot='scatter'] {
-  filter: blur(0.6px); // void-ignore
-}
-
-[data-physics='glass'] .kt-oneshot[data-kt-oneshot='spin'] {
-  filter: blur(0.4px); // void-ignore
-}
-
-[data-physics='glass'] .kt-oneshot[data-kt-oneshot='bounce'] {
-  filter: blur(0.4px); // void-ignore
-}
-
-[data-physics='glass'] .kt-oneshot[data-kt-oneshot='shatter'] {
-  filter: blur(0.7px); // void-ignore
-}
-
-[data-physics='glass'] .kt-oneshot[data-kt-oneshot='vortex'] {
-  filter: blur(0.8px); // void-ignore
-}
-
-[data-physics='glass'] .kt-oneshot[data-kt-oneshot='ripple'] {
-  filter: blur(0.4px); // void-ignore
-}
 
 // ── Glass: motion blur on continuous displacement effects ──
 [data-physics='glass'] .kt-unit[data-kt-effect='burn'] {

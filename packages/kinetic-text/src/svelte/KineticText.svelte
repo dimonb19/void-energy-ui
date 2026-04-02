@@ -28,14 +28,12 @@
     cues = [],
     seed,
     reducedMotion = 'auto',
-    cursor = false,
-    cursorChar = '▍',
-    cursorRemoveOnComplete = true,
     speed,
     charSpeed,
     scramblePasses,
     oneShotEffect = null,
     oneShotTrigger = 0,
+    preRevealed = false,
     onrevealcomplete,
     oneffectscomplete,
     as = 'span',
@@ -74,8 +72,6 @@
   );
   const resolvedScramblePasses = $derived(scramblePasses ?? 4);
   const resolvedSeed = $derived(seed ?? hashSeed(text + revealMode));
-  const resolvedCursor = $derived(cursor ?? revealMode === 'char');
-
   // ── Reduced motion resolution ─────────────────────────────────
   let prefersReducedMotion = $state(false);
 
@@ -193,12 +189,19 @@
         revealStyle: resolvedRevealStyle,
         physics: styleSnapshot.physics,
         mode: styleSnapshot.mode,
-        cursor: resolvedCursor,
-        cursorChar,
+        preRevealed,
       },
       text,
     );
     renderer.render();
+
+    // Pre-revealed: skip timeline entirely, fire callbacks immediately
+    if (preRevealed) {
+      renderer.setAriaBusy(false);
+      onrevealcomplete?.();
+      oneffectscomplete?.();
+      return;
+    }
 
     // Create and start timeline
     const config: TimelineConfig = {
@@ -211,8 +214,6 @@
       charSpeed: resolvedCharSpeed,
       scramblePasses: resolvedScramblePasses,
       physics: styleSnapshot.physics,
-      cursor: resolvedCursor,
-      cursorRemoveOnComplete,
       seed: resolvedSeed,
       reducedMotion: isReducedMotion,
       cues,
@@ -294,7 +295,6 @@
   data-reduced-motion={reducedMotion}
   data-cues={cueCount > 0 ? cueCount : undefined}
   data-seed={seed !== undefined ? String(seed) : undefined}
-  data-cursor={resolvedCursor ? '' : undefined}
   oncopy={handleCopy}
 >
   <!-- Layout, render, and reveal are driven imperatively by $effect above -->

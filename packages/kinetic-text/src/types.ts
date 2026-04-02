@@ -4,20 +4,20 @@ export type ModePreset = 'light' | 'dark';
 export type RevealMode = 'char' | 'word' | 'decode';
 
 /**
- * Named speed presets. Current "fast" is the floor — all presets are fast.
- * - `'fast'`    — speed: 40ms, charSpeed: 8ms  (previous default)
- * - `'rapid'`   — speed: 20ms, charSpeed: 4ms  (2× faster)
- * - `'instant'` — speed: 8ms,  charSpeed: 2ms  (near-instant)
+ * Named speed presets.
+ * - `'slow'`    — speed: 40ms, charSpeed: 8ms  (deliberate, visible typing)
+ * - `'default'` — speed: 20ms, charSpeed: 4ms  (standard baseline)
+ * - `'fast'`    — speed: 8ms,  charSpeed: 2ms  (near-instant)
  */
-export type KineticSpeedPreset = 'fast' | 'rapid' | 'instant';
+export type KineticSpeedPreset = 'slow' | 'default' | 'fast';
 
 export const SPEED_PRESETS: Record<
   KineticSpeedPreset,
   { speed: number; charSpeed: number }
 > = {
-  fast: { speed: 40, charSpeed: 8 },
-  rapid: { speed: 20, charSpeed: 4 },
-  instant: { speed: 8, charSpeed: 2 },
+  slow: { speed: 40, charSpeed: 8 },
+  default: { speed: 20, charSpeed: 4 },
+  fast: { speed: 8, charSpeed: 2 },
 };
 
 /**
@@ -192,8 +192,7 @@ export interface RenderOptions {
   revealStyle: RevealStyle;
   physics: PhysicsPreset;
   mode: ModePreset;
-  cursor: boolean;
-  cursorChar: string;
+  preRevealed?: boolean;
 }
 
 export interface TimelineConfig {
@@ -206,8 +205,6 @@ export interface TimelineConfig {
   charSpeed: number;
   scramblePasses: number;
   physics: PhysicsPreset;
-  cursor: boolean;
-  cursorRemoveOnComplete: boolean;
   seed: number;
   reducedMotion: boolean;
   cues: KineticCue[];
@@ -253,9 +250,6 @@ export interface KineticTextProps {
   cues?: KineticCue[];
   seed?: number;
   reducedMotion?: ReducedMotionMode;
-  cursor?: boolean;
-  cursorChar?: string;
-  cursorRemoveOnComplete?: boolean;
   speed?: number;
   charSpeed?: number;
   scramblePasses?: number;
@@ -263,6 +257,8 @@ export interface KineticTextProps {
   oneShotEffect?: KineticTextEffect | null;
   /** Counter — increment to trigger the one-shot. Value of 0 is ignored. */
   oneShotTrigger?: number;
+  /** Start with all text visible — skip reveal entirely. Useful for showcasing effects without the reveal animation. */
+  preRevealed?: boolean;
   onrevealcomplete?: () => void;
   oneffectscomplete?: () => void;
   as?: string;

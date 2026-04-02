@@ -1,12 +1,12 @@
 type KineticMode = 'char' | 'word' | 'cycle' | 'decode';
 
 /**
- * Named speed presets. Current "fast" is the floor — all presets are fast.
- * - `'fast'`    — speed: 40ms, charSpeed: 8ms (previous default)
- * - `'rapid'`   — speed: 20ms, charSpeed: 4ms (2× faster)
- * - `'instant'` — speed: 8ms,  charSpeed: 2ms (near-instant)
+ * Named speed presets.
+ * - `'slow'`    — speed: 40ms, charSpeed: 8ms  (deliberate, visible typing)
+ * - `'default'` — speed: 20ms, charSpeed: 4ms  (standard baseline)
+ * - `'fast'`    — speed: 8ms,  charSpeed: 2ms  (near-instant)
  */
-type KineticSpeedPreset = 'fast' | 'rapid' | 'instant';
+type KineticSpeedPreset = 'slow' | 'default' | 'fast';
 
 interface KineticConfig {
   /** Single text string (for char, word, decode modes) */
@@ -15,19 +15,12 @@ interface KineticConfig {
   words?: string[];
   /** Animation mode — defaults to 'char' */
   mode?: KineticMode;
-  /** Named speed preset. Overridden by explicit speed/charSpeed values. Default: 'fast' */
+  /** Named speed preset. Overridden by explicit speed/charSpeed values. Default: 'default' */
   speedPreset?: KineticSpeedPreset;
   /** Milliseconds per unit: per-char, per-word, or per-scramble tick. Default: 40 */
   speed?: number;
   /** Initial delay before animation starts (ms). Default: 0 */
   delay?: number;
-  /** Show a blinking cursor during animation. Default: false */
-  cursor?: boolean;
-  /** Cursor character. Default: '▍' */
-  cursorChar?: string;
-  /** Remove cursor after animation completes. Default: true */
-  cursorRemoveOnComplete?: boolean;
-
   // ── Word mode ──
   /** Per-character speed (ms) for word-by-word chunk reveal. Default: 8 */
   charSpeed?: number;

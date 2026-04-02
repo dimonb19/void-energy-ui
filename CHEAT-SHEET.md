@@ -3485,7 +3485,7 @@ Physics-aware visual effects for loading states and skeleton loaders.
 
 **Description:** Pre-configured `use:kinetic` wrapper for loading states. Cycles through a shuffled list of loading words ("Synthesizing…", "Calibrating…", etc.). First word is always "Synthesizing…"; remaining words shuffle randomly per mount. Internally uses `kinetic` action in `cycle` mode with `type` transition.
 **Location:** [src/components/ui/LoadingTextCycler.svelte](src/components/ui/LoadingTextCycler.svelte)
-**CSS:** `.loading-text-cycler` (scoped), inherits `.kinetic-text` and `.kinetic-cursor` from [src/styles/components/\_kinetic.scss](src/styles/components/_kinetic.scss)
+**CSS:** `.loading-text-cycler` (scoped), inherits `.kinetic-text` from [src/styles/components/\_kinetic.scss](src/styles/components/_kinetic.scss)
 
 **Props:**
 
@@ -3493,7 +3493,6 @@ Physics-aware visual effects for loading states and skeleton loaders.
 | --- | --- | --- | --- |
 | `words` | `string[]` | `LOADING_WORDS` | Word list (from `@config/constants`) |
 | `interval` | `number` | `2000` | Pause duration per word (ms) |
-| `cursor` | `boolean` | `true` | Show blinking cursor |
 | `speed` | `number` | `65` | Ms per character in type transition |
 | `class` | `string` | `''` | CSS passthrough |
 
@@ -3511,7 +3510,7 @@ Physics-aware visual effects for loading states and skeleton loaders.
 <LoadingTextCycler interval={1500} speed={40} />
 ```
 
-**Physics:** Inherits all physics behavior from the `kinetic` action — glass glow cursor, flat stepped blink, retro jitter + block cursor.
+**Physics:** Inherits all physics behavior from the `kinetic` action — retro jitter timing, flat speed scaling.
 
 **Showcase:** [/components → Effects](src/components/ui-library/Effects.svelte)
 
@@ -5586,13 +5585,10 @@ Provides both a Svelte action (`use:kinetic`) and a standalone class (`KineticEn
 | `text` | `string` | — | Text to animate (char, word, decode modes) |
 | `words` | `string[]` | — | Word list (cycle mode) |
 | `mode` | `'char' \| 'word' \| 'cycle' \| 'decode'` | `'char'` | Animation mode |
-| `speedPreset` | `'fast' \| 'rapid' \| 'instant'` | `'fast'` | Named speed preset. Overridden by explicit `speed`/`charSpeed`. |
+| `speedPreset` | `'slow' \| 'default' \| 'fast'` | `'default'` | Named speed preset. Overridden by explicit `speed`/`charSpeed`. |
 | `charSpeed` | `number` | `8` | Per-character speed (ms) for smooth chunk reveal within each word group |
 | `speed` | `number` | `40` | Ms per animation unit — in word mode this is the pause between chunks |
 | `delay` | `number` | `0` | Initial delay before animation starts (ms) |
-| `cursor` | `boolean` | `false` | Show blinking cursor |
-| `cursorChar` | `string` | `'▍'` | Cursor character |
-| `cursorRemoveOnComplete` | `boolean` | `true` | Remove cursor after completion |
 | `pauseDuration` | `number` | `1800` | Pause per word in cycle mode (ms) |
 | `loop` | `boolean` | `true` | Loop cycle mode indefinitely |
 | `cycleTransition` | `'type' \| 'fade' \| 'decode'` | `'type'` | Transition between cycled words |
@@ -5614,7 +5610,7 @@ Provides both a Svelte action (`use:kinetic`) and a standalone class (`KineticEn
 
 ```svelte
 <!-- Typewriter -->
-<span use:kinetic={{ text: 'Hello world', mode: 'char', speed: 40, cursor: true }} />
+<span use:kinetic={{ text: 'Hello world', mode: 'char', speed: 40 }} />
 
 <!-- Cycling loading text -->
 <span use:kinetic={{

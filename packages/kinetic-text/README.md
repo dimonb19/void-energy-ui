@@ -74,7 +74,7 @@ Import the stylesheet in your entry point or layout:
 import '@dgrslabs/void-energy-kinetic-text/styles';
 ```
 
-This provides all reveal keyframes, effect animations, physics-variant easing, cursor blink, and reduced-motion overrides.
+This provides all reveal keyframes, effect animations, physics-variant easing, and reduced-motion overrides.
 
 ## Props reference
 
@@ -83,7 +83,7 @@ This provides all reveal keyframes, effect animations, physics-variant easing, c
 | `text` | `string` | — | **Required.** The text to render and reveal. |
 | `styleSnapshot` | `TextStyleSnapshot` | — | **Required.** Font, lineHeight, physics, mode, and CSS variables. |
 | `revealMode` | `RevealMode` | `'char'` | How text is revealed: `char`, `word`, `decode`. |
-| `speedPreset` | `'fast' \| 'rapid' \| 'instant'` | `'fast'` | Named speed preset. `fast` = 40/8ms, `rapid` = 20/4ms, `instant` = 8/2ms. Overridden by explicit `speed`/`charSpeed`. |
+| `speedPreset` | `'slow' \| 'default' \| 'fast'` | `'default'` | Named speed preset. `slow` = 40/8ms, `default` = 20/4ms, `fast` = 8/2ms. Overridden by explicit `speed`/`charSpeed`. |
 | `revealStyle` | `RevealStyle` | `'instant'` | Visual style of the reveal animation: `instant`, `fade`, `rise`, `drop`, `scale`, `blur`. |
 | `staggerPattern` | `StaggerPattern` | `'sequential'` | Timing pattern: `sequential`, `wave`, `cascade`, `random`. |
 | `stagger` | `number` | `40` (char) / `30` (other) | Milliseconds between reveal units. |
@@ -93,9 +93,6 @@ This provides all reveal keyframes, effect animations, physics-variant easing, c
 | `cues` | `KineticCue[]` | `[]` | One-shot effect cues triggered during or after reveal. |
 | `seed` | `number` | hash(text + mode) | Deterministic seed for PRNG (stagger, decode, random). |
 | `reducedMotion` | `ReducedMotionMode` | `'auto'` | `auto` (OS preference), `always`, or `never`. |
-| `cursor` | `boolean` | `false` | Show a blinking cursor during reveal. |
-| `cursorChar` | `string` | `'▍'` | Character used for the cursor. |
-| `cursorRemoveOnComplete` | `boolean` | `true` | Remove cursor after reveal completes. |
 | `speed` | `number` | `200` (char) / `80` (word) | Base speed for grouped reveal modes (ms per group). |
 | `charSpeed` | `number` | `8` | Inner character speed within word/sentence groups (ms). |
 | `scramblePasses` | `number` | `4` | Number of scramble cycles per character in decode mode. |

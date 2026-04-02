@@ -5,7 +5,6 @@
   interface LoadingTextCyclerProps {
     words?: string[];
     interval?: number;
-    cursor?: boolean;
     speed?: number;
     class?: string;
   }
@@ -22,7 +21,6 @@
   let {
     words = [...LOADING_WORDS],
     interval = 2000,
-    cursor = true,
     speed = 65,
     class: className = '',
   }: LoadingTextCyclerProps = $props();
@@ -39,7 +37,6 @@
     cycleTransition: 'type',
     speed,
     pauseDuration: interval,
-    cursor,
     loop: true,
   }}
 ></span>

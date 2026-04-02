@@ -320,11 +320,6 @@ export class RevealTimeline {
     // Fire time-triggered cues
     this.fireTimeCues(elapsed);
 
-    // Update cursor position
-    if (this.config.cursor && this.lastRevealedIndex >= 0) {
-      this.renderer.moveCursorAfter(this.lastRevealedIndex);
-    }
-
     // Check completion — stop RAF but defer completeReveal until
     // all reveal animations have settled (non-instant styles)
     if (this.revealedCount >= this.totalUnits && this.state === 'running') {
@@ -637,15 +632,10 @@ export class RevealTimeline {
     // Step 2: Set aria-busy="false"
     this.renderer.setAriaBusy(false);
 
-    // Step 3: Remove cursor if configured
-    if (this.config.cursorRemoveOnComplete) {
-      this.renderer.removeCursor();
-    }
-
-    // Step 4: Fire onrevealcomplete
+    // Step 3: Fire onrevealcomplete
     this.config.onrevealcomplete?.();
 
-    // Step 5: Fire oneffectscomplete
+    // Step 4: Fire oneffectscomplete
     // If no completion cues exist (or all already finished synchronously),
     // fire immediately. Otherwise, the last one-shot's onComplete callback
     // (in fireCompletionCues) handles this.

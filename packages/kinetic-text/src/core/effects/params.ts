@@ -149,10 +149,10 @@ export function computeCharParams(
 function shakeParams(rng: () => number, phase: number): CharEffectParams {
   return {
     ...DEFAULTS,
-    dx: signedRange(rng, 2, 5),
-    dy: signedRange(rng, 0.5, 1.5),
-    rotate: signedRange(rng, 1.5, 4),
-    delayOffset: phase * 50 + range(rng, 0, 8),
+    dx: signedRange(rng, 6, 14),
+    dy: signedRange(rng, 2, 6),
+    rotate: signedRange(rng, 4, 10),
+    delayOffset: phase * 80 + range(rng, 0, 8),
     durationMult: range(rng, 0.85, 1.15),
   };
 }
@@ -160,10 +160,10 @@ function shakeParams(rng: () => number, phase: number): CharEffectParams {
 function quakeParams(rng: () => number, phase: number): CharEffectParams {
   return {
     ...DEFAULTS,
-    dx: signedRange(rng, 3, 7),
-    dy: signedRange(rng, 2, 5),
-    rotate: signedRange(rng, 2, 6),
-    delayOffset: phase * 30 + range(rng, 0, 8),
+    dx: signedRange(rng, 8, 18),
+    dy: signedRange(rng, 5, 12),
+    rotate: signedRange(rng, 5, 12),
+    delayOffset: phase * 50 + range(rng, 0, 8),
     durationMult: range(rng, 0.85, 1.15),
   };
 }
@@ -176,14 +176,14 @@ function joltParams(
   // All chars displace in a similar direction — powerful impact wave
   const dirRng = createPRNG(seed);
   const angle = dirRng() * Math.PI * 2;
-  const mag = range(rng, 4, 10);
+  const mag = range(rng, 10, 22);
   return {
     ...DEFAULTS,
     dx: Math.cos(angle) * mag,
     dy: Math.sin(angle) * mag,
-    rotate: signedRange(rng, 2, 5),
-    scale: range(rng, 1.02, 1.06),
-    delayOffset: phase * 35 + range(rng, 0, 8),
+    rotate: signedRange(rng, 4, 10),
+    scale: range(rng, 1.04, 1.12),
+    delayOffset: phase * 55 + range(rng, 0, 8),
   };
 }
 
@@ -192,19 +192,19 @@ function glitchParams(rng: () => number, phase: number): CharEffectParams {
   const isLoud = rng() < 0.25;
   return {
     ...DEFAULTS,
-    dx: isLoud ? signedRange(rng, 4, 10) : signedRange(rng, 0.5, 2),
-    dy: isLoud ? signedRange(rng, 1, 3) : 0,
-    skew: isLoud ? signedRange(rng, 3, 8) : signedRange(rng, 0, 1),
-    delayOffset: phase * 80 + range(rng, 0, 20),
+    dx: isLoud ? signedRange(rng, 10, 22) : signedRange(rng, 1, 4),
+    dy: isLoud ? signedRange(rng, 2, 6) : 0,
+    skew: isLoud ? signedRange(rng, 6, 15) : signedRange(rng, 0, 2),
+    delayOffset: phase * 120 + range(rng, 0, 20),
   };
 }
 
 function surgeParams(rng: () => number, phase: number): CharEffectParams {
   return {
     ...DEFAULTS,
-    dy: -range(rng, 1.5, 4),
-    scale: range(rng, 1.03, 1.08),
-    delayOffset: phase * 50 + range(rng, 0, 8),
+    dy: -range(rng, 4, 10),
+    scale: range(rng, 1.06, 1.15),
+    delayOffset: phase * 75 + range(rng, 0, 8),
     durationMult: range(rng, 0.85, 1.15),
   };
 }
@@ -212,9 +212,9 @@ function surgeParams(rng: () => number, phase: number): CharEffectParams {
 function warpParams(rng: () => number, phase: number): CharEffectParams {
   return {
     ...DEFAULTS,
-    scale: range(rng, 0.82, 1.18),
-    skew: signedRange(rng, 4, 10),
-    delayOffset: phase * 45 + range(rng, 0, 8),
+    scale: range(rng, 0.7, 1.3),
+    skew: signedRange(rng, 8, 18),
+    delayOffset: phase * 70 + range(rng, 0, 8),
     durationMult: range(rng, 0.85, 1.15),
   };
 }
@@ -223,15 +223,15 @@ function explodeParams(rng: () => number, phase: number): CharEffectParams {
   // Radial direction from center — chars near edges fly further
   const centerDist = Math.abs(phase - 0.5) * 2; // 0 at center, 1 at edges
   const angle = rng() * Math.PI * 2;
-  const mag = range(rng, 12, 28) * (0.4 + centerDist * 0.6);
+  const mag = range(rng, 24, 50) * (0.4 + centerDist * 0.6);
   return {
     ...DEFAULTS,
     dx: Math.cos(angle) * mag,
     dy: Math.sin(angle) * mag,
-    rotate: signedRange(rng, 15, 50),
-    scale: range(rng, 0.4, 0.7),
-    opacityMin: range(rng, 0.05, 0.2),
-    delayOffset: phase * 50 + range(rng, 0, 10),
+    rotate: signedRange(rng, 25, 70),
+    scale: range(rng, 0.2, 0.5),
+    opacityMin: range(rng, 0, 0.12),
+    delayOffset: phase * 70 + range(rng, 0, 10),
     durationMult: range(rng, 0.85, 1.15),
   };
 }
@@ -240,11 +240,11 @@ function collapseParams(rng: () => number, phase: number): CharEffectParams {
   // Gravity-like: each char falls different height, tumbles
   return {
     ...DEFAULTS,
-    dx: signedRange(rng, 1, 3),
-    dy: range(rng, 8, 18),
-    rotate: signedRange(rng, 10, 35),
-    scale: range(rng, 0.85, 0.95),
-    delayOffset: phase * 55 + range(rng, 0, 10),
+    dx: signedRange(rng, 2, 7),
+    dy: range(rng, 18, 38),
+    rotate: signedRange(rng, 15, 50),
+    scale: range(rng, 0.75, 0.9),
+    delayOffset: phase * 80 + range(rng, 0, 10),
     durationMult: range(rng, 0.85, 1.15),
   };
 }
@@ -252,14 +252,14 @@ function collapseParams(rng: () => number, phase: number): CharEffectParams {
 function scatterParams(rng: () => number, phase: number): CharEffectParams {
   // Gentle drift in random directions like dandelion seeds
   const angle = rng() * Math.PI * 2;
-  const mag = range(rng, 5, 12);
+  const mag = range(rng, 12, 26);
   return {
     ...DEFAULTS,
     dx: Math.cos(angle) * mag,
     dy: Math.sin(angle) * mag,
-    rotate: signedRange(rng, 4, 15),
-    opacityMin: range(rng, 0.35, 0.6),
-    delayOffset: phase * 70 + range(rng, 0, 12),
+    rotate: signedRange(rng, 8, 25),
+    opacityMin: range(rng, 0.2, 0.45),
+    delayOffset: phase * 100 + range(rng, 0, 12),
     durationMult: range(rng, 0.85, 1.15),
   };
 }
@@ -270,9 +270,9 @@ function spinParams(rng: () => number, phase: number): CharEffectParams {
   return {
     ...DEFAULTS,
     rotate: direction * 360,
-    scale: range(rng, 0.92, 1.08),
-    dy: signedRange(rng, 1, 3),
-    delayOffset: phase * 45 + range(rng, 0, 10),
+    scale: range(rng, 0.85, 1.15),
+    dy: signedRange(rng, 3, 8),
+    delayOffset: phase * 65 + range(rng, 0, 10),
     durationMult: range(rng, 0.85, 1.15),
   };
 }
@@ -281,10 +281,10 @@ function bounceParams(rng: () => number, phase: number): CharEffectParams {
   // Drop height varies per char; keyframe handles the bounce physics
   return {
     ...DEFAULTS,
-    dy: range(rng, 8, 16),
-    rotate: signedRange(rng, 2, 5),
+    dy: range(rng, 16, 32),
+    rotate: signedRange(rng, 4, 10),
     scale: range(rng, 0.95, 1.0),
-    delayOffset: phase * 40 + range(rng, 0, 8),
+    delayOffset: phase * 60 + range(rng, 0, 8),
     durationMult: range(rng, 0.85, 1.15),
   };
 }
@@ -293,24 +293,24 @@ function flashParams(rng: () => number, phase: number): CharEffectParams {
   // Quick scale pulse + brightness; wave-based delay for ripple feel
   return {
     ...DEFAULTS,
-    scale: range(rng, 1.08, 1.2),
+    scale: range(rng, 1.15, 1.35),
     opacityMin: 1,
-    delayOffset: phase * 60 + range(rng, 0, 6),
+    delayOffset: phase * 85 + range(rng, 0, 6),
   };
 }
 
 function shatterParams(rng: () => number, phase: number): CharEffectParams {
   // Sharp angular displacement like broken glass — skew is the fingerprint
   const angle = rng() * Math.PI * 2;
-  const mag = range(rng, 3, 10);
+  const mag = range(rng, 8, 20);
   return {
     ...DEFAULTS,
     dx: Math.cos(angle) * mag,
     dy: Math.sin(angle) * mag,
-    rotate: signedRange(rng, 5, 20),
-    skew: signedRange(rng, 4, 12),
-    scale: range(rng, 0.8, 0.95),
-    delayOffset: phase * 35 + range(rng, 0, 8),
+    rotate: signedRange(rng, 10, 35),
+    skew: signedRange(rng, 8, 22),
+    scale: range(rng, 0.65, 0.85),
+    delayOffset: phase * 55 + range(rng, 0, 8),
     durationMult: range(rng, 0.85, 1.15),
   };
 }
@@ -320,15 +320,15 @@ function vortexParams(rng: () => number, phase: number): CharEffectParams {
   const centerDist = Math.abs(phase - 0.5) * 2;
   // Direction points inward toward center
   const direction = phase < 0.5 ? 1 : -1;
-  const mag = range(rng, 4, 10) * centerDist;
+  const mag = range(rng, 10, 22) * centerDist;
   return {
     ...DEFAULTS,
     dx: direction * mag,
-    dy: signedRange(rng, 1, 4) * centerDist,
-    rotate: signedRange(rng, 20, 60),
-    scale: range(rng, 0.6, 0.85),
-    opacityMin: range(rng, 0.3, 0.5),
-    delayOffset: centerDist * 60 + range(rng, 0, 10),
+    dy: signedRange(rng, 3, 10) * centerDist,
+    rotate: signedRange(rng, 35, 90),
+    scale: range(rng, 0.4, 0.7),
+    opacityMin: range(rng, 0.15, 0.35),
+    delayOffset: centerDist * 90 + range(rng, 0, 10),
     durationMult: range(rng, 0.85, 1.15),
   };
 }
@@ -337,9 +337,9 @@ function rippleParams(rng: () => number, phase: number): CharEffectParams {
   // Vertical wave propagating left-to-right; phase-based delay IS the wave
   return {
     ...DEFAULTS,
-    dy: signedRange(rng, 3, 6),
-    rotate: signedRange(rng, 1, 3),
-    delayOffset: phase * 150 + range(rng, 0, 5),
+    dy: signedRange(rng, 6, 14),
+    rotate: signedRange(rng, 3, 7),
+    delayOffset: phase * 200 + range(rng, 0, 5),
     durationMult: range(rng, 0.85, 1.15),
   };
 }
@@ -348,10 +348,10 @@ function slamParams(rng: () => number, phase: number): CharEffectParams {
   // Heavy downward impact — scale squash on landing, not scale-up
   return {
     ...DEFAULTS,
-    scale: range(rng, 1.15, 1.35),
-    dy: range(rng, 3, 8),
-    rotate: signedRange(rng, 1, 3),
-    delayOffset: phase * 40 + range(rng, 0, 8),
+    scale: range(rng, 1.25, 1.5),
+    dy: range(rng, 6, 16),
+    rotate: signedRange(rng, 3, 7),
+    delayOffset: phase * 60 + range(rng, 0, 8),
     durationMult: range(rng, 0.85, 1.15),
   };
 }

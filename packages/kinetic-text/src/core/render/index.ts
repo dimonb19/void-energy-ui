@@ -22,7 +22,6 @@ export class CharacterRenderer {
   private units: HTMLSpanElement[] = [];
   private oneshots: HTMLSpanElement[] = [];
   private glyphs: HTMLSpanElement[] = [];
-  private cursorEl: HTMLSpanElement | null = null;
   private collapsed = false;
   /** Maps unit index → index into this.words (-1 for spaces) */
   private unitToWord: number[] = [];
@@ -95,7 +94,10 @@ export class CharacterRenderer {
       // Inner: kt-glyph (reveal layer)
       const glyph = document.createElement('span');
       glyph.className = 'kt-glyph';
-      glyph.setAttribute('data-kt-state', 'hidden');
+      glyph.setAttribute(
+        'data-kt-state',
+        options.preRevealed ? 'visible' : 'hidden',
+      );
       glyph.style.setProperty('--kt-delay', '0ms');
       glyph.textContent = pos.char;
 
@@ -124,16 +126,6 @@ export class CharacterRenderer {
       this.units[i] = unit;
       this.oneshots[i] = oneshot;
       this.glyphs[i] = glyph;
-    }
-
-    // Cursor (appended after last unit, inside visual layer)
-    if (options.cursor) {
-      const cursor = document.createElement('span');
-      cursor.className = 'kt-cursor';
-      cursor.setAttribute('aria-hidden', 'true');
-      cursor.textContent = options.cursorChar;
-      visual.appendChild(cursor);
-      this.cursorEl = cursor;
     }
 
     // ── Semantic layer ─────────────────────────────────────
@@ -306,27 +298,6 @@ export class CharacterRenderer {
   }
 
   /**
-   * Move cursor after the unit at the given index.
-   * If index is -1, cursor moves before the first unit.
-   */
-  moveCursorAfter(index: number): void {
-    if (!this.cursorEl) return;
-
-    if (index < 0 || index >= this.units.length) {
-      // Place at end of visual layer
-      this.visual?.appendChild(this.cursorEl);
-      return;
-    }
-
-    const unit = this.units[index];
-    if (unit && unit.nextSibling) {
-      unit.parentNode?.insertBefore(this.cursorEl, unit.nextSibling);
-    } else if (unit) {
-      unit.parentNode?.appendChild(this.cursorEl);
-    }
-  }
-
-  /**
    * Set text content of a glyph (inner node). Used by decode mode
    * to show scrambled characters then resolve to the real character.
    */
@@ -334,16 +305,6 @@ export class CharacterRenderer {
     const glyph = this.glyphs[index];
     if (glyph) {
       glyph.textContent = text;
-    }
-  }
-
-  /**
-   * Remove the cursor element.
-   */
-  removeCursor(): void {
-    if (this.cursorEl) {
-      this.cursorEl.remove();
-      this.cursorEl = null;
     }
   }
 
@@ -435,7 +396,6 @@ export class CharacterRenderer {
     this.oneshots = [];
     this.glyphs = [];
     this.unitToWord = [];
-    this.cursorEl = null;
     this.collapsed = false;
   }
 }

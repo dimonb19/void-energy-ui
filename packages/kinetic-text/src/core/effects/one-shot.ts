@@ -98,7 +98,11 @@ export function fireOneShotEffect(
     onComplete();
   };
 
-  // Track individual animationend events
+  // Track individual animationend events — clean up each character
+  // immediately when its own animation ends rather than waiting for
+  // all characters. This distributes the compositing-layer teardown
+  // across time (matching the staggered start), preventing a visible
+  // collective "jump to clean" when all layers drop at once.
   let finishedCount = 0;
 
   for (let i = start; i < end; i++) {
@@ -108,6 +112,12 @@ export function fireOneShotEffect(
     const onEnd = (e: AnimationEvent) => {
       if (e.target !== el) return;
       el.removeEventListener('animationend', onEnd);
+
+      // Clean up this character immediately
+      el.removeAttribute('data-kt-oneshot');
+      el.style.removeProperty('--kt-effect-duration');
+      clearCharParams(el);
+
       finishedCount++;
       if (finishedCount >= pending) {
         finish();
