@@ -88,7 +88,7 @@ jobs:
 1. Ensure each package's `package.json` includes:
 ```json
 {
-  "name": "@dgrslabs/void-energy-kinetic-text",
+  "name": "@dgrslabs/void-energy-ambience",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   }
@@ -143,7 +143,7 @@ For licensed customers who want to install premium packages:
 1. Grant them read access to the `void-energy-premium` repo (or use a dedicated team)
 2. They create a PAT with `read:packages` scope
 3. They add the `.npmrc` configuration above
-4. They can `npm install @dgrslabs/void-energy-kinetic-text`
+4. They can `npm install @dgrslabs/void-energy-ambience` (or other premium packages)
 
 **Pros:**
 - Zero cost
@@ -280,10 +280,12 @@ Premium collaborator packages follow this pattern:
 
 | Package | Name | Status |
 |---------|------|--------|
-| Rive assets (Eric Jordan) | `@dgrslabs/void-energy-rive` | First package, pending delivery |
+| Kinetic Text | `@dgrslabs/void-energy-kinetic-text` | First package — already built, move to premium repo |
+| Ambience Layers | `@dgrslabs/void-energy-ambience` | Second package — build when CoNexus needs it |
+| Rive assets (Eric Jordan) | `@dgrslabs/void-energy-rive` | Third package — pending Eric's delivery |
 | Future collaborator packages | `@dgrslabs/void-energy-{name}` | As collaborators onboard |
 
-**Note:** Kinetic Text now ships free with `void-energy` (not a premium package). Atmospheres are not sold — the 12 originals are DGRS-private. CoNexus UI components live in the CoNexus repo (not published as a package).
+**Note:** ALL packages are premium/private — strategic moat for CoNexus. Atmospheres are not sold — the 12 originals are DGRS-private. CoNexus UI components live in the CoNexus repo (not published as a package). Premium deals with external customers are for later, after CoNexus launches.
 
 ---
 

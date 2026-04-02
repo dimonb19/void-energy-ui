@@ -1,11 +1,11 @@
 # 04 — Premium Repo: `void-energy-premium`
 
-> Private monorepo for premium packages, published under the `@dgrslabs` npm scope. First package: Ambience Layers.
+> Private monorepo for ALL premium packages, published under the `@dgrslabs` npm scope. First package: Kinetic Text. Then Ambience Layers. Then Rive.
 
-**Status:** Planning — Wave 3 (after CoNexus UI extraction)
-**Updated:** 2026-03-31
-**Depends on:** 03-public-repo (Wave 1), 02-conexus-extraction (Wave 2)
-**Blocks:** 05-conexus-repo (Wave 4 — CoNexus consumes Ambience Layers)
+**Status:** Planning — Wave 2 (after starter launch, before CoNexus)
+**Updated:** 2026-04-02
+**Depends on:** 03-public-repo (Wave 1)
+**Blocks:** 05-conexus-repo (Wave 3 — CoNexus consumes premium packages)
 
 ---
 
@@ -18,24 +18,25 @@ Create `github.com/dgrslabs/void-energy-premium` as a private monorepo that:
 - Includes a package template for onboarding collaborators (Eric Jordan and future)
 - Enforces the dependency boundary: premium imports from core, never the reverse
 
-**Key change from earlier plans:** This repo is leaner than originally scoped. Kinetic Text now ships free with `void-energy`. Atmospheres are not a sellable product — the 12 originals are DGRS-private and live in the CoNexus repo. The first premium package is **Ambience Layers** (`@dgrslabs/void-energy-ambience`), built by DGRS. Eric Jordan's Rive package ships whenever he delivers — decoupled from the wave timeline.
+**Strategic decision (2026-04-02):** ALL packages stay premium/private. Kinetic Text, Ambience Layers, and Rive are strategic moat for CoNexus. We don't open-source anything that gives competitors a head start while CoNexus doesn't yet have a second moat (userbase, content). The first premium package is **Kinetic Text** (`@dgrslabs/void-energy-kinetic-text`), then Ambience Layers, then Rive when Eric delivers. Premium deals with external customers are for later — after CoNexus launches and has traction. For now, collect contacts from interested parties.
 
 ---
 
 ## What Premium Is (and Isn't)
 
 **Premium IS:**
-- Packages that extend the public void-energy core
-- First: `@dgrslabs/void-energy-ambience` (Ambience Layers — Blood, Snow, Rain, Fog)
-- Second: `@dgrslabs/void-energy-rive` (Eric Jordan's Rive animations, whenever he delivers)
+- ALL packages that extend the public void-energy core — kept private as strategic moat
+- First: `@dgrslabs/void-energy-kinetic-text` (Kinetic Text — physics-aware text animations)
+- Second: `@dgrslabs/void-energy-ambience` (Ambience Layers — Blood, Snow, Rain, Fog)
+- Third: `@dgrslabs/void-energy-rive` (Eric Jordan's Rive animations, whenever he delivers)
 - Future: additional packages following the same template
-- Distributed via private npm to licensed customers
-- Realistic expectation: niche use case (especially Ambience Layers), but tangible product. Contact DGRS if interested.
+- Private for now — collect contacts, discuss access when demand exists
+- Premium deals happen after CoNexus launches and has traction
 
 **Premium is NOT:**
 - Extra atmospheres (the 12 originals are DGRS-private, not for sale)
-- Kinetic Text (now free — it's a marketing tool for adoption)
-- CoNexus components (those live in a private CoNexus UI package)
+- CoNexus components (those live in the CoNexus repo)
+- Available to external customers yet — moat first, deals later
 
 ---
 
@@ -44,7 +45,21 @@ Create `github.com/dgrslabs/void-energy-premium` as a private monorepo that:
 ```
 void-energy-premium/
 ├── packages/
-│   ├── ambience/                  ← @dgrslabs/void-energy-ambience (FIRST PACKAGE)
+│   ├── kinetic-text/              ← @dgrslabs/void-energy-kinetic-text (FIRST PACKAGE)
+│   │   ├── src/
+│   │   │   ├── svelte/
+│   │   │   │   └── KineticText.svelte
+│   │   │   ├── core/
+│   │   │   ├── adapters/
+│   │   │   ├── types.ts
+│   │   │   ├── index.ts
+│   │   │   └── styles/
+│   │   ├── package.json
+│   │   ├── README.md
+│   │   ├── PACKAGE.md             ← Interface spec
+│   │   └── CHANGELOG.md
+│   │
+│   ├── ambience/                  ← @dgrslabs/void-energy-ambience (SECOND PACKAGE)
 │   │   ├── src/
 │   │   │   ├── components/
 │   │   │   │   ├── BloodLayer.svelte
@@ -58,7 +73,7 @@ void-energy-premium/
 │   │   ├── PACKAGE.md             ← Interface spec
 │   │   └── CHANGELOG.md
 │   │
-│   ├── rive/                      ← @dgrslabs/void-energy-rive (SECOND — when Eric delivers)
+│   ├── rive/                      ← @dgrslabs/void-energy-rive (THIRD — when Eric delivers)
 │   │   ├── assets/                ← .riv files from Eric Jordan
 │   │   ├── src/
 │   │   │   ├── components/
@@ -98,13 +113,42 @@ void-energy-premium/
 
 ## Package Details
 
-### `@dgrslabs/void-energy-ambience` (First Package — DGRS Built)
+### `@dgrslabs/void-energy-kinetic-text` (First Package — DGRS Built)
+
+Physics-aware animated text effects. The KT package was the viral hit that got attention (Pretext hype wave, March 2026). It's the highest-value strategic asset — keeping it private preserves CoNexus's feel advantage.
+
+**Status:** v0.1.0 already built in monorepo (`packages/kinetic-text/`). Move to premium repo during Wave 3.
+
+**Why premium (not free):** Kinetic Text is core to CoNexus's narrative UX. Before CoNexus has a userbase moat, the UI feel IS the moat. Competitors with KT + a basic story engine could ship a "good enough" narrative platform faster. Once CoNexus has traction (6-12 months), revisit open-sourcing KT to boost VE adoption.
+
+**Package.json:**
+```json
+{
+  "name": "@dgrslabs/void-energy-kinetic-text",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./component": "./src/svelte/KineticText.svelte",
+    "./styles/*": "./src/styles/*.scss"
+  },
+  "peerDependencies": {
+    "void-energy": ">=0.1.0",
+    "svelte": "^5.0.0"
+  }
+}
+```
+
+---
+
+### `@dgrslabs/void-energy-ambience` (Second Package — DGRS Built)
 
 Visual immersion layers: Blood, Snow, Rain, Fog. Each adapts to the active physics preset. Built for CoNexus storytelling but available as a premium package for anyone who wants atmospheric effects.
 
-**Status:** Not yet started — Wave 3 (after CoNexus UI extraction).
+**Status:** Not yet started — build when CoNexus narrative flow needs it.
 
-**Realistic expectation:** Very niche use case. Most consumers won't need ambient overlays. But it's a tangible product in the premium tier from day one, and CoNexus uses it in production. Anyone who wants it can contact DGRS Labs.
+**Realistic expectation:** Very niche use case. Most consumers won't need ambient overlays. But it's a tangible premium product, and CoNexus uses it in production for immersive storytelling.
 
 **Planned layers:**
 | Layer | Effect | Physics Adaptation |
@@ -277,7 +321,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        package: [ambience, rive]
+        package: [kinetic-text, ambience, rive]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -325,13 +369,19 @@ gh repo create dgrslabs/void-energy-premium --private
 - Create root `package.json` with workspaces config
 - Create `templates/package-template/`
 
-### Step 3: Build Ambience Layers package
+### Step 3: Move Kinetic Text package
+- Move `packages/kinetic-text/` from monorepo to `packages/kinetic-text/` in premium repo
+- Update imports to use `void-energy` as peer dependency
+- Verify it builds independently from the premium repo
+- This is the first package — it already exists and works
+
+### Step 4: Build Ambience Layers package (when CoNexus needs it)
 - Set up `packages/ambience/` with package.json and PACKAGE.md
 - Implement BloodLayer, SnowLayer, RainLayer, FogLayer
 - Physics adaptation for all 3 presets (glass/flat/retro)
 - Performance testing (< 5ms per frame)
 
-### Step 4: Create Rive package skeleton (when Eric delivers)
+### Step 5: Create Rive package skeleton (when Eric delivers)
 - Set up `packages/rive/` with package.json and PACKAGE.md
 - Placeholder components ready for Eric's assets
 - Document the integration points Eric needs to implement
@@ -347,6 +397,7 @@ gh repo create dgrslabs/void-energy-premium --private
 
 - [ ] Workspace builds from clean clone
 - [ ] Package template is documented and usable
+- [ ] Kinetic Text package builds from premium repo
 - [ ] Rive package skeleton builds (even without assets)
 - [ ] `void-energy` declared as peer dependency in all packages
 - [ ] No package imports from another premium package (only from core)

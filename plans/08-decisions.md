@@ -2,7 +2,7 @@
 
 > Decisions tracking for the Void Energy enterprise decomposition. Most decisions are now resolved.
 
-**Last updated:** 2026-03-31
+**Last updated:** 2026-04-02
 
 ---
 
@@ -101,19 +101,20 @@ Eric is evaluating Rive glass effects. Package scope = Void Energy visual assets
 
 ---
 
-## D7: Ambience Layers Scope
+## D7: Premium Package Order
 
-**Status:** Decided — Wave 3 (first premium package)
+**Status:** Decided — Updated 2026-04-02
 **Owner:** Dima
 
 ### Resolution
-**Build as the first premium package (`@dgrslabs/void-energy-ambience`) in Wave 3.** Not CoNexus-exclusive — it's a real product in the premium tier.
+**Three premium packages in order:**
+1. `@dgrslabs/void-energy-kinetic-text` — first (already built, move from monorepo)
+2. `@dgrslabs/void-energy-ambience` — second (build when CoNexus needs it)
+3. `@dgrslabs/void-energy-rive` — third (ships when Eric delivers)
 
-Planned layers: Blood, Snow, Rain, Fog — each with physics adaptation (glass: blur+glow, flat: opacity, retro: pixel/dither). CoNexus installs it as a dependency. Anyone else who wants it can contact DGRS Labs.
+All premium. All private. CoNexus installs them as dependencies. External customers can discuss access after CoNexus launches.
 
-**Rationale for premium (not CoNexus-private):** The private CoNexus UI (tiles, portal loader) is already enough "private" to differentiate CoNexus. Keeping Ambience Layers as a premium package gives the premium tier something tangible from day one instead of an empty shell waiting for Eric's Rive delivery. Realistic expectation: very niche use case, but it's real and available.
-
-**Wave 3 announcement angle:** "First premium package built on Void Energy — Ambience Layers." Shows the extension model in action.
+Ambience Layers: Blood, Snow, Rain, Fog — each with physics adaptation (glass: blur+glow, flat: opacity, retro: pixel/dither). Realistic expectation: very niche use case, but CoNexus uses it for immersive storytelling.
 
 ---
 
@@ -129,17 +130,19 @@ The monorepo continues as the development environment indefinitely. It's working
 
 ## D9: Public Component Tier — What Ships Free
 
-**Status:** Decided
-**Owner:** Dima
+**Status:** Decided — UPDATED 2026-04-02 (Kinetic Text moved to premium)
+**Owner:** Dima + Boss
 
 ### Resolution
-**All components stay public except CoNexus-specific ones.** Generous free tier drives adoption.
+**All core components stay public except CoNexus-specific ones.** Generous free tier drives adoption. **All packages are premium/private.**
 
-**Public (free):** ~50 components (all fields, buttons, navigation, overlays, charts, layout, icons, modals), all actions (narrative, drag, morph, tooltip, kinetic, navlink), Kinetic Text package, AI atmosphere generator, 4 atmospheres.
+**Public (free):** 40+ components (all fields, buttons, navigation, overlays, charts, layout, icons, modals), all actions (narrative, drag, morph, tooltip, navlink), AI atmosphere generator, 4 atmospheres.
+
+**Premium (private):** Kinetic Text (`@dgrslabs/void-energy-kinetic-text`), Ambience Layers (`@dgrslabs/void-energy-ambience`), Rive (`@dgrslabs/void-energy-rive`).
 
 **Removed from public:** Tile, StoryCategory, PortalLoader, LoadingTextCycler, StoryFeed, PortalLoaderDemo, ReorderShowcase (CoNexus-specific → CoNexus repo).
 
-Premium value comes from collaborator packages (Rive, Ambience Layers), not from withholding basic components.
+**Why KT moved to premium:** See D11 (Strategic Moat decision).
 
 ---
 
@@ -174,6 +177,37 @@ _Pending discussion between Dima and Boss._
 
 ---
 
+## D11: Strategic Moat — Keep All Packages Private
+
+**Status:** Decided
+**Owner:** Dima + Boss
+**Date:** 2026-04-02
+
+### Resolution
+**All packages (Kinetic Text, Ambience Layers, Rive) stay premium/private until CoNexus has traction.** This is a strategic moat decision, not a monetization decision.
+
+**Rationale (boss's argument, Dima agreed):**
+- CoNexus is pre-launch. Zero users, zero network effects, zero content moat.
+- The UI/UX premium feel is literally the only differentiator right now.
+- Kinetic Text is core to CoNexus's narrative UX — a competitor with KT + a basic story engine could ship faster.
+- Once something is open-sourced, you can't take it back.
+- Even at $100k, if a competitor uses KT to launch 3 months faster, that was a terrible trade.
+
+**Precedents cited:**
+- Figma — open plugin API, closed rendering engine. The openness built ecosystem; the closed core built valuation.
+- Linear — internal motion system. It's why clones feel like knockoffs.
+- Vercel — open Next.js, closed deployment infrastructure.
+- Loom — internal async video compression. Acqui-hired for $975M.
+- Netflix (early) — if they'd open-sourced their UI/UX when it was their only moat, they might never have become a giant.
+
+**Pattern:** Open what builds community, close what builds moat. KT and Ambience fall in the second bucket.
+
+**Showcase strategy:** The void.dgrslabs.ink site shows ALL features including premium packages — visible, not downloadable. People see the technology; code stays private. Collect contacts from interested parties; discuss access after CoNexus launches.
+
+**When to revisit:** After CoNexus has traction (6-12 months post-launch). At that point, the moat is userbase + content + community, and open-sourcing KT could boost VE adoption without threatening CoNexus.
+
+---
+
 ## Decision Log
 
 | # | Decision | Status | Date | Outcome |
@@ -184,7 +218,8 @@ _Pending discussion between Dima and Boss._
 | D4 | Free atmospheres | **Decided** | 2026-03-31 | Slate, Terminal, Meridian, Ember (all ready) |
 | D5 | BSL license | **Decided** (approach) | 2026-03-31 | AI draft → lawyer swap |
 | D6 | Rive timeline | Deferred | — | Decoupled from waves, ships when Eric delivers |
-| D7 | Ambience layers | **Decided** | 2026-03-31 | First premium package (Wave 3), CoNexus consumes it |
+| D7 | Premium package order | **Updated** | 2026-04-02 | KT first, Ambience second, Rive third — all premium |
 | D8 | Monorepo decommission | **Decided** | 2026-03-31 | No rush, keep as dev environment |
-| D9 | Public component tier | **Decided** | 2026-03-31 | All primitives + Kinetic Text free |
+| D9 | Public component tier | **Updated** | 2026-04-02 | All primitives free; KT moved to premium |
 | D10 | Eric Jordan deal | **Open** | — | Revenue share recommended |
+| D11 | Strategic moat | **Decided** | 2026-04-02 | All packages private until CoNexus has traction |

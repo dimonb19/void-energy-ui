@@ -1,9 +1,9 @@
 # 03 — Public Repo: `void-energy`
 
-> The public, BSL-licensed starter system. What people fork, star, and install. A complete, working design system on its own.
+> The public, BSL-licensed starter system. What people fork, star, and install. A complete, working design system on its own. No premium packages — those stay private.
 
 **Status:** Planning — Wave 1 (ship in 2-3 weeks)
-**Updated:** 2026-03-31
+**Updated:** 2026-04-02
 **Depends on:** 01-atmosphere-split (all 4 atmospheres ready)
 **Blocks:** 05-conexus-repo (Wave 2), 06-npm-distribution
 
@@ -14,13 +14,15 @@
 Create `github.com/dgrslabs/void-energy` as a standalone, polished open-source (BSL) design system that:
 - Is installable via `npm install void-energy`
 - Ships with 4 free atmospheres (Slate, Terminal, Meridian, Ember) covering all physics modes
-- Includes Kinetic Text package (key marketing differentiator, rides the Pretext hype wave)
-- Includes 50+ components to build real production apps
+- Includes 40+ components to build real production apps
 - Has an AI atmosphere generator for creating custom themes
 - Has professional documentation worthy of GitHub stars
-- Tastefully mentions premium collaborator packages without being obnoxious
+- Tastefully mentions premium packages (KT, Ambience, Rive) without being obnoxious — the showcase site demos them visually
+- **Does NOT include** Kinetic Text, Ambience Layers, or any premium packages — those are strategic moat
 
-**Wave 1 priority:** Ship fast. The public repo does NOT depend on CoNexus extraction being complete. CoNexus-specific files are simply excluded during repo creation. Clean git: init commit + license.
+**Wave 1 priority:** Ship fast. The public repo does NOT depend on CoNexus extraction being complete. CoNexus-specific files and premium packages are simply excluded during repo creation. Clean git: init commit + license.
+
+**After Wave 1:** Focus shifts to premium packages (Wave 2) — finish VE completely before CoNexus.
 
 ---
 
@@ -59,20 +61,6 @@ void-energy/
 │   │   ├── config/                  ← Generated themes (4 free only)
 │   │   └── global.scss              ← Main entry + density system
 │   │
-│   ├── packages/
-│   │   └── kinetic-text/            ← Kinetic Text package (ships FREE with void-energy)
-│   │       ├── src/
-│   │       │   ├── svelte/
-│   │       │   │   └── KineticText.svelte
-│   │       │   ├── core/
-│   │       │   ├── adapters/
-│   │       │   ├── types.ts
-│   │       │   ├── index.ts
-│   │       │   └── styles/
-│   │       ├── dist/
-│   │       ├── package.json
-│   │       └── README.md
-│   │
 │   ├── components/
 │   │   ├── core/                    ← AtmosphereScope, ThemeScript
 │   │   ├── ui/                      ← All public UI primitives
@@ -83,7 +71,7 @@ void-energy/
 │   │   ├── morph.ts
 │   │   ├── tooltip.ts
 │   │   ├── navlink.ts
-│   │   ├── kinetic.ts               ← The action (not the premium package)
+│   │   ├── kinetic.ts               ← Kinetic text action (base action only — full KT package is premium)
 │   │   ├── narrative.ts             ← 18 narrative effects
 │   │   └── drag.ts                  ← Drag-and-drop system
 │   │
@@ -166,7 +154,7 @@ void-energy/
 
 ### UI Primitives (all stay public)
 
-**Fields (16):** FormField, SearchField, EditField, EditTextarea, GenerateField, GenerateTextarea, PasswordField, PasswordMeter, PasswordChecklist, CopyField, ColorField, Selector, Combobox, Switcher, SliderField, Toggle, DropZone
+**Fields (17):** FormField, SearchField, EditField, EditTextarea, GenerateField, GenerateTextarea, PasswordField, PasswordMeter, PasswordChecklist, CopyField, ColorField, Selector, Combobox, Switcher, SliderField, Toggle, DropZone
 
 **Buttons (4):** ActionBtn, IconBtn, ProfileBtn, ThemesBtn
 
@@ -276,13 +264,15 @@ gh repo create dgrslabs/void-energy --public --description "Enterprise design sy
 - Update `_generated-themes.scss` to contain only 4 free themes (Slate, Terminal, Meridian, Ember)
 - Update `void-registry.json` to list only 4 free themes
 - Update `font-registry.ts` to include only free-tier fonts
-- Include Kinetic Text package in `packages/kinetic-text/`
+- **Do NOT** include Kinetic Text package — it's premium
 - Update `component-registry.json` to list only public components
+- **Do NOT include** `packages/kinetic-text/` — it's premium and stays in the premium repo
 
 ### Step 3: Clean imports
 - Search for any remaining references to removed components
 - Update Navigation to remove CoNexus tab
 - Update showcase pages to remove CoNexus demos
+- Remove any Kinetic Text package references (the `kinetic.ts` action can stay as a base action)
 
 ### Step 4: Add BSL license (AI-drafted placeholder)
 - `LICENSE` file with BSL 1.1 text — AI-drafted, clearly marked as "pending legal review"
@@ -344,12 +334,14 @@ jobs:
 
 ## Premium Mention Strategy
 
-The public repo should tastefully acknowledge premium collaborator packages:
-- README: "Extend with premium packages" section (Rive animations, future add-ons)
+The public repo should tastefully acknowledge premium packages:
+- README: "Premium packages available" section (Kinetic Text, Ambience Layers, Rive animations)
+- Link to the showcase site where people can SEE all premium features in action
+- "Interested? Contact us" — collect contacts, discuss access when demand exists
 - No "premium atmospheres" upsell — the 4 free atmospheres are complete, and the AI generator lets anyone create more
 - No feature degradation — the public system is complete and useful on its own
 - The AI generator works fully in the free tier (anyone can create custom atmospheres)
-- Kinetic Text ships free — it's a marketing tool, not a premium gate
+- **The showcase site (void.dgrslabs.ink) IS the marketing** — people see KT, Ambience, all 16 themes there
 
 ---
 
@@ -359,7 +351,7 @@ The public repo should tastefully acknowledge premium collaborator packages:
 - [ ] All 4 free atmospheres work (Slate, Terminal, Meridian, Ember)
 - [ ] All physics modes demonstrated (glass via Ember, flat via Slate/Meridian, retro via Terminal)
 - [ ] Both color modes work (dark via Slate/Terminal/Ember, light via Meridian)
-- [ ] Kinetic Text package builds and works
+- [ ] No Kinetic Text package in public repo (it's premium)
 - [ ] `npm run check` passes (zero type errors)
 - [ ] `npm run test` passes
 - [ ] `npm run check:registry` passes

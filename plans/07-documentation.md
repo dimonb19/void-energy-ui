@@ -69,7 +69,7 @@ npm install void-energy
 - **3 Physics Engines** — Glass (blur + glow), Flat (borders + clean), Retro (pixel-perfect)
 - **4 Free Atmospheres** — Slate, Terminal, Meridian, Ember
 - **50+ Components** — Form fields, navigation, overlays, charts, icons
-- **Kinetic Text** — Pretext-powered text animations, included free
+- **Premium Packages** — Kinetic Text, Ambience Layers, Rive ([see showcase](void.dgrslabs.ink))
 - **AI Theme Generator** — Create custom atmospheres with Claude
 - **Semantic Tokens** — Zero raw values, full customization
 - **Svelte 5 Runes** — Modern reactivity, no legacy patterns
@@ -82,11 +82,13 @@ npm install void-energy
 
 [Categorized list with links to showcase]
 
-## Premium
+## Premium Packages
 
-Extend with premium collaborator packages:
-- **@dgrslabs/void-energy-rive** — Interactive Rive animations by Eric Jordan (2Advanced Studios)
-- More packages coming. [Contact us / Visit premium docs]
+Extend with premium packages (visible on the [showcase site](void.dgrslabs.ink)):
+- **Kinetic Text** — Physics-aware animated text effects
+- **Ambience Layers** — Immersive visual overlays (Blood, Snow, Rain, Fog)
+- **Rive Animations** — Interactive Rive assets by Eric Jordan (2Advanced Studios)
+- Interested? [Contact us](mailto:licensing@dgrslabs.com)
 
 ## Documentation
 

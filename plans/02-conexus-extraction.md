@@ -2,9 +2,9 @@
 
 > Extract all CoNexus-specific components, actions, styles, and types from the monorepo into a private CoNexus UI package.
 
-**Status:** Planning — Wave 2 (after public repo launch)
-**Depends on:** 03-public-repo (Wave 1 must ship first)
-**Blocks:** 05-conexus-repo (Wave 4)
+**Status:** Planning — Wave 3 (after VE is fully complete)
+**Depends on:** 03-public-repo (Wave 1), 04-premium-repo (Wave 2)
+**Blocks:** 05-conexus-repo (Wave 3)
 
 ---
 

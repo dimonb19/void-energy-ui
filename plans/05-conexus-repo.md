@@ -1,10 +1,10 @@
 # 05 — CoNexus Repo
 
-> The CoNexus AI storytelling platform. Consumes public `void-energy` + CoNexus UI private package + premium packages. Owns all 12 DGRS-private atmospheres.
+> The CoNexus AI storytelling platform — TOP PRIORITY. Consumes public `void-energy` from npm (same as everyone else) + premium packages from private npm. Owns all 12 DGRS-private atmospheres.
 
-**Status:** Planning — Wave 4 (after Ambience Layers premium package)
-**Updated:** 2026-03-31
-**Depends on:** 03-public-repo (Wave 1), 02-conexus-extraction (Wave 2), 04-premium-repo (Wave 3)
+**Status:** Planning — Wave 3 (after VE is fully complete — starter + premium)
+**Updated:** 2026-04-02
+**Depends on:** 03-public-repo (Wave 1), 04-premium-repo (Wave 2)
 **Blocks:** Nothing (final consumer).
 
 ---
@@ -13,13 +13,12 @@
 
 Create `github.com/dgrslabs/conexus` as the flagship application that demonstrates the full Void Energy ecosystem. CoNexus is a private repository — it's the product, not the framework.
 
-**This is Wave 4 — the real announcement.** "Here's what a production app looks like on Void Energy." CoNexus running with physics switching, atmosphere changes, kinetic text, and narrative effects in production is the proof of concept that makes developers want to use the system.
+**This is Wave 3 — after Void Energy is fully complete.** "Here's what a production app looks like on Void Energy." CoNexus running with physics switching, atmosphere changes, kinetic text, and narrative effects in production is the proof of concept that makes developers want to use the system. No split focus — finish VE first, then migrate CoNexus.
 
 After setup:
-- CoNexus imports `void-energy` (public core) for the engine, components, and styles
-- CoNexus imports CoNexus UI private package (Tile, StoryFeed, PortalLoader, etc.)
-- CoNexus imports `@dgrslabs/void-energy-ambience` for immersive story effects
-- CoNexus imports additional premium packages as available (Rive, future add-ons)
+- CoNexus imports `void-energy` from public npm (same as any external consumer)
+- CoNexus imports premium packages from private npm (`@dgrslabs/void-energy-kinetic-text`, `@dgrslabs/void-energy-ambience`, etc.)
+- CoNexus UI components (Tile, StoryFeed, PortalLoader, etc.) live directly in the CoNexus repo
 - CoNexus owns the 12 DGRS-private atmospheres (registered at boot via `voidEngine.registerTheme()`)
 - CoNexus-exclusive features (story engine, app logic) live only here
 - All 16 atmospheres available (4 free from void-energy + 12 private registered at boot)
@@ -131,6 +130,7 @@ This runs early in the app lifecycle (imported in the root layout or entry point
   "private": true,
   "dependencies": {
     "void-energy": "^0.1.0",
+    "@dgrslabs/void-energy-kinetic-text": "^0.1.0",
     "@dgrslabs/void-energy-ambience": "^0.1.0",
     "astro": "^5.0.0",
     "svelte": "^5.0.0"
@@ -162,8 +162,8 @@ import { modal } from 'void-energy/lib/modal-manager';
 import { toast } from 'void-energy/stores/toast';
 import { voidEngine } from 'void-energy/engine';
 
-// Kinetic text — from public void-energy (ships free)
-import KineticText from 'void-energy/packages/kinetic-text/component';
+// Kinetic text — from premium package
+import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
 
 // Narrative effects — from public void-energy (free)
 import { narrative } from 'void-energy/actions/narrative';
@@ -215,7 +215,9 @@ gh repo create dgrslabs/conexus --private
 ### Step 3: Install dependencies
 ```bash
 npm install void-energy
-# Premium packages added later as available:
+npm install @dgrslabs/void-energy-kinetic-text
+# Premium packages added as available:
+# npm install @dgrslabs/void-energy-ambience
 # npm install @dgrslabs/void-energy-rive
 ```
 
@@ -240,7 +242,7 @@ npm install void-energy
 - [ ] All 16 atmospheres available after boot (4 free + 12 DGRS-private)
 - [ ] Core components import correctly from `void-energy`
 - [ ] CoNexus UI components work from local `conexus-ui/` directory
-- [ ] Kinetic text works from `void-energy` (ships free)
+- [ ] Kinetic text works from `@dgrslabs/void-energy-kinetic-text` (premium)
 - [ ] Ambience Layers work from `@dgrslabs/void-energy-ambience`
 - [ ] Physics switching works across all imported components
 - [ ] No direct imports from the old monorepo
