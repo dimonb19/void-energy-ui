@@ -5247,7 +5247,7 @@ No manual body padding or scroll offset adjustments needed — `data-has-breadcr
 
 ### U. Kinetic Text
 
-**Premium package:** `@dgrslabs/void-energy-kinetic-text` — character-level DOM, 5 reveal modes, 6 reveal styles, 18 narrative effects with scope targeting, cue system for TTS sync. See [/kinetic-text](src/pages/kinetic-text.astro) for full showcase.
+**Premium package:** `@dgrslabs/void-energy-kinetic-text` — character-level DOM, 3 reveal modes (char, word, decode), 8 reveal styles (pop, scramble, rise, drop, scale, blur, random, instant), 37 effects (16 one-shot + 21 continuous) with per-character animation, three-layer composability (reveal + continuous + one-shot simultaneously), cue system for TTS sync. See [/kinetic-text](src/pages/kinetic-text.astro) for full showcase.
 
 **Loading cycler** (still available as a shipped primitive):
 

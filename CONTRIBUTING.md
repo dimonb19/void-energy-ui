@@ -9,9 +9,10 @@ Thank you for considering contributing to Void Energy UI! This design system pow
 1. [Code of Conduct](#1-code-of-conduct)
 2. [Getting Started](#2-getting-started)
 3. [Development Workflow](#3-development-workflow)
-4. [Architecture & Discipline](#4-architecture--discipline)
-5. [Pull Request Process](#5-pull-request-process)
-6. [Style Guidelines](#6-style-guidelines)
+4. [Adding a Premium Package](#4-adding-a-premium-package)
+5. [Architecture & Discipline](#5-architecture--discipline)
+6. [Pull Request Process](#6-pull-request-process)
+7. [Style Guidelines](#7-style-guidelines)
 
 ---
 
@@ -204,7 +205,149 @@ Follow the step-by-step guide in [THEME-GUIDE.md](./THEME-GUIDE.md).
 
 ---
 
-## 4. Architecture & Discipline
+## 4. Adding a Premium Package
+
+Void Energy UI supports **premium packages** — self-contained feature modules that build on the core design system and are distributed separately via private npm registry. Packages live in `packages/` and have their own `package.json`, types, styles, and documentation.
+
+### Package Structure
+
+Every premium package follows this layout:
+
+```
+packages/
+  your-package/
+    src/
+      index.ts                  Entry point (re-exports component, adapter, types)
+      types.ts                  All public TypeScript definitions
+      svelte/
+        YourComponent.svelte    Main Svelte 5 component
+      adapters/
+        void-energy-host.ts     Adapter that reads live DOM state from VE hosts
+      core/                     Internal engine (layout, rendering, effects, etc.)
+      styles/
+        your-package.scss       All keyframes, animations, physics variants
+    package.json                Scoped name, exports map, peer deps
+    README.md                   Full API reference, props, examples
+    CHANGELOG.md                Version history
+```
+
+### Key Principles
+
+1. **Peer-depend on Svelte, not Void Energy.** The package should work on any Svelte 5 host. VE-specific integration lives in an adapter (`adapters/void-energy-host.ts`) that reads `data-physics`, `data-mode`, CSS variables, and computed styles from the host DOM.
+
+2. **Own your styles.** Package styles use a unique CSS prefix (e.g., `kt-` for Kinetic Text) and ship as a standalone stylesheet via the `./styles` export. Never depend on core SCSS mixins at runtime — the package must be self-contained.
+
+3. **Physics-aware rendering.** Adapt animations to glass (spring easing + motion blur), flat (clean ease-out), and retro (stepped timing + jitter). The adapter provides the active physics preset; your component reads it from `styleSnapshot.physics`.
+
+4. **Reduced motion.** Respect `prefers-reduced-motion` by default (`reducedMotion: 'auto'`). Skip animations and fire callbacks synchronously when active.
+
+5. **Accessibility.** Provide a semantic layer alongside any visual/animated layer. Screen readers should get clean text, not animation artifacts.
+
+6. **Export map.** Provide granular exports so consumers can import only what they need:
+
+```json
+{
+  "exports": {
+    ".": "./src/index.ts",
+    "./component": "./src/svelte/YourComponent.svelte",
+    "./types": "./src/types.ts",
+    "./adapters/void-energy-host": "./src/adapters/void-energy-host.ts",
+    "./styles": "./src/styles/your-package.css"
+  }
+}
+```
+
+### Example: Kinetic Text
+
+`@dgrslabs/void-energy-kinetic-text` is the reference implementation for premium packages. It demonstrates every pattern above:
+
+- **3 reveal modes** (char, word, decode), **8 reveal styles** (pop, scramble, rise, drop, scale, blur, random, instant)
+- **37 effects** — 16 one-shot (shake, explode, vortex...) + 21 continuous (breathe, haunt, sparkle...)
+- **Three composable layers** — reveal + continuous + one-shot run simultaneously on the same text block
+- **Adapter pattern** — `createVoidEnergyTextStyleSnapshot()` reads physics, mode, fonts, and CSS variables from the live DOM
+- **Cue system** — time-triggered and completion-triggered one-shot effects for TTS synchronization
+- **Seeded PRNG** — deterministic per-character animation parameters for reproducible motion
+
+**Quick start (VE host):**
+
+```svelte
+<script lang="ts">
+  import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
+  import { createVoidEnergyTextStyleSnapshot } from '@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host';
+  import '@dgrslabs/void-energy-kinetic-text/styles';
+
+  let el = $state<HTMLElement>();
+  const snapshot = $derived(el ? createVoidEnergyTextStyleSnapshot(el) : null);
+</script>
+
+<div bind:this={el}>
+  {#if snapshot}
+    <KineticText
+      text="The void stirs..."
+      styleSnapshot={snapshot}
+      revealMode="word"
+      revealStyle="drop"
+      activeEffect="breathe"
+    />
+  {/if}
+</div>
+```
+
+**Quick start (non-VE host):**
+
+```svelte
+<script lang="ts">
+  import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
+  import '@dgrslabs/void-energy-kinetic-text/styles';
+
+  const snapshot = {
+    font: '16px "Inter", sans-serif',
+    lineHeight: 24,
+    physics: 'flat' as const,
+    mode: 'dark' as const,
+    density: 1,
+    scale: 1,
+    vars: {},
+  };
+</script>
+
+<KineticText text="Hello world" styleSnapshot={snapshot} />
+```
+
+See `packages/kinetic-text/README.md` for the full API reference, effect catalog, and cue authoring guide.
+
+### Adding a Showcase Page
+
+Every premium package should have a showcase page in the main app that demonstrates all its capabilities:
+
+1. Create a page component in `src/components/` (e.g., `KineticTextPage.svelte`)
+2. Create an Astro page in `src/pages/` that renders it (e.g., `kinetic-text.astro`)
+3. Structure the showcase with:
+   - **Hero section** — interactive demo combining multiple features
+   - **Feature sections** — one section per major capability (reveal modes, effects, etc.)
+   - **Interactive controls** — let users replay, switch modes, fire effects
+   - **Reference section** — collapsible `<details>` with the full effect/prop catalog
+   - **Technical details** — collapsible explanations of how the engine works
+
+Use the existing `KineticTextPage.svelte` as the reference pattern.
+
+### Checklist for New Packages
+
+- [ ] Package lives in `packages/your-package/`
+- [ ] `package.json` has scoped name (`@dgrslabs/void-energy-*`), `UNLICENSED` license, Svelte 5 peer dep
+- [ ] Export map provides `.`, `./component`, `./types`, `./adapters/void-energy-host`, `./styles`
+- [ ] Adapter reads `data-physics`, `data-mode`, computed font, and CSS variables from host DOM
+- [ ] Component adapts to all 3 physics presets (glass, flat, retro) and both color modes
+- [ ] Reduced motion is respected by default
+- [ ] Semantic/accessible layer is provided alongside visual layer
+- [ ] CSS prefix is unique and does not collide with core classes
+- [ ] README documents all props, effects/features, and usage examples
+- [ ] Showcase page exists in the main app with interactive demos
+- [ ] CHEAT-SHEET.md is updated with a summary entry
+
+---
+
+## 5. Architecture & Discipline
 
 ### ⚠️ You MUST Follow These Rules
 
@@ -388,7 +531,7 @@ See [CLAUDE.md → Native-First Protocol](./CLAUDE.md#5-native-first-protocol) f
 
 ---
 
-## 5. Pull Request Process
+## 6. Pull Request Process
 
 ### Before Submitting
 
@@ -460,7 +603,7 @@ When you open a PR, use this template:
 
 ---
 
-## 6. Style Guidelines
+## 7. Style Guidelines
 
 ### TypeScript
 

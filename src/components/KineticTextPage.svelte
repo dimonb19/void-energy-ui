@@ -58,6 +58,10 @@
     'Chaos snaps into order. Every glyph finds its home in an instant — a burst of motion collapsing into stillness. One moment the space is empty, the next a complete thought exists, assembled from nothing in a single frame of controlled disorder.';
   const SAMPLE_RANDOM =
     'Positions fill at random, each letter finding its place unpredictably. The sequence defies expectation — a character from the middle appears first, then one from the end, then the start. Order emerges not from left to right but from chance itself.';
+  const SAMPLE_SCALE =
+    'Every character starts as nothing — a dimensionless point — and expands outward into its full shape. The growth is swift and precise, each letter claiming its space with the confidence of something that knows exactly how large it is meant to be.';
+  const SAMPLE_BLUR =
+    'Focus sharpens one letter at a time. Each glyph emerges from a soft haze, its edges resolving from diffuse light into crisp geometry. The effect is cinematic — a rack focus pulling meaning out of visual noise, word by word.';
 
   // ── Replay counters ──────────────────────────────────────────────
 
@@ -69,6 +73,8 @@
   let replayRevealDrop = $state(0);
   let replayRevealPop = $state(0);
   let replayRevealRandom = $state(0);
+  let replayRevealScale = $state(0);
+  let replayRevealBlur = $state(0);
 
   // ── Hero Showcase Scenes ──────────────────────────────────────────
 
@@ -227,7 +233,16 @@
     | 'burn'
     | 'static'
     | 'distort'
-    | 'sway';
+    | 'sway'
+    | 'glow'
+    | 'wave'
+    | 'float'
+    | 'wobble'
+    | 'sparkle'
+    | 'drip'
+    | 'stretch'
+    | 'vibrate'
+    | 'haunt';
 
   interface EffectDemo<T extends KineticTextEffect> {
     effect: T;
@@ -440,6 +455,73 @@
       text: 'The deck rolled beneath her feet and every step became a negotiation with gravity. The horizon tilted left, then right, then left again.',
       note: 'Lateral translateX sine wave. Distinct from drift (vertical) and burn (vertical+skew).',
     },
+    {
+      effect: 'glow',
+      label: 'Glow',
+      context:
+        'Enchantment, bioluminescence, divine presence, energy radiation',
+      text: 'The runes carved into the archway began to shine, each symbol brightening in slow succession until the whole frame radiated a steady, sourceless light.',
+      note: 'Brightness emission cycle. Characters pulse luminosity independently.',
+    },
+    {
+      effect: 'wave',
+      label: 'Wave',
+      context: 'Ocean, crowd motion, musical rhythm, energy propagation',
+      text: 'The crowd moved as one body, a slow undulation that traveled from the front rows to the back like a tide pulled by invisible hands.',
+      note: 'Y sine wave with scale swell. Has secondary harmonic on word wrappers.',
+    },
+    {
+      effect: 'float',
+      label: 'Float',
+      context:
+        'Zero gravity, levitation, underwater suspension, astral projection',
+      text: 'Objects lifted from the table without urgency — the pen, the glass, the folded letter — each drifting upward on its own slow trajectory, weightless and indifferent to the floor below.',
+      note: 'Dual-axis drift with micro rotation. Has secondary harmonic. Gentler than drift.',
+    },
+    {
+      effect: 'wobble',
+      label: 'Wobble',
+      context: 'Instability, jelly physics, cartoon impact, uncertain footing',
+      text: 'The tower of stacked crates swayed dangerously with each footstep, every layer shifting just enough to keep everyone holding their breath.',
+      note: 'Micro rotation oscillation. Quick, playful instability.',
+    },
+    {
+      effect: 'sparkle',
+      label: 'Sparkle',
+      context:
+        'Magic particles, starlight, treasure glint, fairy dust, celebration',
+      text: 'Dust caught the last ray of sunlight and the whole cavern erupted in pinpoints of gold, each mote flickering at its own rhythm like a sky full of earthbound stars.',
+      note: 'Opacity twinkle with randomized phase per character. Shimmer effect.',
+    },
+    {
+      effect: 'drip',
+      label: 'Drip',
+      context: 'Rain, melting, decay, liquid surfaces, cave dripping',
+      text: 'Water gathered along the ceiling in slow beads, each one stretching downward until gravity won and it fell, replaced immediately by the next.',
+      note: 'Gravity-like downward Y drift. Characters slowly sink and reset.',
+    },
+    {
+      effect: 'stretch',
+      label: 'Stretch',
+      context:
+        'Distortion fields, elastic matter, body horror, spatial warping',
+      text: 'The reflection in the funhouse mirror elongated her face until she no longer recognized the shape looking back. Every feature pulled in a direction it was never meant to go.',
+      note: 'Scale Y elongation cycle. Characters stretch vertically and compress back.',
+    },
+    {
+      effect: 'vibrate',
+      label: 'Vibrate',
+      context: 'Machinery, engines, electrical charge, intense energy, alarm',
+      text: 'The generator hummed at a frequency she could feel in her teeth. Every surface in the room buzzed with sympathetic resonance, blurring the edges of solid objects.',
+      note: 'High-frequency positional jitter. Faster and tighter than tremble.',
+    },
+    {
+      effect: 'haunt',
+      label: 'Haunt',
+      context: 'Ghosts, afterimages, fading memories, liminal spaces, echoes',
+      text: 'The figure stood at the end of the corridor, visible only in the way smoke is visible — present and absent at the same time, fading in and out of the dim light with the patience of something that had been waiting for centuries.',
+      note: 'Ghostly drift with deep opacity cycling. Has secondary harmonic. Very slow, unsettling.',
+    },
   ] satisfies EffectDemo<ContinuousEffect>[];
 
   // ── Effects state (KineticText per-character) ────────────────────
@@ -478,6 +560,15 @@
     static: 'static',
     distort: 'distort',
     sway: 'sway',
+    glow: 'glow',
+    wave: 'wave',
+    float: 'float',
+    wobble: 'wobble',
+    sparkle: 'sparkle',
+    drip: 'drip',
+    stretch: 'stretch',
+    vibrate: 'vibrate',
+    haunt: 'haunt',
   });
 
   function toggleContinuousLoop(effect: ContinuousEffect) {
@@ -644,10 +735,15 @@
         {#if snapshot}
           <div class="grid gap-lg tablet:grid-cols-2">
             {#each narrativeOneShotDemos as demo}
+              <!-- svelte-ignore a11y_no_static_element_interactions -->
               <div
-                class="surface-sunk p-md flex flex-col gap-md h-full"
-                role="group"
+                class="kt-demo-card surface-sunk p-md flex flex-col gap-md h-full"
+                onclick={() => oneShotReplay[demo.effect]++}
                 onpointerenter={() => oneShotReplay[demo.effect]++}
+                onkeydown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ')
+                    oneShotReplay[demo.effect]++;
+                }}
               >
                 <div class="flex items-start justify-between gap-md">
                   <div class="flex flex-col gap-xs">
@@ -655,11 +751,7 @@
                     <p class="text-caption text-mute">{demo.context}</p>
                   </div>
 
-                  <IconBtn
-                    aria-label="Replay {demo.label}"
-                    icon={PlayPause}
-                    onclick={() => oneShotReplay[demo.effect]++}
-                  />
+                  <IconBtn aria-label="Replay {demo.label}" icon={PlayPause} />
                 </div>
 
                 <KineticText
@@ -689,7 +781,15 @@
         {#if snapshot}
           <div class="grid gap-lg tablet:grid-cols-2 large-desktop:grid-cols-3">
             {#each narrativeContinuousDemos as demo}
-              <div class="surface-sunk p-md flex flex-col gap-md h-full">
+              <!-- svelte-ignore a11y_no_static_element_interactions -->
+              <div
+                class="kt-demo-card surface-sunk p-md flex flex-col gap-md h-full"
+                onclick={() => toggleContinuousLoop(demo.effect)}
+                onkeydown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ')
+                    toggleContinuousLoop(demo.effect);
+                }}
+              >
                 <div class="flex items-start justify-between gap-md">
                   <div class="flex flex-col gap-xs">
                     <h6>{demo.label}</h6>
@@ -701,7 +801,6 @@
                     aria-label={activeContinuousEffects[demo.effect]
                       ? 'Pause'
                       : 'Play'}
-                    onclick={() => toggleContinuousLoop(demo.effect)}
                     iconProps={{
                       'data-paused': activeContinuousEffects[demo.effect]
                         ? 'true'
@@ -952,6 +1051,69 @@
                   earthquake aftermath, rope bridges, moving vehicles.
                 </dd>
               </div>
+              <div>
+                <dt><code>glow</code> — Luminous Emission</dt>
+                <dd class="text-small text-mute">
+                  Brightness emission cycle. Enchantment, bioluminescence,
+                  divine presence, energy radiation, rune activation.
+                </dd>
+              </div>
+              <div>
+                <dt><code>wave</code> — Propagating Motion</dt>
+                <dd class="text-small text-mute">
+                  Y sine wave with scale swell and secondary harmonic. Ocean,
+                  crowd motion, musical rhythm, energy propagation.
+                </dd>
+              </div>
+              <div>
+                <dt><code>float</code> — Weightless Suspension</dt>
+                <dd class="text-small text-mute">
+                  Dual-axis drift with micro rotation and secondary harmonic.
+                  Zero gravity, levitation, underwater, astral projection.
+                </dd>
+              </div>
+              <div>
+                <dt><code>wobble</code> — Playful Instability</dt>
+                <dd class="text-small text-mute">
+                  Micro rotation oscillation. Instability, jelly physics,
+                  cartoon impact, uncertain footing, balancing acts.
+                </dd>
+              </div>
+              <div>
+                <dt><code>sparkle</code> — Light Twinkle</dt>
+                <dd class="text-small text-mute">
+                  Opacity twinkle with randomized phase per character. Magic
+                  particles, starlight, treasure glint, fairy dust.
+                </dd>
+              </div>
+              <div>
+                <dt><code>drip</code> — Gravity Pull</dt>
+                <dd class="text-small text-mute">
+                  Downward Y drift with slow reset. Rain, melting, decay, liquid
+                  surfaces, cave dripping, candle wax.
+                </dd>
+              </div>
+              <div>
+                <dt><code>stretch</code> — Vertical Distortion</dt>
+                <dd class="text-small text-mute">
+                  Scale Y elongation cycle. Distortion fields, elastic matter,
+                  body horror, spatial warping, funhouse mirrors.
+                </dd>
+              </div>
+              <div>
+                <dt><code>vibrate</code> — High-Frequency Energy</dt>
+                <dd class="text-small text-mute">
+                  Rapid positional jitter, faster and tighter than tremble.
+                  Machinery, engines, electrical charge, intense energy.
+                </dd>
+              </div>
+              <div>
+                <dt><code>haunt</code> — Ghostly Presence</dt>
+                <dd class="text-small text-mute">
+                  Ghostly drift with deep opacity cycling and secondary
+                  harmonic. Ghosts, afterimages, fading memories, echoes.
+                </dd>
+              </div>
             </dl>
           </div>
 
@@ -1130,6 +1292,56 @@
             left-to-right.
           </p>
         </div>
+
+        <!-- Scale -->
+        <div class="flex flex-col gap-xs">
+          <div class="flex items-center justify-between">
+            <h6>Scale</h6>
+            <button class="btn-icon" onclick={() => replayRevealScale++}>
+              <RotateCcw class="icon" data-size="sm" />
+            </button>
+          </div>
+          <div class="surface-sunk p-lg">
+            {#key replayRevealScale}
+              <KineticText
+                text={SAMPLE_SCALE}
+                styleSnapshot={snapshot}
+                revealStyle="scale"
+                revealMode="char"
+                speed={30}
+              />
+            {/key}
+          </div>
+          <p class="text-caption text-mute px-xs">
+            Characters grow from zero scale to full size. Compact, precise
+            entrance with no positional offset.
+          </p>
+        </div>
+
+        <!-- Blur -->
+        <div class="flex flex-col gap-xs">
+          <div class="flex items-center justify-between">
+            <h6>Blur</h6>
+            <button class="btn-icon" onclick={() => replayRevealBlur++}>
+              <RotateCcw class="icon" data-size="sm" />
+            </button>
+          </div>
+          <div class="surface-sunk p-lg">
+            {#key replayRevealBlur}
+              <KineticText
+                text={SAMPLE_BLUR}
+                styleSnapshot={snapshot}
+                revealStyle="blur"
+                revealMode="char"
+                speed={30}
+              />
+            {/key}
+          </div>
+          <p class="text-caption text-mute px-xs">
+            Characters emerge from a gaussian blur into sharp focus. Cinematic
+            rack-focus feel. Glass physics adds extra depth with motion blur.
+          </p>
+        </div>
       {/if}
     </div>
   </section>
@@ -1274,3 +1486,21 @@
     </div>
   </section>
 </div>
+
+<style>
+  .kt-demo-card {
+    cursor: pointer;
+    transition:
+      background-color var(--speed-fast) var(--ease-flow),
+      border-color var(--speed-fast) var(--ease-flow);
+  }
+
+  .kt-demo-card:hover {
+    background-color: var(--bg-spotlight);
+    border-color: var(--energy-primary);
+
+    :global(button) {
+      color: var(--energy-primary);
+    }
+  }
+</style>

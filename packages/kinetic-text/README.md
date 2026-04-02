@@ -1,6 +1,6 @@
 # @dgrslabs/void-energy-kinetic-text
 
-Kinetic text component for Void Energy hosts and standalone consumers. Pretext-based layout with character-level reveal animations, 18 narrative effects, and physics-aware rendering.
+Character-level kinetic typography for Void Energy hosts and standalone consumers. Pretext-based layout with per-character reveal animations, 37 narrative effects (16 one-shot + 21 continuous), and physics-aware rendering.
 
 > **Private package** — distributed via private npm registry. Not published to the public npm registry.
 
@@ -36,7 +36,7 @@ Use the built-in adapter to resolve styles from the live DOM:
 
 <div bind:this={el}>
   {#if snapshot}
-    <KineticText text="The void stirs..." styleSnapshot={snapshot} revealMode="char" revealStyle="fade" />
+    <KineticText text="The void stirs..." styleSnapshot={snapshot} revealMode="char" revealStyle="pop" />
   {/if}
 </div>
 ```
@@ -82,58 +82,104 @@ This provides all reveal keyframes, effect animations, physics-variant easing, a
 |------|------|---------|-------------|
 | `text` | `string` | — | **Required.** The text to render and reveal. |
 | `styleSnapshot` | `TextStyleSnapshot` | — | **Required.** Font, lineHeight, physics, mode, and CSS variables. |
-| `revealMode` | `RevealMode` | `'char'` | How text is revealed: `char`, `word`, `decode`. |
+| `revealMode` | `'char' \| 'word' \| 'decode'` | `'char'` | How text is revealed: character-by-character, word-by-word, or scramble-then-decode. |
+| `revealStyle` | `RevealStyle` | `'pop'` | Visual entrance animation: `instant`, `pop`, `scale`, `blur`, `scramble`, `rise`, `drop`, `random`. |
 | `speedPreset` | `'slow' \| 'default' \| 'fast'` | `'default'` | Named speed preset. `slow` = 40/8ms, `default` = 20/4ms, `fast` = 8/2ms. Overridden by explicit `speed`/`charSpeed`. |
-| `revealStyle` | `RevealStyle` | `'instant'` | Visual style of the reveal animation: `instant`, `fade`, `rise`, `drop`, `scale`, `blur`. |
-| `staggerPattern` | `StaggerPattern` | `'sequential'` | Timing pattern: `sequential`, `wave`, `cascade`, `random`. |
+| `staggerPattern` | `StaggerPattern` | `'sequential'` | Timing pattern for reveal order. |
 | `stagger` | `number` | `40` (char) / `30` (other) | Milliseconds between reveal units. |
-| `revealDuration` | `number` | `300` | Duration of each unit's reveal animation (ms). |
-| `activeEffect` | `KineticTextEffect \| null` | `null` | Continuous effect to apply. |
-| `effectScope` | `EffectScope` | `'block'` | Scope for the active effect: `block`, `line`, `word`, `glyph`, `range`. |
+| `revealDuration` | `number` | auto | Duration of each unit's reveal animation (ms). Auto-derived per `revealStyle`. |
+| `activeEffect` | `KineticTextEffect \| null` | `null` | Continuous effect to apply (loops indefinitely). |
 | `cues` | `KineticCue[]` | `[]` | One-shot effect cues triggered during or after reveal. |
+| `oneShotEffect` | `KineticTextEffect \| null` | `null` | Imperative one-shot effect. Fires when `oneShotTrigger` increments. |
+| `oneShotTrigger` | `number` | `0` | Counter — increment to fire the `oneShotEffect`. Value of 0 is ignored. |
+| `preRevealed` | `boolean` | `false` | Start with all text visible — skip reveal entirely. Useful for showcasing effects on already-visible text. |
 | `seed` | `number` | hash(text + mode) | Deterministic seed for PRNG (stagger, decode, random). |
 | `reducedMotion` | `ReducedMotionMode` | `'auto'` | `auto` (OS preference), `always`, or `never`. |
-| `speed` | `number` | `200` (char) / `80` (word) | Base speed for grouped reveal modes (ms per group). |
-| `charSpeed` | `number` | `8` | Inner character speed within word/sentence groups (ms). |
+| `speed` | `number` | per preset | Base speed (ms). Overrides `speedPreset`. |
+| `charSpeed` | `number` | per preset | Inner character speed within word groups (ms). Overrides `speedPreset`. |
 | `scramblePasses` | `number` | `4` | Number of scramble cycles per character in decode mode. |
 | `onrevealcomplete` | `() => void` | — | Callback fired when all units are revealed. |
 | `oneffectscomplete` | `() => void` | — | Callback fired when all one-shot effects finish. |
 | `as` | `string` | `'span'` | HTML element tag for the root container. |
 | `class` | `string` | `''` | Additional CSS classes for the root container. |
 
+## Three Effect Layers
+
+Kinetic Text runs three independent effect layers simultaneously on every block of text. They compose together — a single block can be revealing with one style, sustaining a continuous loop, and reacting to one-shot events all at the same time.
+
+1. **Reveal** — how text first appears (entrance animation). Controlled by `revealMode` + `revealStyle`.
+2. **Continuous** — sustained atmosphere loop after reveal. Set via `activeEffect` prop.
+3. **One-shot** — dramatic punctuation moments fired on demand. Triggered via `cues` (timeline-driven) or `oneShotEffect` + `oneShotTrigger` (imperative).
+
+Swapping one layer does not interrupt the others.
+
 ## Effects
 
-### One-shot effects (6)
+### One-shot effects (16)
 
-Triggered via `cues` — fire once at a specific time or on reveal completion.
+Triggered via `cues` or `oneShotEffect` — fire once per trigger. Per-character, with stagger and duration variation.
 
-| Effect | Description | Default scope |
-|--------|-------------|---------------|
-| `shake` | Horizontal jitter with decaying amplitude | `block` |
-| `quake` | Heavy X+Y jitter | `block` |
-| `jolt` | Sharp displacement + elastic snap-back | `block` |
-| `glitch` | Choppy positional offset + skew | `block` |
-| `surge` | Ascending power buildup with brightness flash | `block` |
-| `warp` | Spatial distortion via scaleX oscillation | `block` |
+| Effect | Description | Use Case |
+|--------|-------------|----------|
+| `shake` | Horizontal jitter with decaying amplitude | Door slam, collision, impact |
+| `quake` | Heavy X+Y jitter with rolling settle | Earthquake, explosion, structural collapse |
+| `jolt` | Sharp displacement + elastic snap-back | Jump scare, sudden shock |
+| `glitch` | Choppy positional offset + skew | Digital corruption, reality break |
+| `surge` | Ascending scale with brightness flash | Magic cast, power activation |
+| `warp` | ScaleX oscillation with subtle skew | Teleportation, dimensional shift |
+| `explode` | Radial blast — characters fly outward and reassemble | Detonation, catastrophic failure |
+| `collapse` | Gravity-driven fall with tumbling rotation | Building demolition, cave-in |
+| `scatter` | Gentle drift in random directions with slow fade | Wind dispersal, memory fragmenting |
+| `spin` | Full 360° rotation with staggered domino wave | Vertigo, mechanical activation |
+| `bounce` | Drop + elastic bounce with decreasing amplitude | Landing impact, playful energy |
+| `flash` | Quick scale-up pulse with brightness burst | Lightning, camera flash, revelation |
+| `shatter` | Sharp angular displacement with skew | Glass breaking, shield failure |
+| `vortex` | Spiral inward with accelerating rotation | Black hole, whirlpool, summoning |
+| `ripple` | Vertical wave propagating left-to-right | Shockwave, sonic boom, psychic wave |
+| `slam` | Scale up huge then slam to normal with overshoot | Heavy impact, boss landing |
 
-### Continuous effects (12)
+### Continuous effects (21)
 
-Applied via `activeEffect` prop — loop indefinitely while active.
+Applied via `activeEffect` prop — loop indefinitely while active. Each character animates independently with unique parameters from a seeded PRNG.
 
-| Effect | Description | Default scope |
-|--------|-------------|---------------|
-| `drift` | Gentle vertical sine wave | `block` |
-| `flicker` | Irregular opacity stutters | `block` |
-| `breathe` | Slow rhythmic scale pulse | `block` |
-| `tremble` | Fast micro-shake | `block` |
-| `pulse` | Heartbeat-tempo scale | `block` |
-| `whisper` | Shrink + fade, fragile presence | `block` |
-| `fade` | Slow consciousness dissolve | `block` |
-| `freeze` | Cold stillness / paralysis | `block` |
-| `burn` | Heat distortion / thermal haze | `block` |
-| `static` | Persistent signal noise | `block` |
-| `distort` | Woozy perception warp | `block` |
-| `sway` | Lateral oscillation | `block` |
+| Effect | Description | Use Case | Secondary Harmonic |
+|--------|-------------|----------|--------------------|
+| `drift` | Gentle vertical sine wave + Y float | Underwater, dreaming, weightless | Yes |
+| `flicker` | Irregular opacity stutters | Failing lights, unstable power | No |
+| `breathe` | Slow rhythmic scale pulse | Suspense, emotional weight | Yes |
+| `tremble` | Fast micro-vibration | Cold, fear, fragility | Yes |
+| `pulse` | Heartbeat-tempo scale with sharp attack | Ritual energy, countdown | Yes |
+| `whisper` | Opacity and scale recede together | Ghosts, fading memory, secrets | No |
+| `fade` | Gradual opacity drift | Losing consciousness, time skip | No |
+| `freeze` | Micro contraction + brightness reduction | Ice magic, paralysis, stasis | No |
+| `burn` | Vertical micro-wobble with skew | Fire scenes, desert heat, rage | No |
+| `static` | Rapid micro-jitter + opacity flicker | Radio noise, corrupted data | No |
+| `distort` | Rotation + asymmetric scale oscillation | Drunk, hallucinating, vertigo | No |
+| `sway` | Lateral X oscillation | Ship travel, storms, unstable footing | No |
+| `glow` | Brightness emission cycle | Enchantment, bioluminescence | No |
+| `wave` | Y sine wave with scale swell | Ocean, crowd motion, musical rhythm | Yes |
+| `float` | Dual-axis drift with micro rotation | Zero gravity, levitation | Yes |
+| `wobble` | Micro rotation oscillation | Instability, jelly physics | No |
+| `sparkle` | Opacity twinkle with randomized phase | Magic particles, starlight, treasure | No |
+| `drip` | Gravity-like downward Y drift | Rain, melting, cave dripping | No |
+| `stretch` | Scale Y elongation cycle | Distortion fields, body horror | No |
+| `vibrate` | High-frequency positional jitter | Machinery, engines, electrical charge | No |
+| `haunt` | Ghostly drift with deep opacity cycling | Ghosts, afterimages, liminal spaces | Yes |
+
+Effects marked **Secondary Harmonic** apply an additional animation layer on word wrappers, creating richer composite motion.
+
+## Reveal styles (8)
+
+| Style | Description | Physics Adaptation |
+|-------|-------------|-------------------|
+| `pop` | **Default.** Characters snap in from random offsets — fast, chaotic. | Universal across all physics presets |
+| `scramble` | Characters fly in from random positions/rotations with spring settle | Wide radius, heavy rotation |
+| `rise` | Characters ascend from below into position | Glass adds blur trail during ascent |
+| `drop` | Characters fall from above with gravity feel and landing bounce | Glass/retro have custom variants |
+| `scale` | Characters grow from zero scale to full size | Clean, no positional offset |
+| `blur` | Characters emerge from gaussian blur into sharp focus | Glass adds extra depth |
+| `random` | Characters appear in randomized ORDER with simple fade | Shuffled reveal sequence |
+| `instant` | No animation — binary visible flip | All physics |
 
 ## Cue authoring
 
@@ -147,7 +193,6 @@ const cues: KineticCue[] = [
   {
     id: 'word-3-shake',
     effect: 'shake',
-    scope: 'range',
     trigger: 'at-time',
     atMs: 1200,
     range: { start: 15, end: 20 },
@@ -156,7 +201,6 @@ const cues: KineticCue[] = [
   {
     id: 'end-surge',
     effect: 'surge',
-    scope: 'block',
     trigger: 'on-complete',
   },
 ];
@@ -168,6 +212,44 @@ const cues: KineticCue[] = [
 - Completion-triggered cues (`on-complete`) fire after all units are revealed
 - Each cue fires at most once (tracked by `id`)
 - Cues with out-of-range `range` targets are silently skipped (dev warning in non-production)
+
+### Imperative one-shot (no cue system)
+
+For effects fired by user interaction or external events rather than the reveal timeline:
+
+```svelte
+<script lang="ts">
+  let trigger = $state(0);
+</script>
+
+<KineticText
+  text="The reactor is unstable."
+  styleSnapshot={snapshot}
+  preRevealed
+  oneShotEffect="shake"
+  oneShotTrigger={trigger}
+/>
+
+<button onclick={() => trigger++}>Fire shake</button>
+```
+
+### Composing all three layers
+
+```svelte
+<!-- Reveal word-by-word with drop entrance,
+     continuous pulse loop during and after reveal,
+     fire surge on demand -->
+<KineticText
+  text={scene.text}
+  styleSnapshot={snapshot}
+  revealMode="word"
+  revealStyle="drop"
+  activeEffect="pulse"
+  oneShotEffect="surge"
+  oneShotTrigger={surgeTrigger}
+  speed={40}
+/>
+```
 
 ## Physics behavior
 
@@ -184,16 +266,35 @@ The component adapts its animations to the active physics preset:
 When `reducedMotion` is `'auto'` (default), the component respects `prefers-reduced-motion: reduce`. When active:
 - Reveal skips to end immediately (all text visible)
 - All CSS animations are suppressed
-- Cursor blink is disabled
 - Callbacks still fire normally
 
 Set `reducedMotion: 'always'` to force this behavior, or `'never'` to bypass OS preference.
+
+## DOM architecture
+
+KineticText builds a two-layer DOM for accessibility and animation isolation:
+
+```
+.kinetic-text (root)
+├── .kt-visual (aria-hidden, visual layer)
+│   └── .kt-line (per line)
+│       └── .kt-word (word wrapper, secondary effect target)
+│           └── .kt-unit (continuous effect layer, per-char CSS vars)
+│               └── .kt-oneshot (one-shot isolation, animation-mix: additive)
+│                   └── .kt-glyph (reveal animation target, data-kt-state)
+│
+└── .kt-semantic (sr-only, aria-live='polite')
+    └── [full text for screen readers]
+```
+
+Each character receives unique CSS custom properties (`--kt-dx`, `--kt-dy`, `--kt-rotate`, `--kt-scale`, `--kt-phase`, etc.) computed by a seeded PRNG. Parametric keyframes read these variables, so the same animation produces different motion per character.
 
 ## Exports
 
 | Export path | Contents |
 |-------------|----------|
 | `@dgrslabs/void-energy-kinetic-text` | `KineticText` component, `createVoidEnergyTextStyleSnapshot` adapter, all public types |
+| `@dgrslabs/void-energy-kinetic-text/component` | `KineticText` Svelte component only |
 | `@dgrslabs/void-energy-kinetic-text/types` | Type-only exports |
 | `@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host` | `createVoidEnergyTextStyleSnapshot` function |
 | `@dgrslabs/void-energy-kinetic-text/styles` | Compiled CSS stylesheet |
