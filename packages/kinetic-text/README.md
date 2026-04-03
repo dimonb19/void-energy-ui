@@ -92,6 +92,9 @@ This provides all reveal keyframes, effect animations, physics-variant easing, a
 | `cues` | `KineticCue[]` | `[]` | One-shot effect cues triggered during or after reveal. |
 | `oneShotEffect` | `KineticTextEffect \| null` | `null` | Imperative one-shot effect. Fires when `oneShotTrigger` increments. |
 | `oneShotTrigger` | `number` | `0` | Counter — increment to fire the `oneShotEffect`. Value of 0 is ignored. |
+| `loading` | `boolean` | `false` | Show skeleton loading state. Skeleton geometry is derived from real layout. Reveal is deferred until `loading` becomes `false`. |
+| `skeletonLines` | `number` | `3` | Hint: number of skeleton lines before layout completes. Overridden by actual layout. |
+| `skeletonLastLineWidth` | `number` | `0.7` | Hint: width ratio (0–1) of the last skeleton line. Overridden by actual layout. |
 | `preRevealed` | `boolean` | `false` | Start with all text visible — skip reveal entirely. Useful for showcasing effects on already-visible text. |
 | `seed` | `number` | hash(text + mode) | Deterministic seed for PRNG (stagger, decode, random). |
 | `reducedMotion` | `ReducedMotionMode` | `'auto'` | `auto` (OS preference), `always`, or `never`. |
@@ -251,6 +254,69 @@ For effects fired by user interaction or external events rather than the reveal 
 />
 ```
 
+## Skeleton loading
+
+KineticText includes built-in skeleton loading that shows layout-accurate shimmer line-blocks while content loads. The skeleton geometry (line count, line height, last-line width) is derived from the same Pretext layout engine used for animation — no guessing.
+
+### Loading prop
+
+Set `loading={true}` to show the skeleton and defer the reveal. When `loading` becomes `false`, the skeleton crossfades out (300ms) while the reveal animation begins simultaneously.
+
+```svelte
+<script lang="ts">
+  let isLoading = $state(true);
+
+  async function fetchContent() {
+    const text = await getAIResponse();
+    // Text is set, skeleton shows real geometry while we decide the effect
+    const effect = await decideEffect(text);
+    isLoading = false; // skeleton fades out, reveal starts
+  }
+</script>
+
+<KineticText
+  text={content}
+  styleSnapshot={snapshot}
+  loading={isLoading}
+  revealMode="word"
+  revealStyle="blur"
+/>
+```
+
+The `skeletonLines` and `skeletonLastLineWidth` hint props provide pre-layout estimates shown before the font loads and layout completes. Once the layout engine measures the real text, these are overridden with exact values.
+
+### Standalone skeleton
+
+The `<KineticSkeleton>` component renders shimmer line-blocks without the animation engine. Useful as a lightweight placeholder or premium-tier fallback.
+
+```svelte
+<script lang="ts">
+  import { KineticSkeleton } from '@dgrslabs/void-energy-kinetic-text';
+</script>
+
+<KineticSkeleton lines={4} lineHeight={24} styleSnapshot={snapshot} />
+```
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `lines` | `number` | `3` | Number of skeleton lines. |
+| `lastLineWidth` | `number` | `0.7` | Width ratio (0–1) of the last line. |
+| `lineHeight` | `number` | `24` | Line height in px. |
+| `styleSnapshot` | `TextStyleSnapshot` | — | **Required.** CSS var injection and physics/mode detection. |
+| `class` | `string` | `''` | Additional CSS classes. |
+
+### Shimmer physics
+
+The skeleton shimmer adapts to the active physics preset:
+
+| Physics | Shimmer Style |
+|---------|--------------|
+| **Glass** (dark) | Energy-primary glow sweep at 15% opacity |
+| **Flat** (light) | White beam at 60% opacity |
+| **Retro** | Hard-cut border-color scan line, no border-radius |
+
+Reduced motion disables the shimmer animation; the skeleton blocks remain visible as static placeholders.
+
 ## Physics behavior
 
 The component adapts its animations to the active physics preset:
@@ -276,7 +342,10 @@ KineticText builds a two-layer DOM for accessibility and animation isolation:
 
 ```
 .kinetic-text (root)
-├── .kt-visual (aria-hidden, visual layer)
+├── .kt-skeleton-layer (visible during loading, fades out on transition)
+│   └── .kt-skeleton-line (shimmer line-block, height/width from layout)
+│
+├── .kt-visual (aria-hidden, visual layer — built when loading=false)
 │   └── .kt-line (per line)
 │       └── .kt-word (word wrapper, secondary effect target)
 │           └── .kt-unit (continuous effect layer, per-char CSS vars)
@@ -287,6 +356,8 @@ KineticText builds a two-layer DOM for accessibility and animation isolation:
     └── [full text for screen readers]
 ```
 
+During loading, only the skeleton layer exists — no renderer DOM is built. When `loading` becomes `false`, the renderer builds `.kt-visual` while the skeleton layer goes `position: absolute` and fades out, preventing doubled height.
+
 The visual layer is set to `user-select: none` — animated text cannot be selected or copied by users. The `.kt-semantic` layer provides the full plain text to screen readers and assistive technology via `aria-live="polite"`.
 
 Each character receives unique CSS custom properties (`--kt-dx`, `--kt-dy`, `--kt-rotate`, `--kt-scale`, `--kt-phase`, etc.) computed by a seeded PRNG. Parametric keyframes read these variables, so the same animation produces different motion per character.
@@ -295,8 +366,9 @@ Each character receives unique CSS custom properties (`--kt-dx`, `--kt-dy`, `--k
 
 | Export path | Contents |
 |-------------|----------|
-| `@dgrslabs/void-energy-kinetic-text` | `KineticText` component, `createVoidEnergyTextStyleSnapshot` adapter, all public types |
+| `@dgrslabs/void-energy-kinetic-text` | `KineticText`, `KineticSkeleton` components, `createVoidEnergyTextStyleSnapshot` adapter, all public types |
 | `@dgrslabs/void-energy-kinetic-text/component` | `KineticText` Svelte component only |
+| `@dgrslabs/void-energy-kinetic-text/skeleton` | `KineticSkeleton` Svelte component only |
 | `@dgrslabs/void-energy-kinetic-text/types` | Type-only exports |
 | `@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host` | `createVoidEnergyTextStyleSnapshot` function |
 | `@dgrslabs/void-energy-kinetic-text/styles` | Compiled CSS stylesheet |

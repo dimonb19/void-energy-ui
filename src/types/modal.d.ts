@@ -65,12 +65,6 @@ type ModalContract = {
 
   /** Command palette (Cmd+K) */
   palette: {};
-
-  /** Manual atmosphere creator */
-  'manual-atmosphere': {
-    /** Called when the manual preview activates, so the parent can clean up its own preview. */
-    onPreviewActivated?: () => void;
-  };
 };
 
 type DemoLayout = 'compact' | 'comfortable';

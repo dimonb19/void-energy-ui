@@ -636,7 +636,9 @@
         keep text alive after reveal — ambient loops that sustain mood.
         <strong>One-shot</strong> effects fire on demand for dramatic punctuation.
         All three compose without interfering — text can be mid-reveal while a continuous
-        loop runs and a one-shot fires.
+        loop runs and a one-shot fires. A built-in skeleton loader derives its geometry
+        from the same layout engine, so line count and widths match the real text
+        exactly before it arrives.
       </p>
 
       {#if snapshot}

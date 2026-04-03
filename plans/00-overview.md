@@ -104,7 +104,7 @@ The CoNexus AI storytelling platform. Consumes the public `void-energy` package 
 
 | # | Document | Description | Wave |
 |---|----------|-------------|------|
-| 01 | [Atmosphere Split](01-atmosphere-split.md) | 4 free atmospheres + 12 DGRS-private, runtime registration | Wave 1 |
+| 01 | [Token Modularity](01-atmosphere-split.md) | Extract fonts + atmospheres from design-tokens.ts, tier metadata, developer instructions | Wave 1 |
 | 02 | [CoNexus Extraction](02-conexus-extraction.md) | Extract CoNexus-specific components into CoNexus repo | Wave 3 |
 | 03 | [Public Repo](03-public-repo.md) | Structure, contents, and setup of `void-energy` | Wave 1 |
 | 04 | [Premium Repo](04-premium-repo.md) | Structure of `void-energy-premium`, KT first, then Ambience, then Rive | Wave 2 |

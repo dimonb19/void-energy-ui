@@ -24,6 +24,134 @@ export const CORE_PALETTE_KEYS = [
   'text-mute',
 ] as const;
 
+// ── Shared Utilities ────────────────────────────────────────────────────────
+
+/** Palette field definitions grouped for display in the inline editor. */
+export const PALETTE_GROUPS: {
+  heading: string;
+  fields: { key: string; label: string; hint?: string }[];
+}[] = [
+  {
+    heading: 'Backgrounds',
+    fields: [
+      { key: 'bg-canvas', label: 'Canvas', hint: 'Base page color' },
+      {
+        key: 'bg-spotlight',
+        label: 'Spotlight',
+        hint: 'Gradient glow over Canvas. Match both for a plain look',
+      },
+    ],
+  },
+  {
+    heading: 'Surfaces',
+    fields: [
+      {
+        key: 'bg-surface',
+        label: 'Surface',
+        hint: 'Cards, panels, floating elements',
+      },
+      {
+        key: 'bg-sunk',
+        label: 'Sunk',
+        hint: 'Recessed areas, inset containers',
+      },
+    ],
+  },
+  {
+    heading: 'Energy & Border',
+    fields: [
+      { key: 'energy-primary', label: 'Primary' },
+      { key: 'energy-secondary', label: 'Secondary' },
+      { key: 'border-color', label: 'Border' },
+    ],
+  },
+  {
+    heading: 'Text',
+    fields: [
+      { key: 'text-main', label: 'Main' },
+      { key: 'text-dim', label: 'Dim' },
+      { key: 'text-mute', label: 'Mute' },
+    ],
+  },
+];
+
+/** Convert a 6-digit hex + opacity% into an rgba() string. */
+export function hexToRgba(hex: string, opacityPercent: number): string {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const a = +(opacityPercent / 100).toFixed(2);
+  return `rgba(${r}, ${g}, ${b}, ${a})`;
+}
+
+/**
+ * Parse a CSS color string (hex or rgba) into a pure hex + opacity percentage.
+ * - `#aabbcc` → `{ hex: '#aabbcc', opacity: 100 }`
+ * - `rgba(22, 30, 95, 0.4)` → `{ hex: '#161e5f', opacity: 40 }`
+ */
+export function cssColorToHex(value: string): {
+  hex: string;
+  opacity: number;
+} {
+  const trimmed = value.trim();
+
+  // Already a hex color
+  if (trimmed.startsWith('#')) {
+    return { hex: trimmed.slice(0, 7).toLowerCase(), opacity: 100 };
+  }
+
+  // rgba(r, g, b, a) or rgb(r, g, b)
+  const rgbaMatch = trimmed.match(
+    /rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*(?:,\s*([\d.]+))?\s*\)/,
+  );
+  if (rgbaMatch) {
+    const r = parseInt(rgbaMatch[1], 10);
+    const g = parseInt(rgbaMatch[2], 10);
+    const b = parseInt(rgbaMatch[3], 10);
+    const a = rgbaMatch[4] !== undefined ? parseFloat(rgbaMatch[4]) : 1;
+    const hex = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+    return { hex: hex.toLowerCase(), opacity: Math.round(a * 100) };
+  }
+
+  // Fallback — return as-is with a black placeholder
+  return { hex: '#000000', opacity: 100 };
+}
+
+/** Extract hue (0–360) from a 6-digit hex string. */
+export function hexToHue(hex: string): number {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const d = max - min;
+  if (d === 0) return 0;
+  let h = 0;
+  if (max === r) h = ((g - b) / d + 6) % 6;
+  else if (max === g) h = (b - r) / d + 2;
+  else h = (r - g) / d + 4;
+  return h * 60;
+}
+
+/** Extract perceptual lightness (0–100) from a 6-digit hex string. */
+export function hexToLightness(hex: string): number {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  // Relative luminance (sRGB linearized)
+  const lin = (c: number) =>
+    c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  const L = 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+  return L * 100;
+}
+
+/** Check if a hue falls within a range (handles wrap-around). */
+export function hueInRange(hue: number, lo: number, hi: number): boolean {
+  return lo <= hi ? hue >= lo && hue <= hi : hue >= lo || hue <= hi;
+}
+
+// ── Types ───────────────────────────────────────────────────────────────────
+
 interface ClaudeResponse {
   mode: 'dark' | 'light';
   physics: 'glass' | 'flat' | 'retro';

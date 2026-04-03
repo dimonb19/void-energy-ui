@@ -157,7 +157,7 @@ Eric Jordan (2Advanced Studios, FWA Hall of Fame) is the first premium collabora
 | Doc | What It Covers |
 |-----|---------------|
 | [00-overview.md](00-overview.md) | Master roadmap, wave strategy, repo architecture |
-| [01-atmosphere-split.md](01-atmosphere-split.md) | 4 free + 12 private atmospheres, tier metadata |
+| [01-atmosphere-split.md](01-atmosphere-split.md) | Font + atmosphere extraction from design-tokens.ts, tier metadata, developer instructions |
 | [02-conexus-extraction.md](02-conexus-extraction.md) | What moves to CoNexus repo, what stays public |
 | [03-public-repo.md](03-public-repo.md) | Public repo structure, npm package, docs site |
 | [04-premium-repo.md](04-premium-repo.md) | Premium repo structure, KT/Ambience/Rive packages |
