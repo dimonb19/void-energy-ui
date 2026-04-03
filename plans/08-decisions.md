@@ -208,6 +208,35 @@ _Pending discussion between Dima and Boss._
 
 ---
 
+## D12: Top Navigation Island (Mobile)
+
+**Status:** Decided — Implemented
+**Owner:** Dima
+**Date:** 2026-04-02
+
+### Resolution
+**On mobile, the top navigation bar becomes a floating pill-shaped island** — matching the existing bottom navigation island. The two islands create a symmetric, detached UI that floats over the content. On desktop (≥ 768px), behavior is unchanged: full-width fixed bar with optional hide-on-scroll.
+
+### Why — When Everyone Else Has Top Bars
+
+The traditional mobile top bar is a full-width rectangle fused to the browser chrome. It looks like part of the OS, not the app. Apple's Dynamic Island (2022) normalized the concept of detached, floating elements at the top of the viewport. The industry is moving toward floating surfaces, but almost no one has applied this to the navigation bar yet.
+
+Void Energy is a design system that sells on visual distinction. Adopting the floating island pattern for the top nav — before it becomes the standard — signals that VE is forward-looking, not reactive. When this pattern becomes the norm in 1-2 years, VE apps will have been doing it since day one.
+
+The bottom navigation was already a floating island. Having the top bar remain a full-width rectangle created a visual inconsistency — one half of the UI was modern, the other half was conventional. Now both poles of the mobile UI share the same floating language. The content area sits between two symmetric floating surfaces, which feels intentional and cohesive.
+
+### Technical Approach
+- **CSS-only** — no JS changes. The scroll-hide logic still runs; CSS simply ignores `data-hidden` on mobile by keeping the island's transform at `translateX(-50%)`.
+- **Same visual DNA as bottom island**: identical width formula (safe-area-aware), `surface-raised` + `glass-blur`, `radius-full` pill shape, symmetric `space-xs` offsets from viewport edges.
+- **"Fixed navigation" preference hidden on mobile** — the island is always visible, so the toggle is irrelevant on narrow screens.
+
+### Files Changed
+- `src/styles/components/_navigation.scss` — `@include mobile-only` block on `.nav-bar`
+- `src/styles/base/_reset.scss` — mobile body padding adjustment
+- `src/components/modals/ThemesFragment.svelte` — hide fixedNav toggle on mobile
+
+---
+
 ## Decision Log
 
 | # | Decision | Status | Date | Outcome |
@@ -223,3 +252,4 @@ _Pending discussion between Dima and Boss._
 | D9 | Public component tier | **Updated** | 2026-04-02 | All primitives free; KT moved to premium |
 | D10 | Eric Jordan deal | **Open** | — | Revenue share recommended |
 | D11 | Strategic moat | **Decided** | 2026-04-02 | All packages private until CoNexus has traction |
+| D12 | Top nav island (mobile) | **Decided** | 2026-04-02 | Floating pill nav on mobile, matching bottom island |

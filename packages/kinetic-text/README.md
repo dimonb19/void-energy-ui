@@ -287,6 +287,8 @@ KineticText builds a two-layer DOM for accessibility and animation isolation:
     └── [full text for screen readers]
 ```
 
+The visual layer is set to `user-select: none` — animated text cannot be selected or copied by users. The `.kt-semantic` layer provides the full plain text to screen readers and assistive technology via `aria-live="polite"`.
+
 Each character receives unique CSS custom properties (`--kt-dx`, `--kt-dy`, `--kt-rotate`, `--kt-scale`, `--kt-phase`, etc.) computed by a seeded PRNG. Parametric keyframes read these variables, so the same animation produces different motion per character.
 
 ## Exports

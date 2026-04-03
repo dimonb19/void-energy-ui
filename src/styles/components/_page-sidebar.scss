@@ -83,6 +83,17 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
 
   @include mobile-only {
     transition-timing-function: var(--ease-flow);
+
+    // Island nav: compact height, always visible — no slide, expand in place
+    padding-top: calc(
+      var(--size-touch-min) + var(--space-xs) + var(--safe-top) +
+        var(--size-touch-min)
+    );
+    transform: none;
+
+    @include when-state('open') {
+      transform: none;
+    }
   }
 
   border-bottom: var(--physics-border-width) solid transparent;
@@ -314,6 +325,12 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
 
   @include mobile-only {
     transition-timing-function: var(--ease-flow);
+    // Island nav: always visible, compact height + breathing room below island
+    top: calc(
+      var(--size-touch-min) + var(--space-xs) + var(--safe-top) +
+        var(--space-xs)
+    );
+    transition: none;
   }
 
   // Desktop: transparent wrapper, no sticky behavior
@@ -340,6 +357,11 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
   z-index: z('header');
   background: var(--bg-surface);
   border-bottom: var(--physics-border-width) solid var(--border-color);
+
+  @include mobile-only {
+    margin-top: var(--space-xs);
+    border-top: var(--physics-border-width) solid var(--border-color);
+  }
 
   button {
     transform: none !important; // override scale

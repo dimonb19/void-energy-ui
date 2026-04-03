@@ -33,6 +33,7 @@
     scramblePasses,
     oneShotEffect = null,
     oneShotTrigger = 0,
+    ononeshotcomplete,
     preRevealed = false,
     onrevealcomplete,
     oneffectscomplete,
@@ -155,7 +156,7 @@
         atMs: 0,
         seed: resolvedSeed,
       },
-      () => {},
+      () => ononeshotcomplete?.(),
       reduced,
     );
   });

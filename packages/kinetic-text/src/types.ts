@@ -257,6 +257,8 @@ export interface KineticTextProps {
   oneShotEffect?: KineticTextEffect | null;
   /** Counter — increment to trigger the one-shot. Value of 0 is ignored. */
   oneShotTrigger?: number;
+  /** Called when an imperative one-shot effect finishes (all characters done). */
+  ononeshotcomplete?: () => void;
   /** Start with all text visible — skip reveal entirely. Useful for showcasing effects without the reveal animation. */
   preRevealed?: boolean;
   onrevealcomplete?: () => void;

@@ -449,7 +449,7 @@
 }
 
 @mixin mobile-only {
-  @media (max-width: map.get($breakpoints, 'tablet')) {
+  @media (max-width: #{map.get($breakpoints, 'tablet') - 1px}) {
     @content;
   }
 }

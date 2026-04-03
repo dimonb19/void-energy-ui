@@ -435,7 +435,7 @@
     <div
       class="surface-sunk p-md flex flex-col items-center justify-center gap-md"
     >
-      <span class="flex flex-col items-center gap-xs">
+      <span class="hidden tablet:flex flex-col items-center gap-xs">
         <Toggle
           bind:checked={voidEngine.userConfig.fixedNav}
           label="Fixed navigation"

@@ -548,27 +548,27 @@
   let activeContinuousEffects = $state<
     Record<ContinuousEffect, ContinuousEffect | null>
   >({
-    drift: 'drift',
-    flicker: 'flicker',
-    breathe: 'breathe',
-    tremble: 'tremble',
-    pulse: 'pulse',
-    whisper: 'whisper',
-    fade: 'fade',
-    freeze: 'freeze',
-    burn: 'burn',
-    static: 'static',
-    distort: 'distort',
-    sway: 'sway',
-    glow: 'glow',
-    wave: 'wave',
-    float: 'float',
-    wobble: 'wobble',
-    sparkle: 'sparkle',
-    drip: 'drip',
-    stretch: 'stretch',
-    vibrate: 'vibrate',
-    haunt: 'haunt',
+    drift: null,
+    flicker: null,
+    breathe: null,
+    tremble: null,
+    pulse: null,
+    whisper: null,
+    fade: null,
+    freeze: null,
+    burn: null,
+    static: null,
+    distort: null,
+    sway: null,
+    glow: null,
+    wave: null,
+    float: null,
+    wobble: null,
+    sparkle: null,
+    drip: null,
+    stretch: null,
+    vibrate: null,
+    haunt: null,
   });
 
   function toggleContinuousLoop(effect: ContinuousEffect) {
@@ -785,6 +785,10 @@
               <div
                 class="kt-demo-card surface-sunk p-md flex flex-col gap-md h-full"
                 onclick={() => toggleContinuousLoop(demo.effect)}
+                onpointerenter={() => {
+                  if (!activeContinuousEffects[demo.effect])
+                    activeContinuousEffects[demo.effect] = demo.effect;
+                }}
                 onkeydown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ')
                     toggleContinuousLoop(demo.effect);

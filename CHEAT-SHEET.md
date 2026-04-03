@@ -473,7 +473,7 @@ These components already account for safe areas (no manual work needed):
 
 | Component | Safe Area Handling |
 | --- | --- |
-| **Nav bar** (`.nav-bar`) | Extends glass surface under status bar via `--safe-top` |
+| **Nav bar** (`.nav-bar`) | Desktop: extends glass surface under status bar via `--safe-top`. Mobile: floating island offset by `--safe-top`; landscape-aware width via `--safe-left`/`--safe-right` |
 | **Bottom nav** (`.bottom-nav`) | Offsets above home indicator via `--safe-bottom`; landscape-aware width via `--safe-left`/`--safe-right` |
 | **Nav menu** (`.nav-menu`) | Padding respects `--safe-right` (and `--safe-left` on mobile) |
 | **Toasts** (`.toast-region`) | Top offset includes `--safe-top`; width avoids landscape notch |
@@ -2345,6 +2345,37 @@ const pv = createPasswordValidation(() => password);
 - **Flat:** Same as glass (inherits)
 - **Retro:** `alpha(--energy-primary, 15%)` fill
 - **Light:** `alpha(--energy-primary, 10%)` fill
+
+---
+
+#### Mobile Navigation Islands — Dual Floating UI
+
+**Description:** On mobile (below `tablet:`), both the top navigation bar and bottom navigation use a floating island pattern — pill-shaped, detached from viewport edges, visually symmetric. The content area sits between two floating surfaces, creating a cohesive "app within a browser" feel.
+
+**Why islands instead of a full-width top bar?**
+
+The conventional mobile top bar is a full-width rectangle fused to the browser chrome — it looks like part of the OS, not the app. Apple's Dynamic Island (2022) normalized detached, floating elements at the top of the viewport. The industry is moving toward floating surfaces, but almost no one has applied this to the navigation bar itself yet.
+
+Void Energy adopts this pattern early — before it becomes the standard. When this design language becomes the norm, VE apps will have been doing it from the start. The bottom navigation was already an island; keeping the top bar as a full-width rectangle created a visual split — one half modern, the other conventional. Now both poles share the same floating language.
+
+**How it works:**
+
+| Aspect | Top island (`.nav-bar`) | Bottom island (`.bottom-nav`) |
+| --- | --- | --- |
+| Position | `top: calc(--space-xs + --safe-top)` | `bottom: calc(--space-xs + --safe-bottom)` |
+| Centering | `left: 50%; transform: translateX(-50%)` | `left: 50%; transform: translateX(-50%)` |
+| Width | `100% - max(--space-lg, --safe-left) - max(--space-lg, --safe-right)` | Same formula |
+| Shape | `border-radius: var(--radius-full)` | Same |
+| Surface | `@include surface-raised` + `@include glass-blur` | Same |
+| Contents | Logo + ThemesBtn | Nav tab icons + sliding indicator |
+
+**Scroll behavior:**
+- **Mobile:** Top island is always visible. Hide-on-scroll is disabled via CSS override (`data-hidden` has no effect). The "Fixed navigation" preference toggle is hidden on phones since it's irrelevant.
+- **Desktop (tablet+):** Full-width bar with optional hide-on-scroll, unchanged.
+
+**Technical approach:** CSS-only — no JS changes. The scroll-hide logic still runs; CSS ignores `data-hidden` on mobile by keeping `transform: translateX(-50%)` regardless of state.
+
+**Body clearance:** On mobile, `body` padding-top accounts for the island offset: `var(--nav-height) + var(--space-xs) + var(--safe-top) + var(--space-xs)`.
 
 ---
 

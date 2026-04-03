@@ -162,6 +162,14 @@ body {
   padding-top: calc(
     var(--nav-height) + var(--safe-top)
   ); // Fixed nav + status bar
+
+  // Mobile: compact island height + top offset + breathing room below
+  @include mobile-only {
+    padding-top: calc(
+      var(--size-touch-min) + var(--space-xs) + var(--safe-top) +
+        var(--space-xs)
+    );
+  }
   padding-bottom: var(
     --bottom-nav-clearance,
     0px
@@ -172,6 +180,13 @@ body {
     padding-top: calc(
       var(--nav-height) + var(--safe-top) + var(--breadcrumbs-height)
     );
+
+    @include mobile-only {
+      padding-top: calc(
+        var(--size-touch-min) + var(--space-xs) + var(--safe-top) +
+          var(--space-xs) + var(--breadcrumbs-height)
+      );
+    }
   }
 }
 
@@ -181,12 +196,26 @@ section[id] {
     var(--nav-height) + var(--safe-top) + var(--space-lg)
   );
 
+  @include mobile-only {
+    scroll-margin-top: calc(
+      var(--size-touch-min) + var(--space-xs) + var(--safe-top) +
+        var(--space-lg)
+    );
+  }
+
   // Extra offset when breadcrumbs are present
   body[data-has-breadcrumbs] & {
     scroll-margin-top: calc(
       var(--nav-height) + var(--safe-top) + var(--breadcrumbs-height) +
         var(--space-lg)
     );
+
+    @include mobile-only {
+      scroll-margin-top: calc(
+        var(--size-touch-min) + var(--space-xs) + var(--safe-top) +
+          var(--breadcrumbs-height) + var(--space-lg)
+      );
+    }
   }
 }
 
