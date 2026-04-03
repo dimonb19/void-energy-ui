@@ -17,6 +17,7 @@
     TextStyleSnapshot,
   } from '@dgrslabs/void-energy-kinetic-text/types';
   import { emerge, dissolve } from '@lib/transitions.svelte';
+  import { morph } from '@actions/morph';
 
   // ── Snapshot ─────────────────────────────────────────────────────
   let snapshotEl: HTMLElement | undefined = $state();
@@ -95,22 +96,22 @@
     {
       id: 'digital-corruption',
       label: 'Corruption',
-      description: 'Distort continuous · Spin on demand · Scramble reveal',
+      description: 'Distort continuous · Spin on demand · Word scramble reveal',
       text: "The signal fractured into static and rebuilt itself from noise. Every fragment carried a different version of the truth, reassembling into something that looked correct but felt borrowed from a parallel transmission. She disconnected the feed, reconnected — and heard her own voice reading back the log entry she hadn't written yet. The timestamp was three hours ahead. The words described a corridor she hadn't entered and a door she hadn't opened. She deleted the log, but the next morning it was back, longer this time, written in a hand she almost recognized as her own.",
       revealMode: 'word',
       revealStyle: 'scramble',
       continuous: 'distort',
       oneShot: 'spin',
-
       cues: [],
       speed: 40,
     },
     {
       id: 'signal-interference',
       label: 'Interference',
-      description: 'Static continuous · Glitch on demand · Rise reveal',
-      text: 'The transmission broke apart three hundred kilometers from the relay tower. What arrived was half language, half noise — consonants sheared off mid-syllable, vowels stretched into tones no human mouth could hold. Buried in the interference she could almost hear a rhythm, something that repeated every eleven seconds like a heartbeat made of broken glass. The technician ran the recording backward and found words nested inside the static — coordinates, a name, a date six weeks from now. The signal was not failing. It was answering a question nobody had asked yet.',
-      revealMode: 'word',
+      description:
+        'Static continuous · Glitch on demand · Character rise reveal',
+      text: 'The transmission broke apart. What arrived was half language, half noise — consonants sheared off mid-syllable, vowels stretched into tones no human mouth could hold.',
+      revealMode: 'char',
       revealStyle: 'rise',
       continuous: 'static',
       oneShot: 'glitch',
@@ -120,7 +121,7 @@
     {
       id: 'heartbeat-protocol',
       label: 'Heartbeat',
-      description: 'Pulse continuous · Surge on demand · Drop reveal',
+      description: 'Pulse continuous · Surge on demand · Word drop reveal',
       text: 'The seal beneath the altar began to glow in a slow, deliberate rhythm — bright enough to cast shadows on the vaulted ceiling above. Each pulse traveled outward through the stone floor in concentric rings. At pulse sixty the light shifted from amber to deep arterial red and the temperature dropped by exactly four degrees. Nobody moved. The priest counted under his breath, matching each beat. At pulse ninety the walls began to hum, a low vibration that climbed through the soles of their boots and settled behind their teeth. The light was no longer pulsing. It was breathing.',
       revealMode: 'word',
       revealStyle: 'drop',
@@ -132,8 +133,8 @@
     {
       id: 'ghost-frequency',
       label: 'Ghost',
-      description: 'Whisper continuous · Ripple on demand · Blur reveal',
-      text: 'The voice arrived so quietly that she mistook it for the building settling. It came again — not through her ears but somewhere behind them, a presence that occupied the space between sounds. Words formed at the edge of recognition: fragments of a conversation she had never had, spoken in a cadence that matched her own breathing. She held perfectly still and let it continue. The voice described the room she was standing in — the cracked tile near the window, the water stain on the ceiling, the exact number of steps between the door and the place where she stood listening to a ghost describe her own silence.',
+      description: 'Whisper continuous · Ripple on demand · Word blur reveal',
+      text: 'The voice arrived so quietly that she mistook it for the building settling. Words formed at the edge of recognition: fragments of a conversation she had never had, spoken in a cadence that matched her own breathing.',
       revealMode: 'word',
       revealStyle: 'blur',
       continuous: 'whisper',
@@ -144,10 +145,10 @@
     {
       id: 'thermal-overload',
       label: 'Thermal',
-      description: 'Burn continuous · Quake on demand · Scale reveal',
-      text: 'Heat rolled off the sand in visible waves, warping the horizon into a shimmering ribbon of light. The thermometer read sixty-three degrees and was still climbing. The asphalt had gone viscous, holding bootprints like wet clay. Somewhere to the south the fire line advanced at walking pace, consuming everything it touched with a patience that felt almost deliberate. Metal fences ticked and pinged as they expanded. The air tasted of copper and burnt resin. By noon the sky had turned the color of old paper and the shadows had disappeared entirely, swallowed by a light so total it erased depth itself.',
-      revealMode: 'word',
-      revealStyle: 'scale',
+      description: 'Burn continuous · Quake on demand · Decode reveal',
+      text: 'THERMAL OVERLOAD :: CORE TEMPERATURE CRITICAL :: ALL SYSTEMS NOMINAL :: CONTAINMENT HOLDING',
+      revealMode: 'decode',
+      revealStyle: 'scramble',
       continuous: 'burn',
       oneShot: 'quake',
       cues: [],
@@ -163,13 +164,25 @@
   let activeSceneId: string | number | null = $state('digital-corruption');
   let heroReplay = $state(0);
   let heroOneShotTrigger = $state(0);
+  let heroLoading = $state(true);
 
   const activeScene = $derived(
     heroScenes.find((s) => s.id === activeSceneId) ?? heroScenes[0],
   );
 
+  // Auto-trigger hero skeleton → reveal
+  $effect(() => {
+    if (heroLoading) {
+      const timer = setTimeout(() => {
+        heroLoading = false;
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  });
+
   function replayHero() {
     heroOneShotTrigger = 0;
+    heroLoading = true;
     heroReplay++;
   }
 
@@ -201,6 +214,29 @@
   const revealSpeeds = $derived(
     REVEAL_SPEEDS[String(revealSpeedPreset)] ?? REVEAL_SPEEDS.default,
   );
+
+  // ── Skeleton loading demo state ──────────────────────────────────
+
+  const SKELETON_SAMPLE_TEXT =
+    'The void engine adapts to every atmosphere. Glass physics create translucent surfaces with depth and glow. Flat physics produce clean, minimal interfaces. Retro physics channel the warmth of CRT phosphor.';
+
+  let skeletonDemoLoading = $state(true);
+  let skeletonDemoReplay = $state(0);
+
+  // Auto-trigger skeleton → reveal on first load
+  $effect(() => {
+    if (skeletonDemoLoading) {
+      const timer = setTimeout(() => {
+        skeletonDemoLoading = false;
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  });
+
+  function simulateSkeletonLoad() {
+    skeletonDemoLoading = true;
+    skeletonDemoReplay++;
+  }
 
   // ── Narrative effects demo data ────────────────────────────────
 
@@ -583,8 +619,10 @@
   <header class="flex flex-col gap-lg items-center text-center">
     <h1 class="text-primary">Kinetic Text</h1>
     <p class="text-body text-dim max-w-3xl">
-      Character-level kinetic typography. Every letter is an independent element
-      — revealed, animated, and reactive in real time.
+      Text that reacts. Every character is an independent animated element —
+      revealed with its own entrance, living with ambient motion, and responsive
+      to narrative events in real time. Pair it with TTS and the text doesn't
+      just display a story, it performs one.
     </p>
   </header>
 
@@ -592,23 +630,22 @@
   <section class="flex flex-col gap-xl">
     <div class="surface-raised p-lg flex flex-col gap-lg">
       <p class="text-dim">
-        Three effect layers run simultaneously and compose together.
-        <strong>Reveal</strong> controls how text first appears — typewriter,
-        word-by-word, decode, scramble, rise, drop.
-        <strong>Continuous</strong> effects keep text alive after reveal —
-        drift, breathe, flicker, burn, distort.
-        <strong>One-shot</strong> effects fire on demand for dramatic punctuation
-        — shake, explode, shatter, surge, glitch. A single block of text can be revealing
-        with one style, settling into a living continuous rhythm, and reacting to
-        one-shot events — all at the same time.
+        Three effect layers run simultaneously on separate DOM nodes.
+        <strong>Reveal</strong> controls how text first appears — the entrance
+        style as each character arrives. <strong>Continuous</strong> effects
+        keep text alive after reveal — ambient loops that sustain mood.
+        <strong>One-shot</strong> effects fire on demand for dramatic punctuation.
+        All three compose without interfering — text can be mid-reveal while a continuous
+        loop runs and a one-shot fires.
       </p>
 
       {#if snapshot}
-        <div class="surface-sunk p-lg" in:emerge out:dissolve>
+        <div class="surface-sunk p-lg" use:morph>
           {#key `${activeScene.id}-${heroReplay}`}
             <KineticText
               text={activeScene.text}
               styleSnapshot={snapshot}
+              loading={heroLoading}
               revealMode={activeScene.revealMode}
               revealStyle={activeScene.revealStyle}
               activeEffect={activeScene.continuous}
@@ -652,16 +689,34 @@
         <summary class="text-dim">How it works</summary>
         <div class="p-md flex flex-col gap-md">
           <p>
-            Kinetic Text is built on <a
+            Layout starts with <a
               href="https://github.com/chenglou/pretext"
               target="_blank"
               rel="noopener noreferrer"
               class="text-link">Pretext</a
-            > — Cheng Lou's zero-DOM text measurement engine. Pretext solves the
-            hard problem of measuring and laying out text without triggering browser
-            reflow, using pure arithmetic over the browser's font engine. Kinetic
-            Text uses Pretext to compute per-character positions, then animates every
-            glyph independently.
+            > — Cheng Lou's zero-DOM text measurement engine that computes per-character
+            positions using pure arithmetic over the browser's font metrics, without
+            triggering reflow. Kinetic Text feeds the measured positions into a character
+            renderer that builds a 4-layer DOM tree:
+          </p>
+          <p>
+            <code>.kt-unit</code> (outer, continuous effects) →
+            <code>.kt-oneshot</code> (middle, one-shot effects) →
+            <code>.kt-glyph</code> (inner, reveal animation). A fourth layer,
+            <code>.kt-word</code>, wraps word groups and carries secondary
+            harmonic motion for effects like drift, wave, and float. Each layer
+            runs its own CSS animation independently — swapping or clearing one
+            layer never interrupts the others.
+          </p>
+          <p>
+            A seeded PRNG generates unique CSS custom properties per character (<code
+              >--kt-dx</code
+            >, <code>--kt-dy</code>,
+            <code>--kt-rotate</code>, <code>--kt-scale</code>,
+            <code>--kt-skew</code>, <code>--kt-opacity-min</code>). Parametric
+            <code>@keyframes</code> read these variables, so a single animation definition
+            produces different motion on every glyph. The seed is deterministic —
+            same text, same effect, same visual every time.
           </p>
           <p class="text-caption text-mute">
             Pretext is MIT-licensed open source. Kinetic Text bundles it as a
@@ -678,17 +733,16 @@
       <div class="flex flex-col gap-xs">
         <h2>Per-Character Effects</h2>
         <p class="text-dim">
-          Kinetic Text runs three independent effect layers in parallel on every
-          block of text. <strong>Reveal</strong> controls how text first appears
-          — the entrance animation covered above. <strong>Continuous</strong>
-          effects loop after reveal completes, sustaining mood and atmosphere throughout
-          a scene — drift, breathe, flicker, burn, distort.
-          <strong>One-shot</strong> effects fire on demand for dramatic punctuation
-          — shake, explode, shatter, surge, glitch. All three compose simultaneously:
-          text can be revealing word-by-word while a continuous pulse loop runs,
-          and a one-shot slam fires mid-scene. For TTS-driven narrative, one-shots
-          pair naturally with speech events — fire a glitch when the voice falters,
-          a surge when tension peaks.
+          Effects operate on already-revealed text. <strong>Continuous</strong>
+          effects (21) are ambient loops that set the emotional tone of a scene —
+          they run on the outer <code>.kt-unit</code> layer and persist until
+          explicitly changed. Some carry a secondary harmonic on the
+          <code>.kt-word</code> wrapper for richer compound motion.
+          <strong>One-shot</strong> effects (16) are discrete events that fire
+          once and clean up — they run on the middle <code>.kt-oneshot</code>
+          layer, triggered by the cue system or an imperative counter. For TTS-driven
+          narrative, one-shots pair naturally with speech events — fire a glitch
+          when the voice falters, a surge when tension peaks.
         </p>
       </div>
 
@@ -696,29 +750,30 @@
         <summary>Technical Details</summary>
         <div class="p-md flex flex-col gap-md">
           <p>
-            The three layers are fully independent. Reveal is driven by the
-            tick-based reveal engine. Continuous effects are applied via the
-            <code>activeEffect</code> prop — an infinite CSS animation that
-            starts immediately and persists until the prop changes. One-shot
-            effects fire through the <strong>cue system</strong>
-            (<code>on-complete</code> trigger after reveal, or imperative
-            <code>oneShotTrigger</code> counter at any time). Swapping one layer
-            does not interrupt the others.
+            Continuous effects set <code>animation</code> on
+            <code>.kt-unit</code> with <code>infinite</code> iteration. Seven
+            effects (drift, breathe, wave, float, pulse, tremble, haunt) also
+            set a secondary animation on the <code>.kt-word</code> wrapper — a
+            slower harmonic that modulates the entire word group for compound
+            motion. Changing <code>activeEffect</code> clears the current animation
+            and applies the new one; other layers are untouched.
           </p>
           <p>
-            Every character receives unique CSS custom properties (<code
-              >--kt-dx</code
-            >, <code>--kt-dy</code>,
-            <code>--kt-rotate</code>, <code>--kt-scale</code>, etc.) computed by
-            a seeded PRNG. Parametric keyframes read these variables, so the
-            same animation produces different motion per character — shake makes
-            each letter jitter with its own amplitude, drift floats each
-            character at a different height.
+            One-shot effects set <code>animation</code> on
+            <code>.kt-oneshot</code> with a single iteration. Each character
+            gets a stagger delay (<code>phase * baseDelay + jitter</code>) and a
+            duration multiplier (0.85 &ndash; 1.15) for organic timing. The
+            animation cleans up per-character on <code>animationend</code> — distributed
+            teardown, no global timer. Effects only animate already-visible characters
+            and skip any still mid-reveal.
           </p>
           <p>
-            Physics styling adapts automatically. Glass adds motion blur on
-            displacement-heavy effects, flat keeps the raw curves clean, and
-            retro applies per-effect stepped timing.
+            Physics adaptation: glass adds motion blur (<code
+              >--physics-blur</code
+            >) on displacement-heavy effects and uses spring easing; flat uses
+            clean ease-out curves; retro forces
+            <code>steps()</code> timing and limits scramble charsets to uppercase
+            + digits.
           </p>
         </div>
       </details>
@@ -1150,21 +1205,30 @@
         <summary>Technical Details</summary>
         <div class="p-md flex flex-col gap-md">
           <p>
-            Each reveal style computes per-character CSS custom properties (<code
-              >--kt-dx</code
-            >, <code>--kt-dy</code>,
-            <code>--kt-rotate</code>, <code>--kt-scale</code>) from a seeded
-            PRNG. The same keyframe animation reads these variables, producing
-            different motion per character from a single animation definition.
-            Spring-based easing controls the settle — overshoot and bounce are
-            tuned per style.
+            Reveal animations run on the innermost <code>.kt-glyph</code>
+            layer. Each character transitions through three states:
+            <code>hidden</code> → <code>revealing</code> →
+            <code>visible</code>, driven by <code>data-kt-state</code>. The
+            revealing state triggers a CSS keyframe that reads per-character
+            variables (<code>--kt-dx</code>, <code>--kt-dy</code>,
+            <code>--kt-rotate</code>, <code>--kt-scale</code>) as starting
+            transforms and animates to identity. Spring easing controls
+            overshoot — scramble and drop have heavy bounce, blur and scale
+            settle cleanly.
           </p>
           <p>
-            Physics presets adapt the entrance automatically: glass adds motion
-            blur during displacement-heavy moves, flat keeps curves clean and
-            mechanical, retro uses stepped timing with instant snaps. The
-            <code>revealStyle</code> prop overrides the default — or omit it to get
-            Pop on all presets.
+            Styles differ in which parameters they use: pop sets random XY
+            offsets, scramble adds wide radius + heavy rotation, rise/drop
+            constrain to vertical axis with directional bias, scale uses only
+            the scale channel, blur uses only filter, and random shuffles reveal
+            order rather than changing the animation itself. The
+            <code>instant</code> style skips the animation entirely.
+          </p>
+          <p>
+            Physics presets adapt automatically: glass adds blur trails on
+            rise/drop and uses cubic-bezier spring curves, flat uses ease-out,
+            retro skips blur entirely and uses <code>steps()</code> timing.
+            Default style is pop — set <code>revealStyle</code> to override.
           </p>
         </div>
       </details>
@@ -1369,27 +1433,25 @@
         <summary>Technical Details</summary>
         <div class="p-md flex flex-col gap-md">
           <p>
-            Each mode uses <a
-              href="https://github.com/chenglou/pretext"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="text-link">Pretext</a
-            >
-            to compute per-character target positions up front. The reveal engine
-            then steps through characters according to the mode's granularity — one
-            character per tick (<code>char</code>), one word per tick (<code
-              >word</code
-            >), or all characters simultaneously with staggered decode passes (<code
-              >decode</code
-            >).
+            The reveal timeline is a RAF loop that marks characters as
+            <code>revealing</code> according to the mode's granularity.
+            <strong>Char</strong> advances one character per tick at the
+            <code>stagger</code> interval. <strong>Word</strong> advances one
+            word per tick at the <code>speed</code> interval, with an internal
+            per-character stagger set by <code>charSpeed</code> — so each word
+            appears as a fast burst rather than a single frame.
+            <strong>Decode</strong> makes all characters visible from frame zero
+            with scrambled content, then resolves them left-to-right through
+            configurable <code>scramblePasses</code> (default 4) — each pass swaps
+            the glyph to a random character from a physics-dependent charset before
+            settling on the real one.
           </p>
           <p>
-            Timing adapts to physics automatically: glass uses smooth spring
-            easing with motion blur on fast reveals, flat uses clean linear
-            curves, and retro adds per-tick jitter and stepped timing for a
-            mechanical feel. The <code>speed</code> and
-            <code>speedPreset</code> props control base tick interval — character
-            mode exposes a speed selector below for testing.
+            The <code>speed</code> prop controls inter-word delay (word mode) or
+            is ignored (char/decode mode, which use
+            <code>stagger</code> instead). Speed presets bundle both values for convenience.
+            Retro physics uses a limited charset for scramble passes: uppercase letters
+            and digits only, matching the CRT terminal aesthetic.
           </p>
         </div>
       </details>
@@ -1489,6 +1551,66 @@
       {/if}
     </div>
   </section>
+
+  <!-- ─── SKELETON LOADING SECTION ───────────────────────────────── -->
+  {#if snapshot}
+    <section class="flex flex-col gap-xl">
+      <div class="surface-raised p-lg flex flex-col gap-lg">
+        <div class="flex flex-col gap-xs">
+          <h2>Skeleton Loading</h2>
+          <p class="text-dim">
+            Kinetic Text includes built-in skeleton loading that derives line
+            geometry from the same layout engine used for animation. Line count,
+            line height, and last-line width all come from real text measurement
+            — no guessing. Set <code>loading=true</code> to show the skeleton,
+            then set it to <code>false</code> when ready — the skeleton crossfades
+            out and the reveal animation begins.
+          </p>
+        </div>
+
+        <div class="surface-sunk p-lg" use:morph>
+          {#key skeletonDemoReplay}
+            <KineticText
+              text={SKELETON_SAMPLE_TEXT}
+              styleSnapshot={snapshot}
+              loading={skeletonDemoLoading}
+              revealMode="word"
+              speed={35}
+            />
+          {/key}
+        </div>
+
+        <div class="flex items-center justify-center">
+          <ActionBtn
+            class="btn-system"
+            icon={Restart}
+            text="Simulate Load"
+            onclick={simulateSkeletonLoad}
+          />
+        </div>
+
+        <details>
+          <summary class="text-dim">Usage</summary>
+          <div class="p-md flex flex-col gap-md">
+            <p>
+              The <code>loading</code> prop defers the reveal timeline. Layout
+              still runs (so the skeleton is geometry-accurate), but no
+              animation starts until
+              <code>loading</code> becomes <code>false</code>. The skeleton
+              layer fades out while the reveal begins simultaneously — no blank
+              gap.
+            </p>
+            <p>
+              Hint props <code>skeletonLines</code> and
+              <code>skeletonLastLineWidth</code> provide a pre-layout estimate. Once
+              the layout engine measures the real text, these are overridden with
+              exact values.
+            </p>
+          </div>
+        </details>
+      </div>
+    </section>
+  {/if}
 </div>
 
 <style>

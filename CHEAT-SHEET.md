@@ -5278,7 +5278,34 @@ No manual body padding or scroll offset adjustments needed — `data-has-breadcr
 
 ### U. Kinetic Text
 
-**Premium package:** `@dgrslabs/void-energy-kinetic-text` — character-level DOM, 3 reveal modes (char, word, decode), 8 reveal styles (pop, scramble, rise, drop, scale, blur, random, instant), 37 effects (16 one-shot + 21 continuous) with per-character animation, three-layer composability (reveal + continuous + one-shot simultaneously), cue system for TTS sync. See [/kinetic-text](src/pages/kinetic-text.astro) for full showcase.
+**Premium package:** `@dgrslabs/void-energy-kinetic-text` — character-level DOM, 3 reveal modes (char, word, decode), 8 reveal styles (pop, scramble, rise, drop, scale, blur, random, instant), 37 effects (16 one-shot + 21 continuous) with per-character animation, three-layer composability (reveal + continuous + one-shot simultaneously), cue system for TTS sync, built-in skeleton loading. See [/kinetic-text](src/pages/kinetic-text.astro) for full showcase.
+
+#### Skeleton Loading
+
+KT includes layout-accurate skeleton loading. The `loading` prop shows shimmer line-blocks whose geometry (line count, last-line width) is derived from the same Pretext layout engine used for animation. When `loading` becomes `false`, the skeleton crossfades out and the reveal begins simultaneously.
+
+```svelte
+<!-- Skeleton → reveal flow (e.g., waiting for AI text + effect decision) -->
+<KineticText
+  text={aiResponse}
+  styleSnapshot={snapshot}
+  loading={isWaitingForEffect}
+  revealMode="word"
+  revealStyle="blur"
+/>
+```
+
+The shimmer adapts to physics: energy-primary glow (glass), white beam (flat/light), hard scan-line (retro). Hint props `skeletonLines` and `skeletonLastLineWidth` provide pre-layout estimates, overridden by real measurements once the layout engine runs.
+
+A standalone `<KineticSkeleton>` component is also exported for lightweight placeholders without the animation engine:
+
+```svelte
+<script lang="ts">
+  import { KineticSkeleton } from '@dgrslabs/void-energy-kinetic-text';
+</script>
+
+<KineticSkeleton lines={4} lineHeight={24} styleSnapshot={snapshot} />
+```
 
 **Loading cycler** (still available as a shipped primitive):
 

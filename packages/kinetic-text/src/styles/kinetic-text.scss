@@ -2409,3 +2409,118 @@
 // burn stays linear — heat wobble needs smooth interpolation
 // static jitter stays linear — rapid noise needs smooth interpolation
 // vibrate stays linear — medium-frequency oscillation needs smooth interpolation
+
+// ═══════════════════════════════════════════════════════════════════
+// SKELETON LOADING
+// ═══════════════════════════════════════════════════════════════════
+// Layout-accurate shimmer line-blocks shown during loading state.
+// Physics/mode variants match the Void Energy shimmer system.
+// CSS vars (--energy-primary, --border-color, --bg-sunk) come from
+// TextStyleSnapshot.vars via the host adapter.
+
+// During loading: skeleton is in normal flow, provides container height.
+// During hiding: skeleton goes absolute so it overlays without adding height
+// while the renderer DOM (kt-visual) takes over as the height provider.
+.kt-skeleton-layer {
+  display: block;
+  transition: opacity 300ms ease-out;
+}
+
+.kt-skeleton-layer[data-kt-skeleton='hiding'] {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.kt-skeleton-line {
+  display: block;
+  border-radius: 4px; // void-ignore — skeleton geometry, not a themed surface
+  margin-bottom: 6px; // void-ignore — visual gap between skeleton lines
+
+  // Base: muted sunk background
+  background-color: var(--bg-sunk, rgba(255, 255, 255, 0.06));
+
+  // Shimmer sweep
+  background-size: 400% 100%;
+  animation: kt-shimmer 4s infinite linear;
+
+  // Dark mode default: energy-primary glow beam
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      transparent 30%,
+      color-mix(in srgb, var(--energy-primary, #6366f1) 15%, transparent) 50%,
+      transparent 70%,
+      transparent 100%
+    ),
+    linear-gradient(
+      var(--bg-sunk, rgba(255, 255, 255, 0.06)),
+      var(--bg-sunk, rgba(255, 255, 255, 0.06))
+    );
+}
+
+// Light mode: white beam
+[data-mode='light'] .kt-skeleton-line {
+  background-color: var(--bg-sunk, rgba(0, 0, 0, 0.04));
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      transparent 35%,
+      rgba(255, 255, 255, 0.6) 50%,
+      // void-ignore — physically correct white shimmer
+      transparent 65%,
+      transparent 100%
+    ),
+    linear-gradient(
+      var(--bg-sunk, rgba(0, 0, 0, 0.04)),
+      var(--bg-sunk, rgba(0, 0, 0, 0.04))
+    );
+}
+
+// Retro: hard-cut scan line, no radius
+[data-physics='retro'] .kt-skeleton-line {
+  border-radius: 0;
+  background-image:
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      transparent 44%,
+      var(--border-color, currentColor) 44%,
+      var(--border-color, currentColor) 46%,
+      transparent 46%,
+      transparent 100%
+    ),
+    linear-gradient(
+      var(--bg-sunk, rgba(255, 255, 255, 0.06)),
+      var(--bg-sunk, rgba(255, 255, 255, 0.06))
+    );
+}
+
+@keyframes kt-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// Reduced motion: keep skeleton visible but kill shimmer animation
+@mixin kt-skeleton-reduced-motion {
+  .kt-skeleton-line {
+    animation: none !important;
+  }
+}
+
+[data-reduced-motion='auto'] {
+  @media (prefers-reduced-motion: reduce) {
+    @include kt-skeleton-reduced-motion;
+  }
+}
+
+[data-reduced-motion='always'] {
+  @include kt-skeleton-reduced-motion;
+}

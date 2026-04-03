@@ -259,10 +259,35 @@ export interface KineticTextProps {
   oneShotTrigger?: number;
   /** Called when an imperative one-shot effect finishes (all characters done). */
   ononeshotcomplete?: () => void;
+  /** Show skeleton loading state. When true, layout-accurate skeleton lines are displayed and reveal is deferred. When set to false, skeleton fades out and reveal begins. */
+  loading?: boolean;
+  /** Hint: number of skeleton lines to show before layout completes. Overridden by actual layout once computed. Default 3. */
+  skeletonLines?: number;
+  /** Hint: width ratio (0–1) of the last skeleton line before layout completes. Default 0.7. */
+  skeletonLastLineWidth?: number;
   /** Start with all text visible — skip reveal entirely. Useful for showcasing effects without the reveal animation. */
   preRevealed?: boolean;
   onrevealcomplete?: () => void;
   oneffectscomplete?: () => void;
   as?: string;
+  class?: string;
+}
+
+/**
+ * Props for the standalone `<KineticSkeleton>` component.
+ *
+ * A lightweight skeleton placeholder that renders layout-accurate shimmer
+ * line-blocks without the full animation engine. Useful as a loading state
+ * or premium-tier fallback.
+ */
+export interface KineticSkeletonProps {
+  /** Number of skeleton lines to display. Default 3. */
+  lines?: number;
+  /** Width ratio (0–1) of the last line. Default 0.7. */
+  lastLineWidth?: number;
+  /** Line height in px. Used for skeleton block height. Default 24. */
+  lineHeight?: number;
+  /** Style snapshot for CSS var injection and physics/mode detection. */
+  styleSnapshot: TextStyleSnapshot;
   class?: string;
 }

@@ -33,6 +33,9 @@ const FORWARDED_VARS = [
   '--delay-sequence',
   // Physics
   '--physics-blur',
+  // Skeleton
+  '--border-color',
+  '--bg-sunk',
 ] as const;
 
 /**

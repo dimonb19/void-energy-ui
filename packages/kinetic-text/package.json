@@ -11,7 +11,7 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "svelte": "./dist/svelte/KineticText.svelte",
+      "svelte": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./component": {
@@ -26,6 +26,11 @@
     "./adapters/void-energy-host": {
       "types": "./dist/adapters/void-energy-host.d.ts",
       "default": "./dist/adapters/void-energy-host.js"
+    },
+    "./skeleton": {
+      "types": "./dist/svelte/KineticSkeleton.svelte",
+      "svelte": "./dist/svelte/KineticSkeleton.svelte",
+      "default": "./dist/svelte/KineticSkeleton.svelte"
     },
     "./styles": "./dist/styles/kinetic-text.css"
   },

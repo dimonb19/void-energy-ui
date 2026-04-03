@@ -41,12 +41,17 @@ cpSync(
   resolve(root, 'src/svelte/KineticText.svelte'),
   resolve(dist, 'svelte/KineticText.svelte'),
 );
+cpSync(
+  resolve(root, 'src/svelte/KineticSkeleton.svelte'),
+  resolve(dist, 'svelte/KineticSkeleton.svelte'),
+);
 
 // 5. Write barrel index.js
 writeFileSync(
   resolve(dist, 'index.js'),
   `// Generated barrel — re-exports public API
 export { default as KineticText } from './svelte/KineticText.svelte';
+export { default as KineticSkeleton } from './svelte/KineticSkeleton.svelte';
 export { createVoidEnergyTextStyleSnapshot } from './adapters/void-energy-host.js';
 export {} from './types.js';
 `,
@@ -62,10 +67,16 @@ import type { KineticTextProps } from './types.js';
 declare const KineticText: typeof SvelteComponent<KineticTextProps>;
 export { KineticText };
 
+import type { KineticSkeletonProps } from './types.js';
+/** Standalone skeleton placeholder — lightweight, no animation engine. */
+declare const KineticSkeleton: typeof SvelteComponent<KineticSkeletonProps>;
+export { KineticSkeleton };
+
 export { createVoidEnergyTextStyleSnapshot } from './adapters/void-energy-host.js';
 
 export type {
   CueTrigger,
+  KineticSkeletonProps,
   ModePreset,
   PhysicsPreset,
   ReducedMotionMode,
