@@ -70,9 +70,7 @@
             ? 400
             : resolvedRevealStyle === 'pop'
               ? 250
-              : resolvedRevealStyle === 'random'
-                ? 200
-                : 300),
+              : 300),
   );
   const resolvedScramblePasses = $derived(scramblePasses ?? 4);
   const resolvedSeed = $derived(seed ?? hashSeed(text + revealMode));

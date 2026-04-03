@@ -14,7 +14,7 @@ import {
   applyCharParams,
   clearCharParams,
 } from '../effects/params';
-import { createPRNG, hashSeed, seededShuffle } from './prng';
+import { createPRNG, hashSeed } from './prng';
 import { computeStaggerDelays } from './stagger';
 
 // ── Decode charsets ──────────────────────────────────────────────
@@ -355,13 +355,7 @@ export class RevealTimeline {
       if (!this._wordGroups) this._wordGroups = splitWords(this.positions);
 
       const speed = this.config.speed;
-      let groups = this._wordGroups;
-
-      // Random reveal style: shuffle word group order
-      if (this.config.revealStyle === 'random') {
-        const rng = createPRNG(this.config.seed + 31337);
-        groups = seededShuffle(groups, rng);
-      }
+      const groups = this._wordGroups;
 
       this._groupedSchedule = groups.map((indices, groupIdx) => ({
         groupIndices: indices,
@@ -554,9 +548,6 @@ export class RevealTimeline {
       this.positions,
       this.config.staggerPattern,
       this.config.stagger,
-      this.config.physics,
-      this.config.seed,
-      this.config.revealStyle,
     );
   }
 

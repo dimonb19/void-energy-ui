@@ -379,34 +379,6 @@
   opacity: unset;
 }
 
-// ── Random reveal (order) ───────────────────────────────────────
-// Characters appear in randomized ORDER with a simple fade-in.
-// The ORDER is randomized by JS (shuffled stagger delays), not the animation.
-
-@keyframes kt-reveal-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-[data-reveal-style='random'] .kt-glyph[data-kt-state='revealing'] {
-  animation-name: kt-reveal-fade;
-  animation-duration: 200ms; // void-ignore — simple fade
-  animation-timing-function: ease-out;
-}
-
-// Random retro: stepped fade
-[data-reveal-style='random'][data-physics='retro']
-  .kt-glyph[data-kt-state='revealing'] {
-  animation-name: kt-reveal-fade;
-  animation-duration: 120ms; // void-ignore
-  animation-timing-function: steps(2); // void-ignore
-  opacity: unset;
-}
-
 // ── Semantic layer ───────────────────────────────────────────────
 
 .kt-semantic {

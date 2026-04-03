@@ -83,7 +83,7 @@ This provides all reveal keyframes, effect animations, physics-variant easing, a
 | `text` | `string` | — | **Required.** The text to render and reveal. |
 | `styleSnapshot` | `TextStyleSnapshot` | — | **Required.** Font, lineHeight, physics, mode, and CSS variables. |
 | `revealMode` | `'char' \| 'word' \| 'decode'` | `'char'` | How text is revealed: character-by-character, word-by-word, or scramble-then-decode. |
-| `revealStyle` | `RevealStyle` | `'pop'` | Visual entrance animation: `instant`, `pop`, `scale`, `blur`, `scramble`, `rise`, `drop`, `random`. |
+| `revealStyle` | `RevealStyle` | `'pop'` | Visual entrance animation: `instant`, `pop`, `scale`, `blur`, `scramble`, `rise`, `drop`. |
 | `speedPreset` | `'slow' \| 'default' \| 'fast'` | `'default'` | Named speed preset. `slow` = 40/8ms, `default` = 20/4ms, `fast` = 8/2ms. Overridden by explicit `speed`/`charSpeed`. |
 | `staggerPattern` | `StaggerPattern` | `'sequential'` | Timing pattern for reveal order. |
 | `stagger` | `number` | `40` (char) / `30` (other) | Milliseconds between reveal units. |
@@ -96,7 +96,7 @@ This provides all reveal keyframes, effect animations, physics-variant easing, a
 | `skeletonLines` | `number` | `3` | Hint: number of skeleton lines before layout completes. Overridden by actual layout. |
 | `skeletonLastLineWidth` | `number` | `0.7` | Hint: width ratio (0–1) of the last skeleton line. Overridden by actual layout. |
 | `preRevealed` | `boolean` | `false` | Start with all text visible — skip reveal entirely. Useful for showcasing effects on already-visible text. |
-| `seed` | `number` | hash(text + mode) | Deterministic seed for PRNG (stagger, decode, random). |
+| `seed` | `number` | hash(text + mode) | Deterministic seed for PRNG (decode scramble). |
 | `reducedMotion` | `ReducedMotionMode` | `'auto'` | `auto` (OS preference), `always`, or `never`. |
 | `speed` | `number` | per preset | Base speed (ms). Overrides `speedPreset`. |
 | `charSpeed` | `number` | per preset | Inner character speed within word groups (ms). Overrides `speedPreset`. |
@@ -181,7 +181,6 @@ Effects marked **Secondary Harmonic** apply an additional animation layer on wor
 | `drop` | Characters fall from above with gravity feel and landing bounce | Glass/retro have custom variants |
 | `scale` | Characters grow from zero scale to full size | Clean, no positional offset |
 | `blur` | Characters emerge from gaussian blur into sharp focus | Glass adds extra depth |
-| `random` | Characters appear in randomized ORDER with simple fade | Shuffled reveal sequence |
 | `instant` | No animation — binary visible flip | All physics |
 
 ## Cue authoring

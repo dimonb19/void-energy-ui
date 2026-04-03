@@ -57,8 +57,6 @@
     'Gravity pulls every word into place, heavy and deliberate. Each character falls from somewhere above the frame, accelerating downward with the weight of certainty, landing with just enough force to know it belongs exactly where it stopped.';
   const SAMPLE_POP =
     'Chaos snaps into order. Every glyph finds its home in an instant — a burst of motion collapsing into stillness. One moment the space is empty, the next a complete thought exists, assembled from nothing in a single frame of controlled disorder.';
-  const SAMPLE_RANDOM =
-    'Positions fill at random, each letter finding its place unpredictably. The sequence defies expectation — a character from the middle appears first, then one from the end, then the start. Order emerges not from left to right but from chance itself.';
   const SAMPLE_SCALE =
     'Every character starts as nothing — a dimensionless point — and expands outward into its full shape. The growth is swift and precise, each letter claiming its space with the confidence of something that knows exactly how large it is meant to be.';
   const SAMPLE_BLUR =
@@ -73,7 +71,6 @@
   let replayRevealRise = $state(0);
   let replayRevealDrop = $state(0);
   let replayRevealPop = $state(0);
-  let replayRevealRandom = $state(0);
   let replayRevealScale = $state(0);
   let replayRevealBlur = $state(0);
 
@@ -1222,8 +1219,7 @@
             Styles differ in which parameters they use: pop sets random XY
             offsets, scramble adds wide radius + heavy rotation, rise/drop
             constrain to vertical axis with directional bias, scale uses only
-            the scale channel, blur uses only filter, and random shuffles reveal
-            order rather than changing the animation itself. The
+            the scale channel, and blur uses only filter. The
             <code>instant</code> style skips the animation entirely.
           </p>
           <p>
@@ -1334,32 +1330,6 @@
           <p class="text-caption text-mute px-xs">
             Characters fall from above with gravity feel. Overshoots on landing
             with a subtle bounce. Heavy, deliberate entrance.
-          </p>
-        </div>
-
-        <!-- Random -->
-        <div class="flex flex-col gap-xs">
-          <div class="flex items-center justify-between">
-            <h6>Random</h6>
-            <button class="btn-icon" onclick={() => replayRevealRandom++}>
-              <RotateCcw class="icon" data-size="sm" />
-            </button>
-          </div>
-          <div class="surface-sunk p-lg">
-            {#key replayRevealRandom}
-              <KineticText
-                text={SAMPLE_RANDOM}
-                styleSnapshot={snapshot}
-                revealStyle="random"
-                revealMode="char"
-                speed={30}
-              />
-            {/key}
-          </div>
-          <p class="text-caption text-mute px-xs">
-            Characters appear in randomized order with a simple fade. The reveal
-            order is shuffled — positions fill unpredictably rather than
-            left-to-right.
           </p>
         </div>
 

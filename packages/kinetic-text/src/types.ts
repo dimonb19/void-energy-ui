@@ -29,7 +29,6 @@ export const SPEED_PRESETS: Record<
  * - `'scramble'` — Characters fly in from random positions/rotations and settle.
  * - `'rise'` — Characters ascend from below into position.
  * - `'drop'` — Characters fall from above into position with gravity feel.
- * - `'random'` — Characters appear in randomized ORDER with a simple fade.
  * - `'instant'` — No animation.
  *
  * All reveal styles work on all physics presets. When `revealStyle` is not
@@ -42,8 +41,7 @@ export type RevealStyle =
   | 'scramble'
   | 'rise'
   | 'drop'
-  | 'pop'
-  | 'random';
+  | 'pop';
 
 export type StaggerPattern = 'sequential';
 
