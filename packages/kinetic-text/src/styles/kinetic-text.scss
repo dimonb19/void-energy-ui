@@ -18,7 +18,8 @@
 // ── Root ──────────────────────────────────────────────────────────
 
 .kinetic-text {
-  display: block;
+  display: flex;
+  flex-direction: column;
   position: relative;
 }
 
@@ -2395,6 +2396,7 @@
 // while the renderer DOM (kt-visual) takes over as the height provider.
 .kt-skeleton-layer {
   display: block;
+  font-size: 0; // void-ignore — collapse whitespace nodes between skeleton lines
   transition: opacity 300ms ease-out;
 }
 
@@ -2407,9 +2409,9 @@
 
 .kt-skeleton-line {
   display: block;
+  padding: 3px 0; // void-ignore — creates visual gap between lines via background-clip
   border-radius: 4px; // void-ignore — skeleton geometry, not a themed surface
-  margin-bottom: 6px; // void-ignore — visual gap between skeleton lines
-
+  background-clip: content-box;
   // Base: muted sunk background
   background-color: var(--bg-sunk, rgba(255, 255, 255, 0.06));
 
