@@ -348,7 +348,7 @@
     } else if (e.key === 'Escape') {
       if (open) {
         // e.preventDefault() stops layerStack from firing a second dismiss
-        // (same pattern as EditField / EditTextarea per CLAUDE.md)
+        // (same pattern as EditField / EditTextarea)
         e.preventDefault();
         closePanel();
         inputEl?.focus();

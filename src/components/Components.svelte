@@ -26,6 +26,7 @@
   // Effects & Motion
   import Effects from './ui-library/Effects.svelte';
   import MotionPrimitives from './ui-library/MotionPrimitives.svelte';
+  import KineticText from './ui-library/KineticText.svelte';
   import DragAndDrop from './ui-library/DragAndDrop.svelte';
   import PortalRingShowcase from './ui-library/PortalRing.svelte';
   // Data Visualization
@@ -75,6 +76,7 @@
       items: [
         { id: 'loading-states', label: 'Loading States' },
         { id: 'motion-primitives', label: 'Motion Primitives' },
+        { id: 'kinetic-text', label: 'Kinetic Text' },
         { id: 'drag-and-drop', label: 'Drag & Drop' },
         { id: 'portal-ring', label: 'Portal Ring' },
       ],
@@ -282,6 +284,7 @@
           </div>
           <Effects />
           <MotionPrimitives />
+          <KineticText />
           <DragAndDrop />
           <PortalRingShowcase />
 

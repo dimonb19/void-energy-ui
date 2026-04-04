@@ -32,6 +32,11 @@ Kinetic Text (`packages/kinetic-text/`) is its own premium package (`@dgrslabs/v
 ### Kinetic Action — Public, Stays in Core
 `src/actions/kinetic.ts` is the lightweight kinetic text action (typewriter, word-by-word, cycle, decode modes). It stays public as a free taste of text animation. The premium KT package is the full-featured version.
 
+### Portal Ring — Public, Stays in Core
+`src/components/icons/PortalRing.svelte` is a physics-adaptive parallax SVG that fits the Void Energy identity. It stays public and ships with a ready-made 404 page as an out-of-box feature. The Portal Ring showcase stays on `/components`.
+
+**Note:** Portal Ring (the interactive SVG icon) is different from Portal Loader (the CoNexus loading animation that uses Portal Ring). Portal Loader moves to CoNexus; Portal Ring stays free.
+
 ---
 
 ## Inventory: What Moves to CoNexus
@@ -66,8 +71,9 @@ Kinetic Text (`packages/kinetic-text/`) is its own premium package (`@dgrslabs/v
 
 | File | Current Location | Purpose |
 |------|-----------------|---------|
-| `TilesShowcase.svelte` | `src/components/ui-library/` | Tile component demo |
-| `PortalRing.svelte` | `src/components/ui-library/` | Portal animation demo |
+| `TilesShowcase.svelte` | `src/components/ui-library/` | Tile component demo (not wired into `/components` page, but exists as a file) |
+
+**Stays public:** `PortalRing.svelte` showcase stays in `src/components/ui-library/` — Portal Ring is a free feature.
 
 ### Pages
 
@@ -169,11 +175,11 @@ After extraction, remove CoNexus-specific files from the monorepo:
 7. Delete `src/config/atmospheres-conexus.ts`
 8. Remove CoNexus tab from Navigation
 9. Update `component-registry.json` — remove CoNexus entries
-10. Remove `TilesShowcase.svelte` and `PortalRing.svelte` from `ui-library/`
+10. Remove `TilesShowcase.svelte` from `ui-library/` (Portal Ring showcase stays — it's a free feature)
 
 ### Step 5: Clean showcase pages
 
-**`/components` page:** Remove tile demos, story feed references, portal loader demos. These no longer exist in the public tier.
+**`/components` page:** Remove tile demos and portal loader demos. Portal Ring showcase stays (it's a free feature). Add `use:kinetic` showcase with examples for all 4 modes (char, word, cycle, decode).
 
 **`/conexus` page:** This entire route is removed. The CoNexus showcase becomes part of the conexus app.
 
@@ -230,7 +236,8 @@ Terminal and Solar exist in both `atmospheres.ts` (free) and `atmospheres-conexu
 - [ ] `npm run check:registry` passes after registry cleanup
 - [ ] CoNexus components render correctly when consuming `void-energy` from npm
 - [ ] No circular dependencies between conexus code and core
-- [ ] Tile, StoryCategory, PortalLoader are not in the public component list
+- [ ] Tile, StoryCategory, PortalLoader, LoadingTextCycler are not in the public component list
+- [ ] Portal Ring stays in the public repo with its showcase and 404 page
 - [ ] Navigation no longer shows a CoNexus tab in the public repo
 - [ ] All 16 atmospheres available after boot (4 free from void-energy + 12 DGRS-private registered at boot)
 - [ ] Kinetic Text imports correctly from `@dgrslabs/void-energy-kinetic-text` (premium, independent)

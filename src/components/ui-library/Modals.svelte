@@ -5,7 +5,7 @@
 </script>
 
 <section id="modals" class="flex flex-col gap-md">
-  <h2>16 // MODALS & DIALOGS</h2>
+  <h2>15 // MODALS & DIALOGS</h2>
 
   <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">

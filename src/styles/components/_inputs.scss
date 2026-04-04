@@ -397,7 +397,7 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 textarea:-webkit-autofill {
-  // void-ignore (browser autofill hack — no token equivalent)
+  // void-ignore (browser autofill workaround — no token equivalent)
   -webkit-box-shadow: 0 0 0px 1000px var(--bg-canvas) inset !important;
 
   -webkit-text-fill-color: var(--text-main) !important;

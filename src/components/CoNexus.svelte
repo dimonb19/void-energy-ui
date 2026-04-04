@@ -39,7 +39,7 @@
 
   <hr />
 
-  <div class="container py-2xl">
+  <div class="container py-2xl flex flex-col gap-lg">
     <PortalLoaderDemo />
   </div>
 </PullRefresh>
