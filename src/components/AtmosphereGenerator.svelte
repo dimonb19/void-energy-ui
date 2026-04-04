@@ -33,12 +33,14 @@
     CORE_PALETTE_KEYS,
   } from '@lib/atmosphere-generator';
   import {
+    ATMOSPHERES,
     FONTS,
     FONT_FAMILY_TO_KEY,
     SEMANTIC_DARK,
     SEMANTIC_LIGHT,
   } from '@config/design-tokens';
 
+  import { untrack } from 'svelte';
   import { emerge, dissolve } from '@lib/transitions.svelte';
 
   import ActionBtn from './ui/ActionBtn.svelte';
@@ -73,6 +75,8 @@
   let previewId = $state<string | null>(null);
   let previewHandle = $state<number | null>(null);
   let previewResult = $state<GeneratedAtmosphere | null>(null);
+  /** Snapshot of the last AI-generated atmosphere — used by Restore button. */
+  let generatedResult = $state<GeneratedAtmosphere | null>(null);
 
   // Detect when our preview was cleaned up externally.
   $effect(() => {
@@ -177,6 +181,8 @@
   let editFontHeadingKey = $state('clean');
   let editFontBodyKey = $state('clean');
   let editError = $state('');
+  /** True once the user has changed any color/font/semantic value (not physics/mode). */
+  let editDirty = $state(false);
 
   // Semantic color overrides
   let editColorPremium = $state(SEMANTIC_DARK['color-premium']);
@@ -313,12 +319,13 @@
     value: key,
   }));
 
-  let canPreviewCustom = $derived(editLabel.trim().length > 0);
+  // ── Seed Editor from Theme Definition ────────────────────────────────
 
-  // ── Seed Palette from Current Theme ────────────────────────────────────
-
-  function seedFromCurrentTheme() {
-    const source = previewResult?.definition ?? voidEngine.currentTheme;
+  function seedEditor(
+    source: GeneratedAtmosphere['definition'] | VoidThemeDefinition,
+    label: string,
+    tagline: string,
+  ) {
     const palette = source.palette;
 
     // Decompose each core color into hex + opacity
@@ -346,8 +353,8 @@
     editOpacity = newOpacity;
     editPhysics = source.physics;
     editMode = source.mode;
-    editLabel = source.label ?? capitalize(voidEngine.atmosphere);
-    editTagline = source.tagline ?? '';
+    editLabel = label;
+    editTagline = tagline;
 
     // Capture font keys from source
     const headingFamily = palette['font-atmos-heading'];
@@ -371,7 +378,54 @@
         : semanticBase['color-system'];
 
     editError = '';
+    editDirty = false;
   }
+
+  /** Seed from the mode-appropriate default: Frost (dark) or Meridian (light). */
+  function seedFromModeDefault(mode: ModePreference) {
+    const source = mode === 'light' ? ATMOSPHERES.meridian : ATMOSPHERES.frost;
+    seedEditor(source, '', '');
+    // Restore the user's chosen mode/physics — seedEditor overwrites them
+    // with the source theme's values, but the user may have picked differently.
+    editMode = mode;
+  }
+
+  function seedFromCurrentTheme() {
+    if (previewResult) {
+      const source = previewResult.definition;
+      seedEditor(source, previewResult.label, previewResult.tagline);
+    } else {
+      seedFromModeDefault(editMode);
+    }
+  }
+
+  function restoreGenerated() {
+    if (generatedResult) {
+      seedEditor(
+        generatedResult.definition,
+        generatedResult.label,
+        generatedResult.tagline,
+      );
+
+      // Immediately restore the generated preview (don't wait for debounce)
+      if (previewHandle !== null && previewId) {
+        replacePreview(generatedResult);
+      } else {
+        applyPreview(generatedResult);
+      }
+    } else {
+      // No AI result — reset to mode-appropriate defaults and clean up preview
+      cleanupPreview();
+      seedFromModeDefault(editMode);
+    }
+  }
+
+  // Re-seed palette when mode changes and user hasn't touched colors yet
+  $effect(() => {
+    const mode = editMode;
+    if (!paletteOpen || editDirty) return;
+    untrack(() => seedFromModeDefault(mode));
+  });
 
   function handleDetailsToggle(e: Event) {
     const details = e.currentTarget as HTMLDetailsElement;
@@ -399,6 +453,7 @@
     const sanitized = sanitizeHex(input.value);
     input.value = sanitized;
     editPalette[key] = sanitized;
+    editDirty = true;
   }
 
   function handleSemanticHexInput(setter: (v: string) => void, e: Event) {
@@ -406,6 +461,7 @@
     const sanitized = sanitizeHex(input.value);
     input.value = sanitized;
     setter(sanitized);
+    editDirty = true;
   }
 
   // ── Preview Lifecycle ──────────────────────────────────────────────────
@@ -437,7 +493,7 @@
     voidEngine.registerEphemeralTheme(result.id, result.definition);
     voidEngine.updateTemporaryTheme(previewHandle!, result.id, result.label);
 
-    if (oldId) {
+    if (oldId && oldId !== result.id) {
       voidEngine.unregisterEphemeralTheme(oldId);
     }
 
@@ -491,6 +547,8 @@
       return;
     }
 
+    generatedResult = result.data;
+
     if (previewHandle !== null && previewId) {
       replacePreview(result.data);
     } else {
@@ -512,6 +570,7 @@
     previewId = null;
     previewHandle = null;
     previewResult = null;
+    generatedResult = null;
 
     toast.show(`"${result.label}" is now your atmosphere.`, 'success');
   }
@@ -519,6 +578,7 @@
   function revert() {
     if (generating) return;
     cleanupPreview();
+    generatedResult = null;
   }
 
   function handleSubmit(e: SubmitEvent) {
@@ -526,19 +586,21 @@
     generate();
   }
 
-  // ── Manual Preview Action ──────────────────────────────────────────────
+  // ── Live Preview ────────────────────────────────────────────────────────
 
-  function previewCustom() {
-    if (!canPreviewCustom) return;
-    editError = '';
-
-    // Build final palette with opacity applied
+  /** Build and apply/update the live preview. Silently skips invalid states. */
+  function livePreview() {
     const finalPalette: Record<string, string> = { ...editPalette };
     for (const key of editOpacityKeys) {
       if (finalPalette[key] && isValidHex(finalPalette[key])) {
         finalPalette[key] = hexToRgba(finalPalette[key], editOpacity[key]);
       }
     }
+
+    // Exclude current preview ID so same label keeps same ID (no churn)
+    const existingIds = new Set(
+      voidEngine.availableAtmospheres.filter((id) => id !== previewId),
+    );
 
     const result = buildManualAtmosphere({
       label: editLabel.trim(),
@@ -548,30 +610,44 @@
       palette: finalPalette,
       fontHeadingKey: editFontHeadingKey,
       fontBodyKey: editFontBodyKey,
-      existingIds: new Set(voidEngine.availableAtmospheres),
+      existingIds,
       colorPremium: hasEditPremiumOverride ? editColorPremium : undefined,
       colorSystem: hasEditSystemOverride ? editColorSystem : undefined,
     });
 
-    if (!result.ok) {
-      editError = result.error.message;
-      if (result.error.issues) {
-        editError += ' ' + result.error.issues.join(', ');
-      }
-      toast.show(editError, 'error');
-      return;
-    }
+    if (!result.ok) return; // silently skip invalid states
 
     if (previewHandle !== null && previewId) {
       replacePreview(result.data);
     } else {
       applyPreview(result.data);
     }
-
-    if (previewHandle !== null) {
-      toast.show(`Previewing "${result.data.label}"`, 'success');
-    }
   }
+
+  let livePreviewTimer: ReturnType<typeof setTimeout> | undefined;
+
+  $effect(() => {
+    // Read all editor state to establish reactive tracking
+    const _ = [
+      JSON.stringify(editPalette),
+      JSON.stringify(editOpacity),
+      editPhysics,
+      editMode,
+      editFontHeadingKey,
+      editFontBodyKey,
+      editColorPremium,
+      editColorSystem,
+      editLabel,
+      editTagline,
+    ];
+
+    if (!paletteOpen || !editDirty) return;
+
+    clearTimeout(livePreviewTimer);
+    livePreviewTimer = setTimeout(livePreview, 150);
+
+    return () => clearTimeout(livePreviewTimer);
+  });
 </script>
 
 <div class="surface-raised p-lg flex flex-col gap-lg {className}">
@@ -626,7 +702,11 @@
       out:dissolve
     >
       <div class="flex flex-row flex-wrap gap-md justify-center">
-        <button class="btn-premium" onclick={keep} disabled={generating}>
+        <button
+          class="btn-premium"
+          onclick={keep}
+          disabled={generating || !editLabel.trim()}
+        >
           Keep This Atmosphere
         </button>
         <ActionBtn
@@ -668,12 +748,20 @@
       <div class="flex flex-col gap-md">
         <h5 class="text-center">Identity</h5>
         <div class="flex flex-col tablet:flex-row gap-sm">
-          <FormField label="Name" required class="flex-1">
+          <FormField
+            label="Name"
+            required
+            error={editDirty && !editLabel.trim()
+              ? 'Give your atmosphere a name to keep it'
+              : ''}
+            class="flex-1"
+          >
             {#snippet children({ fieldId, descriptionId, invalid })}
               <input
                 type="text"
                 id={fieldId}
                 bind:value={editLabel}
+                oninput={() => (editDirty = true)}
                 placeholder="Atmosphere name"
                 maxlength={30}
                 required
@@ -751,8 +839,10 @@
                       ? editPalette[field.key]
                       : '#000000'}
                     oninput={(e) => {
-                      const v = (e.target as HTMLInputElement).value;
-                      editPalette[field.key] = v;
+                      editPalette[field.key] = (
+                        e.target as HTMLInputElement
+                      ).value;
+                      editDirty = true;
                     }}
                     class="palette-picker"
                   />
@@ -777,7 +867,13 @@
                   >
                 {/if}
                 {#if editOpacityKeys.has(field.key)}
-                  <div class="flex items-center gap-xs" in:emerge out:dissolve>
+                  <!-- svelte-ignore a11y_no_static_element_interactions -->
+                  <div
+                    class="flex items-center gap-xs"
+                    in:emerge
+                    out:dissolve
+                    oninput={() => (editDirty = true)}
+                  >
                     <SliderField
                       bind:value={editOpacity[field.key]}
                       min={5}
@@ -837,6 +933,7 @@
                     : '#000000'}
                   oninput={(e) => {
                     editColorPremium = (e.target as HTMLInputElement).value;
+                    editDirty = true;
                   }}
                   class="palette-picker"
                 />
@@ -872,6 +969,7 @@
                     : '#000000'}
                   oninput={(e) => {
                     editColorSystem = (e.target as HTMLInputElement).value;
+                    editDirty = true;
                   }}
                   class="palette-picker"
                 />
@@ -924,11 +1022,13 @@
             label="Heading Font"
             options={fontOptions}
             bind:value={editFontHeadingKey}
+            onchange={() => (editDirty = true)}
           />
           <Selector
             label="Body Font"
             options={fontOptions}
             bind:value={editFontBodyKey}
+            onchange={() => (editDirty = true)}
           />
         </div>
       </div>
@@ -944,15 +1044,16 @@
         </p>
       {/if}
 
-      <!-- Preview Custom Button -->
+      <!-- Restore -->
       <div class="flex justify-center">
-        <button
-          class="btn-success"
-          onclick={previewCustom}
-          disabled={!canPreviewCustom}
-        >
-          Preview Custom Colors
-        </button>
+        <ActionBtn
+          icon={Undo}
+          text={generatedResult ? 'Restore Generated' : 'Reset Colors'}
+          type="button"
+          class="btn-ghost"
+          onclick={restoreGenerated}
+          disabled={!editDirty}
+        />
       </div>
     </div>
   </details>

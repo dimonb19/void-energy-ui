@@ -1,0 +1,735 @@
+/* ==========================================================================
+ * TILES & STORY CATEGORIES
+ * ==========================================================================
+ *
+ * Story tiles and category containers for the CoNexus storytelling platform.
+ *
+ * ARCHITECTURE:
+ * - Section 1: Story Category (scrollable row container)
+ *   - .story-category        : Section wrapper (header + scroll strip)
+ *   - .story-category-header : Title + tagline area
+ *   - .story-category-strip  : Horizontal scroll container for tiles
+ *
+ * - Section 2: Tile (landscape story card)
+ *   - .tile                  : 3:2 landscape card (image left, content right)
+ *   - .tile-image            : Left image area (~40% width)
+ *   - .tile-content          : Right content area (title, author, genres)
+ *   - .tile-link             : Stretched link (title = full-card click target)
+ *   - .tile-author           : Author row (PFP + name), separate click target
+ *   - .tile-pfp              : Author profile picture (small circle)
+ *   - .tile-genres           : Genre label row (plain text, truncated)
+ *
+ * - Section 3: Tile Mark (state badge)
+ *   - .tile-mark             : Positioned badge at top-center
+ *   - data-mark="resume"     : Bookmark/pennant shape (energy-primary)
+ *   - data-mark="completed"   : Flat-top pill (energy-secondary)
+ *   - data-mark="replay"     : Flat-top pill (energy-secondary)
+ *
+ * - Section 4: Gated Tile (premium/NFT-locked)
+ *   - data-gated             : Premium tile state (on .tile)
+ *   - .tile-gate             : Lock icon badge at top-right
+ *
+ * - Section 5: Loading Tile (skeleton)
+ *   - data-state="loading"   : Shimmer skeleton matching tile anatomy
+ *
+ * TILE ANATOMY (landscape 3:2):
+ * ┌──────────────────────────────────────────────┐
+ * │ ┌────────────┐ ┌──────────┐           ┌──┐  │
+ * │ │            │ │  RESUME  │  ← mark   │🔒│  │ ← .tile-gate
+ * │ │            │ └──────────┘           └──┘  │
+ * │ │   IMAGE    │                               │
+ * │ │   (~40%)   │  Title              ← h5      │
+ * │ │            │  👤 Author          ← a.link  │
+ * │ │            │  Sci-Fi, Horror     ← text    │
+ * │ │            │                               │
+ * │ └────────────┘                               │
+ * └──────────────────────────────────────────────┘
+ *
+ * PHYSICS BEHAVIOR:
+ * - Glass: Semi-transparent surface, soft shadows, blur
+ * - Flat:  Solid surface, subtle shadows, no blur
+ * - Retro: Hard borders, pixel shadows, instant transitions
+ *
+ * USAGE:
+ * ```svelte
+ * <StoryCategory title="Hottest right now" tagline="Most played this week.">
+ *   <Tile
+ *     title="Machine Rebellion"
+ *     href="/story/123"
+ *     author={{ name: 'Ada Sterling', avatar: '/avatars/user.jpg', href: '/user/456' }}
+ *     genres={['Psychological', 'Sci-Fi']}
+ *     image="/covers/machine-rebellion.jpg"
+ *     mark="resume"
+ *   />
+ * </StoryCategory>
+ * ```
+ *
+ * @see /CHEAT-SHEET.md for usage examples
+ * ========================================================================== */
+
+@use '../abstracts' as *;
+
+// ==========================================================================
+// 1. STORY CATEGORY (Section Container)
+// ==========================================================================
+
+// A. Section Wrapper
+// --------------------------------------------------------------------------
+.story-category {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+// B. Header (Title + Tagline)
+// --------------------------------------------------------------------------
+.story-category-header {
+  display: flex;
+  flex-flow: column wrap;
+  gap: var(--space-xs);
+  padding-inline: var(--space-md);
+
+  @include respond-up('tablet') {
+    flex-direction: row;
+    align-items: flex-end;
+    gap: var(--space-sm);
+  }
+
+  h3 {
+    margin: 0;
+    color: var(--text-main);
+    font-size: var(--font-size-h4);
+  }
+
+  p {
+    color: var(--text-mute);
+  }
+}
+
+// C. Header Navigation (Scroll Arrows)
+// --------------------------------------------------------------------------
+// Hidden on mobile (touch swipe is native); visible tablet+ for TV/remote/desktop.
+.story-category-nav {
+  @include btn-reset;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  min-width: var(--control-height);
+  min-height: var(--control-height);
+
+  color: var(--text-dim);
+  border: var(--physics-border-width) solid transparent;
+  border-radius: var(--radius-base);
+
+  transition:
+    color var(--speed-fast) var(--ease-spring-snappy),
+    background-color var(--speed-fast) var(--ease-spring-snappy),
+    border-color var(--speed-fast) var(--ease-spring-snappy),
+    box-shadow var(--speed-fast) var(--ease-spring-snappy);
+
+  @media (hover: hover) {
+    &:not(:disabled):hover {
+      color: var(--text-main);
+      background: alpha(var(--energy-secondary), 8%);
+
+      @include when-light {
+        background: alpha(var(--energy-primary), 8%);
+      }
+
+      @include when-retro {
+        background: transparent;
+        color: var(--energy-primary);
+      }
+    }
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  &:disabled {
+    color: var(--text-mute);
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+// D. Scroll Strip (Horizontal Tile Container)
+// --------------------------------------------------------------------------
+.story-category-strip {
+  width: 100%;
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: stretch;
+  gap: var(--space-md);
+
+  padding: var(--space-xs) var(--space-md) var(--space-lg) var(--space-md);
+
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+
+  // Scroll snap — proximity so partial scrolls don't fight the user.
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: var(--space-md);
+
+  @include laser-scrollbar;
+}
+
+// E. Pagination Sentinel (IntersectionObserver target)
+// --------------------------------------------------------------------------
+// A 1px-wide invisible element at the end of the strip. When it enters the
+// scroll viewport, the IO fires onloadmore to fetch the next page.
+.story-category-sentinel {
+  flex: none;
+  width: 1px; // void-ignore (IO sentinel — must be non-zero to intersect)
+  align-self: stretch;
+  pointer-events: none;
+}
+
+// ==========================================================================
+// 2. TILE (Landscape Story Card)
+// ==========================================================================
+// NOTE: Width properties intentionally in SCSS (not Tailwind) because:
+// - Widths scale with --density (physics concern, not pure layout)
+// - Values depend on --unit CSS variable cascade
+// - Mobile width uses vw to guarantee peek-ability of the next tile
+// --------------------------------------------------------------------------
+.tile {
+  position: relative;
+  flex: none;
+  display: flex;
+  flex-direction: row;
+  aspect-ratio: 3 / 2;
+  scroll-snap-align: start;
+
+  // Mobile: fills viewport minus container padding, leaving room to peek next tile.
+  // 2 × --space-md (32px) = container padding, --space-xl (48px) = peek gap.
+  // void-hybrid-exception: density-coupled width + viewport peek logic
+  width: calc(100vw - 2 * var(--space-md) - var(--space-xl));
+
+  @include surface-raised($interactive: true);
+  overflow: hidden;
+  user-select: none;
+  -webkit-touch-callout: none;
+
+  // Larger radius for card feel (same as previous tile implementation).
+  border-radius: calc(var(--radius-base) * 1.5);
+  padding: var(--space-xs);
+
+  // Responsive widths (void-hybrid-exception: density-coupled)
+  //
+  // TILE WIDTH PROGRESSION (landscape 3:2):
+  // ┌─────────────┬────────────┬─────────────┬──────────────┐
+  // │ Breakpoint  │ Multiplier │ Base Width  │ Height (3:2) │
+  // ├─────────────┼────────────┼─────────────┼──────────────┤
+  // │ Mobile      │ viewport   │ ~85vw       │ ~auto        │
+  // │ Tablet      │ 72 × 4px   │ 288px       │ 192px        │
+  // │ Desktop     │ 80 × 4px   │ 320px       │ 213px        │
+  // │ Full HD     │ 88 × 4px   │ 352px       │ 235px        │
+  // └─────────────┴────────────┴─────────────┴──────────────┘
+  @include respond-up('tablet') {
+    width: calc(72 * var(--unit) * var(--density, 1));
+  }
+  @include respond-up('large-desktop') {
+    width: calc(80 * var(--unit) * var(--density, 1));
+  }
+  @include respond-up('full-hd') {
+    width: calc(88 * var(--unit) * var(--density, 1));
+  }
+
+  &.tile-fluid {
+    width: 100%;
+  }
+
+  // ── Image Area ──────────────────────────────────────────────────────────
+  .tile-image {
+    flex: none;
+    width: 40%;
+    height: 100%;
+    object-fit: cover;
+    background: var(--bg-sunk); // Fallback surface when no image is provided.
+    border-radius: var(--radius-base);
+
+    &[src] {
+      transition: filter var(--speed-base) var(--ease-spring-snappy);
+
+      @starting-style {
+        filter: blur(4px); // void-ignore (Blurred appearance)
+      }
+    }
+  }
+
+  // ── Content Area ────────────────────────────────────────────────────────
+  .tile-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-sm);
+    padding-block: var(--space-lg) var(--space-xs);
+    padding-inline: var(--space-sm) var(--space-xs);
+  }
+
+  // ── Title (Stretched Link) ──────────────────────────────────────────────
+  // The title link's ::after covers the full tile for click-anywhere behavior.
+  .tile-link {
+    text-decoration: none;
+    color: inherit;
+
+    h5 {
+      color: var(--text-main);
+      font-weight: var(--font-weight-bold);
+      transition: color var(--speed-base) var(--ease-spring-snappy);
+      @include text-truncate(2);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      z-index: z('base');
+    }
+  }
+
+  // ── Author Row ──────────────────────────────────────────────────────────
+  // Positioned above the stretched link so it remains independently clickable.
+  .tile-author {
+    position: relative;
+    z-index: z('decorate');
+
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+
+    font-size: var(--font-size-small);
+    color: var(--text-dim);
+
+    transition: color var(--speed-base) var(--ease-spring-snappy);
+
+    &:hover {
+      color: var(--energy-primary);
+
+      .tile-pfp {
+        transform: translateY(var(--lift));
+        border-color: var(--energy-primary);
+        box-shadow: var(--shadow-lift);
+      }
+
+      .tile-pfp-fallback {
+        color: var(--energy-primary);
+      }
+    }
+  }
+
+  .tile-pfp {
+    width: var(--space-md);
+    height: var(--space-md);
+    border-radius: var(--radius-full);
+    object-fit: cover;
+    flex: none;
+
+    // Sunk border to give the PFP a recessed look.
+    border: var(--physics-border-width) solid var(--border-color);
+
+    transition:
+      transform var(--speed-base) var(--ease-spring-snappy),
+      border-color var(--speed-base) var(--ease-spring-snappy);
+
+    // Fallback: initial letter on sunk background (when no avatar image).
+    &.tile-pfp-fallback {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-sunk);
+      color: var(--text-mute);
+      font-size: var(--font-size-caption);
+      font-weight: var(--font-weight-semibold);
+    }
+  }
+
+  // ── Genres ──────────────────────────────────────────────────────────────
+  .tile-genres {
+    position: relative;
+    z-index: z('decorate');
+
+    font-size: var(--font-size-caption);
+    color: var(--text-mute);
+    @include text-truncate(1);
+  }
+
+  // ── Title Focus ────────────────────────────────────────────────────────
+  // Stretched link covers the tile — suppress its outline; the tile raise is
+  // the focus indicator.
+  .tile-link:focus-visible {
+    box-shadow: none;
+  }
+
+  // ── Author Focus ─────────────────────────────────────────────────────────
+  // Mirror hover effect on keyboard focus.
+  .tile-author:focus-visible {
+    box-shadow: none;
+    color: var(--energy-primary);
+
+    .tile-pfp {
+      transform: translateY(var(--lift));
+      border-color: var(--energy-primary);
+      box-shadow: var(--shadow-lift);
+    }
+
+    .tile-pfp-fallback {
+      color: var(--energy-primary);
+    }
+  }
+
+  // ── Hover / Focus ────────────────────────────────────────────────────────
+  // Tile raise on hover OR keyboard focus (mirrors surface-raised interactive).
+  &:hover:not([data-state='loading']),
+  &:has(:focus-visible):not([data-state='loading']) {
+    transform: translateY(var(--lift));
+    border-color: var(--energy-primary);
+    box-shadow: var(--shadow-lift);
+  }
+}
+
+// ==========================================================================
+// 3. TILE MARK (State Badge)
+// ==========================================================================
+// Absolutely positioned badge at top-center of the tile.
+// Three variants driven by data-mark attribute.
+// --------------------------------------------------------------------------
+.tile-mark {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%) !important; // Prevent starting transition jump
+  z-index: z('float');
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+
+  padding: var(--space-xs) var(--space-sm);
+
+  font-size: var(--font-size-caption);
+  line-height: var(--line-height-caption);
+  letter-spacing: var(--letter-spacing-caption);
+  font-weight: var(--font-weight-bold);
+  text-transform: uppercase;
+  white-space: nowrap;
+  user-select: none;
+
+  pointer-events: none; // Marks are decorative; click passes through to tile link.
+
+  // ── Resume: Bookmark / Pennant Shape ────────────────────────────────────
+  // V-notch bottom, hangs from top edge. Matches mark-resume-shape.svg.
+  &[data-mark='resume'] {
+    background: linear-gradient(
+      to bottom,
+      tint(var(--energy-primary), 60%),
+      var(--energy-primary) 30%
+    );
+    color: var(--bg-canvas);
+    padding-bottom: var(--space-sm);
+
+    // Pennant: flat top, angled V-notch at bottom.
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+  }
+
+  // ── Completed: Flat-top pill ────────────────────────────────────────────
+  // Hangs from top edge with rounded bottom corners.
+  &[data-mark='completed'] {
+    background: linear-gradient(
+      to bottom,
+      tint(var(--color-system), 30%),
+      var(--color-system) 40%
+    );
+    color: var(--bg-canvas);
+    border-radius: 0 0 var(--radius-base) var(--radius-base);
+  }
+
+  // ── Replay: Flat-top pill ───────────────────────────────────────────────
+  // Same shape as completed, different semantic color.
+  &[data-mark='replay'] {
+    background: linear-gradient(
+      to bottom,
+      tint(var(--energy-secondary), 30%),
+      var(--energy-secondary) 40%
+    );
+    color: var(--bg-canvas);
+    border-radius: 0 0 var(--radius-base) var(--radius-base);
+  }
+
+  // ── Physics Overrides ───────────────────────────────────────────────────
+  // Flat uses solid background color
+  @include when-flat {
+    &[data-mark='resume'] {
+      background: var(--energy-primary);
+    }
+
+    &[data-mark='completed'] {
+      background: var(--color-system);
+    }
+
+    &[data-mark='replay'] {
+      background: var(--energy-secondary);
+    }
+  }
+
+  // Retro uses hard border + transparent background, no clip-paths or radii.
+  @include when-retro {
+    background: var(--surface-bg);
+    border: var(--physics-border-width) solid;
+
+    &[data-mark='resume'] {
+      color: var(--energy-primary);
+      clip-path: none;
+      padding-bottom: var(--space-xs);
+    }
+
+    &[data-mark='completed'] {
+      border-radius: 0;
+      color: var(--color-success);
+    }
+
+    &[data-mark='replay'] {
+      border-radius: 0;
+      color: var(--color-system);
+    }
+  }
+}
+
+// ==========================================================================
+// 4. GATED TILE (Premium / NFT-locked)
+// ==========================================================================
+// Premium tiles are distinguished by:
+// - Lock icon badge at top-right (.tile-gate)
+// - Premium-colored title text
+// - Subtle premium border that highlights on hover
+// --------------------------------------------------------------------------
+
+// A. Gate Badge (Lock Icon)
+// --------------------------------------------------------------------------
+.tile-gate {
+  @include btn-reset;
+
+  position: absolute;
+  top: var(--space-xs);
+  right: var(--space-xs);
+  z-index: z('float');
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: var(--space-lg);
+  height: var(--space-lg);
+
+  color: var(--color-premium);
+  background: var(--bg-sunk);
+  border: var(--physics-border-width) solid var(--color-premium-subtle);
+  border-radius: var(--radius-full);
+  cursor: default;
+
+  // Sits above the stretched link so tooltip + future interactions work.
+  pointer-events: auto;
+
+  transition:
+    border-color var(--speed-base) var(--ease-spring-snappy),
+    color var(--speed-base) var(--ease-spring-snappy),
+    box-shadow var(--speed-base) var(--ease-spring-snappy);
+
+  @include when-retro {
+    border-color: var(--color-premium);
+  }
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+  }
+
+  @include when-light {
+    border-color: alpha(var(--color-premium), 50%);
+  }
+}
+
+// B. Gated Tile Overrides
+// --------------------------------------------------------------------------
+.tile[data-gated] {
+  border-color: var(--color-premium-subtle);
+
+  @include when-light {
+    border-color: alpha(var(--color-premium), 50%);
+  }
+
+  @include when-retro {
+    border-color: alpha(var(--color-premium), 50%);
+  }
+
+  // Premium-colored title
+  .tile-link h5 {
+    color: var(--color-premium);
+  }
+
+  // Hover / focus: premium highlight instead of energy-primary
+  &:hover:not([data-state='loading']),
+  &:has(:focus-visible):not([data-state='loading']) {
+    border-color: var(--color-premium);
+
+    .tile-gate {
+      border-color: var(--color-premium);
+    }
+  }
+}
+
+// ==========================================================================
+// 5. LOADING TILE (Skeleton)
+// ==========================================================================
+// Activated via data-state="loading" on .tile.
+// Matches tile anatomy with shimmer placeholders.
+// --------------------------------------------------------------------------
+.tile[data-state='loading'] {
+  pointer-events: none;
+
+  // Hide any live content that might be rendered.
+  .tile-link,
+  .tile-author,
+  .tile-genres,
+  .tile-mark,
+  .tile-gate {
+    display: none;
+  }
+
+  // ── Image Skeleton ──────────────────────────────────────────────────────
+  .tile-image {
+    position: relative;
+    background: var(--bg-sunk);
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--radius-base);
+      @include shimmer;
+    }
+  }
+
+  // ── Content Skeleton Lines ──────────────────────────────────────────────
+  // Pseudo-elements create placeholder bars for title and author.
+  .tile-content {
+    gap: var(--space-sm);
+
+    &::before,
+    &::after {
+      content: '';
+      display: block;
+      height: var(--space-sm);
+      border-radius: var(--radius-base);
+      background: var(--bg-sunk);
+      @include shimmer;
+    }
+
+    // Title placeholder — wider.
+    &::before {
+      width: 75%;
+    }
+
+    // Author placeholder — narrower.
+    &::after {
+      width: 60%;
+    }
+  }
+
+  // Third skeleton line for genres.
+  .skeleton-line {
+    height: var(--space-sm);
+    width: 50%;
+    border-radius: var(--radius-base);
+    background: var(--bg-sunk);
+    @include shimmer;
+  }
+}
+
+// ==========================================================================
+// 6. TILE REORDER (DnD Wrapper + Addon Bar)
+// ==========================================================================
+// Wraps a standard Tile with a reorder addon bar below. The Tile component
+// itself is NOT modified — the wrapper pattern keeps reorder concerns
+// entirely in the consumer.
+//
+// MARKUP PATTERN (consumer):
+// ```svelte
+// <div class="tile-reorder"
+//   aria-label={story.title}
+//   use:draggable={{ id: story.id, group: 'reorder', data: story, handle: '[data-drag-handle]' }}
+//   use:dropTarget={{ id: story.id, group: 'reorder', mode: 'between', axis: 'horizontal', onDrop }}
+//   animate:live
+// >
+//   <Tile title={story.title} href={story.href} ... />
+//   <div class="tile-reorder-bar">
+//     <button class="btn-icon" data-drag-handle ...><GripVertical /></button>
+//     <div class="inline-flex items-center gap-xs">
+//       <button class="btn-icon" ...><ChevronLeft /></button>
+//       <button class="btn-icon" ...><ChevronRight /></button>
+//     </div>
+//   </div>
+// </div>
+// ```
+//
+// KEY DETAILS:
+// - handle: '[data-drag-handle]' is REQUIRED — without it, dragging fights
+//   the tile's stretched link (Tile.svelte .tile-link::after covers the card).
+// - .tile-reorder owns scroll-snap-align and overrides the inner .tile's snap
+//   so the wrapper (tile + bar together) snaps as a unit.
+// - The bar's bottom border-radius matches the tile's radius (1.5 × radius-base)
+//   so the wrapper reads as one continuous card.
+// - Retro physics: bar gets a visible top border (since glass/flat use
+//   border-top: none to fuse with the tile above).
+//
+// DRAG VISUAL STATES:
+// Handled by _drag.scss — the wrapper receives data-drag-state attributes
+// automatically. The horizontal drop indicator (::before pseudo-element) is
+// already supported for [data-drop-axis='horizontal'] targets.
+//
+// ANATOMY:
+// ┌──────────────────────────────────────────┐
+// │              <Tile />                    │
+// ├──────────────────────────────────────────┤
+// │  ⠿ (grip)                      [◀]  [▶]  │  ← .tile-reorder-bar
+// └──────────────────────────────────────────┘
+//
+// @see /src/components/CoNexus.svelte — reorder showcase usage
+// @see /src/styles/components/_drag.scss — drag state visual feedback
+// --------------------------------------------------------------------------
+.tile-reorder {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  scroll-snap-align: start;
+
+  background: var(--bg-sunk);
+  border: var(--physics-border-width) solid var(--border-color);
+  border-radius: calc(var(--radius-base) * 1.5);
+
+  // Override internal tile's snap — wrapper owns snap now.
+  .tile {
+    scroll-snap-align: none;
+  }
+}
+
+// Addon bar: sunk surface below the tile with move controls.
+// Layout: grip handle anchored left, arrow buttons grouped right.
+// Fitts's Law: separating modalities maximizes hit zones and prevents
+// accidental arrow taps when grabbing the grip handle.
+.tile-reorder-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-xs);
+}
