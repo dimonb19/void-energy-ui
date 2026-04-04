@@ -5,16 +5,23 @@
 @use '../config/generated-themes' as config;
 
 // Global defaults for initial paint before JS sets attributes.
+// ┌──────────────────────────────────────────────────────────────┐
+// │  FORK NOTE: These must match your default atmosphere from   │
+// │  src/config/atmospheres.ts. Change the physics preset and   │
+// │  theme key below, AND update DEFAULTS in constants.ts.      │
+// │  See the "HOW TO REPLACE ALL ATMOSPHERES" guide in          │
+// │  atmospheres.ts for the full checklist.                     │
+// └──────────────────────────────────────────────────────────────┘
 :root {
-  // Default physics preset.
+  // Default physics preset — must match the default atmosphere's physics.
   $default-physics: map.get(engine.$physics-presets, 'glass');
 
   @each $key, $val in $default-physics {
     --#{$key}: #{$val};
   }
 
-  // Default atmosphere palette.
-  $default-theme: map.get(config.$themes, 'void');
+  // Default atmosphere palette — must be a key from src/config/atmospheres.ts.
+  $default-theme: map.get(config.$themes, 'frost');
   $default-palette: map.get($default-theme, 'palette');
 
   color-scheme: dark;

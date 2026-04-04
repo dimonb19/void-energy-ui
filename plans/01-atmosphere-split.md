@@ -112,11 +112,11 @@ When extracting to separate repos:
 - Inter (clean) — widely useful body font
 - Courier Prime (code) — Terminal theme + code blocks
 - Lora (nature) — Meridian uses it if needed
+- Cinzel (arcane) — Solar
 - Any font referenced by the 4 free atmospheres
 
 **Private fonts (stay in CoNexus repo):**
 - Exo 2 (mystic) — Nebula
-- Cinzel (arcane) — Solar
 - Caveat (hand) — Velvet
 - Merriweather (horror) — Crimson
 - PT Serif Caption (book) — Paper, Velvet body
@@ -170,7 +170,7 @@ The `VOID_TOKENS` orchestrator object stays in `design-tokens.ts` — it imports
 | **Slate** | flat | dark | Created | Default VE atmosphere. Clean, professional, daily-driver. |
 | **Terminal** | retro | dark | Existing | Only retro theme. Demonstrates pixel physics. |
 | **Meridian** | flat | light | Created | Primary light theme. Created for showcases, broad appeal. |
-| **Ember** | glass | dark | Existing | Fan favorite from testing. Demonstrates glass physics. |
+| **Solar** | glass | dark | Existing | Fan favorite from testing. Demonstrates glass physics. |
 
 **All 4 atmospheres are ready.** No new atmospheres need to be created for Wave 1 launch.
 
@@ -180,10 +180,10 @@ The `VOID_TOKENS` orchestrator object stays in `design-tokens.ts` — it imports
 - **Slate** is Dima's daily driver, the intended default VE experience
 - **Terminal** is the only retro theme — essential for demonstrating the physics
 - **Meridian** was created for the showcase pages, neutral enough for any project
-- **Ember** was the most praised by testers, strong glass showcase
+- **Solar** was the most praised by testers, strong glass showcase
 - Each atmosphere has a distinct personality — no two feel similar
 
-#### DGRS-Private — 12 Atmospheres
+#### DGRS-Private — 11 Atmospheres
 
 These stay in the CoNexus repo. They are registered at runtime via `voidEngine.registerTheme()` during the CoNexus boot sequence. They are never published to npm or distributed in any form.
 
@@ -192,7 +192,6 @@ These stay in the CoNexus repo. They are registered at runtime via `voidEngine.r
 | **Void** | glass | dark | Original system default. DGRS signature. |
 | **Onyx** | flat | dark | Stealth / Cinema |
 | **Nebula** | glass | dark | Synthwave / Cosmic |
-| **Solar** | glass | dark | Royal / Gold |
 | **Overgrowth** | glass | dark | Nature / Organic |
 | **Velvet** | glass | dark | Romance / Soft |
 | **Crimson** | glass | dark | Horror / Intense |
@@ -201,6 +200,8 @@ These stay in the CoNexus repo. They are registered at runtime via `voidEngine.r
 | **Playground** | flat | light | Playful / Vibrant |
 | **Focus** | flat | light | Minimal / Distraction-free |
 | **+ others** | — | — | Any future DGRS-created atmospheres |
+
+**Note:** Solar moved to the free tier as of 2026-04-03.
 
 **Why Paper is private:** Boss specifically wants to preserve it for DGRS. It's a brand asset.
 **Why Laboratory is private:** Uses DGRS Labs blue colors — it's literally the company's atmosphere.
@@ -228,7 +229,7 @@ void: {
 
 **Tier values:**
 - `'free'` — ships with void-energy npm package (4 atmospheres)
-- `'private'` — DGRS-private, lives in CoNexus repo (12 atmospheres)
+- `'private'` — DGRS-private, lives in CoNexus repo (11 atmospheres)
 
 **Files to modify:**
 - `src/config/atmospheres.ts` — new file with tier on each theme
@@ -385,7 +386,7 @@ These files import from `@config/design-tokens` — verify they still work via r
 
 ### Step 7: SCSS generation split (for repo extraction)
 
-**Public repo (`void-energy`):** `_generated-themes.scss` contains only 4 free themes (Slate, Terminal, Meridian, Ember).
+**Public repo (`void-energy`):** `_generated-themes.scss` contains only 4 free themes (Slate, Terminal, Meridian, Solar).
 
 **CoNexus repo:** Registers the 12 private themes at runtime via `voidEngine.registerTheme()`. Private themes work via CSS custom properties set on `<html>` at runtime — no SCSS compilation needed. The SCSS file only covers the initial page load (before JS), which is why free themes are baked in.
 
@@ -400,7 +401,6 @@ conexus/
       void.ts
       onyx.ts
       nebula.ts
-      solar.ts
       overgrowth.ts
       velvet.ts
       crimson.ts
@@ -450,7 +450,7 @@ The existing `builtInAtmospheres` and `customAtmospheres` getters already distin
 ```typescript
 get freeAtmospheres(): string[] {
   // Themes baked into SCSS (available before JS runs)
-  return ['slate', 'terminal', 'meridian', 'ember'];
+  return ['slate', 'terminal', 'meridian', 'solar'];
 }
 ```
 
@@ -466,7 +466,6 @@ get freeAtmospheres(): string[] {
 
 Private atmospheres reference fonts not shipped with the free tier:
 - Nebula: Mystic (heading) + Clean (body)
-- Solar: Arcane (heading) + Book (body)
 - Overgrowth: Nature
 - Velvet: Hand (heading) + Book (body)
 - Crimson: Horror

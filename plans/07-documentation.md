@@ -67,7 +67,7 @@ npm install void-energy
 ## Features
 
 - **3 Physics Engines** — Glass (blur + glow), Flat (borders + clean), Retro (pixel-perfect)
-- **4 Free Atmospheres** — Slate, Terminal, Meridian, Ember
+- **4 Free Atmospheres** — Slate, Terminal, Meridian, Solar
 - **50+ Components** — Form fields, navigation, overlays, charts, icons
 - **Premium Packages** — Kinetic Text, Ambience Layers, Rive ([see showcase](void.dgrslabs.ink))
 - **AI Theme Generator** — Create custom atmospheres with Claude
@@ -275,7 +275,7 @@ These files already exist and need updating for the public repo:
 | File | Updates Needed |
 |------|---------------|
 | **CHEAT-SHEET.md** | Remove CoNexus components (Tile, StoryCategory, PortalLoader). Reference only 4 free atmospheres. |
-| **THEME-GUIDE.md** | Update to reference only 4 free atmospheres (Slate, Terminal, Meridian, Ember). No "premium atmospheres" mention — just note that users can create unlimited custom themes with the AI generator. |
+| **THEME-GUIDE.md** | Update to reference only 4 free atmospheres (Slate, Terminal, Meridian, Solar). No "premium atmospheres" mention — just note that users can create unlimited custom themes with the AI generator. |
 | **AI-PLAYBOOK.md** | Remove CoNexus-specific recipes. |
 | **COMPOSITION-RECIPES.md** | Remove CoNexus page archetypes. |
 | **NARRATIVE-EFFECTS.md** | No changes needed (narrative effects stay public). |

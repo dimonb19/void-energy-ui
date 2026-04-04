@@ -14,6 +14,7 @@
 import { flip, type FlipParams } from 'svelte/animate';
 import { cubicOut, cubicIn } from 'svelte/easing';
 import { voidEngine as theme } from '@adapters/void-engine.svelte';
+import { DEFAULTS } from '@config/constants';
 import THEME_REGISTRY from '@config/void-registry.json';
 import PHYSICS_DATA from '@config/void-physics.json';
 
@@ -81,8 +82,9 @@ function resolvePhysicsMode(): PhysicsPreset {
     return themePhysics;
   }
 
-  const currentAtmosphere = theme.atmosphere || 'void';
-  const themeConfig = REGISTRY[currentAtmosphere] || REGISTRY['void'];
+  const currentAtmosphere = theme.atmosphere || DEFAULTS.ATMOSPHERE;
+  const themeConfig =
+    REGISTRY[currentAtmosphere] || REGISTRY[DEFAULTS.ATMOSPHERE];
   return isPhysicsPreset(themeConfig?.physics) ? themeConfig.physics : 'glass';
 }
 

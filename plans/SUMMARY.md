@@ -54,7 +54,7 @@ Dependency direction (never reversed):
 - [ ] Finish and polish the monorepo
 - [ ] Create public `void-energy` repo (clean git: init + license)
 - [ ] `npm publish void-energy@0.1.0`
-- [ ] 4 free atmospheres: Slate, Terminal, Meridian, Ember
+- [ ] 4 free atmospheres: Slate, Terminal, Meridian, Solar
 - [ ] 40+ components, AI generator, narrative/drag actions
 - [ ] AI-drafted BSL license (lawyer reviews in parallel)
 - [ ] Professional README, docs site
@@ -104,7 +104,7 @@ Only start when Void Energy (starter + premium) is fully done.
 | Slate | flat | dark | Default VE experience, Dima's daily driver |
 | Terminal | retro | dark | Only retro theme, essential for physics demo |
 | Meridian | flat | light | Created for showcases, neutral, broad appeal |
-| Ember | glass | dark | Fan favorite from testing, strong glass showcase |
+| Solar | glass | dark | Fan favorite from testing, strong glass showcase |
 
 Coverage: all 3 physics + both modes. AI generator lets anyone create unlimited custom themes.
 
@@ -141,7 +141,7 @@ Eric Jordan (2Advanced Studios, FWA Hall of Fame) is the first premium collabora
 | D1 | Private npm registry | GitHub Packages to start, Verdaccio later |
 | D2 | Narrative + drag actions | Public (free) |
 | D3 | AI atmosphere generator | Public (free, consumer's API key) |
-| D4 | Free atmospheres | Slate, Terminal, Meridian, Ember (all ready) |
+| D4 | Free atmospheres | Slate, Terminal, Meridian, Solar (all ready) |
 | D5 | BSL license approach | AI draft + lawyer swap |
 | D6 | Rive timeline | Decoupled, ships when Eric delivers |
 | D7 | Premium package order | KT first, Ambience second, Rive third |

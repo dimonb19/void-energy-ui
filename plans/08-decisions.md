@@ -49,11 +49,11 @@
 | **Slate** | flat | dark | Created | Dima's daily driver, default VE experience |
 | **Terminal** | retro | dark | Existing | Only retro theme, essential for physics demo |
 | **Meridian** | flat | light | Created | Created for showcases, neutral, broad appeal |
-| **Ember** | glass | dark | Existing | Fan favorite from testing, strong glass showcase |
+| **Solar** | glass | dark | Existing | Fan favorite from testing, strong glass showcase |
 
 **Coverage:** All 3 physics (glass, flat, retro) + both modes (light, dark). Each has distinct personality.
 
-**Why Ember over Void:** Ember was the most praised by testers. Void is the DGRS signature — keeping it private preserves brand identity.
+**Why Solar over Void:** Solar was the most praised by testers. Void is the DGRS signature — keeping it private preserves brand identity.
 
 **12 DGRS-private atmospheres** stay in CoNexus. Key reasons: Paper (boss's favorite, brand identity), Laboratory (DGRS Labs blue), Void (original signature). All are brand assets, not products for sale.
 
@@ -244,7 +244,7 @@ The bottom navigation was already a floating island. Having the top bar remain a
 | D1 | Private NPM registry | **Decided** | 2026-03-31 | GitHub Packages → Verdaccio later |
 | D2 | Narrative + drag | **Decided** | 2026-03-31 | Both public (free) |
 | D3 | AI generator | **Decided** | 2026-03-31 | Public (free, consumer's API key) |
-| D4 | Free atmospheres | **Decided** | 2026-03-31 | Slate, Terminal, Meridian, Ember (all ready) |
+| D4 | Free atmospheres | **Decided** | 2026-03-31 | Slate, Terminal, Meridian, Solar (all ready) |
 | D5 | BSL license | **Decided** (approach) | 2026-03-31 | AI draft → lawyer swap |
 | D6 | Rive timeline | Deferred | — | Decoupled from waves, ships when Eric delivers |
 | D7 | Premium package order | **Updated** | 2026-04-02 | KT first, Ambience second, Rive third — all premium |

@@ -5,7 +5,7 @@ import ThemesFragment from '@components/modals/ThemesFragment.svelte';
 import { voidEngine } from '@adapters/void-engine.svelte';
 
 function resetThemeState() {
-  voidEngine.atmosphere = 'void';
+  voidEngine.atmosphere = 'frost';
   voidEngine.userConfig = {
     fontHeading: null,
     fontBody: null,
@@ -16,7 +16,7 @@ function resetThemeState() {
     narrativeEffects: true,
   };
 
-  document.documentElement.setAttribute('data-atmosphere', 'void');
+  document.documentElement.setAttribute('data-atmosphere', 'frost');
   document.documentElement.setAttribute('data-mode', 'dark');
   document.documentElement.setAttribute('data-physics', 'glass');
 }
@@ -66,7 +66,7 @@ describe('ThemesFragment', () => {
     // The outgoing dark-mode options stay mounted during the dissolve transition,
     // so assert against the incoming first visible light theme instead of the
     // whole transient radiogroup.
-    expect(radios[0].textContent).toContain('Paper');
+    expect(radios[0].textContent).toContain('Meridian');
     expect(radios[0].getAttribute('tabindex')).toBe('0');
     expect(radios[0].getAttribute('aria-checked')).toBe('false');
   });

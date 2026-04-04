@@ -49,7 +49,6 @@ conexus/
 │   │   ├── void.ts
 │   │   ├── onyx.ts
 │   │   ├── nebula.ts
-│   │   ├── solar.ts
 │   │   ├── overgrowth.ts
 │   │   ├── velvet.ts
 │   │   ├── crimson.ts
@@ -224,7 +223,7 @@ npm install @dgrslabs/void-energy-kinetic-text
 ### Step 4: Set up boot sequence
 - Create `src/boot.ts` with premium atmosphere registration
 - Import in root layout
-- Verify all 12 atmospheres are available
+- Verify all 11 atmospheres are available
 
 ### Step 5: Build the app
 - Migrate app-specific features from the monorepo

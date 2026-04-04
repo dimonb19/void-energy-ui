@@ -13,7 +13,7 @@
 
 Create `github.com/dgrslabs/void-energy` as a standalone, polished open-source (BSL) design system that:
 - Is installable via `npm install void-energy`
-- Ships with 4 free atmospheres (Slate, Terminal, Meridian, Ember) covering all physics modes
+- Ships with 4 free atmospheres (Slate, Terminal, Meridian, Solar) covering all physics modes
 - Includes 40+ components to build real production apps
 - Has an AI atmosphere generator for creating custom themes
 - Has professional documentation worthy of GitHub stars
@@ -261,7 +261,7 @@ gh repo create dgrslabs/void-energy --public --description "Enterprise design sy
 - Copy the file structure above
 - Remove all CoNexus-specific files (per 02-conexus-extraction)
 - Remove DGRS-private atmosphere definitions (per 01-atmosphere-split)
-- Update `_generated-themes.scss` to contain only 4 free themes (Slate, Terminal, Meridian, Ember)
+- Update `_generated-themes.scss` to contain only 4 free themes (Slate, Terminal, Meridian, Solar)
 - Update `void-registry.json` to list only 4 free themes
 - Update `font-registry.ts` to include only free-tier fonts
 - **Do NOT** include Kinetic Text package — it's premium
@@ -348,9 +348,9 @@ The public repo should tastefully acknowledge premium packages:
 ## Verification Checklist
 
 - [ ] Repo builds from clean clone (`npm ci && npm run build`)
-- [ ] All 4 free atmospheres work (Slate, Terminal, Meridian, Ember)
-- [ ] All physics modes demonstrated (glass via Ember, flat via Slate/Meridian, retro via Terminal)
-- [ ] Both color modes work (dark via Slate/Terminal/Ember, light via Meridian)
+- [ ] All 4 free atmospheres work (Slate, Terminal, Meridian, Solar)
+- [ ] All physics modes demonstrated (glass via Solar, flat via Slate/Meridian, retro via Terminal)
+- [ ] Both color modes work (dark via Slate/Terminal/Solar, light via Meridian)
 - [ ] No Kinetic Text package in public repo (it's premium)
 - [ ] `npm run check` passes (zero type errors)
 - [ ] `npm run test` passes

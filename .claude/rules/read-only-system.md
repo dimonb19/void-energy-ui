@@ -21,6 +21,14 @@ In the starter repo, these paths are read-only by convention:
 - `src/types/`
 - `src/config/design-tokens.ts`
 
+## Developer-Editable Config Files
+
+These files are designed for customization and are NOT read-only:
+
+- `src/config/fonts.ts` — add/remove font families
+- `src/config/atmospheres.ts` — add/replace theme palettes
+- `src/config/constants.ts` — change default atmosphere / physics
+
 ## What To Do
 
 - Stop editing this file

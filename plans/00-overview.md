@@ -68,9 +68,9 @@ Open premium packages for external customers when timing is right.
 
 | Tier | What it includes | Who gets it |
 |------|-----------------|-------------|
-| **Free** | 4 atmospheres (Slate, Terminal, Meridian, Ember), 40+ components, AI generator, narrative/drag actions | Everyone via `npm install void-energy` |
+| **Free** | 4 atmospheres (Slate, Terminal, Meridian, Solar), 40+ components, AI generator, narrative/drag actions | Everyone via `npm install void-energy` |
 | **Premium** | Kinetic Text, Ambience Layers, Rive by Eric Jordan, future add-ons | Private — collect contacts, discuss access when demand exists. Deals after CoNexus launches. |
-| **DGRS-Private** | 12 original atmospheres (Void, Onyx, Nebula, Solar, Overgrowth, Velvet, Crimson, Paper, Laboratory, Playground, Focus, + others), CoNexus UI | DGRS Labs internal only |
+| **DGRS-Private** | 12 original atmospheres (Void, Onyx, Terminal, Nebula, Solar, Overgrowth, Velvet, Crimson, Paper, Focus, Laboratory, Playground), CoNexus UI | DGRS Labs internal only |
 
 ---
 
@@ -90,7 +90,7 @@ Dependency direction (never reversed):
 ```
 
 ### Repo 1: `void-energy` (Public) — Wave 1
-The starter system. What people fork, star, and install via `npm install void-energy`. Contains the complete engine, 4 free atmospheres (Slate, Terminal, Meridian, Ember), 40+ public UI components, AI atmosphere generator, and full documentation. A complete, working system on its own. No premium packages included.
+The starter system. What people fork, star, and install via `npm install void-energy`. Contains the complete engine, 4 free atmospheres (Slate, Terminal, Meridian, Solar), 40+ public UI components, AI atmosphere generator, and full documentation. A complete, working system on its own. No premium packages included.
 
 ### Repo 2: `void-energy-premium` (Private) — Wave 2
 All premium packages published under the `@dgrslabs` npm scope. Each package extends the public core without modifying it. Packages: `@dgrslabs/void-energy-kinetic-text` (Kinetic Text — first), `@dgrslabs/void-energy-ambience` (Ambience Layers), `@dgrslabs/void-energy-rive` (Eric Jordan's Rive animations). Private for now — collect contacts, discuss access when demand exists. Premium deals happen after CoNexus launches.
@@ -158,7 +158,7 @@ The **void.dgrslabs.ink** site is the premium showcase. It shows ALL packages an
 |-------|--------|
 | Void Energy UI monorepo | Active, 16 atmospheres, 100+ components. Being polished before extraction. |
 | Kinetic Text package | v0.1.0, built in `packages/kinetic-text/` — **PREMIUM** (private, strategic moat for CoNexus) |
-| Free atmospheres | All 4 ready: Slate (created), Terminal (existing), Meridian (created), Ember (existing) |
+| Free atmospheres | All 4 ready: Slate (created), Terminal (existing), Meridian (created), Solar (existing) |
 | 12 DGRS-private atmospheres | All built, will stay private to CoNexus |
 | Ambience Layers | Not yet started — premium package: `@dgrslabs/void-energy-ambience` |
 | CoNexus components | In `src/components/conexus/` and `src/components/ui/` — move to CoNexus repo |

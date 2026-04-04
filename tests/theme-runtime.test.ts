@@ -20,13 +20,13 @@ describe('theme runtime correctness', () => {
 
     expect(engine.registry['partial-dark'].mode).toBe('dark');
     expect(engine.registry['partial-dark'].physics).toBe(
-      VOID_TOKENS.themes.void.physics,
+      VOID_TOKENS.themes.frost.physics,
     );
     expect(engine.registry['partial-dark'].palette['bg-canvas']).toBe(
-      VOID_TOKENS.themes.void.palette['bg-canvas'],
+      VOID_TOKENS.themes.frost.palette['bg-canvas'],
     );
     expect(engine.registry['partial-dark'].palette['font-atmos-heading']).toBe(
-      VOID_TOKENS.themes.void.palette['font-atmos-heading'],
+      VOID_TOKENS.themes.frost.palette['font-atmos-heading'],
     );
     expect(engine.registry['partial-dark'].palette['energy-primary']).toBe(
       '#123456',
@@ -39,13 +39,13 @@ describe('theme runtime correctness', () => {
 
     expect(engine.registry['partial-light'].mode).toBe('light');
     expect(engine.registry['partial-light'].physics).toBe(
-      VOID_TOKENS.themes.paper.physics,
+      VOID_TOKENS.themes.meridian.physics,
     );
     expect(engine.registry['partial-light'].palette['bg-canvas']).toBe(
-      VOID_TOKENS.themes.paper.palette['bg-canvas'],
+      VOID_TOKENS.themes.meridian.palette['bg-canvas'],
     );
     expect(engine.registry['partial-light'].palette['font-atmos-heading']).toBe(
-      VOID_TOKENS.themes.paper.palette['font-atmos-heading'],
+      VOID_TOKENS.themes.meridian.palette['font-atmos-heading'],
     );
     expect(engine.registry['partial-light'].palette['energy-primary']).toBe(
       '#654321',
@@ -80,7 +80,7 @@ describe('theme runtime correctness', () => {
     });
 
     expect(result.css).toMatch(
-      /\[data-atmosphere=(?:['"])?paper(?:['"])?\][^{]*\{[^}]*color-scheme:\s*light/s,
+      /\[data-atmosphere=(?:['"])?meridian(?:['"])?\][^{]*\{[^}]*color-scheme:\s*light/s,
     );
   });
 
@@ -115,7 +115,7 @@ describe('theme runtime correctness', () => {
     expect(engine.registry.remembered).toBeTruthy();
     expect(engine.registry.remembered.physics).toBe('flat');
     expect(engine.registry.remembered.palette['bg-canvas']).toBe(
-      VOID_TOKENS.themes.paper.palette['bg-canvas'],
+      VOID_TOKENS.themes.meridian.palette['bg-canvas'],
     );
     expect(engine.registry.remembered.palette['energy-primary']).toBe(
       '#123456',
@@ -136,9 +136,9 @@ describe('theme runtime correctness', () => {
 
     const engine = new VoidEngine();
 
-    engine.setAtmosphere('paper');
+    engine.setAtmosphere('meridian');
     expect(meta.getAttribute('content')).toBe(
-      VOID_TOKENS.themes.paper.palette['bg-canvas'],
+      VOID_TOKENS.themes.meridian.palette['bg-canvas'],
     );
 
     engine.registerTheme('meta-runtime', {
@@ -167,22 +167,22 @@ describe('theme runtime correctness', () => {
 
     const engine = new VoidEngine();
 
-    expect(engine.pushTemporaryTheme('crimson', 'Outer')).toBeTruthy();
-    expect(engine.atmosphere).toBe('crimson');
+    expect(engine.pushTemporaryTheme('frost', 'Outer')).toBeTruthy();
+    expect(engine.atmosphere).toBe('frost');
 
-    expect(engine.pushTemporaryTheme('paper', 'Inner')).toBeTruthy();
-    expect(engine.atmosphere).toBe('paper');
+    expect(engine.pushTemporaryTheme('meridian', 'Inner')).toBeTruthy();
+    expect(engine.atmosphere).toBe('meridian');
 
     engine.restoreUserTheme();
-    expect(engine.atmosphere).toBe('crimson');
+    expect(engine.atmosphere).toBe('frost');
     expect(engine.temporaryThemeInfo).toEqual({
-      id: 'crimson',
+      id: 'frost',
       label: 'Outer',
-      returnTo: 'void',
+      returnTo: 'frost',
     });
 
     engine.restoreUserTheme();
-    expect(engine.atmosphere).toBe('void');
+    expect(engine.atmosphere).toBe('frost');
     expect(engine.hasTemporaryTheme).toBe(false);
   });
 
@@ -193,22 +193,22 @@ describe('theme runtime correctness', () => {
 
     const engine = new VoidEngine();
 
-    const outer = engine.pushTemporaryTheme('crimson', 'Outer');
-    const middle = engine.pushTemporaryTheme('paper', 'Middle');
-    const inner = engine.pushTemporaryTheme('onyx', 'Inner');
+    const outer = engine.pushTemporaryTheme('frost', 'Outer');
+    const middle = engine.pushTemporaryTheme('meridian', 'Middle');
+    const inner = engine.pushTemporaryTheme('terminal', 'Inner');
 
     expect(outer).toBeTruthy();
     expect(middle).toBeTruthy();
     expect(inner).toBeTruthy();
-    expect(engine.atmosphere).toBe('onyx');
+    expect(engine.atmosphere).toBe('terminal');
 
     engine.releaseTemporaryTheme(middle!);
 
-    expect(engine.atmosphere).toBe('onyx');
+    expect(engine.atmosphere).toBe('terminal');
     engine.restoreUserTheme();
-    expect(engine.atmosphere).toBe('crimson');
+    expect(engine.atmosphere).toBe('frost');
     engine.restoreUserTheme();
-    expect(engine.atmosphere).toBe('void');
+    expect(engine.atmosphere).toBe('frost');
   });
 
   it('clears temporary handles on manual selection and ignores stale releases', () => {
@@ -218,21 +218,21 @@ describe('theme runtime correctness', () => {
 
     const engine = new VoidEngine();
 
-    const outer = engine.pushTemporaryTheme('crimson', 'Outer');
-    const inner = engine.pushTemporaryTheme('paper', 'Inner');
+    const outer = engine.pushTemporaryTheme('frost', 'Outer');
+    const inner = engine.pushTemporaryTheme('meridian', 'Inner');
 
     expect(engine.hasTemporaryTheme).toBe(true);
 
-    engine.setAtmosphere('onyx');
+    engine.setAtmosphere('terminal');
 
-    expect(engine.atmosphere).toBe('onyx');
+    expect(engine.atmosphere).toBe('terminal');
     expect(engine.hasTemporaryTheme).toBe(false);
 
     engine.releaseTemporaryTheme(inner!);
     engine.releaseTemporaryTheme(outer!);
     engine.restoreUserTheme();
 
-    expect(engine.atmosphere).toBe('onyx');
+    expect(engine.atmosphere).toBe('terminal');
     expect(engine.hasTemporaryTheme).toBe(false);
   });
 
@@ -243,19 +243,19 @@ describe('theme runtime correctness', () => {
 
     const engine = new VoidEngine();
 
-    const outer = engine.pushTemporaryTheme('crimson', 'Outer');
-    const inner = engine.pushTemporaryTheme('paper', 'Inner');
+    const outer = engine.pushTemporaryTheme('frost', 'Outer');
+    const inner = engine.pushTemporaryTheme('meridian', 'Inner');
 
-    expect(engine.atmosphere).toBe('paper');
+    expect(engine.atmosphere).toBe('meridian');
 
     engine.setPreferences({ adaptAtmosphere: false });
 
-    expect(engine.atmosphere).toBe('void');
+    expect(engine.atmosphere).toBe('frost');
     expect(engine.hasTemporaryTheme).toBe(false);
 
     engine.releaseTemporaryTheme(inner!);
     engine.releaseTemporaryTheme(outer!);
 
-    expect(engine.atmosphere).toBe('void');
+    expect(engine.atmosphere).toBe('frost');
   });
 });

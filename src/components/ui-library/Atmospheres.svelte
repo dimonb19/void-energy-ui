@@ -40,11 +40,11 @@
       concept: 'Synth-lit observation deck — cosmic and dreamy',
     },
     {
-      id: 'solar',
+      id: 'frost',
       physics: 'glass',
       mode: 'dark',
-      tagline: 'Royal / Gold',
-      concept: 'Royal archive chamber at midnight',
+      tagline: 'Arctic / Glass',
+      concept: 'Ice station observatory — clean and cold',
     },
     {
       id: 'overgrowth',
@@ -131,38 +131,38 @@
     voidEngine.setAtmosphere('cyberpunk');
   }
 
-  // 2. Slate (dark flat)
-  let slateRegistered = $derived(
-    voidEngine.availableAtmospheres.includes('slate'),
+  // 2. Frost (dark glass — default, customized)
+  let frostRegistered = $derived(
+    voidEngine.availableAtmospheres.includes('frost'),
   );
 
-  function registerSlate() {
-    voidEngine.registerTheme('slate', {
+  function registerFrost() {
+    voidEngine.registerTheme('frost', {
       mode: 'dark',
-      physics: 'flat',
-      tagline: 'Professional / Clean',
+      physics: 'glass',
+      tagline: 'Arctic / Glass',
       palette: {
-        'font-atmos-heading': FONTS.clean.family,
+        'font-atmos-heading': FONTS.sharp.family,
         'font-atmos-body': FONTS.clean.family,
-        'bg-canvas': '#111118',
-        'bg-spotlight': '#1c1c26',
-        'bg-surface': '#1e1e2a',
-        'bg-sunk': '#0c0c12',
-        'energy-primary': '#6ea1ff',
-        'energy-secondary': '#8b8fa3',
-        'border-color': 'rgba(110, 161, 255, 0.2)',
-        'text-main': '#e8e8ed',
-        'text-dim': '#a0a0b0',
-        'text-mute': '#64647a',
+        'bg-canvas': '#080c14',
+        'bg-spotlight': '#141c2e',
+        'bg-surface': 'rgba(20, 30, 50, 0.45)',
+        'bg-sunk': 'rgba(0, 5, 15, 0.5)',
+        'energy-primary': '#7ec8e3',
+        'energy-secondary': '#4a6fa5',
+        'border-color': 'rgba(126, 200, 227, 0.2)',
+        'text-main': '#edf2f7',
+        'text-dim': '#a0b0c0',
+        'text-mute': '#607080',
       },
     });
-    toast.undo('Slate atmosphere registered', () =>
-      voidEngine.unregisterTheme('slate'),
+    toast.undo('Frost atmosphere registered', () =>
+      voidEngine.unregisterTheme('frost'),
     );
   }
 
-  function applySlate() {
-    voidEngine.setAtmosphere('slate');
+  function applyFrost() {
+    voidEngine.setAtmosphere('frost');
   }
 
   // 3. Meridian (light flat brand)
@@ -309,7 +309,7 @@ voidEngine.applyTemporaryTheme('crimson', 'Horror Preview');
 voidEngine.restoreUserTheme(); // pops the stack
 
 // Scoped temporary theme (returns handle for cleanup)
-const handle = voidEngine.pushTemporaryTheme('solar', 'Gold Mode');
+const handle = voidEngine.pushTemporaryTheme('frost', 'Ice Mode');
 voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
         ></pre>
     </details>
@@ -427,36 +427,38 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
         </div>
       </div>
 
-      <!-- Slate (dark flat) -->
+      <!-- Frost (dark glass — default, customized) -->
       <div class="surface-sunk p-md flex flex-col gap-md">
         <h5>
-          Slate <span class="text-mute text-small">&mdash; dark flat</span>
+          Frost <span class="text-mute text-small"
+            >&mdash; dark glass (default)</span
+          >
         </h5>
         <p class="text-caption text-dim">
-          Professional dark interface without glass effects. Opaque surfaces, no
-          blur, sharp borders &mdash; proves flat physics works in dark mode
-          too.
+          The default atmosphere. This example shows how you can override a
+          built-in theme at runtime &mdash; registerTheme merges your values on
+          top via Safety Merge.
         </p>
         <details>
           <summary>View Palette Code</summary>
           <pre class="text-caption overflow-x-auto"><code
-              >{`voidEngine.registerTheme('slate', {
+              >{`voidEngine.registerTheme('frost', {
   mode: 'dark',
-  physics: 'flat',
-  tagline: 'Professional / Clean',
+  physics: 'glass',
+  tagline: 'Arctic / Glass',
   palette: {
-    'font-atmos-heading': "'Inter', sans-serif",
+    'font-atmos-heading': "'Space Grotesk', sans-serif",
     'font-atmos-body':    "'Inter', sans-serif",
-    'bg-canvas':          '#111118',
-    'bg-spotlight':       '#1c1c26',
-    'bg-surface':         '#1e1e2a',
-    'bg-sunk':            '#0c0c12',
-    'energy-primary':     '#6ea1ff',
-    'energy-secondary':   '#8b8fa3',
-    'border-color':       'rgba(110, 161, 255, 0.2)',
-    'text-main':          '#e8e8ed',
-    'text-dim':           '#a0a0b0',
-    'text-mute':          '#64647a',
+    'bg-canvas':          '#080c14',
+    'bg-spotlight':       '#141c2e',
+    'bg-surface':         'rgba(20, 30, 50, 0.45)',
+    'bg-sunk':            'rgba(0, 5, 15, 0.5)',
+    'energy-primary':     '#7ec8e3',
+    'energy-secondary':   '#4a6fa5',
+    'border-color':       'rgba(126, 200, 227, 0.2)',
+    'text-main':          '#edf2f7',
+    'text-dim':           '#a0b0c0',
+    'text-mute':          '#607080',
   }
 });`}</code
             ></pre>
@@ -465,21 +467,21 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
         <div class="flex flex-row gap-md flex-wrap">
           <ActionBtn
             icon={Sparkle}
-            text={slateRegistered ? 'Registered' : 'Register Slate'}
-            onclick={registerSlate}
-            disabled={slateRegistered}
+            text={frostRegistered ? 'Registered' : 'Register Frost'}
+            onclick={registerFrost}
+            disabled={frostRegistered}
           />
 
-          {#if slateRegistered}
+          {#if frostRegistered}
             <span in:materialize out:dematerialize>
               <button
                 class="btn btn-premium"
-                onclick={applySlate}
-                disabled={voidEngine.atmosphere === 'slate'}
+                onclick={applyFrost}
+                disabled={voidEngine.atmosphere === 'frost'}
               >
-                {voidEngine.atmosphere === 'slate'
-                  ? 'Slate Active'
-                  : 'Apply Slate'}
+                {voidEngine.atmosphere === 'frost'
+                  ? 'Frost Active'
+                  : 'Apply Frost'}
               </button>
             </span>
           {/if}
@@ -607,7 +609,7 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
         <pre class="p-md"><code
             >// In a component's $effect — push on mount, release on cleanup
 $effect(() =&gt; &#123;
-  const handle = voidEngine.pushTemporaryTheme('solar', 'Gold Mode');
+  const handle = voidEngine.pushTemporaryTheme('frost', 'Ice Mode');
   return () =&gt; &#123;
     if (handle !== null) voidEngine.releaseTemporaryTheme(handle);
   &#125;;

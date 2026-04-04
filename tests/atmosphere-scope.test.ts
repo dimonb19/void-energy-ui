@@ -12,9 +12,9 @@ function quietConsole() {
 }
 
 function resetRoot() {
-  document.documentElement.setAttribute(DOM_ATTRS.ATMOSPHERE, 'void');
+  document.documentElement.setAttribute(DOM_ATTRS.ATMOSPHERE, 'frost');
   document.documentElement.setAttribute(DOM_ATTRS.MODE, 'dark');
-  document.documentElement.setAttribute(DOM_ATTRS.PHYSICS, 'glass');
+  document.documentElement.setAttribute(DOM_ATTRS.PHYSICS, 'flat');
 }
 
 function defaultUserConfig(): UserConfig {
@@ -32,7 +32,7 @@ function defaultUserConfig(): UserConfig {
 function resetVoidEngine() {
   localStorage.clear();
   resetRoot();
-  voidEngine.setAtmosphere('void');
+  voidEngine.setAtmosphere('frost');
   voidEngine.setPreferences(defaultUserConfig());
 
   for (const id of Object.keys(voidEngine.registry)) {
@@ -52,37 +52,37 @@ describe('AtmosphereScope', () => {
     voidEngine.setPreferences({ adaptAtmosphere: false });
 
     const view = render(AtmosphereScopeFixture, {
-      theme: 'crimson',
+      theme: 'frost',
       label: 'No-op scope',
     });
 
-    expect(voidEngine.atmosphere).toBe('void');
+    expect(voidEngine.atmosphere).toBe('frost');
     expect(voidEngine.hasTemporaryTheme).toBe(false);
     expect(voidEngine.temporaryThemeInfo).toBeNull();
 
     view.unmount();
 
-    expect(voidEngine.atmosphere).toBe('void');
+    expect(voidEngine.atmosphere).toBe('frost');
     expect(voidEngine.hasTemporaryTheme).toBe(false);
   });
 
   it('clears active temporary scope state when adaptation is disabled mid-mount', () => {
     const view = render(AtmosphereScopeFixture, {
-      theme: 'crimson',
+      theme: 'frost',
       label: 'Story scope',
     });
 
-    expect(voidEngine.atmosphere).toBe('crimson');
+    expect(voidEngine.atmosphere).toBe('frost');
     expect(voidEngine.hasTemporaryTheme).toBe(true);
 
     voidEngine.setPreferences({ adaptAtmosphere: false });
 
-    expect(voidEngine.atmosphere).toBe('void');
+    expect(voidEngine.atmosphere).toBe('frost');
     expect(voidEngine.hasTemporaryTheme).toBe(false);
 
     view.unmount();
 
-    expect(voidEngine.atmosphere).toBe('void');
+    expect(voidEngine.atmosphere).toBe('frost');
     expect(voidEngine.hasTemporaryTheme).toBe(false);
   });
 
@@ -128,7 +128,7 @@ describe('AtmosphereScope', () => {
     expect(voidEngine.temporaryThemeInfo).toEqual({
       id: scopeKeys[0],
       label: 'Updated overlay',
-      returnTo: 'void',
+      returnTo: 'frost',
     });
     expect(
       document.documentElement.style.getPropertyValue('--energy-primary'),
@@ -142,7 +142,7 @@ describe('AtmosphereScope', () => {
     );
 
     expect(scopeKeys).toHaveLength(0);
-    expect(voidEngine.atmosphere).toBe('void');
+    expect(voidEngine.atmosphere).toBe('frost');
     expect(voidEngine.hasTemporaryTheme).toBe(false);
   });
 });

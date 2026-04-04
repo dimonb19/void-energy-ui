@@ -4,7 +4,11 @@
   import { toast } from '@stores/toast.svelte';
   import { dissolve, materialize } from '@lib/transitions.svelte';
   import { morph } from '@actions/morph';
-  import { FONTS, FONT_FAMILY_TO_KEY } from '@config/design-tokens';
+  import {
+    FONTS,
+    FONT_FAMILY_TO_KEY,
+    ATMOSPHERES,
+  } from '@config/design-tokens';
 
   import Switcher from '../ui/Switcher.svelte';
   import SliderField from '../ui/SliderField.svelte';
@@ -70,16 +74,28 @@
       }),
   ]);
 
+  // Resolve font family for the current atmosphere.
+  // Built-in themes store palette only in SCSS (not in the JSON registry),
+  // so fall back to the source ATMOSPHERES definition.
+  function resolveAtmosphereFont(
+    token: 'font-atmos-heading' | 'font-atmos-body',
+  ): string {
+    const fromRegistry = voidEngine.currentTheme?.palette?.[token];
+    if (fromRegistry) return fromRegistry;
+    const fromSource = ATMOSPHERES[voidEngine.atmosphere]?.palette?.[token];
+    return fromSource ?? '';
+  }
+
   // Get current atmosphere's font keys for dynamic "System Default" labels
   let currentHeadingKey = $derived.by(() => {
-    const family = voidEngine.currentTheme?.palette?.['font-atmos-heading'];
+    const family = resolveAtmosphereFont('font-atmos-heading');
     if (!family) return 'Unknown';
     const key = FONT_FAMILY_TO_KEY[family];
     return key ? capitalize(key) : 'Unknown';
   });
 
   let currentBodyKey = $derived.by(() => {
-    const family = voidEngine.currentTheme?.palette?.['font-atmos-body'];
+    const family = resolveAtmosphereFont('font-atmos-body');
     if (!family) return 'Unknown';
     const key = FONT_FAMILY_TO_KEY[family];
     return key ? capitalize(key) : 'Unknown';

@@ -11,9 +11,21 @@ export const DOM_ATTRS = {
   MODE: 'data-mode',
 } as const;
 
+/**
+ * DEFAULT ATMOSPHERE & PHYSICS
+ * ----------------------------
+ * Change these to set your app's default theme on first visit.
+ *
+ * ATMOSPHERE must match a key in src/config/atmospheres.ts.
+ * LIGHT_ATMOSPHERE is used when the user's OS prefers light mode.
+ * PHYSICS must match the physics preset of your default ATMOSPHERE.
+ *
+ * After changing, also update the SCSS initial-paint default:
+ *   src/styles/base/_themes.scss — line ~10 (default physics) and ~17 (default theme)
+ */
 export const DEFAULTS = {
-  ATMOSPHERE: 'void',
-  LIGHT_ATMOSPHERE: 'paper', // Default theme for OS light mode
+  ATMOSPHERE: 'frost',
+  LIGHT_ATMOSPHERE: 'meridian',
   PHYSICS: 'glass',
   MODE: 'dark',
 } as const;

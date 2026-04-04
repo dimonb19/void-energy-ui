@@ -8,7 +8,7 @@ paths:
 
 # Token Dictionary
 
-Source of truth: `src/config/design-tokens.ts`. Regenerate with `npm run build:tokens`.
+Source of truth: `src/config/design-tokens.ts` (orchestrator), `src/config/fonts.ts` (fonts), `src/config/atmospheres.ts` (themes). Regenerate with `npm run build:tokens`.
 
 ## Spacing (4px base unit, density-scaled)
 ```
