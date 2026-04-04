@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Tile from '@components/ui/Tile.svelte';
-  import StoryCategory from '@components/ui/StoryCategory.svelte';
+  import Tile from './Tile.svelte';
+  import StoryCategory from './StoryCategory.svelte';
   import LoadMore from '@components/ui/LoadMore.svelte';
   import Skeleton from '@components/ui/Skeleton.svelte';
   import { emerge, dissolve } from '@lib/transitions.svelte';

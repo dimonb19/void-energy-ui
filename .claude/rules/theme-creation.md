@@ -1,13 +1,12 @@
 ---
 paths:
   - "src/config/atmospheres.ts"
-  - "src/config/atmospheres-conexus.ts"
   - "src/config/design-tokens.ts"
 ---
 
 # Theme Creation Rules
 
-When adding or modifying a theme in `src/config/atmospheres.ts` (or `atmospheres-conexus.ts`), run this checklist before finishing.
+When adding or modifying a theme in `src/config/atmospheres.ts`, run this checklist before finishing.
 
 ---
 

@@ -1,7 +1,7 @@
 # Void Energy — Launch Plan Summary
 
 > Quick reference for the full strategy. For details, see individual plan docs.
-> Last updated: 2026-04-02
+> Last updated: 2026-04-04
 
 ---
 
@@ -28,8 +28,7 @@ We don't have a second moat yet (no userbase, no content library, no network eff
 | Tier | What | Who Gets It |
 |------|------|-------------|
 | **Free (public npm)** | 4 atmospheres, 40+ components, AI generator, narrative/drag actions | Everyone via `npm install void-energy` |
-| **Premium (private)** | Kinetic Text, Ambience Layers, Rive animations | CoNexus only. Collect contacts; deals after CoNexus launches. |
-| **DGRS-Private** | 12 original atmospheres, CoNexus UI components | DGRS Labs internal only |
+| **Premium (private)** | Kinetic Text, DGRS Package (12 atmospheres + UI components), Ambience Layers, Rive animations | DGRS Labs apps + licensed customers. Collect contacts; deals after CoNexus launches. |
 
 **Showcase site (void.dgrslabs.ink):** Shows EVERYTHING including premium — visible, not downloadable. People see the technology; code stays private.
 
@@ -48,23 +47,32 @@ Dependency direction (never reversed):
 
 ---
 
+## Completed Milestones
+
+- [x] **Atmosphere Split** (2026-04-04) — Fonts + atmospheres extracted into modular files with tier metadata. 4 free atmospheres separated from 12 DGRS-private.
+- [x] **CoNexus Extraction** (2026-04-04) — Core system free from private dependencies. DGRS components separated into package.
+
+---
+
 ## Wave Plan
 
-### Wave 1 — Starter Launch (2-3 weeks)
+### Wave 1 — Starter Launch (next)
+- [x] Atmosphere split — extract fonts + atmospheres with tier metadata
+- [x] CoNexus extraction — separate private components into DGRS package
+- [x] 4 free atmospheres: Slate, Terminal, Meridian, Solar
 - [ ] Finish and polish the monorepo
 - [ ] Create public `void-energy` repo (clean git: init + license)
 - [ ] `npm publish void-energy@0.1.0`
-- [ ] 4 free atmospheres: Slate, Terminal, Meridian, Solar
 - [ ] 40+ components, AI generator, narrative/drag actions
 - [ ] AI-drafted BSL license (lawyer reviews in parallel)
 - [ ] Professional README, docs site
-- [ ] No Kinetic Text in public repo — it's premium
 - [ ] Showcase site shows all features including premium
 
 ### Wave 2 — Premium Packages (after Wave 1)
 Finish Void Energy completely before touching CoNexus. No split focus.
 - [ ] Create `void-energy-premium` private repo
 - [ ] Move Kinetic Text from monorepo (already built, v0.1.0)
+- [ ] Move DGRS package from monorepo (12 atmospheres + UI components, shared across all DGRS Labs apps)
 - [ ] Build Ambience Layers (Blood, Snow, Rain, Fog)
 - [ ] Private npm via GitHub Packages
 - [ ] Eric Jordan's Rive package — ships whenever he delivers (decoupled)
@@ -74,9 +82,9 @@ Finish Void Energy completely before touching CoNexus. No split focus.
 Only start when Void Energy (starter + premium) is fully done.
 - [ ] Create `conexus` private repo
 - [ ] Import `void-energy` from public npm (same as any external consumer)
-- [ ] Import premium packages from private npm
-- [ ] CoNexus UI components (Tile, StoryFeed, PortalLoader) live in CoNexus repo
-- [ ] Register 12 DGRS-private atmospheres at boot
+- [ ] Import `@dgrslabs/void-energy-dgrs` for DGRS atmospheres + UI components (Tile, StoryFeed, PortalLoader, etc.)
+- [ ] Import other premium packages from private npm (Kinetic Text, Ambience Layers)
+- [ ] Boot sequence registers 12 DGRS atmospheres from the DGRS package
 - [ ] Story engine, narrative orchestration, portal effects — all CoNexus-exclusive
 - [ ] This is the real product launch and the best VE marketing
 
@@ -92,8 +100,9 @@ Only start when Void Energy (starter + premium) is fully done.
 | # | Package | Status | Notes |
 |---|---------|--------|-------|
 | 1 | `@dgrslabs/void-energy-kinetic-text` | v0.1.0 built | Move from monorepo to premium repo |
-| 2 | `@dgrslabs/void-energy-ambience` | Not started | Build when CoNexus needs it |
-| 3 | `@dgrslabs/void-energy-rive` | Pending Eric | Decoupled from wave timeline |
+| 2 | `@dgrslabs/void-energy-dgrs` | Staging in monorepo | 12 atmospheres + UI components, shared across all DGRS Labs apps |
+| 3 | `@dgrslabs/void-energy-ambience` | Not started | Build when CoNexus needs it |
+| 4 | `@dgrslabs/void-energy-rive` | Pending Eric | Decoupled from wave timeline |
 
 ---
 
@@ -144,7 +153,7 @@ Eric Jordan (2Advanced Studios, FWA Hall of Fame) is the first premium collabora
 | D4 | Free atmospheres | Slate, Terminal, Meridian, Solar (all ready) |
 | D5 | BSL license approach | AI draft + lawyer swap |
 | D6 | Rive timeline | Decoupled, ships when Eric delivers |
-| D7 | Premium package order | KT first, Ambience second, Rive third |
+| D7 | Premium package order | KT first, DGRS second, Ambience third, Rive fourth |
 | D8 | Monorepo decommission | No rush, keep as dev environment |
 | D9 | Public component tier | 40+ components free; KT moved to premium |
 | D10 | Eric Jordan deal | Revenue share recommended (open) |
@@ -157,14 +166,12 @@ Eric Jordan (2Advanced Studios, FWA Hall of Fame) is the first premium collabora
 | Doc | What It Covers |
 |-----|---------------|
 | [00-overview.md](00-overview.md) | Master roadmap, wave strategy, repo architecture |
-| [01-atmosphere-split.md](01-atmosphere-split.md) | Font + atmosphere extraction from design-tokens.ts, tier metadata, developer instructions |
-| [02-conexus-extraction.md](02-conexus-extraction.md) | What moves to CoNexus repo, what stays public |
-| [03-public-repo.md](03-public-repo.md) | Public repo structure, npm package, docs site |
-| [04-premium-repo.md](04-premium-repo.md) | Premium repo structure, KT/Ambience/Rive packages |
-| [05-conexus-repo.md](05-conexus-repo.md) | CoNexus app structure, boot sequence, imports |
-| [06-npm-distribution.md](06-npm-distribution.md) | Public npm + private GitHub Packages setup |
-| [07-documentation.md](07-documentation.md) | Docs strategy, README template, licensing docs |
-| [08-decisions.md](08-decisions.md) | All decisions with rationale |
+| [01-public-repo.md](01-public-repo.md) | Public repo structure, npm package, docs site |
+| [02-premium-repo.md](02-premium-repo.md) | Premium repo structure, KT/DGRS/Ambience/Rive packages |
+| [03-conexus-repo.md](03-conexus-repo.md) | CoNexus app structure, boot sequence, imports |
+| [04-npm-distribution.md](04-npm-distribution.md) | Public npm + private GitHub Packages setup |
+| [05-documentation.md](05-documentation.md) | Docs strategy, README template, licensing docs |
+| [06-decisions.md](06-decisions.md) | All decisions with rationale |
 
 ---
 

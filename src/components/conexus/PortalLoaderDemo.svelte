@@ -1,6 +1,6 @@
 <script lang="ts">
-  import PortalLoader from '@components/ui/PortalLoader.svelte';
-  import LoadingTextCycler from '@components/ui/LoadingTextCycler.svelte';
+  import PortalLoader from '../../../packages/dgrs/src/components/PortalLoader.svelte';
+  import LoadingTextCycler from '../../../packages/dgrs/src/components/LoadingTextCycler.svelte';
   import IconBtn from '@components/ui/IconBtn.svelte';
   import PlayPause from '@components/icons/PlayPause.svelte';
 

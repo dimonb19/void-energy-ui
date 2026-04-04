@@ -8,6 +8,7 @@ const ROOT = path.resolve(__dirname, '..');
 const PATHS = {
   registry: path.join(ROOT, 'src/config/component-registry.json'),
   componentsDir: path.join(ROOT, 'src/components/ui'),
+  coreDir: path.join(ROOT, 'src/components/core'),
   modalRegistry: path.join(ROOT, 'src/config/modal-registry.ts'),
   modalTypes: path.join(ROOT, 'src/types/modal.d.ts'),
   toastStore: path.join(ROOT, 'src/stores/toast.svelte.ts'),
@@ -214,7 +215,8 @@ function splitTopLevel(source: string): string[] {
 }
 
 function parseComponentProps(source: string): string[] {
-  const match = source.match(
+  const stripped = source.replace(/<!--[\s\S]*?-->/g, '');
+  const match = stripped.match(
     /let\s*\{([\s\S]*?)\}\s*:[^=]*=\s*\$props\(\);/m,
   );
 
@@ -761,10 +763,15 @@ for (const [typeName, entry] of Object.entries(registry.types ?? {})) {
   }
 }
 
-const componentFiles = fs
+const uiFiles = fs
   .readdirSync(PATHS.componentsDir)
   .filter((file) => file.endsWith('.svelte'))
   .map((file) => file.replace(/\.svelte$/, ''));
+const coreFiles = fs
+  .readdirSync(PATHS.coreDir)
+  .filter((file) => file.endsWith('.svelte'))
+  .map((file) => file.replace(/\.svelte$/, ''));
+const componentFiles = [...uiFiles, ...coreFiles];
 const registryComponents = Object.values(registry.components).map(
   (entry) => entry.component,
 );
@@ -775,8 +782,11 @@ compareArrays(
   registryComponents,
 );
 
+const coreComponentNames = new Set(coreFiles);
+
 for (const [componentKey, entry] of Object.entries(registry.components)) {
-  const expectedImport = `@components/ui/${entry.component}.svelte`;
+  const subdir = coreComponentNames.has(entry.component) ? 'core' : 'ui';
+  const expectedImport = `@components/${subdir}/${entry.component}.svelte`;
   if (entry.import !== expectedImport) {
     fail(
       `${componentKey} import mismatch:\n  actual: ${entry.import}\n  expected: ${expectedImport}`,

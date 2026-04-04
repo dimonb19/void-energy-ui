@@ -172,13 +172,12 @@
     </p>
 
     <p class="text-body text-dim max-w-3xl">
-      40+ components, 3 physics presets, 12 atmospheres, density scaling &mdash;
-      one codebase, zero rebuilds. Drop in the token layer and every surface
-      adapts.
+      40+ components, 3 physics presets, 2 modes, density scaling &mdash; one
+      codebase, zero rebuilds. Drop in the token layer and every surface adapts.
     </p>
 
     <div class="flex flex-row flex-wrap gap-md justify-center">
-      <span class="chip"><span class="chip-label">12 Atmospheres</span></span>
+      <span class="chip"><span class="chip-label">2 Modes</span></span>
       <span class="chip"><span class="chip-label">3 Physics Presets</span></span
       >
       <span class="chip"><span class="chip-label">Runtime Theming</span></span>
@@ -356,7 +355,7 @@
         </ul>
         <p class="text-caption text-mute">
           Density is a user preference, independent of the active atmosphere.
-          All 12 atmospheres respect the same density setting.
+          All atmospheres respect the same density setting.
         </p>
       </div>
     </div>

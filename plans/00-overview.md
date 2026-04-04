@@ -3,8 +3,8 @@
 > Master plan for transforming the void-energy-ui monorepo into a three-repo enterprise product ecosystem.
 
 **Created:** 2026-03-29
-**Updated:** 2026-03-31
-**Status:** Planning — Three-Wave Launch Strategy
+**Updated:** 2026-04-04
+**Status:** In Progress — Wave 1 (atmosphere split + conexus extraction complete)
 **Owner:** Dima (DGRS Labs)
 
 ---
@@ -39,6 +39,7 @@ Polish and finish the monorepo, then ship the public `void-energy` repo and npm 
 ### Wave 2 — Premium Packages (After Wave 1)
 Finish Void Energy completely before touching CoNexus. No split focus.
 - Premium repo created with Kinetic Text as the first package (`@dgrslabs/void-energy-kinetic-text`)
+- `@dgrslabs/void-energy-dgrs` — 12 DGRS atmospheres, UI components (Tile, StoryFeed, PortalLoader, LoadingTextCycler, etc.), shared across all DGRS Labs apps
 - `@dgrslabs/void-energy-ambience` — Blood, Snow, Rain, Fog with physics adaptation
 - Private npm distribution via GitHub Packages
 - Collect contacts from interested parties, discuss access when there's demand
@@ -47,8 +48,8 @@ Finish Void Energy completely before touching CoNexus. No split focus.
 ### Wave 3 — CoNexus Migration (After VE Is Complete)
 Only start when Void Energy (starter + premium) is fully done.
 - CoNexus repo created, imports `void-energy` from public npm (same as any external consumer)
-- CoNexus UI components (Tile, StoryFeed, PortalLoader, etc.) live in the CoNexus repo
-- Boot sequence registers 12 DGRS-private atmospheres at runtime
+- CoNexus installs `@dgrslabs/void-energy-dgrs` for DGRS atmospheres + UI components (Tile, StoryFeed, PortalLoader, etc.)
+- Boot sequence registers 12 DGRS atmospheres from the DGRS package at runtime
 - Premium packages (Kinetic Text, Ambience Layers) imported from the private premium repo
 - Physics switching, atmosphere changes, kinetic text, narrative effects — all running in production
 - **This is the proof of concept AND the product** — the strongest marketing for Void Energy
@@ -69,8 +70,7 @@ Open premium packages for external customers when timing is right.
 | Tier | What it includes | Who gets it |
 |------|-----------------|-------------|
 | **Free** | 4 atmospheres (Slate, Terminal, Meridian, Solar), 40+ components, AI generator, narrative/drag actions | Everyone via `npm install void-energy` |
-| **Premium** | Kinetic Text, Ambience Layers, Rive by Eric Jordan, future add-ons | Private — collect contacts, discuss access when demand exists. Deals after CoNexus launches. |
-| **DGRS-Private** | 12 original atmospheres (Void, Onyx, Terminal, Nebula, Solar, Overgrowth, Velvet, Crimson, Paper, Focus, Laboratory, Playground), CoNexus UI | DGRS Labs internal only |
+| **Premium** | Kinetic Text, DGRS Package (12 atmospheres + UI components), Ambience Layers, Rive by Eric Jordan, future add-ons | Private — collect contacts, discuss access when demand exists. Deals after CoNexus launches. |
 
 ---
 
@@ -93,10 +93,19 @@ Dependency direction (never reversed):
 The starter system. What people fork, star, and install via `npm install void-energy`. Contains the complete engine, 4 free atmospheres (Slate, Terminal, Meridian, Solar), 40+ public UI components, AI atmosphere generator, and full documentation. A complete, working system on its own. No premium packages included.
 
 ### Repo 2: `void-energy-premium` (Private) — Wave 2
-All premium packages published under the `@dgrslabs` npm scope. Each package extends the public core without modifying it. Packages: `@dgrslabs/void-energy-kinetic-text` (Kinetic Text — first), `@dgrslabs/void-energy-ambience` (Ambience Layers), `@dgrslabs/void-energy-rive` (Eric Jordan's Rive animations). Private for now — collect contacts, discuss access when demand exists. Premium deals happen after CoNexus launches.
+All premium packages published under the `@dgrslabs` npm scope. Each package extends the public core without modifying it. Packages: `@dgrslabs/void-energy-kinetic-text` (Kinetic Text), `@dgrslabs/void-energy-dgrs` (12 DGRS atmospheres + UI components — shared across all DGRS Labs apps), `@dgrslabs/void-energy-ambience` (Ambience Layers), `@dgrslabs/void-energy-rive` (Eric Jordan's Rive animations). Private for now — collect contacts, discuss access when demand exists. Premium deals happen after CoNexus launches.
 
 ### Repo 3: `conexus` (Private) — Wave 3
-The CoNexus AI storytelling platform. Consumes the public `void-energy` package from npm (same as any external consumer) + premium packages from private npm. Registers the 12 DGRS-private atmospheres at boot. CoNexus-exclusive features (story engine, portal effects) live here. Serves as the flagship showcase of Void Energy at production scale. Only starts after VE is fully complete.
+The CoNexus AI storytelling platform. Consumes the public `void-energy` package from npm (same as any external consumer) + premium packages from private npm (including `@dgrslabs/void-energy-dgrs` for DGRS atmospheres and UI components). CoNexus-exclusive features (story engine, portal effects) live here. Serves as the flagship showcase of Void Energy at production scale. Only starts after VE is fully complete.
+
+---
+
+## Completed Milestones
+
+| Milestone | Completed | What it achieved |
+|-----------|-----------|-----------------|
+| **Atmosphere Split** | 2026-04-04 | Extracted fonts + atmospheres from design-tokens.ts into modular files with tier metadata. 4 free atmospheres (Slate, Terminal, Meridian, Solar) separated from 12 DGRS-private atmospheres. |
+| **CoNexus Extraction** | 2026-04-04 | Separated CoNexus-specific components (Tile, StoryFeed, PortalLoader, etc.) into the DGRS package. Core system is now free of private dependencies. |
 
 ---
 
@@ -104,14 +113,12 @@ The CoNexus AI storytelling platform. Consumes the public `void-energy` package 
 
 | # | Document | Description | Wave |
 |---|----------|-------------|------|
-| 01 | [Token Modularity](01-atmosphere-split.md) | Extract fonts + atmospheres from design-tokens.ts, tier metadata, developer instructions | Wave 1 |
-| 02 | [CoNexus Extraction](02-conexus-extraction.md) | Extract CoNexus-specific components into CoNexus repo | Wave 3 |
-| 03 | [Public Repo](03-public-repo.md) | Structure, contents, and setup of `void-energy` | Wave 1 |
-| 04 | [Premium Repo](04-premium-repo.md) | Structure of `void-energy-premium`, KT first, then Ambience, then Rive | Wave 2 |
-| 05 | [CoNexus Repo](05-conexus-repo.md) | Structure of the `conexus` app repository | Wave 3 |
-| 06 | [NPM Distribution](06-npm-distribution.md) | Publishing strategy for public and private packages | Wave 1 (public) / Wave 3 (private) |
-| 07 | [Documentation](07-documentation.md) | Documentation site, licensing, and developer guides | Wave 1 |
-| 08 | [Open Decisions](08-decisions.md) | Decisions — most now resolved | All |
+| 01 | [Public Repo](01-public-repo.md) | Structure, contents, and setup of `void-energy` | Wave 1 |
+| 02 | [Premium Repo](02-premium-repo.md) | Structure of `void-energy-premium`, KT first, then Ambience, then Rive | Wave 2 |
+| 03 | [CoNexus Repo](03-conexus-repo.md) | Structure of the `conexus` app repository | Wave 3 |
+| 04 | [NPM Distribution](04-npm-distribution.md) | Publishing strategy for public and private packages | Wave 1 (public) / Wave 3 (private) |
+| 05 | [Documentation](05-documentation.md) | Documentation site, licensing, and developer guides | Wave 1 |
+| 06 | [Open Decisions](06-decisions.md) | Decisions — most now resolved | All |
 
 ---
 
@@ -152,17 +159,18 @@ The **void.dgrslabs.ink** site is the premium showcase. It shows ALL packages an
 
 ---
 
-## Current State (as of 2026-04-02)
+## Current State (as of 2026-04-04)
 
 | Asset | Status |
 |-------|--------|
-| Void Energy UI monorepo | Active, 16 atmospheres, 100+ components. Being polished before extraction. |
+| **Atmosphere Split** | **DONE** — Fonts + atmospheres extracted into modular files with tier metadata. Free/private separation complete. |
+| **CoNexus Extraction** | **DONE** — Core system free from private dependencies. DGRS components separated into package. |
+| Void Energy UI monorepo | Active, 16 atmospheres, 100+ components. Core system clean and ready for public repo extraction. |
 | Kinetic Text package | v0.1.0, built in `packages/kinetic-text/` — **PREMIUM** (private, strategic moat for CoNexus) |
 | Free atmospheres | All 4 ready: Slate (created), Terminal (existing), Meridian (created), Solar (existing) |
-| 12 DGRS-private atmospheres | All built, will stay private to CoNexus |
+| DGRS package | Separated — 12 DGRS atmospheres + UI components (Tile, StoryFeed, PortalLoader, LoadingTextCycler, etc.). Shared across all DGRS Labs apps. |
 | Ambience Layers | Not yet started — premium package: `@dgrslabs/void-energy-ambience` |
-| CoNexus components | In `src/components/conexus/` and `src/components/ui/` — move to CoNexus repo |
-| Public repo | Not yet created — Wave 1 (after monorepo polish is complete) |
+| Public repo | Not yet created — Wave 1 (next step: polish + create repo) |
 | Premium repo | Not yet created — Wave 2 (first package: Kinetic Text, then Ambience Layers) |
 | CoNexus repo | Not yet created — Wave 3 (after VE is fully complete) |
 | BSL License | AI-drafted placeholder for Wave 1 launch; lawyer swap when review completes |

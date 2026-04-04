@@ -1,9 +1,9 @@
 <script lang="ts">
   import { toast } from '@stores/toast.svelte';
   import PullRefresh from '@components/ui/PullRefresh.svelte';
-  import StoryFeed from './conexus/StoryFeed.svelte';
-  import ReorderShowcase from './conexus/ReorderShowcase.svelte';
-  import PortalLoaderDemo from './conexus/PortalLoaderDemo.svelte';
+  import StoryFeed from './StoryFeed.svelte';
+  import ReorderShowcase from './ReorderShowcase.svelte';
+  import PortalLoaderDemo from './PortalLoaderDemo.svelte';
 
   function interceptDemoLink(e: MouseEvent | KeyboardEvent) {
     if (e instanceof KeyboardEvent && e.key !== 'Enter') return;

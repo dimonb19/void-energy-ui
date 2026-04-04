@@ -1,11 +1,11 @@
-# 04 — Premium Repo: `void-energy-premium`
+# 02 — Premium Repo: `void-energy-premium`
 
 > Private monorepo for ALL premium packages, published under the `@dgrslabs` npm scope. First package: Kinetic Text. Then Ambience Layers. Then Rive.
 
 **Status:** Planning — Wave 2 (after starter launch, before CoNexus)
-**Updated:** 2026-04-02
-**Depends on:** 03-public-repo (Wave 1)
-**Blocks:** 05-conexus-repo (Wave 3 — CoNexus consumes premium packages)
+**Updated:** 2026-04-04
+**Depends on:** 01-public-repo (Wave 1)
+**Blocks:** 03-conexus-repo (Wave 3 — CoNexus consumes premium packages)
 
 ---
 
@@ -18,7 +18,7 @@ Create `github.com/dgrslabs/void-energy-premium` as a private monorepo that:
 - Includes a package template for onboarding collaborators (Eric Jordan and future)
 - Enforces the dependency boundary: premium imports from core, never the reverse
 
-**Strategic decision (2026-04-02):** ALL packages stay premium/private. Kinetic Text, Ambience Layers, and Rive are strategic moat for CoNexus. We don't open-source anything that gives competitors a head start while CoNexus doesn't yet have a second moat (userbase, content). The first premium package is **Kinetic Text** (`@dgrslabs/void-energy-kinetic-text`), then Ambience Layers, then Rive when Eric delivers. Premium deals with external customers are for later — after CoNexus launches and has traction. For now, collect contacts from interested parties.
+**Strategic decision (2026-04-02, updated 2026-04-04):** ALL packages stay premium/private. Kinetic Text, DGRS, Ambience Layers, and Rive are strategic moat for CoNexus. We don't open-source anything that gives competitors a head start while CoNexus doesn't yet have a second moat (userbase, content). The premium packages in order: **Kinetic Text** (`@dgrslabs/void-energy-kinetic-text`), **DGRS** (`@dgrslabs/void-energy-dgrs` — 12 atmospheres + UI components, shared across all DGRS Labs apps), then Ambience Layers, then Rive when Eric delivers. Premium deals with external customers are for later — after CoNexus launches and has traction. For now, collect contacts from interested parties.
 
 ---
 
@@ -27,15 +27,15 @@ Create `github.com/dgrslabs/void-energy-premium` as a private monorepo that:
 **Premium IS:**
 - ALL packages that extend the public void-energy core — kept private as strategic moat
 - First: `@dgrslabs/void-energy-kinetic-text` (Kinetic Text — physics-aware text animations)
-- Second: `@dgrslabs/void-energy-ambience` (Ambience Layers — Blood, Snow, Rain, Fog)
-- Third: `@dgrslabs/void-energy-rive` (Eric Jordan's Rive animations, whenever he delivers)
+- Second: `@dgrslabs/void-energy-dgrs` (DGRS Package — 12 atmospheres + UI components, shared across all DGRS Labs apps)
+- Third: `@dgrslabs/void-energy-ambience` (Ambience Layers — Blood, Snow, Rain, Fog)
+- Fourth: `@dgrslabs/void-energy-rive` (Eric Jordan's Rive animations, whenever he delivers)
 - Future: additional packages following the same template
 - Private for now — collect contacts, discuss access when demand exists
 - Premium deals happen after CoNexus launches and has traction
 
 **Premium is NOT:**
-- Extra atmospheres (the 12 originals are DGRS-private, not for sale)
-- CoNexus components (those live in the CoNexus repo)
+- CoNexus app logic (story engine, narrative director — those live in the CoNexus repo)
 - Available to external customers yet — moat first, deals later
 
 ---
@@ -59,7 +59,39 @@ void-energy-premium/
 │   │   ├── PACKAGE.md             ← Interface spec
 │   │   └── CHANGELOG.md
 │   │
-│   ├── ambience/                  ← @dgrslabs/void-energy-ambience (SECOND PACKAGE)
+│   ├── dgrs/                      ← @dgrslabs/void-energy-dgrs (SECOND PACKAGE)
+│   │   ├── src/
+│   │   │   ├── components/
+│   │   │   │   ├── Tile.svelte
+│   │   │   │   ├── StoryCategory.svelte
+│   │   │   │   ├── StoryFeed.svelte
+│   │   │   │   ├── PortalLoader.svelte
+│   │   │   │   ├── LoadingTextCycler.svelte
+│   │   │   │   ├── PortalLoaderDemo.svelte
+│   │   │   │   └── ReorderShowcase.svelte
+│   │   │   ├── atmospheres/       ← 12 DGRS atmospheres (registered at boot)
+│   │   │   │   ├── void.ts
+│   │   │   │   ├── onyx.ts
+│   │   │   │   ├── nebula.ts
+│   │   │   │   ├── ... (12 total)
+│   │   │   │   └── index.ts
+│   │   │   ├── icons/
+│   │   │   │   └── LoadingPortal.svelte
+│   │   │   ├── config/
+│   │   │   │   └── constants.ts
+│   │   │   ├── types/
+│   │   │   │   ├── story.d.ts
+│   │   │   │   └── story-engine.d.ts
+│   │   │   ├── styles/
+│   │   │   │   └── _tiles.scss
+│   │   │   ├── fonts/             ← Font files for DGRS atmospheres
+│   │   │   └── index.ts
+│   │   ├── package.json
+│   │   ├── README.md
+│   │   ├── PACKAGE.md             ← Interface spec
+│   │   └── CHANGELOG.md
+│   │
+│   ├── ambience/                  ← @dgrslabs/void-energy-ambience (THIRD PACKAGE)
 │   │   ├── src/
 │   │   │   ├── components/
 │   │   │   │   ├── BloodLayer.svelte
@@ -73,7 +105,7 @@ void-energy-premium/
 │   │   ├── PACKAGE.md             ← Interface spec
 │   │   └── CHANGELOG.md
 │   │
-│   ├── rive/                      ← @dgrslabs/void-energy-rive (THIRD — when Eric delivers)
+│   ├── rive/                      ← @dgrslabs/void-energy-rive (FOURTH — when Eric delivers)
 │   │   ├── assets/                ← .riv files from Eric Jordan
 │   │   ├── src/
 │   │   │   ├── components/
@@ -117,7 +149,7 @@ void-energy-premium/
 
 Physics-aware animated text effects. The KT package was the viral hit that got attention (Pretext hype wave, March 2026). It's the highest-value strategic asset — keeping it private preserves CoNexus's feel advantage.
 
-**Status:** v0.1.0 already built in monorepo (`packages/kinetic-text/`). Move to premium repo during Wave 3.
+**Status:** v0.1.0 already built in monorepo (`packages/kinetic-text/`). Move to premium repo during Wave 2.
 
 **Why premium (not free):** Kinetic Text is core to CoNexus's narrative UX. Before CoNexus has a userbase moat, the UI feel IS the moat. Competitors with KT + a basic story engine could ship a "good enough" narrative platform faster. Once CoNexus has traction (6-12 months), revisit open-sourcing KT to boost VE adoption.
 
@@ -126,7 +158,6 @@ Physics-aware animated text effects. The KT package was the viral hit that got a
 {
   "name": "@dgrslabs/void-energy-kinetic-text",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
@@ -136,13 +167,73 @@ Physics-aware animated text effects. The KT package was the viral hit that got a
   "peerDependencies": {
     "void-energy": ">=0.1.0",
     "svelte": "^5.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   }
 }
 ```
 
 ---
 
-### `@dgrslabs/void-energy-ambience` (Second Package — DGRS Built)
+### `@dgrslabs/void-energy-dgrs` (Second Package — DGRS Built)
+
+The DGRS Labs shared package. Contains the 12 original DGRS atmospheres plus UI components used across all DGRS Labs apps (CoNexus, future apps). This is the shared DGRS identity layer — atmospheres, loading states, story UI.
+
+**Status:** Staging in monorepo (`packages/dgrs/`). Move to premium repo during Wave 2.
+
+**Why a package (not local to CoNexus):** DGRS atmospheres and UI components (Tile, StoryFeed, PortalLoader, LoadingTextCycler) are used across multiple DGRS Labs apps, not just CoNexus. Publishing as a package enables all apps to share the same identity layer via `npm install`.
+
+**Contents:**
+- **12 DGRS atmospheres:** Void, Onyx, Terminal, Nebula, Solar, Overgrowth, Velvet, Crimson, Paper, Focus, Laboratory, Playground. Note: Terminal and Solar overlap with the free tier — Safety Merge handles duplicates at boot.
+- **UI components:** Tile, StoryCategory, StoryFeed, PortalLoader, LoadingTextCycler, PortalLoaderDemo, ReorderShowcase
+- **Icons:** LoadingPortal
+- **Types:** StoryData, TileAuthor, TileGate, story engine types
+- **Styles:** _tiles.scss (tile layout, reorder animations)
+- **Config:** LOADING_WORDS constants
+- **Fonts:** Font files for the 12 DGRS atmospheres (bundled with the package)
+
+**Package.json:**
+```json
+{
+  "name": "@dgrslabs/void-energy-dgrs",
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./components/*": "./src/components/*.svelte",
+    "./atmospheres": "./src/atmospheres/index.ts",
+    "./icons/*": "./src/icons/*.svelte",
+    "./types": "./src/types/index.ts",
+    "./styles": "./src/styles/_tiles.scss",
+    "./config": "./src/config/constants.ts"
+  },
+  "peerDependencies": {
+    "void-energy": ">=0.1.0",
+    "svelte": "^5.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  }
+}
+```
+
+**Boot sequence in consumer apps:**
+```typescript
+import { voidEngine } from 'void-energy/engine';
+import { dgrsAtmospheres } from '@dgrslabs/void-energy-dgrs/atmospheres';
+
+for (const [id, definition] of Object.entries(dgrsAtmospheres)) {
+  voidEngine.registerTheme(id, definition);
+}
+// Now all 16 atmospheres available (4 free + 12 DGRS)
+```
+
+---
+
+### `@dgrslabs/void-energy-ambience` (Third Package — DGRS Built)
 
 Visual immersion layers: Blood, Snow, Rain, Fog. Each adapts to the active physics preset. Built for CoNexus storytelling but available as a premium package for anyone who wants atmospheric effects.
 
@@ -170,7 +261,6 @@ Visual immersion layers: Blood, Snow, Rain, Fog. Each adapts to the active physi
 {
   "name": "@dgrslabs/void-energy-ambience",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
@@ -179,13 +269,17 @@ Visual immersion layers: Blood, Snow, Rain, Fog. Each adapts to the active physi
   "peerDependencies": {
     "void-energy": ">=0.1.0",
     "svelte": "^5.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   }
 }
 ```
 
 ---
 
-### `@dgrslabs/void-energy-rive` (Second Package — Eric Jordan)
+### `@dgrslabs/void-energy-rive` (Fourth Package — Eric Jordan)
 
 Eric's Rive interactive asset library. Glass-physics visual effects (glow overlays, crystalline transitions, particle systems).
 
@@ -203,7 +297,6 @@ Eric's Rive interactive asset library. Glass-physics visual effects (glow overla
 {
   "name": "@dgrslabs/void-energy-rive",
   "version": "0.1.0",
-  "private": true,
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
@@ -214,6 +307,10 @@ Eric's Rive interactive asset library. Glass-physics visual effects (glow overla
     "void-energy": ">=0.1.0",
     "svelte": "^5.0.0",
     "@rive-app/canvas": "^2.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   }
 }
 ```
@@ -288,14 +385,15 @@ Every new premium package starts from `templates/package-template/`:
     "packages/*"
   ],
   "scripts": {
-    "build": "npm run build --workspaces",
-    "test": "npm run test --workspaces",
-    "check": "npm run check --workspaces"
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "check": "npm run check --workspaces --if-present"
   },
   "devDependencies": {
     "void-energy": "^0.1.0",
     "svelte": "^5.0.0",
     "typescript": "^5.0.0",
+    "sass-embedded": "^1.0.0",
     "vitest": "^3.0.0"
   }
 }
@@ -321,7 +419,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        package: [kinetic-text, ambience, rive]
+        package: [kinetic-text, dgrs, ambience, rive]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -375,18 +473,26 @@ gh repo create dgrslabs/void-energy-premium --private
 - Verify it builds independently from the premium repo
 - This is the first package — it already exists and works
 
-### Step 4: Build Ambience Layers package (when CoNexus needs it)
+### Step 4: Move DGRS package
+- Move `packages/dgrs/` from monorepo to `packages/dgrs/` in premium repo
+- Create `package.json` with proper exports (components, atmospheres, icons, types, styles)
+- Bundle DGRS atmosphere font files with the package
+- Create boot helper for atmosphere registration
+- Verify all 12 atmospheres register correctly via `voidEngine.registerTheme()`
+- Verify all UI components render correctly when consuming `void-energy` from npm
+
+### Step 5: Build Ambience Layers package (when CoNexus needs it)
 - Set up `packages/ambience/` with package.json and PACKAGE.md
 - Implement BloodLayer, SnowLayer, RainLayer, FogLayer
 - Physics adaptation for all 3 presets (glass/flat/retro)
 - Performance testing (< 5ms per frame)
 
-### Step 5: Create Rive package skeleton (when Eric delivers)
+### Step 6: Create Rive package skeleton (when Eric delivers)
 - Set up `packages/rive/` with package.json and PACKAGE.md
 - Placeholder components ready for Eric's assets
 - Document the integration points Eric needs to implement
 
-### Step 5: Set up CI/CD
+### Step 7: Set up CI/CD
 - Add GitHub Actions workflows
 - Configure private npm publishing
 - Test publish flow with dry-run
@@ -398,6 +504,8 @@ gh repo create dgrslabs/void-energy-premium --private
 - [ ] Workspace builds from clean clone
 - [ ] Package template is documented and usable
 - [ ] Kinetic Text package builds from premium repo
+- [ ] DGRS package builds from premium repo — all 12 atmospheres register, all UI components render
+- [ ] DGRS atmosphere fonts are bundled and load correctly
 - [ ] Rive package skeleton builds (even without assets)
 - [ ] `void-energy` declared as peer dependency in all packages
 - [ ] No package imports from another premium package (only from core)

@@ -2,7 +2,6 @@
 paths:
   - "src/config/fonts.ts"
   - "src/config/atmospheres.ts"
-  - "src/config/atmospheres-conexus.ts"
   - "src/config/constants.ts"
 ---
 
@@ -14,7 +13,6 @@ paths:
 |------|---------|-----------|
 | `src/config/fonts.ts` | All font definitions, preload config, font utilities | Yes — developer entry point |
 | `src/config/atmospheres.ts` | Free atmosphere palettes (4 themes), semantic color bases | Yes — developer entry point |
-| `src/config/atmospheres-conexus.ts` | DGRS-private atmospheres (standalone, not wired in) | Yes — will move to CoNexus repo |
 | `src/config/design-tokens.ts` | Orchestrator: spacing, physics, typography + re-exports | Read-only in starter |
 | `src/config/constants.ts` | Runtime defaults (ATMOSPHERE, PHYSICS, MODE) | Yes — change default theme here |
 
@@ -48,7 +46,7 @@ If these drift, users see a flash of wrong theme on first paint.
 
 - Consumer code imports from `@config/design-tokens` (re-exports everything)
 - Direct imports from `@config/fonts` or `@config/atmospheres` are also valid
-- `atmospheres-conexus.ts` is NOT imported by `design-tokens.ts` — it is a standalone archive
+- DGRS atmospheres live in `packages/dgrs/src/config/atmospheres.ts` — not in core
 
 ## The 4 Free Atmospheres
 

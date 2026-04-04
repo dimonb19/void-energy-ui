@@ -1,7 +1,7 @@
 <script lang="ts">
   import LoadingPortal from '@components/icons/LoadingPortal.svelte';
   import LoadingQuill from '@components/icons/LoadingQuill.svelte';
-  import LoadingTextCycler from '@components/ui/LoadingTextCycler.svelte';
+  import LoadingTextCycler from './LoadingTextCycler.svelte';
 
   interface PortalLoaderProps {
     status?: 'idle' | 'loading';

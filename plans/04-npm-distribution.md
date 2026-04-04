@@ -1,9 +1,9 @@
-# 06 — NPM Distribution
+# 04 — NPM Distribution
 
 > Publishing strategy for public and private packages across the Void Energy ecosystem.
 
 **Status:** Planning — Wave 1 (public npm) / Wave 3 (private registry)
-**Depends on:** 03-public-repo (Wave 1)
+**Depends on:** 01-public-repo (Wave 1)
 **Blocks:** Launch (public npm only needed for Wave 1; private registry deferred to Wave 3)
 
 ---
@@ -281,11 +281,12 @@ Premium collaborator packages follow this pattern:
 | Package | Name | Status |
 |---------|------|--------|
 | Kinetic Text | `@dgrslabs/void-energy-kinetic-text` | First package — already built, move to premium repo |
-| Ambience Layers | `@dgrslabs/void-energy-ambience` | Second package — build when CoNexus needs it |
-| Rive assets (Eric Jordan) | `@dgrslabs/void-energy-rive` | Third package — pending Eric's delivery |
+| DGRS | `@dgrslabs/void-energy-dgrs` | Second package — 12 atmospheres + UI components, staging in monorepo |
+| Ambience Layers | `@dgrslabs/void-energy-ambience` | Third package — build when CoNexus needs it |
+| Rive assets (Eric Jordan) | `@dgrslabs/void-energy-rive` | Fourth package — pending Eric's delivery |
 | Future collaborator packages | `@dgrslabs/void-energy-{name}` | As collaborators onboard |
 
-**Note:** ALL packages are premium/private — strategic moat for CoNexus. Atmospheres are not sold — the 12 originals are DGRS-private. CoNexus UI components live in the CoNexus repo (not published as a package). Premium deals with external customers are for later, after CoNexus launches.
+**Note:** ALL packages are premium/private — strategic moat for CoNexus. The DGRS package contains the 12 original atmospheres + shared UI components, used across all DGRS Labs apps. Premium deals with external customers are for later, after CoNexus launches.
 
 ---
 

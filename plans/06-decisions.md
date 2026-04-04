@@ -1,8 +1,8 @@
-# 08 — Open Decisions
+# 06 — Open Decisions
 
 > Decisions tracking for the Void Energy enterprise decomposition. Most decisions are now resolved.
 
-**Last updated:** 2026-04-02
+**Last updated:** 2026-04-04
 
 ---
 
@@ -103,16 +103,19 @@ Eric is evaluating Rive glass effects. Package scope = Void Energy visual assets
 
 ## D7: Premium Package Order
 
-**Status:** Decided — Updated 2026-04-02
+**Status:** Decided — Updated 2026-04-04
 **Owner:** Dima
 
 ### Resolution
-**Three premium packages in order:**
+**Four premium packages in order:**
 1. `@dgrslabs/void-energy-kinetic-text` — first (already built, move from monorepo)
-2. `@dgrslabs/void-energy-ambience` — second (build when CoNexus needs it)
-3. `@dgrslabs/void-energy-rive` — third (ships when Eric delivers)
+2. `@dgrslabs/void-energy-dgrs` — second (12 DGRS atmospheres + UI components, staging in monorepo — shared across all DGRS Labs apps)
+3. `@dgrslabs/void-energy-ambience` — third (build when CoNexus needs it)
+4. `@dgrslabs/void-energy-rive` — fourth (ships when Eric delivers)
 
-All premium. All private. CoNexus installs them as dependencies. External customers can discuss access after CoNexus launches.
+All premium. All private. All DGRS Labs apps install them as dependencies. External customers can discuss access after CoNexus launches.
+
+DGRS package: 12 original atmospheres, Tile, StoryFeed, PortalLoader, LoadingTextCycler, and other shared DGRS UI. Used by CoNexus and future DGRS Labs apps.
 
 Ambience Layers: Blood, Snow, Rain, Fog — each with physics adaptation (glass: blur+glow, flat: opacity, retro: pixel/dither). Realistic expectation: very niche use case, but CoNexus uses it for immersive storytelling.
 
@@ -130,19 +133,20 @@ The monorepo continues as the development environment indefinitely. It's working
 
 ## D9: Public Component Tier — What Ships Free
 
-**Status:** Decided — UPDATED 2026-04-02 (Kinetic Text moved to premium)
+**Status:** Decided — UPDATED 2026-04-04 (DGRS becomes a premium package)
 **Owner:** Dima + Boss
 
 ### Resolution
-**All core components stay public except CoNexus-specific ones.** Generous free tier drives adoption. **All packages are premium/private.**
+**All core components stay public except DGRS-specific ones.** Generous free tier drives adoption. **All packages are premium/private.**
 
-**Public (free):** 40+ components (all fields, buttons, navigation, overlays, charts, layout, icons, modals), all actions (narrative, drag, morph, tooltip, navlink), AI atmosphere generator, 4 atmospheres.
+**Public (free):** 40+ components (all fields, buttons, navigation, overlays, charts, layout, icons, modals), all actions (narrative, drag, morph, tooltip, navlink), AI atmosphere generator, 4 atmospheres. PortalRing (interactive SVG icon) stays public.
 
-**Premium (private):** Kinetic Text (`@dgrslabs/void-energy-kinetic-text`), Ambience Layers (`@dgrslabs/void-energy-ambience`), Rive (`@dgrslabs/void-energy-rive`).
+**Premium (private):** Kinetic Text (`@dgrslabs/void-energy-kinetic-text`), DGRS (`@dgrslabs/void-energy-dgrs` — 12 atmospheres + shared UI components), Ambience Layers (`@dgrslabs/void-energy-ambience`), Rive (`@dgrslabs/void-energy-rive`).
 
-**Removed from public:** Tile, StoryCategory, PortalLoader, LoadingTextCycler, StoryFeed, PortalLoaderDemo, ReorderShowcase (CoNexus-specific → CoNexus repo).
+**Removed from public:** Tile, StoryCategory, PortalLoader, LoadingTextCycler, StoryFeed, PortalLoaderDemo, ReorderShowcase (DGRS package — shared across all DGRS Labs apps).
 
 **Why KT moved to premium:** See D11 (Strategic Moat decision).
+**Why DGRS is a package (not local to CoNexus):** DGRS atmospheres and UI components are used across multiple DGRS Labs apps, not just CoNexus.
 
 ---
 
@@ -190,6 +194,7 @@ _Pending discussion between Dima and Boss._
 - CoNexus is pre-launch. Zero users, zero network effects, zero content moat.
 - The UI/UX premium feel is literally the only differentiator right now.
 - Kinetic Text is core to CoNexus's narrative UX — a competitor with KT + a basic story engine could ship faster.
+- DGRS atmospheres and UI components define the DGRS Labs brand identity across all apps.
 - Once something is open-sourced, you can't take it back.
 - Even at $100k, if a competitor uses KT to launch 3 months faster, that was a terrible trade.
 
@@ -247,9 +252,9 @@ The bottom navigation was already a floating island. Having the top bar remain a
 | D4 | Free atmospheres | **Decided** | 2026-03-31 | Slate, Terminal, Meridian, Solar (all ready) |
 | D5 | BSL license | **Decided** (approach) | 2026-03-31 | AI draft → lawyer swap |
 | D6 | Rive timeline | Deferred | — | Decoupled from waves, ships when Eric delivers |
-| D7 | Premium package order | **Updated** | 2026-04-02 | KT first, Ambience second, Rive third — all premium |
+| D7 | Premium package order | **Updated** | 2026-04-04 | KT first, DGRS second, Ambience third, Rive fourth — all premium |
 | D8 | Monorepo decommission | **Decided** | 2026-03-31 | No rush, keep as dev environment |
-| D9 | Public component tier | **Updated** | 2026-04-02 | All primitives free; KT moved to premium |
+| D9 | Public component tier | **Updated** | 2026-04-04 | All primitives free; KT + DGRS are premium packages |
 | D10 | Eric Jordan deal | **Open** | — | Revenue share recommended |
 | D11 | Strategic moat | **Decided** | 2026-04-02 | All packages private until CoNexus has traction |
 | D12 | Top nav island (mobile) | **Decided** | 2026-04-02 | Floating pill nav on mobile, matching bottom island |

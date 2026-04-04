@@ -8,7 +8,7 @@
  * ARCHITECTURE:
  * - Abstracts (mixins, functions) must be loaded before components
  * - Components are loaded in logical dependency order
- * - Later components may extend earlier ones (e.g., tiles extends buttons)
+ * - Later components may extend earlier ones
  *
  * COMPONENT CATALOG:
  *
@@ -25,7 +25,6 @@
  * | _navigation   | Top nav bar + tab system             | when-state       |
  * | _chips        | Interactive data chips               | chip-structure   |
  * | _badges       | Non-interactive status pills         | badge-variant    |
- * | _tiles        | Story tile cards                     | surface-raised      |
  *
  * HYBRID PROTOCOL:
  * - Layout (padding, gap, flex) -> Tailwind utilities
@@ -48,7 +47,7 @@
 @forward 'navigation'; // Top navigation bar + reusable tab system
 @forward 'chips'; // Interactive data chips (tags, filters, selections)
 @forward 'badges'; // Non-interactive status pill indicators
-@forward 'tiles'; // Story tile cards
+@forward '../../../packages/dgrs/src/styles/tiles'; // DGRS package (showcase only)
 @forward 'pull-refresh'; // Pull-to-refresh indicator + content wrapper
 @forward 'toggle'; // Boolean toggle switch (role="switch")
 @forward 'dropdown'; // Generic floating panel (trigger + popover content)

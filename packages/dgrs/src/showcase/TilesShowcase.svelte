@@ -1,7 +1,7 @@
 <script lang="ts">
   import { toast } from '@stores/toast.svelte';
-  import Tile from '../ui/Tile.svelte';
-  import Selector from '../ui/Selector.svelte';
+  import Tile from '../components/Tile.svelte';
+  import Selector from '@components/ui/Selector.svelte';
 
   function interceptClick(e: MouseEvent) {
     const anchor = (e.target as HTMLElement).closest('a');

@@ -45,8 +45,7 @@
       "nav": ["tabs", "pagination", "load-more", "breadcrumbs", "sidebar"],
       "layout": ["settings-row"],
       "interaction": ["pull-refresh"],
-      "feedback": ["skeleton", "portal-loader"],
-      "motion": ["loading-text-cycler"],
+      "feedback": ["skeleton"],
       "chart": [
         "progress-ring",
         "sparkline",
@@ -55,7 +54,7 @@
         "line-chart",
         "bar-chart"
       ],
-      "content": ["tile", "story-category"]
+      "theme": ["atmosphere-scope"]
     }
   },
   "types": {
@@ -113,20 +112,6 @@
         "icon?: string | Component",
         "disabled?: boolean"
       ]
-    },
-    "TileAuthor": {
-      "source": "src/types/story.d.ts",
-      "shape": ["name: string", "avatar?: string", "href?: string"]
-    },
-    "TileGate": {
-      "source": "src/types/story.d.ts",
-      "shape": [
-        "{ type: 'nft-collection', name: string }",
-        "{ type: 'nft-id', collection: string, ids: string[] }",
-        "{ type: 'nft-id', collection: string, range: [number, number] }",
-        "{ type: 'fungible', token: string, amount: number }"
-      ],
-      "note": "Tile accepts TileGate[]. Multiple entries use OR logic."
     },
     "ChartDataPoint": {
       "source": "src/types/charts.d.ts",
@@ -939,31 +924,9 @@
       "variants": ["text", "avatar", "card", "paragraph"],
       "props": ["variant", "width", "height", "lines", "class"],
       "slots": [],
-      "related": ["portal-loader", "loading-text-cycler"],
+      "related": [],
       "compose": "Use shimmer placeholders during loading. paragraph renders multiple text rows automatically.",
       "example": "<Skeleton variant='paragraph' lines={3} />"
-    },
-    "portal-loader": {
-      "description": "Branded full-page loading state with an animated quill icon and cycling text messages. Use for initial app or portal loading gates.",
-      "category": "feedback",
-      "component": "PortalLoader",
-      "import": "@components/ui/PortalLoader.svelte",
-      "props": ["status", "class"],
-      "slots": [],
-      "related": ["skeleton", "loading-text-cycler"],
-      "compose": "Use for branded portal loading states. status='loading' shows the animated quill and cycling copy.",
-      "example": "<PortalLoader status='loading' class='mx-auto' />"
-    },
-    "loading-text-cycler": {
-      "description": "Rotating text label that cycles through an array of words with a typewriter effect. Use for loading states with dynamic copy.",
-      "category": "motion",
-      "component": "LoadingTextCycler",
-      "import": "@components/ui/LoadingTextCycler.svelte",
-      "props": ["words", "interval", "speed", "class"],
-      "slots": [],
-      "related": ["kinetic", "portal-loader"],
-      "compose": "Use when you need rotating loading copy without building a custom kinetic config.",
-      "example": "<LoadingTextCycler words={['Loading', 'Syncing', 'Compiling']} />"
     },
     "media-slider": {
       "description": "Horizontal volume/playback control bar with mute toggle, play/pause, and optional replay button. Icons animate between states.",
@@ -1112,52 +1075,6 @@
       "compose": "Use data for a single series or series for multi-series. All series must share labels in the same order.",
       "example": "<LineChart data={revenueSeries} filled showDots />"
     },
-    "tile": {
-      "description": "Content card with cover image, title, author link, comma-separated genre text, state mark (resume/completed/replay), and optional token-gate lock overlay. Full-tile click via stretched link.",
-      "category": "content",
-      "component": "Tile",
-      "import": "@components/ui/Tile.svelte",
-      "props": [
-        "title",
-        "href",
-        "author",
-        "genres",
-        "image",
-        "mark",
-        "gate",
-        "loading",
-        "class"
-      ],
-      "propTypes": {
-        "author": "TileAuthor",
-        "genres": "string[]",
-        "gate": "TileGate[]",
-        "loading": "boolean"
-      },
-      "slots": [],
-      "related": ["story-category"],
-      "compose": "Use inside a StoryCategory scroll strip. Supports mark states (resume, completed, replay) and gate prop (TileGate[]) for token-gated tiles with lock icon, premium styling, and requirement tooltip (NFT collection, specific NFT IDs, or fungible token balance). Multiple gates use OR logic. Uses the stretched-link pattern for full-tile clickability with an independent author link. Use loading prop for skeleton state.",
-      "example": "<Tile title='Machine Rebellion' href='/story/123' author={{ name: 'Ada', href: '/user/1' }} genres={['Sci-Fi']} image='/covers/img.jpg' gate={[{ type: 'nft-collection', name: 'Potentials' }]} />"
-    },
-    "story-category": {
-      "description": "Horizontal scroll strip with category header (title + tagline) and always-visible scroll arrows on tablet+. Designed to hold Tile children. Supports infinite scroll pagination.",
-      "category": "content",
-      "component": "StoryCategory",
-      "import": "@components/ui/StoryCategory.svelte",
-      "props": [
-        "title",
-        "tagline",
-        "loading",
-        "hasMore",
-        "onloadmore",
-        "pageSize",
-        "class"
-      ],
-      "slots": ["children()"],
-      "related": ["tile"],
-      "compose": "Renders a category header (title + tagline) and a horizontal scroll strip for Tile children. Supports optional pagination: pass loading, hasMore, and onloadmore to auto-append skeleton tiles and trigger loading via IntersectionObserver when the user scrolls near the end.",
-      "example": "<StoryCategory title='Hottest right now' tagline='Most played this week.' loading={pageLoading} hasMore={hasNext} onloadmore={fetchPage}><Tile ... /><Tile ... /></StoryCategory>"
-    },
     "bar-chart": {
       "description": "SVG bar chart with axes, grid, tooltips, optional value labels, and reference lines. Supports vertical/horizontal orientation, grouped (clustered) bars, entry animations, legend, and accessible data table.",
       "category": "chart",
@@ -1193,6 +1110,21 @@
       "related": ["line-chart", "donut-chart", "stat-card"],
       "compose": "Use data for simple bars or groups for clustered bars. Negative values are not supported.",
       "example": "<BarChart data={quarterlyRevenue} showValues />"
+    },
+    "atmosphere-scope": {
+      "description": "Wraps content in a temporary atmosphere that auto-restores on unmount. Accepts a theme ID string or a partial theme definition object for inline/brand themes. Respects the user's adaptAtmosphere preference.",
+      "category": "theme",
+      "component": "AtmosphereScope",
+      "import": "@components/core/AtmosphereScope.svelte",
+      "props": ["theme", "label"],
+      "propTypes": {
+        "theme": "string | PartialThemeDefinition",
+        "label": "string (default: 'Page theme')"
+      },
+      "slots": ["children()"],
+      "related": [],
+      "compose": "Wrap any section that needs its own atmosphere. Uses pushTemporaryTheme/releaseTemporaryTheme under the hood so nested scopes restore correctly. Pass a string for registered themes or an object for inline/brand themes.",
+      "example": "<AtmosphereScope theme=\"crimson\" label=\"Horror story\"><StoryContent /></AtmosphereScope>"
     }
   },
   "utilities": {
@@ -1228,7 +1160,7 @@
         "options?: Omit<KineticConfig, 'text' | 'words'>"
       ],
       "returns": ["KineticHandle (Promise<void> with abort())"],
-      "related": ["kinetic", "loading-text-cycler"],
+      "related": ["kinetic"],
       "compose": "Use when you need imperative, abortable typing outside Svelte markup or want a promise that resolves when the reveal completes.",
       "example": "const handle = typewrite(node, 'Loading...', { speed: 30 }); handle.abort();"
     },
@@ -1272,7 +1204,7 @@
       "signature": "tooltip(node, params)",
       "args": ["params: string | VoidTooltipOptions"],
       "returns": ["{ update(newParams), destroy() }"],
-      "related": ["dropdown", "tile"],
+      "related": ["dropdown"],
       "compose": "Use string shorthand for plain text or VoidTooltipOptions when placement, delay, or offset must change.",
       "example": "<button use:tooltip=\"Open settings\">...</button>"
     },
@@ -1296,7 +1228,7 @@
       "signature": "kinetic(node, config)",
       "args": ["config: KineticConfig"],
       "returns": ["{ update(newConfig), destroy() }"],
-      "related": ["typewrite", "loading-text-cycler"],
+      "related": ["typewrite"],
       "compose": "Use for declarative text reveal effects in markup. The action restarts whenever the config object reference changes. For premium character-level reveals, use @dgrslabs/void-energy-kinetic-text instead.",
       "example": "<span use:kinetic={{ text: 'SYSTEM ONLINE', mode: 'decode' }} />"
     },
@@ -1308,7 +1240,7 @@
       "signature": "navlink(node)",
       "args": [],
       "returns": ["{ destroy() }"],
-      "related": ["sidebar", "tile"],
+      "related": ["sidebar"],
       "compose": "Use on links or navigational surfaces that should expose loading state immediately on primary-button navigation.",
       "example": "<a href='/components' use:navlink>Components</a>"
     },
@@ -1503,7 +1435,7 @@
         }
       },
       "slots": [],
-      "related": ["portal-loader", "skeleton"],
+      "related": ["skeleton"],
       "compose": "Do not render a new toast region. Use the toast store; the global Toast.svelte host renders items and handles timing.",
       "example": "import { toast } from '@stores/toast.svelte'; toast.promise(save(), { loading: 'Saving...', success: 'Saved', error: 'Save failed' });"
     },

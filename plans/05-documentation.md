@@ -1,9 +1,9 @@
-# 07 — Documentation & Licensing
+# 05 — Documentation & Licensing
 
 > Documentation strategy, licensing implementation, and developer-facing content across all three repos.
 
 **Status:** Planning — Wave 1
-**Depends on:** 03-public-repo
+**Depends on:** 01-public-repo
 **Blocks:** Launch
 
 ---
@@ -257,12 +257,13 @@ Focused on package development:
 - How to extend the core without modifying it
 - Testing requirements
 - Import patterns (from `void-energy` peer dependency)
+- DGRS package specifics: atmosphere registration, font bundling, shared UI components
 
 ### CoNexus Repo CLAUDE.md
 
 App-specific context:
-- How to use imported packages
-- Boot sequence
+- How to use imported packages (`void-energy`, `@dgrslabs/void-energy-dgrs`, etc.)
+- Boot sequence (DGRS atmosphere registration from the DGRS package)
 - CoNexus-exclusive feature patterns
 - Story engine architecture
 
@@ -274,7 +275,7 @@ These files already exist and need updating for the public repo:
 
 | File | Updates Needed |
 |------|---------------|
-| **CHEAT-SHEET.md** | Remove CoNexus components (Tile, StoryCategory, PortalLoader). Reference only 4 free atmospheres. |
+| **CHEAT-SHEET.md** | Remove DGRS components (Tile, StoryCategory, PortalLoader, LoadingTextCycler). Reference only 4 free atmospheres. |
 | **THEME-GUIDE.md** | Update to reference only 4 free atmospheres (Slate, Terminal, Meridian, Solar). No "premium atmospheres" mention — just note that users can create unlimited custom themes with the AI generator. |
 | **AI-PLAYBOOK.md** | Remove CoNexus-specific recipes. |
 | **COMPOSITION-RECIPES.md** | Remove CoNexus page archetypes. |

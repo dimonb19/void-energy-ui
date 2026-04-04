@@ -1,6 +1,6 @@
 <script lang="ts">
-  import Tile from '@components/ui/Tile.svelte';
-  import StoryCategory from '@components/ui/StoryCategory.svelte';
+  import Tile from './Tile.svelte';
+  import StoryCategory from './StoryCategory.svelte';
   import ActionBtn from '@components/ui/ActionBtn.svelte';
   import Restart from '@components/icons/Restart.svelte';
   import { GripVertical, ChevronLeft, ChevronRight } from '@lucide/svelte';

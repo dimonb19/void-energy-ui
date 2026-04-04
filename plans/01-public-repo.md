@@ -1,11 +1,11 @@
-# 03 — Public Repo: `void-energy`
+# 01 — Public Repo: `void-energy`
 
 > The public, BSL-licensed starter system. What people fork, star, and install. A complete, working design system on its own. No premium packages — those stay private.
 
-**Status:** Planning — Wave 1 (ship in 2-3 weeks)
-**Updated:** 2026-04-02
-**Depends on:** 01-atmosphere-split (all 4 atmospheres ready)
-**Blocks:** 05-conexus-repo (Wave 2), 06-npm-distribution
+**Status:** Planning — Wave 1 (next step)
+**Updated:** 2026-04-04
+**Depends on:** Atmosphere split (done), CoNexus extraction (done)
+**Blocks:** 03-conexus-repo (Wave 3), 04-npm-distribution
 
 ---
 
@@ -172,10 +172,12 @@ void-energy/
 
 **Modals (7):** Alert, Confirm, Settings, Themes, Shortcuts, CommandPalette, ManualAtmosphere
 
-### Removed from public (CoNexus-only)
+### Removed from public (DGRS package)
 - Tile, StoryCategory, PortalLoader, LoadingTextCycler
 - StoryFeed, PortalLoaderDemo, ReorderShowcase
-- TilesShowcase, PortalRing (showcase pages)
+- TilesShowcase
+
+**Stays public:** PortalRing (interactive SVG icon) stays in the public repo — it's a free feature. PortalLoader (DGRS loading animation) is in the premium DGRS package.
 
 ---
 
@@ -259,8 +261,8 @@ gh repo create dgrslabs/void-energy --public --description "Enterprise design sy
 
 ### Step 2: Initialize from monorepo
 - Copy the file structure above
-- Remove all CoNexus-specific files (per 02-conexus-extraction)
-- Remove DGRS-private atmosphere definitions (per 01-atmosphere-split)
+- Remove all CoNexus-specific files (conexus extraction already done)
+- Remove DGRS-private atmosphere definitions (atmosphere split already done)
 - Update `_generated-themes.scss` to contain only 4 free themes (Slate, Terminal, Meridian, Solar)
 - Update `void-registry.json` to list only 4 free themes
 - Update `font-registry.ts` to include only free-tier fonts

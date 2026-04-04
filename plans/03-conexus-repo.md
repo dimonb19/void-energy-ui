@@ -1,10 +1,10 @@
-# 05 — CoNexus Repo
+# 03 — CoNexus Repo
 
 > The CoNexus AI storytelling platform — TOP PRIORITY. Consumes public `void-energy` from npm (same as everyone else) + premium packages from private npm. Owns all 12 DGRS-private atmospheres.
 
 **Status:** Planning — Wave 3 (after VE is fully complete — starter + premium)
-**Updated:** 2026-04-02
-**Depends on:** 03-public-repo (Wave 1), 04-premium-repo (Wave 2)
+**Updated:** 2026-04-04
+**Depends on:** 01-public-repo (Wave 1), 02-premium-repo (Wave 2)
 **Blocks:** Nothing (final consumer).
 
 ---
@@ -17,11 +17,11 @@ Create `github.com/dgrslabs/conexus` as the flagship application that demonstrat
 
 After setup:
 - CoNexus imports `void-energy` from public npm (same as any external consumer)
-- CoNexus imports premium packages from private npm (`@dgrslabs/void-energy-kinetic-text`, `@dgrslabs/void-energy-ambience`, etc.)
-- CoNexus UI components (Tile, StoryFeed, PortalLoader, etc.) live directly in the CoNexus repo
-- CoNexus owns the 12 DGRS-private atmospheres (registered at boot via `voidEngine.registerTheme()`)
+- CoNexus imports `@dgrslabs/void-energy-dgrs` for DGRS atmospheres + shared UI components (Tile, StoryFeed, PortalLoader, LoadingTextCycler, etc.)
+- CoNexus imports other premium packages from private npm (`@dgrslabs/void-energy-kinetic-text`, `@dgrslabs/void-energy-ambience`, etc.)
+- Boot sequence registers 12 DGRS atmospheres from the DGRS package at runtime
 - CoNexus-exclusive features (story engine, app logic) live only here
-- All 16 atmospheres available (4 free from void-energy + 12 private registered at boot)
+- All 16 atmospheres available (4 free from void-energy + 12 from DGRS package)
 
 ---
 
@@ -45,30 +45,7 @@ conexus/
 │   │   ├── Navigation.svelte
 │   │   └── ...
 │   │
-│   ├── atmospheres/               ← 12 DGRS-private atmospheres (registered at boot)
-│   │   ├── void.ts
-│   │   ├── onyx.ts
-│   │   ├── nebula.ts
-│   │   ├── overgrowth.ts
-│   │   ├── velvet.ts
-│   │   ├── crimson.ts
-│   │   ├── paper.ts
-│   │   ├── laboratory.ts
-│   │   ├── playground.ts
-│   │   ├── focus.ts
-│   │   ├── fonts/                 ← Font files for private themes
-│   │   └── index.ts               ← re-exports all as privateThemes record
-│   │
-│   ├── conexus-ui/                ← Extracted CoNexus UI components
-│   │   ├── Tile.svelte
-│   │   ├── StoryCategory.svelte
-│   │   ├── PortalLoader.svelte
-│   │   ├── LoadingTextCycler.svelte
-│   │   ├── StoryFeed.svelte
-│   │   └── styles/
-│   │       └── _tiles.scss
-│   │
-│   ├── ui/                        ← CoNexus-exclusive UI (not extracted from monorepo)
+│   ├── ui/                        ← CoNexus-exclusive UI (not from packages)
 │   │   └── ...future CoNexus-only UI
 │   │
 │   ├── engine/                    ← Story engine (CoNexus core logic)
@@ -105,19 +82,19 @@ conexus/
 ```typescript
 // src/boot.ts
 import { voidEngine } from 'void-energy/engine';
-import { privateThemes } from './atmospheres';
+import { dgrsAtmospheres } from '@dgrslabs/void-energy-dgrs/atmospheres';
 
-// Register all 12 DGRS-private atmospheres
-for (const [id, definition] of Object.entries(privateThemes)) {
+// Register all 12 DGRS atmospheres from the package
+for (const [id, definition] of Object.entries(dgrsAtmospheres)) {
   voidEngine.registerTheme(id, definition);
 }
-// Now all 16 atmospheres are available (4 free + 12 private)
+// Now all 16 atmospheres are available (4 free + 12 DGRS)
 
 // App-specific initialization
 // ...
 ```
 
-This runs early in the app lifecycle (imported in the root layout or entry point). The 12 private themes are runtime-registered via CSS custom properties — they work identically to the 4 free themes baked into SCSS.
+This runs early in the app lifecycle (imported in the root layout or entry point). The 12 DGRS themes are runtime-registered via CSS custom properties — they work identically to the 4 free themes baked into SCSS. Terminal and Solar overlap with the free tier; Safety Merge handles duplicates.
 
 ---
 
@@ -129,6 +106,7 @@ This runs early in the app lifecycle (imported in the root layout or entry point
   "private": true,
   "dependencies": {
     "void-energy": "^0.1.0",
+    "@dgrslabs/void-energy-dgrs": "^0.1.0",
     "@dgrslabs/void-energy-kinetic-text": "^0.1.0",
     "@dgrslabs/void-energy-ambience": "^0.1.0",
     "astro": "^5.0.0",
@@ -161,6 +139,15 @@ import { modal } from 'void-energy/lib/modal-manager';
 import { toast } from 'void-energy/stores/toast';
 import { voidEngine } from 'void-energy/engine';
 
+// DGRS shared components — from premium DGRS package
+import Tile from '@dgrslabs/void-energy-dgrs/components/Tile';
+import StoryFeed from '@dgrslabs/void-energy-dgrs/components/StoryFeed';
+import PortalLoader from '@dgrslabs/void-energy-dgrs/components/PortalLoader';
+import LoadingTextCycler from '@dgrslabs/void-energy-dgrs/components/LoadingTextCycler';
+
+// DGRS atmospheres — from premium DGRS package (registered at boot)
+import { dgrsAtmospheres } from '@dgrslabs/void-energy-dgrs/atmospheres';
+
 // Kinetic text — from premium package
 import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
 
@@ -172,11 +159,6 @@ import { BloodLayer, SnowLayer } from '@dgrslabs/void-energy-ambience';
 
 // Rive animations — from premium package (when available)
 import { RiveOverlay } from '@dgrslabs/void-energy-rive';
-
-// CoNexus UI — from private CoNexus UI package
-import Tile from '../conexus-ui/Tile.svelte';
-import StoryFeed from '../conexus-ui/StoryFeed.svelte';
-import PortalLoader from '../conexus-ui/PortalLoader.svelte';
 
 // CoNexus-exclusive (local)
 import { storyEngine } from '../engine/story-engine';
@@ -191,11 +173,10 @@ import { storyEngine } from '../engine/story-engine';
 | Story engine | Narrative orchestration, beat system, branching | Core app logic |
 | Story viewer/editor | Reading and writing interface | App-specific UI |
 | User stories/feed | Content management | App data layer |
-| Portal effects | Loading portal, portal ring | CoNexus brand identity |
 | NFT gating | Token-gated story access | Business logic |
 | AI story generation | Claude-powered narrative | App feature |
 
-**Note:** Ambience Layers (Blood, Snow, Rain, Fog) are a premium package (`@dgrslabs/void-energy-ambience`), not CoNexus-exclusive. CoNexus installs them as a dependency.
+**Note:** DGRS UI components (Tile, StoryFeed, PortalLoader, LoadingTextCycler) and DGRS atmospheres are **NOT** CoNexus-exclusive — they live in the `@dgrslabs/void-energy-dgrs` premium package, shared across all DGRS Labs apps. Ambience Layers are also a separate premium package (`@dgrslabs/void-energy-ambience`).
 
 ---
 
@@ -214,6 +195,7 @@ gh repo create dgrslabs/conexus --private
 ### Step 3: Install dependencies
 ```bash
 npm install void-energy
+npm install @dgrslabs/void-energy-dgrs
 npm install @dgrslabs/void-energy-kinetic-text
 # Premium packages added as available:
 # npm install @dgrslabs/void-energy-ambience
@@ -221,9 +203,9 @@ npm install @dgrslabs/void-energy-kinetic-text
 ```
 
 ### Step 4: Set up boot sequence
-- Create `src/boot.ts` with premium atmosphere registration
+- Create `src/boot.ts` — import DGRS atmospheres from `@dgrslabs/void-energy-dgrs/atmospheres` and register via `voidEngine.registerTheme()`
 - Import in root layout
-- Verify all 11 atmospheres are available
+- Verify all 16 atmospheres are available (4 free + 12 DGRS)
 
 ### Step 5: Build the app
 - Migrate app-specific features from the monorepo
@@ -238,9 +220,10 @@ npm install @dgrslabs/void-energy-kinetic-text
 
 ## Verification Checklist
 
-- [ ] All 16 atmospheres available after boot (4 free + 12 DGRS-private)
+- [ ] All 16 atmospheres available after boot (4 free + 12 from DGRS package)
 - [ ] Core components import correctly from `void-energy`
-- [ ] CoNexus UI components work from local `conexus-ui/` directory
+- [ ] DGRS UI components import correctly from `@dgrslabs/void-energy-dgrs`
+- [ ] DGRS atmospheres register correctly from `@dgrslabs/void-energy-dgrs/atmospheres`
 - [ ] Kinetic text works from `@dgrslabs/void-energy-kinetic-text` (premium)
 - [ ] Ambience Layers work from `@dgrslabs/void-energy-ambience`
 - [ ] Physics switching works across all imported components

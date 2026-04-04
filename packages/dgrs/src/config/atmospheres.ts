@@ -14,12 +14,12 @@
  * =====================================================================
  */
 
-import { FONTS } from './fonts';
+import { FONTS } from '@config/fonts';
 import {
   SEMANTIC_DARK,
   SEMANTIC_LIGHT,
   type AtmosphereDefinition,
-} from './atmospheres';
+} from '@config/atmospheres';
 
 // ---------------------------------------------------------------------------
 // DGRS atmospheres (12 themes, registered at runtime in CoNexus)
