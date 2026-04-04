@@ -51,6 +51,8 @@
   import Sparkle from './icons/Sparkle.svelte';
   import Refresh from './icons/Refresh.svelte';
   import Undo from './icons/Undo.svelte';
+  import Copy from './icons/Copy.svelte';
+  import IconBtn from './ui/IconBtn.svelte';
   import LoadingQuill from './icons/LoadingQuill.svelte';
 
   interface AtmosphereGeneratorProps {
@@ -462,6 +464,81 @@
     input.value = sanitized;
     setter(sanitized);
     editDirty = true;
+  }
+
+  // ── Export to Code ──────────────────────────────────────────────────────
+
+  let exportCopied = $state(false);
+  let exportTimeout: ReturnType<typeof setTimeout> | undefined;
+
+  function buildExportCode(): string {
+    const id =
+      editLabel
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-') || 'custom';
+    const semanticSpread =
+      editMode === 'light' ? '...SEMANTIC_LIGHT' : '...SEMANTIC_DARK';
+
+    // Build palette entries with opacity applied
+    const paletteLines: string[] = [`    ${semanticSpread},`];
+
+    // Font references
+    paletteLines.push(
+      `    'font-atmos-heading': FONTS.${editFontHeadingKey}.family,`,
+    );
+    paletteLines.push(
+      `    'font-atmos-body': FONTS.${editFontBodyKey}.family,`,
+    );
+
+    // Core palette keys
+    for (const key of CORE_PALETTE_KEYS) {
+      const hex = editPalette[key];
+      if (!hex) continue;
+      // Apply opacity for keys that need it
+      if (editOpacityKeys.has(key) && isValidHex(hex)) {
+        paletteLines.push(
+          `    '${key}': '${hexToRgba(hex, editOpacity[key])}',`,
+        );
+      } else {
+        paletteLines.push(`    '${key}': '${hex}',`);
+      }
+    }
+
+    // Semantic color overrides
+    if (hasEditPremiumOverride) {
+      paletteLines.push(`    'color-premium': '${editColorPremium}',`);
+    }
+    if (hasEditSystemOverride) {
+      paletteLines.push(`    'color-system': '${editColorSystem}',`);
+    }
+
+    const tagline = editTagline.trim() || editLabel.trim() || 'Custom theme';
+
+    return [
+      `// Add to ATMOSPHERES in src/config/atmospheres.ts, then run: npm run build:tokens`,
+      `${id}: {`,
+      `  mode: '${editMode}',`,
+      `  physics: '${editPhysics}',`,
+      `  tagline: '${tagline.replace(/'/g, "\\'")}',`,
+      `  palette: {`,
+      ...paletteLines,
+      `  },`,
+      `},`,
+    ].join('\n');
+  }
+
+  async function copyExportCode() {
+    const code = buildExportCode();
+    try {
+      await navigator.clipboard.writeText(code);
+      exportCopied = true;
+      toast.show('Theme code copied to clipboard', 'success');
+      clearTimeout(exportTimeout);
+      exportTimeout = setTimeout(() => (exportCopied = false), 2000);
+    } catch {
+      toast.show('Copy failed', 'error');
+    }
   }
 
   // ── Preview Lifecycle ──────────────────────────────────────────────────
@@ -1044,8 +1121,8 @@
         </p>
       {/if}
 
-      <!-- Restore -->
-      <div class="flex justify-center">
+      <!-- Restore / Export -->
+      <div class="flex justify-center gap-md">
         <ActionBtn
           icon={Undo}
           text={generatedResult ? 'Restore Generated' : 'Reset Colors'}
@@ -1053,6 +1130,13 @@
           class="btn-ghost"
           onclick={restoreGenerated}
           disabled={!editDirty}
+        />
+        <IconBtn
+          icon={Copy}
+          iconProps={{ 'data-state': exportCopied ? 'active' : '' }}
+          onclick={copyExportCode}
+          disabled={!editLabel.trim()}
+          aria-label="Copy theme code"
         />
       </div>
     </div>
