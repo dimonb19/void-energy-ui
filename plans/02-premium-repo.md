@@ -279,18 +279,24 @@ Visual immersion layers: Blood, Snow, Rain, Fog. Each adapts to the active physi
 
 ---
 
-### `@dgrslabs/void-energy-rive` (Fourth Package — Eric Jordan)
+### `@dgrslabs/void-energy-rive` (Fourth Package — Dima + Eric Jordan)
 
-Eric's Rive interactive asset library. Glass-physics visual effects (glow overlays, crystalline transitions, particle systems).
+Rive glass material effects — animated specular highlights, cursor-following light, click ripples, mesh distortion. Exclusively for the glass physics preset (not in DOM for flat/retro).
 
-**Status:** Pending Eric's delivery. Deal structure under discussion. Decoupled from wave timeline — ships whenever Eric is ready.
+**Status:** Planning. Dima builds the prototype (`.riv` file + integration scaffold). Eric Jordan reviews, polishes the visual craft, and connects DGRS Labs with the Rive team. Decoupled from wave timeline.
+
+**Architecture:** Rive owns one thing — animated glass light effects. 5 state machine inputs: `bool_Active`, `num_Intensity`, `num_LightX`, `num_LightY`, `trigger_Click`. White colors only (physically correct for light reflections, works across all atmospheres). The Svelte adapter reads `data-physics` from the DOM and controls when Rive activates — Rive doesn't know about physics presets.
+
+**Integration:** 2 touch points → 9 surfaces. `<RiveOverlay />` added to `Navigation.svelte` (3 nav surfaces) and `Modal.svelte` (6 modal fragments). Everything else stays CSS-only glass.
+
+**Full plan:** See [07-rive-glass-effects.md](07-rive-glass-effects.md).
 
 **Interface spec (PACKAGE.md):**
 - Must export Svelte components that accept Void Energy physics context
-- State machine inputs must respond to `data-physics` and `data-mode` attributes
-- Must declare `void-energy` as peer dependency
+- Glass-only: not in DOM for flat/retro (zero overhead)
+- State machine inputs: `bool_Active`, `num_Intensity`, `num_LightX`, `num_LightY`, `trigger_Click`
+- Must declare `svelte` and `@rive-app/webgl2` as peer dependencies
 - Must include README with visual examples
-- Assets must respond to all 3 physics presets (glass/flat/retro)
 
 **Package.json:**
 ```json
@@ -304,9 +310,8 @@ Eric's Rive interactive asset library. Glass-physics visual effects (glow overla
     "./assets/*": "./assets/*.riv"
   },
   "peerDependencies": {
-    "void-energy": ">=0.1.0",
     "svelte": "^5.0.0",
-    "@rive-app/canvas": "^2.0.0"
+    "@rive-app/webgl2": "^2.0.0"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
@@ -314,6 +319,45 @@ Eric's Rive interactive asset library. Glass-physics visual effects (glow overla
   }
 }
 ```
+
+**Note:** Starts private (GitHub Packages). Flip `publishConfig` to public npm when Eric/Rive deal materializes — see "Selective Publishing" section above.
+```
+
+---
+
+## Selective Publishing — Per-Package Registry Control
+
+The monorepo is private, but individual packages can be published to different registries independently. Each package has its own `publishConfig`:
+
+```json
+// packages/kinetic-text/package.json — STAYS PRIVATE
+{
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  }
+}
+
+// packages/rive/package.json — CAN GO PUBLIC LATER
+{
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  }
+}
+```
+
+**How it works:** One monorepo, different registries per package. Flip `publishConfig` on any package when the time comes — one commit, one field change. Other packages are untouched. The GitHub repo stays private regardless — people get the built package from npm but can't browse the source.
+
+**Timeline example:**
+
+| Time | KT | DGRS | Ambience | Rive |
+|------|-----|------|----------|------|
+| Now | private | private | private | private |
+| ~6 months (Eric/Rive deal) | private | private | private | **public npm** |
+| ~12 months (CoNexus traction) | revisit | private forever | revisit | public |
+
+**If source visibility is needed** (e.g., Rive partnership wants open-source collaboration): extract `packages/rive/` into its own public repo (`github.com/dgrslabs/void-energy-rive`). The package is self-contained — no cross-package imports, only peer dependency on the public `void-energy` core. This is Option B; default is Option A (private repo, public npm package).
 
 ---
 

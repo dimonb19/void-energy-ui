@@ -86,18 +86,22 @@
 
 ## D6: Eric Jordan Rive Package Timeline
 
-**Status:** Deferred — decoupled from wave timeline
-**Owner:** Eric Jordan
-**Timeline:** No hard deadline — ships whenever Eric delivers
+**Status:** In progress — Dima prototyping, decoupled from wave timeline
+**Owner:** Dima (prototype), Eric Jordan (polish)
+**Timeline:** No hard deadline — ships whenever ready
 
 ### Context
-Eric is evaluating Rive glass effects. Package scope = Void Energy visual assets only (not CoNexus content). Present deal after Wave 1 launch. Rive is the second premium package (after Ambience Layers) — it joins the premium repo whenever Eric is ready.
+Dima builds the Rive glass effects prototype (`.riv` file + `RiveOverlay.svelte` integration). Eric Jordan reviews the live showcase site, polishes the `.riv` visual craft, and connects DGRS Labs with the Rive team for potential partnership.
+
+Rive package starts private in the premium monorepo. Can be flipped to public npm independently when the Eric/Rive partnership materializes — no restructuring needed (per-package `publishConfig`). If Rive wants source visibility, extract to a separate public repo.
 
 ### What's Needed
-- Eric delivers `.riv` files + Svelte wrapper components
-- Assets must respond to physics presets (glass/flat/retro)
-- Must follow PACKAGE.md interface spec
-- Must declare `void-energy` as peer dependency
+- Dima: glass-surface.riv with 3 effects + click ripple, RiveOverlay.svelte integration scaffold
+- Eric: polish .riv visual quality, suggest additional effects
+- State machine: 5 inputs (`bool_Active`, `num_Intensity`, `num_LightX`, `num_LightY`, `trigger_Click`)
+- Glass physics only — not in DOM for flat/retro
+- White colors only — physically correct, works across all atmospheres
+- Full plan: [07-rive-glass-effects.md](07-rive-glass-effects.md)
 
 ---
 
@@ -209,6 +213,8 @@ _Pending discussion between Dima and Boss._
 
 **Showcase strategy:** The void.dgrslabs.ink site shows ALL features including premium packages — visible, not downloadable. People see the technology; code stays private. Collect contacts from interested parties; discuss access after CoNexus launches.
 
+**Selective publishing escape hatch:** Individual packages can be flipped from private (GitHub Packages) to public (npmjs.org) independently via `publishConfig` — no repo restructuring needed. The monorepo stays private; only the npm package becomes public. This enables scenarios like open-sourcing Rive for a partnership while keeping KT and DGRS private. See [04-npm-distribution.md](04-npm-distribution.md) for details.
+
 **When to revisit:** After CoNexus has traction (6-12 months post-launch). At that point, the moat is userbase + content + community, and open-sourcing KT could boost VE adoption without threatening CoNexus.
 
 ---
@@ -242,6 +248,23 @@ The bottom navigation was already a floating island. Having the top bar remain a
 
 ---
 
+## D13: Selective Publishing — Per-Package Registry Control
+
+**Status:** Decided
+**Owner:** Dima
+**Date:** 2026-04-04
+
+### Resolution
+**Each premium package has its own `publishConfig` and can be published to a different registry independently.** One monorepo, different registries per package. Flip one field to move a package from private (GitHub Packages) to public (npmjs.org). Other packages are untouched.
+
+**Why this matters:** Enables scenarios like open-sourcing the Rive package for an Eric Jordan/Rive partnership while keeping KT, DGRS, and Ambience private. No repo restructuring, no migration — just change `publishConfig` on the target package.
+
+**Source visibility:** When a package goes public on npm, the GitHub repo stays private. If source visibility is needed for a partnership (e.g., Rive team wants to contribute), extract the package into its own public repo. Each package is self-contained (no cross-package imports), so extraction is straightforward.
+
+**Details:** See [04-npm-distribution.md](04-npm-distribution.md) — "Selective Publishing" section.
+
+---
+
 ## Decision Log
 
 | # | Decision | Status | Date | Outcome |
@@ -251,10 +274,11 @@ The bottom navigation was already a floating island. Having the top bar remain a
 | D3 | AI generator | **Decided** | 2026-03-31 | Public (free, consumer's API key) |
 | D4 | Free atmospheres | **Decided** | 2026-03-31 | Slate, Terminal, Meridian, Solar (all ready) |
 | D5 | BSL license | **Decided** (approach) | 2026-03-31 | AI draft → lawyer swap |
-| D6 | Rive timeline | Deferred | — | Decoupled from waves, ships when Eric delivers |
+| D6 | Rive timeline | **Updated** | 2026-04-04 | Dima prototypes, Eric polishes. Glass-only, 5 inputs, white colors. |
 | D7 | Premium package order | **Updated** | 2026-04-04 | KT first, DGRS second, Ambience third, Rive fourth — all premium |
 | D8 | Monorepo decommission | **Decided** | 2026-03-31 | No rush, keep as dev environment |
 | D9 | Public component tier | **Updated** | 2026-04-04 | All primitives free; KT + DGRS are premium packages |
 | D10 | Eric Jordan deal | **Open** | — | Revenue share recommended |
 | D11 | Strategic moat | **Decided** | 2026-04-02 | All packages private until CoNexus has traction |
 | D12 | Top nav island (mobile) | **Decided** | 2026-04-02 | Floating pill nav on mobile, matching bottom island |
+| D13 | Selective publishing | **Decided** | 2026-04-04 | Per-package `publishConfig` — flip individual packages public/private independently |

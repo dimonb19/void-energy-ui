@@ -75,7 +75,7 @@ Finish Void Energy completely before touching CoNexus. No split focus.
 - [ ] Move DGRS package from monorepo (12 atmospheres + UI components, shared across all DGRS Labs apps)
 - [ ] Build Ambience Layers (Blood, Snow, Rain, Fog)
 - [ ] Private npm via GitHub Packages
-- [ ] Eric Jordan's Rive package — ships whenever he delivers (decoupled)
+- [ ] Rive glass effects package — Dima prototypes, Eric polishes ([plan](07-rive-glass-effects.md))
 - [ ] Collect contacts from interested parties
 
 ### Wave 3 — CoNexus Migration (after VE is complete)
@@ -102,7 +102,7 @@ Only start when Void Energy (starter + premium) is fully done.
 | 1 | `@dgrslabs/void-energy-kinetic-text` | v0.1.0 built | Move from monorepo to premium repo |
 | 2 | `@dgrslabs/void-energy-dgrs` | Staging in monorepo | 12 atmospheres + UI components, shared across all DGRS Labs apps |
 | 3 | `@dgrslabs/void-energy-ambience` | Not started | Build when CoNexus needs it |
-| 4 | `@dgrslabs/void-energy-rive` | Pending Eric | Decoupled from wave timeline |
+| 4 | `@dgrslabs/void-energy-rive` | Planning | Dima prototypes glass effects, Eric reviews/polishes. [Full plan](07-rive-glass-effects.md). |
 
 ---
 
@@ -152,12 +152,20 @@ Eric Jordan (2Advanced Studios, FWA Hall of Fame) is the first premium collabora
 | D3 | AI atmosphere generator | Public (free, consumer's API key) |
 | D4 | Free atmospheres | Slate, Terminal, Meridian, Solar (all ready) |
 | D5 | BSL license approach | AI draft + lawyer swap |
-| D6 | Rive timeline | Decoupled, ships when Eric delivers |
+| D6 | Rive timeline | Dima prototypes, Eric polishes. Glass-only, 5 inputs. |
 | D7 | Premium package order | KT first, DGRS second, Ambience third, Rive fourth |
 | D8 | Monorepo decommission | No rush, keep as dev environment |
 | D9 | Public component tier | 40+ components free; KT moved to premium |
 | D10 | Eric Jordan deal | Revenue share recommended (open) |
 | D11 | Strategic moat | ALL packages private until CoNexus has traction |
+| D12 | Top nav island | Floating pill nav on mobile, matching bottom island |
+| D13 | Selective publishing | Per-package `publishConfig` — flip packages public/private independently |
+
+---
+
+## Selective Publishing
+
+Each premium package has its own `publishConfig`. Individual packages can be flipped from private (GitHub Packages) to public (npmjs.org) independently — one field change, no repo restructuring. Enables open-sourcing Rive for a partnership while keeping KT and DGRS private. See [04-npm-distribution.md](04-npm-distribution.md).
 
 ---
 
@@ -172,6 +180,7 @@ Eric Jordan (2Advanced Studios, FWA Hall of Fame) is the first premium collabora
 | [04-npm-distribution.md](04-npm-distribution.md) | Public npm + private GitHub Packages setup |
 | [05-documentation.md](05-documentation.md) | Docs strategy, README template, licensing docs |
 | [06-decisions.md](06-decisions.md) | All decisions with rationale |
+| [07-rive-glass-effects.md](07-rive-glass-effects.md) | Rive glass effects package — full technical plan |
 
 ---
 

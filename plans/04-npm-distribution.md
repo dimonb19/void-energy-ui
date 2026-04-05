@@ -286,7 +286,52 @@ Premium collaborator packages follow this pattern:
 | Rive assets (Eric Jordan) | `@dgrslabs/void-energy-rive` | Fourth package — pending Eric's delivery |
 | Future collaborator packages | `@dgrslabs/void-energy-{name}` | As collaborators onboard |
 
-**Note:** ALL packages are premium/private — strategic moat for CoNexus. The DGRS package contains the 12 original atmospheres + shared UI components, used across all DGRS Labs apps. Premium deals with external customers are for later, after CoNexus launches.
+**Note:** ALL packages start premium/private — strategic moat for CoNexus. Individual packages can be flipped to public npm independently (see Selective Publishing below). Premium deals with external customers are for later, after CoNexus launches.
+
+---
+
+## Selective Publishing — Per-Package Registry Control
+
+The premium monorepo is private, but each package has its own `publishConfig` and can be published to a different registry independently. This enables flipping individual packages from private to public without affecting others.
+
+### How It Works
+
+```json
+// Private package (default for all premium packages)
+{
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
+  }
+}
+
+// Public package (flip when ready — one field change)
+{
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  }
+}
+```
+
+One monorepo, different registries per package. Change `publishConfig` on one package → that package publishes to public npm on next release. Other packages remain on GitHub Packages (private). The GitHub repo stays private regardless — consumers get the built package from npm but cannot browse source.
+
+### Planned Timeline
+
+| Package | Start | Future |
+|---------|-------|--------|
+| `@dgrslabs/void-energy-kinetic-text` | Private (GitHub Packages) | Revisit at 6-12 months post-CoNexus launch |
+| `@dgrslabs/void-energy-dgrs` | Private (GitHub Packages) | Private forever (internal DGRS identity) |
+| `@dgrslabs/void-energy-ambience` | Private (GitHub Packages) | Revisit when CoNexus has traction |
+| `@dgrslabs/void-energy-rive` | Private (GitHub Packages) | **Public npm when Eric Jordan/Rive partnership materializes** |
+
+### Source Visibility Options
+
+When a package goes public on npm, consumers get the built files but the GitHub repo stays private (no source browsing, no issues, no PRs). Two options if source visibility is needed:
+
+**Option A (default):** Private repo, public npm package. Simplest. Like GSAP — public npm, private source. Good enough for most commercial purposes.
+
+**Option B (partnership):** Extract the package into its own public GitHub repo (e.g., `github.com/dgrslabs/void-energy-rive`). Source visible, community contributions possible, Rive team can showcase collaboration. More overhead, but better for partnership optics. Each premium package is self-contained (no cross-package imports), so extraction is straightforward.
 
 ---
 
@@ -336,7 +381,9 @@ Use a compatibility matrix in the premium repo README:
 - [ ] `@dgrslabs` npm scope is claimed (either npm org or GitHub org)
 - [ ] Premium packages publish to chosen private registry
 - [ ] Consumer can `npm install void-energy` from fresh project
-- [ ] Consumer with auth can `npm install @dgrslabs/void-energy-rive`
+- [ ] Consumer with auth can `npm install @dgrslabs/void-energy-kinetic-text`
 - [ ] Consumer without auth gets a clear error (not a confusing 404)
 - [ ] CI/CD pipelines publish on tagged releases
 - [ ] Version coordination documented in premium repo
+- [ ] Selective publishing works: one package can target public npm while others stay on GitHub Packages
+- [ ] Per-package `publishConfig` verified with `npm publish --dry-run` on individual workspaces

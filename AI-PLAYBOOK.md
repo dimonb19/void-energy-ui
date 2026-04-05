@@ -37,6 +37,7 @@ Use `CHEAT-SHEET.md` for deeper examples only after the compact sources above.
 - Tailwind owns page composition, responsive layout, spacing, and consumer-side geometry.
 - SCSS owns visual physics, materials, and primitive-internal geometry. Do not move those concerns into Tailwind.
 - State belongs in `data-*` and ARIA attributes, not modifier classes.
+- Before writing Tailwind classes, check `.claude/rules/tailwind-registry.md` — standard Tailwind scales (numeric spacing, stock colors, default breakpoints) are fully replaced with semantic tokens.
 
 ## No-Invention Matrix
 

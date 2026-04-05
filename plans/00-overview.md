@@ -93,7 +93,9 @@ Dependency direction (never reversed):
 The starter system. What people fork, star, and install via `npm install void-energy`. Contains the complete engine, 4 free atmospheres (Slate, Terminal, Meridian, Solar), 40+ public UI components, AI atmosphere generator, and full documentation. A complete, working system on its own. No premium packages included.
 
 ### Repo 2: `void-energy-premium` (Private) — Wave 2
-All premium packages published under the `@dgrslabs` npm scope. Each package extends the public core without modifying it. Packages: `@dgrslabs/void-energy-kinetic-text` (Kinetic Text), `@dgrslabs/void-energy-dgrs` (12 DGRS atmospheres + UI components — shared across all DGRS Labs apps), `@dgrslabs/void-energy-ambience` (Ambience Layers), `@dgrslabs/void-energy-rive` (Eric Jordan's Rive animations). Private for now — collect contacts, discuss access when demand exists. Premium deals happen after CoNexus launches.
+All premium packages in one private monorepo, published under the `@dgrslabs` npm scope. Each package extends the public core without modifying it. Packages: `@dgrslabs/void-energy-kinetic-text` (Kinetic Text), `@dgrslabs/void-energy-dgrs` (12 DGRS atmospheres + UI components — shared across all DGRS Labs apps), `@dgrslabs/void-energy-ambience` (Ambience Layers), `@dgrslabs/void-energy-rive` (Rive glass effects — Dima prototypes, Eric Jordan polishes).
+
+**Selective publishing:** Each package has its own `publishConfig` — individual packages can be flipped from private (GitHub Packages) to public (npmjs.org) independently. The monorepo stays private; only the npm package becomes public. This enables scenarios like open-sourcing Rive for an Eric Jordan/Rive partnership while keeping KT and DGRS private. No repo restructuring needed — just change `publishConfig` on one package.
 
 ### Repo 3: `conexus` (Private) — Wave 3
 The CoNexus AI storytelling platform. Consumes the public `void-energy` package from npm (same as any external consumer) + premium packages from private npm (including `@dgrslabs/void-energy-dgrs` for DGRS atmospheres and UI components). CoNexus-exclusive features (story engine, portal effects) live here. Serves as the flagship showcase of Void Energy at production scale. Only starts after VE is fully complete.
@@ -119,6 +121,7 @@ The CoNexus AI storytelling platform. Consumes the public `void-energy` package 
 | 04 | [NPM Distribution](04-npm-distribution.md) | Publishing strategy for public and private packages | Wave 1 (public) / Wave 3 (private) |
 | 05 | [Documentation](05-documentation.md) | Documentation site, licensing, and developer guides | Wave 1 |
 | 06 | [Open Decisions](06-decisions.md) | Decisions — most now resolved | All |
+| 07 | [Rive Glass Effects](07-rive-glass-effects.md) | Rive glass material package — specular, edge glow, mesh distortion | Wave 2 (decoupled) |
 
 ---
 
@@ -176,5 +179,6 @@ The **void.dgrslabs.ink** site is the premium showcase. It shows ALL packages an
 | BSL License | AI-drafted placeholder for Wave 1 launch; lawyer swap when review completes |
 | Private npm | Not needed until Wave 3 (GitHub Packages when ready) |
 | Eric Jordan deal | Revenue share recommended; presenting deal after Wave 1 launch |
-| Eric Jordan Rive package | Decoupled from waves — ships whenever Eric delivers |
+| Eric Jordan Rive package | Dima prototyping glass effects, Eric reviews/polishes. Decoupled from waves. |
+| Selective publishing | Per-package `publishConfig` enables flipping individual packages public/private independently |
 | void.dgrslabs.ink | Live on Vercel, shown at EthCC Cannes. Will serve as premium showcase. |
