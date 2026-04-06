@@ -425,8 +425,10 @@
   // Re-seed palette when mode changes and user hasn't touched colors yet
   $effect(() => {
     const mode = editMode;
-    if (!paletteOpen || editDirty) return;
-    untrack(() => seedFromModeDefault(mode));
+    untrack(() => {
+      if (!paletteOpen || editDirty) return;
+      seedFromModeDefault(mode);
+    });
   });
 
   function handleDetailsToggle(e: Event) {
