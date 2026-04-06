@@ -624,8 +624,8 @@
   </header>
 
   <!-- ─── SHOWCASE ────────────────────────────────────────────────── -->
-  <section class="flex flex-col gap-xl">
-    <div class="surface-raised p-lg flex flex-col gap-lg">
+  <section class="flex flex-col gap-xl min-w-0">
+    <div class="surface-raised p-lg flex flex-col gap-lg min-w-0">
       <p class="text-dim">
         Three effect layers run simultaneously on separate DOM nodes.
         <strong>Reveal</strong> controls how text first appears — the entrance
@@ -727,8 +727,8 @@
   </section>
 
   <!-- ─── PER-CHARACTER EFFECTS ──────────────────────────────────────── -->
-  <section class="flex flex-col gap-xl">
-    <div class="surface-raised p-lg flex flex-col gap-lg">
+  <section class="flex flex-col gap-xl min-w-0">
+    <div class="surface-raised p-lg flex flex-col gap-lg min-w-0">
       <div class="flex flex-col gap-xs">
         <h2>Per-Character Effects</h2>
         <p class="text-dim">
@@ -791,7 +791,7 @@
             {#each narrativeOneShotDemos as demo}
               <!-- svelte-ignore a11y_no_static_element_interactions -->
               <div
-                class="kt-demo-card surface-sunk p-md flex flex-col gap-md h-full"
+                class="kt-demo-card surface-sunk p-md flex flex-col gap-md h-full min-w-0"
                 onclick={() => oneShotReplay[demo.effect]++}
                 onpointerenter={() => oneShotReplay[demo.effect]++}
                 onkeydown={(e) => {
@@ -837,7 +837,7 @@
             {#each narrativeContinuousDemos as demo}
               <!-- svelte-ignore a11y_no_static_element_interactions -->
               <div
-                class="kt-demo-card surface-sunk p-md flex flex-col gap-md h-full"
+                class="kt-demo-card surface-sunk p-md flex flex-col gap-md h-full min-w-0"
                 onclick={() => toggleContinuousLoop(demo.effect)}
                 onpointerenter={() => {
                   if (!activeContinuousEffects[demo.effect])
@@ -1185,8 +1185,8 @@
   </section>
 
   <!-- ─── REVEAL STYLES ─────────────────────────────────────────────── -->
-  <section class="flex flex-col gap-xl">
-    <div class="surface-raised p-lg flex flex-col gap-lg">
+  <section class="flex flex-col gap-xl min-w-0">
+    <div class="surface-raised p-lg flex flex-col gap-lg min-w-0">
       <div class="flex flex-col gap-xs">
         <h2>Reveal Styles</h2>
         <p class="text-dim">
@@ -1233,14 +1233,14 @@
 
       {#if snapshot}
         <!-- Pop (default) -->
-        <div class="flex flex-col gap-xs">
+        <div class="flex flex-col gap-xs min-w-0">
           <div class="flex items-center justify-between">
             <h6>Pop <span class="text-caption text-mute">— default</span></h6>
             <button class="btn-icon" onclick={() => replayRevealPop++}>
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
-          <div class="surface-sunk p-lg">
+          <div class="surface-sunk p-lg min-w-0">
             {#key replayRevealPop}
               <KineticText
                 text={SAMPLE_POP}
@@ -1259,14 +1259,14 @@
         </div>
 
         <!-- Scramble -->
-        <div class="flex flex-col gap-xs">
+        <div class="flex flex-col gap-xs min-w-0">
           <div class="flex items-center justify-between">
             <h6>Scramble</h6>
             <button class="btn-icon" onclick={() => replayRevealScramble++}>
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
-          <div class="surface-sunk p-lg">
+          <div class="surface-sunk p-lg min-w-0">
             {#key replayRevealScramble}
               <KineticText
                 text={SAMPLE_SCRAMBLE}
@@ -1284,14 +1284,14 @@
         </div>
 
         <!-- Rise -->
-        <div class="flex flex-col gap-xs">
+        <div class="flex flex-col gap-xs min-w-0">
           <div class="flex items-center justify-between">
             <h6>Rise</h6>
             <button class="btn-icon" onclick={() => replayRevealRise++}>
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
-          <div class="surface-sunk p-lg">
+          <div class="surface-sunk p-lg min-w-0">
             {#key replayRevealRise}
               <KineticText
                 text={SAMPLE_RISE}
@@ -1309,14 +1309,14 @@
         </div>
 
         <!-- Drop -->
-        <div class="flex flex-col gap-xs">
+        <div class="flex flex-col gap-xs min-w-0">
           <div class="flex items-center justify-between">
             <h6>Drop</h6>
             <button class="btn-icon" onclick={() => replayRevealDrop++}>
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
-          <div class="surface-sunk p-lg">
+          <div class="surface-sunk p-lg min-w-0">
             {#key replayRevealDrop}
               <KineticText
                 text={SAMPLE_DROP}
@@ -1334,14 +1334,14 @@
         </div>
 
         <!-- Scale -->
-        <div class="flex flex-col gap-xs">
+        <div class="flex flex-col gap-xs min-w-0">
           <div class="flex items-center justify-between">
             <h6>Scale</h6>
             <button class="btn-icon" onclick={() => replayRevealScale++}>
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
-          <div class="surface-sunk p-lg">
+          <div class="surface-sunk p-lg min-w-0">
             {#key replayRevealScale}
               <KineticText
                 text={SAMPLE_SCALE}
@@ -1359,14 +1359,14 @@
         </div>
 
         <!-- Blur -->
-        <div class="flex flex-col gap-xs">
+        <div class="flex flex-col gap-xs min-w-0">
           <div class="flex items-center justify-between">
             <h6>Blur</h6>
             <button class="btn-icon" onclick={() => replayRevealBlur++}>
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
-          <div class="surface-sunk p-lg">
+          <div class="surface-sunk p-lg min-w-0">
             {#key replayRevealBlur}
               <KineticText
                 text={SAMPLE_BLUR}
@@ -1387,8 +1387,8 @@
   </section>
 
   <!-- ─── REVEAL MODES ─────────────────────────────────────────────── -->
-  <section class="flex flex-col gap-xl">
-    <div class="surface-raised p-lg flex flex-col gap-lg">
+  <section class="flex flex-col gap-xl min-w-0">
+    <div class="surface-raised p-lg flex flex-col gap-lg min-w-0">
       <div class="flex flex-col gap-xs">
         <h2>Reveal Modes</h2>
         <p class="text-dim">
@@ -1441,14 +1441,14 @@
 
       {#if snapshot}
         <!-- Word (default) -->
-        <div class="flex flex-col gap-xs">
+        <div class="flex flex-col gap-xs min-w-0">
           <div class="flex items-center justify-between">
             <h5>Word <span class="text-caption text-mute">— default</span></h5>
             <button class="btn-icon" onclick={() => replayWord++}>
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
-          <div class="surface-sunk p-lg">
+          <div class="surface-sunk p-lg min-w-0">
             {#key `${replayWord}-${revealSpeedPreset}`}
               <KineticText
                 text={SAMPLE_WORD}
@@ -1467,14 +1467,14 @@
         </div>
 
         <!-- Character -->
-        <div class="flex flex-col gap-xs">
+        <div class="flex flex-col gap-xs min-w-0">
           <div class="flex items-center justify-between">
             <h5>Character</h5>
             <button class="btn-icon" onclick={() => replayChar++}>
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
-          <div class="surface-sunk p-lg">
+          <div class="surface-sunk p-lg min-w-0">
             {#key `${replayChar}-${revealSpeedPreset}`}
               <KineticText
                 text={SAMPLE_CHAR}
@@ -1492,7 +1492,7 @@
 
         <!-- Decode (Character variant) -->
         <div
-          class="flex flex-col gap-xs ml-lg border-0 border-l border-solid border-primary pl-md"
+          class="flex flex-col gap-xs min-w-0 ml-lg border-0 border-l border-solid border-primary pl-md"
         >
           <div class="flex items-center justify-between">
             <h6>
@@ -1503,7 +1503,7 @@
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
-          <div class="surface-sunk p-lg">
+          <div class="surface-sunk p-lg min-w-0">
             {#key `${replayDecode}-${revealSpeedPreset}`}
               <KineticText
                 text={SAMPLE_DECODE}
@@ -1526,8 +1526,8 @@
 
   <!-- ─── SKELETON LOADING SECTION ───────────────────────────────── -->
   {#if snapshot}
-    <section class="flex flex-col gap-xl">
-      <div class="surface-raised p-lg flex flex-col gap-lg">
+    <section class="flex flex-col gap-xl min-w-0">
+      <div class="surface-raised p-lg flex flex-col gap-lg min-w-0">
         <div class="flex flex-col gap-xs">
           <h2>Skeleton Loading</h2>
           <p class="text-dim">

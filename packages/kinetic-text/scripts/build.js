@@ -34,6 +34,10 @@ run('npx tsc --project tsconfig.build.json');
 // 3. SCSS → CSS
 mkdirSync(resolve(dist, 'styles'), { recursive: true });
 run('npx sass src/styles/kinetic-text.scss dist/styles/kinetic-text.css --no-source-map --style=compressed');
+writeFileSync(
+  resolve(dist, 'styles/styles.d.ts'),
+  `// Side-effect CSS import\nexport {};\n`,
+);
 
 // 4. Copy Svelte source files
 mkdirSync(resolve(dist, 'svelte'), { recursive: true });

@@ -32,7 +32,10 @@
       "svelte": "./dist/svelte/KineticSkeleton.svelte",
       "default": "./dist/svelte/KineticSkeleton.svelte"
     },
-    "./styles": "./dist/styles/kinetic-text.css"
+    "./styles": {
+      "types": "./dist/styles/styles.d.ts",
+      "default": "./dist/styles/kinetic-text.css"
+    }
   },
   "dependencies": {
     "@chenglou/pretext": "0.0.3"
