@@ -38,3 +38,4 @@ global.css.map
 /src/config/font-registry.ts
 /src/config/void-*.json
 /src/styles/config/*
+.vercel
