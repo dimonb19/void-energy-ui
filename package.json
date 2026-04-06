@@ -11,7 +11,8 @@
   ],
   "scripts": {
     "dev": "tsx scripts/local-dev.ts",
-    "build": "npm run build:tokens && astro build",
+    "build": "npm run build:kinetic-text && npm run build:tokens && astro build",
+    "build:kinetic-text": "npm --workspace @dgrslabs/void-energy-kinetic-text run build",
     "preview": "astro preview",
     "build:tokens": "tsx scripts/generate-tokens.ts",
     "scan": "tsx scripts/scan-physics.ts",
