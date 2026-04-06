@@ -1143,6 +1143,14 @@
       </div>
     </div>
   </details>
+
+  {#if !voidEngine.userConfig.adaptAtmosphere}
+    <p class="text-caption text-mute text-center">
+      Theme overrides are disabled, so generated atmospheres will be saved and
+      applied immediately with no preview or live customizer. Enable "Allow
+      theme overrides" in the Themes modal to preview before keeping.
+    </p>
+  {/if}
 </div>
 
 <style lang="scss">

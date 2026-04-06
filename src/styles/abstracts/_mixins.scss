@@ -46,11 +46,26 @@
 
 // MIXIN: Glass Blur (Backdrop Filter)
 // Context: Progressive enhancement for frosted glass effect.
-// Note: Falls back gracefully - if not supported, no blur is applied.
+// Under glass physics, layers four perceptual cues over the blur:
+//   1. Lensed backdrop chemistry (saturate + brightness + contrast)
+//   2. Specular rim — bright top hairline, dark bottom hairline
+//   3. Body gradient — vertical light-to-shade falloff
+// Falls back gracefully - if backdrop-filter is unsupported, no enhancements apply.
 @mixin glass-blur {
   @supports (backdrop-filter: blur(1px)) {
     backdrop-filter: blur(var(--physics-blur)) saturate(140%);
     -webkit-backdrop-filter: blur(var(--physics-blur)) saturate(140%);
+
+    @include when-glass {
+      box-shadow: inset 0 0 8px 0 rgba(255, 255, 255, 0.06);
+      // void-ignore (Glass Specular)
+
+      // Lensed backdrop — brightens and saturates content beneath like real glass.
+      backdrop-filter: blur(var(--physics-blur)) saturate(180%) brightness(1.08)
+        contrast(1.05);
+      -webkit-backdrop-filter: blur(var(--physics-blur)) saturate(180%)
+        brightness(1.08) contrast(1.05);
+    }
   }
 }
 
