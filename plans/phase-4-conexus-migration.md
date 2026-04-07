@@ -14,7 +14,7 @@
 Create `github.com/dgrslabs/conexus` as a private repository containing a single Svelte/Astro application that:
 
 - Imports `void-energy` from public npmjs.org
-- Imports `@dgrslabs/void-energy-kinetic-text`, `@dgrslabs/void-energy-dgrs`, `@dgrslabs/void-energy-ambience`, and eventually `@dgrslabs/void-energy-rive` from GitHub Packages
+- Imports `@dgrslabs/void-energy-kinetic-text`, `@dgrslabs/void-energy-dgrs`, `@dgrslabs/void-energy-ambient-layers`, and eventually `@dgrslabs/void-energy-rive` from GitHub Packages
 - Contains only CoNexus-specific code: the story engine, narrative orchestration, portal effects, and the interactive storytelling experience
 - Has zero local copies of library code — everything is a dependency
 - Is the living proof that Void Energy works end-to-end for a real application
@@ -64,7 +64,7 @@ github.com/dgrslabs/conexus                    PRIVATE
 │   │   └── persistence.ts                       save/load
 │   │
 │   ├── narrative/                               CoNexus-exclusive
-│   │   ├── orchestrator.svelte.ts               sequencing ambience + KT + atmosphere shifts
+│   │   ├── orchestrator.svelte.ts               sequencing ambient + KT + atmosphere shifts
 │   │   ├── events.ts
 │   │   └── triggers.ts
 │   │
@@ -95,7 +95,7 @@ github.com/dgrslabs/conexus                    PRIVATE
 - No components that belong in `void-energy` — those are imported from npm
 - No atmosphere definitions — those come from `@dgrslabs/void-energy-dgrs`
 - No KT engine code — that's `@dgrslabs/void-energy-kinetic-text`
-- No ambience layers — those are `@dgrslabs/void-energy-ambience`
+- No ambient layers — those are `@dgrslabs/void-energy-ambient-layers`
 - No Rive bindings — those are `@dgrslabs/void-energy-rive`
 - No design tokens, SCSS engine, physics — all from `void-energy`
 
@@ -114,7 +114,7 @@ github.com/dgrslabs/conexus                    PRIVATE
     "void-energy": "^0.1.0",
     "@dgrslabs/void-energy-kinetic-text": "^0.1.0",
     "@dgrslabs/void-energy-dgrs": "^0.1.0",
-    "@dgrslabs/void-energy-ambience": "^0.1.0",
+    "@dgrslabs/void-energy-ambient-layers": "^0.1.0",
     "@dgrslabs/void-energy-rive": "^0.1.0",
     "@anthropic-ai/sdk": "..."
   }
@@ -178,7 +178,7 @@ CoNexus is the primary consumer — its entire reading experience is rendered th
 - DGRS UI components: `Tile`, `StoryCategory`, `PortalLoader`, `LoadingTextCycler`, `StoryFeed`
 - These are shared across all future DGRS Labs apps
 
-### `@dgrslabs/void-energy-ambience` (premium)
+### `@dgrslabs/void-energy-ambient-layers` (premium)
 - Blood, Snow, Rain, Fog layers triggered by story events
 - Narrative orchestrator decides when to fade layers in/out based on the current scene
 
@@ -212,7 +212,7 @@ CoNexus is the primary consumer — its entire reading experience is rendered th
    - Replace all relative imports of library code with imports from `void-energy`
    - Replace imports of DGRS components with imports from `@dgrslabs/void-energy-dgrs`
    - Replace imports of KT with `@dgrslabs/void-energy-kinetic-text`
-   - Replace imports of ambience with `@dgrslabs/void-energy-ambience`
+   - Replace imports of ambient with `@dgrslabs/void-energy-ambient-layers`
 
 6. **Configure auth:**
    - Add `.npmrc` with `@dgrslabs` registry pointing to GitHub Packages
@@ -226,7 +226,7 @@ CoNexus is the primary consumer — its entire reading experience is rendered th
    - `npm run dev` starts without errors
    - Every page renders correctly
    - All 16 atmospheres work
-   - Ambience layers trigger correctly
+   - Ambient layers trigger correctly
    - Kinetic text renders stories correctly
 
 9. **Update Vercel (or whichever deploy target CoNexus uses):**
@@ -262,7 +262,7 @@ CoNexus is a thin app. Every library primitive is imported. Every atmosphere com
 ## Verification checklist
 
 - [ ] Private repo created at `github.com/dgrslabs/conexus`
-- [ ] Repo contains only CoNexus-specific code (no library code, no atmosphere definitions, no KT engine, no ambience layers)
+- [ ] Repo contains only CoNexus-specific code (no library code, no atmosphere definitions, no KT engine, no ambient layers)
 - [ ] `package.json` declares `void-energy` from public npm
 - [ ] `package.json` declares `@dgrslabs/*` premium packages from GitHub Packages
 - [ ] `.npmrc` configured for GitHub Packages with token substitution
@@ -271,7 +271,7 @@ CoNexus is a thin app. Every library primitive is imported. Every atmosphere com
 - [ ] All pages render correctly
 - [ ] All 16 atmospheres are registered and switchable (4 free + 12 DGRS)
 - [ ] Kinetic text renders stories correctly using the premium engine
-- [ ] Ambience layers trigger correctly based on narrative events
+- [ ] Ambient layers trigger correctly based on narrative events
 - [ ] DGRS UI components (Tile, PortalLoader, StoryFeed) render correctly
 - [ ] Production build succeeds
 - [ ] Deploys successfully to Vercel with `GITHUB_TOKEN` env var
@@ -311,7 +311,7 @@ Three repos, three roles, clean dependency direction:
 │  └── packages/                            │── GitHub Packages
 │      ├── kinetic-text                     │
 │      ├── dgrs                             │
-│      ├── ambience                         │
+│      ├── ambient                         │
 │      └── rive                             │
 └──────────────────────────────────────────┘
                   ▲

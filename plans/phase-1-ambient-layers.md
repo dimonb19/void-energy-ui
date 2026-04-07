@@ -1,6 +1,6 @@
-# Phase 1 — Ambience Layers
+# Phase 1 — Ambient Layers
 
-> Build immersive visual overlay layers (Blood, Snow, Rain, Fog) as a dedicated `@dgrslabs/void-energy-ambience` package from day one, following the existing pattern established by Kinetic Text and DGRS.
+> Build immersive visual overlay layers (Blood, Snow, Rain, Fog) as a dedicated `@dgrslabs/void-energy-ambient-layers` package from day one, following the existing pattern established by Kinetic Text and DGRS.
 
 **Status:** Planning — not started
 **Priority:** Phase 1 (current)
@@ -13,7 +13,7 @@
 
 The Phase 3 monorepo restructure is a large, disruptive reorganization of every file in the project. Mixing "build a new feature" with "reorganize every file" produces slow, risky changes with entangled diffs. Completing the design system feature set *first* means Phase 3 becomes pure plumbing — no feature work, just file movement and package configuration.
 
-Ambience Layers is the last major feature the system needs before it can be considered complete.
+Ambient Layers is the last major feature the system needs before it can be considered complete.
 
 ---
 
@@ -23,15 +23,15 @@ The current monorepo already contains `packages/kinetic-text/` and `packages/dgr
 
 **Advantages over building in `src/` first:**
 
-- **Zero lift later.** When Phase 3 moves packages to the premium repo, ambience is already in its final shape. No refactoring of imports, no path aliasing, no rewriting SCSS `@use` statements.
-- **Forced API discipline.** A package has an `exports` map from day one. You cannot reach into other parts of the codebase through relative paths — you must import via public APIs. This keeps the ambience module clean and portable.
-- **Independent versioning.** The ambience package has its own `version` field from commit 1. When we ship a fix, we bump the ambience version, not the whole monorepo.
-- **Consistent with the rest of the system.** Kinetic Text and DGRS already live in `packages/`. Ambience should too. Uniformity matters for AI automation (the AI sees the same structure across all premium packages) and for developer ergonomics.
+- **Zero lift later.** When Phase 3 moves packages to the premium repo, ambient is already in its final shape. No refactoring of imports, no path aliasing, no rewriting SCSS `@use` statements.
+- **Forced API discipline.** A package has an `exports` map from day one. You cannot reach into other parts of the codebase through relative paths — you must import via public APIs. This keeps the ambient module clean and portable.
+- **Independent versioning.** The ambient package has its own `version` field from commit 1. When we ship a fix, we bump the ambient version, not the whole monorepo.
+- **Consistent with the rest of the system.** Kinetic Text and DGRS already live in `packages/`. Ambient should too. Uniformity matters for AI automation (the AI sees the same structure across all premium packages) and for developer ergonomics.
 - **Easier to demo in isolation.** A package can be installed into any test project without pulling the whole monorepo with it.
 
 ---
 
-## What Ambience Layers is
+## What Ambient Layers is
 
 A **layer** is a full-viewport visual overlay that sits above the page content and below the UI chrome, adding environmental atmosphere without interfering with interaction. Think particle systems, weather effects, mood overlays — immersive but non-blocking.
 
@@ -66,7 +66,7 @@ Each layer is a Svelte component imported from the package:
 
 ```svelte
 <script lang="ts">
-  import { BloodLayer, SnowLayer, RainLayer, FogLayer } from '@dgrslabs/void-energy-ambience';
+  import { BloodLayer, SnowLayer, RainLayer, FogLayer } from '@dgrslabs/void-energy-ambient-layers';
 </script>
 
 <BloodLayer intensity={0.6} />
@@ -78,7 +78,7 @@ Each layer is a Svelte component imported from the package:
 ### Common props (all layers)
 
 ```ts
-interface AmbienceLayerProps {
+interface AmbientLayerProps {
   intensity?: number;        // 0..1, default 0.5
   enabled?: boolean;         // default true; false removes from DOM
   reducedMotion?: 'auto' | 'respect' | 'ignore'; // default 'respect'
@@ -98,12 +98,12 @@ interface AmbienceLayerProps {
 A thin store for coordinating multiple layers narratively:
 
 ```ts
-import { ambience } from '@dgrslabs/void-energy-ambience';
+import { ambient } from '@dgrslabs/void-energy-ambient-layers';
 
-ambience.show('rain', { intensity: 0.7 });
-ambience.fade('rain', 0, { duration: 2000 });
-ambience.replace('fog', { intensity: 0.5 });
-ambience.clear();
+ambient.show('rain', { intensity: 0.7 });
+ambient.fade('rain', 0, { duration: 2000 });
+ambient.replace('fog', { intensity: 0.5 });
+ambient.clear();
 ```
 
 Optional — consumers can mount components directly without the coordinator for simple cases.
@@ -112,12 +112,12 @@ Optional — consumers can mount components directly without the coordinator for
 
 ## Package layout
 
-Inside the current monorepo at `packages/ambience/`, mirroring the existing `packages/kinetic-text/` structure:
+Inside the current monorepo at `packages/ambient/`, mirroring the existing `packages/kinetic-text/` structure:
 
 ```
 packages/
-└── ambience/
-    ├── package.json                              { "name": "@dgrslabs/void-energy-ambience" }
+└── ambient/
+    ├── package.json                              { "name": "@dgrslabs/void-energy-ambient-layers" }
     ├── tsconfig.json
     ├── tsconfig.build.json
     ├── README.md
@@ -131,18 +131,18 @@ packages/
     │   │   ├── RainLayer.svelte
     │   │   └── FogLayer.svelte
     │   ├── lib/
-    │   │   ├── ambience-store.svelte.ts          global coordinator
+    │   │   ├── ambient-store.svelte.ts          global coordinator
     │   │   ├── particle-engine.ts                shared particle logic
     │   │   ├── physics-adapters.ts               per-physics rendering strategies
     │   │   └── reduced-motion.ts
     │   ├── styles/
-    │   │   ├── _ambience.scss                    shared base
-    │   │   ├── _ambience-blood.scss
-    │   │   ├── _ambience-snow.scss
-    │   │   ├── _ambience-rain.scss
-    │   │   └── _ambience-fog.scss
+    │   │   ├── _ambient.scss                    shared base
+    │   │   ├── _ambient-blood.scss
+    │   │   ├── _ambient-snow.scss
+    │   │   ├── _ambient-rain.scss
+    │   │   └── _ambient-fog.scss
     │   ├── types/
-    │   │   └── ambience.d.ts
+    │   │   └── ambient.d.ts
     │   └── adapters/
     │       └── void-energy-host.ts               token bridge to void-energy
     └── dist/                                     build output (gitignored)
@@ -154,7 +154,7 @@ Modeled after `packages/kinetic-text/package.json`:
 
 ```json
 {
-  "name": "@dgrslabs/void-energy-ambience",
+  "name": "@dgrslabs/void-energy-ambient-layers",
   "version": "0.1.0",
   "type": "module",
   "license": "UNLICENSED",
@@ -191,28 +191,28 @@ Modeled after `packages/kinetic-text/package.json`:
 }
 ```
 
-The `workspace:*` on `void-energy` lets ambience develop against the local library copy inside the current monorepo. When the package is lifted into the premium repo in Phase 3, this gets rewritten to `"void-energy": "^0.1.0"` (published version).
+The `workspace:*` on `void-energy` lets ambient develop against the local library copy inside the current monorepo. When the package is lifted into the premium repo in Phase 3, this gets rewritten to `"void-energy": "^0.1.0"` (published version).
 
 ---
 
 ## The token bridge (`adapters/void-energy-host.ts`)
 
-Because the ambience package is separate from the core library, it cannot directly read design tokens from `src/config/design-tokens.ts`. Instead, it imports them through the public `void-energy` entry point:
+Because the ambient package is separate from the core library, it cannot directly read design tokens from `src/config/design-tokens.ts`. Instead, it imports them through the public `void-energy` entry point:
 
 ```ts
-// packages/ambience/src/adapters/void-energy-host.ts
+// packages/ambient/src/adapters/void-energy-host.ts
 import { designTokens } from 'void-energy/tokens';
 
-export const ambienceTokens = {
-  bloodBase: designTokens.ambience.blood.base,
-  snowFlake: designTokens.ambience.snow.flake,
+export const ambientTokens = {
+  bloodBase: designTokens.ambient.blood.base,
+  snowFlake: designTokens.ambient.snow.flake,
   // ...
 };
 ```
 
-**Critical:** the core `void-energy/tokens` export must include an `ambience` namespace. This means Phase 1 adds new tokens to the core `src/config/design-tokens.ts` **in addition to** building the ambience package. The tokens are core (part of the public system), but the implementation that consumes them is the premium package.
+**Critical:** the core `void-energy/tokens` export must include an `ambient` namespace. This means Phase 1 adds new tokens to the core `src/config/design-tokens.ts` **in addition to** building the ambient package. The tokens are core (part of the public system), but the implementation that consumes them is the premium package.
 
-**Why tokens live in core, not in the ambience package:** if a premium package defined its own tokens, every premium package would need its own token pipeline, and themes would fragment. Keeping all tokens in one place (core) preserves a single source of truth. The premium package is just an implementation that reads them.
+**Why tokens live in core, not in the ambient package:** if a premium package defined its own tokens, every premium package would need its own token pipeline, and themes would fragment. Keeping all tokens in one place (core) preserves a single source of truth. The premium package is just an implementation that reads them.
 
 ---
 
@@ -224,7 +224,7 @@ Pure CSS particles animated via `@keyframes` are cheapest:
 - Generate N particles at component mount via a `{#each}` loop
 - Each particle gets randomized delay, duration, horizontal position via CSS custom properties
 - Single shared `@keyframes` animation per layer
-- `intensity` scales opacity and particle count via `--ambience-intensity`
+- `intensity` scales opacity and particle count via `--ambient-intensity`
 
 No JS per-frame updates. The browser handles everything.
 
@@ -262,10 +262,10 @@ Never fully hide the layer.
 
 ## Token additions to `void-energy`
 
-Add to `src/config/design-tokens.ts` (in the core library, not the ambience package):
+Add to `src/config/design-tokens.ts` (in the core library, not the ambient package):
 
 ```ts
-ambience: {
+ambient: {
   blood: { base, pulse, drip },
   snow:  { flake, vignette, tint },
   rain:  { streak, glass, tint },
@@ -280,8 +280,8 @@ Each token has light-mode and dark-mode variants. Run `npm run build:tokens` aft
 
 ## Showcase integration
 
-The existing showcase site (currently in the monorepo, will become `apps/showcase` in Phase 3) demonstrates ambience. Add a new section to the showcase page:
-- Install the ambience package as a workspace dependency in the showcase app
+The existing showcase site (currently in the monorepo, will become `apps/showcase` in Phase 3) demonstrates ambient. Add a new section to the showcase page:
+- Install the ambient package as a workspace dependency in the showcase app
 - Import all four layers
 - Live toggle buttons, intensity sliders, layer-specific controls
 - Physics switcher nearby so users can see layers adapt in real time
@@ -293,19 +293,19 @@ The existing showcase site (currently in the monorepo, will become `apps/showcas
 ## Implementation order
 
 1. **Create the package scaffold**
-   - `packages/ambience/` directory
+   - `packages/ambient/` directory
    - `package.json` modeled after `kinetic-text`
    - `tsconfig.json`, `tsconfig.build.json`
    - `README.md` stub, `CHANGELOG.md` stub
    - Wire into the monorepo workspaces
 
-2. **Add ambience tokens to core**
+2. **Add ambient tokens to core**
    - Edit `src/config/design-tokens.ts` in the core library
    - Run `npm run build:tokens`
    - Verify `void-energy/tokens` export exposes the new namespace
 
 3. **Build the adapter layer**
-   - `packages/ambience/src/adapters/void-energy-host.ts` — reads tokens through the public `void-energy/tokens` export
+   - `packages/ambient/src/adapters/void-energy-host.ts` — reads tokens through the public `void-energy/tokens` export
 
 4. **SnowLayer first** (simplest particle-based)
    - Component, SCSS, physics adaptation
@@ -320,7 +320,7 @@ The existing showcase site (currently in the monorepo, will become `apps/showcas
 
 7. **BloodLayer**
 
-8. **Global coordinator** (`ambience-store.svelte.ts`)
+8. **Global coordinator** (`ambient-store.svelte.ts`)
 
 9. **Performance audit**
    - Profile each layer individually
@@ -331,17 +331,17 @@ The existing showcase site (currently in the monorepo, will become `apps/showcas
 
 11. **Documentation**
     - Package README with full API
-    - CHEAT-SHEET additions (ambience catalog)
+    - CHEAT-SHEET additions (ambient catalog)
     - Register in `component-registry.json` (once Phase 2 AI automation defines how premium packages register)
-    - `packages/ambience/CLAUDE.md` — package-level rules
+    - `packages/ambient/CLAUDE.md` — package-level rules
 
 ---
 
 ## Verification checklist
 
-- [ ] `packages/ambience/` exists with the package scaffold matching the `kinetic-text` pattern
-- [ ] `package.json` declares `"name": "@dgrslabs/void-energy-ambience"` and `"peerDependencies": { "void-energy": "workspace:*" }`
-- [ ] Ambience tokens added to core `design-tokens.ts` and generated into `_generated-themes.scss`
+- [ ] `packages/ambient/` exists with the package scaffold matching the `kinetic-text` pattern
+- [ ] `package.json` declares `"name": "@dgrslabs/void-energy-ambient-layers"` and `"peerDependencies": { "void-energy": "workspace:*" }`
+- [ ] Ambient tokens added to core `design-tokens.ts` and generated into `_generated-themes.scss`
 - [ ] All four layers render correctly in glass / flat / retro physics
 - [ ] All four layers render correctly in light and dark modes
 - [ ] Each layer independently stays under 2ms per frame
@@ -351,9 +351,9 @@ The existing showcase site (currently in the monorepo, will become `apps/showcas
 - [ ] Global coordinator store works: show, hide, fade, crossfade
 - [ ] Showcase demonstrates all four layers with live controls
 - [ ] Showcase works on mobile (test at 375px viewport)
-- [ ] The ambience package has **zero direct imports from other parts of the monorepo** — everything goes through `void-energy/*` public exports
-- [ ] `npm run check` passes inside `packages/ambience/`
-- [ ] `npm run test` passes inside `packages/ambience/`
+- [ ] The ambient package has **zero direct imports from other parts of the monorepo** — everything goes through `void-energy/*` public exports
+- [ ] `npm run check` passes inside `packages/ambient/`
+- [ ] `npm run test` passes inside `packages/ambient/`
 - [ ] Package CHANGELOG reflects the 0.1.0 release
 - [ ] Package README documents the full public API
 - [ ] The package is trivially liftable into the Phase 3 premium repo — no refactoring required, just file move + rewrite `workspace:*` to `^0.1.0`
@@ -362,7 +362,7 @@ The existing showcase site (currently in the monorepo, will become `apps/showcas
 
 ## Out of scope for Phase 1
 
-- **Sound ambience.** Audio layers (wind, rain sounds, ambient drones) are a separate future package. Phase 1 is visual only.
+- **Sound ambient.** Audio layers (wind, rain sounds, ambient drones) are a separate future package. Phase 1 is visual only.
 - **Narrative orchestration.** Automatic layer sequencing based on story events is CoNexus-specific and belongs in the story engine.
 - **Custom layer creation API.** Four concrete layers is the deliverable. Plugin API is over-engineering.
 - **Mobile-specific optimizations beyond the performance budget.** 60fps desktop + 30fps mid-range mobile is acceptable.

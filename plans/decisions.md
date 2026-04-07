@@ -67,7 +67,7 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 ## D6 — Premium repo uses the same Pattern A
 
-**Decision:** `dgrslabs/void-energy-premium` is a monorepo with `packages/kinetic-text`, `packages/dgrs`, `packages/ambience`, `packages/rive`. No `apps/` folder.
+**Decision:** `dgrslabs/void-energy-premium` is a monorepo with `packages/kinetic-text`, `packages/dgrs`, `packages/ambient`, `packages/rive`. No `apps/` folder.
 
 **Why:** consistency with the public repo, and because premium packages share tooling (token pipeline, type generation, test setup). One repo means one version cadence and one CI.
 
@@ -75,19 +75,19 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 ---
 
-## D7 — Ambience Layers ships first, as a dedicated package from day one
+## D7 — Ambient Layers ships first, as a dedicated package from day one
 
-**Decision:** Phase 1 = Ambience Layers, built as `@dgrslabs/void-energy-ambience` inside the current monorepo's `packages/` folder from the first commit — not as loose files in `src/` that get lifted later.
+**Decision:** Phase 1 = Ambient Layers, built as `@dgrslabs/void-energy-ambient-layers` inside the current monorepo's `packages/` folder from the first commit — not as loose files in `src/` that get lifted later.
 
 **Why:** Kinetic Text was built this way and the pattern works. Starting as a package enforces API discipline (must import via public exports only), enables independent versioning, and means Phase 3 lifts the package into the premium repo with zero refactoring — just a file move and a version pin. The alternative (build in `src/` first, extract later) creates refactoring debt and breaks API boundaries during development.
 
-**How to apply:** create `packages/ambience/` mirroring the existing `packages/kinetic-text/` layout. Peer-depend on `void-energy` via `workspace:*`. All core imports go through public `void-energy/*` exports, never relative paths.
+**How to apply:** create `packages/ambient/` mirroring the existing `packages/kinetic-text/` layout. Peer-depend on `void-energy` via `workspace:*`. All core imports go through public `void-energy/*` exports, never relative paths.
 
 ---
 
 ## D8 — AI automation foundation lands before the monorepo restructure
 
-**Decision:** Phase 2 = AI automation foundation, built in the current monorepo after Ambience ships but before Phase 3 touches the directory structure.
+**Decision:** Phase 2 = AI automation foundation, built in the current monorepo after Ambient ships but before Phase 3 touches the directory structure.
 
 **Why:** AI automation is not a cosmetic polish pass. It is the primary way Void Energy is consumed — by AI agents building apps on top of it. If the AI hallucinates components, forgets the 5 Laws, or recreates primitives that already exist, the system fails at its job. Landing the foundation while the current monorepo is stable means Phase 3 inherits a working system and only has to redistribute its files across workspaces, rather than inventing and restructuring simultaneously.
 
@@ -107,7 +107,7 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 ## D10 — Free vs premium split
 
-**Decision:** 4 atmospheres, 40+ components, AI generator, all actions (narrative, drag, base kinetic reveal) are **free**. Kinetic Text engine, DGRS package, Ambience Layers, Rive animations are **premium**.
+**Decision:** 4 atmospheres, 40+ components, AI generator, all actions (narrative, drag, base kinetic reveal) are **free**. Kinetic Text engine, DGRS package, Ambient Layers, Rive animations are **premium**.
 
 **Free atmospheres:** Slate (flat/dark), Terminal (retro/dark), Meridian (flat/light), Frost (glass/dark). All 3 physics + both modes covered. AI generator lets anyone create unlimited custom themes.
 
@@ -169,13 +169,13 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 ---
 
-## D16 — Ambience Layers scope: Blood, Snow, Rain, Fog
+## D16 — Ambient Layers scope: Blood, Snow, Rain, Fog
 
 **Decision:** Phase 1 delivers exactly four layers: Blood, Snow, Rain, Fog. No more, no less.
 
 **Why:** these four cover the range CoNexus needs (horror/intensity, cold/isolation, mood/weather, mystery/obscurity) and demonstrate the system's physics adaptation across all four classic ambient effect categories. More would delay later phases; fewer would leave CoNexus undercooked.
 
-**How to apply:** see [phase-1-ambience-layers.md](phase-1-ambience-layers.md).
+**How to apply:** see [phase-1-ambient-layers.md](phase-1-ambient-layers.md).
 
 ---
 
@@ -209,7 +209,7 @@ Forcing one to use the other creates friction: `install` users would have to ext
 | D4 | Template payload in `apps/starter-template` | Committed |
 | D5 | Showcase in `apps/showcase` | Committed |
 | D6 | Premium repo uses Pattern A | Committed |
-| D7 | Ambience Layers as dedicated package from day one (Phase 1) | Committed |
+| D7 | Ambient Layers as dedicated package from day one (Phase 1) | Committed |
 | D8 | AI automation foundation lands in current monorepo (Phase 2) | Committed |
 | D9 | CoNexus migrates last (Phase 4) | Committed |
 | D10 | Free vs premium split | Committed |
@@ -218,6 +218,6 @@ Forcing one to use the other creates friction: `install` users would have to ext
 | D13 | No CI/CD in starter template | Committed |
 | D14 | AI automation via npm package | Committed |
 | D15 | Starter template self-contained | Committed |
-| D16 | Ambience scope: Blood/Snow/Rain/Fog | Committed |
+| D16 | Ambient scope: Blood/Snow/Rain/Fog | Committed |
 | D17 | Selective publishing via publishConfig | Committed |
 | D18 | Eric deal: revenue share, no equity | Proposed |

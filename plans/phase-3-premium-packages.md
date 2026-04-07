@@ -1,10 +1,10 @@
 # Phase 2 — Premium Packages Repo
 
-> Create the private `dgrslabs/void-energy-premium` monorepo and populate it with the four premium packages: Kinetic Text, DGRS, Ambience, and Rive.
+> Create the private `dgrslabs/void-energy-premium` monorepo and populate it with the four premium packages: Kinetic Text, DGRS, Ambient, and Rive.
 
 **Status:** Planning — blocked on Phase 1 completion
 **Priority:** Phase 2 (parallel to monorepo restructure)
-**Depends on:** Phase 1 (Ambience Layers complete), Phase 2 public monorepo (for `void-energy` as a dependency)
+**Depends on:** Phase 1 (Ambient Layers complete), Phase 2 public monorepo (for `void-energy` as a dependency)
 **Blocks:** Phase 3 (CoNexus imports premium from this repo)
 **Related:** [phase-2-monorepo-structure.md](phase-2-monorepo-structure.md)
 
@@ -26,7 +26,7 @@ After Phase 2:
 
 Same reasoning as the public repo: [decisions.md §D6](decisions.md#d6--premium-repo-uses-the-same-pattern-a). All four premium packages share tooling (token bridging to `void-energy`, type generation, SCSS build, test setup). Keeping them in one repo means one version cadence, one CI, one place to develop all premium features.
 
-**Why NOT a single "void-energy-premium" package:** each premium feature has different consumers. A studio might license only Kinetic Text. CoNexus uses DGRS + Ambience + KT. A customer might want only Rive. Keeping them separate packages means each consumer installs what they need, nothing more.
+**Why NOT a single "void-energy-premium" package:** each premium feature has different consumers. A studio might license only Kinetic Text. CoNexus uses DGRS + Ambient + KT. A customer might want only Rive. Keeping them separate packages means each consumer installs what they need, nothing more.
 
 ---
 
@@ -66,9 +66,9 @@ github.com/dgrslabs/void-energy-premium         PRIVATE
     │   ├── scripts/
     │   └── tests/
     │
-    ├── ambience/                                 @dgrslabs/void-energy-ambience
+    ├── ambient/                                 @dgrslabs/void-energy-ambient-layers
     │   ├── package.json
-    │   ├── src/                                  ← lifted from Phase 1's src/ambience/
+    │   ├── src/                                  ← lifted from Phase 1's src/ambient/
     │   │   ├── components/
     │   │   │   ├── BloodLayer.svelte
     │   │   │   ├── SnowLayer.svelte
@@ -118,12 +118,12 @@ All four premium packages depend on `void-energy` from **public npm**, not from 
 ┌──────────────────────────────────────────┐
 │  @dgrslabs/void-energy-kinetic-text       │──┐
 │  @dgrslabs/void-energy-dgrs               │──┤
-│  @dgrslabs/void-energy-ambience            │──┼──► void-energy (public npm)
+│  @dgrslabs/void-energy-ambient-layers            │──┼──► void-energy (public npm)
 │  @dgrslabs/void-energy-rive                │──┘
 └──────────────────────────────────────────┘
 ```
 
-**Packages do NOT depend on each other.** DGRS does not import from KT. Ambience does not import from Rive. If a consumer wants two of them, they install both; each works independently. This prevents the "tangled premium package graph" that kills modularity.
+**Packages do NOT depend on each other.** DGRS does not import from KT. Ambient does not import from Rive. If a consumer wants two of them, they install both; each works independently. This prevents the "tangled premium package graph" that kills modularity.
 
 ---
 
@@ -151,13 +151,13 @@ All four premium packages depend on `void-energy` from **public npm**, not from 
 
 **Phase 2 work:** extract DGRS-specific components and atmosphere definitions from the current monorepo into this package. Wire up the atmosphere registration so consumers call `registerDGRSAtmospheres()` at boot.
 
-### 3. Ambience (`@dgrslabs/void-energy-ambience`)
+### 3. Ambient (`@dgrslabs/void-energy-ambient-layers`)
 
-**Status:** Phase 1 builds this inside the current monorepo as `src/ambience/`.
+**Status:** Phase 1 builds this inside the current monorepo as `src/ambient/`.
 
-**Scope:** Blood, Snow, Rain, Fog visual overlay layers. See [phase-1-ambience-layers.md](phase-1-ambience-layers.md) for the full spec.
+**Scope:** Blood, Snow, Rain, Fog visual overlay layers. See [phase-1-ambient-layers.md](phase-1-ambient-layers.md) for the full spec.
 
-**Phase 2 work:** lift the entire `src/ambience/` directory from the current monorepo into `packages/ambience/src/`. Because Phase 1 built it in isolation (no cross-imports from other feature modules), this is a clean move. Update the SCSS imports from `@use '../abstracts' as *` to `@use 'void-energy/styles/abstracts' as *`. Publish.
+**Phase 2 work:** lift the entire `src/ambient/` directory from the current monorepo into `packages/ambient/src/`. Because Phase 1 built it in isolation (no cross-imports from other feature modules), this is a clean move. Update the SCSS imports from `@use '../abstracts' as *` to `@use 'void-energy/styles/abstracts' as *`. Publish.
 
 ### 4. Rive (`@dgrslabs/void-energy-rive`)
 
@@ -203,7 +203,7 @@ GitHub Packages is the private npm registry for the `@dgrslabs` scope. To publis
 ```bash
 # In each package's package.json:
 {
-  "name": "@dgrslabs/void-energy-ambience",
+  "name": "@dgrslabs/void-energy-ambient-layers",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com",
     "access": "restricted"
@@ -220,14 +220,14 @@ Consumers need a GitHub personal access token with `read:packages` scope. They c
 //npm.pkg.github.com/:_authToken=ghp_xxxxxxxxxxxx
 ```
 
-Then `npm install @dgrslabs/void-energy-ambience` works like any other package.
+Then `npm install @dgrslabs/void-energy-ambient-layers` works like any other package.
 
 **Who gets tokens:** DGRS Labs team members, licensed customers (once we start selling). Distribution is manual — we issue tokens to people who pay or partner.
 
 ### Publishing workflow
 
 ```bash
-cd packages/ambience
+cd packages/ambient
 npm version patch   # or minor/major
 npm publish
 ```
@@ -262,7 +262,7 @@ The public `apps/showcase/` site demonstrates all four premium packages. It inst
     "void-energy": "workspace:*",
     "@dgrslabs/void-energy-kinetic-text": "^0.1.0",
     "@dgrslabs/void-energy-dgrs": "^0.1.0",
-    "@dgrslabs/void-energy-ambience": "^0.1.0",
+    "@dgrslabs/void-energy-ambient-layers": "^0.1.0",
     "@dgrslabs/void-energy-rive": "^0.1.0"
   }
 }
@@ -282,7 +282,7 @@ The public repo's `.npmrc` (not committed) authenticates to GitHub Packages so V
 2. **Scaffold the workspace structure:** root `package.json`, `packages/` folders, shared tooling
 3. **Migrate Kinetic Text first** — it already exists, move is mostly mechanical
 4. **Migrate DGRS second** — extract 12 atmospheres + UI components from the current monorepo
-5. **Migrate Ambience third** — lift `src/ambience/` from Phase 1's location
+5. **Migrate Ambient third** — lift `src/ambient/` from Phase 1's location
 6. **Scaffold Rive fourth** — placeholder package, reserve the name
 7. **Verify each package builds and publishes to GitHub Packages** (one at a time)
 8. **Wire up the public showcase** to install from the new packages
@@ -297,12 +297,12 @@ The public repo's `.npmrc` (not committed) authenticates to GitHub Packages so V
 - [ ] Root workspace structure in place
 - [ ] Kinetic Text migrated, builds, publishes to GitHub Packages
 - [ ] DGRS migrated, builds, publishes to GitHub Packages
-- [ ] Ambience migrated, builds, publishes to GitHub Packages
+- [ ] Ambient migrated, builds, publishes to GitHub Packages
 - [ ] Rive scaffold created, name reserved, empty package published
 - [ ] Each package declares `void-energy` as a peer dependency
 - [ ] No premium package imports from another premium package
 - [ ] Each package has its own `publishConfig` pointing to GitHub Packages
-- [ ] A developer with a GitHub token can `npm install @dgrslabs/void-energy-ambience` from a fresh directory
+- [ ] A developer with a GitHub token can `npm install @dgrslabs/void-energy-ambient-layers` from a fresh directory
 - [ ] The public `apps/showcase/` installs all four premium packages successfully
 - [ ] The public showcase demonstrates all four premium packages working
 - [ ] The public showcase deploys to Vercel with the GitHub token in env

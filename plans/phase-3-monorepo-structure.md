@@ -3,8 +3,8 @@
 > Restructure Void Energy into its production home: a public monorepo following Pattern A, producing two npm packages, housing the showcase site, and providing the starter template.
 
 **Status:** Planning — blocked on Phase 1 completion
-**Priority:** Phase 2 (after Ambience Layers ship)
-**Depends on:** Phase 1 (Ambience Layers complete and self-contained)
+**Priority:** Phase 2 (after Ambient Layers ship)
+**Depends on:** Phase 1 (Ambient Layers complete and self-contained)
 **Blocks:** Phase 3 (CoNexus migration)
 **Related:** [phase-2-premium-packages.md](phase-2-premium-packages.md), [phase-2-ai-automation.md](phase-2-ai-automation.md)
 
@@ -190,7 +190,7 @@ A **tiny CLI package** (~50–100 lines) whose only job is to copy `apps/starter
 
 **Key rules:**
 - Consumer-side code only. Does NOT edit `packages/void-energy/`.
-- For premium demos (KT, DGRS, Ambience, Rive), installs the premium packages from GitHub Packages as regular dependencies.
+- For premium demos (KT, DGRS, Ambient, Rive), installs the premium packages from GitHub Packages as regular dependencies.
 - Deploys to Vercel from the monorepo root. Vercel auto-detects workspaces.
 
 ### `apps/starter-template/` — the scaffold payload
@@ -288,7 +288,7 @@ The `files` field controls what ends up in the npm tarball. `scripts/`, `src/`, 
     "void-energy": "workspace:*",
     "@dgrslabs/void-energy-kinetic-text": "...",
     "@dgrslabs/void-energy-dgrs": "...",
-    "@dgrslabs/void-energy-ambience": "...",
+    "@dgrslabs/void-energy-ambient-layers": "...",
     "@dgrslabs/void-energy-rive": "..."
   }
 }

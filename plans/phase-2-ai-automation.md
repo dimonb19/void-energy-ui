@@ -2,8 +2,8 @@
 
 > Build the robust AI context system inside the current `void-energy-ui` monorepo. This is foundational infrastructure — not a "polish pass" that happens later during the restructure. The system must have strong AI automation before Phase 3 touches anything.
 
-**Status:** Planning — blocked on Phase 1 (Ambience Layers) completion
-**Priority:** Phase 2 (second priority, after Ambience ships)
+**Status:** Planning — blocked on Phase 1 (Ambient Layers) completion
+**Priority:** Phase 2 (second priority, after Ambient ships)
 **Depends on:** Phase 1 complete
 **Blocks:** Phase 3 (monorepo restructure inherits and redistributes this work)
 
@@ -28,7 +28,7 @@ Inside the current `void-energy-ui` monorepo, establish:
 1. **A layered `CLAUDE.md` + `.claude/` system** that provides the right rules at the right scope (system-level vs consumer-level)
 2. **A complete, enforced `component-registry.json`** that is the single source of truth for "what components exist"
 3. **Strict rules, agents, commands, and skills** that make Claude Code reliably follow the 5 Laws and the Void Energy protocols
-4. **A package-level CLAUDE.md pattern** that premium packages (starting with ambience, kinetic-text, dgrs) all follow
+4. **A package-level CLAUDE.md pattern** that premium packages (starting with ambient, kinetic-text, dgrs) all follow
 5. **AI-readable catalogs** (`CHEAT-SHEET.md`, `AI-PLAYBOOK.md`, `COMPOSITION-RECIPES.md`) that are curated, accurate, and referenced by the rules
 
 After Phase 2, opening Claude Code anywhere in the monorepo produces correct, rule-following behavior without manual prompting.
@@ -43,8 +43,8 @@ Three loading mechanisms, each with different scope:
 
 Claude Code walks up the filesystem from the current working directory and loads every `CLAUDE.md` it finds along the way. Nearest wins on conflicts; higher-level files still contribute rules that aren't overridden.
 
-**Example:** `cd packages/ambience && claude` loads:
-1. `packages/ambience/CLAUDE.md` (nearest)
+**Example:** `cd packages/ambient && claude` loads:
+1. `packages/ambient/CLAUDE.md` (nearest)
 2. `packages/CLAUDE.md` if it exists
 3. `CLAUDE.md` at monorepo root
 4. `~/.claude/CLAUDE.md` (user-global)
@@ -116,9 +116,9 @@ void-energy-ui/                                ← current monorepo root
 │                                                   do not modify src/components."
 │
 └── packages/
-    ├── ambience/
+    ├── ambient/
     │   └── CLAUDE.md                          ← PACKAGE: premium-package rules
-    │                                              "you are editing the ambience package.
+    │                                              "you are editing the ambient package.
     │                                               peer-depend on void-energy only.
     │                                               no cross-reach into other packages."
     ├── kinetic-text/
@@ -188,9 +188,9 @@ Already largely in place today. Phase 2 gaps to fill:
 - "All imports from the core library must go through public exports (`void-energy/tokens`, `void-energy/styles`, `void-energy/components/*`)."
 - "This package does NOT import from other `packages/*` — premium packages are independent of each other."
 - "The package is a dedicated module designed to be liftable into the Phase 3 premium repo with zero refactoring."
-- Package-specific patterns (e.g., kinetic text's engine API, ambience's layer API)
+- Package-specific patterns (e.g., kinetic text's engine API, ambient's layer API)
 
-**Three packages need this file:** `packages/ambience/CLAUDE.md`, `packages/kinetic-text/CLAUDE.md`, `packages/dgrs/CLAUDE.md`.
+**Three packages need this file:** `packages/ambient/CLAUDE.md`, `packages/kinetic-text/CLAUDE.md`, `packages/dgrs/CLAUDE.md`.
 
 ---
 
@@ -262,7 +262,7 @@ Phase 2 builds the foundation **in the current monorepo structure** (`src/`, `pa
 | `.claude/`                            | `.claude/` (monorepo root) — mostly same       |
 | `src/CLAUDE.md`                       | `packages/void-energy/CLAUDE.md`               |
 | `src/pages/CLAUDE.md`                 | `apps/showcase/CLAUDE.md` + new `apps/starter-template/CLAUDE.md` (self-contained) |
-| `packages/ambience/CLAUDE.md`         | `packages/ambience/CLAUDE.md` in the **premium** repo |
+| `packages/ambient/CLAUDE.md`         | `packages/ambient/CLAUDE.md` in the **premium** repo |
 | `src/config/component-registry.json`  | `packages/void-energy/src/config/component-registry.json` |
 | `AI-PLAYBOOK.md` (root)               | `packages/void-energy/AI-PLAYBOOK.md` (ships in npm tarball) |
 | `COMPOSITION-RECIPES.md` (root)       | `packages/void-energy/COMPOSITION-RECIPES.md` (ships in npm tarball) |
@@ -295,7 +295,7 @@ The **starter template** that `create-void-energy` scaffolds in Phase 3 will hav
    - Create `.claude/rules/*.md` files for topic-specific rules
 
 3. **Write package-level CLAUDE.md for each `packages/*`**
-   - `packages/ambience/CLAUDE.md`
+   - `packages/ambient/CLAUDE.md`
    - `packages/kinetic-text/CLAUDE.md`
    - `packages/dgrs/CLAUDE.md`
    - Use a consistent template across all three
@@ -311,7 +311,7 @@ The **starter template** that `create-void-energy` scaffolds in Phase 3 will hav
 
 6. **Curate `CHEAT-SHEET.md`, `AI-PLAYBOOK.md`, `COMPOSITION-RECIPES.md`**
    - Make sure they're accurate, current, and AI-readable
-   - Add new sections as needed for ambience (now that Phase 1 is done)
+   - Add new sections as needed for ambient (now that Phase 1 is done)
    - Cross-link so the AI can navigate from one to another
 
 7. **Formalize `.claude/settings.json`**
@@ -322,7 +322,7 @@ The **starter template** that `create-void-energy` scaffolds in Phase 3 will hav
 8. **Test the layered behavior**
    - `cd src/components/ui && claude` — verify strict library rules kick in
    - `cd src/pages && claude` — verify consumer rules kick in
-   - `cd packages/ambience && claude` — verify package rules kick in
+   - `cd packages/ambient && claude` — verify package rules kick in
    - Each should produce correctly scoped behavior without manual prompting
 
 9. **Document the system**
@@ -336,7 +336,7 @@ The **starter template** that `create-void-energy` scaffolds in Phase 3 will hav
 - [ ] Root `CLAUDE.md` contains the 5 Laws, workspace map, and pointers to sub-directory rules
 - [ ] `src/CLAUDE.md` exists with strict library-level rules
 - [ ] `src/pages/CLAUDE.md` exists with consumer-level rules
-- [ ] `packages/ambience/CLAUDE.md` exists with package-level rules
+- [ ] `packages/ambient/CLAUDE.md` exists with package-level rules
 - [ ] `packages/kinetic-text/CLAUDE.md` exists with package-level rules
 - [ ] `packages/dgrs/CLAUDE.md` exists with package-level rules
 - [ ] `.claude/rules/` contains topic-specific rule files (SCSS, Runes, Token Law, Native-first, State, Composition)
@@ -347,7 +347,7 @@ The **starter template** that `create-void-energy` scaffolds in Phase 3 will hav
 - [ ] `CHEAT-SHEET.md`, `AI-PLAYBOOK.md`, `COMPOSITION-RECIPES.md` are current and accurate
 - [ ] Running Claude Code in `src/components/ui/` produces strict library behavior
 - [ ] Running Claude Code in `src/pages/` produces consumer behavior
-- [ ] Running Claude Code in `packages/ambience/` produces package-level behavior
+- [ ] Running Claude Code in `packages/ambient/` produces package-level behavior
 - [ ] A subagent invocation correctly audits the registry for drift
 - [ ] Root `CLAUDE.md` documents the layered system for future maintainers
 

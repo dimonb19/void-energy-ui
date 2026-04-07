@@ -27,12 +27,12 @@ The UI/UX premium feel is our only differentiator right now — no userbase, no 
 
 Work is organized into four phases. **Each phase ships before the next begins.** No split focus.
 
-### Phase 1 — Ambience Layers
-**Why first:** Ambience Layers is the last major feature the system needs before it can be considered complete. Building it as a dedicated premium package from day one (following the existing Kinetic Text and DGRS pattern) means Phase 3 lifts it into the premium repo with zero refactoring.
+### Phase 1 — Ambient Layers
+**Why first:** Ambient Layers is the last major feature the system needs before it can be considered complete. Building it as a dedicated premium package from day one (following the existing Kinetic Text and DGRS pattern) means Phase 3 lifts it into the premium repo with zero refactoring.
 
-**Deliverable:** `@dgrslabs/void-energy-ambience` package inside the current monorepo containing Blood, Snow, Rain, Fog — four immersive visual overlay layers that adapt to physics and color mode.
+**Deliverable:** `@dgrslabs/void-energy-ambient-layers` package inside the current monorepo containing Blood, Snow, Rain, Fog — four immersive visual overlay layers that adapt to physics and color mode.
 
-**Plan:** [phase-1-ambience-layers.md](phase-1-ambience-layers.md)
+**Plan:** [phase-1-ambient-layers.md](phase-1-ambient-layers.md)
 
 ### Phase 2 — AI Automation Foundation
 **Why second:** AI automation is not a polish pass — it is the primary differentiator of how Void Energy is consumed. Consumers build with AI. The team builds with AI. If the AI hallucinates components or drifts from the 5 Laws, the system fails at its job. Landing the foundation in the current monorepo first means Phase 3 inherits a working system and only has to redistribute it across workspaces.
@@ -50,7 +50,7 @@ Work is organized into four phases. **Each phase ships before the next begins.**
 - `create-void-energy` npm package (scaffolder)
 - `apps/showcase` deployed to `void.dgrslabs.ink`
 - `apps/starter-template` as the self-contained fork/scaffold target
-- Private `dgrslabs/void-energy-premium` monorepo with 4 packages: Kinetic Text, DGRS, Ambience, Rive
+- Private `dgrslabs/void-energy-premium` monorepo with 4 packages: Kinetic Text, DGRS, Ambient, Rive
 - AI automation foundation from Phase 2 redistributed across the new workspace layout
 
 **Plans:**
@@ -105,10 +105,10 @@ All architectural and strategic decisions with rationale are documented in [deci
 |-----|-------|
 | [README.md](README.md) | This index |
 | [decisions.md](decisions.md) | Canonical decisions log with rationale |
-| [phase-1-ambience-layers.md](phase-1-ambience-layers.md) | Phase 1: `@dgrslabs/void-energy-ambience` package |
+| [phase-1-ambient-layers.md](phase-1-ambient-layers.md) | Phase 1: `@dgrslabs/void-energy-ambient-layers` package |
 | [phase-2-ai-automation.md](phase-2-ai-automation.md) | Phase 2: layered CLAUDE.md + registry in current monorepo |
 | [phase-3-monorepo-structure.md](phase-3-monorepo-structure.md) | Phase 3: public monorepo, npm packages, scaffolder |
-| [phase-3-premium-packages.md](phase-3-premium-packages.md) | Phase 3: private premium repo, KT/DGRS/Ambience/Rive |
+| [phase-3-premium-packages.md](phase-3-premium-packages.md) | Phase 3: private premium repo, KT/DGRS/Ambient/Rive |
 | [phase-4-conexus-migration.md](phase-4-conexus-migration.md) | Phase 4: CoNexus as a consumer of the finished system |
 | [archive/](archive/) | Previous plan structure, kept for historical reference |
 
@@ -116,4 +116,4 @@ All architectural and strategic decisions with rationale are documented in [deci
 
 ## One-line priority
 
-**Finish Ambience Layers → land AI automation foundation → restructure into public/premium monorepos + ship npm packages → migrate CoNexus. One phase at a time, no split focus.**
+**Finish Ambient Layers → land AI automation foundation → restructure into public/premium monorepos + ship npm packages → migrate CoNexus. One phase at a time, no split focus.**
