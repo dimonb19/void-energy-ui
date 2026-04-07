@@ -141,6 +141,13 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
   });
   scss += `);\n\n`;
 
+  // Ambient layer tokens map (consumed by base/_themes.scss → :root vars).
+  scss += `$ambient-tokens: (\n`;
+  Object.entries(tokens.ambient).forEach(([key, val]) => {
+    scss += `  '${key}': ${val},\n`;
+  });
+  scss += `);\n\n`;
+
   // Themes map.
   scss += `$themes: (\n`;
   Object.entries(tokens.themes).forEach(([themeName, config]) => {

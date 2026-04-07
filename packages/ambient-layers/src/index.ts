@@ -1,36 +1,49 @@
 /**
- * @dgrslabs/void-energy-ambient-layers - Premium full-viewport ambient overlay layers
- * for Void Energy hosts.
+ * @dgrslabs/void-energy-ambient-layers — Premium full-viewport ambient overlay
+ * layers for Void Energy hosts.
  *
- * Each layer is a `pointer-events: none` Svelte component that mounts a full-viewport
- * fixed overlay above the page content and below the UI chrome. Layers adapt to the
- * active physics preset (glass / flat / retro) and color mode (light / dark) via the
- * `<html data-physics data-mode>` runtime contract.
+ * Four category components, each driven by a `variant` prop that selects the
+ * concrete layer within its category. Mirrors the structural pattern of
+ * `@dgrslabs/void-energy-kinetic-text` (one component, flat variant union).
  *
  * ```svelte
  * <script lang="ts">
- *   import { SnowLayer } from '@dgrslabs/void-energy-ambient-layers';
+ *   import {
+ *     AtmosphereLayer,
+ *     PsychologyLayer,
+ *     ActionLayer,
+ *     EnvironmentLayer,
+ *   } from '@dgrslabs/void-energy-ambient-layers';
  *   import '@dgrslabs/void-energy-ambient-layers/styles';
  * </script>
  *
- * <SnowLayer intensity={0.7} flakeCount="medium" wind={0.4} />
+ * <EnvironmentLayer variant="night" />
+ * <AtmosphereLayer variant="rain" intensity={3} />
+ * <PsychologyLayer variant="danger" intensity={2} />
+ * {#if showImpact}
+ *   <ActionLayer variant="impact" level="heavy" onComplete={() => showImpact = false} />
+ * {/if}
  * ```
  *
  * @module
  */
-export { default as SnowLayer } from './svelte/SnowLayer.svelte';
-export { default as RainLayer } from './svelte/RainLayer.svelte';
-export { default as FogLayer } from './svelte/FogLayer.svelte';
-export { default as BloodLayer } from './svelte/BloodLayer.svelte';
+export { default as AtmosphereLayer } from './svelte/AtmosphereLayer.svelte';
+export { default as PsychologyLayer } from './svelte/PsychologyLayer.svelte';
+export { default as ActionLayer } from './svelte/ActionLayer.svelte';
+export { default as EnvironmentLayer } from './svelte/EnvironmentLayer.svelte';
 
 export type {
-  AmbientLayerProps,
-  SnowLayerProps,
-  RainLayerProps,
-  FogLayerProps,
-  BloodLayerProps,
-  FlakeDensity,
-  RainDensity,
-  FogDrift,
+  AmbientCategory,
+  AmbientLayerId,
+  AmbientIntensity,
+  AtmosphereLayer as AtmosphereLayerId,
+  AtmosphereLayerProps,
+  PsychologyLayer as PsychologyLayerId,
+  PsychologyLayerProps,
+  ActionLayer as ActionLayerId,
+  ActionLayerProps,
+  ActionLevel,
+  EnvironmentLayer as EnvironmentLayerId,
+  EnvironmentLayerProps,
   ReducedMotionMode,
 } from './types';

@@ -42,31 +42,26 @@ writeFileSync(
 
 // 4. Copy Svelte source files
 mkdirSync(resolve(dist, 'svelte'), { recursive: true });
-cpSync(
-  resolve(root, 'src/svelte/SnowLayer.svelte'),
-  resolve(dist, 'svelte/SnowLayer.svelte'),
-);
-cpSync(
-  resolve(root, 'src/svelte/RainLayer.svelte'),
-  resolve(dist, 'svelte/RainLayer.svelte'),
-);
-cpSync(
-  resolve(root, 'src/svelte/FogLayer.svelte'),
-  resolve(dist, 'svelte/FogLayer.svelte'),
-);
-cpSync(
-  resolve(root, 'src/svelte/BloodLayer.svelte'),
-  resolve(dist, 'svelte/BloodLayer.svelte'),
-);
+for (const name of [
+  'AtmosphereLayer',
+  'PsychologyLayer',
+  'ActionLayer',
+  'EnvironmentLayer',
+]) {
+  cpSync(
+    resolve(root, `src/svelte/${name}.svelte`),
+    resolve(dist, `svelte/${name}.svelte`),
+  );
+}
 
 // 5. Barrel index.js
 writeFileSync(
   resolve(dist, 'index.js'),
   `// Generated barrel - re-exports public API
-export { default as SnowLayer } from './svelte/SnowLayer.svelte';
-export { default as RainLayer } from './svelte/RainLayer.svelte';
-export { default as FogLayer } from './svelte/FogLayer.svelte';
-export { default as BloodLayer } from './svelte/BloodLayer.svelte';
+export { default as AtmosphereLayer } from './svelte/AtmosphereLayer.svelte';
+export { default as PsychologyLayer } from './svelte/PsychologyLayer.svelte';
+export { default as ActionLayer } from './svelte/ActionLayer.svelte';
+export { default as EnvironmentLayer } from './svelte/EnvironmentLayer.svelte';
 export {} from './types.js';
 `,
 );
@@ -75,28 +70,37 @@ export {} from './types.js';
 writeFileSync(
   resolve(dist, 'index.d.ts'),
   `import { SvelteComponent } from 'svelte';
-import type { SnowLayerProps, RainLayerProps, FogLayerProps, BloodLayerProps } from './types.js';
+import type {
+  AtmosphereLayerProps,
+  PsychologyLayerProps,
+  ActionLayerProps,
+  EnvironmentLayerProps,
+} from './types.js';
 
-/** Snow ambient layer - drifting CSS particle snowfall, physics-aware. */
-declare const SnowLayer: typeof SvelteComponent<SnowLayerProps>;
-/** Rain ambient layer - angled CSS streak rainfall, physics-aware. */
-declare const RainLayer: typeof SvelteComponent<RainLayerProps>;
-/** Fog ambient layer - drifting volumetric mist blobs, physics-aware. */
-declare const FogLayer: typeof SvelteComponent<FogLayerProps>;
-/** Blood ambient layer - heartbeat vignette + falling drips, physics-aware. */
-declare const BloodLayer: typeof SvelteComponent<BloodLayerProps>;
-export { SnowLayer, RainLayer, FogLayer, BloodLayer };
+/** Atmosphere category layer - weather/sensory variants (rain, snow, ash, fog, underwater, heat). */
+declare const AtmosphereLayer: typeof SvelteComponent<AtmosphereLayerProps>;
+/** Psychology category layer - edge-framed mental variants (danger, tension, dizzy, focus, flashback, dreaming). */
+declare const PsychologyLayer: typeof SvelteComponent<PsychologyLayerProps>;
+/** Action category layer - one-shot transient variants (impact, speed, glitch, flash, reveal). */
+declare const ActionLayer: typeof SvelteComponent<ActionLayerProps>;
+/** Environment category layer - sticky baseline tint variants (night, indoor_warm, neon). */
+declare const EnvironmentLayer: typeof SvelteComponent<EnvironmentLayerProps>;
+export { AtmosphereLayer, PsychologyLayer, ActionLayer, EnvironmentLayer };
 
 export type {
-  AmbientLayerProps,
-  SnowLayerProps,
-  RainLayerProps,
-  FogLayerProps,
-  BloodLayerProps,
-  FlakeDensity,
-  RainDensity,
-  FogDrift,
+  AmbientCategory,
+  AmbientLayerId,
+  AmbientIntensity,
+  ActionLevel,
   ReducedMotionMode,
+  AtmosphereLayer as AtmosphereLayerId,
+  PsychologyLayer as PsychologyLayerId,
+  ActionLayer as ActionLayerId,
+  EnvironmentLayer as EnvironmentLayerId,
+  AtmosphereLayerProps,
+  PsychologyLayerProps,
+  ActionLayerProps,
+  EnvironmentLayerProps,
 } from './types.js';
 `,
 );

@@ -125,6 +125,34 @@ export const VOID_RADIUS = {
   full: '9999px', // Pill shape
 } as const;
 
+/**
+ * AMBIENT LAYER TOKENS
+ *
+ * Global constants consumed by @dgrslabs/void-energy-ambient-layers.
+ * These are intentional raw colors (sepia tint, glitch RGB-split, night/warm/neon
+ * environment washes) that previously lived inline as `// void-ignore` values in
+ * the package's SCSS. Exposing them as CSS variables lets consumers retheme
+ * ambient effects without forking the package, while package SCSS keeps the raw
+ * value as a `var(..., fallback)` so it stays standalone-usable.
+ */
+export const VOID_AMBIENT = {
+  // Flashback — sepia wash
+  'ambient-sepia-shadow': '#3a2a1a',
+  'ambient-sepia-wash': 'rgba(120, 80, 40, 0.15)',
+  // Glitch — RGB-split chroma
+  'ambient-glitch-r': 'rgba(255, 0, 100, 0.3)',
+  'ambient-glitch-b': 'rgba(0, 200, 255, 0.3)',
+  // Night environment — cool deep-blue wash
+  'ambient-night-top': 'rgba(20, 30, 60, 0.45)',
+  'ambient-night-bottom': 'rgba(10, 15, 35, 0.55)',
+  // Indoor warm environment — incandescent amber
+  'ambient-warm-center': 'rgba(255, 200, 140, 0.25)',
+  'ambient-warm-edge': 'rgba(180, 120, 60, 0.35)',
+  // Neon environment — cyberpunk magenta/cyan
+  'ambient-neon-a': 'rgba(255, 0, 200, 0.2)',
+  'ambient-neon-b': 'rgba(0, 200, 255, 0.2)',
+} as const;
+
 // --------------------------------------------------------------------------
 // TYPOGRAPHY TOKENS (Font Scales, Weights, Line Heights)
 // --------------------------------------------------------------------------
@@ -302,6 +330,10 @@ export const VOID_TOKENS = {
       scale: 1,
       shadowOffset: '3px',
     },
+  },
+
+  ambient: {
+    ...VOID_AMBIENT,
   },
 
   // Theme registry: atmospheres defined in src/config/atmospheres.ts

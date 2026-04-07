@@ -28,6 +28,12 @@
   @each $key, $val in $default-palette {
     --#{$key}: #{$val};
   }
+
+  // Ambient layer tokens — global constants, theme-agnostic but overridable
+  // per atmosphere via [data-atmosphere="..."] if a theme needs a custom wash.
+  @each $key, $val in config.$ambient-tokens {
+    --#{$key}: #{$val};
+  }
 }
 
 // Emit [data-physics="..."] layer.

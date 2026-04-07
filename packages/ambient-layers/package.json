@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "type": "module",
   "license": "UNLICENSED",
-  "description": "Immersive full-viewport overlay layers for Void Energy (Snow, Rain, Fog, Blood)",
+  "description": "Immersive full-viewport overlay layers for Void Energy (Atmosphere, Psychology, Action, Environment)",
   "files": [
     "dist",
     "README.md",
@@ -15,25 +15,25 @@
       "svelte": "./dist/index.js",
       "default": "./dist/index.js"
     },
-    "./snow": {
-      "types": "./dist/svelte/SnowLayer.svelte",
-      "svelte": "./dist/svelte/SnowLayer.svelte",
-      "default": "./dist/svelte/SnowLayer.svelte"
+    "./atmosphere": {
+      "types": "./dist/svelte/AtmosphereLayer.svelte",
+      "svelte": "./dist/svelte/AtmosphereLayer.svelte",
+      "default": "./dist/svelte/AtmosphereLayer.svelte"
     },
-    "./rain": {
-      "types": "./dist/svelte/RainLayer.svelte",
-      "svelte": "./dist/svelte/RainLayer.svelte",
-      "default": "./dist/svelte/RainLayer.svelte"
+    "./psychology": {
+      "types": "./dist/svelte/PsychologyLayer.svelte",
+      "svelte": "./dist/svelte/PsychologyLayer.svelte",
+      "default": "./dist/svelte/PsychologyLayer.svelte"
     },
-    "./fog": {
-      "types": "./dist/svelte/FogLayer.svelte",
-      "svelte": "./dist/svelte/FogLayer.svelte",
-      "default": "./dist/svelte/FogLayer.svelte"
+    "./action": {
+      "types": "./dist/svelte/ActionLayer.svelte",
+      "svelte": "./dist/svelte/ActionLayer.svelte",
+      "default": "./dist/svelte/ActionLayer.svelte"
     },
-    "./blood": {
-      "types": "./dist/svelte/BloodLayer.svelte",
-      "svelte": "./dist/svelte/BloodLayer.svelte",
-      "default": "./dist/svelte/BloodLayer.svelte"
+    "./environment": {
+      "types": "./dist/svelte/EnvironmentLayer.svelte",
+      "svelte": "./dist/svelte/EnvironmentLayer.svelte",
+      "default": "./dist/svelte/EnvironmentLayer.svelte"
     },
     "./types": {
       "types": "./dist/types.d.ts",
