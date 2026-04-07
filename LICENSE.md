@@ -23,7 +23,7 @@ You may make production use of the Licensed Work, provided your organization (in
 
 **Change License:** Apache License, Version 2.0
 
-**Commercial licensing:** Organizations exceeding the Additional Use Grant may purchase a commercial license. Contact: licensing@dgrslabs.com
+**Commercial licensing:** Organizations exceeding the Additional Use Grant may purchase a commercial license. Contact: biz@dgrslabs.com
 
 ---
 
