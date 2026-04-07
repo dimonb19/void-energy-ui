@@ -133,7 +133,6 @@ export class VoidEngine {
     density: 'standard',
     adaptAtmosphere: true,
     fixedNav: false,
-    narrativeEffects: true,
   });
 
   // Temporary theme contexts (for story themes, previews, or forced scopes).

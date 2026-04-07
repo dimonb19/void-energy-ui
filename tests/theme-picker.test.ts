@@ -13,7 +13,6 @@ function resetThemeState() {
     density: 'standard',
     adaptAtmosphere: true,
     fixedNav: false,
-    narrativeEffects: true,
   };
 
   document.documentElement.setAttribute('data-atmosphere', 'frost');

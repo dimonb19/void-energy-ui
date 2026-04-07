@@ -119,7 +119,6 @@ const StoredUserConfigSchema = z
     density: VoidDensitySchema.optional(),
     adaptAtmosphere: z.boolean().optional(),
     fixedNav: z.boolean().optional(),
-    narrativeEffects: z.boolean().optional(),
   })
   .strict();
 

@@ -221,8 +221,6 @@ interface UserConfig {
   adaptAtmosphere: boolean;
   /** Keep navigation bar visible while scrolling */
   fixedNav: boolean;
-  /** Enable narrative effects (post-reveal ambient text animations) */
-  narrativeEffects: boolean;
 }
 
 // ==========================================================================
