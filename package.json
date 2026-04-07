@@ -11,13 +11,15 @@
   ],
   "scripts": {
     "dev": "tsx scripts/local-dev.ts",
-    "build": "npm run build:kinetic-text && npm run build:tokens && astro build",
+    "build": "npm run build:kinetic-text && npm run build:ambient-layers && npm run build:tokens && astro build",
     "build:kinetic-text": "npm --workspace @dgrslabs/void-energy-kinetic-text run build",
+    "build:ambient-layers": "npm --workspace @dgrslabs/void-energy-ambient-layers run build",
     "preview": "astro preview",
     "build:tokens": "tsx scripts/generate-tokens.ts",
     "scan": "tsx scripts/scan-physics.ts",
     "check:registry": "tsx scripts/check-component-registry.ts",
     "check:kinetic-text": "npm --workspace @dgrslabs/void-energy-kinetic-text run check",
+    "check:ambient-layers": "npm --workspace @dgrslabs/void-energy-ambient-layers run check",
     "check": "npm run check:registry && svelte-check --tsconfig ./tsconfig.json",
     "test": "vitest run",
     "format": "prettier --write ."

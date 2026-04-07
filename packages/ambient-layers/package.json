@@ -1,0 +1,58 @@
+{
+  "name": "@dgrslabs/void-energy-ambient-layers",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "UNLICENSED",
+  "description": "Immersive full-viewport overlay layers for Void Energy (Snow, Rain, Fog, Blood)",
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./snow": {
+      "types": "./dist/svelte/SnowLayer.svelte",
+      "svelte": "./dist/svelte/SnowLayer.svelte",
+      "default": "./dist/svelte/SnowLayer.svelte"
+    },
+    "./rain": {
+      "types": "./dist/svelte/RainLayer.svelte",
+      "svelte": "./dist/svelte/RainLayer.svelte",
+      "default": "./dist/svelte/RainLayer.svelte"
+    },
+    "./fog": {
+      "types": "./dist/svelte/FogLayer.svelte",
+      "svelte": "./dist/svelte/FogLayer.svelte",
+      "default": "./dist/svelte/FogLayer.svelte"
+    },
+    "./blood": {
+      "types": "./dist/svelte/BloodLayer.svelte",
+      "svelte": "./dist/svelte/BloodLayer.svelte",
+      "default": "./dist/svelte/BloodLayer.svelte"
+    },
+    "./types": {
+      "types": "./dist/types.d.ts",
+      "default": "./dist/types.js"
+    },
+    "./styles": {
+      "types": "./dist/styles/styles.d.ts",
+      "default": "./dist/styles/ambient-layers.css"
+    }
+  },
+  "peerDependencies": {
+    "svelte": "^5.0.0"
+  },
+  "devDependencies": {
+    "sass-embedded": "^1.93.0",
+    "typescript": "^5.8.0"
+  },
+  "scripts": {
+    "build": "node scripts/build.js",
+    "check": "svelte-check --tsconfig ./tsconfig.json"
+  }
+}

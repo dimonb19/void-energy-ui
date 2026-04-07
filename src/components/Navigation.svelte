@@ -11,7 +11,7 @@
   import { navlink } from '@actions/navlink';
   import LogoDGRS from './icons/LogoDGRS.svelte';
   import Quill from './icons/Quill.svelte';
-  import { LayoutGrid, Type } from '@lucide/svelte';
+  import { LayoutGrid, Type, CloudSnow } from '@lucide/svelte';
 
   // ─────────────────────────────────────────────────────────────────────────────
   // Navigation Data Structure
@@ -38,6 +38,12 @@
       label: 'Kinetic Text',
       href: '/kinetic-text',
       icon: Type,
+    },
+    {
+      id: 'ambient-layers',
+      label: 'Ambient',
+      href: '/ambient-layers',
+      icon: CloudSnow,
     },
     { id: 'conexus', label: 'CoNexus', href: '/conexus', icon: Quill },
   ];

@@ -1,0 +1,517 @@
+// @dgrslabs/void-energy-ambient-layers - shared layer styles
+//
+// All ambient layers share a common root: a fixed, full-viewport, pointer-events:none
+// container that sits above page content and below UI chrome (z-index: 10 = `float`).
+// Layer-specific particles/visuals nest inside.
+//
+// This file is built standalone via `sass` (no @use of host abstracts), so physics +
+// mode adaptation uses raw `[data-physics]` / `[data-mode]` attribute selectors against
+// the host's `<html>` element. All color values flow through host-defined CSS variables
+// (--text-main, --text-mute, --bg-canvas, etc.) so layers re-skin automatically per theme.
+
+.ambient-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 10; // 'float' layer - above content, below header (40) and overlays (90)
+  contain: strict;
+  --ambient-intensity: 0.5;
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// SNOW
+// ──────────────────────────────────────────────────────────────────────────
+
+.ambient-snow {
+  &__flake {
+    position: absolute;
+    top: 0;
+    left: var(--x);
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    background: var(--text-main);
+    opacity: 0;
+    will-change: transform, opacity;
+    animation: ambient-snow-fall var(--duration) linear var(--delay) infinite;
+    transform: translate3d(0, -10vh, 0);
+  }
+}
+
+@keyframes ambient-snow-fall {
+  0% {
+    transform: translate3d(0, -10vh, 0);
+    opacity: 0;
+  }
+  8% {
+    opacity: calc(var(--flake-opacity) * var(--ambient-intensity));
+  }
+  92% {
+    opacity: calc(var(--flake-opacity) * var(--ambient-intensity));
+  }
+  100% {
+    transform: translate3d(var(--drift), 110vh, 0);
+    opacity: 0;
+  }
+}
+
+// ── Physics adaptation ──────────────────────────────────────────────────
+
+// Glass: subtle bloom around each flake (depth + light)
+:where([data-physics='glass']) .ambient-snow__flake {
+  filter: blur(0.5px) drop-shadow(0 0 4px var(--text-main));
+}
+
+// Flat: clean silhouettes, no glow, slightly reduced opacity for restraint
+:where([data-physics='flat']) .ambient-snow {
+  --ambient-intensity: calc(var(--ambient-intensity, 0.5) * 0.85);
+}
+:where([data-physics='flat']) .ambient-snow__flake {
+  filter: none;
+}
+
+// Retro: hard pixel squares, stepped fall (jittery CRT feel)
+:where([data-physics='retro']) .ambient-snow__flake {
+  border-radius: 0;
+  filter: none;
+  animation-timing-function: steps(20, end);
+}
+
+// ── Mode adaptation ─────────────────────────────────────────────────────
+
+// Light mode: snow needs to be visible against a light canvas. Use text-main
+// (which is dark in light mode) but give it a soft outer halo via shadow.
+:where([data-mode='light']) .ambient-snow__flake {
+  background: var(--text-mute);
+  filter: blur(0.5px);
+}
+:where([data-mode='light'][data-physics='glass']) .ambient-snow__flake {
+  filter: blur(0.5px) drop-shadow(0 0 3px var(--text-dim));
+}
+
+// ── Reduced motion ─────────────────────────────────────────────────────
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-layer[data-reduced-motion='respect'] .ambient-snow__flake,
+  .ambient-layer[data-reduced-motion='auto'] .ambient-snow__flake {
+    animation-play-state: paused;
+    // Freeze visible at half intensity so the field stays present but still.
+    opacity: calc(var(--flake-opacity) * var(--ambient-intensity) * 0.5);
+    // Lock the frozen position somewhere in the middle of the fall.
+    transform: translate3d(
+      calc(var(--drift) * 0.5),
+      calc(50vh + (var(--delay) * -1px)),
+      0
+    );
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// RAIN
+// ──────────────────────────────────────────────────────────────────────────
+
+.ambient-rain {
+  --rain-angle: 15deg;
+
+  &__drop {
+    position: absolute;
+    top: 0;
+    left: var(--x);
+    width: 1px; // void-ignore — rain stroke floor; sub-pixel widths render inconsistently
+    height: var(--length);
+    background: linear-gradient(to bottom, transparent, var(--text-main));
+    opacity: 0;
+    will-change: transform, opacity;
+    rotate: var(--rain-angle);
+    transform-origin: top;
+    animation: ambient-rain-fall var(--duration) linear var(--delay) infinite;
+    transform: translate3d(0, -20vh, 0);
+  }
+}
+
+@keyframes ambient-rain-fall {
+  0% {
+    transform: translate3d(0, -20vh, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: calc(var(--drop-opacity) * var(--ambient-intensity));
+  }
+  90% {
+    opacity: calc(var(--drop-opacity) * var(--ambient-intensity));
+  }
+  100% {
+    transform: translate3d(0, 120vh, 0);
+    opacity: 0;
+  }
+}
+
+// ── Physics adaptation ──────────────────────────────────────────────────
+
+// Glass: bloom along each streak for wet, lit-edge depth
+:where([data-physics='glass']) .ambient-rain__drop {
+  filter: drop-shadow(0 0 3px var(--text-main)) blur(0.3px);
+}
+
+// Flat: clean silhouettes, slightly restrained intensity
+:where([data-physics='flat']) .ambient-rain {
+  --ambient-intensity: calc(var(--ambient-intensity, 0.5) * 0.85);
+}
+:where([data-physics='flat']) .ambient-rain__drop {
+  filter: none;
+}
+
+// Retro: hard pixel columns, stepped fall (CRT phosphor scanline feel)
+:where([data-physics='retro']) .ambient-rain__drop {
+  width: 2px; // void-ignore — retro readability floor, matches navigation chevron rule
+  background: var(--text-main);
+  filter: none;
+  animation-timing-function: steps(24, end);
+}
+
+// ── Mode adaptation ─────────────────────────────────────────────────────
+
+// Light mode: rain needs to read against a light canvas. Use text-dim
+// (darker than text-mute) so the streaks have presence without weight.
+:where([data-mode='light']) .ambient-rain__drop {
+  background: linear-gradient(to bottom, transparent, var(--text-dim));
+}
+:where([data-mode='light'][data-physics='glass']) .ambient-rain__drop {
+  filter: drop-shadow(0 0 2px var(--text-mute)) blur(0.3px);
+}
+:where([data-mode='light'][data-physics='retro']) .ambient-rain__drop {
+  background: var(--text-dim);
+}
+
+// ── Reduced motion ─────────────────────────────────────────────────────
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-layer[data-reduced-motion='respect'] .ambient-rain__drop,
+  .ambient-layer[data-reduced-motion='auto'] .ambient-rain__drop {
+    animation-play-state: paused;
+    opacity: calc(var(--drop-opacity) * var(--ambient-intensity) * 0.5);
+    transform: translate3d(0, 50vh, 0);
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// FOG
+// ──────────────────────────────────────────────────────────────────────────
+//
+// Fog is rendered as a small set (5) of overlapping radial-gradient blobs that
+// drift horizontally and pulse opacity subtly. Unlike Snow/Rain (particle fields),
+// fog is a volumetric layer — the mental model is "drifting clouds of mist" not
+// "many small things". Each blob's center fades to transparent at ~70% radius so
+// blobs blend smoothly where they overlap.
+
+.ambient-fog {
+  --fog-opacity: 0.5;
+
+  &__blob {
+    position: absolute;
+    top: var(--y);
+    left: var(--x);
+    width: var(--w);
+    height: var(--h);
+    background: radial-gradient(
+      ellipse at center,
+      var(--text-mute) 0%,
+      transparent 70%
+    );
+    border-radius: 50%;
+    opacity: 0;
+    will-change: transform, opacity;
+    filter: blur(60px);
+    transform: translate3d(0, 0, 0);
+    animation:
+      ambient-fog-drift var(--duration) linear var(--delay) infinite,
+      ambient-fog-pulse var(--pulse-duration) ease-in-out var(--pulse-delay)
+        infinite;
+  }
+
+  // 'still' drift: freeze the horizontal sweep but keep the breathing pulse alive.
+  &[data-drift='still'] .ambient-fog__blob {
+    animation:
+      ambient-fog-drift var(--duration) linear var(--delay) infinite paused,
+      ambient-fog-pulse var(--pulse-duration) ease-in-out var(--pulse-delay)
+        infinite;
+    transform: translate3d(40vw, 0, 0);
+  }
+}
+
+@keyframes ambient-fog-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(120vw, 0, 0);
+  }
+}
+
+@keyframes ambient-fog-pulse {
+  0%,
+  100% {
+    opacity: calc(
+      var(--blob-opacity) * var(--ambient-intensity) * var(--fog-opacity) * 0.6
+    );
+  }
+  50% {
+    opacity: calc(
+      var(--blob-opacity) * var(--ambient-intensity) * var(--fog-opacity)
+    );
+  }
+}
+
+// ── Physics adaptation ──────────────────────────────────────────────────
+
+// Glass: heavy bloom — true volumetric depth fog
+:where([data-physics='glass']) .ambient-fog__blob {
+  filter: blur(60px);
+}
+
+// Flat: moderate haze, slightly restrained
+:where([data-physics='flat']) .ambient-fog {
+  --ambient-intensity: calc(var(--ambient-intensity, 0.5) * 0.85);
+}
+:where([data-physics='flat']) .ambient-fog__blob {
+  filter: blur(30px);
+}
+
+// Retro: hard-edged ellipses, stepped drift, dimmer to avoid solid wall
+:where([data-physics='retro']) .ambient-fog {
+  --ambient-intensity: calc(var(--ambient-intensity, 0.5) * 0.7);
+}
+:where([data-physics='retro']) .ambient-fog__blob {
+  filter: none;
+  background: radial-gradient(
+    ellipse at center,
+    var(--text-mute) 0%,
+    transparent 60%
+  );
+  animation-timing-function: steps(40, end), ease-in-out;
+}
+
+// ── Mode adaptation ─────────────────────────────────────────────────────
+
+// Light mode: fog needs to read against a light canvas. Use text-dim
+// (darker than text-mute) so the haze has presence without weight.
+:where([data-mode='light']) .ambient-fog__blob {
+  background: radial-gradient(
+    ellipse at center,
+    var(--text-dim) 0%,
+    transparent 70%
+  );
+}
+// Lighter blur in glass+light — heavy blur over light canvases reads as muddy
+:where([data-mode='light'][data-physics='glass']) .ambient-fog__blob {
+  filter: blur(40px);
+}
+:where([data-mode='light'][data-physics='retro']) .ambient-fog__blob {
+  background: radial-gradient(
+    ellipse at center,
+    var(--text-dim) 0%,
+    transparent 60%
+  );
+}
+
+// ── Reduced motion ─────────────────────────────────────────────────────
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-layer[data-reduced-motion='respect'] .ambient-fog__blob,
+  .ambient-layer[data-reduced-motion='auto'] .ambient-fog__blob {
+    animation-play-state: paused, paused;
+    opacity: calc(
+      var(--blob-opacity) * var(--ambient-intensity) * var(--fog-opacity) * 0.5
+    );
+    transform: translate3d(40vw, 0, 0);
+  }
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+// BLOOD
+// ──────────────────────────────────────────────────────────────────────────
+//
+// Blood is a horror/tension layer composed of two independent sub-elements:
+//   1. `.ambient-blood__vignette` — a full-viewport radial gradient pinned to
+//      the edges that breathes on a heartbeat rhythm (two quick thumps then a
+//      longer rest). Only rendered when `pulse === true`.
+//   2. `.ambient-blood__drip` — vertical falling streaks, thicker and slower
+//      than rain, with a small accumulation bulb at the bottom via ::after.
+//      Count is derived from `dripRate` (drips/min).
+//
+// Either sub-element can be disabled independently: `pulse=false dripRate=24`
+// is "just drips", `pulse=true dripRate=0` is "just vignette". Color flows
+// through `--color-error-dark` (theme-reactive, semantic) so it re-skins per
+// atmosphere automatically.
+
+.ambient-blood {
+  &__vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      ellipse at center,
+      transparent 35%,
+      var(--color-error-dark) 110%
+    );
+    opacity: 0;
+    will-change: opacity;
+    animation: ambient-blood-heartbeat 1.1s ease-in-out infinite;
+  }
+
+  &__drip {
+    position: absolute;
+    top: 0;
+    left: var(--x);
+    width: 2px; // void-ignore — drip readability floor, matches rain-retro rule
+    height: var(--length);
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      var(--color-error-dark)
+    );
+    border-radius: 0 0 50% 50%;
+    opacity: 0;
+    will-change: transform, opacity;
+    transform: translate3d(0, -20vh, 0);
+    animation: ambient-blood-drip var(--duration) linear var(--delay) infinite;
+  }
+
+  // Accumulation bulb at the tip of each drip.
+  &__drip::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    width: 5px; // void-ignore — bulb sizing, physical droplet shape
+    height: 5px; // void-ignore — bulb sizing, physical droplet shape
+    border-radius: 50%;
+    background: var(--color-error-dark);
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes ambient-blood-heartbeat {
+  // Two-beat cardiac rhythm: thump, thump, rest.
+  0%,
+  100% {
+    opacity: calc(var(--ambient-intensity) * 0.25);
+  }
+  10% {
+    opacity: calc(var(--ambient-intensity) * 0.65);
+  }
+  20% {
+    opacity: calc(var(--ambient-intensity) * 0.3);
+  }
+  30% {
+    opacity: calc(var(--ambient-intensity) * 0.6);
+  }
+  45% {
+    opacity: calc(var(--ambient-intensity) * 0.25);
+  }
+}
+
+@keyframes ambient-blood-drip {
+  0% {
+    transform: translate3d(0, -20vh, 0);
+    opacity: 0;
+  }
+  10% {
+    opacity: calc(var(--drip-opacity) * var(--ambient-intensity));
+  }
+  90% {
+    opacity: calc(var(--drip-opacity) * var(--ambient-intensity));
+  }
+  100% {
+    transform: translate3d(0, 120vh, 0);
+    opacity: 0;
+  }
+}
+
+// ── Physics adaptation ──────────────────────────────────────────────────
+
+// Glass: bloom on drips, soft blur on vignette for depth
+:where([data-physics='glass']) .ambient-blood__vignette {
+  filter: blur(20px) saturate(1.2);
+}
+:where([data-physics='glass']) .ambient-blood__drip {
+  filter: drop-shadow(0 0 4px var(--color-error)) blur(0.3px);
+}
+
+// Flat: clean silhouettes, slightly restrained intensity
+:where([data-physics='flat']) .ambient-blood {
+  --ambient-intensity: calc(var(--ambient-intensity, 0.5) * 0.85);
+}
+:where([data-physics='flat']) .ambient-blood__vignette,
+:where([data-physics='flat']) .ambient-blood__drip {
+  filter: none;
+}
+
+// Retro: hard-edged vignette, stepped timing, pixel drip columns
+:where([data-physics='retro']) .ambient-blood__vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 45%,
+    var(--color-error-dark) 95%
+  );
+  filter: none;
+  animation-timing-function: steps(6, end);
+}
+:where([data-physics='retro']) .ambient-blood__drip {
+  filter: none;
+  border-radius: 0;
+  background: var(--color-error-dark);
+  animation-timing-function: steps(24, end);
+}
+:where([data-physics='retro']) .ambient-blood__drip::after {
+  border-radius: 0;
+}
+
+// ── Mode adaptation ─────────────────────────────────────────────────────
+
+// Light mode: --color-error-dark on a light canvas reads as mud. Use the
+// brighter --color-error and trim vignette peak opacity further so it stays
+// a presence rather than a red wash.
+:where([data-mode='light']) .ambient-blood__vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    var(--color-error) 110%
+  );
+}
+:where([data-mode='light']) .ambient-blood__drip {
+  background: linear-gradient(to bottom, transparent, var(--color-error));
+}
+:where([data-mode='light']) .ambient-blood__drip::after {
+  background: var(--color-error);
+}
+:where([data-mode='light'][data-physics='glass']) .ambient-blood__vignette {
+  filter: blur(14px) saturate(1.1);
+}
+:where([data-mode='light'][data-physics='retro']) .ambient-blood__vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 45%,
+    var(--color-error) 95%
+  );
+}
+:where([data-mode='light'][data-physics='retro']) .ambient-blood__drip {
+  background: var(--color-error);
+}
+
+// ── Reduced motion ─────────────────────────────────────────────────────
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient-layer[data-reduced-motion='respect'] .ambient-blood__vignette,
+  .ambient-layer[data-reduced-motion='auto'] .ambient-blood__vignette {
+    animation-play-state: paused;
+    // Freeze at a mid-beat so the vignette stays visually present.
+    opacity: calc(var(--ambient-intensity) * 0.3);
+  }
+  .ambient-layer[data-reduced-motion='respect'] .ambient-blood__drip,
+  .ambient-layer[data-reduced-motion='auto'] .ambient-blood__drip {
+    animation-play-state: paused;
+    opacity: calc(var(--drip-opacity) * var(--ambient-intensity) * 0.5);
+    transform: translate3d(0, 50vh, 0);
+  }
+}
