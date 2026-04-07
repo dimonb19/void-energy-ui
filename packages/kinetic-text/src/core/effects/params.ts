@@ -293,7 +293,7 @@ function flashParams(rng: () => number, phase: number): CharEffectParams {
   // Quick scale pulse + brightness; wave-based delay for ripple feel
   return {
     ...DEFAULTS,
-    scale: range(rng, 1.15, 1.35),
+    scale: range(rng, 1.35, 1.7),
     opacityMin: 1,
     delayOffset: phase * 85 + range(rng, 0, 6),
   };

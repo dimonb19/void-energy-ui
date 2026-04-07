@@ -832,30 +832,37 @@
   0% {
     transform: scale(1);
     filter: brightness(1);
+    text-shadow: none;
   }
-  5% {
+  3% {
     transform: scale(var(--kt-scale)); // void-ignore
-    filter: brightness(2.2); // void-ignore
+    filter: brightness(3.5); // void-ignore
+    text-shadow:
+      0 0 var(--space-md) currentColor,
+      0 0 var(--space-lg) currentColor;
   }
-  15% {
-    transform: scale(calc(1 + (var(--kt-scale) - 1) * 0.5)); // void-ignore
-    filter: brightness(1.6); // void-ignore
+  12% {
+    transform: scale(calc(1 + (var(--kt-scale) - 1) * 0.75)); // void-ignore
+    filter: brightness(2.4); // void-ignore
+    text-shadow: 0 0 var(--space-sm) currentColor;
   }
-  30% {
-    transform: scale(calc(1 + (var(--kt-scale) - 1) * 0.15)); // void-ignore
-    filter: brightness(1.15); // void-ignore
+  25% {
+    transform: scale(calc(1 + (var(--kt-scale) - 1) * 0.3)); // void-ignore
+    filter: brightness(1.35); // void-ignore
+    text-shadow: none;
   }
-  50% {
-    transform: scale(calc(1 - (var(--kt-scale) - 1) * 0.1)); // void-ignore
-    filter: brightness(0.97); // void-ignore
+  55% {
+    transform: scale(calc(1 - (var(--kt-scale) - 1) * 0.15)); // void-ignore
+    filter: brightness(0.85); // void-ignore
   }
-  70% {
-    transform: scale(calc(1 + (var(--kt-scale) - 1) * 0.03)); // void-ignore
-    filter: brightness(1);
+  75% {
+    transform: scale(calc(1 + (var(--kt-scale) - 1) * 0.04)); // void-ignore
+    filter: brightness(1.05); // void-ignore
   }
   100% {
     transform: scale(1);
     filter: brightness(1);
+    text-shadow: none;
   }
 }
 

@@ -396,6 +396,11 @@
     if (previewResult) {
       const source = previewResult.definition;
       seedEditor(source, previewResult.label, previewResult.tagline);
+      return;
+    }
+    const active = voidEngine.currentTheme;
+    if (active) {
+      seedEditor(active, active.label ?? '', active.tagline ?? '');
     } else {
       seedFromModeDefault(editMode);
     }

@@ -5,9 +5,9 @@ export type RevealMode = 'char' | 'word' | 'decode';
 
 /**
  * Named speed presets.
- * - `'slow'`    — speed: 40ms, charSpeed: 8ms  (deliberate, visible typing)
- * - `'default'` — speed: 20ms, charSpeed: 4ms  (standard baseline)
- * - `'fast'`    — speed: 8ms,  charSpeed: 2ms  (near-instant)
+ * - `'slow'`    — speed: 80ms, charSpeed: 16ms (very deliberate, slow typing)
+ * - `'default'` — speed: 40ms, charSpeed: 8ms  (standard baseline, visible typing)
+ * - `'fast'`    — speed: 20ms, charSpeed: 4ms  (quick but still legible)
  */
 export type KineticSpeedPreset = 'slow' | 'default' | 'fast';
 
@@ -15,9 +15,9 @@ export const SPEED_PRESETS: Record<
   KineticSpeedPreset,
   { speed: number; charSpeed: number }
 > = {
-  slow: { speed: 40, charSpeed: 8 },
-  default: { speed: 20, charSpeed: 4 },
-  fast: { speed: 8, charSpeed: 2 },
+  slow: { speed: 80, charSpeed: 16 },
+  default: { speed: 40, charSpeed: 8 },
+  fast: { speed: 20, charSpeed: 4 },
 };
 
 /**
