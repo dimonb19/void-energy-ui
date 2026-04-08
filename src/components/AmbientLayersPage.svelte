@@ -34,6 +34,8 @@
     { value: 'fog', label: 'Fog' },
     { value: 'underwater', label: 'Underwater' },
     { value: 'heat', label: 'Heat' },
+    { value: 'storm', label: 'Storm' },
+    { value: 'wind', label: 'Wind' },
   ];
   let atmosphereEnabled = $state(false);
   let atmosphereVariant = $state<AtmosphereLayerId>('rain');
@@ -51,8 +53,14 @@
     { value: 'tension', label: 'Tension' },
     { value: 'dizzy', label: 'Dizzy' },
     { value: 'focus', label: 'Focus' },
-    { value: 'flashback', label: 'Flashback' },
-    { value: 'dreaming', label: 'Dreaming' },
+    { value: 'filmGrain', label: 'Film Grain' },
+    { value: 'haze', label: 'Haze' },
+    { value: 'calm', label: 'Calm' },
+    { value: 'serenity', label: 'Serenity' },
+    { value: 'success', label: 'Success' },
+    { value: 'fail', label: 'Fail' },
+    { value: 'awe', label: 'Awe' },
+    { value: 'melancholy', label: 'Melancholy' },
   ];
   let psychologyEnabled = $state(false);
   let psychologyVariant = $state<PsychologyLayerId>('danger');
@@ -68,6 +76,9 @@
     { value: 'glitch', label: 'Glitch' },
     { value: 'flash', label: 'Flash' },
     { value: 'reveal', label: 'Reveal' },
+    { value: 'dissolve', label: 'Dissolve' },
+    { value: 'shake', label: 'Shake' },
+    { value: 'zoomBurst', label: 'Zoom Burst' },
   ];
   const actionIntensities: { value: AmbientIntensity; label: string }[] = [
     { value: 'light', label: 'Light' },
@@ -102,9 +113,15 @@
     { value: 'toxic', label: 'Toxic' },
     { value: 'underground', label: 'Underground' },
     { value: 'candlelit', label: 'Candlelit' },
+    { value: 'overcast', label: 'Overcast' },
   ];
   let environmentEnabled = $state(false);
   let environmentVariant = $state<EnvironmentLayerId>('night');
+  let environmentIntensity = $state<AmbientIntensity>('medium');
+
+  function setEnvironmentIntensity(v: string | number | null) {
+    environmentIntensity = v as AmbientIntensity;
+  }
 
   // Switcher coerces to string|number; wrap setters for type narrowing.
   // Selecting any variant activates that section's layer.
@@ -141,7 +158,10 @@
 
 <!-- Live ambient layers — mounted at page root, pointer-events:none -->
 {#if environmentEnabled}
-  <EnvironmentLayer variant={environmentVariant} />
+  <EnvironmentLayer
+    variant={environmentVariant}
+    intensity={environmentIntensity}
+  />
 {/if}
 
 {#if atmosphereEnabled}
@@ -149,8 +169,8 @@
     <AtmosphereLayer
       variant={atmosphereVariant}
       intensity={atmosphereIntensity}
-      decayMs={atmosphereDecayOn ? undefined : 0}
-      onLevelChange={(l: AmbientLevel) => (atmosphereLiveLevel = l)}
+      durationMs={atmosphereDecayOn ? undefined : 0}
+      onChange={(l: AmbientLevel) => (atmosphereLiveLevel = l)}
     />
   {/key}
 {/if}
@@ -160,8 +180,8 @@
     <PsychologyLayer
       variant={psychologyVariant}
       intensity={psychologyIntensity}
-      decayMs={psychologyDecayOn ? undefined : 0}
-      onLevelChange={(l: AmbientLevel) => (psychologyLiveLevel = l)}
+      durationMs={psychologyDecayOn ? undefined : 0}
+      onChange={(l: AmbientLevel) => (psychologyLiveLevel = l)}
     />
   {/key}
 {/if}
@@ -171,7 +191,7 @@
     <ActionLayer
       variant={actionVariant}
       intensity={actionIntensity}
-      onComplete={() => (actionActive = false)}
+      onEnd={() => (actionActive = false)}
     />
   {/key}
 {/if}
@@ -341,6 +361,14 @@
               options={environmentVariants}
               value={environmentEnabled ? environmentVariant : null}
               onchange={setEnvironmentVariant}
+            />
+
+            <Switcher
+              class="text-center"
+              label="Intensity"
+              options={intensityOptions}
+              value={environmentIntensity}
+              onchange={setEnvironmentIntensity}
             />
           </div>
 

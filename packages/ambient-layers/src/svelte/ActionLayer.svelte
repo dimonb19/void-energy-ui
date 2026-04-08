@@ -5,9 +5,11 @@
   let {
     variant,
     intensity = 'medium',
+    durationMs,
     enabled = true,
     reducedMotion = 'respect',
-    onComplete,
+    onChange,
+    onEnd,
     class: className = '',
   }: ActionLayerProps = $props();
 
@@ -20,7 +22,9 @@
     intensity === 'light' ? 1 : intensity === 'heavy' ? 3 : 2,
   );
 
-  const duration = $derived(ACTION_PARAMS[variant][intensity]);
+  const duration = $derived(
+    durationMs ?? ACTION_PARAMS[variant].durationMs[intensity],
+  );
 
   // RGB-split amplitude in px. Scales with level.
   const glitchAmp = $derived(levelNum * 3 + 1); // light 4, medium 7, heavy 10
@@ -32,11 +36,18 @@
     `0;${glitchAmp};-${Math.round(glitchAmp * 0.6)};${Math.round(glitchAmp * 0.9)};-${Math.round(glitchAmp * 0.4)};${Math.round(glitchAmp * 0.7)};-${Math.round(glitchAmp * 0.2)};0`,
   );
 
+  // camelCase variants → kebab-case SCSS class suffix (zoomBurst → zoom-burst).
+  const variantClass = $derived(
+    variant.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`),
+  );
+
   $effect(() => {
     active = true;
+    onChange?.(intensity);
     const id = setTimeout(() => {
       active = false;
-      onComplete?.();
+      onChange?.('off');
+      onEnd?.();
     }, duration);
     return () => clearTimeout(id);
   });
@@ -44,7 +55,7 @@
 
 {#if enabled && active}
   <div
-    class="ambient-layer ambient-action ambient-{variant} {className}"
+    class="ambient-layer ambient-action ambient-{variantClass} {className}"
     aria-hidden="true"
     data-variant={variant}
     data-reduced-motion={reducedMotion}
@@ -81,9 +92,8 @@
               <animate
                 attributeName="dx"
                 values={glitchValuesR}
-                dur="{duration}ms"
-                repeatCount="1"
-                fill="freeze"
+                dur="900ms"
+                repeatCount="indefinite"
               />
             </feOffset>
             <feColorMatrix
@@ -102,9 +112,8 @@
               <animate
                 attributeName="dx"
                 values={glitchValuesB}
-                dur="{duration}ms"
-                repeatCount="1"
-                fill="freeze"
+                dur="900ms"
+                repeatCount="indefinite"
               />
             </feOffset>
             <feBlend in="Ro" in2="G" mode="screen" result="RG" />

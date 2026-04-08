@@ -79,7 +79,7 @@ import type {
 
 /** Atmosphere category layer - weather/sensory variants (rain, snow, ash, fog, underwater, heat). */
 declare const AtmosphereLayer: typeof SvelteComponent<AtmosphereLayerProps>;
-/** Psychology category layer - edge-framed mental variants (danger, tension, dizzy, focus, flashback, dreaming). */
+/** Psychology category layer - edge-framed mental variants (danger, tension, dizzy, focus, filmGrain, haze). */
 declare const PsychologyLayer: typeof SvelteComponent<PsychologyLayerProps>;
 /** Action category layer - one-shot transient variants (impact, speed, glitch, flash, reveal). */
 declare const ActionLayer: typeof SvelteComponent<ActionLayerProps>;

@@ -24,7 +24,9 @@ export type AtmosphereLayer =
   | 'ash'
   | 'fog'
   | 'underwater'
-  | 'heat';
+  | 'heat'
+  | 'storm'
+  | 'wind';
 
 /** Persistent mental/emotional edge-framed layers (above content, below UI). */
 export type PsychologyLayer =
@@ -32,11 +34,25 @@ export type PsychologyLayer =
   | 'tension'
   | 'dizzy'
   | 'focus'
-  | 'flashback'
-  | 'dreaming';
+  | 'filmGrain'
+  | 'haze'
+  | 'calm'
+  | 'serenity'
+  | 'success'
+  | 'fail'
+  | 'awe'
+  | 'melancholy';
 
 /** One-shot transient action layers (top, auto-clear after animation). */
-export type ActionLayer = 'impact' | 'speed' | 'glitch' | 'flash' | 'reveal';
+export type ActionLayer =
+  | 'impact'
+  | 'speed'
+  | 'glitch'
+  | 'flash'
+  | 'reveal'
+  | 'dissolve'
+  | 'shake'
+  | 'zoomBurst';
 
 /** Sticky baseline environment tint layers (deepest, rarely changes). */
 export type EnvironmentLayer =
@@ -47,7 +63,8 @@ export type EnvironmentLayer =
   | 'sickly'
   | 'toxic'
   | 'underground'
-  | 'candlelit';
+  | 'candlelit'
+  | 'overcast';
 
 export type AmbientLayerId =
   | AtmosphereLayer
@@ -85,40 +102,59 @@ interface AmbientBaseProps {
 // Category props
 // ─────────────────────────────────────────────────────────────────────────────
 
-export interface AtmosphereLayerProps extends AmbientBaseProps {
+/**
+ * Unified lifecycle callbacks shared by every category.
+ *
+ * - `onChange` fires on every intensity transition, including the initial
+ *   value and the final 'off' step. Persistent layers fire it on each decay
+ *   tick. Action layers fire it synthetically (start → off). Environment
+ *   fires it on prop change.
+ * - `onEnd` fires exactly once when the layer reaches 'off' (persistent) or
+ *   when the one-shot animation completes (action). Environment never fires
+ *   `onEnd` — it is sticky.
+ */
+export interface AmbientLifecycle {
+  onChange?: (intensity: AmbientLevel) => void;
+  onEnd?: () => void;
+}
+
+export interface AtmosphereLayerProps
+  extends AmbientBaseProps,
+    AmbientLifecycle {
   variant: AtmosphereLayer;
   /** Intensity level: 'light' | 'medium' | 'heavy'. Default 'medium'. */
   intensity?: AmbientIntensity;
   /**
    * Auto-decay duration in ms per step (heavy → medium → light → off).
-   * When 0 or omitted, decay is disabled and intensity stays as set.
+   * When 0, decay is disabled and intensity stays as set.
    * Default: per-variant value from `params.ts`.
    */
-  decayMs?: number;
-  /** Fired on every internal decay step (including the initial level). */
-  onLevelChange?: (level: AmbientLevel) => void;
-  /** Fired when decay reaches 'off' and the layer should unmount. */
-  onComplete?: () => void;
+  durationMs?: number;
 }
 
-export interface PsychologyLayerProps extends AmbientBaseProps {
+export interface PsychologyLayerProps
+  extends AmbientBaseProps,
+    AmbientLifecycle {
   variant: PsychologyLayer;
   intensity?: AmbientIntensity;
-  decayMs?: number;
-  onLevelChange?: (level: AmbientLevel) => void;
-  onComplete?: () => void;
+  durationMs?: number;
 }
 
-export interface ActionLayerProps extends AmbientBaseProps {
+export interface ActionLayerProps extends AmbientBaseProps, AmbientLifecycle {
   variant: ActionLayer;
   /** Animation amplitude/speed preset. Default 'medium'. */
   intensity?: AmbientIntensity;
-  /** Fired when the one-shot animation finishes and the layer should unmount. */
-  onComplete?: () => void;
+  /**
+   * Total one-shot animation duration in ms.
+   * Default: per-variant value from `params.ts`.
+   */
+  durationMs?: number;
 }
 
-export interface EnvironmentLayerProps extends AmbientBaseProps {
+export interface EnvironmentLayerProps
+  extends AmbientBaseProps,
+    AmbientLifecycle {
   variant: EnvironmentLayer;
-  /** Overall layer opacity multiplier (0..1). Default 1. */
-  opacity?: number;
+  /** Tint strength: 'light' | 'medium' | 'heavy'. Default 'medium'. */
+  intensity?: AmbientIntensity;
 }

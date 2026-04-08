@@ -266,6 +266,79 @@ html[data-physics='retro'] .ambient-layer * {
   }
 }
 
+// ── storm — internally composes the rain particle shape + a horizontal wind
+// drift on the layer root + a transient lightning flash overlay driven by the
+// component's [data-lightning='true'] toggle. This is the only atmosphere
+// effect that composes another effect; the pattern is allowed for atmosphere
+// only — see the plan and params.ts header.
+.ambient-storm .ambient-atmosphere__particle {
+  width: 1px; // void-ignore — storm rain stroke floor
+  height: var(--length);
+  background: linear-gradient(to bottom, transparent, var(--text-main));
+  rotate: 24deg; // steeper than rain — wind-driven
+  transform-origin: top;
+  animation: ambient-rain-fall var(--duration) linear var(--delay) infinite;
+}
+// Whole-layer horizontal sway — slow wind drift behind the precipitation.
+.ambient-storm {
+  animation: ambient-storm-drift 9s ease-in-out infinite;
+}
+@keyframes ambient-storm-drift {
+  0%,
+  100% {
+    transform: translate3d(-1.5%, 0, 0);
+  }
+  50% {
+    transform: translate3d(1.5%, 0, 0);
+  }
+}
+// Lightning flash — full-viewport bright pulse, toggled via data-lightning.
+// The transition handles both the bright leading edge and the slow falloff.
+.ambient-storm::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--text-main);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity var(--speed-fast) var(--ease-flow);
+  pointer-events: none;
+}
+.ambient-storm[data-lightning='true']::before {
+  opacity: calc(var(--ambient-alpha) * 0.7);
+  transition-duration: var(--speed-instant);
+}
+
+// ── wind — horizontal dust/leaf streaks, no precipitation. Distinct from
+// storm: no vertical fall, no lightning, just lateral motion. Pairs with heat.
+.ambient-wind .ambient-atmosphere__particle {
+  top: calc(var(--x) * 1%); // reuse --x as vertical scatter for the streak band
+  left: -10vw;
+  width: var(--length);
+  height: 1px; // void-ignore — wind streak stroke floor
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--text-dim),
+    transparent
+  );
+  animation: ambient-wind-drift var(--duration) linear var(--delay) infinite;
+}
+@keyframes ambient-wind-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+    opacity: 0;
+  }
+  10%,
+  90% {
+    opacity: calc(var(--p-opacity) * var(--ambient-alpha));
+  }
+  100% {
+    transform: translate3d(120vw, 0, 0);
+    opacity: 0;
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // ATMOSPHERE — SVG-filter variants (fog, underwater, heat)
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1054,8 +1127,8 @@ html[data-physics='retro'] .ambient-layer * {
   initial-value: 62%;
 }
 
-// ── flashback — heavy sepia wash, steady; occasional frame-drop flickers
-.ambient-flashback .ambient-psychology__vignette {
+// ── filmGrain — heavy sepia wash, steady; occasional frame-drop flickers
+.ambient-film-grain .ambient-psychology__vignette {
   background:
     radial-gradient(
       ellipse at center,
@@ -1069,9 +1142,9 @@ html[data-physics='retro'] .ambient-layer * {
     );
   mix-blend-mode: multiply;
   opacity: calc(var(--ambient-alpha) * 0.85);
-  animation: ambient-flashback-breathe 7s ease-in-out infinite;
+  animation: ambient-film-grain-breathe 7s ease-in-out infinite;
 }
-.ambient-flashback .ambient-psychology__svg {
+.ambient-film-grain .ambient-psychology__svg {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -1080,7 +1153,7 @@ html[data-physics='retro'] .ambient-layer * {
   mix-blend-mode: overlay;
   pointer-events: none;
 }
-@keyframes ambient-flashback-breathe {
+@keyframes ambient-film-grain-breathe {
   0%,
   100% {
     opacity: calc(var(--ambient-alpha) * 0.7);
@@ -1090,27 +1163,27 @@ html[data-physics='retro'] .ambient-layer * {
   }
 }
 
-// ── dreaming — multi-bloom drift, wide hue rotation, hypnagogic layering
-.ambient-dreaming .ambient-psychology__vignette {
+// ── haze — multi-bloom drift, wide hue rotation, soft layered glow
+.ambient-haze .ambient-psychology__vignette {
   inset: -15%;
   background: radial-gradient(
     ellipse 45% 50% at 35% 40%,
     var(--energy-primary, var(--text-mute)) 0%,
     transparent 65%
   );
-  filter: blur(130px) hue-rotate(0deg); // void-ignore — dreaming bloom blur
+  filter: blur(130px) hue-rotate(0deg); // void-ignore — haze bloom blur
   mix-blend-mode: screen;
   will-change: opacity, transform, filter;
   animation: ambient-dream-drift-a 18s ease-in-out infinite;
 }
-.ambient-dreaming .ambient-psychology__vignette--b {
+.ambient-haze .ambient-psychology__vignette--b {
   inset: -15%;
   background: radial-gradient(
     ellipse 50% 45% at 70% 65%,
     var(--energy-secondary, var(--energy-primary)) 0%,
     transparent 65%
   );
-  filter: blur(150px) hue-rotate(40deg); // void-ignore — dreaming bloom blur
+  filter: blur(150px) hue-rotate(40deg); // void-ignore — haze bloom blur
   mix-blend-mode: screen;
   will-change: opacity, transform, filter;
   animation: ambient-dream-drift-b 22s ease-in-out infinite;
@@ -1120,17 +1193,17 @@ html[data-physics='retro'] .ambient-layer * {
   100% {
     opacity: calc(var(--ambient-alpha) * 0.55);
     transform: translate3d(0, 0, 0) scale(1);
-    filter: blur(130px) hue-rotate(0deg); // void-ignore — dreaming bloom blur
+    filter: blur(130px) hue-rotate(0deg); // void-ignore — haze bloom blur
   }
   33% {
     opacity: calc(var(--ambient-alpha) * 0.8);
     transform: translate3d(6%, -4%, 0) scale(1.15);
-    filter: blur(150px) hue-rotate(35deg); // void-ignore — dreaming bloom blur
+    filter: blur(150px) hue-rotate(35deg); // void-ignore — haze bloom blur
   }
   66% {
     opacity: calc(var(--ambient-alpha) * 0.65);
     transform: translate3d(-4%, 5%, 0) scale(1.08);
-    filter: blur(140px) hue-rotate(70deg); // void-ignore — dreaming bloom blur
+    filter: blur(140px) hue-rotate(70deg); // void-ignore — haze bloom blur
   }
 }
 @keyframes ambient-dream-drift-b {
@@ -1138,17 +1211,171 @@ html[data-physics='retro'] .ambient-layer * {
   100% {
     opacity: calc(var(--ambient-alpha) * 0.5);
     transform: translate3d(0, 0, 0) scale(1.05);
-    filter: blur(150px) hue-rotate(40deg); // void-ignore — dreaming bloom blur
+    filter: blur(150px) hue-rotate(40deg); // void-ignore — haze bloom blur
   }
   40% {
     opacity: calc(var(--ambient-alpha) * 0.75);
     transform: translate3d(-6%, 4%, 0) scale(1.18);
-    filter: blur(170px) hue-rotate(90deg); // void-ignore — dreaming bloom blur
+    filter: blur(170px) hue-rotate(90deg); // void-ignore — haze bloom blur
   }
   70% {
     opacity: calc(var(--ambient-alpha) * 0.6);
     transform: translate3d(5%, -5%, 0) scale(1.1);
-    filter: blur(160px) hue-rotate(130deg); // void-ignore — dreaming bloom blur
+    filter: blur(160px) hue-rotate(130deg); // void-ignore — haze bloom blur
+  }
+}
+
+// ── calm — counterpart to tension. Soft cool vignette, slow breathing pulse,
+// no constriction. The relief beat — safe, settled, post-conflict.
+.ambient-calm .ambient-psychology__vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 55%,
+    var(--energy-secondary, var(--text-dim)) 130%
+  );
+  mix-blend-mode: screen;
+  opacity: calc(var(--ambient-alpha) * 0.45);
+  animation: ambient-calm-breathe 4s ease-in-out infinite;
+}
+@keyframes ambient-calm-breathe {
+  0%,
+  100% {
+    opacity: calc(var(--ambient-alpha) * 0.4);
+    transform: scale(1);
+  }
+  50% {
+    opacity: calc(var(--ambient-alpha) * 0.55);
+    transform: scale(1.015);
+  }
+}
+
+// ── serenity — pale outer glow with near-imperceptible drift. Ambient
+// peacefulness for meditation, idle, contemplative reading.
+.ambient-serenity .ambient-psychology__vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 60%,
+    var(--text-dim) 125%
+  );
+  mix-blend-mode: screen;
+  opacity: calc(var(--ambient-alpha) * 0.35);
+  animation: ambient-serenity-drift 14s ease-in-out infinite;
+}
+@keyframes ambient-serenity-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: calc(var(--ambient-alpha) * 0.32);
+  }
+  50% {
+    transform: translate3d(0, -1%, 0) scale(1.02);
+    opacity: calc(var(--ambient-alpha) * 0.4);
+  }
+}
+
+// ── success — counterpart to danger. Warm green vignette with one slow
+// outward bloom on entry, settling into a sustained warm edge.
+.ambient-success .ambient-psychology__vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 50%,
+    var(--color-success) 130%
+  );
+  mix-blend-mode: screen;
+  opacity: calc(var(--ambient-alpha) * 0.55);
+  animation: ambient-success-bloom 2.4s ease-out 1 both;
+}
+@keyframes ambient-success-bloom {
+  0% {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  60% {
+    opacity: calc(var(--ambient-alpha) * 0.7);
+    transform: scale(1.04);
+  }
+  100% {
+    opacity: calc(var(--ambient-alpha) * 0.55);
+    transform: scale(1);
+  }
+}
+
+// ── fail — counterpart to success. Cool red vignette with one inward
+// collapse on entry, settling into a sustained heavy edge. Loss / defeat /
+// negative resolution. Distinct from `danger` (threat in progress) — fail
+// is the moment after.
+.ambient-fail .ambient-psychology__vignette {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 45%,
+    var(--color-error-dark, var(--color-error)) 130%
+  );
+  mix-blend-mode: multiply;
+  opacity: calc(var(--ambient-alpha) * 0.6);
+  animation: ambient-fail-collapse 2.4s ease-out 1 both;
+}
+@keyframes ambient-fail-collapse {
+  0% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+  55% {
+    opacity: calc(var(--ambient-alpha) * 0.75);
+    transform: scale(0.97);
+  }
+  100% {
+    opacity: calc(var(--ambient-alpha) * 0.6);
+    transform: scale(1);
+  }
+}
+
+// ── awe — wonder, discovery, reveal. Pale gold/white radial brightening from
+// center outward, very slow. Distinct from `flash` (one-shot luminance) — this
+// lingers and breathes.
+.ambient-awe .ambient-psychology__vignette {
+  background: radial-gradient(
+    ellipse at center,
+    var(--text-main) 0%,
+    transparent 55%
+  );
+  mix-blend-mode: screen;
+  opacity: calc(var(--ambient-alpha) * 0.3);
+  animation: ambient-awe-radiate 8s ease-in-out infinite;
+}
+@keyframes ambient-awe-radiate {
+  0%,
+  100% {
+    opacity: calc(var(--ambient-alpha) * 0.25);
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: calc(var(--ambient-alpha) * 0.45);
+    transform: scale(1.08);
+  }
+}
+
+// ── melancholy — sadness, loss, reflective sorrow. Desaturated cool vignette,
+// slow downward drift on the edge gradient. Negative-as-grief, not as threat.
+.ambient-melancholy .ambient-psychology__vignette {
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 40%,
+    var(--text-mute) 130%
+  );
+  mix-blend-mode: multiply;
+  opacity: calc(var(--ambient-alpha) * 0.55);
+  animation: ambient-melancholy-sink 11s ease-in-out infinite;
+}
+@keyframes ambient-melancholy-sink {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+    opacity: calc(var(--ambient-alpha) * 0.5);
+  }
+  50% {
+    transform: translate3d(0, 1.5%, 0);
+    opacity: calc(var(--ambient-alpha) * 0.65);
   }
 }
 
@@ -1159,9 +1386,25 @@ html[data-physics='retro'] .ambient-layer * {
 // Level 1/2/3 drives amplitude via --ambient-level. Duration is set inline
 // from ACTION_PARAMS via --ambient-duration.
 
-// ── impact — radial shockwave ring expanding from center
+// Universal envelope: fades the action layer in and out over its full
+// --ambient-duration so inner motion can loop continuously and still read as
+// a one-shot atmospheric beat (rise → sustain → fall).
+@keyframes ambient-action-envelope {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  18%,
+  82% {
+    opacity: 1;
+  }
+}
+
+// ── impact — radial shockwave rings, continuously emitted across the duration
 .ambient-impact {
   background: transparent;
+  animation: ambient-action-envelope var(--ambient-duration) ease-in-out
+    forwards;
 }
 .ambient-impact__ring {
   position: absolute;
@@ -1183,16 +1426,15 @@ html[data-physics='retro'] .ambient-layer * {
   );
   mix-blend-mode: screen;
   will-change: transform, opacity;
-  animation: ambient-impact-ring var(--ambient-duration)
-    cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+  animation: ambient-impact-ring 1800ms cubic-bezier(0.2, 0.7, 0.3, 1) infinite;
 }
 @keyframes ambient-impact-ring {
   0% {
     transform: scale(0.1);
-    opacity: calc(var(--ambient-level) * 0.15);
+    opacity: calc(var(--ambient-level) * 0.18);
   }
-  60% {
-    opacity: calc(var(--ambient-level) * 0.1);
+  70% {
+    opacity: calc(var(--ambient-level) * 0.08);
   }
   100% {
     transform: scale(12);
@@ -1208,6 +1450,8 @@ html[data-physics='retro'] .ambient-layer * {
     black 40%,
     transparent 100%
   );
+  animation: ambient-action-envelope var(--ambient-duration) ease-in-out
+    forwards;
 }
 .ambient-speed,
 .ambient-speed::before,
@@ -1221,37 +1465,28 @@ html[data-physics='retro'] .ambient-layer * {
   );
   mix-blend-mode: overlay;
 }
-.ambient-speed {
-  animation: ambient-speed-sweep var(--ambient-duration) linear forwards;
-}
 .ambient-speed::before,
 .ambient-speed::after {
   content: '';
   position: absolute;
   inset: 0;
+  animation: ambient-speed-sweep 1400ms linear infinite;
 }
 .ambient-speed::before {
-  animation: ambient-speed-sweep var(--ambient-duration) linear forwards;
-  animation-delay: calc(var(--ambient-duration) * 0.15 * -1);
+  animation-delay: -210ms;
   opacity: 0.7;
   filter: blur(2px); // void-ignore — motion-blur floor for parallax layer
 }
 .ambient-speed::after {
-  animation: ambient-speed-sweep var(--ambient-duration) linear forwards;
-  animation-delay: calc(var(--ambient-duration) * 0.3 * -1);
+  animation-delay: -420ms;
   opacity: 0.5;
   filter: blur(4px); // void-ignore — motion-blur for deepest parallax layer
 }
 @keyframes ambient-speed-sweep {
   0% {
-    opacity: 0;
     transform: translate3d(-100%, 0, 0);
   }
-  50% {
-    opacity: calc(var(--ambient-level) * 0.25);
-  }
   100% {
-    opacity: 0;
     transform: translate3d(100%, 0, 0);
   }
 }
@@ -1263,22 +1498,25 @@ html[data-physics='retro'] .ambient-layer * {
 // reads as a discrete hit rather than a slow fade.
 .ambient-glitch {
   background: transparent;
-  animation: ambient-glitch-flicker var(--ambient-duration) steps(8, end)
-    forwards;
+  animation:
+    ambient-action-envelope var(--ambient-duration) ease-in-out forwards,
+    ambient-glitch-flicker 900ms steps(8, end) infinite;
 }
 @keyframes ambient-glitch-flicker {
   0%,
   100% {
-    opacity: 0;
-  }
-  8%,
-  82% {
     opacity: 1;
   }
+  20% {
+    opacity: 0.7;
+  }
   40% {
-    opacity: 0.85;
+    opacity: 1;
   }
   55% {
+    opacity: 0.85;
+  }
+  75% {
     opacity: 1;
   }
 }
@@ -1293,17 +1531,25 @@ html[data-physics='retro'] .ambient-layer * {
 // ── flash — full-screen bright pulse
 .ambient-flash {
   background: var(--text-main);
-  animation: ambient-flash var(--ambient-duration) ease-out forwards;
+  animation: ambient-flash var(--ambient-duration) ease-in-out forwards;
 }
 @keyframes ambient-flash {
-  0% {
-    opacity: 0;
-  }
-  10% {
-    opacity: calc(var(--ambient-level) * 0.3);
-  }
+  0%,
   100% {
     opacity: 0;
+  }
+  10%,
+  25%,
+  45%,
+  65%,
+  85% {
+    opacity: calc(var(--ambient-level) * 0.28);
+  }
+  17%,
+  35%,
+  55%,
+  75% {
+    opacity: calc(var(--ambient-level) * 0.05);
   }
 }
 
@@ -1314,17 +1560,163 @@ html[data-physics='retro'] .ambient-layer * {
     transparent 0%,
     var(--text-main) 100%
   );
-  animation: ambient-reveal var(--ambient-duration) ease-out forwards;
   clip-path: circle(0% at 50% 50%);
+  animation: ambient-reveal var(--ambient-duration) ease-in-out forwards;
 }
 @keyframes ambient-reveal {
   0% {
     clip-path: circle(0% at 50% 50%);
+    opacity: 0;
+  }
+  20% {
     opacity: calc(var(--ambient-level) * 0.3);
   }
+  60% {
+    clip-path: circle(110% at 50% 50%);
+    opacity: calc(var(--ambient-level) * 0.25);
+  }
   100% {
-    clip-path: circle(100% at 50% 50%);
+    clip-path: circle(160% at 50% 50%);
     opacity: 0;
+  }
+}
+
+// ── dissolve — soft fade-to-transparent over a gentle blur. The graceful
+// "exit" counterpart to reveal — every story needs a way to end.
+.ambient-dissolve {
+  background: var(--bg-canvas);
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  animation: ambient-dissolve var(--ambient-duration) ease-in-out forwards;
+}
+@keyframes ambient-dissolve {
+  0%,
+  100% {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+    -webkit-backdrop-filter: blur(0px);
+  }
+  20%,
+  80% {
+    opacity: calc(var(--ambient-level) * 0.3);
+  }
+  35% {
+    backdrop-filter: blur(
+      calc(var(--ambient-level) * 3px)
+    ); // void-ignore — blur amplitude scales with level
+    -webkit-backdrop-filter: blur(
+      calc(var(--ambient-level) * 3px)
+    ); // void-ignore — blur amplitude scales with level
+  }
+  50% {
+    backdrop-filter: blur(
+      calc(var(--ambient-level) * 5px)
+    ); // void-ignore — blur amplitude scales with level
+    -webkit-backdrop-filter: blur(
+      calc(var(--ambient-level) * 5px)
+    ); // void-ignore — blur amplitude scales with level
+  }
+  65% {
+    backdrop-filter: blur(
+      calc(var(--ambient-level) * 3px)
+    ); // void-ignore — blur amplitude scales with level
+    -webkit-backdrop-filter: blur(
+      calc(var(--ambient-level) * 3px)
+    ); // void-ignore — blur amplitude scales with level
+  }
+}
+
+// ── shake — damped translate random walk on the layer root. Reads as
+// vibration / quake aftermath. No color or blur change — pure kinetics.
+// Pairs with impact (impact = ring, shake = tremor).
+.ambient-shake {
+  background: transparent;
+  animation:
+    ambient-action-envelope var(--ambient-duration) ease-in-out forwards,
+    ambient-shake 700ms cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+}
+@keyframes ambient-shake {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  10% {
+    transform: translate3d(
+      calc(var(--ambient-level) * -0.6%),
+      calc(var(--ambient-level) * 0.4%),
+      0
+    );
+  }
+  20% {
+    transform: translate3d(
+      calc(var(--ambient-level) * 0.5%),
+      calc(var(--ambient-level) * -0.5%),
+      0
+    );
+  }
+  30% {
+    transform: translate3d(
+      calc(var(--ambient-level) * -0.4%),
+      calc(var(--ambient-level) * -0.3%),
+      0
+    );
+  }
+  45% {
+    transform: translate3d(
+      calc(var(--ambient-level) * 0.35%),
+      calc(var(--ambient-level) * 0.25%),
+      0
+    );
+  }
+  60% {
+    transform: translate3d(
+      calc(var(--ambient-level) * -0.25%),
+      calc(var(--ambient-level) * 0.2%),
+      0
+    );
+  }
+  78% {
+    transform: translate3d(
+      calc(var(--ambient-level) * 0.15%),
+      calc(var(--ambient-level) * -0.15%),
+      0
+    );
+  }
+  90% {
+    transform: translate3d(calc(var(--ambient-level) * -0.08%), 0, 0);
+  }
+}
+
+// ── zoomBurst — brief radial scale + outward motion blur from center.
+// Sudden attention shift, dramatic emphasis. Distinct from flash (no
+// luminance change).
+.ambient-zoom-burst {
+  background: radial-gradient(
+    circle at center,
+    var(--text-main) 0%,
+    transparent 35%
+  );
+  mix-blend-mode: screen;
+  transform-origin: center;
+  animation:
+    ambient-action-envelope var(--ambient-duration) ease-in-out forwards,
+    ambient-zoom-burst 1600ms cubic-bezier(0.16, 0.84, 0.36, 1) infinite;
+}
+@keyframes ambient-zoom-burst {
+  0% {
+    transform: scale(0.4);
+    filter: blur(0px);
+  }
+  60% {
+    filter: blur(
+      calc(var(--ambient-level) * 6px)
+    ); // void-ignore — radial motion blur scales with level
+  }
+  100% {
+    transform: scale(calc(1.6 + var(--ambient-level) * 0.4));
+    filter: blur(
+      calc(var(--ambient-level) * 12px)
+    ); // void-ignore — radial motion blur scales with level
   }
 }
 
@@ -1334,7 +1726,7 @@ html[data-physics='retro'] .ambient-layer * {
 
 .ambient-environment {
   mix-blend-mode: multiply;
-  opacity: var(--ambient-env-opacity, 1);
+  opacity: var(--ambient-env-level, 1);
 }
 
 // ── night — cool deep-blue wash
@@ -1380,10 +1772,10 @@ html[data-physics='retro'] .ambient-layer * {
 @keyframes ambient-dawn-rise {
   0%,
   100% {
-    opacity: calc(var(--ambient-env-opacity, 1) * 0.85);
+    opacity: calc(var(--ambient-env-level, 1) * 0.85);
   }
   50% {
-    opacity: calc(var(--ambient-env-opacity, 1) * 1);
+    opacity: calc(var(--ambient-env-level, 1) * 1);
   }
 }
 
@@ -1432,6 +1824,18 @@ html[data-physics='retro'] .ambient-layer * {
     var(--ambient-candle-center, rgba(255, 180, 90, 0.3)) 0%,
     var(--ambient-candle-mid, rgba(120, 60, 20, 0.55)) 55%,
     var(--ambient-candle-edge, rgba(8, 5, 2, 0.9)) 100%
+  );
+  mix-blend-mode: multiply;
+}
+
+// ── overcast — flat grey-blue desaturated wash with a slight green tint.
+// Storm/gloom *tone* without committing to atmosphere precipitation. Lets
+// consumers tint a scene "stormy" while keeping the atmosphere slot free.
+.ambient-overcast {
+  background: linear-gradient(
+    180deg,
+    var(--ambient-overcast-top, rgba(110, 125, 130, 0.5)),
+    var(--ambient-overcast-bottom, rgba(80, 95, 100, 0.6))
   );
   mix-blend-mode: multiply;
 }

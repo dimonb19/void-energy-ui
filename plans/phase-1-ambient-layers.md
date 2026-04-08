@@ -1,369 +1,246 @@
-# Phase 1 — Ambient Layers
+# Phase 1 — Ambient Layers: Catalog Completion & API Reconciliation
 
-> Build immersive visual overlay layers (Blood, Snow, Rain, Fog) as a dedicated `@dgrslabs/void-energy-ambient-layers` package from day one, following the existing pattern established by Kinetic Text and DGRS.
+> The `@dgrslabs/void-energy-ambient-layers` package scaffold, four category components, and initial effect catalog already ship. This phase **closes the emotional/expressive gaps in the catalog** and **rationalizes inconsistencies in the cross-category API** so the package is ready to be lifted into the premium repo in Phase 3 without future refactors.
 
-**Status:** Planning — not started
-**Priority:** Phase 1 (current)
-**Blocks:** Phase 2 (AI Automation foundation)
-**Depends on:** nothing — greenfield
-
----
-
-## Why Phase 1
-
-The Phase 3 monorepo restructure is a large, disruptive reorganization of every file in the project. Mixing "build a new feature" with "reorganize every file" produces slow, risky changes with entangled diffs. Completing the design system feature set *first* means Phase 3 becomes pure plumbing — no feature work, just file movement and package configuration.
-
-Ambient Layers is the last major feature the system needs before it can be considered complete.
+**Status:** Planning
+**Depends on:** existing `packages/ambient-layers/` (4 category components, 25 effects total)
+**Blocks:** Phase 2 (AI automation reads a stable ambient catalog), Phase 3 (premium repo lift)
 
 ---
 
-## Why a separate package from day one
+## Why this phase exists
 
-The current monorepo already contains `packages/kinetic-text/` and `packages/dgrs/`, both scoped as `@dgrslabs/void-energy-*`. Kinetic Text has been built and expanded as a dedicated package since inception, not as loose files in `src/` later lifted into a package. This is the correct pattern.
+A design review of the current package surfaced two distinct problems:
 
-**Advantages over building in `src/` first:**
+1. **Catalog gaps.** The effect vocabulary is lopsided. Psychology only depicts negative/edge states (no calm, no success, no awe). Action only has hard "impact"-style beats (no dissolve, no shake). Atmosphere is missing storms. Several effects are misnamed (`flashback` is generic film grain; `dreaming` is generic haze).
+2. **API drift across categories.** Each layer category invented its own intensity semantics, lifecycle callbacks, and decay shape. The four components no longer feel like one system. Adding more effects on top of an inconsistent foundation compounds the drift.
 
-- **Zero lift later.** When Phase 3 moves packages to the premium repo, ambient is already in its final shape. No refactoring of imports, no path aliasing, no rewriting SCSS `@use` statements.
-- **Forced API discipline.** A package has an `exports` map from day one. You cannot reach into other parts of the codebase through relative paths — you must import via public APIs. This keeps the ambient module clean and portable.
-- **Independent versioning.** The ambient package has its own `version` field from commit 1. When we ship a fix, we bump the ambient version, not the whole monorepo.
-- **Consistent with the rest of the system.** Kinetic Text and DGRS already live in `packages/`. Ambient should too. Uniformity matters for AI automation (the AI sees the same structure across all premium packages) and for developer ergonomics.
-- **Easier to demo in isolation.** A package can be installed into any test project without pulling the whole monorepo with it.
+This phase fixes (2) **first**, then expands (1) on the cleaned-up foundation. Order matters: if we add ten new effects to an inconsistent API, every consumer ends up writing ten different integration shapes.
 
 ---
 
-## What Ambient Layers is
+## Current state (snapshot, 2026-04-08)
 
-A **layer** is a full-viewport visual overlay that sits above the page content and below the UI chrome, adding environmental atmosphere without interfering with interaction. Think particle systems, weather effects, mood overlays — immersive but non-blocking.
+| Category | Effects today | Lifetime model | Intensity model | Lifecycle callback |
+|---|---|---|---|---|
+| **Atmosphere** | rain, snow, ash, fog, underwater, heat | persistent + decay | scales **particle count** | `onLevelChange` |
+| **Psychology** | danger, tension, dizzy, focus, flashback, dreaming | persistent + decay | scales **vignette opacity** | `onLevelChange` |
+| **Action** | impact, speed, glitch, flash, reveal | one-shot, auto-unmount | scales **animation amplitude** | `onComplete` |
+| **Environment** | night, neon, dawn, dusk, sickly, toxic, underground, candlelit | sticky, no decay | **opacity only**, no levels | none |
 
-Four layers ship in Phase 1:
-
-| Layer | Effect | Use case |
-|-------|--------|----------|
-| **Blood** | Crimson vignette, pulsing edges, occasional drip | Horror, intensity, combat, danger |
-| **Snow** | Drifting flakes, frost vignette, cold desaturation | Cold, isolation, winter, tragedy |
-| **Rain** | Falling streaks, glass droplets, blue-gray mood | Melancholy, weather, transition |
-| **Fog** | Rolling mist, edge obscuration, depth fade | Mystery, dreams, unknown, tension |
-
-Each is a single Svelte component that can be mounted into any page and configured via props.
-
----
-
-## Design goals
-
-1. **Non-blocking** — layers are `pointer-events: none` by default. User interaction with the page is never affected.
-2. **Physics-adaptive** — each layer responds to the active physics preset (glass, flat, retro) with different rendering strategies. Glass gets blur and depth. Flat gets clean silhouettes. Retro gets dithered/pixelated simulations.
-3. **Color-mode aware** — layers adapt to light/dark mode automatically via semantic tokens. Snow on light mode is not the same as snow on dark mode.
-4. **Performance-first** — layers must hit 60fps on a mid-tier laptop. Use CSS transforms, `will-change` sparingly, prefer GPU-accelerated properties. Fall back to reduced-motion CSS when `prefers-reduced-motion` is set.
-5. **Controllable intensity** — each layer accepts an `intensity` prop (0–1) to scale the effect strength. Lets consumers fade layers in/out narratively.
-6. **No raw values** — all colors, timings, blur amounts flow through design tokens. Token Law applies fully.
-7. **Peer-dependency on `void-energy`** — the package does not bundle the core. It depends on `void-energy` as a peer, exactly like Kinetic Text does.
+**Files:**
+- [packages/ambient-layers/src/types.ts](packages/ambient-layers/src/types.ts) — union SSOT
+- [packages/ambient-layers/src/core/effects/params.ts](packages/ambient-layers/src/core/effects/params.ts) — per-effect defaults
+- [packages/ambient-layers/src/core/runtime/decay.ts](packages/ambient-layers/src/core/runtime/decay.ts) — shared stepper
+- [packages/ambient-layers/src/svelte/AtmosphereLayer.svelte](packages/ambient-layers/src/svelte/AtmosphereLayer.svelte)
+- [packages/ambient-layers/src/svelte/PsychologyLayer.svelte](packages/ambient-layers/src/svelte/PsychologyLayer.svelte)
+- [packages/ambient-layers/src/svelte/ActionLayer.svelte](packages/ambient-layers/src/svelte/ActionLayer.svelte)
+- [src/components/AmbientLayersPage.svelte](src/components/AmbientLayersPage.svelte) — showcase
 
 ---
 
-## Public API
+## Goals
 
-Each layer is a Svelte component imported from the package:
+1. **Unified intensity model** across all four categories — same prop name, same value space, same mental model.
+2. **Unified lifecycle callbacks** — persistent and one-shot layers share a predictable observation surface.
+3. **Effect renames** so generic mechanics aren't trapped under narrative-specific names.
+4. **Psychology positive/neutral expansion** — calm, serenity, success, awe, melancholy.
+5. **Action soft-beat expansion** — dissolve, shake, zoom-burst.
+6. **Atmosphere weather completion** — storm, wind/dust.
+7. **Environment minor completion** — overcast.
+8. **Documentation parity** — every effect appears in showcase, README, and registry.
 
-```svelte
-<script lang="ts">
-  import { BloodLayer, SnowLayer, RainLayer, FogLayer } from '@dgrslabs/void-energy-ambient-layers';
-</script>
+Out of scope: per-physics branches beyond the single retro `steps()` rule, narrative orchestration, audio, plugin/custom-effect API.
 
-<BloodLayer intensity={0.6} />
-<SnowLayer intensity={0.8} wind={0.3} />
-<RainLayer intensity={0.5} />
-<FogLayer intensity={0.7} drift="slow" />
-```
+---
 
-### Common props (all layers)
+## Part A — API Reconciliation (must land first)
 
+### A1. Unify the intensity prop across all categories
+
+**Problem:** Three different shapes today: `intensity: 1|2|3` (persistent), `level: 'light'|'medium'|'heavy'` (action), nothing (environment).
+
+**Decision:** Standardize on `intensity: 'light' | 'medium' | 'heavy'` for **all four** categories.
+- Strings (not numbers) read better in templates and AI tool calls.
+- Environment gains a real intensity prop instead of a raw `opacity` escape hatch — `light` = barely-there tint, `heavy` = fully-saturated grade.
+- Persistent layers keep decay; the decay path becomes `heavy → medium → light → off`.
+
+**Rejected alternatives:**
+- Keep `1|2|3` numeric — harder to read, AI mistakes `0` for `off`.
+- Allow both — drift returns immediately.
+
+**Migration:**
+- Edit `types.ts` — `AmbientIntensity = 'light'|'medium'|'heavy'`.
+- All four category prop interfaces consume `intensity?: AmbientIntensity`.
+- Action loses its separate `level` prop. The decay code path remains persistent-only.
+- Environment maps `intensity` → CSS `--ambient-level` (0.33 / 0.66 / 1.0) consumed by SCSS opacity.
+- Update [params.ts](packages/ambient-layers/src/core/effects/params.ts) so each effect's `defaults` block uses the new shape.
+- Update [AmbientLayersPage.svelte](src/components/AmbientLayersPage.svelte) controls.
+
+### A2. Unify lifecycle callbacks
+
+**Problem:** Persistent uses `onLevelChange(level)`; Action uses `onComplete()`; Environment has nothing.
+
+**Decision:** Single callback shape per concern, named consistently:
 ```ts
-interface AmbientLayerProps {
-  intensity?: number;        // 0..1, default 0.5
-  enabled?: boolean;         // default true; false removes from DOM
-  reducedMotion?: 'auto' | 'respect' | 'ignore'; // default 'respect'
-  class?: string;
+interface AmbientLifecycle {
+  onChange?: (intensity: AmbientIntensity | 'off') => void; // fired on every level transition
+  onEnd?: () => void;                                       // fired exactly once when layer reaches 'off' / completes
 }
 ```
+- Persistent layers fire `onChange` on each decay step, then `onEnd` when reaching `off`.
+- Action layers fire `onChange('heavy' → 'off')` synthetically (start/end), then `onEnd` on animation completion.
+- Environment fires `onChange` on intensity prop change, no `onEnd`.
 
-### Layer-specific props
+This gives consumers **one mental model**: subscribe to `onChange` if you care about steps, `onEnd` if you only care about teardown.
 
-- **BloodLayer:** `pulse?: boolean` (default true), `dripRate?: number` (drips/min)
-- **SnowLayer:** `wind?: number` (0..1 horizontal drift), `flakeCount?: 'sparse' | 'medium' | 'heavy'`
-- **RainLayer:** `angle?: number` (degrees from vertical), `density?: 'light' | 'medium' | 'heavy'`
-- **FogLayer:** `drift?: 'still' | 'slow' | 'fast'`, `opacity?: number`
+### A3. Standardize the decay prop
 
-### Global coordinator (optional)
+**Problem:** `decayMs` lives only on persistent layers. Action effects encode their durations inside `params.ts` and consumers can't tune them per-instance.
 
-A thin store for coordinating multiple layers narratively:
+**Decision:** Promote a single `durationMs?: number` prop on all categories.
+- Persistent: time **per level** before stepping down (current `decayMs` behavior). Rename `decayMs` → `durationMs` for consistency.
+- Action: total animation duration, overrides `params.ts` default.
+- Environment: ignored (sticky).
+- Default per effect lives in [params.ts](packages/ambient-layers/src/core/effects/params.ts).
 
-```ts
-import { ambient } from '@dgrslabs/void-energy-ambient-layers';
+Rename `decayMs` everywhere (props, params, runtime helper). One pass, no compat alias — package is pre-1.0.
 
-ambient.show('rain', { intensity: 0.7 });
-ambient.fade('rain', 0, { duration: 2000 });
-ambient.replace('fog', { intensity: 0.5 });
-ambient.clear();
-```
+### A4. Document params.ts as the registry
 
-Optional — consumers can mount components directly without the coordinator for simple cases.
-
----
-
-## Package layout
-
-Inside the current monorepo at `packages/ambient/`, mirroring the existing `packages/kinetic-text/` structure:
-
-```
-packages/
-└── ambient/
-    ├── package.json                              { "name": "@dgrslabs/void-energy-ambient-layers" }
-    ├── tsconfig.json
-    ├── tsconfig.build.json
-    ├── README.md
-    ├── CHANGELOG.md
-    ├── scripts/                                  build pipeline
-    ├── src/
-    │   ├── index.ts                              public API barrel
-    │   ├── components/
-    │   │   ├── BloodLayer.svelte
-    │   │   ├── SnowLayer.svelte
-    │   │   ├── RainLayer.svelte
-    │   │   └── FogLayer.svelte
-    │   ├── lib/
-    │   │   ├── ambient-store.svelte.ts          global coordinator
-    │   │   ├── particle-engine.ts                shared particle logic
-    │   │   ├── physics-adapters.ts               per-physics rendering strategies
-    │   │   └── reduced-motion.ts
-    │   ├── styles/
-    │   │   ├── _ambient.scss                    shared base
-    │   │   ├── _ambient-blood.scss
-    │   │   ├── _ambient-snow.scss
-    │   │   ├── _ambient-rain.scss
-    │   │   └── _ambient-fog.scss
-    │   ├── types/
-    │   │   └── ambient.d.ts
-    │   └── adapters/
-    │       └── void-energy-host.ts               token bridge to void-energy
-    └── dist/                                     build output (gitignored)
-```
-
-### `package.json` template
-
-Modeled after `packages/kinetic-text/package.json`:
-
-```json
-{
-  "name": "@dgrslabs/void-energy-ambient-layers",
-  "version": "0.1.0",
-  "type": "module",
-  "license": "UNLICENSED",
-  "description": "Immersive visual overlay layers for Void Energy (Blood, Snow, Rain, Fog)",
-  "files": [
-    "dist",
-    "README.md",
-    "CHANGELOG.md"
-  ],
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "svelte": "./dist/index.js",
-      "default": "./dist/index.js"
-    },
-    "./components/blood": {
-      "svelte": "./dist/components/BloodLayer.svelte",
-      "default": "./dist/components/BloodLayer.svelte"
-    },
-    "./components/snow": { "...": "..." },
-    "./components/rain": { "...": "..." },
-    "./components/fog":  { "...": "..." },
-    "./styles": "./dist/styles/index.scss"
-  },
-  "peerDependencies": {
-    "svelte": "^5.0.0",
-    "void-energy": "workspace:*"
-  },
-  "scripts": {
-    "build": "...",
-    "check": "svelte-check",
-    "test": "vitest run"
-  }
-}
-```
-
-The `workspace:*` on `void-energy` lets ambient develop against the local library copy inside the current monorepo. When the package is lifted into the premium repo in Phase 3, this gets rewritten to `"void-energy": "^0.1.0"` (published version).
+Add a header comment to [params.ts](packages/ambient-layers/src/core/effects/params.ts) declaring it the SSOT for per-effect tuning. Every effect must have an entry: `{ defaultIntensity, durationMs, category }`. The decay runtime reads from here, not from component-local constants.
 
 ---
 
-## The token bridge (`adapters/void-energy-host.ts`)
+## Part B — Renames (after API unification)
 
-Because the ambient package is separate from the core library, it cannot directly read design tokens from `src/config/design-tokens.ts`. Instead, it imports them through the public `void-energy` entry point:
+These are simple but must happen before the new effects land, otherwise we cement the old names by association.
 
-```ts
-// packages/ambient/src/adapters/void-energy-host.ts
-import { designTokens } from 'void-energy/tokens';
+| Old | New | Reason |
+|---|---|---|
+| `flashback` (psychology) | `filmGrain` (psychology) | Effect is generic sepia + grain texture; "flashback" is narrative, not mechanical. Reusable as ambience for memory, vintage, photography UI. |
+| `dreaming` (psychology) | `haze` (psychology) | Effect is a soft double vignette with no dream-specific signal. `haze` describes the visual; consumers map it to "dream" themselves. |
+| `decayMs` (prop, param key, runtime arg) | `durationMs` | Aligns with A3. |
 
-export const ambientTokens = {
-  bloodBase: designTokens.ambient.blood.base,
-  snowFlake: designTokens.ambient.snow.flake,
-  // ...
-};
-```
+**Migration:** rename in `types.ts`, `params.ts`, the SCSS class names (`.ambient-flashback` → `.ambient-film-grain`, `.ambient-dreaming` → `.ambient-haze`), the variant switch in [PsychologyLayer.svelte](packages/ambient-layers/src/svelte/PsychologyLayer.svelte), and [AmbientLayersPage.svelte](src/components/AmbientLayersPage.svelte).
 
-**Critical:** the core `void-energy/tokens` export must include an `ambient` namespace. This means Phase 1 adds new tokens to the core `src/config/design-tokens.ts` **in addition to** building the ambient package. The tokens are core (part of the public system), but the implementation that consumes them is the premium package.
-
-**Why tokens live in core, not in the ambient package:** if a premium package defined its own tokens, every premium package would need its own token pipeline, and themes would fragment. Keeping all tokens in one place (core) preserves a single source of truth. The premium package is just an implementation that reads them.
+No backwards-compat alias — pre-1.0 package, single consumer (the showcase).
 
 ---
 
-## Implementation strategy
+## Part C — New Effects
 
-### Particle-based layers (Snow, Rain)
+Built on the unified API. Each effect ships with: variant in `types.ts`, entry in `params.ts`, SCSS block in `ambient-layers.scss`, branch in the relevant category Svelte file, showcase tile.
 
-Pure CSS particles animated via `@keyframes` are cheapest:
-- Generate N particles at component mount via a `{#each}` loop
-- Each particle gets randomized delay, duration, horizontal position via CSS custom properties
-- Single shared `@keyframes` animation per layer
-- `intensity` scales opacity and particle count via `--ambient-intensity`
+### C1. Psychology — positive/neutral states
 
-No JS per-frame updates. The browser handles everything.
+The biggest catalog gap. Today the layer can only depict things going wrong.
 
-### Vignette layers (Blood, Fog)
+| Effect | Visual | Default duration | Purpose |
+|---|---|---|---|
+| **calm** | Soft cool-blue vignette, slow breathing pulse (4s cycle), no tension | 10 000ms | Counterpart to `tension`. Relief, safety, post-conflict downbeat. |
+| **serenity** | Pale white/cyan glow on outer edges, near-imperceptible drift | 12 000ms | Ambient peacefulness; meditation, idle, contemplative reading. |
+| **success** | Warm green vignette with one slow outward bloom on entry | 8 000ms | Counterpart to `danger`. Achievement, resolution, positive narrative beat. |
+| **awe** | Pale gold/white radial brightening from center outward, very slow | 12 000ms | Wonder, discovery, reveal of something significant. Distinct from `flash` (one-shot) — this lingers. |
+| **melancholy** | Desaturated blue-grey vignette, slow downward drift on edge gradient | 10 000ms | Sadness, loss, reflective sorrow. Not negative-as-threat (that's `danger`); negative-as-grief. |
 
-Radial gradient + optional animated SVG filter:
-- Blood: fixed radial gradient, CSS `@keyframes` pulse on opacity
-- Fog: layered SVG `feTurbulence` + `feDisplacementMap` with slow `animate` on turbulence seed for drift
-- Both adapt via CSS custom properties responding to physics data attributes
+**Why these five and not more:** they fill the four obvious quadrants (positive-active = success, positive-passive = serenity, neutral-restorative = calm, positive-transcendent = awe) plus the missing "negative-not-threatening" slot (melancholy). Anger, confusion, shock — anger overlaps `danger`, confusion overlaps `dizzy`, shock belongs in Action.
 
-### Physics adaptation
+### C2. Action — soft and physical beats
 
-Each layer's SCSS uses the existing `@include when-glass/when-flat/when-retro` mixins from `void-energy/styles/abstracts`:
-- **Glass:** full visual fidelity, blur, depth, subtle glow on particles
-- **Flat:** clean silhouettes, no blur, slightly reduced opacity
-- **Retro:** dithered halftone pattern, stepped animation timing, hard pixel edges
+| Effect | Visual | Default duration | Purpose |
+|---|---|---|---|
+| **dissolve** | Whole-screen gentle fade-to-transparent over a soft blur | 1 200ms | Soft narrative close. The "exit" counterpart to `reveal`. Every story needs a way to end gracefully. |
+| **shake** | Translate canvas in a damped random walk; no color/blur change | 600ms | Earthquake, heavy collision aftermath, jolt. Pairs with `impact` (impact = ring, shake = vibration). |
+| **zoomBurst** | Brief radial scale-up + outward motion blur from center | 500ms | Sudden attention shift, dramatic emphasis, "wait, what?" beat. Distinct from `flash` (no luminance change). |
 
-### Reduced motion
+`shake` is the most physically-interesting addition. It's implemented via a CSS transform on a wrapper div, not on `<html>`, so it doesn't fight scroll position.
 
-When `prefers-reduced-motion: reduce` and `reducedMotion === 'respect'`:
-- Particle layers freeze particles at their starting positions
-- Vignette layers stop pulsing/drifting but remain visible
-- Opacity scales to 50% of `intensity`
+### C3. Atmosphere — weather completion
 
-Never fully hide the layer.
+| Effect | Visual | Default duration | Purpose |
+|---|---|---|---|
+| **storm** | Rain particles (denser than `rain`) + occasional full-viewport `flash` style lightning + slow horizontal wind drift | 12 000ms | True storm. Rain-only is drizzle; this is the dramatic option. Internally composes the rain particle system + a separate lightning timer. |
+| **wind** | Drifting horizontal streaks (dust/leaves), no precipitation | 10 000ms | Dryness, desert, exposure, foreboding without rain. Pairs with `heat` for desert scenes. |
 
-### Performance budget
+Storm is the only effect in this phase that **internally composes** another effect. Document this clearly in the SCSS section comment so future contributors know the pattern is allowed for atmosphere only.
 
-- Each layer independently: **under 2ms per frame** on a mid-tier laptop
-- All four layers simultaneously: **under 8ms per frame**
-- Verify with Chrome DevTools Performance tab
-- If a layer exceeds budget, reduce particle count or simplify — never add per-frame JS
+### C4. Environment — minor completion
 
----
-
-## Token additions to `void-energy`
-
-Add to `src/config/design-tokens.ts` (in the core library, not the ambient package):
-
-```ts
-ambient: {
-  blood: { base, pulse, drip },
-  snow:  { flake, vignette, tint },
-  rain:  { streak, glass, tint },
-  fog:   { base, drift, edge },
-  zIndex: { layer: number }
-}
-```
-
-Each token has light-mode and dark-mode variants. Run `npm run build:tokens` after adding them so `_generated-themes.scss` includes them.
+| Effect | Visual | Purpose |
+|---|---|---|
+| **overcast** | Flat grey-blue desaturated wash, very slight green tint | Storm/gloom **tone** without committing to Atmosphere precipitation. Lets consumers tint a scene "stormy" while keeping the atmosphere slot free for fog or nothing. |
 
 ---
 
-## Showcase integration
+## Part D — Showcase, docs, registry
 
-The existing showcase site (currently in the monorepo, will become `apps/showcase` in Phase 3) demonstrates ambient. Add a new section to the showcase page:
-- Install the ambient package as a workspace dependency in the showcase app
-- Import all four layers
-- Live toggle buttons, intensity sliders, layer-specific controls
-- Physics switcher nearby so users can see layers adapt in real time
+Every new effect must appear in:
+- [src/components/AmbientLayersPage.svelte](src/components/AmbientLayersPage.svelte) — variant picker tile + live preview
+- `packages/ambient-layers/README.md` — effect table per category
+- `packages/ambient-layers/CHANGELOG.md` — bump to 0.3.0, list renames as breaking
+- `src/config/component-registry.json` — if ambient is registered there yet (check; if not, defer to Phase 2)
 
-**This is the visible Phase 1 deliverable.** When the showcase shows all four layers working across all three physics presets and both modes, Phase 1 is done.
+Showcase controls must use the new unified `intensity` prop so users see the consistent API in action.
 
 ---
 
 ## Implementation order
 
-1. **Create the package scaffold**
-   - `packages/ambient/` directory
-   - `package.json` modeled after `kinetic-text`
-   - `tsconfig.json`, `tsconfig.build.json`
-   - `README.md` stub, `CHANGELOG.md` stub
-   - Wire into the monorepo workspaces
+The order is deliberate: API first, renames second, additions third. Each step compiles cleanly on its own and can be its own commit.
 
-2. **Add ambient tokens to core**
-   - Edit `src/config/design-tokens.ts` in the core library
-   - Run `npm run build:tokens`
-   - Verify `void-energy/tokens` export exposes the new namespace
-
-3. **Build the adapter layer**
-   - `packages/ambient/src/adapters/void-energy-host.ts` — reads tokens through the public `void-energy/tokens` export
-
-4. **SnowLayer first** (simplest particle-based)
-   - Component, SCSS, physics adaptation
-   - Add to showcase
-   - Verify 60fps and reduced-motion
-
-5. **RainLayer** (follows Snow's pattern)
-
-6. **FogLayer** (first vignette-based)
-   - Establish SVG turbulence pattern
-   - Document the approach in the component header
-
-7. **BloodLayer**
-
-8. **Global coordinator** (`ambient-store.svelte.ts`)
-
-9. **Performance audit**
-   - Profile each layer individually
-   - Profile all four simultaneously
-   - Fix anything over budget
-
-10. **Reduced motion audit**
-
-11. **Documentation**
-    - Package README with full API
-    - CHEAT-SHEET additions (ambient catalog)
-    - Register in `component-registry.json` (once Phase 2 AI automation defines how premium packages register)
-    - `packages/ambient/CLAUDE.md` — package-level rules
+1. **A1 — Unify intensity.** Edit `types.ts`, all four category components, `params.ts`, showcase. Verify compile + showcase still works for all 25 existing effects.
+2. **A2 — Unify lifecycle callbacks.** `onChange` / `onEnd` everywhere. Update showcase if it currently subscribes to `onLevelChange`.
+3. **A3 — Rename `decayMs` → `durationMs`.** Single rename pass across `params.ts`, `decay.ts`, props, showcase.
+4. **A4 — Header comment in `params.ts`** declaring registry status. No code change.
+5. **B — Renames.** `flashback` → `filmGrain`, `dreaming` → `haze`. SCSS classes, variant strings, showcase tiles.
+6. **C1 — Psychology positive states.** Add `calm`, `serenity`, `success`, `awe`, `melancholy`. Each: type union, params entry, SCSS block, variant branch, showcase tile. Land as a single commit per effect or one bundled commit — author's choice.
+7. **C2 — Action soft beats.** Add `dissolve`, `shake`, `zoomBurst`.
+8. **C3 — Atmosphere weather.** Add `storm`, `wind`. Storm composes the rain particle system internally — implement carefully, document in the SCSS section header.
+9. **C4 — Environment overcast.** Single tint addition.
+10. **D — Documentation pass.** README tables, CHANGELOG entry, showcase verification, screenshot if useful.
+11. **Bump package version** to `0.3.0`. Renames are breaking; positive states are additive.
 
 ---
 
 ## Verification checklist
 
-- [ ] `packages/ambient/` exists with the package scaffold matching the `kinetic-text` pattern
-- [ ] `package.json` declares `"name": "@dgrslabs/void-energy-ambient-layers"` and `"peerDependencies": { "void-energy": "workspace:*" }`
-- [ ] Ambient tokens added to core `design-tokens.ts` and generated into `_generated-themes.scss`
-- [ ] All four layers render correctly in glass / flat / retro physics
-- [ ] All four layers render correctly in light and dark modes
-- [ ] Each layer independently stays under 2ms per frame
-- [ ] All four layers simultaneously stay under 8ms per frame
-- [ ] `prefers-reduced-motion: reduce` produces frozen/calmed behavior without hiding layers
-- [ ] Layers are `pointer-events: none`
-- [ ] Global coordinator store works: show, hide, fade, crossfade
-- [ ] Showcase demonstrates all four layers with live controls
-- [ ] Showcase works on mobile (test at 375px viewport)
-- [ ] The ambient package has **zero direct imports from other parts of the monorepo** — everything goes through `void-energy/*` public exports
-- [ ] `npm run check` passes inside `packages/ambient/`
-- [ ] `npm run test` passes inside `packages/ambient/`
-- [ ] Package CHANGELOG reflects the 0.1.0 release
-- [ ] Package README documents the full public API
-- [ ] The package is trivially liftable into the Phase 3 premium repo — no refactoring required, just file move + rewrite `workspace:*` to `^0.1.0`
+### API consistency
+- [ ] All four category components accept `intensity: 'light' | 'medium' | 'heavy'`
+- [ ] Action no longer has a separate `level` prop
+- [ ] Environment uses `intensity` (not raw opacity) to scale its tint
+- [ ] All four categories accept `onChange` and `onEnd`; no `onLevelChange` or `onComplete` remain
+- [ ] All four categories accept `durationMs`; no `decayMs` remains
+- [ ] Every effect has an entry in `params.ts` with `{ defaultIntensity, durationMs, category }`
+- [ ] `params.ts` has a header comment declaring it the per-effect registry SSOT
+
+### Renames
+- [ ] `flashback` is gone everywhere (types, params, SCSS class, showcase, variant string); `filmGrain` works
+- [ ] `dreaming` is gone everywhere; `haze` works
+- [ ] No `decayMs` anywhere in the package
+
+### New effects (showcase smoke test)
+- [ ] Psychology: `calm`, `serenity`, `success`, `awe`, `melancholy` all render and decay correctly
+- [ ] Action: `dissolve`, `shake`, `zoomBurst` all fire once and auto-unmount
+- [ ] Atmosphere: `storm` produces rain + lightning + wind drift without leaking timers; `wind` produces dust streaks
+- [ ] Environment: `overcast` applies as a sticky tint and respects `intensity`
+
+### System hygiene
+- [ ] `npm run check` passes from repo root
+- [ ] `npm run check` passes inside `packages/ambient-layers/`
+- [ ] No raw values introduced in new SCSS blocks (Token Law)
+- [ ] All new effects respect `prefers-reduced-motion` (freeze animation, halve opacity)
+- [ ] All new effects are `pointer-events: none`
+- [ ] Showcase demonstrates every effect across every category, with the new unified controls
+- [ ] CHANGELOG documents A1–A3 and B as **breaking**, C1–C4 as additive, version bumped to `0.3.0`
 
 ---
 
-## Out of scope for Phase 1
+## Out of scope
 
-- **Sound ambient.** Audio layers (wind, rain sounds, ambient drones) are a separate future package. Phase 1 is visual only.
-- **Narrative orchestration.** Automatic layer sequencing based on story events is CoNexus-specific and belongs in the story engine.
-- **Custom layer creation API.** Four concrete layers is the deliverable. Plugin API is over-engineering.
-- **Mobile-specific optimizations beyond the performance budget.** 60fps desktop + 30fps mid-range mobile is acceptable.
-- **Publishing to GitHub Packages.** The package lives in the current monorepo as a workspace only. Publishing to a private registry happens in Phase 3 when the premium repo is created.
+- **Per-physics branching** beyond the existing global retro `steps()` rule. Stays out.
+- **Stacking semantics** between Atmosphere and Environment (e.g., "is `overcast` + `rain` allowed?"). Document the answer in README but do not enforce in code.
+- **Plugin / custom-effect API.** Effects remain a closed enum.
+- **Audio layers.** Separate future package.
+- **Narrative orchestration / story-engine bindings.** CoNexus concern, not the package's job.
+- **Effect combinations beyond `storm`.** `storm` is the only composition; everything else stays atomic.

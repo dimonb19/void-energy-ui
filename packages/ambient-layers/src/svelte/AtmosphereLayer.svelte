@@ -6,11 +6,11 @@
   let {
     variant,
     intensity = 'medium',
-    decayMs,
+    durationMs,
     enabled = true,
     reducedMotion = 'respect',
-    onLevelChange,
-    onComplete,
+    onChange,
+    onEnd,
     class: className = '',
   }: AtmosphereLayerProps = $props();
 
@@ -23,19 +23,19 @@
   // Re-sync if the consumer changes `intensity` or `variant` prop.
   $effect(() => {
     level = intensity;
-    onLevelChange?.(intensity);
+    onChange?.(intensity);
   });
 
   $effect(() => {
-    const ms = decayMs ?? ATMOSPHERE_PARAMS[variant].decayMs;
+    const ms = durationMs ?? ATMOSPHERE_PARAMS[variant].durationMs;
     const handle = startDecay(
       intensity,
       ms,
       (next) => {
         level = next;
-        onLevelChange?.(next);
+        onChange?.(next);
       },
-      onComplete,
+      onEnd,
     );
     return () => handle.stop();
   });
@@ -49,14 +49,43 @@
     level === 'off' ? 0 : ATMOSPHERE_PARAMS[variant].counts[level],
   );
 
-  // Particle-field variants (rain/snow/ash) share an x-y scatter model.
+  // Particle-field variants share an x-y scatter model.
+  // - rain/snow/ash/storm: vertical fall (storm reuses the rain particle shape).
+  // - wind: horizontal streaks (dust/leaves), distinct keyframe in SCSS.
   // SVG-filter variants (fog/underwater/heat) render inline <svg> turbulence.
   const isParticleField = $derived(
-    variant === 'rain' || variant === 'snow' || variant === 'ash',
+    variant === 'rain' ||
+      variant === 'snow' ||
+      variant === 'ash' ||
+      variant === 'storm' ||
+      variant === 'wind',
   );
   const isSvgFilter = $derived(
     variant === 'fog' || variant === 'underwater' || variant === 'heat',
   );
+
+  // Storm-only: occasional lightning flash. Random interval 2.5–6s, scaled
+  // gently by intensity. Toggled via a $state boolean reset by a setTimeout
+  // so SCSS can drive the bright flash via a transient class.
+  let lightning = $state(false);
+  $effect(() => {
+    if (variant !== 'storm' || level === 'off') return;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const schedule = () => {
+      const base = 2500 + Math.random() * 3500;
+      timer = setTimeout(() => {
+        lightning = true;
+        timer = setTimeout(() => {
+          lightning = false;
+          schedule();
+        }, 180);
+      }, base);
+    };
+    schedule();
+    return () => {
+      if (timer !== null) clearTimeout(timer);
+    };
+  });
 
   const particles = $derived.by(() => {
     if (!isParticleField || level === 'off') return [];
@@ -75,9 +104,13 @@
       const duration =
         variant === 'rain'
           ? 0.5 + Math.random() * 0.9
-          : variant === 'snow'
-            ? (8 + Math.random() * 14) * bandSpeed
-            : (10 + Math.random() * 16) * bandSpeed;
+          : variant === 'storm'
+            ? 0.35 + Math.random() * 0.6 // faster than rain
+            : variant === 'wind'
+              ? (3 + Math.random() * 4) * bandSpeed
+              : variant === 'snow'
+                ? (8 + Math.random() * 14) * bandSpeed
+                : (10 + Math.random() * 16) * bandSpeed;
       const delay = -Math.random() * duration;
       const drift = (Math.random() * 2 - 1) * 12; // vw
       // ~10% of ash particles are embers.
@@ -104,6 +137,7 @@
     aria-hidden="true"
     data-variant={variant}
     data-reduced-motion={reducedMotion}
+    data-lightning={variant === 'storm' && lightning ? 'true' : undefined}
     style="--ambient-level: {levelNum};"
   >
     {#if isParticleField}

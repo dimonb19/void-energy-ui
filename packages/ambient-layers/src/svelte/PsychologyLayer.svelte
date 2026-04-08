@@ -6,11 +6,11 @@
   let {
     variant,
     intensity = 'medium',
-    decayMs,
+    durationMs,
     enabled = true,
     reducedMotion = 'respect',
-    onLevelChange,
-    onComplete,
+    onChange,
+    onEnd,
     class: className = '',
   }: PsychologyLayerProps = $props();
 
@@ -21,19 +21,19 @@
 
   $effect(() => {
     level = intensity;
-    onLevelChange?.(intensity);
+    onChange?.(intensity);
   });
 
   $effect(() => {
-    const ms = decayMs ?? PSYCHOLOGY_PARAMS[variant].decayMs;
+    const ms = durationMs ?? PSYCHOLOGY_PARAMS[variant].durationMs;
     const handle = startDecay(
       intensity,
       ms,
       (next) => {
         level = next;
-        onLevelChange?.(next);
+        onChange?.(next);
       },
-      onComplete,
+      onEnd,
     );
     return () => handle.stop();
   });
@@ -42,11 +42,16 @@
   const levelNum = $derived(
     level === 'off' ? 0 : level === 'light' ? 1 : level === 'medium' ? 2 : 3,
   );
+
+  // camelCase variants → kebab-case SCSS class suffix (filmGrain → film-grain).
+  const variantClass = $derived(
+    variant.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`),
+  );
 </script>
 
 {#if enabled && level !== 'off'}
   <div
-    class="ambient-layer ambient-psychology ambient-{variant} {className}"
+    class="ambient-layer ambient-psychology ambient-{variantClass} {className}"
     aria-hidden="true"
     data-variant={variant}
     data-reduced-motion={reducedMotion}
@@ -57,7 +62,7 @@
       <span class="ambient-psychology__vignette ambient-psychology__vignette--b"
       ></span>
     {/if}
-    {#if variant === 'flashback'}
+    {#if variant === 'filmGrain'}
       <svg
         class="ambient-psychology__svg"
         xmlns="http://www.w3.org/2000/svg"
@@ -85,7 +90,7 @@
         <rect width="100%" height="100%" filter="url(#{grainFilterId})" />
       </svg>
     {/if}
-    {#if variant === 'dreaming'}
+    {#if variant === 'haze'}
       <span class="ambient-psychology__vignette ambient-psychology__vignette--b"
       ></span>
     {/if}
