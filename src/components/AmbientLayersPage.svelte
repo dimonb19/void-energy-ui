@@ -96,11 +96,9 @@
     label: string;
   }[] = [
     { value: 'night', label: 'Night' },
-    { value: 'indoor_warm', label: 'Indoor Warm' },
     { value: 'neon', label: 'Neon' },
     { value: 'dawn', label: 'Dawn' },
     { value: 'dusk', label: 'Dusk' },
-    { value: 'overcast', label: 'Overcast' },
     { value: 'sickly', label: 'Sickly' },
     { value: 'toxic', label: 'Toxic' },
     { value: 'underground', label: 'Underground' },
@@ -301,7 +299,7 @@
                 <h3>Environment</h3>
                 <p class="text-dim">
                   Sticky baseline tint layers — deepest z-slot, no decay, no
-                  intensity. Night, warm indoor, and neon color grades.
+                  intensity. Sunrise, dusk, neon, and other color grades.
                 </p>
               </div>
 

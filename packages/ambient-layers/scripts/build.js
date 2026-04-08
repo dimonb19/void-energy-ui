@@ -83,7 +83,7 @@ declare const AtmosphereLayer: typeof SvelteComponent<AtmosphereLayerProps>;
 declare const PsychologyLayer: typeof SvelteComponent<PsychologyLayerProps>;
 /** Action category layer - one-shot transient variants (impact, speed, glitch, flash, reveal). */
 declare const ActionLayer: typeof SvelteComponent<ActionLayerProps>;
-/** Environment category layer - sticky baseline tint variants (night, indoor_warm, neon). */
+/** Environment category layer - sticky baseline tint variants (night, neon, dawn, dusk, sickly, toxic, underground, candlelit). */
 declare const EnvironmentLayer: typeof SvelteComponent<EnvironmentLayerProps>;
 export { AtmosphereLayer, PsychologyLayer, ActionLayer, EnvironmentLayer };
 

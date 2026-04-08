@@ -237,10 +237,48 @@
     {:else if isSvgFilter && variant === 'heat'}
       <span class="ambient-atmosphere__wash ambient-atmosphere__wash--warm"
       ></span>
-      <div class="ambient-atmosphere__heat-refract"></div>
+      <svg
+        class="ambient-atmosphere__svg ambient-atmosphere__svg--heat-defs"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <defs>
+          <filter
+            id="heat-melt-{uid}"
+            x="-10%"
+            y="-10%"
+            width="120%"
+            height="120%"
+          >
+            <feTurbulence
+              type="fractalNoise"
+              baseFrequency="0.008 0.022"
+              numOctaves="2"
+              seed="7"
+            >
+              <animate
+                attributeName="baseFrequency"
+                dur="18s"
+                values="0.008 0.022;0.010 0.030;0.008 0.022"
+                repeatCount="indefinite"
+              />
+            </feTurbulence>
+            <feDisplacementMap in="SourceGraphic" scale="22">
+              <animate
+                attributeName="scale"
+                dur="9s"
+                values="18;34;18"
+                repeatCount="indefinite"
+              />
+            </feDisplacementMap>
+          </filter>
+        </defs>
+      </svg>
       <div
-        class="ambient-atmosphere__heat-refract ambient-atmosphere__heat-refract--b"
+        class="ambient-atmosphere__heat-melt"
+        style="--heat-filter: url(#heat-melt-{uid})"
       ></div>
+      <div class="ambient-atmosphere__heat-sag"></div>
     {/if}
   </div>
 {/if}

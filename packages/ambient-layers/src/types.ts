@@ -41,11 +41,9 @@ export type ActionLayer = 'impact' | 'speed' | 'glitch' | 'flash' | 'reveal';
 /** Sticky baseline environment tint layers (deepest, rarely changes). */
 export type EnvironmentLayer =
   | 'night'
-  | 'indoor_warm'
   | 'neon'
   | 'dawn'
   | 'dusk'
-  | 'overcast'
   | 'sickly'
   | 'toxic'
   | 'underground'

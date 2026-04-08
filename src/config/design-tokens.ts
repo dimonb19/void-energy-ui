@@ -145,12 +145,15 @@ export const VOID_AMBIENT = {
   // Night environment — cool deep-blue wash
   'ambient-night-top': 'rgba(20, 30, 60, 0.45)',
   'ambient-night-bottom': 'rgba(10, 15, 35, 0.55)',
-  // Indoor warm environment — incandescent amber
-  'ambient-warm-center': 'rgba(255, 200, 140, 0.25)',
-  'ambient-warm-edge': 'rgba(180, 120, 60, 0.35)',
   // Neon environment — cyberpunk magenta/cyan
   'ambient-neon-a': 'rgba(255, 0, 200, 0.2)',
   'ambient-neon-b': 'rgba(0, 200, 255, 0.2)',
+  // Dawn environment — sunrise sky gradient + horizon bloom
+  'ambient-dawn-bloom': 'rgba(255, 225, 180, 0.55)',
+  'ambient-dawn-peach': 'rgba(255, 170, 130, 0.4)',
+  'ambient-dawn-sky': 'rgba(60, 80, 130, 0.4)',
+  'ambient-dawn-mid': 'rgba(200, 140, 160, 0.28)',
+  'ambient-dawn-horizon': 'rgba(255, 190, 150, 0.4)',
 } as const;
 
 // --------------------------------------------------------------------------

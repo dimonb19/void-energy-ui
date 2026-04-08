@@ -23,10 +23,9 @@
   --ambient-alpha: calc(var(--ambient-level) / 3);
 }
 
-// Z-index lanes: deeper below content, psychology/action above.
-.ambient-environment {
-  z-index: 1;
-}
+// Z-index lanes. Environment is a global color filter and sits on top of
+// everything (content + chrome) via mix-blend-mode; pointer-events: none on
+// .ambient-layer keeps the UI interactive underneath.
 .ambient-atmosphere {
   z-index: 5;
 }
@@ -35,6 +34,9 @@
 }
 .ambient-action {
   z-index: 12;
+}
+.ambient-environment {
+  z-index: 100;
 }
 
 // Single global retro timing rule — stepped animations everywhere, no per-layer branches.
@@ -426,73 +428,293 @@ html[data-physics='retro'] .ambient-layer * {
     transform: translate3d(-3vw, -3vh, 0);
   }
 }
-
-// ── heat — stacked horizontal shimmer bands with vertical wave, warm overlay
-.ambient-heat .ambient-atmosphere__heat-refract {
+// Bubbles — two offset tiled layers of hollow ring sprites rising continuously
+// from bottom to top. Each layer uses a different tile height so they never
+// synchronize, which keeps the field continuous instead of arriving in waves.
+// Sprites are distributed across the FULL tile vertically (not clustered) so
+// there are no empty stretches between tile repeats. The rise keyframe
+// translates by exactly one tile height via a shared CSS variable, so the
+// loop is seamless regardless of density. Density is driven by --ambient-level:
+// higher intensity shrinks the tile, packing more sprites into the viewport.
+.ambient-underwater::before,
+.ambient-underwater::after {
+  content: '';
   position: absolute;
   inset: 0;
-  // Fine horizontal bands — fake refraction stripes.
-  background: repeating-linear-gradient(
-    0deg,
-    transparent 0,
-    transparent 3px,
-    // void-ignore — shimmer band pitch physics
-    rgba(255, 255, 255, 0.05) 3px,
-    // void-ignore — shimmer band alpha floor
-    rgba(255, 255, 255, 0.05) 4px,
-    // void-ignore — shimmer band pitch physics
-    transparent 4px,
-    // void-ignore — shimmer band pitch physics
-    transparent 7px // void-ignore — shimmer band pitch physics
-  );
-  mask-image: linear-gradient(to top, black 15%, transparent 85%);
-  -webkit-mask-image: linear-gradient(to top, black 15%, transparent 85%);
+  pointer-events: none;
   mix-blend-mode: screen;
-  opacity: calc(var(--ambient-alpha) * 0.85);
-  will-change: transform, filter;
-  animation: ambient-heat-shimmer 2.8s ease-in-out infinite;
+  will-change: transform;
 }
-.ambient-heat .ambient-atmosphere__heat-refract--b {
-  animation:
-    ambient-heat-shimmer 4.4s ease-in-out infinite,
-    ambient-heat-drift 6s ease-in-out infinite;
-  opacity: calc(var(--ambient-alpha) * 0.55);
-  filter: blur(1.5px); // void-ignore — heat shimmer softness
+.ambient-underwater::before {
+  // Small bubbles — denser, faster rise. Tile shrinks as intensity rises.
+  // Tile MUST be smaller than viewport height so multiple tiles stack on
+  // screen at once — otherwise the sparse sprite band reads as a wave with
+  // a visible empty gap between cycles.
+  --bubble-tile: calc(
+    (38 - var(--ambient-level) * 5) * 1vh
+  ); // void-ignore — density scale
+  background-image:
+    radial-gradient(
+      circle at 18% 6%,
+      transparent 0 0.14vmax,
+      // void-ignore — bubble rim radius
+      var(--color-info, var(--text-main)) 0.16vmax 0.19vmax,
+      // void-ignore — bubble rim radius
+      transparent 0.21vmax // void-ignore — bubble rim radius
+    ),
+    radial-gradient(
+      circle at 62% 14%,
+      transparent 0 0.18vmax,
+      // void-ignore — bubble rim radius
+      var(--color-info, var(--text-main)) 0.2vmax 0.23vmax,
+      // void-ignore — bubble rim radius
+      transparent 0.25vmax // void-ignore — bubble rim radius
+    ),
+    radial-gradient(
+      circle at 38% 24%,
+      transparent 0 0.16vmax,
+      // void-ignore — bubble rim radius
+      var(--color-info, var(--text-main)) 0.18vmax 0.21vmax,
+      // void-ignore — bubble rim radius
+      transparent 0.23vmax // void-ignore — bubble rim radius
+    ),
+    radial-gradient(
+      circle at 82% 34%,
+      transparent 0 0.2vmax,
+      // void-ignore — bubble rim radius
+      var(--color-info, var(--text-main)) 0.22vmax 0.26vmax,
+      // void-ignore — bubble rim radius
+      transparent 0.28vmax // void-ignore — bubble rim radius
+    ),
+    radial-gradient(
+      circle at 14% 46%,
+      transparent 0 0.15vmax,
+      // void-ignore — bubble rim radius
+      var(--color-info, var(--text-main)) 0.17vmax 0.2vmax,
+      // void-ignore — bubble rim radius
+      transparent 0.22vmax // void-ignore — bubble rim radius
+    ),
+    radial-gradient(
+      circle at 55% 56%,
+      transparent 0 0.17vmax,
+      // void-ignore — bubble rim radius
+      var(--color-info, var(--text-main)) 0.19vmax 0.22vmax,
+      // void-ignore — bubble rim radius
+      transparent 0.24vmax // void-ignore — bubble rim radius
+    ),
+    radial-gradient(
+      circle at 30% 68%,
+      transparent 0 0.16vmax,
+      // void-ignore — bubble rim radius
+      var(--color-info, var(--text-main)) 0.18vmax 0.21vmax,
+      // void-ignore — bubble rim radius
+      transparent 0.23vmax // void-ignore — bubble rim radius
+    ),
+    radial-gradient(
+      circle at 72% 78%,
+      transparent 0 0.19vmax,
+      // void-ignore — bubble rim radius
+      var(--color-info, var(--text-main)) 0.21vmax 0.24vmax,
+      // void-ignore — bubble rim radius
+      transparent 0.26vmax // void-ignore — bubble rim radius
+    ),
+    radial-gradient(
+      circle at 48% 90%,
+      transparent 0 0.16vmax,
+      // void-ignore — bubble rim radius
+      var(--color-info, var(--text-main)) 0.18vmax 0.21vmax,
+      // void-ignore — bubble rim radius
+      transparent 0.23vmax // void-ignore — bubble rim radius
+    );
+  background-repeat: repeat;
+  background-size: 50% var(--bubble-tile);
+  opacity: calc(var(--ambient-alpha) * 1);
+  animation: ambient-underwater-bubbles-a 16s linear infinite;
+}
+.ambient-underwater::after {
+  // Medium bubbles — offset phase, slower, different tile so layers never sync.
+  --bubble-tile: calc(
+    (52 - var(--ambient-level) * 7) * 1vh
+  ); // void-ignore — density scale
+  background-image:
+    radial-gradient(
+      circle at 28% 10%,
+      transparent 0 0.26vmax,
+      // void-ignore — bubble rim radius
+      var(--color-info, var(--text-main)) 0.28vmax 0.33vmax,
+      // void-ignore — bubble rim radius
+      transparent 0.35vmax // void-ignore — bubble rim radius
+    ),
+    radial-gradient(
+      circle at 72% 22%,
+      transparent 0 0.3vmax,
+      // void-ignore — bubble rim radius
+      var(--color-info, var(--text-main)) 0.32vmax 0.37vmax,
+      // void-ignore — bubble rim radius
+      transparent 0.39vmax // void-ignore — bubble rim radius
+    ),
+    radial-gradient(
+      circle at 44% 38%,
+      transparent 0 0.24vmax,
+      // void-ignore — bubble rim radius
+      var(--color-info, var(--text-main)) 0.26vmax 0.3vmax,
+      // void-ignore — bubble rim radius
+      transparent 0.32vmax // void-ignore — bubble rim radius
+    ),
+    radial-gradient(
+      circle at 18% 52%,
+      transparent 0 0.28vmax,
+      // void-ignore — bubble rim radius
+      var(--color-info, var(--text-main)) 0.3vmax 0.35vmax,
+      // void-ignore — bubble rim radius
+      transparent 0.37vmax // void-ignore — bubble rim radius
+    ),
+    radial-gradient(
+      circle at 80% 62%,
+      transparent 0 0.26vmax,
+      // void-ignore — bubble rim radius
+      var(--color-info, var(--text-main)) 0.28vmax 0.33vmax,
+      // void-ignore — bubble rim radius
+      transparent 0.35vmax // void-ignore — bubble rim radius
+    ),
+    radial-gradient(
+      circle at 38% 76%,
+      transparent 0 0.3vmax,
+      // void-ignore — bubble rim radius
+      var(--color-info, var(--text-main)) 0.32vmax 0.37vmax,
+      // void-ignore — bubble rim radius
+      transparent 0.39vmax // void-ignore — bubble rim radius
+    ),
+    radial-gradient(
+      circle at 64% 90%,
+      transparent 0 0.25vmax,
+      // void-ignore — bubble rim radius
+      var(--color-info, var(--text-main)) 0.27vmax 0.31vmax,
+      // void-ignore — bubble rim radius
+      transparent 0.33vmax // void-ignore — bubble rim radius
+    );
+  background-repeat: repeat;
+  background-size: 65% var(--bubble-tile);
+  opacity: calc(var(--ambient-alpha) * 0.75);
+  filter: blur(0.4px); // void-ignore — medium bubble softness
+  animation: ambient-underwater-bubbles-b 24s linear infinite;
+}
+// Rise keyframes: translate by exactly one tile height so the pattern wraps
+// seamlessly onto itself. Sway is a small horizontal drift.
+@keyframes ambient-underwater-bubbles-a {
+  0% {
+    transform: translate3d(-0.8vw, 0, 0);
+  }
+  50% {
+    transform: translate3d(0.8vw, calc(var(--bubble-tile) * -0.5), 0);
+  }
+  100% {
+    transform: translate3d(-0.8vw, calc(var(--bubble-tile) * -1), 0);
+  }
+}
+@keyframes ambient-underwater-bubbles-b {
+  0% {
+    transform: translate3d(0.6vw, 0, 0);
+  }
+  50% {
+    transform: translate3d(-0.6vw, calc(var(--bubble-tile) * -0.5), 0);
+  }
+  100% {
+    transform: translate3d(0.6vw, calc(var(--bubble-tile) * -1), 0);
+  }
+}
+
+// ── heat — MELTING: real SVG displacement warps the backdrop so the whole
+// screen sags and drips like glass going liquid. Primary layer is a
+// `backdrop-filter: url(#heat-melt)` div driven by an animated feTurbulence +
+// feDisplacementMap (see AtmosphereLayer.svelte heat branch). Secondary layers
+// add a warm wash and a drooping top-edge heat bloom for color temperature.
+.ambient-heat .ambient-atmosphere__svg--heat-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.ambient-heat .ambient-atmosphere__heat-melt {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  backdrop-filter: var(--heat-filter);
+  -webkit-backdrop-filter: var(--heat-filter);
+  // Warm ring tint — strongest at edges, nothing in the center.
+  background: radial-gradient(
+    ellipse 75% 65% at 50% 50%,
+    transparent 0%,
+    transparent 45%,
+    color-mix(in oklab, var(--color-warning, var(--text-main)) 14%, transparent)
+      100%
+  );
+  // Ring mask — clean center, displacement only around the edges. Fully
+  // transparent inside the ellipse (no warp), fully opaque at corners (full warp).
+  mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 50%,
+    transparent 0%,
+    transparent 40%,
+    #000 90%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 50%,
+    transparent 0%,
+    transparent 40%,
+    #000 90%
+  );
+  opacity: calc(0.6 + var(--ambient-alpha) * 0.4);
+  will-change: backdrop-filter;
+}
+.ambient-heat .ambient-atmosphere__heat-sag {
+  // Drooping top-edge: the "ceiling" sags under heat. Blurred warm band that
+  // stretches downward in a slow breathing loop — reads as the scene deforming.
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 60%;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    var(--color-warning, var(--text-main)) 0%,
+    transparent 100%
+  );
+  transform-origin: top center;
+  mix-blend-mode: screen;
+  opacity: calc(var(--ambient-alpha) * 0.22);
+  filter: blur(28px); // void-ignore — heat bloom softness
+  will-change: transform;
+  animation: ambient-heat-droop 11s ease-in-out infinite;
 }
 .ambient-heat .ambient-atmosphere__wash--warm {
-  inset: 30% 0 0 0;
+  // Rising ground warmth — taller, hotter, pushes up from the floor.
+  inset: 20% 0 0 0;
   border-radius: 0;
   background: linear-gradient(
     to top,
     var(--color-warning, var(--text-mute)),
     transparent
   );
-  opacity: calc(var(--ambient-alpha) * 0.18);
+  opacity: calc(var(--ambient-alpha) * 0.28);
   filter: none;
   mix-blend-mode: screen;
+  animation: ambient-heat-breathe 7s ease-in-out infinite;
 }
-@keyframes ambient-heat-shimmer {
+@keyframes ambient-heat-breathe {
   0%,
   100% {
-    transform: translate3d(0, 0, 0) skewX(0deg) skewY(0deg);
-  }
-  25% {
-    transform: translate3d(6px, -3px, 0) skewX(0.5deg) skewY(0.4deg); // void-ignore — shimmer jitter
+    transform: translate3d(0, 0, 0) scaleY(1);
   }
   50% {
-    transform: translate3d(-4px, -1px, 0) skewX(-0.6deg) skewY(-0.3deg); // void-ignore — shimmer jitter
-  }
-  75% {
-    transform: translate3d(5px, -4px, 0) skewX(0.3deg) skewY(0.2deg); // void-ignore — shimmer jitter
+    transform: translate3d(0, -1.5%, 0) scaleY(1.08);
   }
 }
-@keyframes ambient-heat-drift {
+@keyframes ambient-heat-droop {
   0%,
   100% {
-    background-position: 0 0;
+    transform: translate3d(0, 0, 0) scaleY(1);
   }
   50% {
-    background-position: 0 -6px; // void-ignore — shimmer band drift
+    transform: translate3d(0, 0, 0) scaleY(1.3);
   }
 }
 
@@ -535,143 +757,232 @@ html[data-physics='retro'] .ambient-layer * {
   }
 }
 
-// ── tension — pressure: constricting ring with a two-beat heartbeat and
-// a subtle desaturation/contrast bump for body-level unease. Floors its
-// alpha so L1 still reads; distinct from focus by feel, not just numbers.
+// ── tension — nervous system on edge: fast staccato micro-tremors, tight
+// constricting vignette, asymmetric off-rhythm pulses. Must read as involuntary
+// twitch, not drift. Distinct from danger (no red) and faster than focus.
 .ambient-tension .ambient-psychology__vignette {
   background: radial-gradient(
     ellipse at center,
-    transparent var(--tension-inner, 45%),
-    rgba(0, 0, 0, 0.88) var(--tension-outer, 92%) // void-ignore — tension shadow floor
+    transparent var(--tension-inner, 42%),
+    rgba(0, 0, 0, 0.78) var(--tension-outer, 92%) // void-ignore — tension shadow floor
   );
   mix-blend-mode: multiply;
   // alpha floor: L1 still reads as pressure, not a wash
-  opacity: max(0.5, var(--ambient-alpha));
-  animation: ambient-tension-press 11s ease-in-out infinite;
-  --tension-inner: 45%;
+  opacity: max(0.42, var(--ambient-alpha));
+  transform-origin: center;
+  animation:
+    ambient-tension-press 2.6s cubic-bezier(0.7, 0, 0.3, 1) infinite,
+    ambient-tension-jitter 0.42s steps(3, end) infinite;
+  --tension-inner: 42%;
   --tension-outer: 92%;
 }
+// Second contracting ring via ::after — rapid inner flash pulse, off-phase
+// with the main press, reinforcing the clenched-jaw feel.
 .ambient-tension .ambient-psychology__vignette::after {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  backdrop-filter: saturate(0.85) contrast(1.05);
-  -webkit-backdrop-filter: saturate(0.85) contrast(1.05);
+  background: radial-gradient(
+    ellipse at center,
+    transparent 58%,
+    rgba(0, 0, 0, 0.32) 96% // void-ignore — tension inner ring floor
+  );
+  mix-blend-mode: multiply;
+  backdrop-filter: saturate(0.9) contrast(1.05);
+  -webkit-backdrop-filter: saturate(0.9) contrast(1.05);
+  animation: ambient-tension-flash 2.2s cubic-bezier(0.6, 0, 0.3, 1) infinite;
 }
-// Slow two-beat heartbeat: thump-thump … long rest. Subtle constriction —
-// the floor alpha does the heavy lifting, the animation is just a pulse.
+// Fast asymmetric pulse — sharp inward snap, quick release, irregular rhythm.
+// Staccato and off-balance, like a twitching muscle.
 @keyframes ambient-tension-press {
   0% {
-    --tension-inner: 46%;
+    --tension-inner: 44%;
     --tension-outer: 94%;
   }
-  6% {
-    --tension-inner: 38%;
-    --tension-outer: 88%;
-  }
   12% {
-    --tension-inner: 45%;
-    --tension-outer: 93%;
-  }
-  18% {
     --tension-inner: 36%;
     --tension-outer: 86%;
   }
-  28% {
-    --tension-inner: 46%;
+  22% {
+    --tension-inner: 42%;
+    --tension-outer: 92%;
+  }
+  34% {
+    --tension-inner: 32%;
+    --tension-outer: 82%;
+  }
+  46% {
+    --tension-inner: 40%;
+    --tension-outer: 90%;
+  }
+  60% {
+    --tension-inner: 36%;
+    --tension-outer: 86%;
+  }
+  74% {
+    --tension-inner: 44%;
     --tension-outer: 94%;
   }
+  86% {
+    --tension-inner: 38%;
+    --tension-outer: 88%;
+  }
   100% {
-    --tension-inner: 46%;
+    --tension-inner: 44%;
     --tension-outer: 94%;
+  }
+}
+// Micro-tremor: fast stepped translate + micro-scale, feels like involuntary
+// twitch. Steps (not smooth) make it read as nervous vibration rather than drift.
+@keyframes ambient-tension-jitter {
+  0% {
+    transform: translate(0, 0) scale(1);
+  }
+  20% {
+    transform: translate(-0.3%, 0.2%) scale(1.0015);
+  }
+  40% {
+    transform: translate(0.25%, -0.3%) scale(0.9988);
+  }
+  60% {
+    transform: translate(-0.2%, -0.25%) scale(1.001);
+  }
+  80% {
+    transform: translate(0.3%, 0.15%) scale(0.9992);
+  }
+  100% {
+    transform: translate(-0.1%, 0.2%) scale(1);
+  }
+}
+// Inner ring flash — fast asymmetric fade pulses, deliberately off-cycle from
+// the press so the overall rhythm never settles.
+@keyframes ambient-tension-flash {
+  0%,
+  100% {
+    opacity: 0.14;
+  }
+  35% {
+    opacity: 0.26;
+  }
+  55% {
+    opacity: 0.16;
+  }
+  75% {
+    opacity: 0.22;
   }
 }
 @property --tension-inner {
   syntax: '<percentage>';
   inherits: true;
-  initial-value: 45%;
+  initial-value: 38%;
 }
 @property --tension-outer {
   syntax: '<percentage>';
   inherits: true;
-  initial-value: 92%;
+  initial-value: 88%;
 }
 
-// ── dizzy — full-viewport rotating wedge pattern, heavy blur, counter-layer tilt
-// Oversized square prevents corner reveal during rotation.
+// ── dizzy — vertigo: the room pivots around you. Two off-center dark lobes
+// drift in counter-orbits so the heavy side of the frame keeps moving, while
+// the whole layer lists faintly underfoot. No sweeping bars, no strobes.
+.ambient-dizzy {
+  animation: ambient-dizzy-sway 7s ease-in-out infinite;
+  transform-origin: center;
+}
+// Layer A — soft off-center dark lobe, slow orbit. Circular falloff so the
+// darkening reads as weight shifting around the frame, never a sweeping band.
 .ambient-dizzy .ambient-psychology__vignette {
   inset: auto;
   top: 50%;
   left: 50%;
-  width: 220vmax;
-  height: 220vmax;
+  width: 140vmax;
+  height: 140vmax;
   translate: -50% -50%;
   transform-origin: center;
-  background: repeating-conic-gradient(
-    from 0deg,
-    rgba(255, 255, 255, 0.14) 0deg,
-    // void-ignore — dizzy light wedge
-    transparent 18deg,
-    transparent 36deg,
-    rgba(0, 0, 0, 0.35) 54deg,
-    // void-ignore — dizzy dark wedge
-    transparent 72deg
+  background: radial-gradient(
+    circle 55% at 28% 50%,
+    rgba(0, 0, 0, 0.6) 0%,
+    // void-ignore — vertigo lobe core
+    rgba(0, 0, 0, 0.32) 45%,
+    // void-ignore — vertigo lobe mid
+    transparent 82%
   );
-  mix-blend-mode: overlay;
-  filter: blur(40px); // void-ignore — dizzy smear softening
+  mix-blend-mode: multiply;
+  filter: blur(48px); // void-ignore — vertigo motion softness
   opacity: calc(var(--ambient-alpha) * 0.9);
-  animation: ambient-dizzy-spin 9s linear infinite;
+  animation: ambient-dizzy-orbit-a 18s linear infinite;
 }
+// Layer B — counter-orbiting lobe, offset starting angle, gentle hue breath.
+// Together with A this creates the "room pivoting around you" read.
 .ambient-dizzy .ambient-psychology__vignette--b {
   inset: auto;
   top: 50%;
   left: 50%;
-  width: 220vmax;
-  height: 220vmax;
+  width: 140vmax;
+  height: 140vmax;
   translate: -50% -50%;
   transform-origin: center;
-  background: repeating-conic-gradient(
-    from 12deg,
-    rgba(255, 255, 255, 0.1) 0deg,
-    // void-ignore — dizzy counter light wedge
-    transparent 24deg,
-    rgba(0, 0, 0, 0.28) 48deg,
-    // void-ignore — dizzy counter dark wedge
-    transparent 72deg
+  background: radial-gradient(
+    circle 48% at 72% 50%,
+    rgba(0, 0, 0, 0.52) 0%,
+    // void-ignore — vertigo lobe core
+    rgba(0, 0, 0, 0.28) 45%,
+    // void-ignore — vertigo lobe falloff
+    transparent 85%
   );
-  mix-blend-mode: overlay;
-  filter: blur(60px); // void-ignore — soft smear for dizzy counter-layer
-  opacity: calc(var(--ambient-alpha) * 0.75);
-  animation: ambient-dizzy-spin-reverse 14s linear infinite;
+  mix-blend-mode: multiply;
+  filter: blur(52px) hue-rotate(0deg); // void-ignore — vertigo lobe smear
+  opacity: calc(var(--ambient-alpha) * 0.8);
+  animation:
+    ambient-dizzy-orbit-b 22s linear infinite,
+    ambient-dizzy-hue 6.5s ease-in-out infinite;
 }
-@keyframes ambient-dizzy-spin {
+@keyframes ambient-dizzy-orbit-a {
   0% {
     rotate: 0deg;
-    opacity: calc(var(--ambient-alpha) * 0.55);
-  }
-  50% {
-    opacity: calc(var(--ambient-alpha) * 0.85);
   }
   100% {
     rotate: 360deg;
-    opacity: calc(var(--ambient-alpha) * 0.55);
   }
 }
-@keyframes ambient-dizzy-spin-reverse {
+@keyframes ambient-dizzy-orbit-b {
   0% {
-    rotate: 0deg;
+    rotate: 180deg;
   }
   100% {
-    rotate: -360deg;
+    rotate: -180deg;
   }
 }
-// ── focus — tunnel vision: sharp circular falloff, never opaque.
+// Whole-layer sway — the core vertigo cue. A faint queasy list, not a metronome.
+@keyframes ambient-dizzy-sway {
+  0%,
+  100% {
+    transform: rotate(-1.2deg);
+  }
+  50% {
+    transform: rotate(1.2deg);
+  }
+}
+// Subtle chromatic breath on the counter-orbiting lobe — disorientation without strobe.
+@keyframes ambient-dizzy-hue {
+  0%,
+  100% {
+    filter: blur(52px) hue-rotate(-6deg); // void-ignore — vertigo lobe smear
+  }
+  50% {
+    filter: blur(52px) hue-rotate(6deg); // void-ignore — vertigo lobe smear
+  }
+}
+// ── focus — living tunnel vision: the vignette breathes, tightens, and a
+// subtle inner pull draws the eye to center. Calmer and slower than tension
+// (smooth sine, not staccato) but never static — the focus is actively held.
 // Level drives tunnel *tightness*, not darkness: L1 wide, L3 narrow.
 // Alpha stays capped so content remains readable even at L3.
 .ambient-focus .ambient-psychology__vignette {
   // Per-level geometry: --focus-level-clear / --focus-level-edge are the
-  // resting radii; the animation then modulates them by ±4%.
+  // resting radii; the breath animation modulates them by a wider margin so
+  // the tunnel visibly tightens and releases.
   --focus-level-clear: calc(
     42% - (var(--ambient-level) - 1) * 8%
   ); // L1 42 · L2 34 · L3 26
@@ -681,22 +992,55 @@ html[data-physics='retro'] .ambient-layer * {
   background: radial-gradient(
     circle at center,
     transparent var(--focus-clear, 34%),
-    rgba(0, 0, 0, 0.78) var(--focus-edge, 68%) // void-ignore — tunnel-vision darkness floor
+    rgba(0, 0, 0, 0.82) var(--focus-edge, 68%) // void-ignore — tunnel-vision darkness floor
   );
-  opacity: 0.82;
-  animation: ambient-focus-lock 6s ease-in-out infinite;
+  opacity: 0.85;
+  transform-origin: center;
+  animation: ambient-focus-breathe 4.2s ease-in-out infinite;
   --focus-clear: var(--focus-level-clear);
   --focus-edge: var(--focus-level-edge);
 }
-@keyframes ambient-focus-lock {
+// Inner pull — a faint secondary ring that slowly contracts toward center,
+// reinforcing the sensation of locking on. Offset cycle from the main breath
+// so the tunnel feels alive rather than pumping in lockstep.
+.ambient-focus .ambient-psychology__vignette::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at center,
+    transparent 52%,
+    rgba(0, 0, 0, 0.35) 88% // void-ignore — inner focus ring floor
+  );
+  mix-blend-mode: multiply;
+  animation: ambient-focus-pull 5.8s ease-in-out infinite;
+}
+// Main breath — tunnel tightens then releases, with a gentle scale pulse that
+// reads as the eye pulling focus. Slow sine, no jitter.
+@keyframes ambient-focus-breathe {
   0%,
   100% {
-    --focus-clear: calc(var(--focus-level-clear) + 2%);
-    --focus-edge: calc(var(--focus-level-edge) + 4%);
+    --focus-clear: calc(var(--focus-level-clear) + 3%);
+    --focus-edge: calc(var(--focus-level-edge) + 5%);
+    transform: scale(1);
   }
   50% {
-    --focus-clear: calc(var(--focus-level-clear) - 4%);
-    --focus-edge: calc(var(--focus-level-edge) - 6%);
+    --focus-clear: calc(var(--focus-level-clear) - 6%);
+    --focus-edge: calc(var(--focus-level-edge) - 8%);
+    transform: scale(1.015);
+  }
+}
+// Inner ring pull — opacity ebb + slight scale, off-cycle from the breath.
+@keyframes ambient-focus-pull {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1.02);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(0.97);
   }
 }
 @property --focus-clear {
@@ -1002,16 +1346,6 @@ html[data-physics='retro'] .ambient-layer * {
   );
 }
 
-// ── indoor_warm — amber incandescent wash
-.ambient-indoor_warm {
-  background: radial-gradient(
-    ellipse at center,
-    var(--ambient-warm-center, rgba(255, 200, 140, 0.25)),
-    var(--ambient-warm-edge, rgba(180, 120, 60, 0.35)) 100%
-  );
-  mix-blend-mode: soft-light;
-}
-
 // ── neon — cyan/magenta cyberpunk cast
 .ambient-neon {
   background: linear-gradient(
@@ -1022,14 +1356,35 @@ html[data-physics='retro'] .ambient-layer * {
   mix-blend-mode: screen;
 }
 
-// ── dawn — warm pink/gold vertical wash
+// ── dawn — sunrise: cool night sky above, warm peach horizon glow below,
+// soft bloom pulse at the horizon as the sun rises.
 .ambient-dawn {
-  background: linear-gradient(
-    180deg,
-    var(--ambient-dawn-top, rgba(255, 170, 190, 0.35)),
-    var(--ambient-dawn-bottom, rgba(255, 210, 130, 0.35))
-  );
+  background:
+    // Sun bloom — warm radial glow anchored at the bottom horizon
+    radial-gradient(
+      ellipse 80% 55% at 50% 100%,
+      var(--ambient-dawn-bloom, rgba(255, 225, 180, 0.55)) 0%,
+      var(--ambient-dawn-peach, rgba(255, 170, 130, 0.4)) 35%,
+      transparent 70%
+    ),
+    // Horizon band — warm peach-pink rising into cool sky
+    linear-gradient(
+        180deg,
+        var(--ambient-dawn-sky, rgba(60, 80, 130, 0.4)) 0%,
+        var(--ambient-dawn-mid, rgba(200, 140, 160, 0.28)) 55%,
+        var(--ambient-dawn-horizon, rgba(255, 190, 150, 0.4)) 100%
+      );
   mix-blend-mode: soft-light;
+  animation: ambient-dawn-rise 12s ease-in-out infinite;
+}
+@keyframes ambient-dawn-rise {
+  0%,
+  100% {
+    opacity: calc(var(--ambient-env-opacity, 1) * 0.85);
+  }
+  50% {
+    opacity: calc(var(--ambient-env-opacity, 1) * 1);
+  }
 }
 
 // ── dusk — deep orange to violet vertical gradient
@@ -1038,16 +1393,6 @@ html[data-physics='retro'] .ambient-layer * {
     180deg,
     var(--ambient-dusk-top, rgba(220, 90, 40, 0.4)),
     var(--ambient-dusk-bottom, rgba(60, 30, 90, 0.55))
-  );
-  mix-blend-mode: multiply;
-}
-
-// ── overcast — flat desaturating grey wash, slightly darker at top
-.ambient-overcast {
-  background: linear-gradient(
-    180deg,
-    var(--ambient-overcast-top, rgba(120, 125, 135, 0.45)),
-    var(--ambient-overcast-bottom, rgba(150, 155, 165, 0.3))
   );
   mix-blend-mode: multiply;
 }
