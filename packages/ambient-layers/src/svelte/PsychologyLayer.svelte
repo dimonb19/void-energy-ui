@@ -1,14 +1,15 @@
 <script lang="ts">
-  import type { PsychologyLayerProps } from '../types';
+  import type { PsychologyLayerProps, AmbientLevel } from '../types';
   import { PSYCHOLOGY_PARAMS } from '../core/effects/params';
   import { startDecay } from '../core/runtime/decay';
 
   let {
     variant,
-    intensity = 2,
+    intensity = 'medium',
     decayMs,
     enabled = true,
     reducedMotion = 'respect',
+    onLevelChange,
     onComplete,
     class: className = '',
   }: PsychologyLayerProps = $props();
@@ -16,10 +17,11 @@
   const uid = $props.id();
   const grainFilterId = `ambient-psy-grain-${uid}`;
 
-  let level = $state<0 | 1 | 2 | 3>(2);
+  let level = $state<AmbientLevel>('medium');
 
   $effect(() => {
     level = intensity;
+    onLevelChange?.(intensity);
   });
 
   $effect(() => {
@@ -27,20 +29,28 @@
     const handle = startDecay(
       intensity,
       ms,
-      (next) => (level = next),
+      (next) => {
+        level = next;
+        onLevelChange?.(next);
+      },
       onComplete,
     );
     return () => handle.stop();
   });
+
+  // Numeric mirror for SCSS calc() consumers via --ambient-level.
+  const levelNum = $derived(
+    level === 'off' ? 0 : level === 'light' ? 1 : level === 'medium' ? 2 : 3,
+  );
 </script>
 
-{#if enabled && level > 0}
+{#if enabled && level !== 'off'}
   <div
     class="ambient-layer ambient-psychology ambient-{variant} {className}"
     aria-hidden="true"
     data-variant={variant}
     data-reduced-motion={reducedMotion}
-    style="--ambient-level: {level};"
+    style="--ambient-level: {levelNum};"
   >
     <span class="ambient-psychology__vignette"></span>
     {#if variant === 'dizzy'}

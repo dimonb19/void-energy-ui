@@ -1,18 +1,15 @@
 <script lang="ts">
-  import type {
-    AtmosphereLayer,
-    AtmosphereLayerProps,
-    AmbientIntensity,
-  } from '../types';
+  import type { AtmosphereLayerProps, AmbientLevel } from '../types';
   import { ATMOSPHERE_PARAMS } from '../core/effects/params';
   import { startDecay } from '../core/runtime/decay';
 
   let {
     variant,
-    intensity = 2,
+    intensity = 'medium',
     decayMs,
     enabled = true,
     reducedMotion = 'respect',
+    onLevelChange,
     onComplete,
     class: className = '',
   }: AtmosphereLayerProps = $props();
@@ -20,12 +17,13 @@
   // Unique id for SVG filter defs (fog/underwater/heat).
   const uid = $props.id();
 
-  // Live decay level — starts at `intensity`, steps down to 0.
-  let level = $state<0 | 1 | 2 | 3>(2);
+  // Live decay level — starts at `intensity`, steps down to 'off'.
+  let level = $state<AmbientLevel>('medium');
 
   // Re-sync if the consumer changes `intensity` or `variant` prop.
   $effect(() => {
     level = intensity;
+    onLevelChange?.(intensity);
   });
 
   $effect(() => {
@@ -33,14 +31,22 @@
     const handle = startDecay(
       intensity,
       ms,
-      (next) => (level = next),
+      (next) => {
+        level = next;
+        onLevelChange?.(next);
+      },
       onComplete,
     );
     return () => handle.stop();
   });
 
+  // Numeric mirror for SCSS calc() consumers via --ambient-level.
+  const levelNum = $derived(
+    level === 'off' ? 0 : level === 'light' ? 1 : level === 'medium' ? 2 : 3,
+  );
+
   const count = $derived(
-    level > 0 ? ATMOSPHERE_PARAMS[variant].counts[level - 1] : 0,
+    level === 'off' ? 0 : ATMOSPHERE_PARAMS[variant].counts[level],
   );
 
   // Particle-field variants (rain/snow/ash) share an x-y scatter model.
@@ -53,7 +59,7 @@
   );
 
   const particles = $derived.by(() => {
-    if (!isParticleField || level === 0) return [];
+    if (!isParticleField || level === 'off') return [];
     return Array.from({ length: count }, (_, i) => {
       const x = Math.random() * 100;
       // Three depth bands (near=0, mid=1, far=2) via modulo.
@@ -92,13 +98,13 @@
   });
 </script>
 
-{#if enabled && level > 0}
+{#if enabled && level !== 'off'}
   <div
     class="ambient-layer ambient-atmosphere ambient-{variant} {className}"
     aria-hidden="true"
     data-variant={variant}
     data-reduced-motion={reducedMotion}
-    style="--ambient-level: {level};"
+    style="--ambient-level: {levelNum};"
   >
     {#if isParticleField}
       {#each particles as p (p.i)}

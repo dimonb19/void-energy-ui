@@ -41,7 +41,7 @@
     },
     {
       id: 'ambient-layers',
-      label: 'Ambient',
+      label: 'Ambient Layers',
       href: '/ambient-layers',
       icon: CloudSnow,
     },

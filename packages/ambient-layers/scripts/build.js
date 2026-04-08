@@ -91,6 +91,7 @@ export type {
   AmbientCategory,
   AmbientLayerId,
   AmbientIntensity,
+  AmbientLevel,
   ActionLevel,
   ReducedMotionMode,
   AtmosphereLayer as AtmosphereLayerId,

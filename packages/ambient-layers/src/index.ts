@@ -18,10 +18,10 @@
  * </script>
  *
  * <EnvironmentLayer variant="night" />
- * <AtmosphereLayer variant="rain" intensity={3} />
- * <PsychologyLayer variant="danger" intensity={2} />
+ * <AtmosphereLayer variant="rain" intensity="heavy" />
+ * <PsychologyLayer variant="danger" intensity="medium" />
  * {#if showImpact}
- *   <ActionLayer variant="impact" level="heavy" onComplete={() => showImpact = false} />
+ *   <ActionLayer variant="impact" intensity="heavy" onComplete={() => showImpact = false} />
  * {/if}
  * ```
  *
@@ -36,6 +36,7 @@ export type {
   AmbientCategory,
   AmbientLayerId,
   AmbientIntensity,
+  AmbientLevel,
   AtmosphereLayer as AtmosphereLayerId,
   AtmosphereLayerProps,
   PsychologyLayer as PsychologyLayerId,

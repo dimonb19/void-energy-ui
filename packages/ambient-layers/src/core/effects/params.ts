@@ -7,21 +7,24 @@
 import type {
   ActionLayer,
   ActionLevel,
+  AmbientIntensity,
   AtmosphereLayer,
   PsychologyLayer,
 } from '../../types';
 
-/** Atmosphere auto-decay duration per level in ms, and default particle counts per intensity. */
+type IntensityCounts = Record<AmbientIntensity, number>;
+
+/** Atmosphere auto-decay duration per step in ms, and default particle counts per intensity. */
 export const ATMOSPHERE_PARAMS: Record<
   AtmosphereLayer,
-  { decayMs: number; counts: [number, number, number] }
+  { decayMs: number; counts: IntensityCounts }
 > = {
-  rain: { decayMs: 8000, counts: [60, 140, 260] },
-  snow: { decayMs: 10000, counts: [30, 70, 140] },
-  ash: { decayMs: 12000, counts: [20, 50, 100] },
-  fog: { decayMs: 12000, counts: [3, 5, 7] },
-  underwater: { decayMs: 12000, counts: [4, 6, 8] },
-  heat: { decayMs: 10000, counts: [3, 5, 7] },
+  rain: { decayMs: 8000, counts: { light: 60, medium: 140, heavy: 260 } },
+  snow: { decayMs: 10000, counts: { light: 30, medium: 70, heavy: 140 } },
+  ash: { decayMs: 12000, counts: { light: 20, medium: 50, heavy: 100 } },
+  fog: { decayMs: 12000, counts: { light: 3, medium: 5, heavy: 7 } },
+  underwater: { decayMs: 12000, counts: { light: 4, medium: 6, heavy: 8 } },
+  heat: { decayMs: 10000, counts: { light: 3, medium: 5, heavy: 7 } },
 };
 
 /** Psychology auto-decay duration per level in ms. */

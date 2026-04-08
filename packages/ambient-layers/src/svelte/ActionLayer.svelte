@@ -4,7 +4,7 @@
 
   let {
     variant,
-    level = 'medium',
+    intensity = 'medium',
     enabled = true,
     reducedMotion = 'respect',
     onComplete,
@@ -16,9 +16,11 @@
   const glitchFilterId = `ambient-glitch-${uid}`;
 
   // Maps 'light'|'medium'|'heavy' → 1..3 amplitude multiplier for SCSS via --ambient-level
-  const levelNum = $derived(level === 'light' ? 1 : level === 'heavy' ? 3 : 2);
+  const levelNum = $derived(
+    intensity === 'light' ? 1 : intensity === 'heavy' ? 3 : 2,
+  );
 
-  const duration = $derived(ACTION_PARAMS[variant][level]);
+  const duration = $derived(ACTION_PARAMS[variant][intensity]);
 
   // RGB-split amplitude in px. Scales with level.
   const glitchAmp = $derived(levelNum * 3 + 1); // light 4, medium 7, heavy 10

@@ -55,11 +55,14 @@ export type AmbientLayerId =
   | ActionLayer
   | EnvironmentLayer;
 
-/** Persistent-layer intensity scale. */
-export type AmbientIntensity = 1 | 2 | 3;
+/** Persistent-layer intensity scale. Unified vocabulary across every category. */
+export type AmbientIntensity = 'light' | 'medium' | 'heavy';
+
+/** Decay step including the resting state. */
+export type AmbientLevel = 'off' | AmbientIntensity;
 
 /** Action-layer variant — scales animation amplitude/speed, not keyframes. */
-export type ActionLevel = 'light' | 'medium' | 'heavy';
+export type ActionLevel = AmbientIntensity;
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Base props
@@ -84,15 +87,17 @@ interface AmbientBaseProps {
 
 export interface AtmosphereLayerProps extends AmbientBaseProps {
   variant: AtmosphereLayer;
-  /** Intensity level 1..3. Default 2. */
+  /** Intensity level: 'light' | 'medium' | 'heavy'. Default 'medium'. */
   intensity?: AmbientIntensity;
   /**
-   * Auto-decay duration in ms per level (3 → 2 → 1 → 0).
+   * Auto-decay duration in ms per step (heavy → medium → light → off).
    * When 0 or omitted, decay is disabled and intensity stays as set.
    * Default: per-variant value from `params.ts`.
    */
   decayMs?: number;
-  /** Fired when decay reaches 0 and the layer should unmount. */
+  /** Fired on every internal decay step (including the initial level). */
+  onLevelChange?: (level: AmbientLevel) => void;
+  /** Fired when decay reaches 'off' and the layer should unmount. */
   onComplete?: () => void;
 }
 
@@ -100,13 +105,14 @@ export interface PsychologyLayerProps extends AmbientBaseProps {
   variant: PsychologyLayer;
   intensity?: AmbientIntensity;
   decayMs?: number;
+  onLevelChange?: (level: AmbientLevel) => void;
   onComplete?: () => void;
 }
 
 export interface ActionLayerProps extends AmbientBaseProps {
   variant: ActionLayer;
   /** Animation amplitude/speed preset. Default 'medium'. */
-  level?: ActionLevel;
+  intensity?: AmbientIntensity;
   /** Fired when the one-shot animation finishes and the layer should unmount. */
   onComplete?: () => void;
 }
