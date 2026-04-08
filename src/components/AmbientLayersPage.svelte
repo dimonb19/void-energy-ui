@@ -98,6 +98,13 @@
     { value: 'night', label: 'Night' },
     { value: 'indoor_warm', label: 'Indoor Warm' },
     { value: 'neon', label: 'Neon' },
+    { value: 'dawn', label: 'Dawn' },
+    { value: 'dusk', label: 'Dusk' },
+    { value: 'overcast', label: 'Overcast' },
+    { value: 'sickly', label: 'Sickly' },
+    { value: 'toxic', label: 'Toxic' },
+    { value: 'underground', label: 'Underground' },
+    { value: 'candlelit', label: 'Candlelit' },
   ];
   let environmentEnabled = $state(false);
   let environmentVariant = $state<EnvironmentLayerId>('night');
@@ -175,10 +182,10 @@
         <h1>Ambient Layers</h1>
         <p class="text-dim max-w-2xl">
           Full-viewport overlay layers across four categories — atmosphere,
-          psychology, action, environment. Twenty variants, four components, one
-          SCSS file. Physics-agnostic: layers look identical across glass, flat,
-          and retro except for a single global stepped-timing rule in retro.
-          Pick a category, pick a variant, see it live.
+          psychology, action, environment. Twenty-six variants, four components,
+          one SCSS file. Physics-agnostic: layers look identical across glass,
+          flat, and retro except for a single global stepped-timing rule in
+          retro. Pick a category, pick a variant, see it live.
         </p>
       </div>
     </div>

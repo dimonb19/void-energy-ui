@@ -36,9 +36,9 @@ export const PSYCHOLOGY_PARAMS: Record<PsychologyLayer, { decayMs: number }> = {
 
 /** Action one-shot duration per level in ms. Component unmounts after this. */
 export const ACTION_PARAMS: Record<ActionLayer, Record<ActionLevel, number>> = {
-  impact: { light: 300, medium: 500, heavy: 800 },
-  speed: { light: 500, medium: 800, heavy: 1200 },
-  glitch: { light: 250, medium: 450, heavy: 800 },
+  impact: { light: 500, medium: 800, heavy: 1200 },
+  speed: { light: 900, medium: 1400, heavy: 1800 },
+  glitch: { light: 350, medium: 600, heavy: 1000 },
   flash: { light: 200, medium: 350, heavy: 600 },
   reveal: { light: 400, medium: 700, heavy: 1100 },
 };

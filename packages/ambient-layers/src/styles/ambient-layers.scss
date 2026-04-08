@@ -90,13 +90,27 @@ html[data-physics='retro'] .ambient-layer * {
   }
 }
 
-// ── snow
+// ── snow — soft radial flakes in 3 depth bands with sway + slow rotation
 .ambient-snow .ambient-atmosphere__particle {
   width: var(--size);
   height: var(--size);
-  border-radius: 50%;
-  background: var(--text-main);
-  animation: ambient-snow-fall var(--duration) linear var(--delay) infinite;
+  background: radial-gradient(circle, var(--text-main) 0%, transparent 70%);
+  animation:
+    ambient-snow-fall var(--duration) cubic-bezier(0.45, 0.05, 0.55, 0.95)
+      var(--delay) infinite,
+    ambient-snow-spin calc(var(--duration) * 0.6) linear var(--delay) infinite;
+}
+// Near band — larger, sharper, slightly brighter.
+.ambient-snow .ambient-atmosphere__particle[data-band='0'] {
+  filter: none;
+}
+// Mid band — default crispness, subtle softening.
+.ambient-snow .ambient-atmosphere__particle[data-band='1'] {
+  filter: blur(0.5px); // void-ignore — depth-of-field softening floor
+}
+// Far band — smaller, blurred for parallax depth.
+.ambient-snow .ambient-atmosphere__particle[data-band='2'] {
+  filter: blur(1.5px); // void-ignore — depth-of-field far band
 }
 @keyframes ambient-snow-fall {
   0% {
@@ -107,101 +121,378 @@ html[data-physics='retro'] .ambient-layer * {
   92% {
     opacity: calc(var(--p-opacity) * var(--ambient-alpha));
   }
+  25% {
+    transform: translate3d(var(--drift), 27.5vh, 0);
+  }
+  50% {
+    transform: translate3d(0, 55vh, 0);
+  }
+  75% {
+    transform: translate3d(var(--drift), 82.5vh, 0);
+  }
   100% {
-    transform: translate3d(var(--drift), 110vh, 0);
+    transform: translate3d(0, 110vh, 0);
     opacity: 0;
   }
 }
+@keyframes ambient-snow-spin {
+  0% {
+    rotate: 0deg;
+  }
+  100% {
+    rotate: 360deg;
+  }
+}
 
-// ── ash — soft grey flakes, slower drift, warmer tint
+// ── ash — torn paper-like flakes tumbling down, 10% embers
 .ambient-ash .ambient-atmosphere__particle {
+  // Flat sheet silhouette — wider than tall — reads as paper fragment.
   width: var(--size);
-  height: var(--size);
-  border-radius: 50%;
-  background: var(--text-mute);
-  filter: blur(1px);
-  animation: ambient-ash-fall var(--duration) linear var(--delay) infinite;
+  height: calc(var(--size) * 0.45);
+  background: var(--text-dim);
+  border-radius: 0;
+  transform-style: preserve-3d;
+  // Jagged torn-paper polygon — varied per nth-child below.
+  clip-path: polygon(
+    8% 22%,
+    32% 4%,
+    58% 14%,
+    86% 0%,
+    96% 38%,
+    82% 72%,
+    94% 96%,
+    64% 88%,
+    38% 98%,
+    14% 76%,
+    0% 52%
+  );
+  animation:
+    ambient-ash-fall var(--duration) ease-in-out var(--delay) infinite,
+    ambient-ash-sway calc(var(--duration) * 0.45) ease-in-out var(--delay)
+      infinite;
+}
+// Shape variety — four torn silhouettes cycled across the field.
+.ambient-ash .ambient-atmosphere__particle:nth-child(4n + 1) {
+  clip-path: polygon(
+    4% 40%,
+    28% 8%,
+    62% 0%,
+    88% 24%,
+    100% 60%,
+    76% 92%,
+    42% 100%,
+    18% 82%
+  );
+}
+.ambient-ash .ambient-atmosphere__particle:nth-child(4n + 2) {
+  clip-path: polygon(
+    12% 10%,
+    46% 0%,
+    84% 18%,
+    98% 52%,
+    88% 90%,
+    52% 96%,
+    22% 84%,
+    0% 48%
+  );
+}
+.ambient-ash .ambient-atmosphere__particle:nth-child(4n + 3) {
+  clip-path: polygon(
+    0% 28%,
+    22% 0%,
+    54% 12%,
+    82% 4%,
+    100% 44%,
+    78% 84%,
+    48% 100%,
+    14% 88%
+  );
+}
+// Depth-of-field softening only on the far band for parallax.
+.ambient-ash .ambient-atmosphere__particle[data-band='2'] {
+  filter: blur(0.8px); // void-ignore — far-band depth softening
+}
+// Embers — warm tint + brightness pulse, same flake silhouette.
+.ambient-ash .ambient-atmosphere__particle[data-ember='true'] {
+  background: var(--color-warning, var(--text-mute));
+  animation:
+    ambient-ash-fall var(--duration) ease-in-out var(--delay) infinite,
+    ambient-ash-sway calc(var(--duration) * 0.45) ease-in-out var(--delay)
+      infinite,
+    ambient-ash-ember 1.2s ease-in-out var(--delay) infinite;
 }
 @keyframes ambient-ash-fall {
   0% {
-    transform: translate3d(0, -10vh, 0) rotate(0deg);
+    transform: translate3d(0, -10vh, 0);
     opacity: 0;
   }
   10%,
   90% {
-    opacity: calc(var(--p-opacity) * var(--ambient-alpha) * 0.7);
+    opacity: calc(var(--p-opacity) * var(--ambient-alpha) * 0.8);
+  }
+  25% {
+    transform: translate3d(var(--drift), 27.5vh, 0);
+  }
+  50% {
+    transform: translate3d(calc(var(--drift) * -1), 55vh, 0);
+  }
+  75% {
+    transform: translate3d(calc(var(--drift) * 0.8), 82.5vh, 0);
   }
   100% {
-    transform: translate3d(var(--drift), 110vh, 0) rotate(360deg);
+    transform: translate3d(0, 110vh, 0);
     opacity: 0;
   }
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ATMOSPHERE — volumetric blobs (fog, underwater, heat)
-// ─────────────────────────────────────────────────────────────────────────────
-
-.ambient-atmosphere__blob {
-  position: absolute;
-  top: var(--y);
-  left: var(--x);
-  width: var(--w);
-  height: var(--h);
-  border-radius: 50%;
-  opacity: 0;
-  will-change: transform, opacity;
-  filter: blur(60px);
-  animation:
-    ambient-blob-drift var(--duration) linear var(--delay) infinite,
-    ambient-blob-pulse var(--pulse-duration) ease-in-out var(--pulse-delay)
-      infinite;
-}
-
-// ── fog
-.ambient-fog .ambient-atmosphere__blob {
-  background: radial-gradient(
-    ellipse at center,
-    var(--text-mute) 0%,
-    transparent 70%
-  );
-}
-
-// ── underwater — cool blue/green cast with slower wobble
-.ambient-underwater .ambient-atmosphere__blob {
-  background: radial-gradient(
-    ellipse at center,
-    var(--color-info, var(--text-mute)) 0%,
-    transparent 65%
-  );
-  mix-blend-mode: screen;
-}
-
-// ── heat — warm amber shimmer
-.ambient-heat .ambient-atmosphere__blob {
-  background: radial-gradient(
-    ellipse at center,
-    var(--color-warning, var(--text-mute)) 0%,
-    transparent 70%
-  );
-  mix-blend-mode: screen;
-  filter: blur(40px);
-}
-
-@keyframes ambient-blob-drift {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  100% {
-    transform: translate3d(120vw, 0, 0);
-  }
-}
-@keyframes ambient-blob-pulse {
+// Gentle in-plane wobble — flake rocks as it falls, never flips edge-on.
+@keyframes ambient-ash-sway {
   0%,
   100% {
-    opacity: calc(var(--b-opacity) * var(--ambient-alpha) * 0.6);
+    rotate: -14deg;
   }
   50% {
-    opacity: calc(var(--b-opacity) * var(--ambient-alpha));
+    rotate: 16deg;
+  }
+}
+@keyframes ambient-ash-ember {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.8);
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ATMOSPHERE — SVG-filter variants (fog, underwater, heat)
+// ─────────────────────────────────────────────────────────────────────────────
+
+.ambient-atmosphere__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  will-change: opacity;
+}
+
+.ambient-atmosphere__wash {
+  position: absolute;
+  inset: -20%;
+  border-radius: 50%;
+  filter: blur(120px); // void-ignore — volumetric haze blur
+  pointer-events: none;
+  will-change: opacity, transform;
+}
+
+// ── fog — volumetric: vertical gradient base + two turbulence-masked banks.
+// Base: soft vertical falloff (denser low, thinner top). No animation.
+.ambient-fog .ambient-atmosphere__wash--a {
+  inset: 0;
+  border-radius: 0;
+  filter: none;
+  background: linear-gradient(
+    to top,
+    var(--text-dim) 0%,
+    var(--text-mute) 60%,
+    transparent 100%
+  );
+  opacity: calc(var(--ambient-alpha) * 0.22);
+}
+// Near bank: low-freq turbulence, brightens via screen blend. Drifts + breathes.
+.ambient-fog .ambient-atmosphere__svg--fog-near {
+  inset: -10%;
+  width: 120%;
+  height: 120%;
+  opacity: calc(var(--ambient-alpha) * 0.38);
+  mix-blend-mode: screen;
+  animation:
+    ambient-fog-near-drift 60s ease-in-out infinite,
+    ambient-fog-near-breathe 22s ease-in-out infinite;
+  transform-origin: center;
+}
+// Far bank: higher-freq turbulence, slower, more diffuse (extra blur).
+.ambient-fog .ambient-atmosphere__svg--fog-far {
+  inset: -15%;
+  width: 130%;
+  height: 130%;
+  opacity: calc(var(--ambient-alpha) * 0.28);
+  filter: blur(40px); // void-ignore — far-bank atmospheric diffusion
+  animation: ambient-fog-far-drift 120s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes ambient-fog-near-drift {
+  0%,
+  100% {
+    transform: translate3d(-4vw, 1vh, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(4vw, -1vh, 0) scale(1.12);
+  }
+}
+@keyframes ambient-fog-near-breathe {
+  0%,
+  100% {
+    opacity: calc(var(--ambient-alpha) * 0.3);
+  }
+  50% {
+    opacity: calc(var(--ambient-alpha) * 0.45);
+  }
+}
+@keyframes ambient-fog-far-drift {
+  0%,
+  100% {
+    transform: translate3d(3vw, 0, 0) scale(1.05);
+  }
+  50% {
+    transform: translate3d(-3vw, 1vh, 0) scale(1);
+  }
+}
+
+// ── underwater — soft displacement + info tint + drifting caustic bands
+.ambient-underwater .ambient-atmosphere__svg--underwater {
+  opacity: calc(var(--ambient-alpha) * 0.28);
+  mix-blend-mode: screen;
+}
+.ambient-underwater .ambient-atmosphere__wash--info {
+  inset: 0;
+  border-radius: 0;
+  background: var(--color-info, var(--text-mute));
+  opacity: calc(var(--ambient-alpha) * 0.14);
+  filter: none;
+  mix-blend-mode: multiply;
+}
+// Caustic pools — soft radial light shafts drifting across the viewport.
+.ambient-underwater .ambient-atmosphere__caustic {
+  position: absolute;
+  inset: -30%;
+  background:
+    radial-gradient(
+      ellipse 40% 55% at 20% 15%,
+      var(--color-info, var(--text-main)) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 30% 45% at 75% 40%,
+      var(--color-info, var(--text-main)) 0%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 50% 40% at 45% 80%,
+      var(--color-info, var(--text-main)) 0%,
+      transparent 60%
+    );
+  mix-blend-mode: screen;
+  opacity: calc(var(--ambient-alpha) * 0.22);
+  filter: blur(60px); // void-ignore — caustic light softness
+  will-change: transform;
+  animation: ambient-underwater-caustic-a 22s ease-in-out infinite;
+}
+.ambient-underwater .ambient-atmosphere__caustic--b {
+  background:
+    radial-gradient(
+      ellipse 45% 50% at 65% 20%,
+      var(--color-info, var(--text-main)) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 35% 40% at 25% 60%,
+      var(--color-info, var(--text-main)) 0%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 40% 45% at 85% 85%,
+      var(--color-info, var(--text-main)) 0%,
+      transparent 60%
+    );
+  opacity: calc(var(--ambient-alpha) * 0.16);
+  animation: ambient-underwater-caustic-b 34s ease-in-out infinite;
+}
+@keyframes ambient-underwater-caustic-a {
+  0%,
+  100% {
+    transform: translate3d(-4vw, -2vh, 0);
+  }
+  50% {
+    transform: translate3d(4vw, 2vh, 0);
+  }
+}
+@keyframes ambient-underwater-caustic-b {
+  0%,
+  100% {
+    transform: translate3d(3vw, 3vh, 0);
+  }
+  50% {
+    transform: translate3d(-3vw, -3vh, 0);
+  }
+}
+
+// ── heat — stacked horizontal shimmer bands with vertical wave, warm overlay
+.ambient-heat .ambient-atmosphere__heat-refract {
+  position: absolute;
+  inset: 0;
+  // Fine horizontal bands — fake refraction stripes.
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0,
+    transparent 3px,
+    // void-ignore — shimmer band pitch physics
+    rgba(255, 255, 255, 0.05) 3px,
+    // void-ignore — shimmer band alpha floor
+    rgba(255, 255, 255, 0.05) 4px,
+    // void-ignore — shimmer band pitch physics
+    transparent 4px,
+    // void-ignore — shimmer band pitch physics
+    transparent 7px // void-ignore — shimmer band pitch physics
+  );
+  mask-image: linear-gradient(to top, black 15%, transparent 85%);
+  -webkit-mask-image: linear-gradient(to top, black 15%, transparent 85%);
+  mix-blend-mode: screen;
+  opacity: calc(var(--ambient-alpha) * 0.85);
+  will-change: transform, filter;
+  animation: ambient-heat-shimmer 2.8s ease-in-out infinite;
+}
+.ambient-heat .ambient-atmosphere__heat-refract--b {
+  animation:
+    ambient-heat-shimmer 4.4s ease-in-out infinite,
+    ambient-heat-drift 6s ease-in-out infinite;
+  opacity: calc(var(--ambient-alpha) * 0.55);
+  filter: blur(1.5px); // void-ignore — heat shimmer softness
+}
+.ambient-heat .ambient-atmosphere__wash--warm {
+  inset: 30% 0 0 0;
+  border-radius: 0;
+  background: linear-gradient(
+    to top,
+    var(--color-warning, var(--text-mute)),
+    transparent
+  );
+  opacity: calc(var(--ambient-alpha) * 0.18);
+  filter: none;
+  mix-blend-mode: screen;
+}
+@keyframes ambient-heat-shimmer {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) skewX(0deg) skewY(0deg);
+  }
+  25% {
+    transform: translate3d(6px, -3px, 0) skewX(0.5deg) skewY(0.4deg); // void-ignore — shimmer jitter
+  }
+  50% {
+    transform: translate3d(-4px, -1px, 0) skewX(-0.6deg) skewY(-0.3deg); // void-ignore — shimmer jitter
+  }
+  75% {
+    transform: translate3d(5px, -4px, 0) skewX(0.3deg) skewY(0.2deg); // void-ignore — shimmer jitter
+  }
+}
+@keyframes ambient-heat-drift {
+  0%,
+  100% {
+    background-position: 0 0;
+  }
+  50% {
+    background-position: 0 -6px; // void-ignore — shimmer band drift
   }
 }
 
@@ -244,108 +535,276 @@ html[data-physics='retro'] .ambient-layer * {
   }
 }
 
-// ── tension — slow amber breathing edge
+// ── tension — pressure: constricting ring with a two-beat heartbeat and
+// a subtle desaturation/contrast bump for body-level unease. Floors its
+// alpha so L1 still reads; distinct from focus by feel, not just numbers.
 .ambient-tension .ambient-psychology__vignette {
   background: radial-gradient(
     ellipse at center,
-    transparent 45%,
-    var(--color-warning, var(--text-mute)) 120%
+    transparent var(--tension-inner, 45%),
+    rgba(0, 0, 0, 0.88) var(--tension-outer, 92%) // void-ignore — tension shadow floor
   );
-  animation: ambient-breathe 3.5s ease-in-out infinite;
+  mix-blend-mode: multiply;
+  // alpha floor: L1 still reads as pressure, not a wash
+  opacity: max(0.5, var(--ambient-alpha));
+  animation: ambient-tension-press 11s ease-in-out infinite;
+  --tension-inner: 45%;
+  --tension-outer: 92%;
 }
-@keyframes ambient-breathe {
-  0%,
+.ambient-tension .ambient-psychology__vignette::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  backdrop-filter: saturate(0.85) contrast(1.05);
+  -webkit-backdrop-filter: saturate(0.85) contrast(1.05);
+}
+// Slow two-beat heartbeat: thump-thump … long rest. Subtle constriction —
+// the floor alpha does the heavy lifting, the animation is just a pulse.
+@keyframes ambient-tension-press {
+  0% {
+    --tension-inner: 46%;
+    --tension-outer: 94%;
+  }
+  6% {
+    --tension-inner: 38%;
+    --tension-outer: 88%;
+  }
+  12% {
+    --tension-inner: 45%;
+    --tension-outer: 93%;
+  }
+  18% {
+    --tension-inner: 36%;
+    --tension-outer: 86%;
+  }
+  28% {
+    --tension-inner: 46%;
+    --tension-outer: 94%;
+  }
   100% {
-    opacity: calc(var(--ambient-alpha) * 0.2);
+    --tension-inner: 46%;
+    --tension-outer: 94%;
   }
-  50% {
-    opacity: calc(var(--ambient-alpha) * 0.55);
-  }
+}
+@property --tension-inner {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 45%;
+}
+@property --tension-outer {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 92%;
 }
 
-// ── dizzy — rotating radial with subtle wobble
+// ── dizzy — full-viewport rotating wedge pattern, heavy blur, counter-layer tilt
+// Oversized square prevents corner reveal during rotation.
 .ambient-dizzy .ambient-psychology__vignette {
-  background: conic-gradient(
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  width: 220vmax;
+  height: 220vmax;
+  translate: -50% -50%;
+  transform-origin: center;
+  background: repeating-conic-gradient(
     from 0deg,
-    transparent,
-    var(--text-mute) 25%,
-    transparent 50%,
-    var(--text-mute) 75%,
-    transparent
+    rgba(255, 255, 255, 0.14) 0deg,
+    // void-ignore — dizzy light wedge
+    transparent 18deg,
+    transparent 36deg,
+    rgba(0, 0, 0, 0.35) 54deg,
+    // void-ignore — dizzy dark wedge
+    transparent 72deg
   );
   mix-blend-mode: overlay;
-  animation: ambient-dizzy-spin 6s linear infinite;
+  filter: blur(40px); // void-ignore — dizzy smear softening
+  opacity: calc(var(--ambient-alpha) * 0.9);
+  animation: ambient-dizzy-spin 9s linear infinite;
+}
+.ambient-dizzy .ambient-psychology__vignette--b {
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  width: 220vmax;
+  height: 220vmax;
+  translate: -50% -50%;
+  transform-origin: center;
+  background: repeating-conic-gradient(
+    from 12deg,
+    rgba(255, 255, 255, 0.1) 0deg,
+    // void-ignore — dizzy counter light wedge
+    transparent 24deg,
+    rgba(0, 0, 0, 0.28) 48deg,
+    // void-ignore — dizzy counter dark wedge
+    transparent 72deg
+  );
+  mix-blend-mode: overlay;
+  filter: blur(60px); // void-ignore — soft smear for dizzy counter-layer
+  opacity: calc(var(--ambient-alpha) * 0.75);
+  animation: ambient-dizzy-spin-reverse 14s linear infinite;
 }
 @keyframes ambient-dizzy-spin {
   0% {
-    transform: rotate(0deg);
-    opacity: calc(var(--ambient-alpha) * 0.15);
+    rotate: 0deg;
+    opacity: calc(var(--ambient-alpha) * 0.55);
   }
   50% {
-    opacity: calc(var(--ambient-alpha) * 0.35);
+    opacity: calc(var(--ambient-alpha) * 0.85);
   }
   100% {
-    transform: rotate(360deg);
-    opacity: calc(var(--ambient-alpha) * 0.15);
+    rotate: 360deg;
+    opacity: calc(var(--ambient-alpha) * 0.55);
   }
 }
-
-// ── focus — tight central spotlight, darkened edges
+@keyframes ambient-dizzy-spin-reverse {
+  0% {
+    rotate: 0deg;
+  }
+  100% {
+    rotate: -360deg;
+  }
+}
+// ── focus — tunnel vision: sharp circular falloff, never opaque.
+// Level drives tunnel *tightness*, not darkness: L1 wide, L3 narrow.
+// Alpha stays capped so content remains readable even at L3.
 .ambient-focus .ambient-psychology__vignette {
+  // Per-level geometry: --focus-level-clear / --focus-level-edge are the
+  // resting radii; the animation then modulates them by ±4%.
+  --focus-level-clear: calc(
+    42% - (var(--ambient-level) - 1) * 8%
+  ); // L1 42 · L2 34 · L3 26
+  --focus-level-edge: calc(
+    78% - (var(--ambient-level) - 1) * 10%
+  ); // L1 78 · L2 68 · L3 58
   background: radial-gradient(
-    ellipse at center,
-    transparent 20%,
-    var(--bg-canvas) 90%
+    circle at center,
+    transparent var(--focus-clear, 34%),
+    rgba(0, 0, 0, 0.78) var(--focus-edge, 68%) // void-ignore — tunnel-vision darkness floor
   );
-  opacity: calc(var(--ambient-alpha) * 0.6);
-  animation: none;
+  opacity: 0.82;
+  animation: ambient-focus-lock 6s ease-in-out infinite;
+  --focus-clear: var(--focus-level-clear);
+  --focus-edge: var(--focus-level-edge);
+}
+@keyframes ambient-focus-lock {
+  0%,
+  100% {
+    --focus-clear: calc(var(--focus-level-clear) + 2%);
+    --focus-edge: calc(var(--focus-level-edge) + 4%);
+  }
+  50% {
+    --focus-clear: calc(var(--focus-level-clear) - 4%);
+    --focus-edge: calc(var(--focus-level-edge) - 6%);
+  }
+}
+@property --focus-clear {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 30%;
+}
+@property --focus-edge {
+  syntax: '<percentage>';
+  inherits: true;
+  initial-value: 62%;
 }
 
-// ── flashback — sepia wash with film grain drift
+// ── flashback — heavy sepia wash, steady; occasional frame-drop flickers
 .ambient-flashback .ambient-psychology__vignette {
   background:
     radial-gradient(
       ellipse at center,
-      transparent 30%,
-      var(--ambient-sepia-shadow, #3a2a1a) 120%
+      transparent 40%,
+      var(--ambient-sepia-shadow, rgba(58, 42, 26, 0.85)) 115% // void-ignore — sepia shadow floor
     ),
     linear-gradient(
-      transparent,
-      var(--ambient-sepia-wash, rgba(120, 80, 40, 0.15))
+      rgba(120, 80, 40, 0.1),
+      // void-ignore — sepia wash top
+      var(--ambient-sepia-wash, rgba(120, 80, 40, 0.28)) // void-ignore — sepia wash bottom
     );
   mix-blend-mode: multiply;
-  animation: ambient-flashback-fade 4s ease-in-out infinite;
+  opacity: calc(var(--ambient-alpha) * 0.85);
+  animation: ambient-flashback-breathe 7s ease-in-out infinite;
 }
-@keyframes ambient-flashback-fade {
+.ambient-flashback .ambient-psychology__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: calc(var(--ambient-alpha) * 0.5);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+@keyframes ambient-flashback-breathe {
   0%,
   100% {
-    opacity: calc(var(--ambient-alpha) * 0.4);
+    opacity: calc(var(--ambient-alpha) * 0.7);
   }
   50% {
-    opacity: calc(var(--ambient-alpha) * 0.7);
+    opacity: calc(var(--ambient-alpha) * 0.95);
   }
 }
 
-// ── dreaming — soft pastel bloom
+// ── dreaming — multi-bloom drift, wide hue rotation, hypnagogic layering
 .ambient-dreaming .ambient-psychology__vignette {
+  inset: -15%;
   background: radial-gradient(
-    ellipse at center,
-    var(--color-info, var(--text-mute)) 0%,
-    transparent 60%
+    ellipse 45% 50% at 35% 40%,
+    var(--energy-primary, var(--text-mute)) 0%,
+    transparent 65%
   );
-  filter: blur(80px);
+  filter: blur(130px) hue-rotate(0deg); // void-ignore — dreaming bloom blur
   mix-blend-mode: screen;
-  animation: ambient-dream-drift 8s ease-in-out infinite;
+  will-change: opacity, transform, filter;
+  animation: ambient-dream-drift-a 18s ease-in-out infinite;
 }
-@keyframes ambient-dream-drift {
+.ambient-dreaming .ambient-psychology__vignette--b {
+  inset: -15%;
+  background: radial-gradient(
+    ellipse 50% 45% at 70% 65%,
+    var(--energy-secondary, var(--energy-primary)) 0%,
+    transparent 65%
+  );
+  filter: blur(150px) hue-rotate(40deg); // void-ignore — dreaming bloom blur
+  mix-blend-mode: screen;
+  will-change: opacity, transform, filter;
+  animation: ambient-dream-drift-b 22s ease-in-out infinite;
+}
+@keyframes ambient-dream-drift-a {
   0%,
   100% {
-    opacity: calc(var(--ambient-alpha) * 0.3);
-    transform: translate3d(-5%, 0, 0);
+    opacity: calc(var(--ambient-alpha) * 0.55);
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: blur(130px) hue-rotate(0deg); // void-ignore — dreaming bloom blur
   }
-  50% {
+  33% {
+    opacity: calc(var(--ambient-alpha) * 0.8);
+    transform: translate3d(6%, -4%, 0) scale(1.15);
+    filter: blur(150px) hue-rotate(35deg); // void-ignore — dreaming bloom blur
+  }
+  66% {
+    opacity: calc(var(--ambient-alpha) * 0.65);
+    transform: translate3d(-4%, 5%, 0) scale(1.08);
+    filter: blur(140px) hue-rotate(70deg); // void-ignore — dreaming bloom blur
+  }
+}
+@keyframes ambient-dream-drift-b {
+  0%,
+  100% {
+    opacity: calc(var(--ambient-alpha) * 0.5);
+    transform: translate3d(0, 0, 0) scale(1.05);
+    filter: blur(150px) hue-rotate(40deg); // void-ignore — dreaming bloom blur
+  }
+  40% {
+    opacity: calc(var(--ambient-alpha) * 0.75);
+    transform: translate3d(-6%, 4%, 0) scale(1.18);
+    filter: blur(170px) hue-rotate(90deg); // void-ignore — dreaming bloom blur
+  }
+  70% {
     opacity: calc(var(--ambient-alpha) * 0.6);
-    transform: translate3d(5%, 0, 0);
+    transform: translate3d(5%, -5%, 0) scale(1.1);
+    filter: blur(160px) hue-rotate(130deg); // void-ignore — dreaming bloom blur
   }
 }
 
@@ -356,33 +815,59 @@ html[data-physics='retro'] .ambient-layer * {
 // Level 1/2/3 drives amplitude via --ambient-level. Duration is set inline
 // from ACTION_PARAMS via --ambient-duration.
 
-// ── impact — screen shake + white flash
+// ── impact — radial shockwave ring expanding from center
 .ambient-impact {
-  background: var(--text-main);
-  animation: ambient-impact var(--ambient-duration) ease-out forwards;
+  background: transparent;
 }
-@keyframes ambient-impact {
+.ambient-impact__ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20vmax;
+  height: 20vmax;
+  translate: -50% -50%;
+  border-radius: 50%;
+  // Ring via radial-gradient: narrow bright band around 48-52%.
+  background: radial-gradient(
+    circle,
+    transparent 0%,
+    transparent 44%,
+    var(--text-mute) 49%,
+    var(--text-mute) 51%,
+    transparent 56%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  will-change: transform, opacity;
+  animation: ambient-impact-ring var(--ambient-duration)
+    cubic-bezier(0.2, 0.7, 0.3, 1) forwards;
+}
+@keyframes ambient-impact-ring {
   0% {
-    opacity: calc(var(--ambient-level) * 0.25);
-    transform: scale(1);
-  }
-  20% {
-    transform: translate3d(calc(var(--ambient-level) * 4px), 0, 0);
-  }
-  40% {
-    transform: translate3d(calc(var(--ambient-level) * -4px), 0, 0);
+    transform: scale(0.1);
+    opacity: calc(var(--ambient-level) * 0.15);
   }
   60% {
-    transform: translate3d(calc(var(--ambient-level) * 2px), 0, 0);
+    opacity: calc(var(--ambient-level) * 0.1);
   }
   100% {
+    transform: scale(12);
     opacity: 0;
-    transform: scale(1);
   }
 }
 
-// ── speed — radial motion blur streaks from edges inward
+// ── speed — 3-layer parallax sweep with radial edge mask
 .ambient-speed {
+  mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
+  -webkit-mask-image: radial-gradient(
+    ellipse at center,
+    black 40%,
+    transparent 100%
+  );
+}
+.ambient-speed,
+.ambient-speed::before,
+.ambient-speed::after {
   background: repeating-linear-gradient(
     90deg,
     transparent 0,
@@ -391,7 +876,27 @@ html[data-physics='retro'] .ambient-layer * {
     transparent calc(10% + var(--ambient-level) * 1%)
   );
   mix-blend-mode: overlay;
+}
+.ambient-speed {
   animation: ambient-speed-sweep var(--ambient-duration) linear forwards;
+}
+.ambient-speed::before,
+.ambient-speed::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.ambient-speed::before {
+  animation: ambient-speed-sweep var(--ambient-duration) linear forwards;
+  animation-delay: calc(var(--ambient-duration) * 0.15 * -1);
+  opacity: 0.7;
+  filter: blur(2px); // void-ignore — motion-blur floor for parallax layer
+}
+.ambient-speed::after {
+  animation: ambient-speed-sweep var(--ambient-duration) linear forwards;
+  animation-delay: calc(var(--ambient-duration) * 0.3 * -1);
+  opacity: 0.5;
+  filter: blur(4px); // void-ignore — motion-blur for deepest parallax layer
 }
 @keyframes ambient-speed-sweep {
   0% {
@@ -407,37 +912,38 @@ html[data-physics='retro'] .ambient-layer * {
   }
 }
 
-// ── glitch — RGB-split skew pulse
+// ── glitch — RGB chromatic aberration on underlying page content.
+// Visual work is done by an inline SVG filter referenced via backdrop-filter
+// from the component (url(#ambient-glitch-<uid>)). The layer itself just
+// provides the backdrop surface and a short flicker on/off so the effect
+// reads as a discrete hit rather than a slow fade.
 .ambient-glitch {
-  background: linear-gradient(
-    90deg,
-    var(--ambient-glitch-r, rgba(255, 0, 100, 0.3)),
-    transparent 30%,
-    transparent 70%,
-    var(--ambient-glitch-b, rgba(0, 200, 255, 0.3))
-  );
-  mix-blend-mode: screen;
-  animation: ambient-glitch var(--ambient-duration) steps(8, end) forwards;
+  background: transparent;
+  animation: ambient-glitch-flicker var(--ambient-duration) steps(8, end)
+    forwards;
 }
-@keyframes ambient-glitch {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 0, 0);
-  }
-  20% {
-    opacity: calc(var(--ambient-level) * 0.3);
-    transform: translate3d(calc(var(--ambient-level) * 3px), 0, 0) skewX(1deg);
-  }
-  40% {
-    transform: translate3d(calc(var(--ambient-level) * -3px), 0, 0) skewX(-1deg);
-  }
-  60% {
-    transform: translate3d(calc(var(--ambient-level) * 2px), 0, 0);
-  }
+@keyframes ambient-glitch-flicker {
+  0%,
   100% {
     opacity: 0;
-    transform: translate3d(0, 0, 0);
   }
+  8%,
+  82% {
+    opacity: 1;
+  }
+  40% {
+    opacity: 0.85;
+  }
+  55% {
+    opacity: 1;
+  }
+}
+// Hidden SVG host for the filter <defs>. Zero footprint, never painted.
+.ambient-glitch__svg {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
 }
 
 // ── flash — full-screen bright pulse
@@ -484,6 +990,7 @@ html[data-physics='retro'] .ambient-layer * {
 
 .ambient-environment {
   mix-blend-mode: multiply;
+  opacity: var(--ambient-env-opacity, 1);
 }
 
 // ── night — cool deep-blue wash
@@ -513,4 +1020,73 @@ html[data-physics='retro'] .ambient-layer * {
     var(--ambient-neon-b, rgba(0, 200, 255, 0.2))
   );
   mix-blend-mode: screen;
+}
+
+// ── dawn — warm pink/gold vertical wash
+.ambient-dawn {
+  background: linear-gradient(
+    180deg,
+    var(--ambient-dawn-top, rgba(255, 170, 190, 0.35)),
+    var(--ambient-dawn-bottom, rgba(255, 210, 130, 0.35))
+  );
+  mix-blend-mode: soft-light;
+}
+
+// ── dusk — deep orange to violet vertical gradient
+.ambient-dusk {
+  background: linear-gradient(
+    180deg,
+    var(--ambient-dusk-top, rgba(220, 90, 40, 0.4)),
+    var(--ambient-dusk-bottom, rgba(60, 30, 90, 0.55))
+  );
+  mix-blend-mode: multiply;
+}
+
+// ── overcast — flat desaturating grey wash, slightly darker at top
+.ambient-overcast {
+  background: linear-gradient(
+    180deg,
+    var(--ambient-overcast-top, rgba(120, 125, 135, 0.45)),
+    var(--ambient-overcast-bottom, rgba(150, 155, 165, 0.3))
+  );
+  mix-blend-mode: multiply;
+}
+
+// ── sickly — green/yellow radial with vignette darkening
+.ambient-sickly {
+  background: radial-gradient(
+    ellipse at center,
+    var(--ambient-sickly-center, rgba(180, 200, 60, 0.25)) 0%,
+    var(--ambient-sickly-mid, rgba(120, 140, 40, 0.4)) 70%,
+    var(--ambient-sickly-edge, rgba(50, 60, 20, 0.6)) 100%
+  );
+  mix-blend-mode: multiply;
+}
+
+// ── toxic — saturated irradiated green, even chemical cast, no vignette
+.ambient-toxic {
+  background: var(--ambient-toxic, rgba(120, 220, 60, 0.28));
+  mix-blend-mode: screen;
+}
+
+// ── underground — dark cool-grey radial with heavy edge darkening (no light source)
+.ambient-underground {
+  background: radial-gradient(
+    ellipse at center,
+    var(--ambient-underground-center, rgba(40, 42, 48, 0.55)) 0%,
+    var(--ambient-underground-mid, rgba(18, 20, 24, 0.8)) 55%,
+    var(--ambient-underground-edge, rgba(4, 5, 7, 0.95)) 100%
+  );
+  mix-blend-mode: multiply;
+}
+
+// ── candlelit — warm radial spotlight with strong edge darkening
+.ambient-candlelit {
+  background: radial-gradient(
+    ellipse at center,
+    var(--ambient-candle-center, rgba(255, 180, 90, 0.3)) 0%,
+    var(--ambient-candle-mid, rgba(120, 60, 20, 0.55)) 55%,
+    var(--ambient-candle-edge, rgba(8, 5, 2, 0.9)) 100%
+  );
+  mix-blend-mode: multiply;
 }

@@ -5,6 +5,7 @@
     variant,
     enabled = true,
     reducedMotion = 'respect',
+    opacity = 1,
     class: className = '',
   }: EnvironmentLayerProps = $props();
 </script>
@@ -15,5 +16,6 @@
     aria-hidden="true"
     data-variant={variant}
     data-reduced-motion={reducedMotion}
+    style="--ambient-env-opacity: {opacity};"
   ></div>
 {/if}

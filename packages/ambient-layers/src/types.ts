@@ -39,7 +39,17 @@ export type PsychologyLayer =
 export type ActionLayer = 'impact' | 'speed' | 'glitch' | 'flash' | 'reveal';
 
 /** Sticky baseline environment tint layers (deepest, rarely changes). */
-export type EnvironmentLayer = 'night' | 'indoor_warm' | 'neon';
+export type EnvironmentLayer =
+  | 'night'
+  | 'indoor_warm'
+  | 'neon'
+  | 'dawn'
+  | 'dusk'
+  | 'overcast'
+  | 'sickly'
+  | 'toxic'
+  | 'underground'
+  | 'candlelit';
 
 export type AmbientLayerId =
   | AtmosphereLayer
@@ -105,4 +115,6 @@ export interface ActionLayerProps extends AmbientBaseProps {
 
 export interface EnvironmentLayerProps extends AmbientBaseProps {
   variant: EnvironmentLayer;
+  /** Overall layer opacity multiplier (0..1). Default 1. */
+  opacity?: number;
 }
