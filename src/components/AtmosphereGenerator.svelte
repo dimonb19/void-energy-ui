@@ -432,6 +432,11 @@
     const mode = editMode;
     untrack(() => {
       if (!paletteOpen || editDirty) return;
+      // If a generated preview is active, keep its palette — don't overwrite
+      // with mode defaults. seedEditor (called on open / generation) already
+      // assigns editMode, which would otherwise retrigger this effect and
+      // clobber the freshly-seeded generated colors.
+      if (previewResult) return;
       seedFromModeDefault(mode);
     });
   });
@@ -569,6 +574,12 @@
     previewId = result.id;
     previewHandle = handle;
     previewResult = result;
+    if (paletteOpen) {
+      seedEditor(result.definition, result.label, result.tagline ?? '');
+    } else {
+      editLabel = result.label;
+      editTagline = result.tagline ?? '';
+    }
   }
 
   function replacePreview(result: GeneratedAtmosphere) {
@@ -583,6 +594,12 @@
 
     previewId = result.id;
     previewResult = result;
+    if (paletteOpen) {
+      seedEditor(result.definition, result.label, result.tagline ?? '');
+    } else {
+      editLabel = result.label;
+      editTagline = result.tagline ?? '';
+    }
   }
 
   function cleanupPreview() {
@@ -786,11 +803,7 @@
       out:dissolve
     >
       <div class="flex flex-row flex-wrap gap-md justify-center">
-        <button
-          class="btn-premium"
-          onclick={keep}
-          disabled={generating || !editLabel.trim()}
-        >
+        <button class="btn-premium" onclick={keep} disabled={generating}>
           Keep This Atmosphere
         </button>
         <ActionBtn
