@@ -266,31 +266,18 @@ html[data-physics='retro'] .ambient-layer * {
   }
 }
 
-// ── storm — internally composes the rain particle shape + a horizontal wind
-// drift on the layer root + a transient lightning flash overlay driven by the
-// component's [data-lightning='true'] toggle. This is the only atmosphere
-// effect that composes another effect; the pattern is allowed for atmosphere
-// only — see the plan and params.ts header.
-.ambient-storm .ambient-atmosphere__particle {
+// ── storm — genuine composition of three distinct effects: wind-driven rain
+// drops (data-kind='rain'), horizontal wind streaks (data-kind='wind'), and a
+// transient lightning flash driven by the component's [data-lightning='true']
+// toggle. This is the only atmosphere effect that composes another effect;
+// the pattern is allowed for atmosphere only — see params.ts header.
+.ambient-storm .ambient-atmosphere__particle[data-kind='rain'] {
   width: 1px; // void-ignore — storm rain stroke floor
   height: var(--length);
   background: linear-gradient(to bottom, transparent, var(--text-main));
   rotate: 24deg; // steeper than rain — wind-driven
   transform-origin: top;
   animation: ambient-rain-fall var(--duration) linear var(--delay) infinite;
-}
-// Whole-layer horizontal sway — slow wind drift behind the precipitation.
-.ambient-storm {
-  animation: ambient-storm-drift 9s ease-in-out infinite;
-}
-@keyframes ambient-storm-drift {
-  0%,
-  100% {
-    transform: translate3d(-1.5%, 0, 0);
-  }
-  50% {
-    transform: translate3d(1.5%, 0, 0);
-  }
 }
 // Lightning flash — full-viewport bright pulse, toggled via data-lightning.
 // The transition handles both the bright leading edge and the slow falloff.
@@ -309,32 +296,52 @@ html[data-physics='retro'] .ambient-layer * {
   transition-duration: var(--speed-instant);
 }
 
-// ── wind — horizontal dust/leaf streaks, no precipitation. Distinct from
-// storm: no vertical fall, no lightning, just lateral motion. Pairs with heat.
-.ambient-wind .ambient-atmosphere__particle {
-  top: calc(var(--x) * 1%); // reuse --x as vertical scatter for the streak band
-  left: -10vw;
+// ── wind — long horizontal gust streaks sweeping across the viewport.
+// Shared with storm's wind streaks via [data-kind='wind']. Distinct from
+// storm: no vertical fall, no lightning, just lateral motion.
+.ambient-wind .ambient-atmosphere__particle,
+.ambient-storm .ambient-atmosphere__particle[data-kind='wind'] {
+  top: var(--y);
+  left: 100vw;
   width: var(--length);
-  height: 1px; // void-ignore — wind streak stroke floor
+  height: 2px; // void-ignore — wind streak stroke floor (readability)
   background: linear-gradient(
     to right,
-    transparent,
-    var(--text-dim),
-    transparent
+    transparent 0%,
+    var(--text-main) 50%,
+    transparent 100%
   );
-  animation: ambient-wind-drift var(--duration) linear var(--delay) infinite;
+  border-radius: var(--radius-full);
+  filter: blur(0.6px); // void-ignore — motion softening on the streak edge
+  animation: ambient-wind-drift var(--duration) cubic-bezier(0.4, 0, 0.6, 1)
+    var(--delay) infinite;
+}
+// Near band — thicker, sharper.
+.ambient-wind .ambient-atmosphere__particle[data-band='0'],
+.ambient-storm .ambient-atmosphere__particle[data-kind='wind'][data-band='0'] {
+  height: 3px; // void-ignore — near-band wind streak thickness
+  filter: blur(0.3px); // void-ignore — depth-of-field near band
+}
+// Far band — more diffuse, parallax depth.
+.ambient-wind .ambient-atmosphere__particle[data-band='2'],
+.ambient-storm .ambient-atmosphere__particle[data-kind='wind'][data-band='2'] {
+  filter: blur(1.2px); // void-ignore — depth-of-field far band
+}
+// Storm wind streaks tilt slightly — same angle family as the driven rain.
+.ambient-storm .ambient-atmosphere__particle[data-kind='wind'] {
+  rotate: 4deg;
 }
 @keyframes ambient-wind-drift {
   0% {
     transform: translate3d(0, 0, 0);
     opacity: 0;
   }
-  10%,
-  90% {
+  8%,
+  92% {
     opacity: calc(var(--p-opacity) * var(--ambient-alpha));
   }
   100% {
-    transform: translate3d(120vw, 0, 0);
+    transform: translate3d(-140vw, 0, 0);
     opacity: 0;
   }
 }
@@ -517,6 +524,28 @@ html[data-physics='retro'] .ambient-layer * {
   pointer-events: none;
   mix-blend-mode: screen;
   will-change: transform;
+  // Keep bubbles on the sides, clear the middle — reads more like natural
+  // rising columns near the edges and stops cluttering the content area.
+  mask-image: linear-gradient(
+    to right,
+    black 0%,
+    rgba(0, 0, 0, 0.85) 14%,
+    rgba(0, 0, 0, 0.3) 32%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.3) 68%,
+    rgba(0, 0, 0, 0.85) 86%,
+    black 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    black 0%,
+    rgba(0, 0, 0, 0.85) 14%,
+    rgba(0, 0, 0, 0.3) 32%,
+    transparent 50%,
+    rgba(0, 0, 0, 0.3) 68%,
+    rgba(0, 0, 0, 0.85) 86%,
+    black 100%
+  );
 }
 .ambient-underwater::before {
   // Small bubbles — denser, faster rise. Tile shrinks as intensity rises.
@@ -722,22 +751,82 @@ html[data-physics='retro'] .ambient-layer * {
     color-mix(in oklab, var(--color-warning, var(--text-main)) 14%, transparent)
       100%
   );
-  // Ring mask — clean center, displacement only around the edges. Fully
-  // transparent inside the ellipse (no warp), fully opaque at corners (full warp).
+  // Frame mask — clean center, displacement only on the edges. The center is
+  // fully transparent (backdrop-filter does nothing where the element is
+  // transparent), so the middle of the viewport stays crisp while the sides
+  // shimmer/melt like heat haze through a doorway.
   mask-image: radial-gradient(
-    ellipse 70% 60% at 50% 50%,
+    ellipse 60% 50% at 50% 50%,
     transparent 0%,
     transparent 40%,
-    #000 90%
+    rgba(0, 0, 0, 0.85) 75%,
+    #000 100%
   );
   -webkit-mask-image: radial-gradient(
-    ellipse 70% 60% at 50% 50%,
+    ellipse 60% 50% at 50% 50%,
     transparent 0%,
     transparent 40%,
-    #000 90%
+    rgba(0, 0, 0, 0.85) 75%,
+    #000 100%
   );
   opacity: calc(0.6 + var(--ambient-alpha) * 0.4);
   will-change: backdrop-filter;
+}
+.ambient-heat .ambient-atmosphere__heat-shimmer {
+  // Self-visible shimmer: carries its own faint warm gradient and is warped
+  // with `filter: url(#heat-melt)` (not backdrop-filter) so the wavy motion
+  // stays visible even on empty regions of the page where there's no backdrop
+  // content for the melt layer to displace. Kept low-opacity so it reads as
+  // "air shimmer" rather than a dominant overlay.
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 60% 45% at 50% 55%,
+      color-mix(
+          in oklab,
+          var(--color-warning, var(--text-main)) 18%,
+          transparent
+        )
+        0%,
+      transparent 70%
+    ),
+    repeating-linear-gradient(
+      0deg,
+      color-mix(
+          in oklab,
+          var(--color-warning, var(--text-main)) 9%,
+          transparent
+        )
+        0,
+      color-mix(
+          in oklab,
+          var(--color-warning, var(--text-main)) 9%,
+          transparent
+        )
+        1px,
+      transparent 1px,
+      transparent 6px
+    );
+  filter: var(--heat-filter);
+  mix-blend-mode: screen;
+  opacity: calc(var(--ambient-alpha) * 0.55);
+  mask-image: radial-gradient(
+    ellipse 60% 50% at 50% 50%,
+    transparent 0%,
+    transparent 40%,
+    rgba(0, 0, 0, 0.85) 75%,
+    #000 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 60% 50% at 50% 50%,
+    transparent 0%,
+    transparent 40%,
+    rgba(0, 0, 0, 0.85) 75%,
+    #000 100%
+  );
+  will-change: filter;
 }
 .ambient-heat .ambient-atmosphere__heat-sag {
   // Drooping top-edge: the "ceiling" sags under heat. Blurred warm band that
@@ -960,7 +1049,7 @@ html[data-physics='retro'] .ambient-layer * {
 // drift in counter-orbits so the heavy side of the frame keeps moving, while
 // the whole layer lists faintly underfoot. No sweeping bars, no strobes.
 .ambient-dizzy {
-  animation: ambient-dizzy-sway 7s ease-in-out infinite;
+  animation: ambient-dizzy-sway 11s ease-in-out infinite;
   transform-origin: center;
 }
 // Layer A — soft off-center dark lobe, slow orbit. Circular falloff so the
@@ -1031,10 +1120,10 @@ html[data-physics='retro'] .ambient-layer * {
 @keyframes ambient-dizzy-sway {
   0%,
   100% {
-    transform: rotate(-1.2deg);
+    transform: rotate(-1deg);
   }
   50% {
-    transform: rotate(1.2deg);
+    transform: rotate(1deg);
   }
 }
 // Subtle chromatic breath on the counter-orbiting lobe — disorientation without strobe.
@@ -1046,6 +1135,13 @@ html[data-physics='retro'] .ambient-layer * {
   50% {
     filter: blur(52px) hue-rotate(6deg); // void-ignore — vertigo lobe smear
   }
+}
+// Invisible defs container for the dizzy backdrop-filter.
+.ambient-dizzy .ambient-psychology__svg--defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
 }
 // ── focus — living tunnel vision: the vignette breathes, tightens, and a
 // subtle inner pull draws the eye to center. Calmer and slower than tension
@@ -1152,6 +1248,20 @@ html[data-physics='retro'] .ambient-layer * {
   opacity: calc(var(--ambient-alpha) * 0.5);
   mix-blend-mode: overlay;
   pointer-events: none;
+  animation: ambient-film-grain-jitter 0.35s steps(2) infinite;
+}
+// ── old-film artifact: vertical hair scratch that jumps between positions
+.ambient-film-grain::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px; // void-ignore — hair scratch
+  background: rgba(255, 235, 190, 0.45); // void-ignore — warm film scratch
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: calc(var(--ambient-alpha) * 0.55);
+  animation: ambient-film-grain-scratch 22s linear infinite;
 }
 @keyframes ambient-film-grain-breathe {
   0%,
@@ -1160,6 +1270,111 @@ html[data-physics='retro'] .ambient-layer * {
   }
   50% {
     opacity: calc(var(--ambient-alpha) * 0.95);
+  }
+}
+@keyframes ambient-film-grain-jitter {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  25% {
+    transform: translate3d(0, -0.4%, 0);
+  }
+  50% {
+    transform: translate3d(0, 0.3%, 0);
+  }
+  75% {
+    transform: translate3d(0, -0.2%, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+}
+@keyframes ambient-film-grain-scratch {
+  // Real-film behavior: scratch persists for a stretch of frames with subtle
+  // horizontal weave (film gate instability), then disappears. A different
+  // scratch appears later at a new position. No smooth slides across the frame.
+
+  // ── gap ──
+  0%,
+  9% {
+    opacity: 0;
+    left: 26%;
+  }
+
+  // ── scratch A: ~26%, visible for ~22% of cycle (~4.8s) with weave jitter ──
+  11% {
+    opacity: calc(var(--ambient-alpha) * 0.55);
+    left: 26%;
+  }
+  14% {
+    left: 26.4%;
+    opacity: calc(var(--ambient-alpha) * 0.6);
+  }
+  17% {
+    left: 25.7%;
+    opacity: calc(var(--ambient-alpha) * 0.5);
+  }
+  20% {
+    left: 26.3%;
+    opacity: calc(var(--ambient-alpha) * 0.62);
+  }
+  23% {
+    left: 25.9%;
+    opacity: calc(var(--ambient-alpha) * 0.55);
+  }
+  26% {
+    left: 26.2%;
+    opacity: calc(var(--ambient-alpha) * 0.58);
+  }
+  29% {
+    left: 25.8%;
+    opacity: calc(var(--ambient-alpha) * 0.5);
+  }
+  31% {
+    opacity: 0;
+    left: 26%;
+  }
+
+  // ── gap ──
+  52% {
+    opacity: 0;
+    left: 68%;
+  }
+
+  // ── scratch B: ~68%, visible for ~18% of cycle (~4s) with weave jitter ──
+  54% {
+    opacity: calc(var(--ambient-alpha) * 0.6);
+    left: 68%;
+  }
+  57% {
+    left: 68.3%;
+    opacity: calc(var(--ambient-alpha) * 0.55);
+  }
+  60% {
+    left: 67.7%;
+    opacity: calc(var(--ambient-alpha) * 0.62);
+  }
+  63% {
+    left: 68.2%;
+    opacity: calc(var(--ambient-alpha) * 0.58);
+  }
+  66% {
+    left: 67.8%;
+    opacity: calc(var(--ambient-alpha) * 0.55);
+  }
+  69% {
+    left: 68.1%;
+    opacity: calc(var(--ambient-alpha) * 0.5);
+  }
+  71% {
+    opacity: 0;
+    left: 68%;
+  }
+
+  // ── long gap to end ──
+  100% {
+    opacity: 0;
+    left: 68%;
   }
 }
 
@@ -1225,51 +1440,54 @@ html[data-physics='retro'] .ambient-layer * {
   }
 }
 
-// ── calm — counterpart to tension. Soft cool vignette, slow breathing pulse,
-// no constriction. The relief beat — safe, settled, post-conflict.
+// ── calm — counterpart to tension. A centered cool glow that breathes in and
+// out like slow, deliberate lungs. The relief beat — safe, settled,
+// post-conflict. Clearly visible: you *see* it breathing, even in 'light'.
 .ambient-calm .ambient-psychology__vignette {
   background: radial-gradient(
     ellipse at center,
-    transparent 55%,
-    var(--energy-secondary, var(--text-dim)) 130%
+    var(--energy-secondary, var(--text-dim)) 0%,
+    transparent 55%
   );
   mix-blend-mode: screen;
-  opacity: calc(var(--ambient-alpha) * 0.45);
-  animation: ambient-calm-breathe 4s ease-in-out infinite;
+  opacity: calc(var(--ambient-alpha) * 0.55);
+  filter: blur(80px); // void-ignore — soft breath bloom
+  animation: ambient-calm-breathe 7s ease-in-out infinite;
 }
 @keyframes ambient-calm-breathe {
   0%,
   100% {
-    opacity: calc(var(--ambient-alpha) * 0.4);
-    transform: scale(1);
+    opacity: calc(var(--ambient-alpha) * 0.35);
+    transform: scale(0.9);
   }
   50% {
-    opacity: calc(var(--ambient-alpha) * 0.55);
-    transform: scale(1.015);
+    opacity: calc(var(--ambient-alpha) * 0.7);
+    transform: scale(1.12);
   }
 }
 
-// ── serenity — pale outer glow with near-imperceptible drift. Ambient
-// peacefulness for meditation, idle, contemplative reading.
+// ── serenity — a wide pale band drifting slowly across the viewport.
+// Distinct from calm's centered breath: serenity moves, calm pulses.
+// Ambient peacefulness for meditation, idle, contemplative reading.
 .ambient-serenity .ambient-psychology__vignette {
-  background: radial-gradient(
-    ellipse at center,
-    transparent 60%,
-    var(--text-dim) 125%
+  background: linear-gradient(
+    115deg,
+    transparent 25%,
+    var(--text-dim) 50%,
+    transparent 75%
   );
   mix-blend-mode: screen;
-  opacity: calc(var(--ambient-alpha) * 0.35);
-  animation: ambient-serenity-drift 14s ease-in-out infinite;
+  opacity: calc(var(--ambient-alpha) * 0.45);
+  filter: blur(60px); // void-ignore — soft drift bloom
+  animation: ambient-serenity-drift 18s ease-in-out infinite;
 }
 @keyframes ambient-serenity-drift {
   0%,
   100% {
-    transform: translate3d(0, 0, 0) scale(1);
-    opacity: calc(var(--ambient-alpha) * 0.32);
+    transform: translate3d(-15%, 0, 0) scale(1.15);
   }
   50% {
-    transform: translate3d(0, -1%, 0) scale(1.02);
-    opacity: calc(var(--ambient-alpha) * 0.4);
+    transform: translate3d(15%, 0, 0) scale(1.15);
   }
 }
 
@@ -1288,11 +1506,11 @@ html[data-physics='retro'] .ambient-layer * {
 @keyframes ambient-success-bloom {
   0% {
     opacity: 0;
-    transform: scale(0.85);
+    transform: scale(1.1);
   }
   60% {
     opacity: calc(var(--ambient-alpha) * 0.7);
-    transform: scale(1.04);
+    transform: scale(1.03);
   }
   100% {
     opacity: calc(var(--ambient-alpha) * 0.55);
@@ -1317,11 +1535,11 @@ html[data-physics='retro'] .ambient-layer * {
 @keyframes ambient-fail-collapse {
   0% {
     opacity: 0;
-    transform: scale(1.15);
+    transform: scale(1.12);
   }
   55% {
     opacity: calc(var(--ambient-alpha) * 0.75);
-    transform: scale(0.97);
+    transform: scale(1.04);
   }
   100% {
     opacity: calc(var(--ambient-alpha) * 0.6);
@@ -1329,33 +1547,70 @@ html[data-physics='retro'] .ambient-layer * {
   }
 }
 
-// ── awe — wonder, discovery, reveal. Pale gold/white radial brightening from
-// center outward, very slow. Distinct from `flash` (one-shot luminance) — this
-// lingers and breathes.
+// ── awe — wonder, discovery, reveal. Light-from-above halo (cathedral light),
+// paired with faint crepuscular rays fanning out from the same origin. Motion
+// is geological, not biological: a slow opacity breathe on the halo and a
+// slower, independent drift on the rays. No central hotspot, no scale pulse.
 .ambient-awe .ambient-psychology__vignette {
   background: radial-gradient(
-    ellipse at center,
-    var(--text-main) 0%,
+    ellipse 110% 75% at 50% 0%,
+    color-mix(in oklch, var(--text-main) 85%, var(--energy-primary)) 0%,
+    color-mix(in oklch, var(--text-main) 60%, var(--energy-primary)) 18%,
     transparent 55%
   );
   mix-blend-mode: screen;
-  opacity: calc(var(--ambient-alpha) * 0.3);
-  animation: ambient-awe-radiate 8s ease-in-out infinite;
+  opacity: calc(var(--ambient-alpha) * 0.42);
+  transform-origin: 50% 0%;
+  animation: ambient-awe-breathe 12s ease-in-out infinite;
 }
-@keyframes ambient-awe-radiate {
+.ambient-awe .ambient-psychology__vignette--b {
+  background:
+    // crepuscular rays fanning from top-center
+    repeating-conic-gradient(
+      from 255deg at 50% -10%,
+      transparent 0deg,
+      color-mix(in oklch, var(--text-main) 80%, var(--energy-primary)) 2deg,
+      transparent 7deg,
+      transparent 13deg
+    ),
+    // subtle ground darkening to imply looking upward
+    linear-gradient(180deg, transparent 55%, var(--bg-deep) 130%);
+  mix-blend-mode: screen;
+  opacity: calc(var(--ambient-alpha) * 0.26);
+  transform-origin: 50% 0%;
+  animation: ambient-awe-rays 12s ease-in-out infinite;
+}
+@keyframes ambient-awe-breathe {
   0%,
   100% {
-    opacity: calc(var(--ambient-alpha) * 0.25);
-    transform: scale(0.95);
+    opacity: calc(var(--ambient-alpha) * 0.35);
+    transform: scaleY(0.96);
   }
   50% {
-    opacity: calc(var(--ambient-alpha) * 0.45);
-    transform: scale(1.08);
+    opacity: calc(var(--ambient-alpha) * 0.7);
+    transform: scaleY(1.04);
+  }
+}
+@keyframes ambient-awe-rays {
+  0% {
+    opacity: calc(var(--ambient-alpha) * 0.16);
+    transform: rotate(-4deg);
+  }
+  50% {
+    opacity: calc(var(--ambient-alpha) * 0.34);
+    transform: rotate(4deg);
+  }
+  100% {
+    opacity: calc(var(--ambient-alpha) * 0.16);
+    transform: rotate(-4deg);
   }
 }
 
 // ── melancholy — sadness, loss, reflective sorrow. Desaturated cool vignette,
 // slow downward drift on the edge gradient. Negative-as-grief, not as threat.
+// Three overlapping layers on incommensurate periods (11/13/17s) — the
+// composite never visibly repeats, so the frame feels like it is quietly
+// breathing rather than looping.
 .ambient-melancholy .ambient-psychology__vignette {
   background: linear-gradient(
     180deg,
@@ -1365,17 +1620,73 @@ html[data-physics='retro'] .ambient-layer * {
   );
   mix-blend-mode: multiply;
   opacity: calc(var(--ambient-alpha) * 0.55);
+  transform-origin: 50% 100%;
   animation: ambient-melancholy-sink 11s ease-in-out infinite;
+}
+.ambient-melancholy::before,
+.ambient-melancholy::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+// Bottom-wide breathing wash — rises/falls and drifts laterally so the floor
+// of the frame feels like it is slowly sighing. Kept low and wide so it reads
+// as mood, not a visible shape.
+.ambient-melancholy::before {
+  background: radial-gradient(
+    ellipse 120% 80% at 50% 100%,
+    var(--text-mute) 0%,
+    transparent 70%
+  );
+  mix-blend-mode: multiply;
+  opacity: 0;
+  animation: ambient-melancholy-breathe 13s ease-in-out infinite;
+}
+// Off-center "tear-weight" — a second soft radial that slowly pans across the
+// lower frame on a longer period. Desyncs from the other two layers so the
+// composite never looks frozen.
+.ambient-melancholy::after {
+  background: radial-gradient(
+    ellipse 90% 60% at 30% 110%,
+    var(--text-mute) 0%,
+    transparent 65%
+  );
+  mix-blend-mode: multiply;
+  opacity: 0;
+  animation: ambient-melancholy-drift 17s ease-in-out infinite;
 }
 @keyframes ambient-melancholy-sink {
   0%,
   100% {
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) scale(1);
     opacity: calc(var(--ambient-alpha) * 0.5);
   }
   50% {
-    transform: translate3d(0, 1.5%, 0);
+    transform: translate3d(0, 3%, 0) scale(1.03);
     opacity: calc(var(--ambient-alpha) * 0.65);
+  }
+}
+@keyframes ambient-melancholy-breathe {
+  0%,
+  100% {
+    opacity: calc(var(--ambient-alpha) * 0.1);
+    transform: translate3d(-2%, 0, 0);
+  }
+  50% {
+    opacity: calc(var(--ambient-alpha) * 0.25);
+    transform: translate3d(2%, 0, 0);
+  }
+}
+@keyframes ambient-melancholy-drift {
+  0%,
+  100% {
+    opacity: calc(var(--ambient-alpha) * 0.08);
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    opacity: calc(var(--ambient-alpha) * 0.2);
+    transform: translate3d(40%, -1%, 0);
   }
 }
 
@@ -1531,25 +1842,38 @@ html[data-physics='retro'] .ambient-layer * {
 // ── flash — full-screen bright pulse
 .ambient-flash {
   background: var(--text-main);
-  animation: ambient-flash var(--ambient-duration) ease-in-out forwards;
+  animation: ambient-flash var(--ambient-duration) ease-out forwards;
 }
+// Two quick pre-flashes (stepped-leader stutter), one dominant peak (return
+// stroke), then a long slow afterglow fade. Asymmetric rise/fall reads as a
+// physical event rather than a mechanical strobe.
 @keyframes ambient-flash {
-  0%,
-  100% {
+  0% {
     opacity: 0;
   }
-  10%,
-  25%,
-  45%,
-  65%,
-  85% {
-    opacity: calc(var(--ambient-level) * 0.28);
+  4% {
+    opacity: calc(var(--ambient-level) * 0.18);
   }
-  17%,
-  35%,
-  55%,
-  75% {
-    opacity: calc(var(--ambient-level) * 0.05);
+  7% {
+    opacity: calc(var(--ambient-level) * 0.03);
+  }
+  11% {
+    opacity: calc(var(--ambient-level) * 0.22);
+  }
+  14% {
+    opacity: calc(var(--ambient-level) * 0.03);
+  }
+  20% {
+    opacity: calc(var(--ambient-level) * 0.4);
+  }
+  30% {
+    opacity: calc(var(--ambient-level) * 0.22);
+  }
+  55% {
+    opacity: calc(var(--ambient-level) * 0.1);
+  }
+  100% {
+    opacity: 0;
   }
 }
 
@@ -1626,14 +1950,23 @@ html[data-physics='retro'] .ambient-layer * {
   }
 }
 
-// ── shake — damped translate random walk on the layer root. Reads as
-// vibration / quake aftermath. No color or blur change — pure kinetics.
+// ── shake — camera tremor: an oversized vignette shifts against the
+// viewport edge. Without a visible frame the translate is invisible,
+// so we paint a dark edge vignette on the layer and shake it — the
+// shifting dark borders read as a hand-held camera quake.
 // Pairs with impact (impact = ring, shake = tremor).
 .ambient-shake {
-  background: transparent;
+  background: radial-gradient(
+    ellipse 78% 72% at center,
+    transparent 42%,
+    rgba(0, 0, 0, calc(var(--ambient-level) * 0.92)) 100%
+  );
+  // Oversize generously — larger translate distances need more slack
+  // before the hard edge of the layer peeks through.
+  inset: -14%;
   animation:
     ambient-action-envelope var(--ambient-duration) ease-in-out forwards,
-    ambient-shake 700ms cubic-bezier(0.36, 0.07, 0.19, 0.97) infinite;
+    ambient-shake 880ms linear infinite;
 }
 @keyframes ambient-shake {
   0%,
@@ -1642,48 +1975,48 @@ html[data-physics='retro'] .ambient-layer * {
   }
   10% {
     transform: translate3d(
-      calc(var(--ambient-level) * -0.6%),
-      calc(var(--ambient-level) * 0.4%),
+      calc(var(--ambient-level) * -4.5%),
+      calc(var(--ambient-level) * 3.2%),
       0
     );
   }
   20% {
     transform: translate3d(
-      calc(var(--ambient-level) * 0.5%),
-      calc(var(--ambient-level) * -0.5%),
+      calc(var(--ambient-level) * 4.2%),
+      calc(var(--ambient-level) * -3.8%),
       0
     );
   }
   30% {
     transform: translate3d(
-      calc(var(--ambient-level) * -0.4%),
-      calc(var(--ambient-level) * -0.3%),
+      calc(var(--ambient-level) * -3.4%),
+      calc(var(--ambient-level) * -2.6%),
       0
     );
   }
   45% {
     transform: translate3d(
-      calc(var(--ambient-level) * 0.35%),
-      calc(var(--ambient-level) * 0.25%),
+      calc(var(--ambient-level) * 3%),
+      calc(var(--ambient-level) * 2.2%),
       0
     );
   }
   60% {
     transform: translate3d(
-      calc(var(--ambient-level) * -0.25%),
-      calc(var(--ambient-level) * 0.2%),
+      calc(var(--ambient-level) * -2.2%),
+      calc(var(--ambient-level) * 1.8%),
       0
     );
   }
   78% {
     transform: translate3d(
-      calc(var(--ambient-level) * 0.15%),
-      calc(var(--ambient-level) * -0.15%),
+      calc(var(--ambient-level) * 1.4%),
+      calc(var(--ambient-level) * -1.4%),
       0
     );
   }
   90% {
-    transform: translate3d(calc(var(--ambient-level) * -0.08%), 0, 0);
+    transform: translate3d(calc(var(--ambient-level) * -0.3%), 0, 0);
   }
 }
 
@@ -1691,31 +2024,57 @@ html[data-physics='retro'] .ambient-layer * {
 // Sudden attention shift, dramatic emphasis. Distinct from flash (no
 // luminance change).
 .ambient-zoom-burst {
-  background: radial-gradient(
-    circle at center,
-    var(--text-main) 0%,
-    transparent 35%
+  background: repeating-conic-gradient(
+    from 0deg at center,
+    var(--text-mute) 0deg,
+    var(--text-mute) 1.5deg,
+    transparent 1.5deg,
+    transparent 6deg
   );
   mix-blend-mode: screen;
   transform-origin: center;
-  animation:
-    ambient-action-envelope var(--ambient-duration) ease-in-out forwards,
-    ambient-zoom-burst 1600ms cubic-bezier(0.16, 0.84, 0.36, 1) infinite;
+  // Hollow the center so streaks emanate outward instead of filling as a blob.
+  mask-image: radial-gradient(
+    circle at center,
+    transparent 0%,
+    #000 22%,
+    // void-ignore — mask alpha constant
+    #000 55%,
+    // void-ignore — mask alpha constant
+    transparent 78%
+  );
+  -webkit-mask-image: radial-gradient(
+    circle at center,
+    transparent 0%,
+    #000 22%,
+    // void-ignore — mask alpha constant
+    #000 55%,
+    // void-ignore — mask alpha constant
+    transparent 78%
+  );
+  animation: ambient-zoom-burst var(--ambient-duration)
+    cubic-bezier(0.16, 0.84, 0.36, 1) forwards;
 }
 @keyframes ambient-zoom-burst {
   0% {
-    transform: scale(0.4);
+    transform: scale(0.2) rotate(0deg);
+    opacity: 0;
     filter: blur(0px);
   }
+  18% {
+    opacity: calc(var(--ambient-level) * 0.22);
+  }
   60% {
+    opacity: calc(var(--ambient-level) * 0.1);
     filter: blur(
-      calc(var(--ambient-level) * 6px)
+      calc(var(--ambient-level) * 2px)
     ); // void-ignore — radial motion blur scales with level
   }
   100% {
-    transform: scale(calc(1.6 + var(--ambient-level) * 0.4));
+    transform: scale(calc(2 + var(--ambient-level) * 0.6)) rotate(6deg);
+    opacity: 0;
     filter: blur(
-      calc(var(--ambient-level) * 12px)
+      calc(var(--ambient-level) * 5px)
     ); // void-ignore — radial motion blur scales with level
   }
 }

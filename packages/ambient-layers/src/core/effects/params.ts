@@ -88,7 +88,7 @@ export const ATMOSPHERE_PARAMS: Record<
   storm: {
     defaultIntensity: 'medium',
     durationMs: 12000,
-    counts: { light: 100, medium: 200, heavy: 360 },
+    counts: { light: 180, medium: 360, heavy: 640 },
   },
   // wind is a horizontal-streak field (dust/leaves) with no precipitation.
   wind: {

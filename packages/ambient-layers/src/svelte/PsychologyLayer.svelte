@@ -16,6 +16,7 @@
 
   const uid = $props.id();
   const grainFilterId = `ambient-psy-grain-${uid}`;
+  const dizzyFilterId = `ambient-psy-dizzy-${uid}`;
 
   let level = $state<AmbientLevel>('medium');
 
@@ -55,12 +56,44 @@
     aria-hidden="true"
     data-variant={variant}
     data-reduced-motion={reducedMotion}
-    style="--ambient-level: {levelNum};"
+    style={variant === 'dizzy'
+      ? `--ambient-level: ${levelNum}; backdrop-filter: url(#${dizzyFilterId}); -webkit-backdrop-filter: url(#${dizzyFilterId});`
+      : `--ambient-level: ${levelNum};`}
   >
     <span class="ambient-psychology__vignette"></span>
     {#if variant === 'dizzy'}
       <span class="ambient-psychology__vignette ambient-psychology__vignette--b"
       ></span>
+      <svg
+        class="ambient-psychology__svg ambient-psychology__svg--defs"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <filter id={dizzyFilterId} x="-20%" y="-20%" width="140%" height="140%">
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.0022 0.0028"
+            numOctaves="1"
+            seed="4"
+            result="noise"
+          >
+            <animate
+              attributeName="baseFrequency"
+              values="0.0022 0.0028;0.0030 0.0020;0.0020 0.0030;0.0022 0.0028"
+              dur="16s"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="10">
+            <animate
+              attributeName="scale"
+              values="6;14;6"
+              dur="10s"
+              repeatCount="indefinite"
+            />
+          </feDisplacementMap>
+        </filter>
+      </svg>
     {/if}
     {#if variant === 'filmGrain'}
       <svg
@@ -90,7 +123,7 @@
         <rect width="100%" height="100%" filter="url(#{grainFilterId})" />
       </svg>
     {/if}
-    {#if variant === 'haze'}
+    {#if variant === 'haze' || variant === 'awe'}
       <span class="ambient-psychology__vignette ambient-psychology__vignette--b"
       ></span>
     {/if}

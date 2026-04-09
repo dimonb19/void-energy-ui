@@ -16,6 +16,7 @@
 
   // Unique id for SVG filter defs (fog/underwater/heat).
   const uid = $props.id();
+  const underwaterFilterId = `uw-distort-${uid}`;
 
   // Live decay level — starts at `intensity`, steps down to 'off'.
   let level = $state<AmbientLevel>('medium');
@@ -91,23 +92,38 @@
     if (!isParticleField || level === 'off') return [];
     return Array.from({ length: count }, (_, i) => {
       const x = Math.random() * 100;
+      const y = Math.random() * 100;
       // Three depth bands (near=0, mid=1, far=2) via modulo.
       const band = (i % 3) as 0 | 1 | 2;
       // Size by band: near biggest, far smallest.
       const sizeBase = band === 0 ? 0.7 : band === 1 ? 0.5 : 0.35;
       const size = sizeBase + Math.random() * 0.4;
-      const length = 0.8 + Math.random() * 1.6;
-      const opacity =
+      // Storm composes rain drops + occasional wind streaks. Wind variant is
+      // all streaks. Everything else renders as its variant default.
+      const kind: 'rain' | 'wind' =
+        variant === 'wind'
+          ? 'wind'
+          : variant === 'storm' && Math.random() < 0.18
+            ? 'wind'
+            : 'rain';
+      // Wind streaks are long and horizontal; everything else uses the
+      // original short particle length.
+      const length =
+        kind === 'wind' ? 4 + Math.random() * 8 : 0.8 + Math.random() * 1.6;
+      const opacityBase =
         (band === 0 ? 0.7 : band === 1 ? 0.5 : 0.35) + Math.random() * 0.3;
+      // Wind streaks read as atmosphere, not precipitation — pull their
+      // apparent density way down so they sit behind the scene.
+      const opacity = kind === 'wind' ? opacityBase * 0.4 : opacityBase;
       // Per-variant fall duration — near falls faster than far.
       const bandSpeed = band === 0 ? 0.7 : band === 1 ? 1 : 1.4;
       const duration =
-        variant === 'rain'
-          ? 0.5 + Math.random() * 0.9
-          : variant === 'storm'
-            ? 0.35 + Math.random() * 0.6 // faster than rain
-            : variant === 'wind'
-              ? (3 + Math.random() * 4) * bandSpeed
+        kind === 'wind'
+          ? (1.6 + Math.random() * 2.4) * bandSpeed
+          : variant === 'rain'
+            ? 0.5 + Math.random() * 0.9
+            : variant === 'storm'
+              ? 0.35 + Math.random() * 0.6 // faster than rain
               : variant === 'snow'
                 ? (8 + Math.random() * 14) * bandSpeed
                 : (10 + Math.random() * 16) * bandSpeed;
@@ -118,6 +134,7 @@
       return {
         i,
         x,
+        y,
         size,
         length,
         duration,
@@ -126,6 +143,7 @@
         opacity,
         band,
         ember,
+        kind,
       };
     });
   });
@@ -138,16 +156,20 @@
     data-variant={variant}
     data-reduced-motion={reducedMotion}
     data-lightning={variant === 'storm' && lightning ? 'true' : undefined}
-    style="--ambient-level: {levelNum};"
+    style={variant === 'underwater'
+      ? `--ambient-level: ${levelNum}; backdrop-filter: url(#${underwaterFilterId}); -webkit-backdrop-filter: url(#${underwaterFilterId});`
+      : `--ambient-level: ${levelNum};`}
   >
     {#if isParticleField}
       {#each particles as p (p.i)}
         <span
           class="ambient-atmosphere__particle"
           data-band={p.band}
+          data-kind={p.kind}
           data-ember={p.ember ? 'true' : undefined}
           style="
             --x: {p.x}%;
+            --y: {p.y}%;
             --size: {p.size}rem;
             --length: {p.length}rem;
             --duration: {p.duration}s;
@@ -245,34 +267,40 @@
       <span class="ambient-atmosphere__caustic ambient-atmosphere__caustic--b"
       ></span>
       <svg
-        class="ambient-atmosphere__svg ambient-atmosphere__svg--underwater"
+        class="ambient-atmosphere__svg ambient-atmosphere__svg--defs"
         xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="none"
+        aria-hidden="true"
       >
-        <defs>
-          <filter id="uw-{uid}" x="0%" y="0%" width="100%" height="100%">
-            <feTurbulence
-              type="fractalNoise"
-              baseFrequency="0.02 0.04"
-              numOctaves="2"
-              seed="2"
-            >
-              <animate
-                attributeName="baseFrequency"
-                dur="14s"
-                values="0.02 0.04;0.03 0.05;0.02 0.04"
-                repeatCount="indefinite"
-              />
-            </feTurbulence>
-            <feDisplacementMap in="SourceGraphic" scale="10" />
-          </filter>
-        </defs>
-        <rect
-          width="100%"
-          height="100%"
-          fill="var(--text-main)"
-          filter="url(#uw-{uid})"
-        />
+        <filter
+          id={underwaterFilterId}
+          x="-20%"
+          y="-20%"
+          width="140%"
+          height="140%"
+        >
+          <feTurbulence
+            type="fractalNoise"
+            baseFrequency="0.012 0.018"
+            numOctaves="2"
+            seed="2"
+            result="noise"
+          >
+            <animate
+              attributeName="baseFrequency"
+              values="0.010 0.016;0.014 0.020;0.010 0.016"
+              dur="34s"
+              repeatCount="indefinite"
+            />
+          </feTurbulence>
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="6">
+            <animate
+              attributeName="scale"
+              values="4;8;4"
+              dur="24s"
+              repeatCount="indefinite"
+            />
+          </feDisplacementMap>
+        </filter>
       </svg>
     {:else if isSvgFilter && variant === 'heat'}
       <span class="ambient-atmosphere__wash ambient-atmosphere__wash--warm"
@@ -303,11 +331,11 @@
                 repeatCount="indefinite"
               />
             </feTurbulence>
-            <feDisplacementMap in="SourceGraphic" scale="22">
+            <feDisplacementMap in="SourceGraphic" scale="30">
               <animate
                 attributeName="scale"
                 dur="9s"
-                values="18;34;18"
+                values="24;44;24"
                 repeatCount="indefinite"
               />
             </feDisplacementMap>
@@ -316,6 +344,10 @@
       </svg>
       <div
         class="ambient-atmosphere__heat-melt"
+        style="--heat-filter: url(#heat-melt-{uid})"
+      ></div>
+      <div
+        class="ambient-atmosphere__heat-shimmer"
         style="--heat-filter: url(#heat-melt-{uid})"
       ></div>
       <div class="ambient-atmosphere__heat-sag"></div>
