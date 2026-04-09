@@ -18,10 +18,13 @@
   const grainFilterId = `ambient-psy-grain-${uid}`;
   const dizzyFilterId = `ambient-psy-dizzy-${uid}`;
 
+  // Semantic level drives mount/onChange; continuous float drives SCSS.
   let level = $state<AmbientLevel>('medium');
+  let levelNum = $state<number>(2);
 
   $effect(() => {
     level = intensity;
+    levelNum = intensity === 'light' ? 1 : intensity === 'medium' ? 2 : 3;
     onChange?.(intensity);
   });
 
@@ -30,6 +33,9 @@
     const handle = startDecay(
       intensity,
       ms,
+      (value) => {
+        levelNum = value;
+      },
       (next) => {
         level = next;
         onChange?.(next);
@@ -39,9 +45,18 @@
     return () => handle.stop();
   });
 
-  // Numeric mirror for SCSS calc() consumers via --ambient-level.
-  const levelNum = $derived(
-    level === 'off' ? 0 : level === 'light' ? 1 : level === 'medium' ? 2 : 3,
+  // Dizzy warp amount per intensity — subtle spread so levels feel distinct
+  // without changing the character of the effect. Values: [min, max] for the
+  // feDisplacementMap scale animation (resting-peak-resting).
+  const dizzyScale = $derived(
+    intensity === 'light'
+      ? { min: 6, max: 13, dur: '11s' }
+      : intensity === 'heavy'
+        ? { min: 12, max: 26, dur: '9s' }
+        : { min: 9, max: 20, dur: '10s' },
+  );
+  const dizzyScaleValues = $derived(
+    `${dizzyScale.min};${dizzyScale.max};${dizzyScale.min}`,
   );
 
   // camelCase variants → kebab-case SCSS class suffix (filmGrain → film-grain).
@@ -82,11 +97,15 @@
               repeatCount="indefinite"
             />
           </feTurbulence>
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="14">
+          <feDisplacementMap
+            in="SourceGraphic"
+            in2="noise"
+            scale={dizzyScale.max}
+          >
             <animate
               attributeName="scale"
-              values="9;20;9"
-              dur="10s"
+              values={dizzyScaleValues}
+              dur={dizzyScale.dur}
               repeatCount="indefinite"
             />
           </feDisplacementMap>

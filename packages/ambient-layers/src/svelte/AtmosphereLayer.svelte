@@ -18,12 +18,18 @@
   const uid = $props.id();
   const underwaterFilterId = `uw-distort-${uid}`;
 
-  // Live decay level — starts at `intensity`, steps down to 'off'.
+  // Semantic level — used for mount gating, `onChange`, and locking the
+  // particle count. Starts at `intensity` and only flips to 'off' when the
+  // continuous fade reaches zero.
   let level = $state<AmbientLevel>('medium');
+  // Continuous float (0..3) driven by rAF. Fed to `--ambient-level` so every
+  // SCSS `calc()` consumer scales smoothly instead of jumping between rungs.
+  let levelNum = $state<number>(2);
 
   // Re-sync if the consumer changes `intensity` or `variant` prop.
   $effect(() => {
     level = intensity;
+    levelNum = intensity === 'light' ? 1 : intensity === 'medium' ? 2 : 3;
     onChange?.(intensity);
   });
 
@@ -32,6 +38,9 @@
     const handle = startDecay(
       intensity,
       ms,
+      (value) => {
+        levelNum = value;
+      },
       (next) => {
         level = next;
         onChange?.(next);
@@ -41,14 +50,10 @@
     return () => handle.stop();
   });
 
-  // Numeric mirror for SCSS calc() consumers via --ambient-level.
-  const levelNum = $derived(
-    level === 'off' ? 0 : level === 'light' ? 1 : level === 'medium' ? 2 : 3,
-  );
-
-  const count = $derived(
-    level === 'off' ? 0 : ATMOSPHERE_PARAMS[variant].counts[level],
-  );
+  // Particle count is locked to the *initial* intensity for the lifetime of
+  // the layer. Regenerating particles mid-fade would pop; instead we spawn
+  // the full field once and let `--ambient-level` fade it out continuously.
+  const count = $derived(ATMOSPHERE_PARAMS[variant].counts[intensity]);
 
   // Particle-field variants share an x-y scatter model.
   // - rain/snow/ash/storm: vertical fall (storm reuses the rain particle shape).
@@ -149,7 +154,7 @@
   });
 
   const particles = $derived.by(() => {
-    if (!isParticleField || level === 'off') return [];
+    if (!isParticleField) return [];
     return Array.from({ length: count }, (_, i) => {
       const x = Math.random() * 100;
       const y = Math.random() * 100;

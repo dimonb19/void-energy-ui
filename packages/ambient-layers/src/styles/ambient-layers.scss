@@ -5,8 +5,10 @@
 // a global `steps()` timing override for retro. All colors flow through host
 // CSS variables so layers re-skin per theme automatically.
 //
-// Intensity is surfaced on the root element as `--ambient-level: 1|2|3`. SCSS
-// uses it via `calc()` to scale opacity. No `[data-level="3"]` duplication.
+// Intensity is surfaced on the root element as `--ambient-level`, a continuous
+// float in [0..3] driven by a rAF-based auto-decay (light=1, medium=2,
+// heavy=3). SCSS consumes it via `calc()` so every opacity/amplitude scales
+// smoothly as the layer fades out — no discrete jumps between rungs.
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Base

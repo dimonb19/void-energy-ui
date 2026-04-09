@@ -1,13 +1,23 @@
 /**
- * Tiny auto-decay helper for persistent ambient layers.
+ * Continuous auto-decay helper for persistent ambient layers.
  *
- * Steps a level from its initial value down through the intensity ladder
- * (heavy → medium → light → off) at a fixed interval. Each step fires
- * `onStep`; reaching 'off' fires `onComplete`. When `ms <= 0`, decay is
- * disabled and the level stays at its initial value.
+ * Drives a float value from `initialNum` (light=1, medium=2, heavy=3) down to
+ * 0 over `stepMs * initialNum` ms via `requestAnimationFrame`, so the fade is
+ * perceptually smooth — no visual jumps between intensity ladder rungs.
  *
- * Scope-owned: the calling `$effect` block is responsible for clearing the
- * returned handle on teardown.
+ * - `onTick(value, level)` fires every frame with the current float (used to
+ *   feed `--ambient-level` in the DOM) and the semantic ladder level that
+ *   float currently maps to.
+ * - `onStep(level)` fires only when the semantic level changes (heavy →
+ *   medium → light → off). Mirrors the legacy step-based callback so
+ *   consumers can still react to threshold crossings (e.g. `onChange`).
+ * - `onComplete` fires once when the value reaches 0.
+ *
+ * When `stepMs <= 0`, decay is disabled and only a single `onTick` at the
+ * initial value is emitted so the caller can sync its initial state.
+ *
+ * Scope-owned: the calling `$effect` block is responsible for calling `stop`
+ * on teardown.
  */
 
 import type { AmbientIntensity, AmbientLevel } from '../../types';
@@ -16,43 +26,61 @@ export interface DecayHandle {
   stop: () => void;
 }
 
-const LADDER: readonly AmbientLevel[] = ['heavy', 'medium', 'light', 'off'];
+const NUM: Record<AmbientIntensity, number> = {
+  light: 1,
+  medium: 2,
+  heavy: 3,
+};
 
-function nextStep(current: AmbientLevel): AmbientLevel {
-  const i = LADDER.indexOf(current);
-  return i < 0 || i === LADDER.length - 1 ? 'off' : LADDER[i + 1];
+function toLevel(value: number): AmbientLevel {
+  if (value <= 0.0001) return 'off';
+  if (value <= 1) return 'light';
+  if (value <= 2) return 'medium';
+  return 'heavy';
 }
 
 export function startDecay(
   initial: AmbientIntensity,
-  ms: number,
-  onStep: (level: AmbientLevel) => void,
+  stepMs: number,
+  onTick: (value: number, level: AmbientLevel) => void,
+  onStep?: (level: AmbientLevel) => void,
   onComplete?: () => void,
 ): DecayHandle {
-  if (ms <= 0) {
+  const start = NUM[initial];
+
+  if (stepMs <= 0) {
+    onTick(start, initial);
     return { stop: () => {} };
   }
 
-  let level: AmbientLevel = initial;
-  let timer: ReturnType<typeof setTimeout> | null = null;
+  const total = stepMs * start;
+  const startTime = performance.now();
+  let rafId: number | null = null;
+  let lastLevel: AmbientLevel = initial;
 
-  const tick = () => {
-    level = nextStep(level);
-    onStep(level);
-    if (level !== 'off') {
-      timer = setTimeout(tick, ms);
+  const frame = (now: number) => {
+    const t = Math.min(1, (now - startTime) / total);
+    const value = start * (1 - t);
+    const level = toLevel(value);
+    onTick(value, level);
+    if (level !== lastLevel) {
+      lastLevel = level;
+      onStep?.(level);
+    }
+    if (t < 1) {
+      rafId = requestAnimationFrame(frame);
     } else {
       onComplete?.();
     }
   };
 
-  timer = setTimeout(tick, ms);
+  rafId = requestAnimationFrame(frame);
 
   return {
     stop: () => {
-      if (timer !== null) {
-        clearTimeout(timer);
-        timer = null;
+      if (rafId !== null) {
+        cancelAnimationFrame(rafId);
+        rafId = null;
       }
     },
   };
