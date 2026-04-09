@@ -781,7 +781,7 @@
   <!-- ── Preview Controls ───────────────────────────────────────────── -->
   {#if previewResult && previewHandle !== null}
     <div
-      class="surface-void p-md flex flex-col-reverse small-desktop:flex-col gap-md items-center"
+      class="surface-spotlight p-md flex flex-col-reverse small-desktop:flex-col gap-md items-center"
       in:emerge
       out:dissolve
     >
@@ -907,7 +907,7 @@
             </p>
           {/if}
           <div
-            class="surface-void p-md flex flex-col tablet:flex-row tablet:flex-wrap gap-md tablet:justify-center"
+            class="surface-spotlight p-md flex flex-col tablet:flex-row tablet:flex-wrap gap-md tablet:justify-center"
           >
             {#each group.fields as field}
               <div
@@ -1001,7 +1001,7 @@
       <!-- Semantic Color Overrides -->
       <div class="flex flex-col gap-md">
         <h5 class="text-center">Semantic Colors</h5>
-        <div class="surface-void p-md flex flex-col gap-md">
+        <div class="surface-spotlight p-md flex flex-col gap-md">
           <div
             class="flex flex-col tablet:flex-row tablet:flex-wrap gap-md tablet:justify-center"
           >

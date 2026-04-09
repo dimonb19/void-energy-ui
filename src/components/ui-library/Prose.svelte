@@ -558,7 +558,7 @@ E = mc&lt;sup&gt;2&lt;/sup&gt;
       <div class="surface-sunk p-md flex flex-col gap-lg">
         <div class="flex flex-col gap-xs">
           <p class="text-small text-main px-xs">.prose</p>
-          <div class="surface-void p-md prose">
+          <div class="surface-spotlight p-md prose">
             <ul>
               <li>Energy-primary colored markers</li>
               <li>
@@ -577,7 +577,7 @@ E = mc&lt;sup&gt;2&lt;/sup&gt;
 
         <div class="flex flex-col gap-xs">
           <p class="text-small text-main px-xs">.legal-content</p>
-          <div class="surface-void p-md legal-content">
+          <div class="surface-spotlight p-md legal-content">
             <ul>
               <li>Standard disc markers</li>
               <li>

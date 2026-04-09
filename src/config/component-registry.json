@@ -1650,15 +1650,15 @@
       "spacing": "p-md and gap-md are the default inset recipe",
       "note": "Recessed surface for inputs, wells, sidebar blocks, and grouped controls."
     },
-    "surface-void": {
-      "usage": "class='surface-void'",
-      "spacing": "use only when you need an opaque masking surface",
-      "note": "Opaque canvas surface used by modal and overlay contexts."
-    },
     "surface-spotlight": {
       "usage": "class='surface-spotlight p-md'",
-      "spacing": "p-md and gap-md work well for highlighted rows and callouts",
-      "note": "Slightly lighter solid surface for active sections, emphasized rows, and callouts."
+      "spacing": "p-md and gap-md work well for highlighted content inside a sunk well",
+      "note": "Raised-within-sunk. Default nested fill inside surface-sunk — highlighted content, callouts, emphasized rows. Canonical flow: canvas → raised → sunk → spotlight."
+    },
+    "surface-void": {
+      "usage": "class='surface-void p-md'",
+      "spacing": "p-md for scroll/overflow containers; otherwise matches host context",
+      "note": "Sunk-within-sunk. Last-priority surface — use when content should recede further than sunk: scrollable viewports, overflow clippers, solid masking bars, opaque headers. Prefer surface-spotlight for standard nested content."
     },
     "shimmer-surface": {
       "usage": "class='shimmer-surface surface-raised'",

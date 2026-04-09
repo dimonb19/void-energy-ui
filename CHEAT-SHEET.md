@@ -1065,19 +1065,39 @@ Base surface classes for applying physics.
 
 ---
 
-#### `.surface-void`
+#### `.surface-spotlight`
 
-**Description:** Opaque canvas (Modals, masking overlays)
-**Physics:** Solid background, no blur
+**Description:** Raised-within-sunk (Default nested fill inside `surface-sunk`)
+**Physics:** Solid `--bg-spotlight` background, thin border
 **Interactive:** None
 
 **Usage:**
 
 ```svelte
-<div class="surface-void">
-  <p>Opaque background</p>
+<div class="surface-sunk p-md">
+  <div class="surface-spotlight p-md">Highlighted content</div>
 </div>
 ```
+
+---
+
+#### `.surface-void`
+
+**Description:** Sunk-within-sunk (Scroll/overflow containers, masking bars — last-priority surface)
+**Physics:** Solid `--bg-canvas` background, thin border
+**Interactive:** None
+
+**Usage:**
+
+```svelte
+<div class="surface-sunk p-md">
+  <div class="surface-void p-md overflow-auto" style="max-height: 10rem;">
+    <!-- Scrollable region that recedes further than its parent -->
+  </div>
+</div>
+```
+
+**Canonical surface flow:** `canvas` → `.surface-raised` → `.surface-sunk` → `.surface-spotlight` (default) or `.surface-void` (scroll/overflow).
 
 ---
 

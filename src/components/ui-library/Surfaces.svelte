@@ -76,25 +76,30 @@
     <div class="flex flex-col gap-sm">
       <h5>Solid Surfaces</h5>
       <p class="text-small text-mute">
-        Opaque backgrounds with a thin physics border. No blur or shadow.
-        <code>.surface-void</code> uses <code>--bg-canvas</code> (the page
-        background) &mdash; use for masking overlaps or solid bars.
+        Opaque backgrounds with a thin physics border. No blur or shadow. Think
+        of them as symmetric around the sunk baseline:
         <code>.surface-spotlight</code> uses <code>--bg-spotlight</code>
-        (slightly lighter) &mdash; use for highlighted sections or active rows.
+        (slightly lighter) &mdash; it's
+        <strong>raised within sunk</strong>, the default highlighted zone for
+        content inside a well. <code>.surface-void</code> uses
+        <code>--bg-canvas</code> (the page base) &mdash; it's
+        <strong>sunk within sunk</strong>, where content recedes further: scroll
+        viewports, overflow clippers, solid masking bars.
       </p>
 
       <div class="surface-sunk p-md flex flex-col gap-md tablet:flex-row">
-        <div class="surface-void p-lg flex-1 flex flex-col gap-md">
-          <h5>.surface-void</h5>
-          <p class="text-small text-mute">
-            Solid canvas background. Matches the page base.
-          </p>
-        </div>
-
         <div class="surface-spotlight p-lg flex-1 flex flex-col gap-md">
           <h5>.surface-spotlight</h5>
           <p class="text-small text-mute">
-            Slightly lighter solid background. For active sections and callouts.
+            Raised within sunk. Default nested fill for highlighted content.
+          </p>
+        </div>
+
+        <div class="surface-void p-lg flex-1 flex flex-col gap-md">
+          <h5>.surface-void</h5>
+          <p class="text-small text-mute">
+            Sunk within sunk. For scrollable or overflow containers that should
+            recede further.
           </p>
         </div>
       </div>
@@ -106,8 +111,8 @@
       <p class="text-small text-mute">
         Surfaces nest to create visual hierarchy. A floating raised card
         contains a sunk area for inputs or secondary content, which can itself
-        contain spotlight rows or void panels. This layering is how real layouts
-        are built &mdash; each level communicates depth and purpose.
+        contain a spotlight (raised-in-sunk, the default) or a void panel
+        (sunk-in-sunk, for scroll/overflow containers).
       </p>
 
       <div class="surface-raised p-lg flex flex-col gap-md">
@@ -119,20 +124,24 @@
           </p>
 
           <div class="surface-spotlight p-md flex flex-col gap-xs">
-            <p class="text-small">Spotlight row &mdash; highlighted item</p>
+            <p class="text-small">
+              Spotlight &mdash; raised within sunk (default nested fill)
+            </p>
           </div>
 
           <div class="surface-void p-md flex flex-col gap-xs">
-            <p class="text-small text-dim">Void row &mdash; baseline item</p>
+            <p class="text-small text-dim">
+              Void &mdash; sunk within sunk (scrollable / overflow)
+            </p>
           </div>
         </div>
       </div>
 
       <p class="text-caption text-mute px-xs">
-        Pattern: <code>.surface-raised</code> &rarr;
-        <code>.surface-sunk</code> &rarr;
-        <code>.surface-spotlight</code> / <code>.surface-void</code>. This
-        three-level nesting covers most real-world layouts.
+        Canonical flow: <code>canvas</code> &rarr;
+        <code>.surface-raised</code> &rarr; <code>.surface-sunk</code> &rarr;
+        <code>.surface-spotlight</code> (default) or
+        <code>.surface-void</code> (scroll/overflow).
       </p>
     </div>
 
@@ -166,14 +175,14 @@
               <td>Input areas, demo containers, sidebars</td>
             </tr>
             <tr>
-              <td><code>.surface-void</code></td>
-              <td>Flush</td>
-              <td>Canvas-matching backgrounds, solid bars</td>
+              <td><code>.surface-spotlight</code></td>
+              <td>Raised-in-sunk</td>
+              <td>Default nested fill, highlighted rows, callouts</td>
             </tr>
             <tr>
-              <td><code>.surface-spotlight</code></td>
-              <td>Flush</td>
-              <td>Highlighted rows, active sections, callouts</td>
+              <td><code>.surface-void</code></td>
+              <td>Sunk-in-sunk</td>
+              <td>Scroll/overflow containers, masking bars</td>
             </tr>
           </tbody>
         </table>
@@ -193,14 +202,14 @@
 &lt;div class="surface-sunk p-md"&gt;Input area&lt;/div&gt;
 
 &lt;!-- Solid backgrounds --&gt;
-&lt;div class="surface-void p-lg"&gt;Canvas match&lt;/div&gt;
-&lt;div class="surface-spotlight p-lg"&gt;Highlighted section&lt;/div&gt;
+&lt;div class="surface-spotlight p-lg"&gt;Raised within sunk (default)&lt;/div&gt;
+&lt;div class="surface-void p-lg"&gt;Sunk within sunk (scroll/overflow)&lt;/div&gt;
 
-&lt;!-- Nesting pattern --&gt;
+&lt;!-- Canonical nesting: canvas → raised → sunk → spotlight --&gt;
 &lt;div class="surface-raised p-lg"&gt;
   &lt;div class="surface-sunk p-md"&gt;
-    &lt;div class="surface-spotlight p-md"&gt;Highlighted row&lt;/div&gt;
-    &lt;div class="surface-void p-md"&gt;Baseline row&lt;/div&gt;
+    &lt;div class="surface-spotlight p-md"&gt;Highlighted content&lt;/div&gt;
+    &lt;div class="surface-void p-md overflow-auto"&gt;Scrollable region&lt;/div&gt;
   &lt;/div&gt;
 &lt;/div&gt;
 
