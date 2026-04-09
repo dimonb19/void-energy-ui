@@ -410,6 +410,337 @@
           </div>
         </div>
       </div>
+
+      <details>
+        <summary>Reference</summary>
+        <div class="p-md flex flex-col gap-lg">
+          <div class="flex flex-col gap-md">
+            <h6>Atmosphere</h6>
+            <p class="text-caption text-mute">
+              Weather and physical sensory layers. Persistent with auto-decay.
+              Sits behind your content.
+            </p>
+            <dl class="flex flex-col gap-md">
+              <div>
+                <dt><code>rain</code> — Vertical Downpour</dt>
+                <dd class="text-small text-mute">
+                  Vertical particle field across three parallax depth bands.
+                  Noir scenes, melancholy, cleansing moments, night city
+                  streets.
+                </dd>
+              </div>
+              <div>
+                <dt><code>snow</code> — Quiet Fall</dt>
+                <dd class="text-small text-mute">
+                  Soft radial flakes with gentle sway and slow rotation. Winter
+                  forests, hushed stillness, fragile beauty, memorial scenes.
+                </dd>
+              </div>
+              <div>
+                <dt><code>ash</code> — Burned Aftermath</dt>
+                <dd class="text-small text-mute">
+                  Torn-paper flakes tumbling down with ~10% glowing embers.
+                  Post-apocalypse, scorched cities, funeral pyres, nuclear
+                  winter.
+                </dd>
+              </div>
+              <div>
+                <dt><code>storm</code> — Hostile Sky</dt>
+                <dd class="text-small text-mute">
+                  Dense rain with lightning flashes and horizontal wind drift.
+                  Peak weather drama, climactic chaos, sea voyages in peril.
+                </dd>
+              </div>
+              <div>
+                <dt><code>wind</code> — Dry Tension</dt>
+                <dd class="text-small text-mute">
+                  Horizontal dust or leaf streaks without precipitation.
+                  Deserts, plains, the stillness before a fight, dust storms
+                  building.
+                </dd>
+              </div>
+              <div>
+                <dt><code>fog</code> — Lost Bearings</dt>
+                <dd class="text-small text-mute">
+                  Volumetric turbulence with vertical gradient and two masked
+                  banks. Misty moors, horror scenes, liminal transitions, dream
+                  logic.
+                </dd>
+              </div>
+              <div>
+                <dt><code>underwater</code> — Submerged Drift</dt>
+                <dd class="text-small text-mute">
+                  Soft SVG displacement with cool tint and drifting caustics.
+                  Diving, drowning, amniotic dreams, near-death submersion.
+                </dd>
+              </div>
+              <div>
+                <dt><code>heat</code> — Oppressive Warp</dt>
+                <dd class="text-small text-mute">
+                  Real SVG displacement melt above a warm wash. Desert
+                  exteriors, forges, volcanic vents, fever delirium.
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="flex flex-col gap-md">
+            <h6>Psychology</h6>
+            <p class="text-caption text-mute">
+              Edge-framed emotional states. Persistent with auto-decay. Colors
+              mood without obscuring the scene center.
+            </p>
+            <dl class="flex flex-col gap-md">
+              <div>
+                <dt><code>danger</code> — Active Threat</dt>
+                <dd class="text-small text-mute">
+                  Crimson vignette pulsing on a heartbeat rhythm from the edges.
+                  Predators nearby, boss encounters, low-health moments, red
+                  alert.
+                </dd>
+              </div>
+              <div>
+                <dt><code>tension</code> — Pressure Building</dt>
+                <dd class="text-small text-mute">
+                  Staccato micro-tremors with a slowly constricting vignette.
+                  Negotiations about to break, sneaking past patrols, withheld
+                  truths cracking.
+                </dd>
+              </div>
+              <div>
+                <dt><code>dizzy</code> — Lost Equilibrium</dt>
+                <dd class="text-small text-mute">
+                  Two off-center dark lobes in slow counter-orbits. Concussion,
+                  drunk or poisoned perception, vertigo on a high ledge, waking
+                  disoriented.
+                </dd>
+              </div>
+              <div>
+                <dt><code>focus</code> — Locked In</dt>
+                <dd class="text-small text-mute">
+                  Living tunnel vision that breathes and tightens toward center.
+                  Aiming the final shot, flow state, sniper patience, surgical
+                  precision.
+                </dd>
+              </div>
+              <div>
+                <dt><code>filmGrain</code> — Memory Recording</dt>
+                <dd class="text-small text-mute">
+                  Heavy sepia wash with irregular frame-drop flickers.
+                  Flashbacks, noir stylization, found footage, unreliable
+                  narrators.
+                </dd>
+              </div>
+              <div>
+                <dt><code>haze</code> — Dreamlike Layer</dt>
+                <dd class="text-small text-mute">
+                  Multi-bloom drift with wide hue rotation. Psychedelic
+                  sequences, visions, romantic overwhelm, reveries softening.
+                </dd>
+              </div>
+              <div>
+                <dt><code>calm</code> — Earned Relief</dt>
+                <dd class="text-small text-mute">
+                  Cool vignette with a slow breathing pulse. Returning to safety
+                  after combat, healing scenes, reconciliation, quiet after
+                  exertion.
+                </dd>
+              </div>
+              <div>
+                <dt><code>serenity</code> — Deep Stillness</dt>
+                <dd class="text-small text-mute">
+                  Pale outer glow with near-imperceptible drift. Deep
+                  meditation, chosen death, journey's end, transcendence.
+                </dd>
+              </div>
+              <div>
+                <dt><code>success</code> — Earned Victory</dt>
+                <dd class="text-small text-mute">
+                  Warm green vignette with a single outward bloom from center.
+                  Quest completed, lock opened, level-up, plan visibly working.
+                </dd>
+              </div>
+              <div>
+                <dt><code>fail</code> — Rejection Beat</dt>
+                <dd class="text-small text-mute">
+                  Red edge flash with sharp attack and quick decay. Failed
+                  action, wrong answer, denied access, critical miss, companion
+                  lost.
+                </dd>
+              </div>
+              <div>
+                <dt><code>awe</code> — Sublime Revelation</dt>
+                <dd class="text-small text-mute">
+                  Pale gold-white radial brightening from center. First sight of
+                  a cathedral or cosmic vista, witnessing a miracle, a reframing
+                  revelation.
+                </dd>
+              </div>
+              <div>
+                <dt><code>melancholy</code> — Held Grief</dt>
+                <dd class="text-small text-mute">
+                  Desaturated cool vignette with slow downward drift. After
+                  permanent loss, bittersweet endings, rain-soaked goodbyes, the
+                  weight carried forward.
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="flex flex-col gap-md">
+            <h6>Environment</h6>
+            <p class="text-caption text-mute">
+              Sticky baseline color grades. Sets hour and place. No decay, no
+              animation — the LUT of the scene.
+            </p>
+            <dl class="flex flex-col gap-md">
+              <div>
+                <dt><code>dawn</code> — Sunrise Bloom</dt>
+                <dd class="text-small text-mute">
+                  Cool blue sky above, warm peach horizon, slow sunrise glow.
+                  Morning beginnings, long darkness ending, emotional recovery.
+                </dd>
+              </div>
+              <div>
+                <dt><code>dusk</code> — Dying Light</dt>
+                <dd class="text-small text-mute">
+                  Deep orange bleeding vertically into violet. Sunset scenes,
+                  final conversations, romantic and elegiac moments outdoors.
+                </dd>
+              </div>
+              <div>
+                <dt><code>candlelit</code> — Intimate Firelight</dt>
+                <dd class="text-small text-mute">
+                  Warm golden radial spotlight with strong edge falloff.
+                  Fire-lit interiors, quiet confessions, ritual chambers, gothic
+                  libraries.
+                </dd>
+              </div>
+              <div>
+                <dt><code>night</code> — Cool Darkness</dt>
+                <dd class="text-small text-mute">
+                  Even deep-blue wash across the viewport. Generic night,
+                  moonlit stealth, calm night dialogue without immediate danger.
+                </dd>
+              </div>
+              <div>
+                <dt><code>neon</code> — Synthetic Glow</dt>
+                <dd class="text-small text-mute">
+                  Cyan and magenta cast bleeding across the scene. Cyberpunk
+                  streets, clubs, arcades, wet reflective city nights.
+                </dd>
+              </div>
+              <div>
+                <dt><code>overcast</code> — Drained Sky</dt>
+                <dd class="text-small text-mute">
+                  Flat grey-blue desaturated wash with slight green undertone.
+                  Bleak daytime exteriors, cemeteries, battlefields, emotional
+                  numbness.
+                </dd>
+              </div>
+              <div>
+                <dt><code>sickly</code> — Quiet Wrongness</dt>
+                <dd class="text-small text-mute">
+                  Green-yellow radial glow with vignette darkening. Plague
+                  zones, cursed villages, fever delirium, abandoned medical
+                  facilities.
+                </dd>
+              </div>
+              <div>
+                <dt><code>toxic</code> — Active Hazard</dt>
+                <dd class="text-small text-mute">
+                  Saturated irradiated green, even chemical cast. Radioactive
+                  zones, chemical spills, acid swamps, biohazard interiors.
+                </dd>
+              </div>
+              <div>
+                <dt><code>underground</code> — Buried Pressure</dt>
+                <dd class="text-small text-mute">
+                  Dark cool-grey radial with heavy edge darkening. Caves,
+                  catacombs, deep mines, bunker depths, claustrophobic darkness.
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <div class="flex flex-col gap-md">
+            <h6>Action</h6>
+            <p class="text-caption text-mute">
+              Transient one-shot beats. Fire once, auto-unmount. Use for
+              discrete moments, never for sustained mood.
+            </p>
+            <dl class="flex flex-col gap-md">
+              <div>
+                <dt><code>impact</code> — Shockwave Hit</dt>
+                <dd class="text-small text-mute">
+                  Radial shockwave ring expanding from center. Heavy punches,
+                  landings, collisions, critical hits, doors being breached.
+                </dd>
+              </div>
+              <div>
+                <dt><code>speed</code> — Acceleration Sweep</dt>
+                <dd class="text-small text-mute">
+                  Three-layer parallax sweep with radial edge mask. Dashes,
+                  sprints, launches, chase sequences, vehicles taking off.
+                </dd>
+              </div>
+              <div>
+                <dt><code>glitch</code> — Reality Stutter</dt>
+                <dd class="text-small text-mute">
+                  RGB chromatic aberration applied briefly to underlying
+                  content. Simulation hiccups, hack attacks, reality tears, AI
+                  masks slipping.
+                </dd>
+              </div>
+              <div>
+                <dt><code>flash</code> — White Pulse</dt>
+                <dd class="text-small text-mute">
+                  Full-screen bright pulse with quick rise and decay. Lightning
+                  strikes, flash grenades, sudden revelations, teleport
+                  arrivals.
+                </dd>
+              </div>
+              <div>
+                <dt><code>reveal</code> — Curtain Rise</dt>
+                <dd class="text-small text-mute">
+                  Radial expand wipe from center outward. Scene openings,
+                  chapter starts, unveiling locations, scan pulses finding
+                  targets.
+                </dd>
+              </div>
+              <div>
+                <dt><code>dissolve</code> — Soft Exit</dt>
+                <dd class="text-small text-mute">
+                  Soft fade to transparent across a gentle blur. Scene endings,
+                  dreams dissolving, gentle death transitions, time-skip exits.
+                </dd>
+              </div>
+              <div>
+                <dt><code>shake</code> — World Tremor</dt>
+                <dd class="text-small text-mute">
+                  Damped translate random walk on the layer root. Nearby
+                  explosions rattling the environment, large creatures
+                  approaching, earthquakes, structural damage.
+                </dd>
+              </div>
+              <div>
+                <dt><code>zoomBurst</code> — Focus Punch</dt>
+                <dd class="text-small text-mute">
+                  Brief radial scale with outward motion blur from center.
+                  Dramatic reveals, decision beats, boss spawns, attention
+                  collapsing to one point.
+                </dd>
+              </div>
+            </dl>
+          </div>
+
+          <p class="text-caption text-mute">
+            Most scenes need at most one or two layers. One variant per category
+            at a time. Ambient is seasoning — contrast and restraint make it
+            land.
+          </p>
+        </div>
+      </details>
     </div>
   </section>
 </div>

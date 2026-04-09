@@ -62,8 +62,6 @@
   >
     <span class="ambient-psychology__vignette"></span>
     {#if variant === 'dizzy'}
-      <span class="ambient-psychology__vignette ambient-psychology__vignette--b"
-      ></span>
       <svg
         class="ambient-psychology__svg ambient-psychology__svg--defs"
         xmlns="http://www.w3.org/2000/svg"
