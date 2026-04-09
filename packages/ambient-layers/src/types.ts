@@ -26,7 +26,9 @@ export type AtmosphereLayer =
   | 'underwater'
   | 'heat'
   | 'storm'
-  | 'wind';
+  | 'wind'
+  | 'spores'
+  | 'fireflies';
 
 /** Persistent mental/emotional edge-framed layers (above content, below UI). */
 export type PsychologyLayer =

@@ -59,32 +59,92 @@
       variant === 'snow' ||
       variant === 'ash' ||
       variant === 'storm' ||
-      variant === 'wind',
+      variant === 'wind' ||
+      variant === 'spores' ||
+      variant === 'fireflies',
   );
   const isSvgFilter = $derived(
     variant === 'fog' || variant === 'underwater' || variant === 'heat',
   );
 
-  // Storm-only: occasional lightning flash. Random interval 2.5–6s, scaled
-  // gently by intensity. Toggled via a $state boolean reset by a setTimeout
-  // so SCSS can drive the bright flash via a transient class.
+  // Storm-only: occasional lightning strike. Random interval 2.5–6s. Each
+  // strike generates a fresh jagged bolt path (with 0–2 forks) and fires a
+  // natural double-flicker so the sky lights up, darkens briefly, then
+  // re-strikes. SCSS drives the wash via [data-lightning='true']; the bolt
+  // SVG is rendered while `bolt` is non-null.
   let lightning = $state(false);
+  let bolt = $state<{ main: string; forks: string[] } | null>(null);
+
+  function buildBolt(): { main: string; forks: string[] } {
+    // Percent-based coordinates so the bolt scales to the viewport via
+    // SVG viewBox="0 0 100 100" preserveAspectRatio="none".
+    const segments = 10 + Math.floor(Math.random() * 5);
+    const startX = 20 + Math.random() * 60;
+    const points: Array<{ x: number; y: number }> = [{ x: startX, y: 0 }];
+    let x = startX;
+    const totalY = 70 + Math.random() * 25; // bolt ends mid-to-lower sky
+    for (let i = 1; i <= segments; i++) {
+      const y = (i / segments) * totalY;
+      // Lateral jitter grows slightly with depth.
+      x += (Math.random() * 2 - 1) * (4 + (i / segments) * 4);
+      points.push({ x, y });
+    }
+    const main = points
+      .map((p) => `${p.x.toFixed(2)},${p.y.toFixed(2)}`)
+      .join(' ');
+
+    // 0–2 forks branching from a mid segment.
+    const forkCount = Math.random() < 0.7 ? (Math.random() < 0.4 ? 2 : 1) : 0;
+    const forks: string[] = [];
+    for (let f = 0; f < forkCount; f++) {
+      const from = points[2 + Math.floor(Math.random() * (points.length - 4))];
+      if (!from) continue;
+      const forkSegs = 3 + Math.floor(Math.random() * 3);
+      const dir = Math.random() < 0.5 ? -1 : 1;
+      const fpts: Array<{ x: number; y: number }> = [{ x: from.x, y: from.y }];
+      let fx = from.x;
+      let fy = from.y;
+      for (let i = 1; i <= forkSegs; i++) {
+        fx += dir * (2 + Math.random() * 4);
+        fy += 3 + Math.random() * 5;
+        fpts.push({ x: fx, y: fy });
+      }
+      forks.push(
+        fpts.map((p) => `${p.x.toFixed(2)},${p.y.toFixed(2)}`).join(' '),
+      );
+    }
+    return { main, forks };
+  }
+
   $effect(() => {
     if (variant !== 'storm' || level === 'off') return;
-    let timer: ReturnType<typeof setTimeout> | null = null;
+    const timers: Array<ReturnType<typeof setTimeout>> = [];
+    const at = (ms: number, fn: () => void) => {
+      timers.push(setTimeout(fn, ms));
+    };
     const schedule = () => {
       const base = 2500 + Math.random() * 3500;
-      timer = setTimeout(() => {
+      at(base, () => {
+        // Strike: generate bolt + flash on.
+        bolt = buildBolt();
         lightning = true;
-        timer = setTimeout(() => {
+        // Brief dip (~40ms off), then re-strike (~80ms on), then fade.
+        at(120, () => {
           lightning = false;
+        });
+        at(170, () => {
+          lightning = true;
+        });
+        at(290, () => {
+          lightning = false;
+          bolt = null;
           schedule();
-        }, 180);
-      }, base);
+        });
+      });
     };
     schedule();
     return () => {
-      if (timer !== null) clearTimeout(timer);
+      timers.forEach(clearTimeout);
     };
   });
 
@@ -96,8 +156,29 @@
       // Three depth bands (near=0, mid=1, far=2) via modulo.
       const band = (i % 3) as 0 | 1 | 2;
       // Size by band: near biggest, far smallest.
-      const sizeBase = band === 0 ? 0.7 : band === 1 ? 0.5 : 0.35;
-      const size = sizeBase + Math.random() * 0.4;
+      // Spores and fireflies are intentionally tiny — they must read as
+      // unresolved points so only their motion/blink pattern identifies them.
+      const sizeBase =
+        variant === 'spores'
+          ? band === 0
+            ? 0.18
+            : band === 1
+              ? 0.14
+              : 0.1
+          : variant === 'fireflies'
+            ? band === 0
+              ? 0.22
+              : band === 1
+                ? 0.17
+                : 0.13
+            : band === 0
+              ? 0.7
+              : band === 1
+                ? 0.5
+                : 0.35;
+      const sizeJitter =
+        variant === 'spores' || variant === 'fireflies' ? 0.08 : 0.4;
+      const size = sizeBase + Math.random() * sizeJitter;
       // Storm composes rain drops + occasional wind streaks. Wind variant is
       // all streaks. Everything else renders as its variant default.
       const kind: 'rain' | 'wind' =
@@ -114,7 +195,7 @@
         (band === 0 ? 0.7 : band === 1 ? 0.5 : 0.35) + Math.random() * 0.3;
       // Wind streaks read as atmosphere, not precipitation — pull their
       // apparent density way down so they sit behind the scene.
-      const opacity = kind === 'wind' ? opacityBase * 0.4 : opacityBase;
+      const opacity = kind === 'wind' ? opacityBase * 0.25 : opacityBase;
       // Per-variant fall duration — near falls faster than far.
       const bandSpeed = band === 0 ? 0.7 : band === 1 ? 1 : 1.4;
       const duration =
@@ -126,7 +207,17 @@
               ? 0.35 + Math.random() * 0.6 // faster than rain
               : variant === 'snow'
                 ? (8 + Math.random() * 14) * bandSpeed
-                : (10 + Math.random() * 16) * bandSpeed;
+                : variant === 'spores'
+                  ? // Pollen/dust terminal velocity in still air is tiny —
+                    // we fake "hanging" with a very long traversal. No
+                    // bandSpeed multiplier: depth reads from size/blur/
+                    // opacity, not from differential rise speed (that would
+                    // fight the "all particles hanging" illusion).
+                    40 + Math.random() * 30
+                  : variant === 'fireflies'
+                    ? // very slow wander — long period so motion reads organic
+                      (18 + Math.random() * 14) * bandSpeed
+                    : (10 + Math.random() * 16) * bandSpeed;
       const delay = -Math.random() * duration;
       const drift = (Math.random() * 2 - 1) * 12; // vw
       // ~10% of ash particles are embers.
@@ -179,6 +270,24 @@
           "
         ></span>
       {/each}
+      {#if variant === 'storm' && bolt}
+        <svg
+          class="ambient-atmosphere__bolt"
+          viewBox="0 0 100 100"
+          preserveAspectRatio="none"
+          xmlns="http://www.w3.org/2000/svg"
+          aria-hidden="true"
+        >
+          <polyline class="ambient-atmosphere__bolt-glow" points={bolt.main} />
+          {#each bolt.forks as f}
+            <polyline class="ambient-atmosphere__bolt-glow" points={f} />
+          {/each}
+          <polyline class="ambient-atmosphere__bolt-core" points={bolt.main} />
+          {#each bolt.forks as f}
+            <polyline class="ambient-atmosphere__bolt-core" points={f} />
+          {/each}
+        </svg>
+      {/if}
     {:else if isSvgFilter && variant === 'fog'}
       <!-- Volumetric fog: vertical gradient base + two turbulence-masked banks. -->
       <span class="ambient-atmosphere__wash ambient-atmosphere__wash--a"></span>

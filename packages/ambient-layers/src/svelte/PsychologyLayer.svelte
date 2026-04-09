@@ -82,10 +82,10 @@
               repeatCount="indefinite"
             />
           </feTurbulence>
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="10">
+          <feDisplacementMap in="SourceGraphic" in2="noise" scale="14">
             <animate
               attributeName="scale"
-              values="6;14;6"
+              values="9;20;9"
               dur="10s"
               repeatCount="indefinite"
             />

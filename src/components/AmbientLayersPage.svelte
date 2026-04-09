@@ -27,15 +27,68 @@
   const atmosphereVariants: {
     value: AtmosphereLayerId;
     label: string;
+    description: string;
   }[] = [
-    { value: 'rain', label: 'Rain' },
-    { value: 'snow', label: 'Snow' },
-    { value: 'ash', label: 'Ash' },
-    { value: 'fog', label: 'Fog' },
-    { value: 'underwater', label: 'Underwater' },
-    { value: 'heat', label: 'Heat' },
-    { value: 'storm', label: 'Storm' },
-    { value: 'wind', label: 'Wind' },
+    {
+      value: 'rain',
+      label: 'Rain',
+      description:
+        'Vertical downpour drifting behind the scene for noir, melancholy, and cleansing moments.',
+    },
+    {
+      value: 'snow',
+      label: 'Snow',
+      description:
+        'Soft flakes swaying down for hushed stillness, winter forests, and fragile beauty.',
+    },
+    {
+      value: 'ash',
+      label: 'Ash',
+      description:
+        'Burned flakes and embers tumbling through post-apocalypse and scorched aftermath.',
+    },
+    {
+      value: 'fog',
+      label: 'Fog',
+      description:
+        'Volumetric mist banks for lost bearings, horror beats, and liminal transitions.',
+    },
+    {
+      value: 'underwater',
+      label: 'Underwater',
+      description:
+        'Cool displacement and caustics for submersion, drowning, and amniotic dreams.',
+    },
+    {
+      value: 'heat',
+      label: 'Heat',
+      description:
+        'Warm shimmer melt for desert exteriors, forges, and fever delirium.',
+    },
+    {
+      value: 'storm',
+      label: 'Storm',
+      description:
+        'Dense rain with lightning and wind drift for peak weather drama and climactic chaos.',
+    },
+    {
+      value: 'wind',
+      label: 'Wind',
+      description:
+        'Horizontal dust streaks for dry tension, deserts, and the stillness before a fight.',
+    },
+    {
+      value: 'spores',
+      label: 'Spores',
+      description:
+        'Slow floating motes for alien forests, fungal zones, and enchanted decay.',
+    },
+    {
+      value: 'fireflies',
+      label: 'Fireflies',
+      description:
+        'Soft drifting lights for summer nights, tranquil clearings, and quiet wonder.',
+    },
   ];
   let atmosphereEnabled = $state(false);
   let atmosphereVariant = $state<AtmosphereLayerId>('rain');
@@ -48,19 +101,80 @@
   const psychologyVariants: {
     value: PsychologyLayerId;
     label: string;
+    description: string;
   }[] = [
-    { value: 'danger', label: 'Danger' },
-    { value: 'tension', label: 'Tension' },
-    { value: 'dizzy', label: 'Dizzy' },
-    { value: 'focus', label: 'Focus' },
-    { value: 'filmGrain', label: 'Film Grain' },
-    { value: 'haze', label: 'Haze' },
-    { value: 'calm', label: 'Calm' },
-    { value: 'serenity', label: 'Serenity' },
-    { value: 'success', label: 'Success' },
-    { value: 'fail', label: 'Fail' },
-    { value: 'awe', label: 'Awe' },
-    { value: 'melancholy', label: 'Melancholy' },
+    {
+      value: 'danger',
+      label: 'Danger',
+      description:
+        'Crimson heartbeat vignette for active threats, predators, and low-health moments.',
+    },
+    {
+      value: 'tension',
+      label: 'Tension',
+      description:
+        'Constricting edges and micro-tremors for pressure building toward a break.',
+    },
+    {
+      value: 'dizzy',
+      label: 'Dizzy',
+      description:
+        'Off-center dark lobes for concussion, drunkenness, poison, and vertigo.',
+    },
+    {
+      value: 'focus',
+      label: 'Focus',
+      description:
+        'Breathing tunnel vision for flow state, final shots, and sniper patience.',
+    },
+    {
+      value: 'filmGrain',
+      label: 'Film Grain',
+      description:
+        'Sepia wash and flicker for flashbacks, noir, and unreliable memory.',
+    },
+    {
+      value: 'haze',
+      label: 'Haze',
+      description:
+        'Drifting bloom and hue shift for psychedelic visions and romantic overwhelm.',
+    },
+    {
+      value: 'calm',
+      label: 'Calm',
+      description:
+        'Cool breathing vignette for relief, healing, and quiet after exertion.',
+    },
+    {
+      value: 'serenity',
+      label: 'Serenity',
+      description:
+        "Pale outer glow for deep meditation, transcendence, and the journey's end.",
+    },
+    {
+      value: 'success',
+      label: 'Success',
+      description:
+        'Warm green bloom for quests completed, level-ups, and plans paying off.',
+    },
+    {
+      value: 'fail',
+      label: 'Fail',
+      description:
+        'Sharp red edge flash for failed actions, denials, and critical misses.',
+    },
+    {
+      value: 'awe',
+      label: 'Awe',
+      description:
+        'Pale gold brightening for sublime revelations and first sight of vastness.',
+    },
+    {
+      value: 'melancholy',
+      label: 'Melancholy',
+      description:
+        'Desaturated cool vignette for held grief, bittersweet endings, and loss.',
+    },
   ];
   let psychologyEnabled = $state(false);
   let psychologyVariant = $state<PsychologyLayerId>('danger');
@@ -70,15 +184,59 @@
   let psychologyLiveLevel = $state<AmbientLevel>('medium');
 
   // ── Action controls ────────────────────────────────────────────────
-  const actionVariants: { value: ActionLayerId; label: string }[] = [
-    { value: 'impact', label: 'Impact' },
-    { value: 'speed', label: 'Speed' },
-    { value: 'glitch', label: 'Glitch' },
-    { value: 'flash', label: 'Flash' },
-    { value: 'reveal', label: 'Reveal' },
-    { value: 'dissolve', label: 'Dissolve' },
-    { value: 'shake', label: 'Shake' },
-    { value: 'zoomBurst', label: 'Zoom Burst' },
+  const actionVariants: {
+    value: ActionLayerId;
+    label: string;
+    description: string;
+  }[] = [
+    {
+      value: 'impact',
+      label: 'Impact',
+      description:
+        'Radial shockwave for heavy hits, landings, collisions, and breached doors.',
+    },
+    {
+      value: 'speed',
+      label: 'Speed',
+      description:
+        'Parallax sweep for dashes, sprints, launches, and chase sequences.',
+    },
+    {
+      value: 'glitch',
+      label: 'Glitch',
+      description:
+        'Brief chromatic aberration for simulation hiccups, hacks, and reality tears.',
+    },
+    {
+      value: 'flash',
+      label: 'Flash',
+      description:
+        'Full-screen pulse for lightning, flashbangs, and sudden revelations.',
+    },
+    {
+      value: 'reveal',
+      label: 'Reveal',
+      description:
+        'Radial curtain wipe for scene openings, chapter starts, and unveilings.',
+    },
+    {
+      value: 'dissolve',
+      label: 'Dissolve',
+      description:
+        'Soft blurred fade for scene endings, dreams, and gentle transitions.',
+    },
+    {
+      value: 'shake',
+      label: 'Shake',
+      description:
+        'Damped tremor for nearby explosions, earthquakes, and structural damage.',
+    },
+    {
+      value: 'zoomBurst',
+      label: 'Zoom Burst',
+      description:
+        'Radial scale punch for dramatic reveals, decision beats, and boss spawns.',
+    },
   ];
   const actionIntensities: { value: AmbientIntensity; label: string }[] = [
     { value: 'light', label: 'Light' },
@@ -104,16 +262,62 @@
   const environmentVariants: {
     value: EnvironmentLayerId;
     label: string;
+    description: string;
   }[] = [
-    { value: 'night', label: 'Night' },
-    { value: 'neon', label: 'Neon' },
-    { value: 'dawn', label: 'Dawn' },
-    { value: 'dusk', label: 'Dusk' },
-    { value: 'sickly', label: 'Sickly' },
-    { value: 'toxic', label: 'Toxic' },
-    { value: 'underground', label: 'Underground' },
-    { value: 'candlelit', label: 'Candlelit' },
-    { value: 'overcast', label: 'Overcast' },
+    {
+      value: 'night',
+      label: 'Night',
+      description:
+        'Deep-blue wash for generic night, moonlit stealth, and calm nocturnal dialogue.',
+    },
+    {
+      value: 'neon',
+      label: 'Neon',
+      description:
+        'Cyan and magenta cast for cyberpunk streets, clubs, and wet city nights.',
+    },
+    {
+      value: 'dawn',
+      label: 'Dawn',
+      description:
+        'Cool sky and warm horizon for sunrise beginnings and emotional recovery.',
+    },
+    {
+      value: 'dusk',
+      label: 'Dusk',
+      description:
+        'Orange bleeding into violet for sunsets, final conversations, and elegiac beats.',
+    },
+    {
+      value: 'sickly',
+      label: 'Sickly',
+      description:
+        'Green-yellow glow for plague zones, cursed villages, and fever delirium.',
+    },
+    {
+      value: 'toxic',
+      label: 'Toxic',
+      description:
+        'Irradiated green cast for radioactive zones, acid swamps, and biohazard interiors.',
+    },
+    {
+      value: 'underground',
+      label: 'Underground',
+      description:
+        'Dark grey radial for caves, catacombs, bunkers, and claustrophobic depths.',
+    },
+    {
+      value: 'candlelit',
+      label: 'Candlelit',
+      description:
+        'Warm golden spotlight for fire-lit interiors, confessions, and ritual chambers.',
+    },
+    {
+      value: 'overcast',
+      label: 'Overcast',
+      description:
+        'Flat desaturated wash for bleak exteriors, cemeteries, and emotional numbness.',
+    },
   ];
   let environmentEnabled = $state(false);
   let environmentVariant = $state<EnvironmentLayerId>('night');
@@ -154,6 +358,23 @@
     { value: 'medium', label: 'Medium' },
     { value: 'heavy', label: 'Heavy' },
   ];
+
+  // Dynamic one-sentence caption per section, based on current selection.
+  const atmosphereCaption = $derived(
+    atmosphereVariants.find((v) => v.value === atmosphereVariant)
+      ?.description ?? '',
+  );
+  const psychologyCaption = $derived(
+    psychologyVariants.find((v) => v.value === psychologyVariant)
+      ?.description ?? '',
+  );
+  const environmentCaption = $derived(
+    environmentVariants.find((v) => v.value === environmentVariant)
+      ?.description ?? '',
+  );
+  const actionCaption = $derived(
+    actionVariants.find((v) => v.value === actionVariant)?.description ?? '',
+  );
 </script>
 
 <!-- Live ambient layers — mounted at page root, pointer-events:none -->
@@ -241,6 +462,10 @@
               onchange={setAtmosphereVariant}
             />
 
+            <p use:morph class="text-caption text-dim text-center">
+              {#if atmosphereEnabled}{atmosphereCaption}{/if}
+            </p>
+
             <Switcher
               class="text-center"
               label="Intensity"
@@ -301,6 +526,10 @@
               value={psychologyEnabled ? psychologyVariant : null}
               onchange={setPsychologyVariant}
             />
+
+            <p use:morph class="text-caption text-dim text-center">
+              {#if psychologyEnabled}{psychologyCaption}{/if}
+            </p>
 
             <Switcher
               class="text-center"
@@ -363,6 +592,10 @@
               onchange={setEnvironmentVariant}
             />
 
+            <p use:morph class="text-caption text-dim text-center">
+              {#if environmentEnabled}{environmentCaption}{/if}
+            </p>
+
             <Switcher
               class="text-center"
               label="Intensity"
@@ -400,6 +633,11 @@
                 </button>
               {/each}
             </div>
+
+            <p use:morph class="text-caption text-dim text-center">
+              {#if actionActive}{actionCaption}{/if}
+            </p>
+
             <Switcher
               class="text-center"
               label="Intensity"

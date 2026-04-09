@@ -96,6 +96,20 @@ export const ATMOSPHERE_PARAMS: Record<
     durationMs: 10000,
     counts: { light: 30, medium: 60, heavy: 100 },
   },
+  // spores — warm drifting motes rising slowly. Sparser than ash — density
+  // kills the "floating in sunbeam" feeling. Reuses the particle engine.
+  spores: {
+    defaultIntensity: 'medium',
+    durationMs: 12000,
+    counts: { light: 18, medium: 40, heavy: 80 },
+  },
+  // fireflies — point-light glows wandering and flickering. Sparsest of all
+  // particle fields; density destroys the effect.
+  fireflies: {
+    defaultIntensity: 'medium',
+    durationMs: 14000,
+    counts: { light: 12, medium: 28, heavy: 55 },
+  },
 };
 
 /** Psychology effect registry — decay duration per variant. */
