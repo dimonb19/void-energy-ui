@@ -1,8 +1,7 @@
 // @dgrslabs/void-energy-ambient-layers — shared layer styles
 //
-// One file, organized by category. No per-physics branches (consumers get
-// identical animations across glass/flat/retro), with the single exception of
-// a global `steps()` timing override for retro. All colors flow through host
+// One file, organized by category. No per-physics branches — consumers get
+// identical animations across glass/flat/retro. All colors flow through host
 // CSS variables so layers re-skin per theme automatically.
 //
 // Intensity is surfaced on the root element as `--ambient-level`, a continuous
@@ -39,11 +38,6 @@
 }
 .ambient-environment {
   z-index: 100;
-}
-
-// Single global retro timing rule — stepped animations everywhere, no per-layer branches.
-html[data-physics='retro'] .ambient-layer * {
-  animation-timing-function: steps(12, end) !important;
 }
 
 // Reduced motion: freeze animations, hold at half opacity. Single global rule.
@@ -1724,6 +1718,21 @@ html[data-physics='retro'] .ambient-layer * {
   mix-blend-mode: multiply;
   opacity: 0;
   animation: ambient-melancholy-breathe 13s ease-in-out infinite;
+  // Feather horizontal edges so the ±2% translate never reveals a hard box line.
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 6%,
+    black 94%,
+    transparent
+  ); // void-ignore
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 6%,
+    black 94%,
+    transparent
+  ); // void-ignore
 }
 // Off-center "tear-weight" — a second soft radial that slowly pans across the
 // lower frame on a longer period. Desyncs from the other two layers so the
@@ -1737,6 +1746,22 @@ html[data-physics='retro'] .ambient-layer * {
   mix-blend-mode: multiply;
   opacity: 0;
   animation: ambient-melancholy-drift 17s ease-in-out infinite;
+  // The drift keyframe translates up to 40% rightward — feather the edges
+  // generously so the box boundary never reads as a hard line.
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 12%,
+    black 88%,
+    transparent
+  ); // void-ignore
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 12%,
+    black 88%,
+    transparent
+  ); // void-ignore
 }
 @keyframes ambient-melancholy-sink {
   0%,
@@ -2039,13 +2064,13 @@ html[data-physics='retro'] .ambient-layer * {
 // Pairs with impact (impact = ring, shake = tremor).
 .ambient-shake {
   background: radial-gradient(
-    ellipse 78% 72% at center,
+    ellipse 71% 66% at center,
     transparent 42%,
     rgba(0, 0, 0, calc(var(--ambient-level) * 0.92)) 100%
   );
-  // Oversize generously — larger translate distances need more slack
-  // before the hard edge of the layer peeks through.
-  inset: -14%;
+  // Oversize generously — at heavy intensity the diagonal displacement
+  // reaches ~17%, so 20% slack keeps the hard edge safely off-screen.
+  inset: -20%;
   animation:
     ambient-action-envelope var(--ambient-duration) ease-in-out forwards,
     ambient-shake 880ms linear infinite;
