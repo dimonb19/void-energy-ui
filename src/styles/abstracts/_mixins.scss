@@ -68,6 +68,28 @@
       -webkit-backdrop-filter: blur(var(--physics-blur)) saturate(180%)
         brightness(1.08) contrast(1.05);
     }
+
+    // Disable displacement for users who prefer reduced motion.
+    @media (prefers-reduced-motion: reduce) {
+      @include when-glass {
+        backdrop-filter: blur(var(--physics-blur)) saturate(180%)
+          brightness(1.08) contrast(1.05);
+        -webkit-backdrop-filter: blur(var(--physics-blur)) saturate(180%)
+          brightness(1.08) contrast(1.05);
+      }
+    }
+  }
+
+  // Liquid glass refraction — SVG displacement filter for loupe-like distortion.
+  // Gated by [data-liquid-glass] on <html>, set by LiquidGlassFilter.svelte
+  // AFTER the SVG filter is in the DOM and Chromium support is confirmed.
+  // This avoids two problems:
+  //   1. Firefox parses url() as valid but can't render it → transparent panel
+  //   2. Chrome race condition: CSS references filter before SVG is hydrated
+  // void-ignore (Liquid Glass Enhancement — Chromium progressive)
+  @at-root html[data-liquid-glass][data-physics='glass'] & {
+    backdrop-filter: url(#liquid-glass) brightness(1.08) contrast(1.05);
+    -webkit-backdrop-filter: url(#liquid-glass) brightness(1.08) contrast(1.05);
   }
 }
 

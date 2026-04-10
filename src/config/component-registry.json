@@ -1125,6 +1125,17 @@
       "related": [],
       "compose": "Wrap any section that needs its own atmosphere. Uses pushTemporaryTheme/releaseTemporaryTheme under the hood so nested scopes restore correctly. Pass a string for registered themes or an object for inline/brand themes.",
       "example": "<AtmosphereScope theme=\"crimson\" label=\"Horror story\"><StoryContent /></AtmosphereScope>"
+    },
+    "liquid-glass-filter": {
+      "description": "Global SVG filter definitions for glass refraction. Provides a displacement-based distortion filter simulating light bending through curved glass. Place once in Layout.astro — invisible, only defines reusable SVG filter primitives referenced by CSS.",
+      "category": "theme",
+      "component": "LiquidGlassFilter",
+      "import": "@components/core/LiquidGlassFilter.svelte",
+      "props": [],
+      "slots": [],
+      "related": ["atmosphere-scope"],
+      "compose": "Mount once in the app shell (Layout.astro) with client:load. The filter activates automatically when glass physics is active on Chromium browsers. No props needed.",
+      "example": "<LiquidGlassFilter client:load />"
     }
   },
   "utilities": {

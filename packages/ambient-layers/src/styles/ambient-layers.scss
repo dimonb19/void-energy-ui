@@ -1849,10 +1849,10 @@
 @keyframes ambient-impact-ring {
   0% {
     transform: scale(0.1);
-    opacity: calc(var(--ambient-level) * 0.18);
+    opacity: calc(var(--ambient-level) * 0.25);
   }
   70% {
-    opacity: calc(var(--ambient-level) * 0.08);
+    opacity: calc(var(--ambient-level) * 0.12);
   }
   100% {
     transform: scale(12);

@@ -802,6 +802,11 @@ for (const [componentKey, entry] of Object.entries(registry.components)) {
   const source = readText(resolvedImport);
   const actualProps = parseComponentProps(source);
   if (actualProps.length === 0) {
+    // Infrastructure components (e.g. LiquidGlassFilter) may have no $props().
+    // Skip deep validation when registry declares empty props and slots.
+    if (entry.props.length === 0 && entry.slots.length === 0) {
+      continue;
+    }
     fail(`${componentKey} props could not be parsed from ${entry.import}`);
     continue;
   }

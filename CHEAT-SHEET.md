@@ -3750,6 +3750,30 @@ Reactive singletons for app-wide state. Each store uses `$state` + `$derived` an
 
 ---
 
+#### `LiquidGlassFilter` — SVG refraction filter for glass physics
+
+**Location:** [src/components/core/LiquidGlassFilter.svelte](src/components/core/LiquidGlassFilter.svelte)
+**Placed in:** [src/layouts/Layout.astro](src/layouts/Layout.astro) (`client:load`)
+
+Global SVG filter definitions that provide displacement-based glass refraction. The component renders an invisible `<svg>` with a `<filter id="liquid-glass">` referenced by the `glass-blur` SCSS mixin via `backdrop-filter: url(#liquid-glass)`.
+
+**Filter pipeline:** blur (frost) → feTurbulence (noise) → feDisplacementMap (warp) → feColorMatrix (saturate)
+
+Blur is inside the SVG chain (not CSS) because displacement must operate on already-blurred content — if CSS blur ran after the SVG filter, it would smooth the warping away.
+
+**Reactivity:** Only renders filter defs when `voidEngine.currentTheme?.physics === 'glass'`. Other physics modes get no extra DOM.
+
+**Browser support:**
+
+| Browser | Effect |
+| --- | --- |
+| Chromium (Chrome, Edge, Brave, Opera) | Full displacement + blur (backdrop-filter accepts `url()`) |
+| Firefox / Safari | Graceful fallback to CSS blur-only (backdrop-filter `url()` silently dropped) |
+
+**No props.** Placed once in `Layout.astro` — consumed automatically by `glass-blur` mixin.
+
+---
+
 #### Temporary Themes — Scoped overrides and imperative previews
 
 **Engine:** [src/adapters/void-engine.svelte.ts](src/adapters/void-engine.svelte.ts)
@@ -4298,6 +4322,17 @@ Pure SVG chart components for dashboards and metrics. All charts adapt to atmosp
 
 **Purpose:** Backdrop blur effect (frosted glass) with progressive enhancement.
 **Context:** Falls back gracefully on unsupported browsers via `@supports`.
+
+**Layers (glass physics):**
+
+| Layer | Effect | Details |
+| --- | --- | --- |
+| Base blur | `blur(--physics-blur) saturate(140%)` | All physics modes via `@supports` |
+| Lensed chemistry | `saturate(180%) brightness(1.08) contrast(1.05)` | Glass-only: brightens + saturates backdrop like real glass |
+| Liquid glass | SVG displacement filter (`url(#liquid-glass)`) | Chromium-only progressive enhancement: `feTurbulence` + `feDisplacementMap` warp the frosted backdrop for organic glass refraction. Firefox/Safari silently fall back to blur-only. Requires `<LiquidGlassFilter>` in the DOM (placed in `Layout.astro`). |
+| Specular rim | `inset box-shadow` | Glass-only: bright top hairline + dark bottom hairline |
+
+**Reduced motion:** Displacement is disabled under `prefers-reduced-motion: reduce` (reverts to blur-only).
 
 **Usage:**
 

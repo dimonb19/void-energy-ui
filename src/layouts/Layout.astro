@@ -3,6 +3,7 @@ import '@styles/global.scss';
 
 import ThemeScript from '@components/core/ThemeScript.astro';
 import UserScript from '@components/core/UserScript.astro';
+import LiquidGlassFilter from '@components/core/LiquidGlassFilter.svelte';
 import Navigation from '@components/Navigation.svelte';
 import Modal from '@components/Modal.svelte';
 import Toast from '@components/Toast.svelte';
@@ -36,6 +37,7 @@ const { title = 'Void Energy UI', breadcrumbs } = Astro.props;
     <UserScript />
   </head>
   <body data-has-breadcrumbs={breadcrumbs && breadcrumbs.length > 0 ? '' : undefined}>
+    <LiquidGlassFilter client:load />
     <a href="#main-content" class="skip-link">Skip to main content</a>
     <Navigation client:load pathname={Astro.url.pathname} breadcrumbs={breadcrumbs} />
 
