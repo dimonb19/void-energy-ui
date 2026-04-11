@@ -2,11 +2,11 @@
 
 > Restructure Void Energy into its production home: a public monorepo following Pattern A, producing two npm packages, housing the showcase site, and providing the starter template.
 
-**Status:** Planning — blocked on Phase 1 completion
-**Priority:** Phase 2 (after Ambient Layers ship)
-**Depends on:** Phase 1 (Ambient Layers complete and self-contained)
-**Blocks:** Phase 3 (CoNexus migration)
-**Related:** [phase-2-premium-packages.md](phase-2-premium-packages.md), [phase-2-ai-automation.md](phase-2-ai-automation.md)
+**Status:** Planning — blocked on Phase 1 (L0) and Phase 2 (L2) completion
+**Priority:** Phase 3 (after L0 preset and L2 AI automation ship)
+**Depends on:** Phase 1 (L0 Tailwind Preset), Phase 2 (AI Automation Foundation)
+**Blocks:** Phase 4 (CoNexus migration)
+**Related:** [phase-3-premium-packages.md](phase-3-premium-packages.md), [phase-2-ai-automation.md](phase-2-ai-automation.md)
 
 ---
 
@@ -14,7 +14,8 @@
 
 Transform the current two-repo situation (`void-energy-ui` monorepo + standalone `void-energy-starter`) into a single public monorepo at `github.com/dgrslabs/void-energy` that:
 
-- Houses the `void-energy` library as a workspace package
+- Houses the `void-energy` library (L1) as a workspace package
+- Houses the `@void-energy/tailwind` preset (L0) as a workspace package
 - Houses the `create-void-energy` scaffolder as a workspace package
 - Houses the `apps/showcase` site (current `void.dgrslabs.ink`) as a workspace app
 - Houses the `apps/starter-template` as a workspace app that doubles as the scaffolder's payload
@@ -93,7 +94,22 @@ github.com/dgrslabs/void-energy                PUBLIC (BSL 1.1)
 │
 ├── packages/
 │   │
-│   ├── void-energy/                            ← THE LIBRARY (published to npm)
+│   ├── void-energy-tailwind/                   ← L0: TAILWIND PRESET (published to npm as @void-energy/tailwind)
+│   │   ├── package.json                          { "name": "@void-energy/tailwind" }
+│   │   ├── CLAUDE.md                             L0-specific rules (no Svelte, no SCSS, pure CSS + JS)
+│   │   ├── src/
+│   │   │   ├── runtime.ts                        vanilla JS runtime (~2-3kb)
+│   │   │   └── preset.js                         Tailwind v4 preset configuration
+│   │   ├── dist/                                 generated CSS output (from build:l0)
+│   │   │   ├── preset.css                        foundation tokens as :root variables
+│   │   │   ├── atmospheres/                      per-atmosphere CSS overrides
+│   │   │   ├── physics/                          per-physics CSS overrides
+│   │   │   ├── density.css                       density scaling
+│   │   │   └── typography.css                    font scale with clamp()
+│   │   ├── TOKEN-REFERENCE.md                    complete token vocabulary for AI agents
+│   │   └── README.md
+│   │
+│   ├── void-energy/                            ← L1: THE LIBRARY (published to npm)
 │   │   ├── package.json                          { "name": "void-energy" }
 │   │   ├── CLAUDE.md                             system-level rules
 │   │   ├── CHEAT-SHEET.md                        component + action catalog

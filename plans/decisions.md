@@ -199,6 +199,73 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 ---
 
+---
+
+## D19 — Layer architecture: L0 / L1 / L2
+
+**Decision:** Void Energy's value is decomposed into three independent layers:
+- **L0** — framework-agnostic design system brain (`@void-energy/tailwind`). Tokens, atmospheres, physics, density. Pure CSS + vanilla JS.
+- **L1** — Svelte 5 component library (`void-energy`). 40+ components with constraint enforcement. The actual product.
+- **L2** — AI pipeline (CLAUDE.md, registry, recipes). Turns L1 into an automated frontend engine.
+
+**Why:** VE is currently Svelte-only, which limits reach to ~3% of frontend developers. The token system (atmospheres, physics, density) is pure CSS custom properties with zero framework dependency — it can be extracted without losing fidelity. Separating the brain (L0) from the body (L1) lets VE sit *underneath* other component libraries instead of competing with them. "shadcn + VE" instead of "shadcn vs VE." L0 is the gateway to L1; L2 is the moat that only works on top of L1.
+
+**How to apply:** L0 ships as a separate npm package from the same public monorepo. L0 and L1 share the same `design-tokens.ts` SSOT. L0 imports nothing from L1. L2 only references L1 components and patterns.
+
+---
+
+## D20 — L0 ships as `@void-energy/tailwind`, not inside `void-energy`
+
+**Decision:** the framework-agnostic preset is a separate package (`@void-energy/tailwind`), not a sub-export of `void-energy`.
+
+**Why:** consumers who only want tokens should not install Svelte as a peer dependency. Keeping L0 as a separate package means its dependency graph is: Tailwind CSS v4, nothing else. A React developer never sees Svelte in their `node_modules`. The package name also signals clearly what it is — a Tailwind preset, not a component library.
+
+**How to apply:** both packages live in the public monorepo (`packages/void-energy/` and `packages/void-energy-tailwind/`). Published independently to npm. The monorepo structure in [phase-3-monorepo-structure.md](phase-3-monorepo-structure.md) updated to include L0 as a workspace package.
+
+---
+
+## D21 — No L0.5 (CSS component classes)
+
+**Decision:** do NOT build a CSS-only component layer (`.ve-button`, `.ve-card`, etc.) between L0 tokens and L1 Svelte components.
+
+**Why:** L0.5 would create two component systems to maintain in perpetual sync. CSS classes cannot enforce composition constraints (TypeScript props, slot contracts, data-state protocol) — the enforcement that makes L1 valuable is framework-level, not style-level. L0.5 also creates an upgrade off-ramp: someone using `.ve-button` CSS classes has less reason to upgrade to L1, not more, because they already "have VE components." L0 deliberately doesn't give you components, which creates pull toward L1. Additionally, the CSS component framework market (Bootstrap, DaisyUI, Pico) is brutally competitive with minimal differentiation opportunity.
+
+**How to apply:** if someone asks for CSS components, point them to L0 (tokens) + their preferred component library (shadcn, Radix, etc.). The answer is "use our design system brain with your own body."
+
+---
+
+## D22 — L0 Phase 1, L2 Phase 2 (replaces Ambient Layers as Phase 1)
+
+**Decision:** Phase 1 is now the L0 Tailwind preset extraction. Phase 2 is the L2 AI automation foundation. Ambient Layers (previously Phase 1) is complete and shipped.
+
+**Why:** with Ambient Layers done, the next highest-leverage move is expanding VE's addressable market. L0 is low effort (the token system already exists and is well-structured for extraction) with outsized reach (millions of Tailwind users across every framework). L2 depends on understanding the L0/L1 split to provide correct context at each layer.
+
+**How to apply:** see [phase-1-l0-tailwind-preset.md](phase-1-l0-tailwind-preset.md) and [phase-2-ai-automation.md](phase-2-ai-automation.md).
+
+---
+
+## D23 — L0 includes only free atmospheres
+
+**Decision:** `@void-energy/tailwind` ships with 4 atmosphere CSS files: Frost (glass/dark), Slate (flat/dark), Terminal (retro/dark), Meridian (flat/light). The 12 DGRS atmospheres remain premium-only.
+
+**Why:** the free tier must demonstrate all 3 physics presets + both color modes without any "buy the atmosphere pack" upsell. The AI atmosphere generator (future) lets anyone create unlimited custom atmospheres. Premium atmospheres are additive luxury, not gated necessity. This matches D10 (free vs premium split).
+
+**How to apply:** L0's build script generates CSS only for the 4 free atmospheres. Premium atmospheres ship separately via `@dgrslabs/void-energy-dgrs` (which can optionally produce L0-compatible CSS files for its atmospheres in the future).
+
+---
+
+---
+
+## D24 — Tailwind v4 migration before L0 extraction (Phase 0)
+
+**Decision:** Migrate the existing L1 codebase from Tailwind v3.4 to v4 as Phase 0, before extracting L0.
+
+**Why:** L0 must target v4's CSS-first `@theme` API (that's how presets work in v4). Running L1 on v3 while building L0 for v4 means maintaining two Tailwind integration approaches and cannot validate the `@theme` block against the running system. The migration is low risk: zero `@apply` directives, zero `@tailwindcss` directives, all theme values already reference CSS variables. The changes are config-level only — no template or SCSS modifications.
+
+**How to apply:** See [phase-0-tailwind-v4-migration.md](phase-0-tailwind-v4-migration.md). Replace `tailwind.config.mjs` with a CSS `@theme` block. Drop `@tailwindcss/container-queries` (built-in) and `autoprefixer` (built-in). One potential risk: `text-*` namespace collision between `--color-main` (color utility) and `--text-*` (font-size utility) — test explicitly during migration.
+
+---
+
 ## Decision summary table
 
 | # | Decision | Status |
@@ -209,7 +276,7 @@ Forcing one to use the other creates friction: `install` users would have to ext
 | D4 | Template payload in `apps/starter-template` | Committed |
 | D5 | Showcase in `apps/showcase` | Committed |
 | D6 | Premium repo uses Pattern A | Committed |
-| D7 | Ambient Layers as dedicated package from day one (Phase 1) | Committed |
+| D7 | Ambient Layers as dedicated package from day one | Committed (shipped) |
 | D8 | AI automation foundation lands in current monorepo (Phase 2) | Committed |
 | D9 | CoNexus migrates last (Phase 4) | Committed |
 | D10 | Free vs premium split | Committed |
@@ -218,6 +285,12 @@ Forcing one to use the other creates friction: `install` users would have to ext
 | D13 | No CI/CD in starter template | Committed |
 | D14 | AI automation via npm package | Committed |
 | D15 | Starter template self-contained | Committed |
-| D16 | Ambient scope: Blood/Snow/Rain/Fog | Committed |
+| D16 | Ambient scope: 4 categories, 35+ effects | Committed (shipped) |
 | D17 | Selective publishing via publishConfig | Committed |
 | D18 | Eric deal: revenue share, no equity | Proposed |
+| D19 | Layer architecture: L0 / L1 / L2 | Committed |
+| D20 | L0 as separate `@void-energy/tailwind` package | Committed |
+| D21 | No L0.5 CSS component classes | Committed |
+| D22 | L0 Phase 1, L2 Phase 2 (Ambient complete) | Committed |
+| D23 | L0 includes only free atmospheres | Committed |
+| D24 | Tailwind v4 migration before L0 (Phase 0) | Committed |
