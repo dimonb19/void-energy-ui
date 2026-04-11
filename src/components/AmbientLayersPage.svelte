@@ -327,20 +327,111 @@
     environmentIntensity = v as AmbientIntensity;
   }
 
+  // ── Preset showcase ─────────────────────────────────────────────────
+  interface AmbientPreset {
+    label: string;
+    tagline: string;
+    atmosphere: { variant: AtmosphereLayerId; intensity: AmbientIntensity };
+    environment: { variant: EnvironmentLayerId; intensity: AmbientIntensity };
+    psychology: { variant: PsychologyLayerId; intensity: AmbientIntensity };
+  }
+
+  const presets: AmbientPreset[] = [
+    {
+      label: 'Underwater Underground Serenity',
+      tagline:
+        'Submerged in a buried cavern. Cool displacement drifts through claustrophobic depth while pale stillness settles over everything.',
+      atmosphere: { variant: 'underwater', intensity: 'medium' },
+      environment: { variant: 'underground', intensity: 'medium' },
+      psychology: { variant: 'serenity', intensity: 'light' },
+    },
+    {
+      label: 'Storm Dusk Tension',
+      tagline:
+        'A hostile sky tears open at sundown. Lightning cracks through dying orange light while pressure builds from the edges.',
+      atmosphere: { variant: 'storm', intensity: 'heavy' },
+      environment: { variant: 'dusk', intensity: 'medium' },
+      psychology: { variant: 'tension', intensity: 'medium' },
+    },
+    {
+      label: 'Ash Dawn Serenity',
+      tagline:
+        'Embers tumble through a pale sunrise. The aftermath glows with fragile warmth — destruction giving way to quiet transcendence.',
+      atmosphere: { variant: 'ash', intensity: 'medium' },
+      environment: { variant: 'dawn', intensity: 'medium' },
+      psychology: { variant: 'serenity', intensity: 'medium' },
+    },
+    {
+      label: 'Fireflies Night Calm',
+      tagline:
+        'Soft drifting lights pulse through cool darkness. A summer clearing after the world has gone quiet — earned rest.',
+      atmosphere: { variant: 'fireflies', intensity: 'heavy' },
+      environment: { variant: 'night', intensity: 'light' },
+      psychology: { variant: 'calm', intensity: 'light' },
+    },
+    {
+      label: 'Fog Sickly Melancholy',
+      tagline:
+        'Mist banks roll through a plague-tinted haze. Something is wrong here — the air itself carries grief and quiet decay.',
+      atmosphere: { variant: 'fog', intensity: 'heavy' },
+      environment: { variant: 'sickly', intensity: 'medium' },
+      psychology: { variant: 'melancholy', intensity: 'medium' },
+    },
+  ];
+
+  const presetOptions = presets.map((p, i) => ({
+    value: i,
+    label: p.label,
+  }));
+
+  let presetIndex = $state<number | null>(null);
+  let presetKey = $state(0);
+
+  const activePreset = $derived(
+    presetIndex !== null ? presets[presetIndex] : null,
+  );
+
+  function setPreset(v: string | number | null) {
+    // Clear individual layer controls when switching to a preset
+    atmosphereEnabled = false;
+    psychologyEnabled = false;
+    environmentEnabled = false;
+    presetIndex = v as number | null;
+    presetKey++;
+  }
+
+  function clearPreset() {
+    presetIndex = null;
+  }
+
+  // ── Preset action one-shots ────────────────────────────────────────
+  let presetActionVariant = $state<ActionLayerId>('glitch');
+  let presetActionActive = $state(false);
+  let presetActionFireKey = $state(0);
+
+  function firePresetAction(v: ActionLayerId) {
+    presetActionVariant = v;
+    presetActionFireKey++;
+    presetActionActive = true;
+  }
+
   // Switcher coerces to string|number; wrap setters for type narrowing.
   // Selecting any variant activates that section's layer.
   function setAtmosphereVariant(v: string | number | null) {
+    presetIndex = null; // clear preset when using individual controls
     atmosphereVariant = v as AtmosphereLayerId;
     atmosphereEnabled = true;
     // Remount so decay restarts from full intensity on the new variant.
     atmosphereReplayKey++;
   }
   function setPsychologyVariant(v: string | number | null) {
+    presetIndex = null;
     psychologyVariant = v as PsychologyLayerId;
     psychologyEnabled = true;
     psychologyReplayKey++;
   }
   function setEnvironmentVariant(v: string | number | null) {
+    presetIndex = null;
     environmentVariant = v as EnvironmentLayerId;
     environmentEnabled = true;
   }
@@ -417,6 +508,35 @@
   {/key}
 {/if}
 
+{#if activePreset}
+  {#key presetKey}
+    <EnvironmentLayer
+      variant={activePreset.environment.variant}
+      intensity={activePreset.environment.intensity}
+    />
+    <AtmosphereLayer
+      variant={activePreset.atmosphere.variant}
+      intensity={activePreset.atmosphere.intensity}
+      durationMs={0}
+    />
+    <PsychologyLayer
+      variant={activePreset.psychology.variant}
+      intensity={activePreset.psychology.intensity}
+      durationMs={0}
+    />
+  {/key}
+{/if}
+
+{#if presetActionActive}
+  {#key presetActionFireKey}
+    <ActionLayer
+      variant={presetActionVariant}
+      intensity="heavy"
+      onEnd={() => (presetActionActive = false)}
+    />
+  {/key}
+{/if}
+
 <div class="container flex flex-col gap-2xl py-2xl">
   <header class="flex flex-col gap-lg items-center text-center">
     <h1 class="text-primary">Ambient Layers</h1>
@@ -426,6 +546,93 @@
       hour — all behind your content, never in its way.
     </p>
   </header>
+
+  <section class="flex flex-col gap-xl">
+    <div class="surface-raised p-lg flex flex-col gap-lg">
+      <div class="flex flex-col gap-xs">
+        <h3>Preset Scenes</h3>
+        <p class="text-dim">
+          Curated combinations of weather, environment, and psychology layers
+          firing together. Each preset is a creative starting point &mdash; pick
+          one to feel how layers compose into a unified scene.
+        </p>
+      </div>
+
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <Switcher
+          class="text-center"
+          label="Preset"
+          options={presetOptions}
+          value={presetIndex}
+          onchange={setPreset}
+        />
+
+        <p use:morph class="text-caption text-dim text-center min-h-control">
+          {#if activePreset}
+            {activePreset.tagline}
+          {:else}
+            <span class="text-mute">Choose a preset to set the scene</span>
+          {/if}
+        </p>
+
+        {#if activePreset}
+          <div
+            use:morph
+            class="flex flex-wrap gap-md justify-center text-caption text-mute"
+          >
+            <span>
+              Atmosphere: <strong class="text-main"
+                >{activePreset.atmosphere.variant}</strong
+              >
+              ({activePreset.atmosphere.intensity})
+            </span>
+            <span>
+              Environment: <strong class="text-main"
+                >{activePreset.environment.variant}</strong
+              >
+              ({activePreset.environment.intensity})
+            </span>
+            <span>
+              Psychology: <strong class="text-main"
+                >{activePreset.psychology.variant}</strong
+              >
+              ({activePreset.psychology.intensity})
+            </span>
+          </div>
+        {/if}
+      </div>
+
+      <div class="flex flex-col gap-sm">
+        <h5>Action Effects</h5>
+        <p class="text-small text-mute">
+          One-shot transient effects that punch through the frame and
+          auto-clear. Fire them on top of any active preset.
+        </p>
+        <div
+          class="surface-sunk p-md flex flex-row flex-wrap gap-md justify-center"
+        >
+          <button class="btn" onclick={() => firePresetAction('glitch')}>
+            Glitch
+          </button>
+          <button class="btn" onclick={() => firePresetAction('flash')}>
+            Flash
+          </button>
+          <button class="btn" onclick={() => firePresetAction('zoomBurst')}>
+            Zoom Burst
+          </button>
+        </div>
+      </div>
+
+      {#if activePreset}
+        <ActionBtn
+          icon={Remove}
+          text="Clear scene"
+          class="btn-ghost btn-error"
+          onclick={clearPreset}
+        />
+      {/if}
+    </div>
+  </section>
 
   <section class="flex flex-col gap-xl">
     <div class="surface-raised p-lg flex flex-col gap-lg">

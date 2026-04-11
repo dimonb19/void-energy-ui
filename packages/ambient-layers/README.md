@@ -1,6 +1,6 @@
 # @dgrslabs/void-energy-ambient-layers
 
-Full-viewport ambient overlay system for Void Energy hosts and standalone consumers. Four composable layer categories — **Atmosphere**, **Psychology**, **Action**, **Environment** — with 37 effects across weather, mood, impact, and color grading. Physics-aware, reduced-motion-safe, and driven by a unified `variant` + `intensity` vocabulary.
+Full-viewport ambient overlay system for Void Energy hosts and standalone consumers. Four composable layer categories — **Atmosphere**, **Psychology**, **Action**, **Environment** — with 39 effects across weather, mood, impact, and color grading. Physics-aware, reduced-motion-safe, and driven by a unified `variant` + `intensity` vocabulary.
 
 > **Private package** — distributed via private npm registry. Not published to the public npm registry.
 
@@ -109,7 +109,7 @@ Per-variant tuning (default duration, particle counts, intensity ladders) lives 
 
 ## Effects
 
-### Atmosphere (8)
+### Atmosphere (10)
 
 Weather and physical sensory overlays. Persistent with auto-decay. Particle fields use three parallax depth bands; SVG-filter variants use real displacement.
 
@@ -123,6 +123,8 @@ Weather and physical sensory overlays. Persistent with auto-decay. Particle fiel
 | `fog` | Volumetric turbulence: vertical gradient + two masked banks | Mystery, liminal spaces, dream logic |
 | `underwater` | Soft SVG displacement + cool tint + drifting caustics | Submerged scenes, dreaming, drowning |
 | `heat` | Real SVG displacement melt + warm wash | Desert, fire aftermath, fever |
+| `spores` | Tiny motes drifting in Brownian motion, rise + wobble | Alien forest, fungal environment, biological hazard |
+| `fireflies` | Hovering point emitters with discrete pulse pattern | Enchanted forest, summer night, wonder |
 
 ### Psychology (12)
 
