@@ -1,12 +1,12 @@
-# Phase 2 — Premium Packages Repo
+# Phase 3 — Premium Packages Repo
 
 > Create the private `dgrslabs/void-energy-premium` monorepo and populate it with the four premium packages: Kinetic Text, DGRS, Ambient, and Rive.
 
-**Status:** Planning — blocked on Phase 1 completion
-**Priority:** Phase 2 (parallel to monorepo restructure)
-**Depends on:** Phase 1 (Ambient Layers complete), Phase 2 public monorepo (for `void-energy` as a dependency)
-**Blocks:** Phase 3 (CoNexus imports premium from this repo)
-**Related:** [phase-2-monorepo-structure.md](phase-2-monorepo-structure.md)
+**Status:** Planning — blocked on Phase 2 completion
+**Priority:** Phase 3 (parallel to public monorepo restructure)
+**Depends on:** Phase 1 (L0 Tailwind Preset shipped), Phase 2 (AI Automation Foundation landed), Phase 3 public monorepo (for `void-energy` as a dependency). Ambient Layers is already complete and ships in its current location.
+**Blocks:** Phase 4 (CoNexus imports premium from this repo)
+**Related:** [phase-3-monorepo-structure.md](phase-3-monorepo-structure.md)
 
 ---
 
@@ -282,7 +282,7 @@ The public repo's `.npmrc` (not committed) authenticates to GitHub Packages so V
 2. **Scaffold the workspace structure:** root `package.json`, `packages/` folders, shared tooling
 3. **Migrate Kinetic Text first** — it already exists, move is mostly mechanical
 4. **Migrate DGRS second** — extract 12 atmospheres + UI components from the current monorepo
-5. **Migrate Ambient third** — lift `src/ambient/` from Phase 1's location
+5. **Migrate Ambient third** — lift from `packages/ambient-layers/` (already complete and in its package structure)
 6. **Scaffold Rive fourth** — placeholder package, reserve the name
 7. **Verify each package builds and publishes to GitHub Packages** (one at a time)
 8. **Wire up the public showcase** to install from the new packages

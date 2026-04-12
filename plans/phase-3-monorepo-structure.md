@@ -1,4 +1,4 @@
-# Phase 2 — Public Monorepo Structure
+# Phase 3 — Public Monorepo Structure
 
 > Restructure Void Energy into its production home: a public monorepo following Pattern A, producing two npm packages, housing the showcase site, and providing the starter template.
 

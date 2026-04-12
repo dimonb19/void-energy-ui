@@ -495,7 +495,7 @@ function glowParams(rng: () => number, phase: number): CharEffectParams {
   // Actual glow — brightness + drop-shadow cycling. Scale adds subtle swell.
   return {
     ...DEFAULTS,
-    scale: range(rng, 1.03, 1.08),
+    scale: range(rng, 1.04, 1.1),
     delayOffset: phase * 400 + range(rng, 0, 60),
     durationMult: range(rng, 0.85, 1.15),
   };

@@ -24,7 +24,7 @@
 
   $effect(() => {
     level = intensity;
-    levelNum = intensity === 'light' ? 1 : intensity === 'medium' ? 2 : 3;
+    levelNum = intensity === 'low' ? 1 : intensity === 'medium' ? 2 : 3;
     onChange?.(intensity);
   });
 
@@ -49,9 +49,9 @@
   // without changing the character of the effect. Values: [min, max] for the
   // feDisplacementMap scale animation (resting-peak-resting).
   const dizzyScale = $derived(
-    intensity === 'light'
+    intensity === 'low'
       ? { min: 6, max: 13, dur: '11s' }
-      : intensity === 'heavy'
+      : intensity === 'high'
         ? { min: 12, max: 26, dur: '9s' }
         : { min: 9, max: 20, dur: '10s' },
   );

@@ -1,7 +1,7 @@
 /**
  * Continuous auto-decay helper for persistent ambient layers.
  *
- * Drives a float value from `initialNum` (light=1, medium=2, heavy=3) down to
+ * Drives a float value from `initialNum` (low=1, medium=2, high=3) down to
  * 0 over `stepMs * initialNum` ms via `requestAnimationFrame`, so the fade is
  * perceptually smooth — no visual jumps between intensity ladder rungs.
  *
@@ -9,7 +9,7 @@
  *   feed `--ambient-level` in the DOM) and the semantic ladder level that
  *   float currently maps to.
  * - `onStep(level)` fires only when the semantic level changes (heavy →
- *   medium → light → off). Mirrors the legacy step-based callback so
+ *   medium → low → off). Mirrors the legacy step-based callback so
  *   consumers can still react to threshold crossings (e.g. `onChange`).
  * - `onComplete` fires once when the value reaches 0.
  *
@@ -27,16 +27,16 @@ export interface DecayHandle {
 }
 
 const NUM: Record<AmbientIntensity, number> = {
-  light: 1,
+  low: 1,
   medium: 2,
-  heavy: 3,
+  high: 3,
 };
 
 function toLevel(value: number): AmbientLevel {
   if (value <= 0.0001) return 'off';
-  if (value <= 1) return 'light';
+  if (value <= 1) return 'low';
   if (value <= 2) return 'medium';
-  return 'heavy';
+  return 'high';
 }
 
 export function startDecay(

@@ -36,13 +36,13 @@ No runtime dependencies. No host adapter required — layers read the global `<h
 </script>
 
 <EnvironmentLayer variant="night" intensity="medium" />
-<AtmosphereLayer variant="rain" intensity="heavy" />
+<AtmosphereLayer variant="rain" intensity="high" />
 <PsychologyLayer variant="tension" intensity="medium" />
 
 {#if showImpact}
   <ActionLayer
     variant="impact"
-    intensity="heavy"
+    intensity="high"
     onEnd={() => (showImpact = false)}
   />
 {/if}
@@ -84,7 +84,7 @@ Each category has a distinct lifetime model and a dedicated z-lane. They compose
 
 ### Lifetime semantics
 
-- **Persistent + decay** (Atmosphere, Psychology): mounts at the given `intensity`, then steps down `heavy → medium → light → off` every `durationMs` ms. Set `durationMs={0}` to disable decay and stay sticky at the starting intensity.
+- **Persistent + decay** (Atmosphere, Psychology): mounts at the given `intensity`, then steps down `high → medium → low → off` every `durationMs` ms. Set `durationMs={0}` to disable decay and stay sticky at the starting intensity.
 - **One-shot** (Action): plays once for `durationMs` (per-variant, per-intensity), then auto-unmounts. Intensity scales amplitude via the `--ambient-level` CSS variable.
 - **Sticky** (Environment): no decay, no animation lifecycle. Tint persists until the prop is changed or the component unmounts.
 
@@ -95,7 +95,7 @@ All four layer components accept the same props interface. Only the `variant` un
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `variant` | category-specific union | — | **Required.** Picks the concrete effect within the category. |
-| `intensity` | `'light' \| 'medium' \| 'heavy'` | `'medium'` | Intensity level. Scales opacity, particle counts, or animation amplitude depending on category. |
+| `intensity` | `'low' \| 'medium' \| 'high'` | `'medium'` | Intensity level. Scales opacity, particle counts, or animation amplitude depending on category. |
 | `durationMs` | `number` | per-variant | Persistent: time per decay step. Action: total animation duration. Environment: ignored. Set to `0` on persistent layers to disable decay. |
 | `enabled` | `boolean` | `true` | When `false`, the layer is not rendered. |
 | `reducedMotion` | `'respect' \| 'ignore'` | `'respect'` | `'respect'` freezes animations and halves opacity when the OS prefers reduced motion. `'ignore'` plays regardless. |
@@ -147,7 +147,7 @@ Edge-framed emotional and mental states. Persistent with auto-decay. Rendered as
 
 ### Action (8)
 
-Transient one-shot beats. Auto-unmount when `durationMs` expires. Intensity modulates amplitude through `--ambient-level` (`1` light, `2` medium, `3` heavy).
+Transient one-shot beats. Auto-unmount when `durationMs` expires. Intensity modulates amplitude through `--ambient-level` (`1` low, `2` medium, `3` high).
 
 | Variant | Description | Use Case |
 |---|---|---|
@@ -184,7 +184,7 @@ Ambient Layers has **no director or manager** — composition is consumer-owned.
 
 ```svelte
 <EnvironmentLayer variant="night" />
-<AtmosphereLayer variant="storm" intensity="heavy" durationMs={0} />
+<AtmosphereLayer variant="storm" intensity="high" durationMs={0} />
 <PsychologyLayer variant="tension" intensity="medium" />
 ```
 
@@ -196,10 +196,10 @@ Ambient Layers has **no director or manager** — composition is consumer-owned.
 </script>
 
 <EnvironmentLayer variant="dawn" />
-<AtmosphereLayer variant="fog" intensity="light" />
+<AtmosphereLayer variant="fog" intensity="low" />
 
 {#key impactKey}
-  <ActionLayer variant="impact" intensity="heavy" />
+  <ActionLayer variant="impact" intensity="high" />
 {/key}
 
 <button onclick={() => impactKey++}>Fire impact</button>
@@ -212,13 +212,13 @@ Incrementing `impactKey` remounts the Action layer, firing the one-shot again. A
 ```svelte
 <PsychologyLayer
   variant="danger"
-  intensity="heavy"
+  intensity="high"
   onChange={(level) => console.log('danger →', level)}
   onEnd={() => console.log('danger cleared')}
 />
 ```
 
-`onChange` fires on every step (`heavy → medium → light → off`); `onEnd` fires once when the layer reaches `off`.
+`onChange` fires on every step (`high → medium → low → off`); `onEnd` fires once when the layer reaches `off`.
 
 ### Disabling auto-decay
 

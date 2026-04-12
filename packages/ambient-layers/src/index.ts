@@ -18,10 +18,10 @@
  * </script>
  *
  * <EnvironmentLayer variant="night" />
- * <AtmosphereLayer variant="rain" intensity="heavy" />
+ * <AtmosphereLayer variant="rain" intensity="high" />
  * <PsychologyLayer variant="danger" intensity="medium" />
  * {#if showImpact}
- *   <ActionLayer variant="impact" intensity="heavy" onComplete={() => showImpact = false} />
+ *   <ActionLayer variant="impact" intensity="high" onComplete={() => showImpact = false} />
  * {/if}
  * ```
  *

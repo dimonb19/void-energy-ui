@@ -5,7 +5,7 @@
 ### Breaking — API reconciliation
 
 - **Unified intensity prop.** `EnvironmentLayer` now takes
-  `intensity: 'light' | 'medium' | 'heavy'` (default `'medium'`); the previous
+  `intensity: 'low' | 'medium' | 'high'` (default `'medium'`); the previous
   `opacity` prop is removed. All four categories now share the same intensity
   vocabulary. The CSS variable consumed by the environment SCSS is now
   `--ambient-env-level` (was `--ambient-env-opacity`).

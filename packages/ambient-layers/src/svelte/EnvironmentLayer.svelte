@@ -13,7 +13,7 @@
   // Numeric mirror for SCSS calc() consumers via --ambient-level (1..3),
   // and a 0..1 tint multiplier for opacity-based blocks.
   const levelNum = $derived(
-    intensity === 'light' ? 1 : intensity === 'heavy' ? 3 : 2,
+    intensity === 'low' ? 1 : intensity === 'high' ? 3 : 2,
   );
   const tint = $derived(levelNum / 3);
 

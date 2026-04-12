@@ -10,10 +10,10 @@ The AI returns these fields per story step. All are optional — omitted fields 
 
 ```json
 {
-  "atmosphere": { "variant": "storm", "intensity": "heavy" },
-  "environment": { "variant": "night", "intensity": "heavy" },
+  "atmosphere": { "variant": "storm", "intensity": "high" },
+  "environment": { "variant": "night", "intensity": "high" },
   "psychology": { "variant": "tension", "intensity": "medium" },
-  "action": { "variant": "impact", "intensity": "heavy" }
+  "action": { "variant": "impact", "intensity": "high" }
 }
 ```
 
@@ -30,9 +30,9 @@ All four categories use the same scale:
 
 | Value | Meaning |
 |-------|---------|
-| `"light"` | Subtle, hint, background presence |
+| `"low"` | Subtle, hint, background presence |
 | `"medium"` | Clear, noticeable, standard weight |
-| `"heavy"` | Dominant, overwhelming, maximum impact |
+| `"high"` | Dominant, overwhelming, maximum impact |
 
 Default when omitted: `"medium"`.
 
@@ -42,11 +42,11 @@ The client maintains ambient state across story steps. The AI only needs to spec
 
 ```json
 // Step 1: set the scene
-{ "environment": { "variant": "night", "intensity": "heavy" },
-  "atmosphere": { "variant": "rain", "intensity": "light" } }
+{ "environment": { "variant": "night", "intensity": "high" },
+  "atmosphere": { "variant": "rain", "intensity": "low" } }
 
 // Step 2: rain intensifies — environment stays, only atmosphere changes
-{ "atmosphere": { "variant": "rain", "intensity": "heavy" } }
+{ "atmosphere": { "variant": "rain", "intensity": "high" } }
 
 // Step 3: rain stops, tension rises — clear atmosphere, add psychology
 { "atmosphere": null,
@@ -62,7 +62,7 @@ The client maintains ambient state across story steps. The AI only needs to spec
 - **Environment** never decays. Night stays night until the AI changes it.
 - **Action** fires once and disappears. No persistence.
 
-If the AI sets `"heavy"` rain at a dramatic beat, the reader experiences intense rain that naturally subsides. For sustained weather, the client can disable decay — but the AI doesn't control this.
+If the AI sets `"high"` rain at a dramatic beat, the reader experiences intense rain that naturally subsides. For sustained weather, the client can disable decay — but the AI doesn't control this.
 
 ---
 
@@ -196,36 +196,36 @@ Complete ambient configurations for common story scenarios. Copy-paste ready for
 ### Horror — Something in the dark
 ```json
 {
-  "environment": { "variant": "night", "intensity": "heavy" },
+  "environment": { "variant": "night", "intensity": "high" },
   "atmosphere": { "variant": "fog", "intensity": "medium" },
-  "psychology": { "variant": "danger", "intensity": "light" }
+  "psychology": { "variant": "danger", "intensity": "low" }
 }
 ```
 
 ### Horror — Jump scare beat
 ```json
 {
-  "psychology": { "variant": "tension", "intensity": "heavy" },
-  "action": { "variant": "shake", "intensity": "heavy" }
+  "psychology": { "variant": "tension", "intensity": "high" },
+  "action": { "variant": "shake", "intensity": "high" }
 }
 ```
 
 ### Storm climax
 ```json
 {
-  "environment": { "variant": "night", "intensity": "heavy" },
-  "atmosphere": { "variant": "storm", "intensity": "heavy" },
-  "psychology": { "variant": "tension", "intensity": "heavy" },
-  "action": { "variant": "flash", "intensity": "heavy" }
+  "environment": { "variant": "night", "intensity": "high" },
+  "atmosphere": { "variant": "storm", "intensity": "high" },
+  "psychology": { "variant": "tension", "intensity": "high" },
+  "action": { "variant": "flash", "intensity": "high" }
 }
 ```
 
 ### Peaceful forest night
 ```json
 {
-  "environment": { "variant": "night", "intensity": "light" },
+  "environment": { "variant": "night", "intensity": "low" },
   "atmosphere": { "variant": "fireflies", "intensity": "medium" },
-  "psychology": { "variant": "serenity", "intensity": "light" }
+  "psychology": { "variant": "serenity", "intensity": "low" }
 }
 ```
 
@@ -233,7 +233,7 @@ Complete ambient configurations for common story scenarios. Copy-paste ready for
 ```json
 {
   "environment": { "variant": "night", "intensity": "medium" },
-  "atmosphere": { "variant": "underwater", "intensity": "heavy" },
+  "atmosphere": { "variant": "underwater", "intensity": "high" },
   "psychology": { "variant": "focus", "intensity": "medium" }
 }
 ```
@@ -241,8 +241,8 @@ Complete ambient configurations for common story scenarios. Copy-paste ready for
 ### Post-apocalypse wasteland
 ```json
 {
-  "environment": { "variant": "overcast", "intensity": "heavy" },
-  "atmosphere": { "variant": "ash", "intensity": "heavy" },
+  "environment": { "variant": "overcast", "intensity": "high" },
+  "atmosphere": { "variant": "ash", "intensity": "high" },
   "psychology": { "variant": "melancholy", "intensity": "medium" }
 }
 ```
@@ -250,8 +250,8 @@ Complete ambient configurations for common story scenarios. Copy-paste ready for
 ### Cyberpunk street
 ```json
 {
-  "environment": { "variant": "neon", "intensity": "heavy" },
-  "atmosphere": { "variant": "rain", "intensity": "light" },
+  "environment": { "variant": "neon", "intensity": "high" },
+  "atmosphere": { "variant": "rain", "intensity": "low" },
   "psychology": null
 }
 ```
@@ -260,7 +260,7 @@ Complete ambient configurations for common story scenarios. Copy-paste ready for
 ```json
 {
   "environment": { "variant": "dusk", "intensity": "medium" },
-  "atmosphere": { "variant": "heat", "intensity": "heavy" },
+  "atmosphere": { "variant": "heat", "intensity": "high" },
   "psychology": null
 }
 ```
@@ -270,23 +270,23 @@ Complete ambient configurations for common story scenarios. Copy-paste ready for
 {
   "environment": { "variant": "sickly", "intensity": "medium" },
   "atmosphere": { "variant": "spores", "intensity": "medium" },
-  "psychology": { "variant": "haze", "intensity": "light" }
+  "psychology": { "variant": "haze", "intensity": "low" }
 }
 ```
 
 ### Cave exploration
 ```json
 {
-  "environment": { "variant": "underground", "intensity": "heavy" },
-  "atmosphere": { "variant": "fog", "intensity": "light" },
-  "psychology": { "variant": "focus", "intensity": "light" }
+  "environment": { "variant": "underground", "intensity": "high" },
+  "atmosphere": { "variant": "fog", "intensity": "low" },
+  "psychology": { "variant": "focus", "intensity": "low" }
 }
 ```
 
 ### Candlelit ritual
 ```json
 {
-  "environment": { "variant": "candlelit", "intensity": "heavy" },
+  "environment": { "variant": "candlelit", "intensity": "high" },
   "psychology": { "variant": "awe", "intensity": "medium" }
 }
 ```
@@ -295,7 +295,7 @@ Complete ambient configurations for common story scenarios. Copy-paste ready for
 ```json
 {
   "environment": { "variant": "dawn", "intensity": "medium" },
-  "psychology": { "variant": "success", "intensity": "heavy" },
+  "psychology": { "variant": "success", "intensity": "high" },
   "action": { "variant": "reveal", "intensity": "medium" }
 }
 ```
@@ -303,25 +303,25 @@ Complete ambient configurations for common story scenarios. Copy-paste ready for
 ### Character death
 ```json
 {
-  "atmosphere": { "variant": "rain", "intensity": "light" },
-  "psychology": { "variant": "melancholy", "intensity": "heavy" },
-  "action": { "variant": "dissolve", "intensity": "heavy" }
+  "atmosphere": { "variant": "rain", "intensity": "low" },
+  "psychology": { "variant": "melancholy", "intensity": "high" },
+  "action": { "variant": "dissolve", "intensity": "high" }
 }
 ```
 
 ### Chase / Action sequence
 ```json
 {
-  "atmosphere": { "variant": "wind", "intensity": "heavy" },
-  "psychology": { "variant": "focus", "intensity": "heavy" },
-  "action": { "variant": "speed", "intensity": "heavy" }
+  "atmosphere": { "variant": "wind", "intensity": "high" },
+  "psychology": { "variant": "focus", "intensity": "high" },
+  "action": { "variant": "speed", "intensity": "high" }
 }
 ```
 
 ### Waking up confused
 ```json
 {
-  "environment": { "variant": "overcast", "intensity": "light" },
+  "environment": { "variant": "overcast", "intensity": "low" },
   "psychology": { "variant": "dizzy", "intensity": "medium" }
 }
 ```
@@ -347,7 +347,7 @@ Complete ambient configurations for common story scenarios. Copy-paste ready for
 
 5. **Psychology should match the character's state, not the weather.** Rain doesn't require `"melancholy"`. A character can feel `"calm"` in a storm or `"danger"` on a sunny day.
 
-6. **Intensity escalation = narrative arc.** Start a scene at `"light"`, build to `"heavy"` at the climax, then let auto-decay handle the comedown. Don't jump straight to `"heavy"` every step.
+6. **Intensity escalation = narrative arc.** Start a scene at `"low"`, build to `"high"` at the climax, then let auto-decay handle the comedown. Don't jump straight to `"high"` every step.
 
 7. **Empty object `{}` is valid.** Not every step needs ambient changes. Let the previous state persist and the auto-decay do its work.
 
@@ -370,4 +370,4 @@ Complete ambient configurations for common story scenarios. Copy-paste ready for
 `"dawn"` `"dusk"` `"candlelit"` `"night"` `"neon"` `"overcast"` `"sickly"` `"toxic"` `"underground"`
 
 ### intensity (3)
-`"light"` `"medium"` `"heavy"`
+`"low"` `"medium"` `"high"`

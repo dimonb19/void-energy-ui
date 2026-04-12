@@ -16,7 +16,7 @@
  *
  * Field meanings (unified across categories per Phase 1 reconciliation):
  * - `durationMs` — for persistent layers, time per decay step
- *   (heavy → medium → light → off). For action layers, total one-shot
+ *   (high → medium → low → off). For action layers, total one-shot
  *   animation duration. Environment layers ignore duration (sticky).
  * - `defaultIntensity` — the intensity used when the consumer omits the
  *   `intensity` prop. Always `'medium'` today; reserved for future tuning.
@@ -56,59 +56,59 @@ export const ATMOSPHERE_PARAMS: Record<
   rain: {
     defaultIntensity: 'medium',
     durationMs: 8000,
-    counts: { light: 60, medium: 140, heavy: 260 },
+    counts: { low: 60, medium: 140, high: 260 },
   },
   snow: {
     defaultIntensity: 'medium',
     durationMs: 10000,
-    counts: { light: 30, medium: 70, heavy: 140 },
+    counts: { low: 30, medium: 70, high: 140 },
   },
   ash: {
     defaultIntensity: 'medium',
     durationMs: 12000,
-    counts: { light: 20, medium: 50, heavy: 100 },
+    counts: { low: 20, medium: 50, high: 100 },
   },
   fog: {
     defaultIntensity: 'medium',
     durationMs: 12000,
-    counts: { light: 3, medium: 5, heavy: 7 },
+    counts: { low: 3, medium: 5, high: 7 },
   },
   underwater: {
     defaultIntensity: 'medium',
     durationMs: 12000,
-    counts: { light: 4, medium: 6, heavy: 8 },
+    counts: { low: 4, medium: 6, high: 8 },
   },
   heat: {
     defaultIntensity: 'medium',
     durationMs: 10000,
-    counts: { light: 3, medium: 5, heavy: 7 },
+    counts: { low: 3, medium: 5, high: 7 },
   },
   // storm composes the rain particle system internally + lightning + wind drift.
   // Counts intentionally heavier than rain.
   storm: {
     defaultIntensity: 'medium',
     durationMs: 12000,
-    counts: { light: 180, medium: 360, heavy: 640 },
+    counts: { low: 180, medium: 360, high: 640 },
   },
   // wind is a horizontal-streak field (dust/leaves) with no precipitation.
   wind: {
     defaultIntensity: 'medium',
     durationMs: 10000,
-    counts: { light: 30, medium: 60, heavy: 100 },
+    counts: { low: 30, medium: 60, high: 100 },
   },
   // spores — warm drifting motes rising slowly. Sparser than ash — density
   // kills the "floating in sunbeam" feeling. Reuses the particle engine.
   spores: {
     defaultIntensity: 'medium',
     durationMs: 12000,
-    counts: { light: 18, medium: 40, heavy: 80 },
+    counts: { low: 18, medium: 40, high: 80 },
   },
   // fireflies — point-light glows wandering and flickering. Sparsest of all
   // particle fields; density destroys the effect.
   fireflies: {
     defaultIntensity: 'medium',
     durationMs: 14000,
-    counts: { light: 12, medium: 28, heavy: 55 },
+    counts: { low: 12, medium: 28, high: 55 },
   },
 };
 
@@ -135,34 +135,34 @@ export const PSYCHOLOGY_PARAMS: Record<
 export const ACTION_PARAMS: Record<ActionLayer, ActionEffectParams> = {
   impact: {
     defaultIntensity: 'medium',
-    durationMs: { light: 2500, medium: 3500, heavy: 5000 },
+    durationMs: { low: 2500, medium: 3500, high: 5000 },
   },
   speed: {
     defaultIntensity: 'medium',
-    durationMs: { light: 3500, medium: 5000, heavy: 7000 },
+    durationMs: { low: 3500, medium: 5000, high: 7000 },
   },
   glitch: {
     defaultIntensity: 'medium',
-    durationMs: { light: 2500, medium: 3500, heavy: 5000 },
+    durationMs: { low: 2500, medium: 3500, high: 5000 },
   },
   flash: {
     defaultIntensity: 'medium',
-    durationMs: { light: 2000, medium: 3000, heavy: 4500 },
+    durationMs: { low: 2000, medium: 3000, high: 4500 },
   },
   reveal: {
     defaultIntensity: 'medium',
-    durationMs: { light: 2500, medium: 3500, heavy: 5000 },
+    durationMs: { low: 2500, medium: 3500, high: 5000 },
   },
   dissolve: {
     defaultIntensity: 'medium',
-    durationMs: { light: 3000, medium: 4500, heavy: 6000 },
+    durationMs: { low: 3000, medium: 4500, high: 6000 },
   },
   shake: {
     defaultIntensity: 'medium',
-    durationMs: { light: 2500, medium: 3500, heavy: 5000 },
+    durationMs: { low: 2500, medium: 3500, high: 5000 },
   },
   zoomBurst: {
     defaultIntensity: 'medium',
-    durationMs: { light: 2500, medium: 3500, heavy: 5000 },
+    durationMs: { low: 2500, medium: 3500, high: 5000 },
   },
 };

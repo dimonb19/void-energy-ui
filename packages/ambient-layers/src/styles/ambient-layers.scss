@@ -2166,23 +2166,30 @@
   0% {
     transform: scale(0.2) rotate(0deg);
     opacity: 0;
-    filter: blur(0px);
+    filter: blur(0px); // void-ignore — animation start
   }
   18% {
     opacity: calc(var(--ambient-level) * 0.22);
   }
-  60% {
-    opacity: calc(var(--ambient-level) * 0.1);
+  50% {
+    opacity: calc(var(--ambient-level) * 0.08);
     filter: blur(
       calc(var(--ambient-level) * 2px)
     ); // void-ignore — radial motion blur scales with level
+  }
+  70% {
+    transform: scale(calc(2 + var(--ambient-level) * 0.6)) rotate(6deg);
+    opacity: 0;
+    filter: blur(
+      calc(var(--ambient-level) * 3px)
+    ); // void-ignore — radial motion blur capped to avoid rasterization stall
   }
   100% {
     transform: scale(calc(2 + var(--ambient-level) * 0.6)) rotate(6deg);
     opacity: 0;
     filter: blur(
-      calc(var(--ambient-level) * 5px)
-    ); // void-ignore — radial motion blur scales with level
+      calc(var(--ambient-level) * 3px)
+    ); // void-ignore — holds final state invisible
   }
 }
 

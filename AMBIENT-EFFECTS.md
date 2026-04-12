@@ -12,7 +12,7 @@ interface AmbientScene {
   atmosphere?:  AtmosphereVariant  | null;   // persistent weather / sensory
   psychology?:  PsychologyVariant  | null;   // persistent emotional framing
   action?:      ActionVariant      | null;   // transient one-shot beat
-  intensity?:   'light' | 'medium' | 'heavy';
+  intensity?:   'low' | 'medium' | 'high';
 }
 
 type EnvironmentVariant =

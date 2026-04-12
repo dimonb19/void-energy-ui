@@ -292,6 +292,23 @@ The Phase 0a fixes also surfaced the **`@theme inline` vs `@theme reference` dis
 
 ---
 
+## D26 — Mobile deployment via Capacitor + cloud builds (Phase 5)
+
+**Decision:** Ship Void Energy apps to App Store and Google Play using Capacitor as the native WebView wrapper, with cloud build services (Capawesome/Appflow/Codemagic) handling compilation and signing. Deliver as a `ve-app-template` — a ready-to-clone project that builders use without touching native code.
+
+**Why:** VE apps are web apps; app stores require native binaries. Capacitor is the mature, Ionic-backed bridge for this exact use case. Cloud builds eliminate the Mac/Xcode requirement so any team member on any OS can ship to both stores. The template approach means the native configuration is done once by the maintainer, not reinvented per app.
+
+**Key constraints:**
+- Mobile apps use `output: 'static'` (WebView can't run Node); backend stays hosted (Go API / Vercel SSR)
+- Glass physics (`backdrop-filter`) must be tested on mid-range Android before shipping — if it can't sustain 60fps, flat becomes the mobile default
+- Safe-area tokens already exist in `_reset.scss`; layout primitives must consume them
+- Status bar color must sync with the active atmosphere/mode
+- Keyboard resize mode must be `ionic` to avoid breaking `dvh` layouts
+
+**How to apply:** Phase 5 executes after Phase 3 (needs `void-energy` npm package). The plan is written now so Phases 1-3 can account for mobile concerns (L0 safe-area utilities, capacitor helper exports). See [phase-5-mobile-deployment.md](phase-5-mobile-deployment.md).
+
+---
+
 ## Decision summary table
 
 | # | Decision | Status |
@@ -321,3 +338,4 @@ The Phase 0a fixes also surfaced the **`@theme inline` vs `@theme reference` dis
 | D23 | L0 includes only free atmospheres | Committed |
 | D24 | Tailwind v4 migration before L0 (Phase 0) | Committed (shipped) |
 | D25 | Design language modernization before L0 (Phase 0b) | Committed (shipped) |
+| D26 | Mobile deployment via Capacitor + cloud builds (Phase 5) | Planned |

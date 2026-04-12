@@ -79,12 +79,26 @@ Updated the visual language to align with 2025-2026 best practices (MD3, shadcn/
 - [phase-3-monorepo-structure.md](phase-3-monorepo-structure.md) — the public repo shape, workspaces, `npm install` vs `npm create`
 - [phase-3-premium-packages.md](phase-3-premium-packages.md) — the private premium repo and its 4 packages
 
+### Phase 3b — TTS + Kinetic Text Synchronization
+**Why here:** KT needs timeline-driven reveal before CoNexus can build its narrative reading experience. This is a KT premium package enhancement — not repo restructuring (Phase 3) and not CoNexus app code (Phase 4). Separating it keeps Phase 3 focused on infrastructure and Phase 4 focused on the app.
+
+**Deliverable:** `revealMarks` prop on `<KineticText>` for externally-timed reveal, an InWorld TTS adapter, audio-KT synchronizer, and inline effect cue resolver — all shipped as a `@dgrslabs/void-energy-kinetic-text/tts` sub-export.
+
+**Plan:** [phase-3b-tts-kinetic-sync.md](phase-3b-tts-kinetic-sync.md)
+
 ### Phase 4 — CoNexus Migration
 **Why last:** CoNexus is the consumer. It proves the system works end-to-end by importing `void-energy` and premium packages from npm exactly the way any external customer would. Migrating earlier would force architectural decisions based on one app's needs; migrating last keeps the library honest.
 
 **Deliverable:** `dgrslabs/conexus` private repo — a single Svelte/Astro app consuming public `void-energy` from npmjs.org and the premium packages from GitHub Packages.
 
 **Plan:** [phase-4-conexus-migration.md](phase-4-conexus-migration.md)
+
+### Phase 5 — Mobile Deployment (Capacitor)
+**Why here:** App Store and Play Store distribution is critical for the core DGRS app (Go backend) and potentially CoNexus. The plan is written now so Phases 1-3 can account for mobile concerns (L0 safe-area utilities, capacitor helper exports), but execution waits until `void-energy` is published to npm.
+
+**Deliverable:** `ve-app-template` — a ready-to-clone Astro + Svelte + Void Energy + Capacitor project with cloud build scripts. Builders work only in `src/` with Claude Code; native compilation and signing happens in the cloud. No Mac, Xcode, or Android Studio required.
+
+**Plan:** [phase-5-mobile-deployment.md](phase-5-mobile-deployment.md)
 
 ---
 
@@ -156,11 +170,13 @@ All architectural and strategic decisions with rationale are documented in [deci
 | [phase-2-ai-automation.md](phase-2-ai-automation.md) | Phase 2: L2 AI automation foundation in current monorepo |
 | [phase-3-monorepo-structure.md](phase-3-monorepo-structure.md) | Phase 3: public monorepo, npm packages, scaffolder |
 | [phase-3-premium-packages.md](phase-3-premium-packages.md) | Phase 3: private premium repo, KT/DGRS/Ambient/Rive |
+| [phase-3b-tts-kinetic-sync.md](phase-3b-tts-kinetic-sync.md) | Phase 3b: TTS + Kinetic Text sync (InWorld adapter, timeline-driven reveal) |
 | [phase-4-conexus-migration.md](phase-4-conexus-migration.md) | Phase 4: CoNexus as a consumer of the finished system |
+| [phase-5-mobile-deployment.md](phase-5-mobile-deployment.md) | Phase 5: Capacitor mobile template + cloud builds for App Store / Play Store |
 | [archive/](archive/) | Previous plan structure, kept for historical reference |
 
 ---
 
 ## One-Line Priority
 
-**~~Migrate to Tailwind v4~~ ✓ -> ship L0 Tailwind preset -> land L2 AI automation foundation -> restructure into public/premium monorepos + ship npm packages -> migrate CoNexus. One phase at a time, no split focus.**
+**~~Migrate to Tailwind v4~~ ✓ -> ship L0 Tailwind preset -> land L2 AI automation foundation -> restructure into public/premium monorepos + ship npm packages -> TTS + KT sync -> mobile deployment template (Capacitor) -> migrate CoNexus. One phase at a time, no split focus.**

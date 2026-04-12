@@ -29,7 +29,7 @@
   // Re-sync if the consumer changes `intensity` or `variant` prop.
   $effect(() => {
     level = intensity;
-    levelNum = intensity === 'light' ? 1 : intensity === 'medium' ? 2 : 3;
+    levelNum = intensity === 'low' ? 1 : intensity === 'medium' ? 2 : 3;
     onChange?.(intensity);
   });
 

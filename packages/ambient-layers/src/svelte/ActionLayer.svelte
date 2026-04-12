@@ -17,9 +17,9 @@
   const uid = $props.id();
   const glitchFilterId = `ambient-glitch-${uid}`;
 
-  // Maps 'light'|'medium'|'heavy' → 1..3 amplitude multiplier for SCSS via --ambient-level
+  // Maps 'low'|'medium'|'high' → 1..3 amplitude multiplier for SCSS via --ambient-level
   const levelNum = $derived(
-    intensity === 'light' ? 1 : intensity === 'heavy' ? 3 : 2,
+    intensity === 'low' ? 1 : intensity === 'high' ? 3 : 2,
   );
 
   const duration = $derived(
@@ -27,7 +27,7 @@
   );
 
   // RGB-split amplitude in px. Scales with level.
-  const glitchAmp = $derived(levelNum * 3 + 1); // light 4, medium 7, heavy 10
+  const glitchAmp = $derived(levelNum * 3 + 1); // low 4, medium 7, high 10
   // Erratic jitter sequence for R (and mirrored for B). Final value = 0 so it settles.
   const glitchValuesR = $derived(
     `0;-${glitchAmp};${Math.round(glitchAmp * 0.6)};-${Math.round(glitchAmp * 0.9)};${Math.round(glitchAmp * 0.4)};-${Math.round(glitchAmp * 0.7)};${Math.round(glitchAmp * 0.2)};0`,

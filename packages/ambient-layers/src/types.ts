@@ -75,7 +75,7 @@ export type AmbientLayerId =
   | EnvironmentLayer;
 
 /** Persistent-layer intensity scale. Unified vocabulary across every category. */
-export type AmbientIntensity = 'light' | 'medium' | 'heavy';
+export type AmbientIntensity = 'low' | 'medium' | 'high';
 
 /** Decay step including the resting state. */
 export type AmbientLevel = 'off' | AmbientIntensity;
@@ -124,7 +124,7 @@ export interface AtmosphereLayerProps
   extends AmbientBaseProps,
     AmbientLifecycle {
   variant: AtmosphereLayer;
-  /** Intensity level: 'light' | 'medium' | 'heavy'. Default 'medium'. */
+  /** Intensity level: 'low' | 'medium' | 'high'. Default 'medium'. */
   intensity?: AmbientIntensity;
   /**
    * Auto-decay duration in ms per step (heavy → medium → light → off).
@@ -157,6 +157,6 @@ export interface EnvironmentLayerProps
   extends AmbientBaseProps,
     AmbientLifecycle {
   variant: EnvironmentLayer;
-  /** Tint strength: 'light' | 'medium' | 'heavy'. Default 'medium'. */
+  /** Tint strength: 'low' | 'medium' | 'high'. Default 'medium'. */
   intensity?: AmbientIntensity;
 }

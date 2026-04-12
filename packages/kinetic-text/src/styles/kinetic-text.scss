@@ -1494,28 +1494,35 @@
   }
 }
 
-// ── Glow: warm radiance — strong brightness swell + scale ──
+// ── Glow: warm radiance — brightness swell + scale + text-shadow emission ──
 @keyframes kt-effect-glow {
   0%,
   100% {
     transform: scale(1);
     filter: brightness(1);
+    text-shadow: 0 0 0 transparent; // void-ignore
   }
   20% {
     transform: scale(calc(1 + (var(--kt-scale) - 1) * 0.4)); // void-ignore
     filter: brightness(1.2); // void-ignore
+    text-shadow: 0 0 3px currentColor; // void-ignore
   }
   40% {
     transform: scale(var(--kt-scale)); // void-ignore
     filter: brightness(1.5); // void-ignore
+    text-shadow:
+      0 0 6px currentColor,
+      0 0 12px currentColor; // void-ignore
   }
   55% {
     transform: scale(calc(1 + (var(--kt-scale) - 1) * 0.7)); // void-ignore
     filter: brightness(1.35); // void-ignore
+    text-shadow: 0 0 4px currentColor; // void-ignore
   }
   75% {
     transform: scale(calc(1 + (var(--kt-scale) - 1) * 0.15)); // void-ignore
     filter: brightness(1.1); // void-ignore
+    text-shadow: 0 0 1px currentColor; // void-ignore
   }
 }
 

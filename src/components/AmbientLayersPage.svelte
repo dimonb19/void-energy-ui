@@ -239,9 +239,9 @@
     },
   ];
   const actionIntensities: { value: AmbientIntensity; label: string }[] = [
-    { value: 'light', label: 'Light' },
+    { value: 'low', label: 'Low' },
     { value: 'medium', label: 'Medium' },
-    { value: 'heavy', label: 'Heavy' },
+    { value: 'high', label: 'High' },
   ];
   let actionVariant = $state<ActionLayerId>('impact');
   let actionIntensity = $state<AmbientIntensity>('medium');
@@ -255,6 +255,7 @@
     actionActive = true;
   }
   function setActionIntensity(v: string | number | null) {
+    presetIndex = null;
     actionIntensity = v as AmbientIntensity;
   }
 
@@ -324,6 +325,7 @@
   let environmentIntensity = $state<AmbientIntensity>('medium');
 
   function setEnvironmentIntensity(v: string | number | null) {
+    presetIndex = null;
     environmentIntensity = v as AmbientIntensity;
   }
 
@@ -331,51 +333,50 @@
   interface AmbientPreset {
     label: string;
     tagline: string;
-    atmosphere: { variant: AtmosphereLayerId; intensity: AmbientIntensity };
-    environment: { variant: EnvironmentLayerId; intensity: AmbientIntensity };
-    psychology: { variant: PsychologyLayerId; intensity: AmbientIntensity };
+    atmosphere?: { variant: AtmosphereLayerId; intensity: AmbientIntensity };
+    environment?: { variant: EnvironmentLayerId; intensity: AmbientIntensity };
+    psychology?: { variant: PsychologyLayerId; intensity: AmbientIntensity };
   }
 
   const presets: AmbientPreset[] = [
     {
-      label: 'Underwater Underground Serenity',
+      label: 'Abyss',
       tagline:
-        'Submerged in a buried cavern. Cool displacement drifts through claustrophobic depth while pale stillness settles over everything.',
-      atmosphere: { variant: 'underwater', intensity: 'medium' },
-      environment: { variant: 'underground', intensity: 'medium' },
-      psychology: { variant: 'serenity', intensity: 'light' },
+        'Heavy currents push through buried stone. The surface is a memory — down here there is only pressure and drift.',
+      atmosphere: { variant: 'underwater', intensity: 'high' },
+      environment: { variant: 'underground', intensity: 'low' },
     },
     {
-      label: 'Storm Dusk Tension',
+      label: 'Wrath',
       tagline:
-        'A hostile sky tears open at sundown. Lightning cracks through dying orange light while pressure builds from the edges.',
-      atmosphere: { variant: 'storm', intensity: 'heavy' },
+        'The sky splits open at sundown. Lightning tears through dying orange light while pressure builds from every edge.',
+      atmosphere: { variant: 'storm', intensity: 'high' },
       environment: { variant: 'dusk', intensity: 'medium' },
       psychology: { variant: 'tension', intensity: 'medium' },
     },
     {
-      label: 'Ash Dawn Serenity',
+      label: 'Remnant',
       tagline:
-        'Embers tumble through a pale sunrise. The aftermath glows with fragile warmth — destruction giving way to quiet transcendence.',
+        'Embers tumble through a brightening sky. What burned is behind — the dawn carries what survived into stillness.',
       atmosphere: { variant: 'ash', intensity: 'medium' },
-      environment: { variant: 'dawn', intensity: 'medium' },
-      psychology: { variant: 'serenity', intensity: 'medium' },
+      environment: { variant: 'dawn', intensity: 'high' },
+      psychology: { variant: 'serenity', intensity: 'high' },
     },
     {
-      label: 'Fireflies Night Calm',
+      label: 'Solace',
       tagline:
         'Soft drifting lights pulse through cool darkness. A summer clearing after the world has gone quiet — earned rest.',
-      atmosphere: { variant: 'fireflies', intensity: 'heavy' },
-      environment: { variant: 'night', intensity: 'light' },
-      psychology: { variant: 'calm', intensity: 'light' },
+      atmosphere: { variant: 'fireflies', intensity: 'high' },
+      environment: { variant: 'night', intensity: 'medium' },
+      psychology: { variant: 'calm', intensity: 'high' },
     },
     {
-      label: 'Fog Sickly Melancholy',
+      label: 'Plague',
       tagline:
-        'Mist banks roll through a plague-tinted haze. Something is wrong here — the air itself carries grief and quiet decay.',
-      atmosphere: { variant: 'fog', intensity: 'heavy' },
-      environment: { variant: 'sickly', intensity: 'medium' },
-      psychology: { variant: 'melancholy', intensity: 'medium' },
+        'Mist rolls through a poisoned haze. The air itself is wrong — thick with threat and the slow pulse of something watching.',
+      atmosphere: { variant: 'fog', intensity: 'high' },
+      environment: { variant: 'sickly', intensity: 'high' },
+      psychology: { variant: 'danger', intensity: 'high' },
     },
   ];
 
@@ -385,34 +386,51 @@
   }));
 
   let presetIndex = $state<number | null>(null);
-  let presetKey = $state(0);
 
   const activePreset = $derived(
     presetIndex !== null ? presets[presetIndex] : null,
   );
 
   function setPreset(v: string | number | null) {
-    // Clear individual layer controls when switching to a preset
-    atmosphereEnabled = false;
-    psychologyEnabled = false;
-    environmentEnabled = false;
     presetIndex = v as number | null;
-    presetKey++;
+    const preset = v !== null ? presets[v as number] : null;
+    if (!preset) return;
+
+    // Sync preset choices into individual controls — single rendering path
+    if (preset.atmosphere) {
+      atmosphereVariant = preset.atmosphere.variant;
+      atmosphereIntensity = preset.atmosphere.intensity;
+      atmosphereEnabled = true;
+      atmosphereDecayOn = false;
+      atmosphereReplayKey++;
+    } else {
+      atmosphereEnabled = false;
+    }
+
+    if (preset.psychology) {
+      psychologyVariant = preset.psychology.variant;
+      psychologyIntensity = preset.psychology.intensity;
+      psychologyEnabled = true;
+      psychologyDecayOn = false;
+      psychologyReplayKey++;
+    } else {
+      psychologyEnabled = false;
+    }
+
+    if (preset.environment) {
+      environmentVariant = preset.environment.variant;
+      environmentIntensity = preset.environment.intensity;
+      environmentEnabled = true;
+    } else {
+      environmentEnabled = false;
+    }
   }
 
   function clearPreset() {
     presetIndex = null;
-  }
-
-  // ── Preset action one-shots ────────────────────────────────────────
-  let presetActionVariant = $state<ActionLayerId>('glitch');
-  let presetActionActive = $state(false);
-  let presetActionFireKey = $state(0);
-
-  function firePresetAction(v: ActionLayerId) {
-    presetActionVariant = v;
-    presetActionFireKey++;
-    presetActionActive = true;
+    atmosphereEnabled = false;
+    psychologyEnabled = false;
+    environmentEnabled = false;
   }
 
   // Switcher coerces to string|number; wrap setters for type narrowing.
@@ -436,18 +454,20 @@
     environmentEnabled = true;
   }
   function setAtmosphereIntensity(v: string | number | null) {
+    presetIndex = null;
     atmosphereIntensity = v as AmbientIntensity;
     atmosphereReplayKey++;
   }
   function setPsychologyIntensity(v: string | number | null) {
+    presetIndex = null;
     psychologyIntensity = v as AmbientIntensity;
     psychologyReplayKey++;
   }
 
   const intensityOptions: { value: AmbientIntensity; label: string }[] = [
-    { value: 'light', label: 'Light' },
+    { value: 'low', label: 'Low' },
     { value: 'medium', label: 'Medium' },
-    { value: 'heavy', label: 'Heavy' },
+    { value: 'high', label: 'High' },
   ];
 
   // Dynamic one-sentence caption per section, based on current selection.
@@ -508,35 +528,6 @@
   {/key}
 {/if}
 
-{#if activePreset}
-  {#key presetKey}
-    <EnvironmentLayer
-      variant={activePreset.environment.variant}
-      intensity={activePreset.environment.intensity}
-    />
-    <AtmosphereLayer
-      variant={activePreset.atmosphere.variant}
-      intensity={activePreset.atmosphere.intensity}
-      durationMs={0}
-    />
-    <PsychologyLayer
-      variant={activePreset.psychology.variant}
-      intensity={activePreset.psychology.intensity}
-      durationMs={0}
-    />
-  {/key}
-{/if}
-
-{#if presetActionActive}
-  {#key presetActionFireKey}
-    <ActionLayer
-      variant={presetActionVariant}
-      intensity="heavy"
-      onEnd={() => (presetActionActive = false)}
-    />
-  {/key}
-{/if}
-
 <div class="container flex flex-col gap-2xl py-2xl">
   <header class="flex flex-col gap-lg items-center text-center">
     <h1 class="text-primary">Ambient Layers</h1>
@@ -550,11 +541,18 @@
   <section class="flex flex-col gap-xl">
     <div class="surface-raised p-lg flex flex-col gap-lg">
       <div class="flex flex-col gap-xs">
-        <h3>Preset Scenes</h3>
         <p class="text-dim">
-          Curated combinations of weather, environment, and psychology layers
-          firing together. Each preset is a creative starting point &mdash; pick
-          one to feel how layers compose into a unified scene.
+          Ambient Layers wrap the world around your content in four distinct
+          ways. <strong class="text-main">Atmosphere</strong>
+          brings the weather — rain, snow, ash, fog — drifting quietly behind everything.
+          <strong class="text-main">Psychology</strong> shapes how a moment
+          feels, framing the edges with danger, tension, focus, or dreamlike
+          haze.
+          <strong class="text-main">Environment</strong> sets the hour and
+          place, tinting the whole scene like dawn, neon, or candlelight.
+          <strong class="text-main">Action</strong> reacts to a single beat: a hit,
+          a flash, a burst of speed that comes and goes. They all live behind your
+          content and never get in its way.
         </p>
       </div>
 
@@ -580,30 +578,35 @@
             use:morph
             class="flex flex-wrap gap-md justify-center text-caption text-mute"
           >
-            <span>
-              Atmosphere: <strong class="text-main"
-                >{activePreset.atmosphere.variant}</strong
-              >
-              ({activePreset.atmosphere.intensity})
-            </span>
-            <span>
-              Environment: <strong class="text-main"
-                >{activePreset.environment.variant}</strong
-              >
-              ({activePreset.environment.intensity})
-            </span>
-            <span>
-              Psychology: <strong class="text-main"
-                >{activePreset.psychology.variant}</strong
-              >
-              ({activePreset.psychology.intensity})
-            </span>
+            {#if activePreset.atmosphere}
+              <span>
+                Atmosphere: <strong class="text-main"
+                  >{activePreset.atmosphere.variant}</strong
+                >
+                ({activePreset.atmosphere.intensity})
+              </span>
+            {/if}
+            {#if activePreset.environment}
+              <span>
+                Environment: <strong class="text-main"
+                  >{activePreset.environment.variant}</strong
+                >
+                ({activePreset.environment.intensity})
+              </span>
+            {/if}
+            {#if activePreset.psychology}
+              <span>
+                Psychology: <strong class="text-main"
+                  >{activePreset.psychology.variant}</strong
+                >
+                ({activePreset.psychology.intensity})
+              </span>
+            {/if}
           </div>
         {/if}
       </div>
 
       <div class="flex flex-col gap-sm">
-        <h5>Action Effects</h5>
         <p class="text-small text-mute">
           One-shot transient effects that punch through the frame and
           auto-clear. Fire them on top of any active preset.
@@ -611,13 +614,13 @@
         <div
           class="surface-sunk p-md flex flex-row flex-wrap gap-md justify-center"
         >
-          <button class="btn" onclick={() => firePresetAction('glitch')}>
+          <button class="btn" onclick={() => fireActionVariant('glitch')}>
             Glitch
           </button>
-          <button class="btn" onclick={() => firePresetAction('flash')}>
+          <button class="btn" onclick={() => fireActionVariant('flash')}>
             Flash
           </button>
-          <button class="btn" onclick={() => firePresetAction('zoomBurst')}>
+          <button class="btn" onclick={() => fireActionVariant('zoomBurst')}>
             Zoom Burst
           </button>
         </div>
@@ -631,25 +634,68 @@
           onclick={clearPreset}
         />
       {/if}
+
+      <details>
+        <summary>How It Works</summary>
+        <div class="flex flex-col gap-md p-md">
+          <p class="text-small text-dim">
+            Every effect is <strong>pure CSS and SVG</strong> &mdash; no
+            <code>&lt;canvas&gt;</code>, no WebGL, no JavaScript animation
+            loops. Particle fields (rain, snow, ash, storm) are real DOM
+            elements animated via CSS <code>@keyframes</code> and
+            <code>transform3d</code>, which the browser composites on the GPU
+            automatically. Complex distortions (underwater caustics, heat
+            shimmer, film grain, glitch) use inline SVG filters &mdash;
+            <code>feTurbulence</code>
+            and
+            <code>feDisplacementMap</code> &mdash; with
+            <code>&lt;animate&gt;</code>
+            elements for real-time parameter mutation.
+          </p>
+
+          <p class="text-small text-dim">
+            The result is a zero-dependency rendering pipeline that doesn't
+            fight the browser &mdash; it <em>is</em> the browser. Every effect
+            runs on the same compositor that paints the rest of the page,
+            respects
+            <code>prefers-reduced-motion</code>, and costs no additional
+            JavaScript per frame. The only JS is a single
+            <code>requestAnimationFrame</code> callback that drives one float (<code
+              >--ambient-level</code
+            >) for smooth intensity decay &mdash; not per-particle, per
+            <em>layer</em>.
+          </p>
+
+          <div class="surface-void p-md flex flex-col gap-sm">
+            <p class="text-small font-medium text-main">
+              Why not Canvas or WebGL?
+            </p>
+            <p class="text-small text-dim">
+              Canvas-based rendering requires manual hit-testing, breaks native
+              accessibility, and forces every visual update through JavaScript.
+              The new <strong>HTML-in-Canvas</strong> proposal (WICG, currently
+              behind a Chrome flag) can rasterize live HTML into a
+              <code>&lt;canvas&gt;</code> for shader effects &mdash; but drawn
+              elements <strong>lose interactivity</strong> inside the canvas, and
+              the API is experimental with no cross-browser support. Our CSS/SVG
+              approach delivers the same atmospheric effects with zero runtime cost,
+              full browser compatibility, and inherent accessibility.
+            </p>
+            <p class="text-small text-dim">
+              For effects that genuinely need per-pixel shaders
+              (physically-based refraction, volumetric lighting), we're
+              exploring targeted
+              <code>feDisplacementMap</code> pipelines and will evaluate HTML-in-Canvas
+              when it ships &mdash; as an opt-in enhancement, not a foundation rewrite.
+            </p>
+          </div>
+        </div>
+      </details>
     </div>
   </section>
 
   <section class="flex flex-col gap-xl">
     <div class="surface-raised p-lg flex flex-col gap-lg">
-      <p class="text-dim">
-        Ambient Layers wrap the world around your content in four distinct ways. <strong
-          class="text-main">Atmosphere</strong
-        >
-        brings the weather — rain, snow, ash, fog — drifting quietly behind everything.
-        <strong class="text-main">Psychology</strong> shapes how a moment feels,
-        framing the edges with danger, tension, focus, or dreamlike haze.
-        <strong class="text-main">Environment</strong> sets the hour and place,
-        tinting the whole scene like dawn, neon, or candlelight.
-        <strong class="text-main">Action</strong> reacts to a single beat: a hit,
-        a flash, a burst of speed that comes and goes. They all live behind your
-        content and never get in its way.
-      </p>
-
       <div class="grid grid-cols-1 large-desktop:grid-cols-2 gap-md">
         <div class="surface-sunk p-md flex flex-col gap-md">
           <div class="flex flex-col gap-xs">
@@ -691,7 +737,7 @@
                 {:else if atmosphereEnabled}
                   Faded out
                 {:else}
-                  Will fade out heavy → medium → light → off after firing
+                  Will fade out high → medium → low → off after firing
                 {/if}
               {:else}
                 Pinned at the chosen intensity
@@ -756,7 +802,7 @@
                 {:else if psychologyEnabled}
                   Faded out
                 {:else}
-                  Will fade out heavy → medium → light → off after firing
+                  Will fade out high → medium → low → off after firing
                 {/if}
               {:else}
                 Pinned at the chosen intensity

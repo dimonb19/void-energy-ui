@@ -1,10 +1,10 @@
-# Phase 3 — CoNexus Migration
+# Phase 4 — CoNexus Migration
 
 > Rebuild CoNexus as a private Svelte/Astro app that consumes `void-energy` from public npm and premium packages from GitHub Packages, exactly the way any external customer would.
 
-**Status:** Planning — blocked on Phase 2 completion
-**Priority:** Phase 3 (final phase)
-**Depends on:** Phase 2 complete (public monorepo shipped, premium packages published)
+**Status:** Planning — blocked on Phase 3 + 3b completion
+**Priority:** Phase 4 (final phase)
+**Depends on:** Phase 3 complete (public monorepo shipped, premium packages published), Phase 3b (TTS + KT sync)
 **Blocks:** nothing — this is the last phase
 
 ---
