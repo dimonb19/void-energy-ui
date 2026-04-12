@@ -67,16 +67,16 @@
         'Warm shimmer melt for desert exteriors, forges, and fever delirium.',
     },
     {
-      value: 'storm',
-      label: 'Storm',
-      description:
-        'Dense rain with lightning and wind drift for peak weather drama and climactic chaos.',
-    },
-    {
       value: 'wind',
       label: 'Wind',
       description:
         'Horizontal dust streaks for dry tension, deserts, and the stillness before a fight.',
+    },
+    {
+      value: 'storm',
+      label: 'Storm',
+      description:
+        'Dense rain with lightning and wind drift for peak weather drama and climactic chaos.',
     },
     {
       value: 'spores',
@@ -607,9 +607,7 @@
           </div>
         {/if}
 
-        <div
-          class="flex flex-row flex-wrap gap-sm justify-center"
-        >
+        <div class="flex flex-row flex-wrap gap-sm justify-center">
           <button class="btn" onclick={() => fireActionVariant('glitch')}>
             Glitch
           </button>
@@ -622,8 +620,7 @@
         </div>
 
         <p class="text-caption text-mute text-center">
-          One-shot transient effects that punch through the frame and
-          auto-clear
+          One-shot transient effects that punch through the frame and auto-clear
         </p>
 
         <ActionBtn

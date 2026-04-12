@@ -1860,47 +1860,88 @@
   }
 }
 
-// ── speed — 3-layer parallax sweep with radial edge mask
+// ── speed — horizontal motion-blur streaks (fast camera pan)
+// Three layers of vertical bars at different spacings and sweep speeds.
+// The composite of desynchronised layers reads as organic motion blur
+// rather than a uniform barcode. Horizontal mask reinforces directionality.
 .ambient-speed {
-  mask-image: radial-gradient(ellipse at center, black 40%, transparent 100%);
-  -webkit-mask-image: radial-gradient(
-    ellipse at center,
-    black 40%,
-    transparent 100%
-  );
-  animation: ambient-action-envelope var(--ambient-duration) ease-in-out
-    forwards;
-}
-.ambient-speed,
-.ambient-speed::before,
-.ambient-speed::after {
-  background: repeating-linear-gradient(
+  // Medium-weight streaks — primary rhythm
+  background-image: repeating-linear-gradient(
     90deg,
     transparent 0,
-    transparent calc(10% - var(--ambient-level) * 1%),
-    var(--text-main) 10%,
-    transparent calc(10% + var(--ambient-level) * 1%)
+    transparent calc(5% - var(--ambient-level) * 0.3%),
+    var(--text-main) 5%,
+    transparent calc(5% + var(--ambient-level) * 0.5%),
+    transparent 13%
   );
+  background-size: 200% 100%;
   mix-blend-mode: overlay;
+  // Horizontal edge fade — reinforces left-to-right directionality
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 8%,
+    // void-ignore — mask edge constant
+    #000 92%,
+    // void-ignore — mask edge constant
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 8%,
+    // void-ignore — mask edge constant
+    #000 92%,
+    // void-ignore — mask edge constant
+    transparent
+  );
+  animation:
+    ambient-action-envelope var(--ambient-duration) ease-in-out forwards,
+    ambient-speed-streak 900ms linear infinite;
 }
 .ambient-speed::before,
 .ambient-speed::after {
   content: '';
   position: absolute;
   inset: 0;
-  animation: ambient-speed-sweep 1400ms linear infinite;
+  mask-image: inherit;
+  -webkit-mask-image: inherit;
+  mix-blend-mode: overlay;
+  background-size: 200% 100%;
 }
+// Thin fast streaks — high-frequency layer
 .ambient-speed::before {
-  animation-delay: -210ms;
-  opacity: 0.7;
-  filter: blur(2px); // void-ignore — motion-blur floor for parallax layer
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent calc(3% - var(--ambient-level) * 0.2%),
+    var(--text-main) 3%,
+    transparent calc(3% + var(--ambient-level) * 0.3%),
+    transparent 7%
+  );
+  animation: ambient-speed-streak 600ms linear infinite;
+  opacity: 0.65;
+  filter: blur(
+    calc(1px + var(--ambient-level) * 1px)
+  ); // void-ignore — motion-blur scales with level
 }
+// Wide slow streaks — low-frequency wash layer
 .ambient-speed::after {
-  animation-delay: -420ms;
-  opacity: 0.5;
-  filter: blur(4px); // void-ignore — motion-blur for deepest parallax layer
+  background-image: repeating-linear-gradient(
+    90deg,
+    transparent 0,
+    transparent calc(8% - var(--ambient-level) * 0.5%),
+    var(--text-main) 9%,
+    transparent calc(9% + var(--ambient-level) * 0.8%),
+    transparent 19%
+  );
+  animation: ambient-speed-streak 1400ms linear infinite;
+  opacity: 0.35;
+  filter: blur(
+    calc(3px + var(--ambient-level) * 2px)
+  ); // void-ignore — heavy motion-blur for depth
 }
-@keyframes ambient-speed-sweep {
+@keyframes ambient-speed-streak {
   0% {
     transform: translate3d(-100%, 0, 0);
   }

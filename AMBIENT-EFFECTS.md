@@ -613,7 +613,7 @@ type ActionVariant =
   {
     "effect": "speed",
     "category": "action",
-    "motion": "Three-layer parallax sweep with a radial edge mask.",
+    "motion": "Three-layer horizontal motion-blur streaks at different speeds and blur depths.",
     "emotion": "Acceleration. Wind being knocked out of the frame.",
     "use_when": [
       "A dash, sprint, launch, or sudden acceleration",
