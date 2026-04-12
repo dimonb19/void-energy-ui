@@ -1,12 +1,12 @@
-# Phase 3 — Public Monorepo Structure
+# Phase 4a — Public Monorepo Structure
 
 > Restructure Void Energy into its production home: a public monorepo following Pattern A, producing two npm packages, housing the showcase site, and providing the starter template.
 
-**Status:** Planning — blocked on Phase 1 (L0) and Phase 2 (L2) completion
-**Priority:** Phase 3 (after L0 preset and L2 AI automation ship)
-**Depends on:** Phase 1 (L0 Tailwind Preset), Phase 2 (AI Automation Foundation)
-**Blocks:** Phase 4 (CoNexus migration)
-**Related:** [phase-3-premium-packages.md](phase-3-premium-packages.md), [phase-2-ai-automation.md](phase-2-ai-automation.md)
+**Status:** Planning — blocked on Phase 3 (L2 AI Automation) completion
+**Priority:** Phase 4 (after L0 preset, TTS sync, and L2 AI automation ship)
+**Depends on:** Phase 1 (L0 Tailwind Preset), Phase 2 (TTS + KT Sync), Phase 3 (AI Automation Foundation)
+**Blocks:** Phase 6 (CoNexus migration)
+**Related:** [phase-4b-premium-packages.md](phase-4b-premium-packages.md), [phase-3-ai-automation.md](phase-3-ai-automation.md)
 
 ---
 
@@ -23,7 +23,7 @@ Transform the current two-repo situation (`void-energy-ui` monorepo + standalone
 - Deploys `apps/showcase` to Vercel
 - Retires the standalone `void-energy-starter` repo on Desktop
 
-After Phase 2, there is **one public repo** and **two npm packages**, with the showcase and starter template both living inside the monorepo and always running against the local working copy of the library.
+After Phase 4a, there is **one public repo** and **two npm packages**, with the showcase and starter template both living inside the monorepo and always running against the local working copy of the library.
 
 ---
 
@@ -113,6 +113,7 @@ github.com/dgrslabs/void-energy                PUBLIC (BSL 1.1)
 │   │   ├── package.json                          { "name": "void-energy" }
 │   │   ├── CLAUDE.md                             system-level rules
 │   │   ├── CHEAT-SHEET.md                        component + action catalog
+│   │   ├── SYSTEM-PROMPT.md                      tool-agnostic AI prompt (any LLM)
 │   │   ├── src/
 │   │   │   ├── actions/                          morph, tooltip, navlink, kinetic, narrative, drag
 │   │   │   ├── adapters/                         VoidEngine
@@ -216,10 +217,10 @@ A **tiny CLI package** (~50–100 lines) whose only job is to copy `apps/starter
 - `void-energy` as a dependency (imports styles + core)
 - A self-contained `CLAUDE.md` + `.claude/` for the consumer's own AI automation
 - Tailored `AI-PLAYBOOK.md` and `COMPOSITION-RECIPES.md` for app-building (not system-building)
-- Zero GitHub workflows (see [decisions.md §D12](decisions.md#d12--no-cicd-workflows-in-the-starter-template))
+- Zero GitHub workflows (see [decisions.md §D13](decisions.md#d13--no-cicd-workflows-in-the-starter-template))
 - No pre-built showcase pages, no component demos — this is the blank canvas
 
-**Why this matters for AI automation:** when a user runs `npm create void-energy@latest my-app` and opens it in Claude Code, the AI immediately reads the template's `CLAUDE.md` and starts composing pages using the installed `void-energy` package. The template is optimized for AI-driven app construction on a blank canvas. See [phase-2-ai-automation.md](phase-2-ai-automation.md).
+**Why this matters for AI automation:** when a user runs `npm create void-energy@latest my-app` and opens it in Claude Code, the AI immediately reads the template's `CLAUDE.md` and starts composing pages using the installed `void-energy` package. The template is optimized for AI-driven app construction on a blank canvas. See [phase-3-ai-automation.md](phase-3-ai-automation.md).
 
 **Dev mode:** the starter template runs as a regular workspace (`npm run dev` from `apps/starter-template/`), using `workspace:*` to link the library. This lets us dev-test the template alongside the library.
 
@@ -264,6 +265,7 @@ A **tiny CLI package** (~50–100 lines) whose only job is to copy `apps/starter
     "src",
     "scripts",
     "CHEAT-SHEET.md",
+    "SYSTEM-PROMPT.md",
     "README.md",
     "LICENSE"
   ],
@@ -365,7 +367,7 @@ The migration path:
 - [ ] `npm run dev` from `apps/starter-template/` runs the blank starter against local library
 - [ ] `npm run build:lib` produces a valid library package
 - [ ] `npm pack --workspace=packages/void-energy` produces a tarball with only the files listed in `files`
-- [ ] Tarball includes `component-registry.json`, `CHEAT-SHEET.md`, `LICENSE`
+- [ ] Tarball includes `component-registry.json`, `CHEAT-SHEET.md`, `SYSTEM-PROMPT.md`, `LICENSE`
 - [ ] Tarball excludes `node_modules`, `tests`, `.claude`
 - [ ] `npm run check` passes across all workspaces
 - [ ] `npm run test` passes across all workspaces
@@ -378,9 +380,9 @@ The migration path:
 
 ---
 
-## Out of scope for Phase 2
+## Out of scope for Phase 4a
 
-- **CoNexus migration** — that's Phase 3. Do not touch CoNexus code during Phase 2.
-- **Premium package development** — the premium repo and its packages are covered in [phase-2-premium-packages.md](phase-2-premium-packages.md). They are a parallel workstream.
-- **New features in the library** — Phase 2 is pure plumbing. No new components, no new physics, no new actions. If something feels missing, note it and defer.
+- **CoNexus migration** — that's Phase 6. Do not touch CoNexus code during Phase 4.
+- **Premium package development** — the premium repo and its packages are covered in [phase-4b-premium-packages.md](phase-4b-premium-packages.md). They are a parallel workstream.
+- **New features in the library** — Phase 4a is pure plumbing. No new components, no new physics, no new actions. If something feels missing, note it and defer.
 - **Docs site beyond the current showcase** — the current `/components` and `/themes` pages are enough. A dedicated docs site can come later.

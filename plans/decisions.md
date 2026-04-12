@@ -27,7 +27,7 @@
 - **Pattern B (rejected):** separate library repo and separate consumer/docs repo. Every library change requires two PRs and a publish step between them. High friction for a solo dev.
 - **Pattern C (rejected):** "staging vs prod" with manual sync script. Known anti-pattern — the sync rots, public repo falls behind, final syncs become huge unrelated diffs.
 
-**How to apply:** see [phase-2-monorepo-structure.md](phase-2-monorepo-structure.md). The premium repo uses the same pattern.
+**How to apply:** see [phase-4a-monorepo-structure.md](phase-4a-monorepo-structure.md). The premium repo uses the same pattern.
 
 ---
 
@@ -71,7 +71,7 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 **Why:** consistency with the public repo, and because premium packages share tooling (token pipeline, type generation, test setup). One repo means one version cadence and one CI.
 
-**How to apply:** all four premium packages declare `void-energy` as a peer dependency installed from public npm. Each has its own `package.json` with a `publishConfig` that can be flipped from private (GitHub Packages) to public (npmjs.org) independently. See [phase-2-premium-packages.md](phase-2-premium-packages.md).
+**How to apply:** all four premium packages declare `void-energy` as a peer dependency installed from public npm. Each has its own `package.json` with a `publishConfig` that can be flipped from private (GitHub Packages) to public (npmjs.org) independently. See [phase-4b-premium-packages.md](phase-4b-premium-packages.md).
 
 ---
 
@@ -87,21 +87,21 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 ## D8 — AI automation foundation lands before the monorepo restructure
 
-**Decision:** Phase 2 = AI automation foundation, built in the current monorepo after Ambient ships but before Phase 3 touches the directory structure.
+**Decision:** Phase 3 = AI automation foundation, built in the current monorepo after L0 and TTS sync ship but before Phase 4 touches the directory structure.
 
-**Why:** AI automation is not a cosmetic polish pass. It is the primary way Void Energy is consumed — by AI agents building apps on top of it. If the AI hallucinates components, forgets the 5 Laws, or recreates primitives that already exist, the system fails at its job. Landing the foundation while the current monorepo is stable means Phase 3 inherits a working system and only has to redistribute its files across workspaces, rather than inventing and restructuring simultaneously.
+**Why:** AI automation is not a cosmetic polish pass. It is the primary way Void Energy is consumed — by AI agents building apps on top of it. If the AI hallucinates components, forgets the 5 Laws, or recreates primitives that already exist, the system fails at its job. Landing the foundation while the current monorepo is stable means Phase 4 inherits a working system and only has to redistribute its files across workspaces, rather than inventing and restructuring simultaneously.
 
-**How to apply:** inside the current monorepo, build layered `CLAUDE.md` files (root, `src/`, `src/pages/`, `packages/*/`), complete the `component-registry.json`, formalize rules in `.claude/rules/`, and audit the existing `AI-PLAYBOOK.md`, `COMPOSITION-RECIPES.md`, `CHEAT-SHEET.md`. Phase 3 will move the files without rewriting the content.
+**How to apply:** inside the current monorepo, build layered `CLAUDE.md` files (root, `src/`, `src/pages/`, `packages/*/`), complete the `component-registry.json`, formalize rules in `.claude/rules/`, and audit the existing `AI-PLAYBOOK.md`, `COMPOSITION-RECIPES.md`, `CHEAT-SHEET.md`. Phase 4 will move the files without rewriting the content.
 
 ---
 
 ## D9 — CoNexus migrates last
 
-**Decision:** Phase 4 = CoNexus migration. Nothing CoNexus-related touches Phases 1, 2, or 3.
+**Decision:** Phase 6 = CoNexus migration. Nothing CoNexus-related touches Phases 1–5.
 
 **Why:** CoNexus is the consumer. Migrating it earlier would force architectural decisions based on one app's needs and pollute the library with assumptions. Migrating last means the library has to be cleanly usable by any external consumer, which is the right pressure to keep the APIs honest.
 
-**How to apply:** during Phase 1 and 2, CoNexus changes are on hold. When Phase 3 begins, CoNexus is rebuilt as a thin app consuming `void-energy` from public npm and `@dgrslabs/void-energy-*` from GitHub Packages.
+**How to apply:** during Phases 1–5, CoNexus changes are on hold. When Phase 6 begins, CoNexus is rebuilt as a thin app consuming `void-energy` from public npm and `@dgrslabs/void-energy-*` from GitHub Packages.
 
 ---
 
@@ -113,7 +113,7 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 **Why:** the free tier must be complete and useful on its own — no feature degradation, no "buy the atmosphere pack" upsell. The AI generator removes any reason to gate atmospheres. The premium packages are all additive immersion layers that real apps (CoNexus) need but that small projects do not.
 
-**How to apply:** the public repo never contains premium code. Premium packages live only in the private repo and install as optional dependencies. See [phase-3-premium-packages.md](phase-3-premium-packages.md).
+**How to apply:** the public repo never contains premium code. Premium packages live only in the private repo and install as optional dependencies. See [phase-4b-premium-packages.md](phase-4b-premium-packages.md).
 
 ---
 
@@ -151,11 +151,11 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 ## D14 — AI automation distributes via the npm package
 
-**Decision:** `component-registry.json`, `AI-PLAYBOOK.md`, `COMPOSITION-RECIPES.md`, and `CHEAT-SHEET.md` ship inside the `void-energy` npm tarball via the `files` field. The `.claude/` directory does NOT ship — it's monorepo development tooling only. Consumers get their AI context from the starter template, which copies a self-contained `CLAUDE.md` + `.claude/` into their new project.
+**Decision:** `component-registry.json`, `AI-PLAYBOOK.md`, `COMPOSITION-RECIPES.md`, `CHEAT-SHEET.md`, and `SYSTEM-PROMPT.md` ship inside the `void-energy` npm tarball via the `files` field. The `.claude/` directory does NOT ship — it's monorepo development tooling only. Consumers get their AI context from the starter template, which copies a self-contained `CLAUDE.md` + `.claude/` into their new project.
 
-**Why:** consumer AI (Claude Code running in a user's project) needs to read the registry from `node_modules/void-energy/` to know what components exist without inventing new ones. Shipping `.claude/` would bloat the tarball and leak monorepo-specific rules.
+**Why:** consumer AI (Claude Code running in a user's project) needs to read the registry from `node_modules/void-energy/` to know what components exist without inventing new ones. `SYSTEM-PROMPT.md` enables any automation tool (not just Claude Code) to generate correct VE code. Shipping `.claude/` would bloat the tarball and leak monorepo-specific rules.
 
-**How to apply:** see [phase-2-ai-automation.md](phase-2-ai-automation.md) for the foundation and [phase-3-monorepo-structure.md](phase-3-monorepo-structure.md) for the distribution layout.
+**How to apply:** see [phase-3-ai-automation.md](phase-3-ai-automation.md) for the foundation and [phase-4a-monorepo-structure.md](phase-4a-monorepo-structure.md) for the distribution layout.
 
 ---
 
@@ -169,13 +169,13 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 ---
 
-## D16 — Ambient Layers scope: Blood, Snow, Rain, Fog
+## D16 — Ambient Layers scope: 4 categories with multiple effects
 
-**Decision:** Phase 1 delivers exactly four layers: Blood, Snow, Rain, Fog. No more, no less.
+**Decision:** Ambient Layers delivers four categories: Blood, Snow, Rain, Fog — with multiple intensity/variant effects per category. Shipped.
 
-**Why:** these four cover the range CoNexus needs (horror/intensity, cold/isolation, mood/weather, mystery/obscurity) and demonstrate the system's physics adaptation across all four classic ambient effect categories. More would delay later phases; fewer would leave CoNexus undercooked.
+**Why:** these four cover the range CoNexus needs (horror/intensity, cold/isolation, mood/weather, mystery/obscurity) and demonstrate the system's physics adaptation across all four classic ambient effect categories.
 
-**How to apply:** see [phase-1-ambient-layers.md](phase-1-ambient-layers.md).
+**How to apply:** Ambient Layers is complete and ships in `packages/ambient-layers/`. Phase 4b lifts it into the premium repo.
 
 ---
 
@@ -220,7 +220,7 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 **Why:** consumers who only want tokens should not install Svelte as a peer dependency. Keeping L0 as a separate package means its dependency graph is: Tailwind CSS v4, nothing else. A React developer never sees Svelte in their `node_modules`. The package name also signals clearly what it is — a Tailwind preset, not a component library.
 
-**How to apply:** both packages live in the public monorepo (`packages/void-energy/` and `packages/void-energy-tailwind/`). Published independently to npm. The monorepo structure in [phase-3-monorepo-structure.md](phase-3-monorepo-structure.md) updated to include L0 as a workspace package.
+**How to apply:** both packages live in the public monorepo (`packages/void-energy/` and `packages/void-energy-tailwind/`). Published independently to npm. The monorepo structure in [phase-4a-monorepo-structure.md](phase-4a-monorepo-structure.md) updated to include L0 as a workspace package.
 
 ---
 
@@ -234,13 +234,13 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 ---
 
-## D22 — L0 Phase 1, L2 Phase 2 (replaces Ambient Layers as Phase 1)
+## D22 — Phase order: L0 (1), TTS (2), L2 (3) — Ambient complete
 
-**Decision:** Phase 1 is now the L0 Tailwind preset extraction. Phase 2 is the L2 AI automation foundation. Ambient Layers (previously Phase 1) is complete and shipped.
+**Decision:** Phase 1 is now the L0 Tailwind preset extraction. Phase 2 is TTS + KT sync. Phase 3 is the L2 AI automation foundation. Ambient Layers (previously Phase 1) is complete and shipped.
 
-**Why:** with Ambient Layers done, the next highest-leverage move is expanding VE's addressable market. L0 is low effort (the token system already exists and is well-structured for extraction) with outsized reach (millions of Tailwind users across every framework). L2 depends on understanding the L0/L1 split to provide correct context at each layer.
+**Why:** with Ambient Layers done, the next highest-leverage move is expanding VE's addressable market. L0 is low effort (the token system already exists and is well-structured for extraction) with outsized reach (millions of Tailwind users across every framework). TTS sync follows because KT needs timeline-driven reveal before CoNexus can build its narrative reading experience. L2 depends on understanding the L0/L1 split to provide correct context at each layer.
 
-**How to apply:** see [phase-1-l0-tailwind-preset.md](phase-1-l0-tailwind-preset.md) and [phase-2-ai-automation.md](phase-2-ai-automation.md).
+**How to apply:** see [phase-1-l0-tailwind-preset.md](phase-1-l0-tailwind-preset.md), [phase-2-tts-kinetic-sync.md](phase-2-tts-kinetic-sync.md), and [phase-3-ai-automation.md](phase-3-ai-automation.md).
 
 ---
 
@@ -305,7 +305,21 @@ The Phase 0a fixes also surfaced the **`@theme inline` vs `@theme reference` dis
 - Status bar color must sync with the active atmosphere/mode
 - Keyboard resize mode must be `ionic` to avoid breaking `dvh` layouts
 
-**How to apply:** Phase 5 executes after Phase 3 (needs `void-energy` npm package). The plan is written now so Phases 1-3 can account for mobile concerns (L0 safe-area utilities, capacitor helper exports). See [phase-5-mobile-deployment.md](phase-5-mobile-deployment.md).
+**How to apply:** Phase 5 executes after Phase 4 (monorepo restructure + premium packages), before Phase 6 (CoNexus migration). The plan is written now so Phases 1–4 can account for mobile concerns (L0 safe-area utilities, capacitor helper exports). See [phase-5-mobile-deployment.md](phase-5-mobile-deployment.md).
+
+---
+
+## D27 — Tool-agnostic system prompt (`SYSTEM-PROMPT.md`), not a `.void/` config directory
+
+**Decision:** L2's portable automation surface is a single `SYSTEM-PROMPT.md` file — a condensed, API-ready prompt that any LLM can consume. No `.void/` directory, no `project.yaml`, no `void-agent` CLI config format.
+
+**Why:** `.claude/` and `CLAUDE.md` are Claude Code-specific (walk-up discovery, rule triggers, nearest-only merging). That locks L2's value to one tool. A single system prompt file is the minimal portable piece — any automation tool (Cursor, custom agents, CI pipelines, a future `void-agent` CLI) can read it. A `.void/` config directory would duplicate the content already in `.claude/` and the AI catalogs, creating two systems to maintain. The config format for a CLI that doesn't exist yet would be speculative — design the config when the tool exists and has real requirements.
+
+**What it contains:** condensed 5 Laws, component catalog (from `component-registry.json`), composition patterns, token vocabulary, constraint summary, import paths. Self-contained — an LLM reading only this file produces correct VE code.
+
+**What it does NOT contain:** Claude Code-specific mechanics, development workflow instructions (pre-flight audit, analog matching), premium package details, monorepo structure.
+
+**How to apply:** `SYSTEM-PROMPT.md` ships in the npm tarball alongside `component-registry.json` and the other catalogs. CoNexus extends it with a CoNexus-specific `SYSTEM-PROMPT.md` that references the base from `node_modules/void-energy/`. See [phase-3-ai-automation.md](phase-3-ai-automation.md).
 
 ---
 
@@ -320,22 +334,23 @@ The Phase 0a fixes also surfaced the **`@theme inline` vs `@theme reference` dis
 | D5 | Showcase in `apps/showcase` | Committed |
 | D6 | Premium repo uses Pattern A | Committed |
 | D7 | Ambient Layers as dedicated package from day one | Committed (shipped) |
-| D8 | AI automation foundation lands in current monorepo (Phase 2) | Committed |
-| D9 | CoNexus migrates last (Phase 4) | Committed |
+| D8 | AI automation foundation lands in current monorepo (Phase 3) | Committed |
+| D9 | CoNexus migrates last (Phase 6) | Committed |
 | D10 | Free vs premium split | Committed |
 | D11 | KT base free, engine premium | Committed |
 | D12 | BSL 1.1 with lawyer review | Pending lawyer |
 | D13 | No CI/CD in starter template | Committed |
 | D14 | AI automation via npm package | Committed |
 | D15 | Starter template self-contained | Committed |
-| D16 | Ambient scope: 4 categories, 35+ effects | Committed (shipped) |
+| D16 | Ambient scope: 4 categories with multiple effects | Committed (shipped) |
 | D17 | Selective publishing via publishConfig | Committed |
 | D18 | Eric deal: revenue share, no equity | Proposed |
 | D19 | Layer architecture: L0 / L1 / L2 | Committed |
 | D20 | L0 as separate `@void-energy/tailwind` package | Committed |
 | D21 | No L0.5 CSS component classes | Committed |
-| D22 | L0 Phase 1, L2 Phase 2 (Ambient complete) | Committed |
+| D22 | L0 Phase 1, TTS Phase 2, L2 Phase 3 (Ambient complete) | Committed |
 | D23 | L0 includes only free atmospheres | Committed |
 | D24 | Tailwind v4 migration before L0 (Phase 0) | Committed (shipped) |
 | D25 | Design language modernization before L0 (Phase 0b) | Committed (shipped) |
 | D26 | Mobile deployment via Capacitor + cloud builds (Phase 5) | Planned |
+| D27 | Tool-agnostic `SYSTEM-PROMPT.md`, no `.void/` config directory | Committed |

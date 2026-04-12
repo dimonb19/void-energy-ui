@@ -1,12 +1,12 @@
-# Phase 3b — TTS + Kinetic Text Synchronization
+# Phase 2 — TTS + Kinetic Text Synchronization
 
 > Extend the Kinetic Text premium package with a timeline-driven reveal mode that syncs character/word reveal to TTS audio playback, using InWorld TTS as the reference provider.
 
 **Status:** Planning
-**Priority:** Phase 3b (after premium packages are structured, before CoNexus migration)
-**Depends on:** Phase 3 complete (KT package published as `@dgrslabs/void-energy-kinetic-text`)
-**Blocks:** Phase 4 narrative orchestration (CoNexus needs synced KT + TTS for its reading experience)
-**Related:** [phase-3-premium-packages.md](phase-3-premium-packages.md) (KT package), [phase-4-conexus-migration.md](phase-4-conexus-migration.md) (consumer)
+**Priority:** Phase 2 (after L0 Tailwind preset, before AI automation foundation)
+**Depends on:** Phase 1 (L0 shipped). KT package already exists at `packages/kinetic-text/` with working build + RevealTimeline engine.
+**Blocks:** Phase 6 narrative orchestration (CoNexus needs synced KT + TTS for its reading experience)
+**Related:** [phase-4b-premium-packages.md](phase-4b-premium-packages.md) (KT package), [phase-6-conexus-migration.md](phase-6-conexus-migration.md) (consumer)
 
 ---
 
@@ -14,7 +14,7 @@
 
 A consumer can play an InWorld TTS audio clip alongside a `<KineticText>` component and have characters reveal in precise sync with the spoken words — no drift, no estimation. One-shot effects (shatter, glitch, etc.) fire at exact moments keyed to the audio timeline.
 
-After Phase 3b:
+After Phase 2:
 - KT accepts externally-provided timing marks and reveals by them instead of computed stagger
 - A thin integration layer converts InWorld TTS timestamps to KT's format
 - Audio playback events (play, pause, seek) propagate to the KT timeline
@@ -25,7 +25,7 @@ After Phase 3b:
 
 ## Why this is a separate phase
 
-TTS sync is not repo restructuring (Phase 3) and not CoNexus app code (Phase 4). It's a **capability enhancement** to the KT premium package that must land before CoNexus can build its narrative reading experience. Mixing it into Phase 3 would bloat a phase that's already about infrastructure. Deferring it to Phase 4 would force CoNexus to build narrative orchestration and TTS integration simultaneously.
+TTS sync is not repo restructuring (Phase 4) and not CoNexus app code (Phase 6). It's a **capability enhancement** to the KT premium package that must land before CoNexus can build its narrative reading experience. The KT package already exists locally at `packages/kinetic-text/` with a working build and RevealTimeline engine — no monorepo restructure required. Building it now while the package is in the current repo means the TTS integration ships with KT when Phase 4 lifts it into the premium monorepo.
 
 ---
 
@@ -39,6 +39,21 @@ TTS sync is not repo restructuring (Phase 3) and not CoNexus app code (Phase 4).
 - **Language:** English stable, others experimental.
 - **SSML:** supports pronunciation/pitch/speed/emotion markup. `<mark name="..."/>` event support is **unconfirmed** — do not rely on it for effect cues.
 - **Inline audio tags:** `[happy]`, `[sad]`, `[whisper]`, `[cough]`, `[sigh]` — experimental, English only. These control vocal delivery, not timing events.
+
+### TTS provider landscape (timestamp support)
+
+The architecture is provider-agnostic, but not all providers are equal. This table documents which providers can drive precise sync (timestamps) vs which need the estimated pacing fallback.
+
+| Provider | Timestamp support | Mechanism | SSML `<mark>` events | Notes |
+|---|---|---|---|---|
+| **InWorld** | Word + character | `timestampType: 'WORD'`/`'CHARACTER'` in request, parallel arrays in response | Unconfirmed | Reference provider for Phase 2. ~100ms latency added. |
+| **ElevenLabs** | Per-character | `/v1/text-to-speech/{id}/with-timestamps` returns start/end per char | N/A | Strong candidate for second adapter. |
+| **Azure Speech** | Word boundaries | `WordBoundary` events fire during playback (real-time) | Yes — robust support | Best `<mark>` support of any provider. Good for effect cues via SSML. |
+| **Google Cloud TTS** | Word-level | `timepoints[]` in response when `SSML` input used | Yes — via `<mark name="..."/>` | Requires SSML input format for timepoints. |
+| **OpenAI TTS** | None | No native timestamp support | No | **Blocker for precise sync.** Must use estimated pacing fallback or post-hoc alignment. |
+| **Browser SpeechSynthesis** | Word boundaries | `onboundary` event | No | Quality/consistency varies by OS. Unreliable for production sync. |
+
+**Implication:** InWorld, ElevenLabs, Azure, and Google all support precise sync. OpenAI TTS and browser SpeechSynthesis require the estimated pacing fallback (see below). When adding future provider adapters, the adapter returns `TTSResult` with `wordTimestamps` populated (precise) or empty (triggers fallback).
 
 ### Current KT architecture (relevant parts)
 
@@ -58,6 +73,40 @@ TTS sync is not repo restructuring (Phase 3) and not CoNexus app code (Phase 4).
 
 **Audio drift mitigation:** for pre-rendered audio (not streaming), both clocks start from the same moment and run at wall-clock speed. Drift is sub-frame. For pause/resume, the KT timeline pauses when audio pauses — clocks stay aligned. For seek (user scrubs audio), a single `seek()` call realigns. This is the only case where `seek()` fires, and it's user-initiated so the per-call cost is fine.
 
+### Estimated pacing fallback (no-timestamp providers)
+
+Not all TTS providers return timestamps (notably OpenAI TTS). For these, a simple fallback:
+
+1. Measure the audio's total `duration` (from the `<audio>` element's `loadedmetadata` event or the API response).
+2. Compute `charSpeed = duration / charCount`.
+3. Feed that as a uniform `charSpeed` to KT's existing computed stagger path — no `revealMarks` needed.
+
+This produces linear, evenly-paced reveal that roughly follows the audio. It drifts on long passages (speakers don't talk at constant speed) and can't fire effects at precise moments, but it's good enough for ambient narration where the audio sets the mood rather than demanding frame-perfect sync.
+
+**Implementation:** a helper function in the TTS core module:
+
+```ts
+// packages/kinetic-text/src/tts/fallback.ts
+function estimateCharSpeed(audioDurationMs: number, text: string): number;
+```
+
+Returns a `charSpeed` value (ms per character) that KT's existing `computeStaggerDelays()` consumes directly. The consumer checks whether their `TTSResult` has `wordTimestamps` — if yes, use `wordTimesToRevealMarks()` for precise sync; if no, use `estimateCharSpeed()` for approximate pacing.
+
+```ts
+// Consumer decision:
+if (tts.wordTimestamps.length > 0) {
+  // Precise sync — timestamp-driven
+  const revealMarks = wordTimesToRevealMarks(cleanText, tts.wordTimestamps);
+  // pass revealMarks to <KineticText>
+} else {
+  // Estimated pacing — no timestamps available
+  const charSpeed = estimateCharSpeed(tts.durationMs, cleanText);
+  // pass charSpeed to <KineticText> (existing prop)
+}
+```
+
+**Scope:** the fallback helper ships in Phase 2. No provider adapter is required to use it — it works with any audio source, even a local file with known duration.
+
 ---
 
 ## Architecture
@@ -66,7 +115,7 @@ Three layers, clean separation:
 
 ```
 ┌──────────────────────────────────────────────────────┐
-│  Layer 3 — Narrative Pipeline (Phase 4 / CoNexus)    │
+│  Layer 3 — Narrative Pipeline (Phase 6 / CoNexus)    │
 │  LLM streams text → strips {{fx}} tokens → sends     │
 │  clean text to TTS → feeds audio + marks to Layer 2   │
 └──────────────────────┬───────────────────────────────┘
@@ -94,7 +143,7 @@ Three layers, clean separation:
 └───────────────────────────────────────────────────────┘
 ```
 
-**Layer 1** changes the KT package (premium). **Layer 2** is a new integration module — lives inside the KT package as optional sub-exports. The core (`@dgrslabs/void-energy-kinetic-text/tts`) is provider-agnostic. Providers (`@dgrslabs/void-energy-kinetic-text/tts/providers`) are one-file adapters that normalize API responses to the universal `TTSResult` type. Switching TTS models = swap one import. **Layer 3** is CoNexus-specific app code built in Phase 4.
+**Layer 1** changes the KT package (premium). **Layer 2** is a new integration module — lives inside the KT package as optional sub-exports. The core (`@dgrslabs/void-energy-kinetic-text/tts`) is provider-agnostic. Providers (`@dgrslabs/void-energy-kinetic-text/tts/providers`) are one-file adapters that normalize API responses to the universal `TTSResult` type. Switching TTS models = swap one import. **Layer 3** is CoNexus-specific app code built in Phase 6.
 
 ---
 
@@ -179,6 +228,7 @@ packages/kinetic-text/src/tts/
 ├── marks.ts                  ← wordTimesToRevealMarks (pure function)
 ├── sync.ts                   ← syncAudioToKT (event wiring)
 ├── cues.ts                   ← stripEffectTokens, resolveEffectCues
+├── fallback.ts               ← estimateCharSpeed (no-timestamp providers)
 └── providers/
     ├── index.ts              ← provider re-exports
     └── inworld.ts            ← InWorld adapter (the only one for now)
@@ -322,6 +372,7 @@ export type { TTSResult, WordTimestamp, TTSProvider } from './types';
 export { wordTimesToRevealMarks } from './marks';
 export { syncAudioToKT, type SyncOptions } from './sync';
 export { stripEffectTokens, resolveEffectCues, type InlineEffectToken } from './cues';
+export { estimateCharSpeed } from './fallback';
 
 // packages/kinetic-text/src/tts/providers/index.ts
 export { synthesize as inworldSynthesize, type InWorldOptions } from './inworld';
@@ -345,7 +396,7 @@ To add ElevenLabs (or any other provider):
 3. Done. The consumer swaps one import line. Core utilities, sync logic, effect cues — all unchanged.
 
 ```ts
-// providers/elevenlabs.ts (future, not Phase 3b scope)
+// providers/elevenlabs.ts (future, not Phase 2 scope)
 interface ElevenLabsOptions {
   voiceId: string;
   apiKey: string;
@@ -357,9 +408,9 @@ async function synthesize(text: string, options: ElevenLabsOptions): Promise<TTS
 
 ---
 
-## Consumer usage (preview of Phase 4 wiring)
+## Consumer usage (preview of Phase 6 wiring)
 
-This is **not** Phase 3b scope — it's here to validate that the API shape works for CoNexus.
+This is **not** Phase 2 scope — it's here to validate that the API shape works for CoNexus.
 
 ```svelte
 <script lang="ts">
@@ -424,12 +475,12 @@ This is **not** Phase 3b scope — it's here to validate that the API shape work
 
 ## What this does NOT include
 
-- **Streaming TTS.** Phase 3b assumes pre-rendered audio (call API, get full response, play). Streaming reveal (audio chunks arrive while playing) is a Phase 4+ enhancement if needed. The architecture doesn't preclude it — `revealMarks` could be updated incrementally — but it's not designed or tested for it here.
-- **Forced alignment fallback.** If a TTS provider returns no timestamps, a Whisper-based forced aligner could recover them post-hoc. This is out of scope — InWorld provides timestamps natively.
-- **Additional provider adapters.** Only the InWorld adapter ships in Phase 3b. The architecture is provider-agnostic (`TTSResult`, `WordTimestamp`, `TTSProvider` interface) — adding ElevenLabs or Azure is one file in `providers/` — but writing those adapters is not Phase 3b scope.
-- **Lip sync / viseme data.** InWorld supports viseme timestamps. Not needed for text reveal — potentially useful for character portraits in CoNexus but that's Phase 4 scope.
-- **SSML `<mark>` event cues.** InWorld's SSML mark support is unconfirmed. The `{{fx:token}}` approach is provider-agnostic and works regardless.
-- **Narrative pipeline / LLM streaming.** That's Layer 3, which is CoNexus-specific Phase 4 work.
+- **Streaming TTS.** Phase 2 assumes pre-rendered audio (call API, get full response, play). Streaming reveal (audio chunks arrive while playing) is a future enhancement if needed. The architecture doesn't preclude it — `revealMarks` could be updated incrementally — but it's not designed or tested for it here.
+- **Forced alignment (Whisper).** If a TTS provider returns no timestamps, a Whisper-based forced aligner could recover precise word timings post-hoc. Out of scope — the estimated pacing fallback (see above) covers no-timestamp providers cheaply. Forced alignment is a future option if fallback quality proves insufficient.
+- **Additional provider adapters.** Only the InWorld adapter ships in Phase 2. The architecture is provider-agnostic (`TTSResult`, `WordTimestamp`, `TTSProvider` interface) — adding ElevenLabs or Azure is one file in `providers/` — but writing those adapters is not Phase 2 scope.
+- **Lip sync / viseme data.** InWorld supports viseme timestamps. Not needed for text reveal ��� potentially useful for character portraits in CoNexus but that's Phase 6 scope.
+- **SSML `<mark>` event cues for effects.** Azure and Google Cloud TTS support `<mark name="..."/>` events natively — the cleanest mechanism for firing one-shot effects with zero drift. InWorld's SSML mark support is unconfirmed. Phase 2 uses the `{{fx:token}}` approach which is provider-agnostic and works regardless. A future provider adapter for Azure/Google could use SSML marks as an alternative to `{{fx:token}}` stripping.
+- **Narrative pipeline / LLM streaming.** That's Layer 3, which is CoNexus-specific Phase 6 work.
 
 ---
 
@@ -444,7 +495,7 @@ This is **not** Phase 3b scope — it's here to validate that the API shape work
 
 ## Open questions
 
-1. **Where does the InWorld API key live?** Session-first (user provides in UI) like the AI theme generator, or server-side only? For Phase 3b demo/testing, a `.env` variable is fine. CoNexus production architecture is Phase 4's problem.
+1. **Where does the InWorld API key live?** Session-first (user provides in UI) like the AI theme generator, or server-side only? For Phase 2 demo/testing, a `.env` variable is fine. CoNexus production architecture is Phase 6's problem.
 2. **Sub-export or separate package?** Current plan: `@dgrslabs/void-energy-kinetic-text/tts` sub-export. Alternative: a separate `@dgrslabs/void-energy-tts` package. Sub-export is simpler and avoids a fifth premium package, but it does couple TTS to KT at the package level. Decision: **sub-export** unless we discover TTS integration is useful independent of KT (unlikely in the near term).
 3. **Drift threshold tuning.** The synchronizer has a configurable `driftThreshold` (default 150ms). This may need tuning based on real InWorld response latency. Flag for testing.
 4. **Char-level vs word-level timestamps from InWorld.** Word-level is more reliable and lower overhead. Char-level exists but adds more data per response. Start with word-level + micro-stagger interpolation; switch to char-level only if interpolation quality is insufficient.
@@ -465,5 +516,7 @@ This is **not** Phase 3b scope — it's here to validate that the API shape work
 - [ ] One-shot effects fire at correct audio moments
 - [ ] Works across all 3 physics presets (glass, flat, retro)
 - [ ] Reduced motion: text still reveals on time, animations suppressed
+- [ ] `estimateCharSpeed()` produces reasonable pacing for audio without timestamps (unit test)
+- [ ] Fallback path works end-to-end: audio with no timestamps still drives reveal at approximate pace
 - [ ] Consumers who don't use TTS are unaffected (no bundle cost, no API changes)
 - [ ] Demo page demonstrates end-to-end sync with real InWorld audio

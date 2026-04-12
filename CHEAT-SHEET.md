@@ -3850,7 +3850,7 @@ Generates complete `VoidThemeDefinition` palettes from natural language descript
 | Keep | `unregisterEphemeralTheme` → `registerTheme` → `setAtmosphere` | 1 (`setAtmosphere` clears stack without restoring) |
 | Revert | `releaseTemporaryTheme` → `unregisterEphemeralTheme` | 1 (restores previous) |
 
-**API key handling:** Server-side only. The key never reaches the browser — requests go through `/api/generate-atmosphere` which proxies to the configured AI provider. Set `ANTHROPIC_API_KEY` (or `AI_API_KEY` for OpenAI-compatible providers) in your `.env` or hosting dashboard. See [AI-PIPELINES.md](./AI-PIPELINES.md) for full configuration.
+**API key handling:** Server-side only. The key never reaches the browser — requests go through `/api/generate-atmosphere` which proxies to the configured AI provider. Set `ANTHROPIC_API_KEY` (or `AI_API_KEY` for OpenAI-compatible providers) in your `.env` or hosting dashboard. See [AI-SERVICE.md](./AI-SERVICE.md) for full configuration.
 
 **Generation contract:** The AI returns `{ mode, physics, tagline, label, fontHeadingKey, fontBodyKey, palette }` with 10 core tokens. The route normalizes the response to `{ text, provider, model }`. The client-side parser auto-fills 12 semantic variant tokens from `SEMANTIC_DARK`/`SEMANTIC_LIGHT` and resolves font keys to CSS family strings.
 

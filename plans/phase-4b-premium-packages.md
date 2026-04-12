@@ -1,12 +1,12 @@
-# Phase 3 — Premium Packages Repo
+# Phase 4b — Premium Packages Repo
 
 > Create the private `dgrslabs/void-energy-premium` monorepo and populate it with the four premium packages: Kinetic Text, DGRS, Ambient, and Rive.
 
-**Status:** Planning — blocked on Phase 2 completion
-**Priority:** Phase 3 (parallel to public monorepo restructure)
-**Depends on:** Phase 1 (L0 Tailwind Preset shipped), Phase 2 (AI Automation Foundation landed), Phase 3 public monorepo (for `void-energy` as a dependency). Ambient Layers is already complete and ships in its current location.
-**Blocks:** Phase 4 (CoNexus imports premium from this repo)
-**Related:** [phase-3-monorepo-structure.md](phase-3-monorepo-structure.md)
+**Status:** Planning — blocked on Phase 3 completion
+**Priority:** Phase 4 (parallel to public monorepo restructure)
+**Depends on:** Phase 1 (L0 shipped), Phase 2 (TTS sync landed in KT), Phase 3 (AI Automation Foundation landed), Phase 4a public monorepo (for `void-energy` as a dependency). Ambient Layers is already complete and ships in its current location.
+**Blocks:** Phase 6 (CoNexus imports premium from this repo)
+**Related:** [phase-4a-monorepo-structure.md](phase-4a-monorepo-structure.md)
 
 ---
 
@@ -14,11 +14,11 @@
 
 Create a single private monorepo at `github.com/dgrslabs/void-energy-premium` that houses all four premium packages, follows the same Pattern A layout as the public repo, and publishes to GitHub Packages under the `@dgrslabs` scope.
 
-After Phase 2:
+After Phase 4b:
 - Four premium packages are published and installable
 - Each package can be flipped public independently via `publishConfig`
 - The public showcase site demonstrates all four (installed as regular dependencies)
-- CoNexus can import any of them in Phase 3 as a normal consumer
+- CoNexus can import any of them in Phase 6 as a normal consumer
 
 ---
 
@@ -68,7 +68,7 @@ github.com/dgrslabs/void-energy-premium         PRIVATE
     │
     ├── ambient/                                 @dgrslabs/void-energy-ambient-layers
     │   ├── package.json
-    │   ├── src/                                  ← lifted from Phase 1's src/ambient/
+    │   ├── src/                                  ← lifted from current monorepo's packages/ambient-layers/
     │   │   ├── components/
     │   │   │   ├── BloodLayer.svelte
     │   │   │   ├── SnowLayer.svelte
@@ -83,10 +83,10 @@ github.com/dgrslabs/void-energy-premium         PRIVATE
     └── rive/                                     @dgrslabs/void-energy-rive
         ├── package.json
         ├── src/
-        │   ├── components/
-        │   ├── effects/                          glass effect bindings
+        │   ├── components/                       animated CTA button components
+        │   ├── state-machines/                   Rive state machine bindings
         │   └── index.ts
-        ├── assets/                               .riv source files
+        ├── assets/                               .riv source files (Eric Jordan)
         └── tests/
 ```
 
@@ -135,9 +135,9 @@ All four premium packages depend on `void-energy` from **public npm**, not from 
 
 **Scope:** advanced kinetic text engine with pretext effects, narrative orchestration, multi-stage reveals, character-level animation control.
 
-**What stays in the public `void-energy` package:** the basic `kinetic` action + `_kinetic.scss` + types for simple text reveal. See [decisions.md §D10](decisions.md#d10--kinetic-text-base-reveal-stays-free-full-engine-is-premium).
+**What stays in the public `void-energy` package:** the basic `kinetic` action + `_kinetic.scss` + types for simple text reveal. See [decisions.md §D11](decisions.md#d11--kinetic-text-base-reveal-stays-free-full-engine-is-premium).
 
-**Phase 2 work:** lift the existing `packages/kinetic-text/` from the current monorepo into `packages/kinetic-text/` of the premium repo. Update imports from relative paths to `void-energy` public imports. Publish.
+**Phase 4b work:** lift the existing `packages/kinetic-text/` from the current monorepo into `packages/kinetic-text/` of the premium repo. Update imports from relative paths to `void-energy` public imports. Publish.
 
 ### 2. DGRS (`@dgrslabs/void-energy-dgrs`)
 
@@ -149,23 +149,23 @@ All four premium packages depend on `void-energy` from **public npm**, not from 
 
 **What's in the 12 atmospheres:** the full atmosphere set that currently lives in the monorepo as "private" themes. Extract them, package them, ship them.
 
-**Phase 2 work:** extract DGRS-specific components and atmosphere definitions from the current monorepo into this package. Wire up the atmosphere registration so consumers call `registerDGRSAtmospheres()` at boot.
+**Phase 4b work:** extract DGRS-specific components and atmosphere definitions from the current monorepo into this package. Wire up the atmosphere registration so consumers call `registerDGRSAtmospheres()` at boot.
 
 ### 3. Ambient (`@dgrslabs/void-energy-ambient-layers`)
 
-**Status:** Phase 1 builds this inside the current monorepo as `src/ambient/`.
+**Status:** Complete. Already exists in the current monorepo as `packages/ambient-layers/`.
 
-**Scope:** Blood, Snow, Rain, Fog visual overlay layers. See [phase-1-ambient-layers.md](phase-1-ambient-layers.md) for the full spec.
+**Scope:** Blood, Snow, Rain, Fog visual overlay layers with multiple intensity/variant effects per category.
 
-**Phase 2 work:** lift the entire `src/ambient/` directory from the current monorepo into `packages/ambient/src/`. Because Phase 1 built it in isolation (no cross-imports from other feature modules), this is a clean move. Update the SCSS imports from `@use '../abstracts' as *` to `@use 'void-energy/styles/abstracts' as *`. Publish.
+**Phase 4b work:** lift the existing `packages/ambient-layers/` from the current monorepo into `packages/ambient/src/` of the premium repo. Because Ambient was built in isolation (no cross-imports from other feature modules), this is a clean move. Update the SCSS imports from `@use '../abstracts' as *` to `@use 'void-energy/styles/abstracts' as *`. Publish.
 
 ### 4. Rive (`@dgrslabs/void-energy-rive`)
 
 **Status:** planning only — Dima prototypes, Eric Jordan polishes.
 
-**Scope:** Rive animation bindings for Void Energy, specifically targeting glass physics effects (see the archived [rive-glass-effects plan](archive/07-rive-glass-effects.md) for technical detail if it still exists — otherwise this is documented in memory files).
+**Scope:** Rive animation bindings for Void Energy — specifically animated CTA buttons (pivoted from glass effects, which are now handled by Liquid Glass). Eric Jordan builds the `.riv` assets; DGRS owns distribution.
 
-**Phase 2 work:** create the package scaffold with a placeholder component and a clear README explaining the package is under active development. Do NOT try to ship Rive in Phase 2 if it's not ready — the Eric Jordan partnership timeline is decoupled from the main phases. Shipping the scaffold means the package name is reserved and CoNexus can import from it as soon as it has content.
+**Phase 4b work:** create the package scaffold with a placeholder component and a clear README explaining the package is under active development. Do NOT try to ship Rive in Phase 4b if it's not ready — the Eric Jordan partnership timeline is decoupled from the main phases. Shipping the scaffold means the package name is reserved and CoNexus can import from it as soon as it has content.
 
 ---
 
@@ -232,7 +232,7 @@ npm version patch   # or minor/major
 npm publish
 ```
 
-No GitHub Actions — see [decisions.md §D12](decisions.md#d12--no-cicd-workflows-in-the-starter-template). Manual `npm publish` from the developer's machine. If volume grows, revisit CI later.
+No GitHub Actions — see [decisions.md §D13](decisions.md#d13--no-cicd-workflows-in-the-starter-template). Manual `npm publish` from the developer's machine. If volume grows, revisit CI later.
 
 ### Selective publishing
 
@@ -247,7 +247,7 @@ Because each package has its own `publishConfig`, flipping one public (to npmjs.
 }
 ```
 
-Change, commit, `npm publish`. Done. This enables scenarios like "open-source Rive for the Eric Jordan partnership while keeping KT and DGRS private" without repo surgery. See [decisions.md §D16](decisions.md#d16--selective-publishing-via-publishconfig).
+Change, commit, `npm publish`. Done. This enables scenarios like "open-source Rive for the Eric Jordan partnership while keeping KT and DGRS private" without repo surgery. See [decisions.md §D17](decisions.md#d17--selective-publishing-via-publishconfig).
 
 ---
 
@@ -311,10 +311,10 @@ The public repo's `.npmrc` (not committed) authenticates to GitHub Packages so V
 
 ---
 
-## Out of scope for Phase 2
+## Out of scope for Phase 4b
 
-- **Publishing the Rive package with real content** — Eric Jordan's partnership timeline is decoupled. Phase 2 only reserves the package name.
+- **Publishing the Rive package with real content** — Eric Jordan's partnership timeline is decoupled. Phase 4b only reserves the package name.
 - **Verdaccio or other registries** — GitHub Packages is sufficient. Revisit if it becomes a bottleneck.
 - **Automated publishing via CI** — manual `npm publish` is fine for the current team size.
 - **License key system or DRM** — trust-based distribution via token provisioning is enough for now. Formalize later if needed.
-- **Selling the premium packages** — no commerce work in Phase 2. Collect contacts, ship code, handle deals case-by-case.
+- **Selling the premium packages** — no commerce work in Phase 4b. Collect contacts, ship code, handle deals case-by-case.

@@ -1,11 +1,11 @@
-# Phase 2 — L2: AI Automation Foundation
+# Phase 3 — L2: AI Automation Foundation
 
 > Build the AI context system that turns Void Energy from "a good component library" into "an automated frontend engine." This is the layer that makes Claude Code (and future AI agents) reliably compose correct, constraint-following UIs on first shot.
 
-**Status:** Planning — blocked on Phase 0 (Tailwind v4) and Phase 1 (L0 Tailwind Preset) completion
-**Priority:** Phase 2 (after L0 ships)
-**Depends on:** Phase 0 (Tailwind v4 migration), Phase 1 (L0 establishes the universal token layer that L2 references)
-**Blocks:** Phase 3 (monorepo restructure inherits and redistributes this work)
+**Status:** Planning — blocked on Phase 1 (L0 Tailwind Preset) and Phase 2 (TTS + KT Sync) completion
+**Priority:** Phase 3 (after L0 and TTS sync ship)
+**Depends on:** Phase 1 (L0 establishes the universal token layer that L2 references), Phase 2 (TTS sync — KT package APIs finalized)
+**Blocks:** Phase 4 (monorepo restructure inherits and redistributes this work)
 
 ---
 
@@ -29,16 +29,16 @@ CLAUDE.md, component-registry.json, composition recipes, page archetypes, rules,
 
 ---
 
-## Why Phase 2 (and Why Now)
+## Why Phase 3 (and Why Now)
 
 AI automation is not a cosmetic feature. It is the primary differentiator of how Void Energy is consumed:
 
 - **Consumers build with AI.** The entire value proposition is "AI composes apps correctly using the system." If the AI hallucinates components, forgets the 5 Laws, or recreates primitives that already exist, the system fails at its job.
 - **The team builds with AI.** Every hour of AI assistance inside the monorepo that drifts from the 5 Laws is an hour of cleanup later. Strong AI context prevents drift at the source.
-- **Later is harder.** Bolting on AI automation during the Phase 3 restructure means doing two disruptive things at once. Landing it in the current monorepo first means Phase 3 inherits a working system and just redistributes it across workspaces.
+- **Later is harder.** Bolting on AI automation during the Phase 4 restructure means doing two disruptive things at once. Landing it in the current monorepo first means Phase 4 inherits a working system and just redistributes it across workspaces.
 - **L2 is the demo that sells VE.** The pitch isn't "look at our components." It's "I told Claude to build a settings page and it came out perfect." That demo requires L2.
 
-**This phase delivers foundation. Phase 3 will redistribute that foundation across `packages/` and `apps/` workspaces, but it will not have to invent it.**
+**This phase delivers foundation. Phase 4 will redistribute that foundation across `packages/` and `apps/` workspaces, but it will not have to invent it.**
 
 ---
 
@@ -52,8 +52,34 @@ Inside the current `void-energy-ui` monorepo, establish:
 4. **A package-level CLAUDE.md pattern** that premium packages (starting with ambient, kinetic-text, dgrs) all follow
 5. **AI-readable catalogs** (`CHEAT-SHEET.md`, `AI-PLAYBOOK.md`, `COMPOSITION-RECIPES.md`) that are curated, accurate, and referenced by the rules
 6. **L0 awareness** — the AI context system understands the L0/L1/L2 distinction and guides consumers to the right layer for their framework
+7. **A tool-agnostic `SYSTEM-PROMPT.md`** — a condensed, API-ready system prompt that any LLM or automation tool can consume, not just Claude Code
 
-After Phase 2, opening Claude Code anywhere in the monorepo produces correct, rule-following behavior without manual prompting.
+After Phase 3, opening Claude Code anywhere in the monorepo produces correct, rule-following behavior without manual prompting. And any automation tool — Claude Code, Cursor, a custom pipeline, or a future `void-agent` CLI — can read `SYSTEM-PROMPT.md` and generate constraint-following VE code.
+
+---
+
+## Existing Root Files — Audit & Disposition
+
+The root currently has 13 `.md` files. Phase 3 audits each and assigns a clear role:
+
+| File | Audience | Disposition |
+|---|---|---|
+| `CLAUDE.md` | AI (Claude Code) | **SLIM DOWN** — split library-specific rules into `src/CLAUDE.md`, keep only shared rules at root |
+| `AGENTS.md` | AI (non-Claude: Codex, Copilot, Windsurf) | **UPDATE** — currently stale (says "Tailwind CSS 3", no L0/L1/L2). Refresh to match slimmed `CLAUDE.md` |
+| `SYSTEM-PROMPT.md` | AI (any LLM, any tool) | **CREATE** — tool-agnostic portable prompt |
+| `AI-PLAYBOOK.md` | AI | **KEEP + CURATE** — update with L0/L1/L2 context |
+| `COMPOSITION-RECIPES.md` | AI | **KEEP + CURATE** — update with ambient/KT patterns |
+| `CHEAT-SHEET.md` | AI | **KEEP + CURATE** — verify all components/actions documented |
+| `AI-SERVICE.md` | Human (devs) | **KEEP AS-IS** — developer docs for the `/api/generate-atmosphere` endpoint and provider-agnostic AI service layer (renamed from `AI-PIPELINES.md`) |
+| `AMBIENT-EFFECTS.md` | AI (CoNexus backend) | **KEEP** — defines `AmbientScene` interface for story generation LLM. Phase 6 reference — feeds into CoNexus `SYSTEM-PROMPT.md` |
+| `NARRATIVE-EFFECTS.md` | AI (CoNexus backend) | **KEEP** — defines `NarrativeEffect` types for story generation LLM. Phase 6 reference — feeds into CoNexus `SYSTEM-PROMPT.md` |
+| `THEME-GUIDE.md` | Human | **KEEP AS-IS** |
+| `CONTRIBUTING.md` | Human | **KEEP AS-IS** |
+| `README.md` | Human | **KEEP AS-IS** |
+| `LICENSE.md` | Legal | **KEEP AS-IS** |
+| `CLAUDE-MIGRATION-TEMPLATE.md` | — | **DELETE** — superseded by Phase 6 plan |
+
+**Net change:** 13 files → 13 files (1 created, 1 deleted, 3 updated, 8 unchanged). No file sprawl.
 
 ---
 
@@ -170,11 +196,11 @@ void-energy-ui/                                <- current monorepo root
 - Pointer to `src/CLAUDE.md` and `packages/*/CLAUDE.md` for specialized behavior
 - Pointer to `AI-PLAYBOOK.md`, `COMPOSITION-RECIPES.md`, `CHEAT-SHEET.md`
 
-**Most of this already exists today.** Phase 2 audits, restructures, and splits it into the layered form.
+**Most of this already exists today.** Phase 3 audits, restructures, and splits it into the layered form.
 
 ### Root `.claude/` — canonical AI infrastructure
 
-Already largely in place today. Phase 2 gaps to fill:
+Already largely in place today. Phase 3 gaps to fill:
 
 - **`.claude/rules/`** — extract topic-specific rule files from the current CLAUDE.md. Each rule file is loaded on-demand based on file type or task. Keeps the root CLAUDE.md shorter and more focused.
 - **`.claude/rules/l0-tokens.md`** — new rule loaded when editing L0 package files. Enforces: no SCSS, no Svelte, pure CSS output, tokens must match L1.
@@ -248,16 +274,16 @@ Without the registry, the AI guesses — creates a custom `<input type="search">
 
 The existing `scripts/check-component-registry.ts` verifies that every `.svelte` file in `components/ui/` has a registry entry and vice versa. Runs on `npm run check:registry`. Source files and registry cannot drift.
 
-**Phase 2 work:**
+**Phase 3 work:**
 - Audit the current registry for completeness and accuracy
 - Expand the schema to include `examples`, `description`, and `category` for every entry if not already present
 - Ensure premium packages can register their components too — either via a separate `packages/*/component-registry.json` in each package, or by extending the core registry with a `package` field. Decide at implementation time.
 
 ### How It Travels Later
 
-In Phase 3, when `void-energy` becomes an npm package, `component-registry.json` ships inside the published tarball via the `files` field. Consumer AI (Claude Code running in a user's project) reads it from `node_modules/void-energy/src/config/component-registry.json`. The starter template's CLAUDE.md points the AI at that exact path.
+In Phase 4, when `void-energy` becomes an npm package, `component-registry.json` ships inside the published tarball via the `files` field. Consumer AI (Claude Code running in a user's project) reads it from `node_modules/void-energy/src/config/component-registry.json`. The starter template's CLAUDE.md points the AI at that exact path.
 
-**Phase 2 prepares for this** by making the registry complete and the rules reference it correctly. Phase 3 just redistributes the location.
+**Phase 3 prepares for this** by making the registry complete and the rules reference it correctly. Phase 4 just redistributes the location.
 
 ---
 
@@ -285,15 +311,70 @@ When someone scaffolds a project that uses L0 (not the full Svelte stack), they 
 - "Check TOKEN-REFERENCE.md for the complete token vocabulary."
 - No 5 Laws (those are L1 system-building rules), no pre-flight audit, no analog matching.
 
-This is a future deliverable (post-Phase 3 when we have the starter scaffold), but Phase 2 establishes the pattern.
+This is a future deliverable (post-Phase 4 when we have the starter scaffold), but Phase 3 establishes the pattern.
 
 ---
 
-## Distinction from Phase 3's AI Work
+## Tool-Agnostic System Prompt (`SYSTEM-PROMPT.md`)
 
-Phase 2 builds the foundation **in the current monorepo structure** (`src/`, `packages/`, `src/pages/`). Phase 3 will redistribute that foundation across the new structure (`packages/void-energy/`, `apps/showcase/`, `apps/starter-template/`):
+### Why This Exists
 
-| Phase 2 location | Phase 3 new location |
+The `.claude/` directory and `CLAUDE.md` files are Claude Code-specific. They rely on Claude Code's walk-up discovery, nearest-only `.claude/` merging, and rule trigger mechanics. This is great for the development workflow — but it means L2's value is locked to one tool.
+
+The "backend ships, frontend appears" pipeline — and any future `void-agent` CLI, Cursor integration, or CI-driven generation — needs a single file it can feed to any LLM as a system prompt. `SYSTEM-PROMPT.md` is that file.
+
+### What It Contains
+
+A condensed, self-contained prompt that any LLM can consume via API. It compiles the essential knowledge from across the L2 system into one document:
+
+1. **The 5 Laws** — compressed to actionable rules (not the full explanations from CLAUDE.md)
+2. **Component catalog** — every public component, its purpose, key props, when to use it (derived from `component-registry.json`)
+3. **Composition patterns** — the page archetypes from `COMPOSITION-RECIPES.md` (dashboard, settings, list/detail, etc.)
+4. **Token vocabulary** — semantic token names and usage guidance (derived from `design-tokens.ts`)
+5. **Constraint summary** — surface depth rules, density, spacing gravity, "before creating anything new, check if it exists"
+6. **Import paths** — exact import statements for every component and utility
+
+### What It Does NOT Contain
+
+- Claude Code-specific mechanics (walk-up, `.claude/` directory, rules triggers)
+- Development workflow instructions (pre-flight audit, analog matching — those are for humans editing the library)
+- Premium package details (those ship in the premium repo's own context)
+- Monorepo structure or build commands
+
+### How It's Generated
+
+`SYSTEM-PROMPT.md` is **hand-curated, not auto-generated.** The component catalog section is kept in sync with `component-registry.json` manually (or via a simple script in a future minor release). Auto-generating the entire prompt from scattered sources would produce a bloated, unfocused document. The value is in the curation — what to include, what to omit, and how to phrase it for LLM consumption.
+
+### How It Ships
+
+In Phase 4, `SYSTEM-PROMPT.md` ships inside the `void-energy` npm tarball via the `files` field, alongside `component-registry.json` and the other AI catalogs. Any automation tool reads it from `node_modules/void-energy/SYSTEM-PROMPT.md`.
+
+### How CoNexus Extends It
+
+CoNexus (Phase 6) will have its own `SYSTEM-PROMPT.md` in the CoNexus repo that layers on top of the base:
+
+```
+# CoNexus System Prompt
+
+## Base
+Read node_modules/void-energy/SYSTEM-PROMPT.md for the core design system rules.
+
+## CoNexus-Specific
+- Narrative orchestration patterns (ambient + KT + atmosphere shift sequencing)
+- Story-adaptive page archetypes (reader, library, portal)
+- Kinetic text + TTS integration patterns
+- DGRS atmosphere trigger conditions
+```
+
+This matches the dependency direction: CoNexus extends VE, never the other way around.
+
+---
+
+## Distinction from Phase 4's AI Work
+
+Phase 3 builds the foundation **in the current monorepo structure** (`src/`, `packages/`, `src/pages/`). Phase 4 will redistribute that foundation across the new structure (`packages/void-energy/`, `apps/showcase/`, `apps/starter-template/`):
+
+| Phase 3 location | Phase 4 new location |
 |---|---|
 | `CLAUDE.md` (root) | `CLAUDE.md` (monorepo root) — mostly same |
 | `.claude/` | `.claude/` (monorepo root) — mostly same |
@@ -305,18 +386,19 @@ Phase 2 builds the foundation **in the current monorepo structure** (`src/`, `pa
 | `AI-PLAYBOOK.md` (root) | `packages/void-energy/AI-PLAYBOOK.md` (ships in npm tarball) |
 | `COMPOSITION-RECIPES.md` (root) | `packages/void-energy/COMPOSITION-RECIPES.md` (ships in npm tarball) |
 | `CHEAT-SHEET.md` (root) | `packages/void-energy/CHEAT-SHEET.md` (ships in npm tarball) |
+| `SYSTEM-PROMPT.md` (root) | `packages/void-energy/SYSTEM-PROMPT.md` (ships in npm tarball) |
 
-**The content stays the same. Only the paths change.** Phase 2 writes the rules once; Phase 3 moves the files. This is why Phase 2 has to land first — Phase 3 becomes a mechanical move instead of a "write and restructure simultaneously" scramble.
+**The content stays the same. Only the paths change.** Phase 3 writes the rules once; Phase 4 moves the files. This is why Phase 3 has to land first — Phase 4 becomes a mechanical move instead of a "write and restructure simultaneously" scramble.
 
 ---
 
 ## Implementation Order
 
-1. **Audit the current `CLAUDE.md`**
-   - Identify which rules are universal (stay at root)
-   - Identify which rules are library-specific (move to `src/CLAUDE.md`)
-   - Identify which rules are consumer-specific (move to `src/pages/CLAUDE.md`)
-   - Identify which rules are topic-specific (move to `.claude/rules/*.md` with triggers)
+1. **Audit existing files and `CLAUDE.md`**
+   - Follow the "Existing Root Files — Audit & Disposition" table above
+   - Delete `CLAUDE-MIGRATION-TEMPLATE.md` (superseded by Phase 6 plan)
+   - Update `AGENTS.md` to match current stack (Tailwind v4, L0/L1/L2, current patterns)
+   - Split `CLAUDE.md`: identify which rules are universal (stay at root), library-specific (move to `src/CLAUDE.md`), consumer-specific (move to `src/pages/CLAUDE.md`), or topic-specific (move to `.claude/rules/*.md`)
 
 2. **Split into layered files**
    - Keep root `CLAUDE.md` focused on the 5 Laws, layer architecture, workspace map, pointers
@@ -343,27 +425,32 @@ Phase 2 builds the foundation **in the current monorepo structure** (`src/`, `pa
 6. **Curate `CHEAT-SHEET.md`, `AI-PLAYBOOK.md`, `COMPOSITION-RECIPES.md`**
    - Make sure they're accurate, current, and AI-readable
    - Add L0/L1/L2 context where relevant
-   - Add ambient layers sections (Phase 1 is complete)
+   - Add ambient layers sections (Ambient Layers is complete)
    - Cross-link so the AI can navigate from one to another
 
-7. **Write L0 token reference**
+7. **Write `SYSTEM-PROMPT.md`**
+   - Compile the 5 Laws (condensed), component catalog, composition patterns, token vocabulary, constraint summary, and import paths into a single API-ready prompt
+   - Hand-curated, not auto-generated — focus on what an LLM needs to produce correct VE code
+   - Validate by feeding it to Claude API (not Claude Code) with a test request like "build a settings page" and checking the output follows the 5 Laws
+
+8. **Write L0 token reference**
    - `TOKEN-REFERENCE.md` for L0 consumers
    - Every token, its purpose, which axis (atmosphere/physics/density) controls it
    - Common usage patterns
 
-8. **Formalize `.claude/settings.json`**
+9. **Formalize `.claude/settings.json`**
    - Hooks that enforce rules automatically where possible
    - Pre-edit reminder on `.svelte` files: "check the registry first"
    - Permissions tuning
 
-9. **Test the layered behavior**
-   - `cd src/components/ui && claude` — verify strict library rules kick in
-   - `cd src/pages && claude` — verify consumer rules kick in
-   - `cd packages/ambient-layers && claude` — verify package rules kick in
-   - `cd packages/void-energy-tailwind && claude` — verify L0 rules kick in
-   - Each should produce correctly scoped behavior without manual prompting
+10. **Test the layered behavior**
+    - `cd src/components/ui && claude` — verify strict library rules kick in
+    - `cd src/pages && claude` — verify consumer rules kick in
+    - `cd packages/ambient-layers && claude` — verify package rules kick in
+    - `cd packages/void-energy-tailwind && claude` — verify L0 rules kick in
+    - Each should produce correctly scoped behavior without manual prompting
 
-10. **Document the system**
+11. **Document the system**
     - Add a section to the root `CLAUDE.md` explaining the layering (for future humans reading the file)
     - Update any existing docs that reference the old single-file CLAUDE.md structure
 
@@ -394,6 +481,9 @@ Phase 2 builds the foundation **in the current monorepo structure** (`src/`, `pa
 - [ ] `CHEAT-SHEET.md`, `AI-PLAYBOOK.md`, `COMPOSITION-RECIPES.md` are current and accurate
 - [ ] Ambient layers are documented in all catalogs
 - [ ] L0 `TOKEN-REFERENCE.md` exists with complete token vocabulary
+- [ ] `SYSTEM-PROMPT.md` exists with condensed 5 Laws, component catalog, composition patterns, token vocabulary, and import paths
+- [ ] `SYSTEM-PROMPT.md` is self-contained — an LLM reading only this file produces correct VE code
+- [ ] `SYSTEM-PROMPT.md` does not contain Claude Code-specific mechanics or monorepo development workflow
 
 ### Behavior
 - [ ] Running Claude Code in `src/components/ui/` produces strict library behavior
@@ -402,18 +492,25 @@ Phase 2 builds the foundation **in the current monorepo structure** (`src/`, `pa
 - [ ] Running Claude Code in `packages/void-energy-tailwind/` produces L0-specific behavior
 - [ ] A subagent invocation correctly audits the registry for drift
 
+### File Hygiene
+- [ ] `CLAUDE-MIGRATION-TEMPLATE.md` deleted
+- [ ] `AGENTS.md` updated to match current stack (Tailwind v4, L0/L1/L2, no stale references)
+- [ ] `AMBIENT-EFFECTS.md` and `NARRATIVE-EFFECTS.md` confirmed as Phase 6 references (not modified)
+
 ### Meta
 - [ ] Root `CLAUDE.md` documents the layered system for future maintainers
 - [ ] Layer architecture (L0/L1/L2) is explained in the root README or a dedicated doc
 
 ---
 
-## Out of Scope for Phase 2
+## Out of Scope for Phase 3
 
-- **Restructuring into `packages/void-energy/` and `apps/*`.** That's Phase 3. Phase 2 works within the current directory structure.
-- **Shipping AI context inside an npm package.** That's Phase 3 (via the `files` field). Phase 2 only ensures the content is ready to ship.
-- **Building a consumer-facing starter template.** That's Phase 3. Phase 2 prepares the consumer rules in `src/pages/CLAUDE.md` so they can be lifted later.
-- **L0 consumer CLAUDE.md template.** Phase 2 establishes the pattern; Phase 3 builds the actual template.
-- **AI-powered migration tooling.** Maybe Phase 4 or later.
+- **Restructuring into `packages/void-energy/` and `apps/*`.** That's Phase 4. Phase 3 works within the current directory structure.
+- **Shipping AI context inside an npm package.** That's Phase 4 (via the `files` field). Phase 3 only ensures the content is ready to ship.
+- **Building a consumer-facing starter template.** That's Phase 4. Phase 3 prepares the consumer rules in `src/pages/CLAUDE.md` so they can be lifted later.
+- **L0 consumer CLAUDE.md template.** Phase 3 establishes the pattern; Phase 4 builds the actual template.
+- **AI-powered migration tooling.** Maybe Phase 5 or later.
+- **A `void-agent` CLI or `.void/` config directory.** `SYSTEM-PROMPT.md` is the portable piece. A dedicated CLI and its config format come later when there's a real consumer to design for. Don't design the config for the tool before the tool exists.
+- **Auto-generating `SYSTEM-PROMPT.md` from source files.** Hand-curation is the right approach — the value is in what's included and how it's phrased, not in mechanical completeness. A sync script can come later if drift becomes a problem.
 - **Telemetry on AI usage.** Never — privacy-first.
 - **Dynamic registry generation from AST.** Static JSON with a CI check is enough.

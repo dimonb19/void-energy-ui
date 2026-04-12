@@ -1,7 +1,7 @@
 # Phase 5 — Mobile Deployment (Capacitor)
 
 > Ship Void Energy apps to App Store and Google Play via Capacitor + cloud builds.
-> Planned: 2026-04-12. Executes after Phase 3 (monorepo ships npm packages).
+> Planned: 2026-04-12. Executes after Phase 4 (monorepo restructure), before CoNexus migration.
 
 ---
 
@@ -15,7 +15,7 @@ This phase produces a **ve-app-template** — a ready-to-clone Astro + Svelte + 
 
 ## Prerequisites
 
-- Phase 3 complete (monorepo restructured, `void-energy` and `@void-energy/tailwind` published to npm)
+- Phase 4 complete (monorepo restructured, `void-energy` and `@void-energy/tailwind` published to npm)
 - Apple Developer account ($99/year) — required regardless of build method
 - Google Play Developer account ($25 one-time)
 - Cloud build service account (Capawesome Cloud recommended for Capacitor)
@@ -341,7 +341,7 @@ Each subsequent app from the template: ~20 min (clone, update appId/appName, cre
 ## Execution Dependencies
 
 ```
-Phase 3 (monorepo)  ──►  Phase 5 (this)  ──►  Phase 4 (CoNexus)
+Phase 4 (monorepo)  ──►  Phase 5 (this)  ──►  Phase 6 (CoNexus)
         │                      │
         │   void-energy npm    │   ve-app-template uses
         │   package exists     │   published packages
@@ -349,11 +349,11 @@ Phase 3 (monorepo)  ──►  Phase 5 (this)  ──►  Phase 4 (CoNexus)
         └──────────────────────┘
 ```
 
-Phase 5 can begin as soon as `void-energy` is published to npm (end of Phase 3). CoNexus (Phase 4) can optionally use the mobile template if it targets app stores — but CoNexus web deployment is independent of this phase.
+Phase 5 can begin as soon as `void-energy` is published to npm (end of Phase 4). CoNexus (Phase 6) can optionally use the mobile template if it targets app stores — but CoNexus web deployment is independent of this phase.
 
-The plan itself is written now so architectural decisions (safe area consumption, glass perf thresholds, haptics integration points) can inform Phase 1-3 work. Specifically:
+The plan itself is written now so architectural decisions (safe area consumption, glass perf thresholds, haptics integration points) can inform Phase 1–4 work. Specifically:
 - **Phase 1 (L0):** ensure the Tailwind preset includes `safe-*` utility classes
-- **Phase 3 (monorepo):** ensure `void-energy` package exports a `capacitor.ts` helper module (status bar sync, haptics, lifecycle hooks)
+- **Phase 4 (monorepo):** ensure `void-energy` package exports a `capacitor.ts` helper module (status bar sync, haptics, lifecycle hooks)
 
 ---
 

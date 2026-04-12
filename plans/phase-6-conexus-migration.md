@@ -1,10 +1,10 @@
-# Phase 4 — CoNexus Migration
+# Phase 6 — CoNexus Migration
 
-> Rebuild CoNexus as a private Svelte/Astro app that consumes `void-energy` from public npm and premium packages from GitHub Packages, exactly the way any external customer would.
+> Refactor the existing CoNexus Astro+Svelte+SCSS frontend to consume `void-energy` from public npm and premium packages from GitHub Packages, exactly the way any external customer would. This is the last step — the complete system must be shipped first.
 
-**Status:** Planning — blocked on Phase 3 + 3b completion
-**Priority:** Phase 4 (final phase)
-**Depends on:** Phase 3 complete (public monorepo shipped, premium packages published), Phase 3b (TTS + KT sync)
+**Status:** Planning — blocked on all prior phases
+**Priority:** Phase 6 (final phase — intentionally last so the system is complete before the flagship app migrates)
+**Depends on:** Phase 4 (monorepo + premium packages), Phase 5 (mobile deployment). Also requires Phase 2 (TTS sync) for narrative features.
 **Blocks:** nothing — this is the last phase
 
 ---
@@ -19,7 +19,7 @@ Create `github.com/dgrslabs/conexus` as a private repository containing a single
 - Has zero local copies of library code — everything is a dependency
 - Is the living proof that Void Energy works end-to-end for a real application
 
-After Phase 3, the current monorepo's CoNexus-specific code has been extracted and the system is complete: three repos in a clean dependency hierarchy, with each repo serving its defined purpose.
+After Phase 6, the existing CoNexus frontend has been refactored to Void Energy, and the system is complete: three repos in a clean dependency hierarchy, with each repo serving its defined purpose.
 
 ---
 
@@ -43,6 +43,7 @@ github.com/dgrslabs/conexus                    PRIVATE
 ├── tsconfig.json
 ├── README.md                                    private docs
 ├── CLAUDE.md                                    CoNexus-specific AI rules
+├── SYSTEM-PROMPT.md                             extends base VE prompt with narrative layer
 ├── .claude/                                     CoNexus-specific rules/commands
 │   └── rules/
 │       ├── story-engine.md
@@ -183,8 +184,31 @@ CoNexus is the primary consumer — its entire reading experience is rendered th
 - Narrative orchestrator decides when to fade layers in/out based on the current scene
 
 ### `@dgrslabs/void-energy-rive` (premium)
-- Rive glass effect bindings for premium visual moments
-- Used selectively for key story beats (not persistent)
+- Rive animated CTA buttons for premium interactive moments
+- Used selectively for key story beats and calls to action
+
+---
+
+## CoNexus AI Automation Layer
+
+CoNexus extends the base VE automation (Phase 3's `SYSTEM-PROMPT.md`) with a narrative-specific layer. This sits ABOVE the general Void Energy rules and makes CoNexus development faster by teaching the AI about the storytelling domain.
+
+### `SYSTEM-PROMPT.md` (CoNexus-specific)
+
+References the base VE prompt from `node_modules/void-energy/SYSTEM-PROMPT.md`, then adds:
+
+- **Narrative effect system** — when to trigger atmosphere shifts, what combinations work (e.g., Blood ambient + Crimson atmosphere for horror scenes), what transitions to use between story beats
+- **Kinetic typography modes** — which pretext effects suit which narrative moments (shatter for violence, glitch for digital/corruption, fade for memory/dream), how TTS sync integrates with reveal timing
+- **Ambient layer triggers** — conditions for activating/deactivating Blood, Snow, Rain, Fog based on story metadata (genre, mood, scene tags), intensity scaling by narrative tension
+- **Story-adaptive page archetypes** — reader view, library/browse, portal/loading, character detail — each with its expected VE component composition
+- **DGRS atmosphere mapping** — which of the 12 DGRS atmospheres maps to which narrative moods, and the rules for AI-driven atmosphere selection during story generation
+
+### `.claude/rules/` (CoNexus-specific)
+
+- `story-engine.md` — how the story runner works, state management patterns, save/load, branching logic
+- `narrative-orchestration.md` — the sequencing model for ambient + KT + atmosphere shifts, how events propagate, timing constraints
+
+These rules only apply inside the CoNexus repo. They never leak into the public VE library.
 
 ---
 
@@ -205,7 +229,7 @@ CoNexus is the primary consumer — its entire reading experience is rendered th
 
 4. **Identify any code that "feels library-worthy" but is currently CoNexus-only:**
    - If it's generically useful, it should probably be promoted to `void-energy` or to a premium package
-   - Discuss case-by-case; defer promotion if it delays Phase 3
+   - Discuss case-by-case; defer promotion if it delays Phase 6
    - For the migration itself, keep questionable code in CoNexus and promote later
 
 5. **Wire up imports:**
@@ -221,7 +245,12 @@ CoNexus is the primary consumer — its entire reading experience is rendered th
 
 7. **Register DGRS atmospheres at boot** via `src/boot/register-dgrs.ts`
 
-8. **Verify the migration:**
+8. **Write CoNexus AI automation layer:**
+   - `SYSTEM-PROMPT.md` extending the base VE prompt with narrative effect rules, KT mode guidance, ambient trigger conditions, story-adaptive page archetypes, and DGRS atmosphere mapping
+   - `CLAUDE.md` with CoNexus-specific development rules (references installed packages, not relative paths)
+   - `.claude/rules/story-engine.md` and `.claude/rules/narrative-orchestration.md`
+
+9. **Verify the migration:**
    - `npm install` succeeds with GitHub Packages auth
    - `npm run dev` starts without errors
    - Every page renders correctly
@@ -229,24 +258,24 @@ CoNexus is the primary consumer — its entire reading experience is rendered th
    - Ambient layers trigger correctly
    - Kinetic text renders stories correctly
 
-9. **Update Vercel (or whichever deploy target CoNexus uses):**
-   - Add `GITHUB_TOKEN` environment variable for package auth during build
-   - Point the deployment at the new repo
-   - Verify production build succeeds
+10. **Update Vercel (or whichever deploy target CoNexus uses):**
+    - Add `GITHUB_TOKEN` environment variable for package auth during build
+    - Point the deployment at the new repo
+    - Verify production build succeeds
 
-10. **Retire CoNexus code from the current monorepo:**
+11. **Retire CoNexus code from the current monorepo:**
     - After CoNexus runs cleanly from its new repo, delete the CoNexus-specific code from the old monorepo
-    - The old monorepo's fate is already sealed by Phase 2 — it's replaced by the new public `void-energy` monorepo. Phase 3 just ensures no dangling CoNexus references remain.
+    - The old monorepo's fate is already sealed by Phase 4a — it's replaced by the new public `void-energy` monorepo. Phase 6 just ensures no dangling CoNexus references remain.
 
 ---
 
 ## What changes about CoNexus
 
-### Before Phase 3
+### Before Phase 6
 
 CoNexus code is scattered throughout `void-energy-ui/` mixed with library code. Pages, components, story engine, library primitives, DGRS atmospheres — all in one git tree. Library changes and CoNexus changes are indistinguishable in the commit log.
 
-### After Phase 3
+### After Phase 6
 
 CoNexus is a thin app. Every library primitive is imported. Every atmosphere comes from a package. The CoNexus repo contains only the story engine, narrative logic, and CoNexus-specific pages. Commits in the CoNexus repo are CoNexus commits, not library commits.
 
@@ -278,20 +307,23 @@ CoNexus is a thin app. Every library primitive is imported. Every atmosphere com
 - [ ] No CoNexus-specific code remains in any other repo
 - [ ] The old `void-energy-ui` monorepo is either retired (its role replaced by the new public repo) or contains only legacy/archive content
 - [ ] CoNexus `CLAUDE.md` references the installed packages, not relative paths
+- [ ] CoNexus `SYSTEM-PROMPT.md` extends the base VE prompt with narrative/KT/ambient/atmosphere rules
+- [ ] `.claude/rules/story-engine.md` and `.claude/rules/narrative-orchestration.md` exist
+- [ ] AI generating CoNexus pages uses correct KT modes, ambient triggers, and atmosphere mapping
 
 ---
 
-## Out of scope for Phase 3
+## Out of scope for Phase 6
 
-- **New CoNexus features.** Phase 3 is migration only. Any new story features, new narrative effects, or new gameplay mechanics come after Phase 3 ships.
+- **New CoNexus features.** Phase 6 is migration only. Any new story features, new narrative effects, or new gameplay mechanics come after Phase 6 ships.
 - **Promoting CoNexus-only code to the library.** If something feels library-worthy, note it and defer. Promoting during migration creates scope creep.
-- **Changing the library to fit CoNexus.** If the library is missing something CoNexus needs, work around it in CoNexus. Library changes happen in a separate cycle after Phase 3.
+- **Changing the library to fit CoNexus.** If the library is missing something CoNexus needs, work around it in CoNexus. Library changes happen in a separate cycle after Phase 6.
 - **Automated story generation improvements.** The story engine is imported as-is. No AI/prompting work.
-- **Public CoNexus beta or launch.** Phase 3 is migration. Launch planning is a separate effort.
+- **Public CoNexus beta or launch.** Phase 6 is migration. Launch planning is a separate effort.
 
 ---
 
-## After Phase 3 — the end state
+## After Phase 6 — the end state
 
 Three repos, three roles, clean dependency direction:
 
