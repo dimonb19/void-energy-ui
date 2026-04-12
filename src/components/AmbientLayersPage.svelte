@@ -21,6 +21,7 @@
   import { morph } from '@actions/morph';
   import Remove from '@components/icons/Remove.svelte';
   import Restart from '@components/icons/Restart.svelte';
+  import { dissolve, emerge } from '@lib/transitions.svelte';
 
   // ── Tabs ────────────────────────────────────────────────────────────
   // ── Atmosphere controls ────────────────────────────────────────────
@@ -565,7 +566,7 @@
           onchange={setPreset}
         />
 
-        <p use:morph class="text-caption text-dim text-center min-h-control">
+        <p use:morph class="text-caption text-dim text-center">
           {#if activePreset}
             {activePreset.tagline}
           {:else}
@@ -575,12 +576,13 @@
 
         {#if activePreset}
           <div
-            use:morph
+            in:emerge
+            out:dissolve
             class="flex flex-wrap gap-md justify-center text-caption text-mute"
           >
             {#if activePreset.atmosphere}
               <span>
-                Atmosphere: <strong class="text-main"
+                Atmosphere: <strong class="badge text-main uppercase"
                   >{activePreset.atmosphere.variant}</strong
                 >
                 ({activePreset.atmosphere.intensity})
@@ -588,7 +590,7 @@
             {/if}
             {#if activePreset.environment}
               <span>
-                Environment: <strong class="text-main"
+                Environment: <strong class="badge text-main uppercase"
                   >{activePreset.environment.variant}</strong
                 >
                 ({activePreset.environment.intensity})
@@ -596,7 +598,7 @@
             {/if}
             {#if activePreset.psychology}
               <span>
-                Psychology: <strong class="text-main"
+                Psychology: <strong class="badge text-main uppercase"
                   >{activePreset.psychology.variant}</strong
                 >
                 ({activePreset.psychology.intensity})
@@ -604,15 +606,9 @@
             {/if}
           </div>
         {/if}
-      </div>
 
-      <div class="flex flex-col gap-sm">
-        <p class="text-small text-mute">
-          One-shot transient effects that punch through the frame and
-          auto-clear. Fire them on top of any active preset.
-        </p>
         <div
-          class="surface-sunk p-md flex flex-row flex-wrap gap-md justify-center"
+          class="flex flex-row flex-wrap gap-sm justify-center"
         >
           <button class="btn" onclick={() => fireActionVariant('glitch')}>
             Glitch
@@ -624,16 +620,20 @@
             Zoom Burst
           </button>
         </div>
-      </div>
 
-      {#if activePreset}
+        <p class="text-caption text-mute text-center">
+          One-shot transient effects that punch through the frame and
+          auto-clear
+        </p>
+
         <ActionBtn
           icon={Remove}
           text="Clear scene"
-          class="btn-ghost btn-error"
+          class="btn-ghost btn-error self-center"
           onclick={clearPreset}
+          disabled={!activePreset}
         />
-      {/if}
+      </div>
 
       <details>
         <summary>How It Works</summary>
