@@ -1,7 +1,7 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
 import svelte from '@astrojs/svelte';
-import tailwind from '@astrojs/tailwind';
+import tailwindcss from '@tailwindcss/vite';
 import vercel from '@astrojs/vercel';
 // import { execSync } from 'node:child_process';
 
@@ -53,14 +53,9 @@ import vercel from '@astrojs/vercel';
 export default defineConfig({
   output: 'server',
   adapter: vercel(),
-  integrations: [
-    svelte(),
-    // Loads Tailwind and Autoprefixer; ensures Sass runs first.
-    tailwind({
-      applyBaseStyles: false,
-    }),
-  ],
+  integrations: [svelte()],
   vite: {
+    plugins: [tailwindcss()],
     // plugins: [voidEnergyWatcher()],
     css: {
       preprocessorOptions: {

@@ -174,11 +174,13 @@ The goal is to standardize the parts that carry shared behavior and shared acces
 │   │   ├── config/
 │   │   │   ├── _generated-themes.scss <-- 🤖 Generated (SCSS Maps)
 │   │   │   └── _fonts.scss       <-- 🤖 Generated (@font-face)
+│   │   ├── tailwind-theme.css    <-- Tailwind v4 Bridge (@theme, @utility, @layer)
 │   │   └── global.scss           <-- Main CSS Entry Point
 │   └── types/
 │       └── *.d.ts                <-- Ambient and global type declarations
-├── tailwind.config.mjs           <-- The Bridge (Maps Tokens to Tailwind)
 ```
+
+> **Tailwind v4:** The system uses Tailwind CSS v4 via `@tailwindcss/vite`. There is no `tailwind.config.mjs` — all theme registration, namespace resets, and `@utility` / `@layer void-overrides` declarations live in [src/styles/tailwind-theme.css](src/styles/tailwind-theme.css). Token values still flow from `src/config/design-tokens.ts` → SCSS-emitted CSS variables → Tailwind utilities; the bridge file just tells Tailwind which variable names to generate classes for.
 
 ### Key Singletons
 

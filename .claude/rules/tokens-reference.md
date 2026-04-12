@@ -3,7 +3,7 @@ paths:
   - "src/**/*.scss"
   - "src/**/*.svelte"
   - "src/**/*.ts"
-  - "tailwind.config.mjs"
+  - "src/styles/tailwind-theme.css"
 ---
 
 # Token Dictionary

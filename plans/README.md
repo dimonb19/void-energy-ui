@@ -1,7 +1,7 @@
 # Void Energy — Plans
 
 > The complete launch and architecture plan for Void Energy, organized by priority.
-> Last updated: 2026-04-11
+> Last updated: 2026-04-11 (Phase 0 + 0a complete; Phase 1 revised post-migration)
 
 ---
 
@@ -42,15 +42,11 @@ The UI/UX premium feel is our only differentiator right now — no userbase, no 
 
 Work is organized into five phases. **Each phase ships before the next begins.** No split focus.
 
-### Phase 0 — Tailwind CSS v4 Migration
-**Why first:** L0 must target Tailwind v4's CSS-first `@theme` API. Building L0 for v4 while L1 runs on v3 means maintaining two Tailwind integration approaches. Upgrading first means both layers share the same Tailwind version and configuration pattern. This is a low-risk config-level migration — zero template changes, zero SCSS changes.
-
-**Deliverable:** The existing codebase running on Tailwind CSS v4 with a `@theme`-based CSS config replacing `tailwind.config.mjs`.
-
-**Plan:** [phase-0-tailwind-v4-migration.md](phase-0-tailwind-v4-migration.md)
+### Phase 0 — Tailwind CSS v4 Migration ✓ COMPLETE
+The existing codebase migrated from Tailwind v3.4 to v4 with a `@theme`-based CSS config. Phase 0a follow-up patched the v4 footguns surfaced after the swap (bare `border` family hardcoded 1px, bare `rounded` no longer driven by `--radius-*`, `min-h-control` namespace mismatch, `.container` shadowed by Tailwind's built-in, `--max-width > --spacing > --container` fallback chain). Both phases are landed; the canonical reference for v4 namespace strategy and footgun fixes lives in [src/styles/tailwind-theme.css](../src/styles/tailwind-theme.css). Phase 1 absorbs these learnings.
 
 ### Phase 1 — L0: Framework-Agnostic Tailwind Preset
-**Why second:** This is the adoption unlock. VE is currently Svelte-only (~3% of frontend devs). Extracting the design system brain as a Tailwind v4 preset makes every Tailwind user a potential VE user. Low effort (the token system already exists), high reach (millions of Tailwind users across every framework).
+**Why first remaining:** This is the adoption unlock. VE is currently Svelte-only (~3% of frontend devs). Extracting the design system brain as a Tailwind v4 preset makes every Tailwind user a potential VE user. Low effort (the token system already exists), high reach (millions of Tailwind users across every framework).
 
 **Deliverable:** `@void-energy/tailwind` — a Tailwind CSS v4 preset with atmosphere switching, physics presets, density scaling, semantic tokens, and a tiny vanilla JS runtime. Works with any framework.
 
@@ -153,8 +149,7 @@ All architectural and strategic decisions with rationale are documented in [deci
 |-----|-------|
 | [README.md](README.md) | This index |
 | [decisions.md](decisions.md) | Canonical decisions log with rationale |
-| [phase-0-tailwind-v4-migration.md](phase-0-tailwind-v4-migration.md) | Phase 0: Tailwind v3 → v4 migration (config-level only) |
-| [phase-1-l0-tailwind-preset.md](phase-1-l0-tailwind-preset.md) | Phase 1: `@void-energy/tailwind` — framework-agnostic Tailwind preset |
+| [phase-1-l0-tailwind-preset.md](phase-1-l0-tailwind-preset.md) | Phase 1: `@void-energy/tailwind` — framework-agnostic Tailwind preset (revised post-Phase 0a) |
 | [phase-2-ai-automation.md](phase-2-ai-automation.md) | Phase 2: L2 AI automation foundation in current monorepo |
 | [phase-3-monorepo-structure.md](phase-3-monorepo-structure.md) | Phase 3: public monorepo, npm packages, scaffolder |
 | [phase-3-premium-packages.md](phase-3-premium-packages.md) | Phase 3: private premium repo, KT/DGRS/Ambient/Rive |
@@ -165,4 +160,4 @@ All architectural and strategic decisions with rationale are documented in [deci
 
 ## One-Line Priority
 
-**Migrate to Tailwind v4 -> ship L0 Tailwind preset -> land L2 AI automation foundation -> restructure into public/premium monorepos + ship npm packages -> migrate CoNexus. One phase at a time, no split focus.**
+**~~Migrate to Tailwind v4~~ ✓ -> ship L0 Tailwind preset -> land L2 AI automation foundation -> restructure into public/premium monorepos + ship npm packages -> migrate CoNexus. One phase at a time, no split focus.**

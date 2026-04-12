@@ -567,7 +567,7 @@ Our spacing scale is **100% compatible** with Tailwind CSS:
 
 - **Implementation**: [/src/styles/base/\_reset.scss:9-79](./src/styles/base/_reset.scss) (Density Engine)
 - **Token Definitions**: [/src/config/design-tokens.ts:20-66](./src/config/design-tokens.ts) (Spacing scale)
-- **Tailwind Integration**: [/tailwind.config.mjs](./tailwind.config.mjs) (Spacing utilities)
+- **Tailwind Integration**: [src/styles/tailwind-theme.css](./src/styles/tailwind-theme.css) (v4 `@theme` bridge, spacing utilities, namespace resets)
 
 ---
 
@@ -958,7 +958,7 @@ Comprehensive print optimization. All rules scoped inside `@media print` — zer
 
 Component-scoped responsive styles based on container width (not viewport width). Infrastructure is ready — no components use container queries yet.
 
-**Source:** [tailwind.config.mjs](tailwind.config.mjs) (`@tailwindcss/container-queries` plugin), [src/styles/abstracts/\_mixins.scss](src/styles/abstracts/_mixins.scss) (`container-up` mixin)
+**Source:** [src/styles/tailwind-theme.css](src/styles/tailwind-theme.css) (`--container-*` breakpoint values — container queries are built into Tailwind v4 core, no plugin needed), [src/styles/abstracts/\_mixins.scss](src/styles/abstracts/_mixins.scss) (`container-up` mixin)
 
 #### Container Breakpoints
 

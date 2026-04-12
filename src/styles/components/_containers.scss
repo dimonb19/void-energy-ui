@@ -1,43 +1,14 @@
-/* Containers (layout) and surfaces (physics). */
+/* Surface physics. Layout containers live in `_container-layout.scss`,
+ * loaded separately into the `void-overrides` layer to defeat Tailwind v4's
+ * built-in `.container` utility (which uses breakpoint widths and would
+ * otherwise shadow our intentional container max-widths). */
 
 @use 'sass:map';
 @use '../abstracts' as *;
 @use '../base/typography';
 
-/* Containers set width/margins; surfaces set background/blur/border. */
-
 // ==========================================================================
-// 1. LAYOUT CONTAINERS (Structure)
-// ==========================================================================
-
-// STANDARD CONTAINER
-// Role: Handles max-widths and margins across breakpoints.
-// Logic: Pure layout. No visuals (blur/glow) by default.
-.container {
-  width: 100%;
-  margin-inline: auto;
-
-  padding-inline: var(--space-md);
-
-  @each $bp-name, $max-width in $container-widths {
-    @include respond-up($bp-name) {
-      max-width: $max-width;
-    }
-  }
-}
-
-// FLUID CONTAINER
-// Role: Background sections that span viewport edge-to-edge.
-// Logic: 100% width, but respects the grid's side
-.container-fluid {
-  width: 100%;
-  padding-inline: var(--space-md);
-  margin-inline: auto;
-  max-width: none; // Unset the limit
-}
-
-// ==========================================================================
-// 2. ATOMIC SURFACES (Texture Only)
+// ATOMIC SURFACES (Texture Only)
 // ==========================================================================
 // Purpose: Apply "Void Physics" to any element without enforcing layout/spacing.
 

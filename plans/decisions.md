@@ -256,13 +256,21 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 ---
 
-## D24 — Tailwind v4 migration before L0 extraction (Phase 0)
+## D24 — Tailwind v4 migration before L0 extraction (Phase 0) ✓ COMPLETE
 
 **Decision:** Migrate the existing L1 codebase from Tailwind v3.4 to v4 as Phase 0, before extracting L0.
 
-**Why:** L0 must target v4's CSS-first `@theme` API (that's how presets work in v4). Running L1 on v3 while building L0 for v4 means maintaining two Tailwind integration approaches and cannot validate the `@theme` block against the running system. The migration is low risk: zero `@apply` directives, zero `@tailwindcss` directives, all theme values already reference CSS variables. The changes are config-level only — no template or SCSS modifications.
+**Why:** L0 must target v4's CSS-first `@theme` API (that's how presets work in v4). Running L1 on v3 while building L0 for v4 means maintaining two Tailwind integration approaches and cannot validate the `@theme` block against the running system.
 
-**How to apply:** See [phase-0-tailwind-v4-migration.md](phase-0-tailwind-v4-migration.md). Replace `tailwind.config.mjs` with a CSS `@theme` block. Drop `@tailwindcss/container-queries` (built-in) and `autoprefixer` (built-in). One potential risk: `text-*` namespace collision between `--color-main` (color utility) and `--text-*` (font-size utility) — test explicitly during migration.
+**How it played out:** Phase 0 swapped the build tool (`@astrojs/tailwind` → `@tailwindcss/vite`) and replaced `tailwind.config.mjs` with a CSS `@theme` block in [src/styles/tailwind-theme.css](../src/styles/tailwind-theme.css). The risks the original plan flagged (`text-*` namespace collision, `@astrojs/tailwind` v6 availability) turned out to be non-issues. The *actual* problems were five v4 quirks the plan didn't anticipate, fixed in Phase 0a:
+
+1. Bare `border` family hardcoded to 1px (v3's `borderWidth.DEFAULT` no longer wired) — fixed via `@layer void-overrides` block
+2. Bare `rounded` not driven by `--radius-*` namespace — fixed via `@utility rounded`
+3. `min-h-control` namespace mismatch (`--min-height-*`, not `--min-h-*`) — fixed via `@utility`
+4. `.container` shadowed by Tailwind v4's built-in container utility — fixed via `void-overrides` layer
+5. `--max-width > --spacing > --container` fallback chain shadowing container queries — fixed via explicit `--max-width-*` declarations
+
+The Phase 0a fixes also surfaced the **`@theme inline` vs `@theme reference` distinction** as the load-bearing learning for L0: any token whose name SCSS/atmosphere/physics CSS already defines on `:root` must use `@theme reference` to avoid a self-reference cycle. The full namespace strategy and footgun inventory are documented in [phase-1-l0-tailwind-preset.md](phase-1-l0-tailwind-preset.md), which absorbs all Phase 0/0a learnings.
 
 ---
 
@@ -293,4 +301,4 @@ Forcing one to use the other creates friction: `install` users would have to ext
 | D21 | No L0.5 CSS component classes | Committed |
 | D22 | L0 Phase 1, L2 Phase 2 (Ambient complete) | Committed |
 | D23 | L0 includes only free atmospheres | Committed |
-| D24 | Tailwind v4 migration before L0 (Phase 0) | Committed |
+| D24 | Tailwind v4 migration before L0 (Phase 0) | Committed (shipped) |

@@ -11,6 +11,8 @@ paths:
 
 Quick-reference of every Tailwind utility available in this system. Standard Tailwind numeric scales and color palettes are **fully replaced** — only the classes listed here resolve to real values. If a class isn't here and isn't a standard layout/display utility, it won't work.
 
+**Tailwind v4 setup.** The system runs on Tailwind CSS v4 via `@tailwindcss/vite`. There is no `tailwind.config.mjs`. All theme registration, namespace resets, `@utility` declarations, and the `void-overrides` cascade layer live in [src/styles/tailwind-theme.css](../../src/styles/tailwind-theme.css). Cascade layer order is `void-scss, properties, theme, base, components, utilities, void-overrides` (declared identically in `tailwind-theme.css` and `global.scss`).
+
 ## Spacing — `p-*`, `m-*`, `gap-*`, `space-x-*`, `space-y-*`, `inset-*`, `top-*`, etc.
 
 ```
@@ -143,16 +145,16 @@ tracking-title  tracking-subtitle    tracking-body    tracking-small    tracking
 ## Border Radius — `rounded-*`
 
 ```
-rounded          var(--radius-md) — static 8px in all physics (NOT physics-adaptive)
+rounded          var(--radius-md)   — 8px (0 in retro)  [provided via @utility override in tailwind-theme.css — v4 has no --radius-DEFAULT namespace]
 rounded-none     0
-rounded-sm       var(--radius-sm)  — 4px (0 in retro)
-rounded-md       var(--radius-md)  — 8px (0 in retro)
-rounded-lg       var(--radius-lg)  — 16px (0 in retro)
-rounded-xl       var(--radius-xl)  — 24px (0 in retro)
+rounded-sm       var(--radius-sm)   — 4px (0 in retro)
+rounded-md       var(--radius-md)   — 8px (0 in retro)
+rounded-lg       var(--radius-lg)   — 16px (0 in retro)
+rounded-xl       var(--radius-xl)   — 24px (0 in retro)
 rounded-full     var(--radius-full) — 9999px (0 in retro)
 ```
 
-**Note:** All radius tokens except `rounded-none` are force-zeroed in retro physics. For physics-adaptive radius in SCSS, use `var(--radius-base)` directly — it is not exposed as a Tailwind class.
+**Note:** All radius tokens except `rounded-none` are force-zeroed in retro physics. The bare `rounded` utility is physics-adaptive (same as `rounded-md`) — it is an explicit `@utility` override in `tailwind-theme.css` because v4 has no `--radius-DEFAULT` namespace and bare `rounded` would otherwise be a hardcoded static utility. For physics-adaptive radius in SCSS, use `var(--radius-base)` directly — it is not exposed as a Tailwind class.
 
 **Not available:** `rounded-2xl`, `rounded-3xl` — not in scale.
 
@@ -160,11 +162,18 @@ rounded-full     var(--radius-full) — 9999px (0 in retro)
 
 ```
 border           var(--physics-border-width) — adapts per physics (1px glass/flat, 2px retro)
+border-x         var(--physics-border-width) — adapts per physics
+border-y         var(--physics-border-width) — adapts per physics
+border-l / -r / -t / -b   var(--physics-border-width) — adapts per physics (directional)
 border-0         0
 border-2         2px
 ```
 
 **Not available:** `border-4`, `border-8` — only 0, default, and 2.
+
+**How the physics-adaptive bare family works.** In v4, `border` and `border-{l,r,t,b,x,y}` are hardcoded 1px static utilities. `tailwind-theme.css` restores v3's physics-aware behavior by declaring these rules in the `void-overrides` cascade layer (highest priority), which wins over Tailwind's static values regardless of source order or specificity.
+
+**TRAP:** do not combine `border` (or `border-l`/`border-t`/etc.) with a numeric directional like `border-l-2` on the same element. The bare family sets the width via the shorthand, which expands to all four longhand `border-*-width` declarations in a higher layer than `utilities`. `border-l-2`'s `border-left-width: 2px` then silently loses to physics width. Use **either** the bare family **or** numeric directionals, not both. (In v3 source order let `border-l-2` win; v4 cascade layers don't honor source order across layers.)
 
 ## Z-Index — `z-*`
 
@@ -210,11 +219,15 @@ ease-linear            linear
 min-h-control    var(--control-height) — ~44px, density-scaled
 ```
 
+Provided via `@utility min-h-control` in `tailwind-theme.css`. In v4 the `min-h-*` namespace reads from `--min-height-*` (not `--min-h-*`), so a theme entry would emit the variable at `:root` without generating a class. The `@utility` declaration is the correct way to register custom `min-h-*` names.
+
 ## Physics Bridge
 
 ```
 backdrop-blur-physics    blur(var(--physics-blur)) — 20px glass, 0 flat/retro
 ```
+
+Provided via `@utility backdrop-blur-physics` in `tailwind-theme.css`. Replaces the v3 JS plugin approach.
 
 **Not available:** `backdrop-blur-sm`, `backdrop-blur-md`, `backdrop-blur-lg` — use `backdrop-blur-physics` or SCSS.
 

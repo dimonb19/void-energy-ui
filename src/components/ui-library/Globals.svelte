@@ -27,8 +27,7 @@
         chrome, and reveals link URLs. Container queries use
         <code>@include container-up($breakpoint)</code> in SCSS and
         <code>@sm:</code> / <code>@md:</code> / <code>@lg:</code> /
-        <code>@xl:</code> Tailwind variants via the
-        <code>@tailwindcss/container-queries</code> plugin.
+        <code>@xl:</code> Tailwind variants (built into Tailwind v4 core).
       </p>
     </details>
 

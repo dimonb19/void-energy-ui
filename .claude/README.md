@@ -172,7 +172,7 @@ These load automatically when Claude edits matching file types. No action needed
 | `styling.md` | all `.scss` files | Starter styling guardrails and hybrid protocol |
 | `read-only-system.md` | `src/components/ui/**/*`, `src/components/icons/**/*`, `src/components/core/**/*`, `src/styles/**/*`, `src/types/**/*`, `src/config/design-tokens.ts` | Hard stop for shipped system files |
 | `new-page.md` | `src/pages/**/*.astro` | Copy-paste scaffold for new routes |
-| `tokens-reference.md` | `.scss`, `.svelte`, `.ts`, `tailwind.config.mjs` | Full token dictionary (spacing, colors, physics, z-index, typography) |
+| `tokens-reference.md` | `.scss`, `.svelte`, `.ts`, `src/styles/tailwind-theme.css` | Full token dictionary (spacing, colors, physics, z-index, typography) |
 | `scss-reference.md` | `src/styles/**/*.scss`, `src/components/**/*.svelte` | SCSS toolkit (mixins, functions, state selectors) |
 | `spacing-protocol.md` | `.svelte`, `.scss`, `.ts`, `.astro` | Spacing floors, layout gaps, common mistakes, page scaffold |
 
@@ -220,7 +220,7 @@ Or ask directly: "Review my latest changes for design system violations and acce
 
 For migrating a large codebase using the strangler fig pattern:
 
-1. **Import the foundation first.** Copy Void Energy's `styles/abstracts/`, `config/design-tokens.ts`, VoidEngine, `tailwind.config.mjs`, and the `.claude/` directory into the big repo. Rename the template to `CLAUDE.md` and fill in Section 0 (Legacy Patterns).
+1. **Import the foundation first.** Copy Void Energy's `styles/abstracts/`, `styles/tailwind-theme.css`, `config/design-tokens.ts`, VoidEngine, and the `.claude/` directory into the big repo. Rename the template to `CLAUDE.md` and fill in Section 0 (Legacy Patterns). Note: Void Energy uses Tailwind v4 via `@tailwindcss/vite` — there is no `tailwind.config.mjs` file to copy. Consumers must also be on v4 (or willing to migrate).
 
 2. **Rename old files with `-legacy` suffix.** `Modal.svelte` → `Modal-legacy.svelte`, `/styles/` → `/styles-legacy/`. The Void Energy versions take the clean names.
 

@@ -12,32 +12,11 @@
   // ── Built-in atmospheres table data ────────────────────────────────────
   const builtInAtmospheres = [
     {
-      id: 'void',
-      physics: 'glass',
-      mode: 'dark',
-      tagline: 'Default / Cyber',
-      concept: 'Sci-fi control interface scanning deep space',
-    },
-    {
-      id: 'onyx',
+      id: 'slate',
       physics: 'flat',
       mode: 'dark',
-      tagline: 'Stealth / Cinema',
-      concept: 'Film noir editorial minimalism — content is the only color',
-    },
-    {
-      id: 'terminal',
-      physics: 'retro',
-      mode: 'dark',
-      tagline: 'Hacker / Retro',
-      concept: '1980s amber phosphor CRT monitor',
-    },
-    {
-      id: 'nebula',
-      physics: 'glass',
-      mode: 'dark',
-      tagline: 'Synthwave / Cosmic',
-      concept: 'Synth-lit observation deck — cosmic and dreamy',
+      tagline: 'Professional / Clean',
+      concept: 'Calm dark workspace — neutral surfaces, blue accent',
     },
     {
       id: 'frost',
@@ -47,53 +26,18 @@
       concept: 'Ice station observatory — clean and cold',
     },
     {
-      id: 'overgrowth',
-      physics: 'glass',
+      id: 'meridian',
+      physics: 'flat',
+      mode: 'light',
+      tagline: 'Fintech / Brand',
+      concept: 'Quiet light interface — teal authority, indigo accent',
+    },
+    {
+      id: 'terminal',
+      physics: 'retro',
       mode: 'dark',
-      tagline: 'Nature / Organic',
-      concept: 'Bioluminescent forest at night',
-    },
-    {
-      id: 'velvet',
-      physics: 'glass',
-      mode: 'dark',
-      tagline: 'Romance / Soft',
-      concept: 'Candlelit rose garden at midnight',
-    },
-    {
-      id: 'crimson',
-      physics: 'glass',
-      mode: 'dark',
-      tagline: 'Horror / Intense',
-      concept: 'Blood moon at its zenith — beauty through dread',
-    },
-    {
-      id: 'paper',
-      physics: 'flat',
-      mode: 'light',
-      tagline: 'Light / Print',
-      concept: 'Quality broadsheet — the quiet authority of print',
-    },
-    {
-      id: 'focus',
-      physics: 'flat',
-      mode: 'light',
-      tagline: 'Distraction Free',
-      concept: 'A blank page with a pen — nothing else',
-    },
-    {
-      id: 'laboratory',
-      physics: 'flat',
-      mode: 'light',
-      tagline: 'Science / Clinical',
-      concept: 'Precision instruments, sterile surfaces',
-    },
-    {
-      id: 'playground',
-      physics: 'flat',
-      mode: 'light',
-      tagline: 'Playful / Vibrant',
-      concept: "Children's art studio — every color is welcome",
+      tagline: 'Hacker / Retro',
+      concept: '1980s amber phosphor CRT monitor',
     },
   ];
 
@@ -131,94 +75,94 @@
     voidEngine.setAtmosphere('cyberpunk');
   }
 
-  // 2. Frost (dark glass — default, customized)
-  let frostRegistered = $derived(
-    voidEngine.availableAtmospheres.includes('frost'),
+  // 2. Dusk (dark flat — twilight rose)
+  let duskRegistered = $derived(
+    voidEngine.availableAtmospheres.includes('dusk'),
   );
 
-  function registerFrost() {
-    voidEngine.registerTheme('frost', {
+  function registerDusk() {
+    voidEngine.registerTheme('dusk', {
       mode: 'dark',
-      physics: 'glass',
-      tagline: 'Arctic / Glass',
+      physics: 'flat',
+      tagline: 'Twilight / Editorial',
       palette: {
-        'font-atmos-heading': FONTS.sharp.family,
-        'font-atmos-body': FONTS.clean.family,
-        'bg-canvas': '#080c14',
-        'bg-spotlight': '#141c2e',
-        'bg-surface': 'rgba(20, 30, 50, 0.45)',
-        'bg-sunk': 'rgba(0, 5, 15, 0.5)',
-        'energy-primary': '#7ec8e3',
-        'energy-secondary': '#4a6fa5',
-        'border-color': 'rgba(126, 200, 227, 0.2)',
-        'text-main': '#edf2f7',
-        'text-dim': '#a0b0c0',
-        'text-mute': '#607080',
+        'font-atmos-heading': FONTS.elegant.family,
+        'font-atmos-body': FONTS.book.family,
+        'bg-canvas': '#16121a',
+        'bg-spotlight': '#241b2c',
+        'bg-surface': '#1e1726',
+        'bg-sunk': '#0e0a14',
+        'energy-primary': '#d97a8c',
+        'energy-secondary': '#5b9a92',
+        'border-color': 'rgba(217, 122, 140, 0.22)',
+        'text-main': '#f3ebef',
+        'text-dim': '#a99aa3',
+        'text-mute': '#6b5e66',
       },
     });
-    toast.undo('Frost atmosphere registered', () =>
-      voidEngine.unregisterTheme('frost'),
+    toast.undo('Dusk atmosphere registered', () =>
+      voidEngine.unregisterTheme('dusk'),
     );
   }
 
-  function applyFrost() {
-    voidEngine.setAtmosphere('frost');
+  function applyDusk() {
+    voidEngine.setAtmosphere('dusk');
   }
 
-  // 3. Meridian (light flat brand)
-  let meridianRegistered = $derived(
-    voidEngine.availableAtmospheres.includes('meridian'),
+  // 3. Linen (light flat — warm cream paper)
+  let linenRegistered = $derived(
+    voidEngine.availableAtmospheres.includes('linen'),
   );
 
-  function registerMeridian() {
-    voidEngine.registerTheme('meridian', {
+  function registerLinen() {
+    voidEngine.registerTheme('linen', {
       mode: 'light',
       physics: 'flat',
-      tagline: 'Fintech / Brand',
+      tagline: 'Stationery / Print',
       palette: {
-        'font-atmos-heading': FONTS.lab.family,
-        'font-atmos-body': FONTS.clean.family,
-        'bg-canvas': '#f4f6f9',
-        'bg-spotlight': '#ffffff',
+        'font-atmos-heading': FONTS.book.family,
+        'font-atmos-body': FONTS.book.family,
+        'bg-canvas': '#f5efe6',
+        'bg-spotlight': '#fbf6ee',
         'bg-surface': '#ffffff',
-        'bg-sunk': '#e8ecf1',
-        'energy-primary': '#0d6e6e',
-        'energy-secondary': '#4a3df7',
-        'border-color': 'rgba(13, 110, 110, 0.25)',
-        'text-main': '#0f1729',
-        'text-dim': '#3d4a5c',
-        'text-mute': '#7c8797',
+        'bg-sunk': '#ebe3d4',
+        'energy-primary': '#5a7a52',
+        'energy-secondary': '#3a5470',
+        'border-color': 'rgba(90, 122, 82, 0.28)',
+        'text-main': '#2a2520',
+        'text-dim': '#5a5048',
+        'text-mute': '#8a7f73',
       },
     });
-    toast.undo('Meridian atmosphere registered', () =>
-      voidEngine.unregisterTheme('meridian'),
+    toast.undo('Linen atmosphere registered', () =>
+      voidEngine.unregisterTheme('linen'),
     );
   }
 
-  function applyMeridian() {
-    voidEngine.setAtmosphere('meridian');
+  function applyLinen() {
+    voidEngine.setAtmosphere('linen');
   }
 
   // ── Temporary theme demo ───────────────────────────────────────────────
   let tempHandle: number | null = $state(null);
-  let alreadyCrimson = $derived(voidEngine.atmosphere === 'crimson');
+  let alreadyTerminal = $derived(voidEngine.atmosphere === 'terminal');
 
-  // Sync local handle with engine state — if our Crimson push was cleared
-  // externally (Themes modal, Cyberpunk override, etc.), reset local state
+  // Sync local handle with engine state — if our Terminal push was cleared
+  // externally (Themes modal, custom override, etc.), reset local state
   // so the button reflects reality.
   $effect(() => {
     if (tempHandle === null) return;
     const info = voidEngine.temporaryThemeInfo;
-    if (!info || info.id !== 'crimson') {
+    if (!info || info.id !== 'terminal') {
       tempHandle = null;
     }
   });
 
   function pushTempTheme() {
     if (tempHandle !== null) return;
-    tempHandle = voidEngine.pushTemporaryTheme('crimson', 'Horror Preview');
+    tempHandle = voidEngine.pushTemporaryTheme('terminal', 'Terminal Preview');
     if (tempHandle !== null) {
-      toast.show('Temporary theme pushed (Crimson)', 'info', 4000, {
+      toast.show('Temporary theme pushed (Terminal)', 'info', 4000, {
         label: 'View',
         onclick: () => modal.themes(),
       });
@@ -244,8 +188,8 @@
   <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Atmospheres define the visual identity of the interface &mdash; palette,
-      typography, and mood. Void Energy ships 12 built-in atmospheres spanning
-      dark glass, retro CRT, and clean light modes. You can also register custom
+      typography, and mood. Void Energy ships 4 built-in atmospheres covering
+      all 3 physics presets and both color modes. You can also register custom
       atmospheres at runtime with partial palettes (missing values are filled
       from defaults via Safety Merge), apply temporary themes that restore on
       dismissal, and scope themes to individual components.
@@ -288,7 +232,7 @@
       <summary>View Code</summary>
       <pre><code
           >// Switch to a built-in atmosphere (persists)
-voidEngine.setAtmosphere('nebula');
+voidEngine.setAtmosphere('terminal');
 
 // Register a custom atmosphere at runtime
 voidEngine.registerTheme('brand', &#123;
@@ -305,7 +249,7 @@ voidEngine.registerTheme('brand', &#123;
 voidEngine.setAtmosphere('brand');
 
 // Temporary theme (non-persistent, stack-based)
-voidEngine.applyTemporaryTheme('crimson', 'Horror Preview');
+voidEngine.applyTemporaryTheme('terminal', 'Terminal Preview');
 voidEngine.restoreUserTheme(); // pops the stack
 
 // Scoped temporary theme (returns handle for cleanup)
@@ -318,8 +262,8 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
     <div class="flex flex-col gap-sm">
       <h5>Built-in Atmospheres</h5>
       <p class="text-small text-mute">
-        12 presets covering dark glass, retro CRT, and clean light modes. Click
-        any row to switch the active atmosphere.
+        4 presets covering all 3 physics presets and both color modes. Click any
+        row to switch the active atmosphere.
       </p>
 
       <div class="surface-sunk p-md overflow-x-auto">
@@ -427,38 +371,36 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
         </div>
       </div>
 
-      <!-- Frost (dark glass — default, customized) -->
+      <!-- Dusk (dark flat — twilight rose) -->
       <div class="surface-sunk p-md flex flex-col gap-md">
         <h5>
-          Frost <span class="text-mute text-small"
-            >&mdash; dark glass (default)</span
-          >
+          Dusk <span class="text-mute text-small">&mdash; dark flat</span>
         </h5>
         <p class="text-caption text-dim">
-          The default atmosphere. This example shows how you can override a
-          built-in theme at runtime &mdash; registerTheme merges your values on
-          top via Safety Merge.
+          A twilight editorial atmosphere. Demonstrates the dark + flat
+          combination &mdash; opaque surfaces, no blur, dusty rose primary
+          against a warm-grey canvas.
         </p>
         <details>
           <summary>View Palette Code</summary>
           <pre class="text-caption overflow-x-auto"><code
-              >{`voidEngine.registerTheme('frost', {
+              >{`voidEngine.registerTheme('dusk', {
   mode: 'dark',
-  physics: 'glass',
-  tagline: 'Arctic / Glass',
+  physics: 'flat',
+  tagline: 'Twilight / Editorial',
   palette: {
-    'font-atmos-heading': "'Space Grotesk', sans-serif",
-    'font-atmos-body':    "'Inter', sans-serif",
-    'bg-canvas':          '#080c14',
-    'bg-spotlight':       '#141c2e',
-    'bg-surface':         'rgba(20, 30, 50, 0.45)',
-    'bg-sunk':            'rgba(0, 5, 15, 0.5)',
-    'energy-primary':     '#7ec8e3',
-    'energy-secondary':   '#4a6fa5',
-    'border-color':       'rgba(126, 200, 227, 0.2)',
-    'text-main':          '#edf2f7',
-    'text-dim':           '#a0b0c0',
-    'text-mute':          '#607080',
+    'font-atmos-heading': "'Cormorant Garamond', serif",
+    'font-atmos-body':    "'Lora', serif",
+    'bg-canvas':          '#16121a',
+    'bg-spotlight':       '#241b2c',
+    'bg-surface':         '#1e1726',
+    'bg-sunk':            '#0e0a14',
+    'energy-primary':     '#d97a8c',
+    'energy-secondary':   '#5b9a92',
+    'border-color':       'rgba(217, 122, 140, 0.22)',
+    'text-main':          '#f3ebef',
+    'text-dim':           '#a99aa3',
+    'text-mute':          '#6b5e66',
   }
 });`}</code
             ></pre>
@@ -467,59 +409,57 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
         <div class="flex flex-row gap-md flex-wrap">
           <ActionBtn
             icon={Sparkle}
-            text={frostRegistered ? 'Registered' : 'Register Frost'}
-            onclick={registerFrost}
-            disabled={frostRegistered}
+            text={duskRegistered ? 'Registered' : 'Register Dusk'}
+            onclick={registerDusk}
+            disabled={duskRegistered}
           />
 
-          {#if frostRegistered}
+          {#if duskRegistered}
             <span in:materialize out:dematerialize>
               <button
                 class="btn btn-premium"
-                onclick={applyFrost}
-                disabled={voidEngine.atmosphere === 'frost'}
+                onclick={applyDusk}
+                disabled={voidEngine.atmosphere === 'dusk'}
               >
-                {voidEngine.atmosphere === 'frost'
-                  ? 'Frost Active'
-                  : 'Apply Frost'}
+                {voidEngine.atmosphere === 'dusk'
+                  ? 'Dusk Active'
+                  : 'Apply Dusk'}
               </button>
             </span>
           {/if}
         </div>
       </div>
 
-      <!-- Meridian (light flat brand) -->
+      <!-- Linen (light flat — warm cream paper) -->
       <div class="surface-sunk p-md flex flex-col gap-md">
         <h5>
-          Meridian <span class="text-mute text-small"
-            >&mdash; light flat brand</span
-          >
+          Linen <span class="text-mute text-small">&mdash; light flat</span>
         </h5>
         <p class="text-caption text-dim">
-          A fictional fintech brand atmosphere. Shows how any company can create
-          its own identity by overriding a handful of palette values &mdash;
-          teal primary, indigo accent, clean typography.
+          A warm stationery atmosphere. Cream canvas, sage primary, slate-blue
+          accent &mdash; the kind of palette a print magazine or independent
+          publisher might use.
         </p>
         <details>
           <summary>View Palette Code</summary>
           <pre class="text-caption overflow-x-auto"><code
-              >{`voidEngine.registerTheme('meridian', {
+              >{`voidEngine.registerTheme('linen', {
   mode: 'light',
   physics: 'flat',
-  tagline: 'Fintech / Brand',
+  tagline: 'Stationery / Print',
   palette: {
-    'font-atmos-heading': "'Open Sans', sans-serif",
-    'font-atmos-body':    "'Inter', sans-serif",
-    'bg-canvas':          '#f4f6f9',
-    'bg-spotlight':       '#ffffff',
+    'font-atmos-heading': "'Lora', serif",
+    'font-atmos-body':    "'Lora', serif",
+    'bg-canvas':          '#f5efe6',
+    'bg-spotlight':       '#fbf6ee',
     'bg-surface':         '#ffffff',
-    'bg-sunk':            '#e8ecf1',
-    'energy-primary':     '#0d6e6e',
-    'energy-secondary':   '#4a3df7',
-    'border-color':       'rgba(13, 110, 110, 0.25)',
-    'text-main':          '#0f1729',
-    'text-dim':           '#3d4a5c',
-    'text-mute':          '#7c8797',
+    'bg-sunk':            '#ebe3d4',
+    'energy-primary':     '#5a7a52',
+    'energy-secondary':   '#3a5470',
+    'border-color':       'rgba(90, 122, 82, 0.28)',
+    'text-main':          '#2a2520',
+    'text-dim':           '#5a5048',
+    'text-mute':          '#8a7f73',
   }
 });`}</code
             ></pre>
@@ -528,21 +468,21 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
         <div class="flex flex-row gap-md flex-wrap">
           <ActionBtn
             icon={Sparkle}
-            text={meridianRegistered ? 'Registered' : 'Register Meridian'}
-            onclick={registerMeridian}
-            disabled={meridianRegistered}
+            text={linenRegistered ? 'Registered' : 'Register Linen'}
+            onclick={registerLinen}
+            disabled={linenRegistered}
           />
 
-          {#if meridianRegistered}
+          {#if linenRegistered}
             <span in:materialize out:dematerialize>
               <button
                 class="btn btn-premium"
-                onclick={applyMeridian}
-                disabled={voidEngine.atmosphere === 'meridian'}
+                onclick={applyLinen}
+                disabled={voidEngine.atmosphere === 'linen'}
               >
-                {voidEngine.atmosphere === 'meridian'
-                  ? 'Meridian Active'
-                  : 'Apply Meridian'}
+                {voidEngine.atmosphere === 'linen'
+                  ? 'Linen Active'
+                  : 'Apply Linen'}
               </button>
             </span>
           {/if}
@@ -572,11 +512,11 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
         <div class="flex flex-row gap-md flex-wrap">
           <ActionBtn
             icon={Sparkle}
-            text={alreadyCrimson
-              ? 'Crimson is already active'
-              : 'Push Crimson (Temporary)'}
+            text={alreadyTerminal
+              ? 'Terminal is already active'
+              : 'Push Terminal (Temporary)'}
             onclick={pushTempTheme}
-            disabled={tempHandle !== null || alreadyCrimson}
+            disabled={tempHandle !== null || alreadyTerminal}
           />
           <ActionBtn
             icon={Undo}
@@ -616,8 +556,8 @@ $effect(() =&gt; &#123;
 &#125;);
 
 // Or use AtmosphereScope component for declarative scoping
-&lt;AtmosphereScope atmosphere="crimson" label="Horror Scene"&gt;
-  &lt;!-- children render with crimson palette --&gt;
+&lt;AtmosphereScope atmosphere="terminal" label="Terminal Scene"&gt;
+  &lt;!-- children render with terminal palette --&gt;
 &lt;/AtmosphereScope&gt;</code
           ></pre>
       </details>
@@ -859,8 +799,8 @@ $effect(() =&gt; &#123;
 
     <p class="text-caption text-mute px-xs">
       Atmosphere definitions live in
-      <code>src/config/design-tokens.ts</code>. The engine runtime is
-      <code>src/adapters/void-engine.svelte.ts</code>. All 12 built-in
+      <code>src/config/atmospheres.ts</code>. The engine runtime is
+      <code>src/adapters/void-engine.svelte.ts</code>. All 4 built-in
       atmospheres are registered at boot; custom themes are registered via
       <code>registerTheme()</code> or loaded from a remote URL with
       <code>loadExternalTheme()</code>.
