@@ -416,7 +416,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: var(--text-main);
+  background: #fff; // void-ignore — lightning is emitted light, always white
   mix-blend-mode: screen;
   opacity: 0;
   transition: opacity var(--speed-fast) var(--ease-flow);
@@ -445,7 +445,7 @@
 }
 .ambient-storm .ambient-atmosphere__bolt-glow {
   fill: none;
-  stroke: var(--text-main);
+  stroke: #fff; // void-ignore — lightning is emitted light, always white
   stroke-width: 1.2; // void-ignore — SVG userSpaceOnUse stroke, viewBox units
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -454,7 +454,7 @@
 }
 .ambient-storm .ambient-atmosphere__bolt-core {
   fill: none;
-  stroke: var(--text-main);
+  stroke: #fff; // void-ignore — lightning is emitted light, always white
   stroke-width: 0.35; // void-ignore — SVG viewBox units, sharp core
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -2289,6 +2289,20 @@
   .ambient-toxic {
     background: var(--ambient-toxic-light, rgba(90, 170, 40, 0.4));
     mix-blend-mode: multiply;
+  }
+
+  .ambient-fog .ambient-atmosphere__wash--a {
+    opacity: calc(var(--ambient-alpha) * 0.35);
+  }
+
+  .ambient-fog .ambient-atmosphere__svg--fog-near {
+    mix-blend-mode: multiply;
+    opacity: calc(var(--ambient-alpha) * 0.45);
+  }
+
+  .ambient-fog .ambient-atmosphere__svg--fog-far {
+    mix-blend-mode: multiply;
+    opacity: calc(var(--ambient-alpha) * 0.35);
   }
 }
 
