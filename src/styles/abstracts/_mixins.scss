@@ -681,10 +681,10 @@ $container-breakpoints: (
   padding-inline: calc(var(--space-sm) + var(--space-xs) / 2);
 
   font-family: var(--font-body);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-medium);
   font-size: var(--font-size-small);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-transform: none;
   line-height: 1;
   text-decoration: none;
 

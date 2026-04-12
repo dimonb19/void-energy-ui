@@ -713,7 +713,8 @@
         "btn-system",
         "btn-success",
         "btn-error",
-        "btn-ghost"
+        "btn-ghost",
+        "btn-loud"
       ],
       "props": ["icon", "text", "class", "size", "disabled", "...rest:button"],
       "propTypes": {
@@ -1638,9 +1639,10 @@
         "btn-error",
         "btn-ghost",
         "btn-void",
-        "btn-icon"
+        "btn-icon",
+        "btn-loud"
       ],
-      "note": "There is no Button.svelte. Native <button> already gets base button styling; use ActionBtn or IconBtn when you need icon animation wiring."
+      "note": "There is no Button.svelte. Native <button> already gets base button styling (sentence case, medium weight); use ActionBtn or IconBtn when you need icon animation wiring. Add btn-loud for opt-in uppercase + semibold treatment."
     },
     "dismiss-button": {
       "usage": "<button class='btn-ghost btn-error'>Cancel</button>",

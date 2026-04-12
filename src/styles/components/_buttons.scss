@@ -147,8 +147,8 @@
 
       // Only apply colored glow if we are in Glass Physics
       @include when-glass {
-        box-shadow: 0 0 15px alpha($color-var, 40%); // void-ignore (Glow Physics)
-        text-shadow: 0 0 10px alpha($color-var, 60%); // void-ignore (Glow Physics)
+        box-shadow: 0 0 15px alpha($color-var, 28%); // void-ignore (Glow Physics)
+        text-shadow: 0 0 10px alpha($color-var, 40%); // void-ignore (Glow Physics)
       }
 
       @include when-light {
@@ -174,10 +174,14 @@
       transition-duration: 0ms;
     }
 
-    filter: brightness(0.85);
-    transform: scale(0.96);
+    filter: brightness(0.92);
+    transform: scale(0.98);
     border-color: blend($color-var, var(--energy-secondary), 12%);
     background: alpha($color-var, 25%);
+
+    @include when-flat {
+      transform: none;
+    }
   }
 
   @include when-state('active') {
@@ -187,7 +191,7 @@
     box-shadow: var(--shadow-lift);
 
     @include when-glass {
-      box-shadow: 0 0 12px alpha($color-var, 35%); // void-ignore (Glow Physics)
+      box-shadow: 0 0 12px alpha($color-var, 25%); // void-ignore (Glow Physics)
     }
 
     @include when-light {
@@ -263,10 +267,10 @@ button:not(.btn-void, .btn-icon, .tabs-trigger),
 
   // --- B. Typography ---
   font-family: var(--font-body);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-medium);
   font-size: var(--font-size-small);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  text-transform: none;
   color: var(--text-main);
   text-decoration: none;
   line-height: 1;
@@ -313,6 +317,11 @@ button:not(.btn-void, .btn-icon, .tabs-trigger),
       transform: translateY(var(--lift)) scale(var(--scale, 1));
       color: var(--text-main);
       box-shadow: var(--shadow-lift);
+
+      // Flat physics: stronger tint compensates for the removed lift/scale feedback.
+      @include when-flat {
+        background: blend(var(--bg-surface), var(--energy-secondary), 12%);
+      }
     }
   }
 
@@ -329,10 +338,15 @@ button:not(.btn-void, .btn-icon, .tabs-trigger),
     }
 
     // STRONGER VISUAL CHANGE: More perceptible on quick taps.
-    filter: brightness(0.85);
-    transform: scale(0.96);
+    filter: brightness(0.92);
+    transform: scale(0.98);
     background: blend(var(--bg-surface), var(--energy-secondary), 18%);
     border-color: var(--energy-secondary);
+
+    // Flat physics: tint-only active feedback — no scale on flat surfaces.
+    @include when-flat {
+      transform: none;
+    }
   }
 
   &:disabled {
@@ -460,9 +474,13 @@ button:not(.btn-void, .btn-icon, .tabs-trigger),
         transition-duration: 0ms;
       }
 
-      filter: brightness(0.85);
-      transform: scale(0.96);
+      filter: brightness(0.92);
+      transform: scale(0.98);
       background: alpha(var(--energy-secondary), 12%);
+
+      @include when-flat {
+        transform: none;
+      }
 
       @include when-light {
         background: alpha(var(--energy-primary), 12%);
@@ -601,4 +619,13 @@ button:not(.btn-void, .btn-icon, .tabs-trigger),
       }
     }
   }
+}
+
+// Opt-in uppercase treatment for consumers who want assertive button text.
+// Restores pre-0b uppercase + wide tracking + semibold weight.
+// Usage: <button class="btn btn-loud">Action</button>
+.btn-loud {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: var(--font-weight-semibold);
 }

@@ -81,7 +81,7 @@ $physics-presets: (
         // 25/35% = edge + ambient pool (theme-derived depth)
         'shadow-lift': (
             0 8px 28px -4px alpha(var(--bg-canvas), 35%),
-            0 0 12px alpha(var(--energy-primary), 50%),
+            0 0 12px alpha(var(--energy-primary), 35%),
           ),
         // 35% = deep ambient, 50% = visible glow
       )

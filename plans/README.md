@@ -1,7 +1,7 @@
 # Void Energy — Plans
 
 > The complete launch and architecture plan for Void Energy, organized by priority.
-> Last updated: 2026-04-11 (Phase 0 + 0a complete; Phase 1 revised post-migration)
+> Last updated: 2026-04-12 (Phase 0 + 0a + 0b complete; Phase 1 revised post-migration)
 
 ---
 
@@ -44,6 +44,9 @@ Work is organized into five phases. **Each phase ships before the next begins.**
 
 ### Phase 0 — Tailwind CSS v4 Migration ✓ COMPLETE
 The existing codebase migrated from Tailwind v3.4 to v4 with a `@theme`-based CSS config. Phase 0a follow-up patched the v4 footguns surfaced after the swap (bare `border` family hardcoded 1px, bare `rounded` no longer driven by `--radius-*`, `min-h-control` namespace mismatch, `.container` shadowed by Tailwind's built-in, `--max-width > --spacing > --container` fallback chain). Both phases are landed; the canonical reference for v4 namespace strategy and footgun fixes lives in [src/styles/tailwind-theme.css](../src/styles/tailwind-theme.css). Phase 1 absorbs these learnings.
+
+### Phase 0b — Design Language Modernization ✓ COMPLETE
+Updated the visual language to align with 2025-2026 best practices (MD3, shadcn/ui, Linear, Radix). Key changes: (1) **Button typography** — sentence case + medium weight (500) replaces MD2-era uppercase + semibold (600); CTA retains uppercase; `.btn-loud` opt-in class preserves old treatment. (2) **Flat physics radius** — `--radius-base` increased from 4px to 8px, matching glass and the industry standard. (3) **Flat hover** — removed lift/scale transforms; flat buttons now use background tint only (12% secondary blend), matching the modern minimal UI pattern. (4) **Active press** — reduced from brightness(0.85)/scale(0.96) to brightness(0.92)/scale(0.98); flat physics uses tint-only (no scale). (5) **Glass glow** — alpha values reduced from 40-60% to 25-40% for refined "luxury dashboard" glow instead of "neon sign." Flat easings and focus ring reviewed and confirmed already best-in-class. Must land before Phase 1 so L0 ships with modern defaults.
 
 ### Phase 1 — L0: Framework-Agnostic Tailwind Preset
 **Why first remaining:** This is the adoption unlock. VE is currently Svelte-only (~3% of frontend devs). Extracting the design system brain as a Tailwind v4 preset makes every Tailwind user a potential VE user. Low effort (the token system already exists), high reach (millions of Tailwind users across every framework).

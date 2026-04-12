@@ -297,7 +297,7 @@ export const VOID_TOKENS = {
       scale: 1.02,
     },
     flat: {
-      radiusBase: VOID_RADIUS.sm,
+      radiusBase: VOID_RADIUS.md,
       radiusFull: VOID_RADIUS.full,
       blur: 0,
       borderWidth: 1,
@@ -311,8 +311,8 @@ export const VOID_TOKENS = {
       easeSpringSnappy: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
       easeSpringBounce: 'cubic-bezier(0.175, 0.885, 0.32, 1.1)',
       easeFlow: 'ease-in-out',
-      lift: '-2px',
-      scale: 1.01,
+      lift: '0px',
+      scale: 1,
     },
     retro: {
       radiusBase: '0px',

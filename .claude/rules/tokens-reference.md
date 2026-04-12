@@ -34,8 +34,8 @@ Delay:      --delay-cascade(glass:50ms flat:40ms retro:0s)  --delay-sequence(gla
 Easing:     --ease-spring-gentle  --ease-spring-snappy  --ease-spring-bounce  --ease-flow
 Surface:    --physics-blur  --physics-border-width
 Depth:      --shadow-float  --shadow-lift  --shadow-sunk  --shadow-offset(retro: 3px)  --focus-ring
-Feedback:   --lift  --scale
-Radius:     --radius-base(glass:8px flat:4px retro:0)  --radius-full(pill, 0 in retro)
+Feedback:   --lift(glass:-3px flat:0px retro:-2px)  --scale(glass:1.02 flat:1 retro:1)
+Radius:     --radius-base(glass:8px flat:8px retro:0)  --radius-full(pill, 0 in retro)
             --radius-sm(4px)  --radius-md(8px)  --radius-lg(16px)  --radius-xl(24px)  (all 0 in retro)
             Default to --radius-base unless you need a specific size.
 ```

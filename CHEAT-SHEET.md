@@ -1123,6 +1123,7 @@ Preset components with built-in layout and physics.
 | `.btn-ghost` | Text-only, no surface/border at rest | Secondary/tertiary actions |
 | `.btn-void` | Complete style reset | Custom-styled buttons |
 | `.btn-icon` | Circular icon-only | Toolbar actions, inline controls |
+| `.btn-loud` | Opt-in uppercase + wide tracking + semibold | Assertive actions needing old-style emphasis |
 
 **Usage:**
 
@@ -1140,7 +1141,7 @@ Preset components with built-in layout and physics.
 
 #### `.btn-ghost`
 
-**Description:** Text-only action button with no background or border at rest. Inherits button-family typography (uppercase, semibold, small) for visual kinship with other `.btn` variants while staying visually lightweight.
+**Description:** Text-only action button with no background or border at rest. Inherits button-family typography (sentence case, medium weight, small) for visual kinship with other `.btn` variants while staying visually lightweight.
 **Use for:** Cancel, Dismiss, Skip, "Learn more", any secondary action paired with a primary button.
 
 **Resting state:** Transparent background, `--text-dim` color
@@ -4546,7 +4547,7 @@ h2 {
 
 **Purpose:** Structural button base — sizing, typography, and layout without physics, interaction states, or semantic variants. Use for CSS-only elements that need to look like a button but have no Svelte template for Tailwind classes. *(void-exception: layout properties in SCSS because consumers are CSS-only classes.)*
 
-**Includes:** `inline-flex` layout, `--control-height` min-height, button padding, uppercase semibold typography, `--radius-base` border-radius, `cursor: pointer`, `user-select: none`.
+**Includes:** `inline-flex` layout, `--control-height` min-height, button padding, sentence-case medium-weight typography, `--radius-base` border-radius, `cursor: pointer`, `user-select: none`.
 
 **Does NOT include:** Background, border, color, transitions, hover/focus/active states, physics variants, semantic color variants.
 

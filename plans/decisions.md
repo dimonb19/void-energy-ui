@@ -1,7 +1,7 @@
 # Canonical Decisions
 
 > Every architectural and strategic decision that shapes the plan, with the reasoning behind it. Do not re-litigate these without updating this file.
-> Last updated: 2026-04-07
+> Last updated: 2026-04-12
 
 ---
 
@@ -274,6 +274,24 @@ The Phase 0a fixes also surfaced the **`@theme inline` vs `@theme reference` dis
 
 ---
 
+## D25 — Design language modernization before L0 extraction (Phase 0b) ✓ COMPLETE
+
+**Decision:** Update the visual language to 2025-2026 best practices before Phase 1 extracts L0.
+
+**Why:** L0 will bake these values into `@void-energy/tailwind` — shipping MD2-era uppercase buttons and 4px flat radius as the default for all Tailwind consumers would hurt adoption. The system's architecture is modern; only the surface-level styling was dated.
+
+**Changes:**
+1. **Button typography:** Sentence case + medium weight (500) + 0.02em tracking replaces uppercase + semibold (600) + 0.05em tracking. CTA retains uppercase. `.btn-loud` opt-in class preserves old treatment.
+2. **Flat radius:** `--radius-base` from 4px (`VOID_RADIUS.sm`) to 8px (`VOID_RADIUS.md`), matching glass and industry standard (shadcn, MD3, Linear all use 8px+).
+3. **Flat hover:** Removed lift/scale transforms (`lift: '0px'`, `scale: 1`). Flat buttons use 12% background tint on hover — the modern minimal pattern.
+4. **Active press:** Reduced from `brightness(0.85)/scale(0.96)` to `brightness(0.92)/scale(0.98)`. Flat physics uses tint-only (no scale).
+5. **Glass glow:** Alpha values reduced from 40-60% to 25-40%. Still brand-defining, no longer overwhelming.
+6. **CTA weight:** Reduced from extrabold (800) to bold (700) — assertive without being oppressive alongside uppercase.
+
+**Reviewed and confirmed no changes needed:** Flat easings (already standard ease-out, no overshoot), focus ring (dual-ring pattern is best-in-class), spacing scale (4px base is industry standard), density scaling (unaffected by all changes).
+
+---
+
 ## Decision summary table
 
 | # | Decision | Status |
@@ -302,3 +320,4 @@ The Phase 0a fixes also surfaced the **`@theme inline` vs `@theme reference` dis
 | D22 | L0 Phase 1, L2 Phase 2 (Ambient complete) | Committed |
 | D23 | L0 includes only free atmospheres | Committed |
 | D24 | Tailwind v4 migration before L0 (Phase 0) | Committed (shipped) |
+| D25 | Design language modernization before L0 (Phase 0b) | Committed (shipped) |

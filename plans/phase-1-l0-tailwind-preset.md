@@ -875,7 +875,7 @@ Each session leaves `main` green and ends at a verifiable boundary, so we can st
 - [ ] `bg-surface`, `bg-canvas`, `text-main`, `text-dim`, `text-mute` resolve correctly
 - [ ] `shadow-float`, `shadow-lift`, `shadow-sunk` resolve to physics-specific shadows
 - [ ] `p-md`, `gap-lg`, `m-sm` resolve to density-scalable spacing
-- [ ] `rounded` adapts per physics preset (8px glass, 4px flat, 0 retro)
+- [ ] `rounded` adapts per physics preset (8px glass, 8px flat, 0 retro)
 - [ ] `transition-base`, `duration-fast`, `ease-flow` resolve correctly
 - [ ] `border` family is physics-aware (1px glass/flat, 2px retro)
 - [ ] `min-h-control` produces a class (not an orphan `:root` variable)
