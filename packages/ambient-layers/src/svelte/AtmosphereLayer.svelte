@@ -158,10 +158,17 @@
     // Rain/storm streaks rotate 15–24° clockwise via `rotate` (individual CSS
     // transform property). Because individual props compose as rotate *before*
     // the keyframe's translate3d, the entire streak drifts leftward as it falls
-    // — roughly sin(angle) × 120vh. This leaves a bare triangle in the
-    // bottom-right. Extending the spawn range past 100% fills that gap; the
-    // excess on the right is clipped by overflow:hidden on .ambient-layer.
-    const xMax = variant === 'rain' ? 140 : variant === 'storm' ? 150 : 100;
+    // — roughly sin(angle) × 140vh (total travel). On wide screens the drift is
+    // a small fraction of vw, but on narrow/portrait screens (phone) the drift
+    // can exceed the viewport width entirely. Compute the required overshoot
+    // from the actual aspect ratio so the spawn range always covers the gap.
+    const angle = variant === 'storm' ? 24 : variant === 'rain' ? 15 : 0;
+    const ar =
+      typeof window !== 'undefined'
+        ? window.innerHeight / window.innerWidth
+        : 1;
+    const drift = Math.sin((angle * Math.PI) / 180) * 140 * ar;
+    const xMax = 100 + drift + 10; // +10% safety margin; clipped by overflow:hidden
     return Array.from({ length: count }, (_, i) => {
       const x = Math.random() * xMax;
       const y = Math.random() * 100;
