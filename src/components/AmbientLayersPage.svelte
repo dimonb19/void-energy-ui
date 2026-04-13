@@ -608,11 +608,11 @@
         {/if}
 
         <div class="flex flex-row flex-wrap gap-sm justify-center">
-          <button class="btn" onclick={() => fireActionVariant('glitch')}>
-            Glitch
-          </button>
           <button class="btn" onclick={() => fireActionVariant('flash')}>
             Flash
+          </button>
+          <button class="btn" onclick={() => fireActionVariant('speed')}>
+            Speed
           </button>
           <button class="btn" onclick={() => fireActionVariant('zoomBurst')}>
             Zoom Burst

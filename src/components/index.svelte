@@ -19,11 +19,10 @@
 
   // ── Live Proof: atmosphere previewer ──────────────────────────────────
   const proofAtmospheres = [
-    { value: 'void', label: 'Void' },
-    { value: 'paper', label: 'Paper' },
+    { value: 'slate', label: 'Slate' },
     { value: 'terminal', label: 'Terminal' },
-    { value: 'nebula', label: 'Nebula' },
-    { value: 'playground', label: 'Playground' },
+    { value: 'meridian', label: 'Meridian' },
+    { value: 'frost', label: 'Frost' },
   ];
 
   // Derived: only highlights if current atmosphere is one of the curated set
