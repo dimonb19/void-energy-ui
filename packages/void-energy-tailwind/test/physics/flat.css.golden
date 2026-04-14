@@ -1,0 +1,45 @@
+/*
+ * 🤖 AUTO-GENERATED — DO NOT EDIT
+ * @void-energy/tailwind — physics: flat
+ * Source of truth: src/config/design-tokens.ts (VOID_TOKENS.physics.flat)
+ *
+ * Geometry (offsets, blur, spread, motion timings) lives here.
+ * Color pulls from atmosphere tokens (--bg-canvas, --energy-primary).
+ */
+
+[data-physics='flat'] {
+  --speed-instant: 0.08s;
+  --speed-fast: 0.133s;
+  --speed-base: 0.28s;
+  --speed-slow: 0.35s;
+  --delay-cascade: 40ms;
+  --delay-sequence: 80ms;
+  --ease-spring-gentle: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --ease-spring-snappy: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --ease-spring-bounce: cubic-bezier(0.175, 0.885, 0.32, 1.1);
+  --ease-flow: ease-in-out;
+  --physics-blur: 0px;
+  --physics-border-width: 1px;
+  --lift: 0px;
+  --scale: 1;
+  --radius-base: 8px;
+  --radius-full: 9999px;
+  --surface-bg: var(--bg-surface);
+  --shadow-sunk: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-float: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-lift: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/*
+ * Flat + dark: light-mode alphas (5-10%) are invisible on dark canvases.
+ * These overrides add depth without changing the flat aesthetic.
+ */
+[data-physics='flat'][data-mode='dark'] {
+  --shadow-sunk: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-float:
+    0 1px 4px rgba(0, 0, 0, 0.3),
+    0 4px 12px -2px rgba(0, 0, 0, 0.25);
+  --shadow-lift:
+    0 4px 16px rgba(0, 0, 0, 0.4),
+    0 8px 24px -4px rgba(0, 0, 0, 0.3);
+}

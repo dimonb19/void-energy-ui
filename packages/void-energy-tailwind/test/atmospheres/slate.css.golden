@@ -1,0 +1,39 @@
+/*
+ * 🤖 AUTO-GENERATED — DO NOT EDIT
+ * @void-energy/tailwind — atmosphere: slate
+ * Professional / Clean — dark / flat
+ * Source of truth: src/config/atmospheres.ts
+ */
+
+[data-atmosphere='slate'] {
+  color-scheme: dark;
+
+  --color-premium: #ff8c00;
+  --color-system: #a078ff;
+  --color-success: #00e055;
+  --color-error: #ff3c40;
+  --color-premium-light: oklch(from #ff8c00 calc(l * 1.25) c h);
+  --color-premium-dark: oklch(from #ff8c00 calc(l * 0.75) c h);
+  --color-premium-subtle: oklch(from #ff8c00 l c h / 0.15);
+  --color-system-light: oklch(from #a078ff calc(l * 1.25) c h);
+  --color-system-dark: oklch(from #a078ff calc(l * 0.75) c h);
+  --color-system-subtle: oklch(from #a078ff l c h / 0.15);
+  --color-success-light: oklch(from #00e055 calc(l * 1.25) c h);
+  --color-success-dark: oklch(from #00e055 calc(l * 0.75) c h);
+  --color-success-subtle: oklch(from #00e055 l c h / 0.15);
+  --color-error-light: oklch(from #ff3c40 calc(l * 1.25) c h);
+  --color-error-dark: oklch(from #ff3c40 calc(l * 0.75) c h);
+  --color-error-subtle: oklch(from #ff3c40 l c h / 0.15);
+  --font-heading: 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --bg-canvas: #111118;
+  --bg-spotlight: #1c1c26;
+  --bg-surface: #1e1e2a;
+  --bg-sunk: #0c0c12;
+  --energy-primary: #6ea1ff;
+  --energy-secondary: #8b8fa3;
+  --border-color: rgba(110, 161, 255, 0.2);
+  --text-main: #e8e8ed;
+  --text-dim: #a0a0b0;
+  --text-mute: #64647a;
+}

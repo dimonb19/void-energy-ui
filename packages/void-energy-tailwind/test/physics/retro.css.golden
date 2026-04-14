@@ -1,0 +1,38 @@
+/*
+ * 🤖 AUTO-GENERATED — DO NOT EDIT
+ * @void-energy/tailwind — physics: retro
+ * Source of truth: src/config/design-tokens.ts (VOID_TOKENS.physics.retro)
+ *
+ * Geometry (offsets, blur, spread, motion timings) lives here.
+ * Color pulls from atmosphere tokens (--bg-canvas, --energy-primary).
+ */
+
+[data-physics='retro'] {
+  --speed-instant: 0s;
+  --speed-fast: 0s;
+  --speed-base: 0s;
+  --speed-slow: 0s;
+  --delay-cascade: 0ms;
+  --delay-sequence: 0ms;
+  --ease-spring-gentle: steps(2);
+  --ease-spring-snappy: steps(2);
+  --ease-spring-bounce: steps(4);
+  --ease-flow: steps(4);
+  --physics-blur: 0px;
+  --physics-border-width: 2px;
+  --lift: -2px;
+  --scale: 1;
+  --radius-base: 0px;
+  --radius-full: 0px;
+  --shadow-offset: 3px;
+  --surface-bg: var(--bg-surface);
+  --shadow-sunk: none;
+  --shadow-float: none;
+  --shadow-lift: var(--shadow-offset) var(--shadow-offset) 0
+    color-mix(in oklch, var(--energy-secondary) 50%, transparent 50%);
+
+  --radius-sm: 0;
+  --radius-md: 0;
+  --radius-lg: 0;
+  --radius-xl: 0;
+}

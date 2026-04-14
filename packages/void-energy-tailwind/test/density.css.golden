@@ -1,0 +1,12 @@
+/*
+ * 🤖 AUTO-GENERATED — DO NOT EDIT
+ * @void-energy/tailwind — density scaling
+ * Source of truth: src/config/design-tokens.ts (VOID_TOKENS.density.factors)
+ *
+ * Overrides --density, which multiplies into every spacing and control
+ * geometry token in tokens.css. Default lives on :root (--density: 1).
+ */
+
+[data-density='compact'] { --density: 0.75; }
+[data-density='default'] { --density: 1; }
+[data-density='comfortable'] { --density: 1.25; }

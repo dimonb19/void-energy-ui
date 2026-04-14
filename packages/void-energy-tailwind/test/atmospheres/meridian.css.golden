@@ -1,0 +1,39 @@
+/*
+ * 🤖 AUTO-GENERATED — DO NOT EDIT
+ * @void-energy/tailwind — atmosphere: meridian
+ * Fintech / Brand — light / flat
+ * Source of truth: src/config/atmospheres.ts
+ */
+
+[data-atmosphere='meridian'] {
+  color-scheme: light;
+
+  --color-premium: #b45309;
+  --color-system: #6d28d9;
+  --color-success: #15803d;
+  --color-error: #dc2626;
+  --color-premium-light: oklch(from #b45309 calc(l * 1.25) c h);
+  --color-premium-dark: oklch(from #b45309 calc(l * 0.75) c h);
+  --color-premium-subtle: oklch(from #b45309 l c h / 0.15);
+  --color-system-light: oklch(from #6d28d9 calc(l * 1.25) c h);
+  --color-system-dark: oklch(from #6d28d9 calc(l * 0.75) c h);
+  --color-system-subtle: oklch(from #6d28d9 l c h / 0.15);
+  --color-success-light: oklch(from #15803d calc(l * 1.25) c h);
+  --color-success-dark: oklch(from #15803d calc(l * 0.75) c h);
+  --color-success-subtle: oklch(from #15803d l c h / 0.15);
+  --color-error-light: oklch(from #dc2626 calc(l * 1.25) c h);
+  --color-error-dark: oklch(from #dc2626 calc(l * 0.75) c h);
+  --color-error-subtle: oklch(from #dc2626 l c h / 0.15);
+  --font-heading: 'Open Sans', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --bg-canvas: #f4f6f9;
+  --bg-spotlight: #ffffff;
+  --bg-surface: #ffffff;
+  --bg-sunk: #e8ecf1;
+  --energy-primary: #0d6e6e;
+  --energy-secondary: #4a3df7;
+  --border-color: rgba(13, 110, 110, 0.25);
+  --text-main: #0f1729;
+  --text-dim: #3d4a5c;
+  --text-mute: #7c8797;
+}

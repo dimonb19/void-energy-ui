@@ -1,0 +1,22 @@
+{
+  "slate": {
+    "physics": "flat",
+    "mode": "dark",
+    "tagline": "Professional / Clean"
+  },
+  "terminal": {
+    "physics": "retro",
+    "mode": "dark",
+    "tagline": "Hacker / Retro"
+  },
+  "meridian": {
+    "physics": "flat",
+    "mode": "light",
+    "tagline": "Fintech / Brand"
+  },
+  "frost": {
+    "physics": "glass",
+    "mode": "dark",
+    "tagline": "Arctic / Glass"
+  }
+}

@@ -1,0 +1,486 @@
+/*
+ * @void-energy/tailwind — theme.css
+ *
+ * The Tailwind v4 bridge. Hand-written. Mirrors src/styles/tailwind-theme.css
+ * from the L1 repo (Phase 0a), with three differences:
+ *
+ *   1. Imports the L0 sub-files at the top so consumers get a working
+ *      default atmosphere (frost) + physics (glass) + density on a single
+ *      `@import "@void-energy/tailwind/theme.css"`.
+ *   2. Includes the `void-overrides` `.container` block (which L1 keeps in
+ *      global.scss). An alternate `theme-no-container.css` omits this for
+ *      consumers who want Tailwind v4's stock breakpoint container.
+ *   3. Does NOT import `tailwindcss` — consumer owns that import per D-L0.4.
+ *
+ * Source of truth for the namespace strategy:
+ *   plans/phase-1-l0-tailwind-preset.md → "v4 Namespace Strategy"
+ *
+ * Decision tree for new tokens:
+ *   1. Already defined on :root by tokens.css/atmospheres/physics?  → @theme reference
+ *   2. Literal value, no underlying var?                            → plain @theme
+ *   3. Forwarder with a different name?                             → @theme inline
+ */
+
+/*
+ * Cascade layer ordering — declared BEFORE Tailwind's own imports in the
+ * consumer's app so `void-scss` gets position 1 (lowest priority). This
+ * matches L1's global.scss declaration; first-seen wins.
+ *
+ * `void-overrides` (highest priority) defeats v4 utilities that are static/
+ * hardcoded and can't be overridden via @utility (which only APPENDS to
+ * existing utilities — Tailwind's original declaration still wins source-
+ * order ties within the same rule). Used sparingly: bare `border` family,
+ * `.container`. See footgun inventory in the phase-1 plan.
+ *
+ * `void-scss` (lowest) is included even though L0 ships zero SCSS — it lets
+ * L1 (and any consumer that mirrors L1's pattern) append SCSS into this
+ * layer without conflicting layer-order declarations.
+ */
+@layer void-scss, properties, theme, base, components, utilities, void-overrides;
+
+/*
+ * L0 sub-files: foundation tokens + default atmosphere + default physics +
+ * density. Consumers can switch atmosphere by also importing one of:
+ *   @import "@void-energy/tailwind/atmospheres/slate.css"
+ *   @import "@void-energy/tailwind/atmospheres/terminal.css"
+ *   @import "@void-energy/tailwind/atmospheres/meridian.css"
+ * …and switch physics by importing physics/{flat,retro}.css. Then toggle at
+ * runtime via [data-atmosphere] / [data-physics] / [data-mode] attributes.
+ */
+@import './tokens.css';
+@import './atmospheres/frost.css';
+@import './physics/glass.css';
+@import './density.css';
+
+/* ── Spacing ── */
+@theme inline {
+  --spacing-*: initial;
+
+  --spacing-0: 0;
+  --spacing-px: 1px;
+  --spacing-xs: var(--space-xs);
+  --spacing-sm: var(--space-sm);
+  --spacing-md: var(--space-md);
+  --spacing-lg: var(--space-lg);
+  --spacing-xl: var(--space-xl);
+  --spacing-2xl: var(--space-2xl);
+  --spacing-3xl: var(--space-3xl);
+  --spacing-4xl: var(--space-4xl);
+  --spacing-5xl: var(--space-5xl);
+}
+
+/*
+ * ── Colors ──
+ *
+ * Bridge aliases (--color-canvas → --bg-canvas, --color-main → --text-main,
+ * --color-primary → --energy-primary, etc.) use @theme inline because their
+ * Tailwind names DIFFER from the underlying atmosphere variable names.
+ *
+ * Semantic colors (--color-premium, --color-system, --color-success,
+ * --color-error and their light/dark/subtle variants) are defined on :root
+ * by the active atmosphere CSS file under those EXACT names — so we must
+ * use @theme reference to avoid a self-reference cycle that would
+ * invalidate the atmosphere's value.
+ */
+@theme inline {
+  --color-*: initial;
+
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-inherit: inherit;
+
+  /* Canvas */
+  --color-canvas: var(--bg-canvas);
+  --color-surface: var(--bg-surface);
+  --color-sunk: var(--bg-sunk);
+  --color-spotlight: var(--bg-spotlight);
+
+  /* Energy */
+  --color-primary: var(--energy-primary);
+  --color-secondary: var(--energy-secondary);
+
+  /* Structure */
+  --color-border: var(--border-color);
+
+  /* Text signals */
+  --color-main: var(--text-main);
+  --color-dim: var(--text-dim);
+  --color-mute: var(--text-mute);
+}
+
+/*
+ * Semantic colors — atmosphere CSS owns these names on :root. Placeholder
+ * hex values exist only so Tailwind generates the utility classes
+ * (bg-premium, text-error, etc.); the actual colors come from the active
+ * atmosphere via var(--color-premium) etc.
+ */
+@theme reference {
+  --color-premium: #ff8c00;
+  --color-system: #a078ff;
+  --color-success: #10b981;
+  --color-error: #ef4444;
+
+  --color-premium-light: #ffae4a;
+  --color-premium-dark: #cc7000;
+  --color-premium-subtle: #ff8c0033;
+  --color-system-light: #bfa3ff;
+  --color-system-dark: #7b52d9;
+  --color-system-subtle: #a078ff33;
+  --color-success-light: #34d399;
+  --color-success-dark: #059669;
+  --color-success-subtle: #10b98133;
+  --color-error-light: #f87171;
+  --color-error-dark: #dc2626;
+  --color-error-subtle: #ef444433;
+}
+
+/* ── Breakpoints ── */
+@theme {
+  --breakpoint-*: initial;
+
+  --breakpoint-tablet: 768px;
+  --breakpoint-small-desktop: 1024px;
+  --breakpoint-large-desktop: 1440px;
+  --breakpoint-full-hd: 1920px;
+  --breakpoint-quad-hd: 2560px;
+}
+
+/*
+ * ── Border Radius ──
+ *
+ * @theme reference tells Tailwind "these variables exist at runtime;
+ * generate utilities that reference them but DO NOT emit them yourself."
+ * tokens.css :root and physics/retro.css set the real values. Using
+ * @theme inline here would write :root { --radius-sm: var(--radius-sm); }
+ * into @layer theme, creating a self-reference cycle that invalidates the
+ * underlying value and breaks rounded-sm/rounded-full/etc.
+ */
+@theme {
+  --radius-*: initial;
+}
+
+@theme reference {
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+}
+
+@theme {
+  --radius-none: 0;
+}
+
+/*
+ * ── Border Width ──
+ *
+ * In v4, bare `border` and directional `border-{l,r,t,b,x,y}` are static
+ * utilities that hardcode 1px — the `--border-width` namespace doesn't feed
+ * them. v3's `borderWidth.DEFAULT: var(--physics-border-width)` gave retro
+ * physics its 2px CRT rails; restored below in the void-overrides layer.
+ * Numeric variants (border-2) stay literal and unaffected.
+ */
+
+/* ── Z-Index ── */
+@theme {
+  --z-*: initial;
+
+  --z-sunk: -1;
+  --z-floor: 0;
+  --z-base: 1;
+  --z-decorate: 2;
+  --z-float: 10;
+  --z-sticky: 20;
+  --z-header: 40;
+  --z-dropdown: 50;
+  --z-overlay: 90;
+}
+
+/*
+ * ── Motion ──
+ *
+ * Duration bridges (--duration-fast → --speed-fast) use different names →
+ * harmless forwarders via @theme inline.
+ *
+ * Delays (--delay-cascade, --delay-sequence) and ease functions
+ * (--ease-flow, --ease-spring-*) share names with physics-defined tokens
+ * → @theme reference to avoid self-cycles.
+ */
+@theme inline {
+  --duration-*: initial;
+
+  --duration-0: 0ms;
+  --duration-instant: var(--speed-instant);
+  --duration-fast: var(--speed-fast);
+  --duration-base: var(--speed-base);
+  --duration-slow: var(--speed-slow);
+}
+
+@theme {
+  --delay-*: initial;
+  --delay-0: 0ms;
+}
+
+@theme reference {
+  --delay-cascade: 50ms;
+  --delay-sequence: 100ms;
+}
+
+@theme {
+  --ease-*: initial;
+  --ease-linear: linear;
+}
+
+@theme reference {
+  --ease-flow: linear;
+  --ease-spring-gentle: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  --ease-spring-snappy: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-spring-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ── Typography ── */
+@theme inline {
+  --font-*: initial;
+  --text-*: initial;
+  --leading-*: initial;
+  --tracking-*: initial;
+  --font-weight-*: initial;
+
+  /* Font sizes */
+  --text-caption: var(--font-size-caption);
+  --text-small: var(--font-size-small);
+  --text-base: var(--font-size-body);
+  --text-h6: var(--font-size-h6);
+  --text-h5: var(--font-size-h5);
+  --text-h4: var(--font-size-h4);
+  --text-h3: var(--font-size-h3);
+  --text-h2: var(--font-size-h2);
+  --text-h1: var(--font-size-h1);
+
+  /* Line heights */
+  --leading-none: 1;
+  --leading-h1: var(--line-height-h1);
+  --leading-h2: var(--line-height-h2);
+  --leading-h3: var(--line-height-h3);
+  --leading-h4: var(--line-height-h4);
+  --leading-title: var(--line-height-h5);
+  --leading-subtitle: var(--line-height-h6);
+  --leading-body: var(--line-height-body);
+  --leading-small: var(--line-height-small);
+  --leading-caption: var(--line-height-caption);
+  --leading-tight: var(--line-height-h1);
+  --leading-normal: var(--line-height-body);
+
+  /* Letter spacing */
+  --tracking-h1: var(--letter-spacing-h1);
+  --tracking-h2: var(--letter-spacing-h2);
+  --tracking-h3: var(--letter-spacing-h3);
+  --tracking-h4: var(--letter-spacing-h4);
+  --tracking-title: var(--letter-spacing-h5);
+  --tracking-subtitle: var(--letter-spacing-h6);
+  --tracking-body: var(--letter-spacing-body);
+  --tracking-small: var(--letter-spacing-small);
+  --tracking-caption: var(--letter-spacing-caption);
+}
+
+/*
+ * Font weights share names with tokens.css :root → reference mode to avoid
+ * self-cycles. Placeholder numerics only drive utility class generation;
+ * the real weights come from tokens.css.
+ */
+@theme reference {
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+}
+
+/*
+ * Font families — tokens.css :root sets the real values; atmosphere CSS
+ * overrides them. Use @theme reference to generate font-heading/font-body/
+ * font-mono utilities WITHOUT re-emitting the variables in @layer theme
+ * (which would self-cycle and fall back to browser defaults).
+ *
+ * The placeholder stacks below are never rendered.
+ */
+@theme reference {
+  --font-heading: 'system-ui', sans-serif;
+  --font-body: 'system-ui', sans-serif;
+  --font-mono: 'ui-monospace', monospace;
+}
+
+/*
+ * ── Min-Height ──
+ *
+ * v4's min-h-* utility reads from --min-height-*, NOT --min-h-*. A
+ * --min-h-control entry in @theme would emit the variable at :root but
+ * generate no class. Restored as a real @utility declaration below.
+ */
+
+/*
+ * ── Max-width scale ──
+ *
+ * Tailwind v4's max-w-* utility resolves through:
+ *   --max-width > --spacing > --container
+ * Our --spacing-md is 24px (from the physics spacing scale), which would
+ * shadow any --container-md value. Explicit --max-width-* (highest
+ * priority) restores v3's maxWidth scale so max-w-md / max-w-2xl etc.
+ * render at their pre-v4 sizes.
+ */
+@theme {
+  --max-width-*: initial;
+
+  --max-width-3xs: 16rem;
+  --max-width-2xs: 18rem;
+  --max-width-xs: 20rem;
+  --max-width-sm: 24rem;
+  --max-width-md: 28rem;
+  --max-width-lg: 32rem;
+  --max-width-xl: 36rem;
+  --max-width-2xl: 42rem;
+  --max-width-3xl: 48rem;
+  --max-width-4xl: 56rem;
+  --max-width-5xl: 64rem;
+  --max-width-6xl: 72rem;
+  --max-width-7xl: 80rem;
+}
+
+/*
+ * ── Container query breakpoints ──
+ *
+ * Used by the @container variant (@md:, @lg: children of `class="@container"`
+ * parents). v4 folds container queries into --container-*, which is also a
+ * fallback for max-w-*. Defining --max-width-* above frees container
+ * queries to carry their own semantic breakpoints without affecting max-w.
+ */
+@theme {
+  --container-*: initial;
+
+  --container-sm: 320px;
+  --container-md: 480px;
+  --container-lg: 640px;
+  --container-xl: 800px;
+}
+
+/*
+ * ── Shadow utilities ──
+ *
+ * physics CSS owns the real --shadow-{float,lift,sunk} values. Use @theme
+ * reference to generate shadow-float/shadow-lift/shadow-sunk utilities
+ * without re-emitting (which would self-cycle).
+ */
+@theme reference {
+  --shadow-float: 0 0 0 transparent;
+  --shadow-lift: 0 0 0 transparent;
+  --shadow-sunk: 0 0 0 transparent;
+}
+
+/* ── Custom Utilities (replaces JS plugin) ── */
+@utility backdrop-blur-physics {
+  backdrop-filter: blur(var(--physics-blur));
+}
+
+/*
+ * v4's min-h-* namespace is --min-height-*, not --min-h-*. Declared as a
+ * real @utility so class="min-h-control" produces a class instead of an
+ * orphan :root variable.
+ */
+@utility min-h-control {
+  min-height: var(--control-height);
+}
+
+/*
+ * v4 has no --radius-DEFAULT namespace — bare `rounded` is a hardcoded
+ * static utility. Override it to match v3's borderRadius.DEFAULT. Stays
+ * physics-aware automatically because --radius-md is force-zeroed in retro
+ * by physics/retro.css.
+ */
+@utility rounded {
+  border-radius: var(--radius-md);
+}
+
+/*
+ * ── void-overrides layer ──
+ *
+ * @utility APPENDS to existing utilities rather than replacing them, so
+ * we can't fix hardcoded statics like bare `border` (1px) that way. The
+ * void-overrides layer (declared at file top, above utilities) wins by
+ * cascade-layer priority regardless of source order or specificity.
+ *
+ * v3 parity: bare `border` and directional `border-{l,r,t,b,x,y}` resolve
+ * to var(--physics-border-width) (1px glass/flat, 2px retro). Numeric
+ * variants like `border-2` remain literal and untouched.
+ *
+ * TRAP: don't combine `border` with a numeric directional like `border-l-2`
+ * on the same element. The shorthand `border-width` here expands to all
+ * four longhand `border-*-width` declarations in a higher layer than
+ * `utilities`, so `border-l-2`'s `border-left-width: 2px` silently loses
+ * to physics width. Use either the bare family OR numeric directionals,
+ * not both.
+ */
+@layer void-overrides {
+  .border {
+    border-width: var(--physics-border-width);
+  }
+  .border-x {
+    border-inline-width: var(--physics-border-width);
+  }
+  .border-y {
+    border-block-width: var(--physics-border-width);
+  }
+  .border-l {
+    border-left-width: var(--physics-border-width);
+  }
+  .border-r {
+    border-right-width: var(--physics-border-width);
+  }
+  .border-t {
+    border-top-width: var(--physics-border-width);
+  }
+  .border-b {
+    border-bottom-width: var(--physics-border-width);
+  }
+}
+
+/*
+ * ── Container override ──
+ *
+ * v4 ships a `.container` utility with hardcoded breakpoint widths
+ * (768/1024/1440/1920/2560). Void Energy's max-widths are intentionally
+ * smaller than each breakpoint for content readability. Widths come from
+ * design-tokens.ts ($container-widths).
+ *
+ * Consumers who prefer Tailwind's stock container can import
+ * @void-energy/tailwind/theme-no-container.css instead, which omits this
+ * block.
+ */
+@layer void-overrides {
+  .container {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: var(--space-md);
+
+    @media (min-width: 768px) {
+      max-width: 720px;
+    }
+    @media (min-width: 1024px) {
+      max-width: 960px;
+    }
+    @media (min-width: 1440px) {
+      max-width: 1320px;
+    }
+    @media (min-width: 1920px) {
+      max-width: 1600px;
+    }
+    @media (min-width: 2560px) {
+      max-width: 1920px;
+    }
+  }
+
+  .container-fluid {
+    width: 100%;
+    padding-inline: var(--space-md);
+    margin-inline: auto;
+    max-width: none;
+  }
+}

@@ -1,0 +1,290 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@void-energy/tailwind — Session 5 smoke test</title>
+
+    <!--
+      FOUC prevention — inline copy of @void-energy/tailwind/head#FOUC_SCRIPT.
+      This is load-bearing: the L0 CSS reads data-atmosphere / data-physics /
+      data-mode / data-density off <html>, so those attributes must be set
+      before any stylesheet renders. Keep this string in sync with
+      dist/head.js#FOUC_SCRIPT. The Session 5 tests assert the runtime
+      keys match.
+    -->
+    <script>
+      (function () {
+        try {
+          var s = localStorage;
+          var r = document.documentElement;
+          r.setAttribute(
+            'data-atmosphere',
+            s.getItem('ve-atmosphere') || 'frost',
+          );
+          r.setAttribute('data-physics', s.getItem('ve-physics') || 'glass');
+          r.setAttribute('data-mode', s.getItem('ve-mode') || 'dark');
+          r.setAttribute('data-density', s.getItem('ve-density') || 'default');
+        } catch (e) {}
+      })();
+    </script>
+
+    <!--
+      Tailwind v4 Play CDN — brings in the tailwindcss engine and compiles
+      utility classes on the page at runtime. In a real app you'd use the
+      Vite plugin instead; this is only for the Session 3 stop-point smoke
+      test (no build tooling required).
+    -->
+    <script src="https://cdn.tailwindcss.com/4"></script>
+
+    <!--
+      L0 cascade — import order matches theme.css defaults. To preview other
+      atmospheres / physics presets, import them here and toggle via the
+      data attributes on <html> using the buttons at the bottom of the page.
+    -->
+    <link rel="stylesheet" href="../dist/tokens.css" />
+    <link rel="stylesheet" href="../dist/atmospheres/slate.css" />
+    <link rel="stylesheet" href="../dist/atmospheres/terminal.css" />
+    <link rel="stylesheet" href="../dist/atmospheres/meridian.css" />
+    <link rel="stylesheet" href="../dist/atmospheres/frost.css" />
+    <link rel="stylesheet" href="../dist/physics/glass.css" />
+    <link rel="stylesheet" href="../dist/physics/flat.css" />
+    <link rel="stylesheet" href="../dist/physics/retro.css" />
+    <link rel="stylesheet" href="../dist/density.css" />
+    <link rel="stylesheet" href="../dist/theme.css" />
+
+    <style>
+      body {
+        background: var(--bg-canvas);
+        color: var(--text-main);
+        font-family: var(--font-body);
+        min-height: 100dvh;
+      }
+    </style>
+  </head>
+
+  <body class="flex flex-col gap-2xl p-xl">
+    <header class="container flex flex-col gap-md">
+      <h1
+        class="text-h1 font-heading"
+        style="font-weight: var(--font-weight-bold)"
+      >
+        @void-energy/tailwind — smoke test
+      </h1>
+      <p class="text-dim max-w-2xl">
+        Verifies atmospheres × physics × density switching via DOM attributes.
+        No framework, no build step — just the L0 CSS files + Tailwind v4 Play
+        CDN.
+      </p>
+    </header>
+
+    <main class="container flex flex-col gap-xl">
+      <!-- Surfaces card -->
+      <section class="flex flex-col gap-lg">
+        <h2 class="text-h3 font-heading text-main">Surfaces</h2>
+        <div class="grid grid-cols-1 tablet:grid-cols-3 gap-lg">
+          <div
+            class="flex flex-col gap-md p-lg rounded border"
+            style="
+              background: var(--surface-bg);
+              box-shadow: var(--shadow-float);
+            "
+          >
+            <div class="text-h6 font-heading">Floating</div>
+            <p class="text-dim">
+              shadow-float applied; background from --surface-bg.
+            </p>
+          </div>
+
+          <div
+            class="flex flex-col gap-md p-lg rounded border"
+            style="
+              background: var(--surface-bg);
+              box-shadow: var(--shadow-lift);
+            "
+          >
+            <div class="text-h6 font-heading">Lift</div>
+            <p class="text-dim">shadow-lift on hover equivalent.</p>
+          </div>
+
+          <div
+            class="flex flex-col gap-md p-lg rounded border"
+            style="background: var(--bg-sunk); box-shadow: var(--shadow-sunk)"
+          >
+            <div class="text-h6 font-heading">Sunk</div>
+            <p class="text-dim">Recessed well with inset shadow.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Typography + colors -->
+      <section class="flex flex-col gap-lg">
+        <h2 class="text-h3 font-heading text-main">
+          Typography + semantic colors
+        </h2>
+        <div class="flex flex-col gap-sm" style="background: var(--surface-bg)">
+          <div class="p-lg flex flex-col gap-xs">
+            <span class="text-h2 font-heading">H2 heading</span>
+            <span class="text-h4">H4 heading</span>
+            <span class="text-base">Body text at base size.</span>
+            <span class="text-small text-dim">Small dim text.</span>
+            <span class="text-caption text-mute">Caption in mute.</span>
+          </div>
+          <div class="p-lg flex flex-wrap gap-md">
+            <span
+              class="px-md py-sm rounded"
+              style="
+                background: var(--color-premium-subtle);
+                color: var(--color-premium);
+              "
+              >premium</span
+            >
+            <span
+              class="px-md py-sm rounded"
+              style="
+                background: var(--color-system-subtle);
+                color: var(--color-system);
+              "
+              >system</span
+            >
+            <span
+              class="px-md py-sm rounded"
+              style="
+                background: var(--color-success-subtle);
+                color: var(--color-success);
+              "
+              >success</span
+            >
+            <span
+              class="px-md py-sm rounded"
+              style="
+                background: var(--color-error-subtle);
+                color: var(--color-error);
+              "
+              >error</span
+            >
+          </div>
+        </div>
+      </section>
+
+      <!-- Border family test (Footgun 1 verification) -->
+      <section class="flex flex-col gap-lg">
+        <h2 class="text-h3 font-heading text-main">
+          Border family (Footgun 1)
+        </h2>
+        <div class="grid grid-cols-2 tablet:grid-cols-4 gap-md">
+          <div class="p-md border" style="background: var(--bg-sunk)">
+            bare .border
+          </div>
+          <div class="p-md border-l" style="background: var(--bg-sunk)">
+            .border-l
+          </div>
+          <div class="p-md border-t" style="background: var(--bg-sunk)">
+            .border-t
+          </div>
+          <div class="p-md border-2" style="background: var(--bg-sunk)">
+            .border-2 (literal)
+          </div>
+        </div>
+        <p class="text-mute text-small">
+          Retro physics should render all `.border*` at 2px; glass/flat at 1px.
+          `.border-2` stays literal 2px in every physics.
+        </p>
+      </section>
+    </main>
+
+    <!-- Controls -->
+    <footer class="container flex flex-col gap-md">
+      <div class="flex flex-wrap gap-sm">
+        <strong class="text-mute">Atmosphere:</strong>
+        <button data-set-atmosphere="frost" class="px-md py-xs rounded border">
+          frost
+        </button>
+        <button data-set-atmosphere="slate" class="px-md py-xs rounded border">
+          slate
+        </button>
+        <button
+          data-set-atmosphere="terminal"
+          class="px-md py-xs rounded border"
+        >
+          terminal
+        </button>
+        <button
+          data-set-atmosphere="meridian"
+          class="px-md py-xs rounded border"
+        >
+          meridian
+        </button>
+      </div>
+      <div class="flex flex-wrap gap-sm">
+        <strong class="text-mute">Physics:</strong>
+        <button data-set-physics="glass" class="px-md py-xs rounded border">
+          glass
+        </button>
+        <button data-set-physics="flat" class="px-md py-xs rounded border">
+          flat
+        </button>
+        <button data-set-physics="retro" class="px-md py-xs rounded border">
+          retro
+        </button>
+      </div>
+      <div class="flex flex-wrap gap-sm">
+        <strong class="text-mute">Density:</strong>
+        <button data-set-density="compact" class="px-md py-xs rounded border">
+          compact
+        </button>
+        <button data-set-density="default" class="px-md py-xs rounded border">
+          default
+        </button>
+        <button
+          data-set-density="comfortable"
+          class="px-md py-xs rounded border"
+        >
+          comfortable
+        </button>
+      </div>
+      <div class="flex flex-wrap gap-sm">
+        <strong class="text-mute">Mode:</strong>
+        <button data-set-mode="dark" class="px-md py-xs rounded border">
+          dark
+        </button>
+        <button data-set-mode="light" class="px-md py-xs rounded border">
+          light
+        </button>
+      </div>
+      <p class="text-mute text-small">
+        Manual QA: switch all 4 atmospheres × all 3 physics presets. Verify
+        surface card shadows change per physics (glass: atmospheric blur, flat:
+        subtle rgba, retro: hard pixel offset). Verify font-heading changes with
+        atmosphere (frost → Space Grotesk, terminal → Courier, etc). If a font
+        falls back to browser default, the @theme reference cycle is back and
+        the font namespace row needs the "raw :root" fix per the Session 3 plan.
+      </p>
+    </footer>
+
+    <script type="module">
+      // Session 4 switch: the in-page prototype has been replaced by the real
+      // @void-energy/tailwind/runtime. Browsers can ESM-import the file
+      // directly — no build step needed for this smoke page.
+      import {
+        setAtmosphere,
+        setPhysics,
+        setMode,
+        setDensity,
+      } from '../dist/runtime.js';
+
+      document.addEventListener('click', (e) => {
+        const t = e.target;
+        if (!(t instanceof HTMLElement)) return;
+        const a = t.getAttribute('data-set-atmosphere');
+        const p = t.getAttribute('data-set-physics');
+        const d = t.getAttribute('data-set-density');
+        const m = t.getAttribute('data-set-mode');
+        if (a) setAtmosphere(a);
+        if (p) setPhysics(p);
+        if (d) setDensity(d);
+        if (m) setMode(m);
+      });
+    </script>
+  </body>
+</html>
