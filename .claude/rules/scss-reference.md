@@ -54,7 +54,9 @@ All accept optional $low-specificity: true for :where() wrapping.
 ## Responsive
 ```
 respond-up($breakpoint)   Min-width query. Breakpoints: tablet, small-desktop, large-desktop, full-hd, quad-hd
-mobile-only               Max-width: tablet
+mobile-only               Max-width: tablet - 1px (< 768px). Phone-only styling.
+touch-only                Max-width: small-desktop - 1px (< 1024px). Phone + tablet; used for floating-island navigation.
+pointer-coarse-only       @media (hover: none) and (pointer: coarse). True touch detection, orthogonal to viewport width. Use for input-method affordances that must hold regardless of window size (hit-target sizing, hover-gating). Prefer touch-only for layout, pointer-coarse-only for interaction.
 container-up($breakpoint) Min-width container query. Breakpoints: sm(320), md(480), lg(640), xl(800). Parent needs container-type: inline-size.
 ```
 

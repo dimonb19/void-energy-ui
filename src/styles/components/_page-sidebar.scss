@@ -70,41 +70,73 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
   max-height: 70vh;
   overflow: hidden;
   visibility: hidden;
+  opacity: 0;
   padding-top: calc(
     (var(--nav-height) + var(--safe-top)) +
       (var(--nav-height) + var(--safe-top)) * (1 - var(--nav-hidden, 0))
   );
   padding-bottom: var(--space-md);
   transform: translateY(-100%);
+  transform-origin: top center;
   transition:
     padding-top var(--speed-base) var(--ease-spring-bounce),
     visibility var(--speed-base) var(--ease-spring-snappy),
+    opacity var(--speed-base) var(--ease-flow),
     transform var(--speed-base) var(--ease-spring-snappy);
 
-  @include mobile-only {
-    transition-timing-function: var(--ease-flow);
-
-    // Island nav: compact height, always visible — no slide, expand in place
-    padding-top: calc(
-      var(--size-touch-min) + var(--space-xs) + var(--safe-top) +
-        var(--size-touch-min)
+  @include touch-only {
+    // Island nav + island toggle: panel becomes a floating island below the
+    // toggle. Inset from screen edges, capped height, rounded.
+    //   top = safe-top + (nav island top-gap + nav island height)
+    //               + (toggle gap + toggle island height)
+    //   The panel sits flush against toggle-bottom; the scale(0.96) +
+    //   translateY(-space-xs) transform below creates the "emerge from
+    //   toggle" animation origin, so no explicit panel gap is needed.
+    top: calc(
+      var(--safe-top) + var(--space-xs) + var(--size-touch-min) +
+        var(--space-xs) + var(--size-touch-min)
     );
-    transform: none;
+    left: max(var(--space-lg), var(--safe-left));
+    right: max(var(--space-lg), var(--safe-right));
+    bottom: auto;
+    max-height: 60vh;
+    padding-top: var(--space-sm);
+    padding-bottom: var(--space-sm);
+    border-radius: var(--radius-base);
+
+    // Island animation: emerge from toggle bar above
+    transform: scale(0.96) translateY(calc(-1 * var(--space-xs)));
+    transition:
+      visibility var(--speed-base) var(--ease-flow),
+      opacity var(--speed-base) var(--ease-flow),
+      transform var(--speed-base) var(--ease-spring-snappy);
 
     @include when-state('open') {
+      transform: scale(1) translateY(0);
+      border: var(--physics-border-width) solid var(--border-color);
+    }
+
+    // Retro: no scale, no slide (CRT reveal is hard-edged), stepped opacity only
+    @include when-retro {
       transform: none;
+      transition-timing-function: steps(4);
     }
   }
 
   border-bottom: var(--physics-border-width) solid transparent;
   box-shadow: none;
 
+  // Desktop strip/rail retro: chunky 8-step slide.
+  // (Touch island retro has its own steps(4) inside the touch-only block.)
   @include when-retro {
-    transition-timing-function: steps(8);
+    @include respond-up('small-desktop') {
+      transition-timing-function: steps(8);
+    }
   }
 
   @include when-state('open') {
     visibility: visible;
+    opacity: 1;
     transform: translateY(0);
     overflow-y: auto;
     border-bottom-color: var(--border-color);
@@ -130,6 +162,7 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
     );
     padding-bottom: var(--space-md);
     visibility: visible;
+    opacity: 1;
     max-height: none;
     transform: none;
     overflow-y: auto;
@@ -240,8 +273,13 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
     }
   }
 
+  // Desktop strip/rail retro: compensates for retro's 0ms --speed-* tokens so
+  // steps(8) can chunk visibly over 300ms. Not applied at touch — the island
+  // reveal stays instant (no animation) for a true CRT snap-to-state feel.
   @include when-retro {
-    transition-duration: 0.3s; // void-ignore (Stepped retro transition)
+    @include respond-up('small-desktop') {
+      transition-duration: 0.3s; // void-ignore (Stepped retro transition)
+    }
   }
 }
 
@@ -287,12 +325,10 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
   line-height: var(--line-height-small);
   text-decoration: none;
   color: var(--text-dim);
-  border-left: calc(var(--physics-border-width) * 2) solid transparent;
-  border-radius: var(--radius-base);
 
   transition:
     color var(--speed-base) var(--ease-spring-snappy),
-    border-color var(--speed-base) var(--ease-spring-snappy);
+    background-color var(--speed-base) var(--ease-spring-snappy);
 
   &:hover {
     color: var(--energy-primary);
@@ -303,10 +339,11 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
     box-shadow: var(--focus-ring);
   }
 
-  // Active state — left border accent + primary color + subtle tint
+  // Active state — inset left accent rail + primary color + subtle tint.
+  // Inset box-shadow (not border) so the accent can't interact with
+  // border-radius and can't leak to other sides via border shorthand.
   @include when-state('active') {
     color: var(--energy-primary);
-    border-left-color: var(--energy-primary);
     font-weight: var(--font-weight-semibold);
     background: alpha(var(--energy-primary), 8%);
   }
@@ -323,11 +360,14 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
   z-index: z('sticky');
   transition: top var(--speed-base) var(--ease-spring-bounce);
 
-  @include mobile-only {
+  @include touch-only {
     transition-timing-function: var(--ease-flow);
-    // Island nav: always visible, compact height + breathing room below island
+    // Island nav: always visible. Header is sticky — its `top` drives the
+    // visual position of the toggle (margin-top on the toggle would collapse
+    // into the header and never render). Gap = space-xs breathing room below
+    // the nav island.
     top: calc(
-      var(--size-touch-min) + var(--space-xs) + var(--safe-top) +
+      var(--safe-top) + var(--space-xs) + var(--size-touch-min) +
         var(--space-xs)
     );
     transition: none;
@@ -341,8 +381,11 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
     transition: none;
   }
 
+  // Desktop-only retro duration compensation (see .page-sidebar for rationale).
   @include when-retro {
-    transition-duration: 0.3s; // void-ignore (Stepped retro transition)
+    @include respond-up('small-desktop') {
+      transition-duration: 0.3s; // void-ignore (Stepped retro transition)
+    }
   }
 }
 
@@ -358,9 +401,22 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
   background: var(--bg-surface);
   border-bottom: var(--physics-border-width) solid var(--border-color);
 
-  @include mobile-only {
-    margin-top: var(--space-xs);
-    border-top: var(--physics-border-width) solid var(--border-color);
+  // ── Touch (< small-desktop): Floating island matching nav-bar pattern ──
+  // Vertical position is driven by .page-sidebar-header's sticky `top`;
+  // margin-top here would collapse into the header and never render.
+  @include touch-only {
+    margin-inline: max(var(--space-lg), var(--safe-left))
+      max(var(--space-lg), var(--safe-right));
+    height: var(--size-touch-min);
+    border: var(--physics-border-width) solid var(--border-color);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-float);
+    overflow: hidden; // clip inner button corners
+
+    button {
+      border-radius: var(--radius-full);
+      height: 100%;
+    }
   }
 
   button {

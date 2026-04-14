@@ -163,8 +163,8 @@ body {
     var(--nav-height) + var(--safe-top)
   ); // Fixed nav + status bar
 
-  // Mobile: compact island height + top offset + breathing room below
-  @include mobile-only {
+  // Touch (< small-desktop): compact island height + top offset + breathing room below
+  @include touch-only {
     padding-top: calc(
       var(--size-touch-min) + var(--space-xs) + var(--safe-top) +
         var(--space-xs)
@@ -181,7 +181,7 @@ body {
       var(--nav-height) + var(--safe-top) + var(--breadcrumbs-height)
     );
 
-    @include mobile-only {
+    @include touch-only {
       padding-top: calc(
         var(--size-touch-min) + var(--space-xs) + var(--safe-top) +
           var(--space-xs) + var(--breadcrumbs-height)
@@ -196,7 +196,7 @@ section[id] {
     var(--nav-height) + var(--safe-top) + var(--space-lg)
   );
 
-  @include mobile-only {
+  @include touch-only {
     scroll-margin-top: calc(
       var(--size-touch-min) + var(--space-xs) + var(--safe-top) +
         var(--space-lg)
@@ -210,7 +210,7 @@ section[id] {
         var(--space-lg)
     );
 
-    @include mobile-only {
+    @include touch-only {
       scroll-margin-top: calc(
         var(--size-touch-min) + var(--space-xs) + var(--safe-top) +
           var(--breadcrumbs-height) + var(--space-lg)

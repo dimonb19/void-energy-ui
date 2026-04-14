@@ -431,7 +431,7 @@
 <svelte:window {onscroll} {onmousemove} />
 
 <nav
-  class="nav-bar flex flex-row items-center justify-between tablet:justify-normal gap-xs px-xs"
+  class="nav-bar flex flex-row items-center justify-between small-desktop:justify-normal gap-xs px-xs"
   aria-label="Navigation"
   data-hidden={navHidden}
 >
@@ -440,7 +440,7 @@
   </a>
 
   <!-- Desktop Nav Links -->
-  <ul class="hidden tablet:flex items-center gap-xs">
+  <ul class="hidden small-desktop:flex items-center gap-xs">
     {#each navItems as tab}
       <li>
         <a
@@ -460,9 +460,9 @@
   <ThemesBtn class="btn-void tab ml-auto flex-row-reverse gap-sm" />
 </nav>
 
-<!-- Mobile Nav Links -->
+<!-- Mobile/Tablet Nav Links (touch-screen island) -->
 <nav
-  class="bottom-nav flex flex-row items-center justify-center tablet:hidden"
+  class="bottom-nav flex flex-row items-center justify-center small-desktop:hidden"
   aria-label="Mobile navigation"
   bind:this={bottomNavEl}
 >

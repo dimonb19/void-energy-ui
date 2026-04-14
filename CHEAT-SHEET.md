@@ -473,13 +473,13 @@ These components already account for safe areas (no manual work needed):
 
 | Component | Safe Area Handling |
 | --- | --- |
-| **Nav bar** (`.nav-bar`) | Desktop: extends glass surface under status bar via `--safe-top`. Mobile: floating island offset by `--safe-top`; landscape-aware width via `--safe-left`/`--safe-right` |
+| **Nav bar** (`.nav-bar`) | Desktop (≥ 1024px): extends glass surface under status bar via `--safe-top`. Touch (< 1024px): floating island offset by `--safe-top`; landscape-aware inset via `--safe-left`/`--safe-right` |
 | **Bottom nav** (`.bottom-nav`) | Offsets above home indicator via `--safe-bottom`; landscape-aware width via `--safe-left`/`--safe-right` |
 | **Nav menu** (`.nav-menu`) | Padding respects `--safe-right` (and `--safe-left` on mobile) |
 | **Toasts** (`.toast-region`) | Top offset includes `--safe-top`; width avoids landscape notch |
 | **Full-size dialogs** (`dialog[data-size="full"]`) | Dimensions account for all four safe area insets |
 | **Breadcrumbs** (`.breadcrumbs`) | Fixed below nav-bar; `top` includes `--safe-top`; hidden offset includes `--nav-height + --safe-top` |
-| **Body** | `padding-top` includes `--safe-top` (+ `--breadcrumbs-height` when breadcrumbs present); `padding-bottom` uses `--bottom-nav-clearance` on mobile |
+| **Body** | `padding-top` includes `--safe-top` (+ `--breadcrumbs-height` when breadcrumbs present); `padding-bottom` uses `--bottom-nav-clearance` on touch (< 1024px) |
 
 #### Usage in Custom Components
 
@@ -2349,9 +2349,9 @@ const pv = createPasswordValidation(() => password);
 
 ---
 
-#### Mobile Bottom Nav — Sliding Pill Indicator
+#### Touch Bottom Nav — Sliding Pill Indicator
 
-**Description:** The mobile bottom navigation bar (`.bottom-nav`, visible below `tablet:`) uses a sliding pill indicator behind the active tab, following the same pattern as the `<Tabs>` component. The pill slides between tabs on navigation and fades in with a blur-to-clear animation on first paint.
+**Description:** The touch-screen bottom navigation bar (`.bottom-nav`, visible below `small-desktop:` / < 1024px) uses a sliding pill indicator behind the active tab, following the same pattern as the `<Tabs>` component. The pill slides between tabs on navigation and fades in with a blur-to-clear animation on first paint.
 **Location:** [src/components/Navigation.svelte](src/components/Navigation.svelte) (JS positioning logic) + [src/styles/components/\_navigation.scss](src/styles/components/_navigation.scss) (`.bottom-nav-indicator`)
 
 **How it works:**
@@ -2359,7 +2359,7 @@ const pv = createPasswordValidation(() => password);
 - A `ResizeObserver` recomputes on layout shifts
 - On first paint, the indicator positions instantly (no transition), then animates in via `bottom-nav-materialize` keyframe (fade + blur clear)
 - Active tab `background-color` is overridden to `transparent` so the sliding pill is the sole active indicator
-- Navlink loading shimmer is suppressed on mobile — the pill slide is the navigation feedback
+- Navlink loading shimmer is suppressed on touch — the pill slide is the navigation feedback
 
 **Physics:**
 - **Glass:** `alpha(--energy-secondary, 12%)` fill, full pill rounding
@@ -2369,9 +2369,9 @@ const pv = createPasswordValidation(() => password);
 
 ---
 
-#### Mobile Navigation Islands — Dual Floating UI
+#### Touch Navigation Islands — Dual Floating UI
 
-**Description:** On mobile (below `tablet:`), both the top navigation bar and bottom navigation use a floating island pattern — pill-shaped, detached from viewport edges, visually symmetric. The content area sits between two floating surfaces, creating a cohesive "app within a browser" feel.
+**Description:** On touch screens (below `small-desktop:` / < 1024px), both the top navigation bar and bottom navigation use a floating island pattern — pill-shaped, detached from viewport edges, visually symmetric. The content area sits between two floating surfaces, creating a cohesive "app within a browser" feel. On phone + tablet alike, the page sidebar toggle also takes the same island treatment, forming a three-island vertical stack at the top of the viewport.
 
 **Why islands instead of a full-width top bar?**
 
@@ -2384,19 +2384,21 @@ Void Energy adopts this pattern early — before it becomes the standard. When t
 | Aspect | Top island (`.nav-bar`) | Bottom island (`.bottom-nav`) |
 | --- | --- | --- |
 | Position | `top: calc(--space-xs + --safe-top)` | `bottom: calc(--space-xs + --safe-bottom)` |
-| Centering | `left: 50%; transform: translateX(-50%)` | `left: 50%; transform: translateX(-50%)` |
-| Width | `100% - max(--space-lg, --safe-left) - max(--space-lg, --safe-right)` | Same formula |
+| Inset | `left: max(--space-lg, --safe-left); right: max(--space-lg, --safe-right)` | Same formula |
+| Width | `auto` (derived from inset) | Same |
 | Shape | `border-radius: var(--radius-full)` | Same |
 | Surface | `@include surface-raised` + `@include glass-blur` | Same |
 | Contents | Logo + ThemesBtn | Nav tab icons + sliding indicator |
 
+The sidebar toggle (`.page-sidebar-toggle-bar`) uses `margin-inline` with the same `max(--space-lg, --safe-X)` expression — the inset semantics are unified across all three islands, just expressed as `inset-inline` for fixed-positioned elements and `margin-inline` for in-flow elements.
+
 **Scroll behavior:**
-- **Mobile:** Top island is always visible. Hide-on-scroll is disabled via CSS override (`data-hidden` has no effect). The "Fixed navigation" preference toggle is hidden on phones since it's irrelevant.
-- **Desktop (tablet+):** Full-width bar with optional hide-on-scroll, unchanged.
+- **Touch (< 1024px):** Top island is always visible. Hide-on-scroll is disabled via CSS override (`data-hidden` has no effect). The "Fixed navigation" preference toggle is hidden on touch since it's irrelevant.
+- **Desktop (≥ 1024px):** Full-width bar with optional hide-on-scroll, unchanged.
 
-**Technical approach:** CSS-only — no JS changes. The scroll-hide logic still runs; CSS ignores `data-hidden` on mobile by keeping `transform: translateX(-50%)` regardless of state.
+**Technical approach:** CSS-only — no JS changes. The scroll-hide logic still runs; CSS ignores `data-hidden` on touch by keeping `transform: none` regardless of state.
 
-**Body clearance:** On mobile, `body` padding-top accounts for the island offset: `var(--nav-height) + var(--space-xs) + var(--safe-top) + var(--space-xs)`.
+**Body clearance:** On touch, `body` padding-top accounts for the island offset: `var(--size-touch-min) + var(--space-xs) + var(--safe-top) + var(--space-xs)`.
 
 ---
 
@@ -4626,14 +4628,53 @@ h2 {
 
 #### `@include mobile-only`
 
-**Purpose:** Media query for screens below the `tablet` breakpoint (max-width: 768px). Shorthand for mobile-specific overrides.
+**Purpose:** Media query for screens below the `tablet` breakpoint (< 768px). Use for phone-only overrides — things that change because of phone-specific constraints (cramped height, icon-only affordances).
 
 **Usage:**
 
 ```scss
-.desktop-nav {
+.pull-refresh-pill {
   @include mobile-only {
-    display: none; // Hidden on mobile
+    padding: var(--space-xs); // Icon-only on phones
+  }
+}
+```
+
+---
+
+#### `@include touch-only`
+
+**Purpose:** Media query for screens below the `small-desktop` breakpoint (< 1024px). Use for touch-screen overrides that apply to both phone and tablet — floating-island navigation, body padding for island-height compensation, scroll-margin offsets.
+
+**Usage:**
+
+```scss
+.nav-bar {
+  @include touch-only {
+    // Floating island inset from screen edges
+    top: calc(var(--space-xs) + var(--safe-top));
+    left: max(var(--space-lg), var(--safe-left));
+    right: max(var(--space-lg), var(--safe-right));
+  }
+}
+```
+
+---
+
+#### `@include pointer-coarse-only`
+
+**Purpose:** True touch detection via `@media (hover: none) and (pointer: coarse)` — orthogonal to viewport width. Holds regardless of window size, so an iPad Pro in landscape (≥ 1024px) is still treated as touch, and a resized desktop browser (< 1024px) is still treated as mouse.
+
+**When to use which:**
+- `touch-only` for **layout** (islands, safe-area insets, body clearance) — driven by viewport width
+- `pointer-coarse-only` for **interaction** (hit-target sizing, disabling hover-only affordances) — driven by input method
+
+**Usage:**
+
+```scss
+.btn {
+  @include pointer-coarse-only {
+    min-height: 44px; // Enforce hit-target floor on touch devices at any size
   }
 }
 ```

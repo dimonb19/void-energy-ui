@@ -63,7 +63,7 @@
   transition: transform var(--speed-base) var(--ease-spring-bounce);
   transform: translateY(calc(-1 * var(--space-md)));
 
-  @include mobile-only {
+  @include touch-only {
     transition-timing-function: var(--ease-flow);
   }
 
@@ -79,29 +79,25 @@
     box-shadow: var(--shadow-lift); // Subtle shadow for separation
   }
 
-  // ── Mobile: Floating island (matches bottom-nav) ──
-  @include mobile-only {
+  // ── Touch (< small-desktop): Floating island (matches bottom-nav) ──
+  @include touch-only {
     top: calc(var(--space-xs) + var(--safe-top));
-    left: 50%;
-    width: calc(
-      100% - max(var(--space-lg), var(--safe-left)) - max(
-          var(--space-lg),
-          var(--safe-right)
-        )
-    );
+    left: max(var(--space-lg), var(--safe-left));
+    right: max(var(--space-lg), var(--safe-right));
+    width: auto;
     height: var(--size-touch-min);
     padding-top: 0;
     border-radius: var(--radius-full);
-    transform: translateX(-50%);
+    transform: none;
 
     // Restore surface-raised properties overridden by desktop nav-bar
-    background: var(--surface-bg);
+    background: var(--bg-surface);
     border: var(--physics-border-width) solid var(--border-color);
     box-shadow: var(--shadow-float);
 
     // Always visible — override hide-on-scroll
     &[data-hidden='true'] {
-      transform: translateX(-50%);
+      transform: none;
     }
   }
 
@@ -428,8 +424,8 @@
   }
 }
 
-// Body clearance for mobile bottom nav (matches tablet:hidden in template).
-@include mobile-only {
+// Body clearance for touch-screen bottom nav (matches small-desktop:hidden in template).
+@include touch-only {
   :root {
     --bottom-nav-clearance: calc(
       var(--size-touch-min) + var(--space-sm) + var(--safe-bottom)
@@ -479,7 +475,7 @@
   // --- D. Hide-on-scroll transition (synced with nav-bar) ---
   transition: transform var(--speed-base) var(--ease-spring-bounce);
 
-  @include mobile-only {
+  @include touch-only {
     transition-timing-function: var(--ease-flow);
   }
 

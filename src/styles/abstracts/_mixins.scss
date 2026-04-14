@@ -493,6 +493,23 @@
   }
 }
 
+@mixin touch-only {
+  @media (max-width: #{map.get($breakpoints, 'small-desktop') - 1px}) {
+    @content;
+  }
+}
+
+// Pointer-media detection — orthogonal to viewport width. Use for input-method
+// affordances that must hold regardless of window size (e.g. iPad Pro landscape
+// at ≥1024px is still touch; a resized desktop browser at <1024px is still mouse).
+// Prefer `touch-only` for layout (islands, clearance), `pointer-coarse-only` for
+// interaction (hit-target sizing, hover-gating).
+@mixin pointer-coarse-only {
+  @media (hover: none) and (pointer: coarse) {
+    @content;
+  }
+}
+
 // ==========================================================================
 // 6b. CONTAINER QUERIES
 // ==========================================================================
