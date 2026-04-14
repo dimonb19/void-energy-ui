@@ -66,8 +66,8 @@ describe('L0 npm pack — metadata', () => {
     expect(pack.name).toBe('@void-energy/tailwind');
   });
 
-  it('files field limits the tarball to dist + README (no src, no node_modules)', () => {
-    expect(pkg.files.sort()).toEqual(['README.md', 'dist'].sort());
+  it('files field limits the tarball to dist + bin + README (no src, no node_modules)', () => {
+    expect(pkg.files.sort()).toEqual(['README.md', 'bin', 'dist'].sort());
     // Defensive: no source files should leak into the tarball.
     for (const entry of pack.files) {
       expect(entry.path).not.toMatch(/^src\//);
@@ -131,12 +131,29 @@ describe('L0 npm pack — required dist files are all present', () => {
     'dist/tokens.css',
     'dist/density.css',
     'dist/atmospheres.json',
+    'dist/builtins.json',
     'dist/runtime.js',
     'dist/runtime.cjs',
     'dist/runtime.d.ts',
     'dist/head.js',
     'dist/head.cjs',
     'dist/head.d.ts',
+    'dist/config.js',
+    'dist/config.cjs',
+    'dist/config.d.ts',
+    'dist/generator.js',
+    'dist/generator.cjs',
+    'dist/generator.d.ts',
+    'dist/loader.js',
+    'dist/loader.cjs',
+    'dist/loader.d.ts',
+    'dist/vite.js',
+    'dist/vite.cjs',
+    'dist/vite.d.ts',
+    'dist/cli.js',
+    'dist/cli.cjs',
+    'dist/cli.d.ts',
+    'bin/void-energy.js',
     'dist/atmospheres/slate.css',
     'dist/atmospheres/terminal.css',
     'dist/atmospheres/meridian.css',

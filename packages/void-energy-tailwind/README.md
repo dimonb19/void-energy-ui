@@ -1,8 +1,8 @@
 # @void-energy/tailwind
 
-Void Energy's design system brain as a **framework-agnostic Tailwind CSS v4 preset**. Four atmospheres, three physics presets, two color modes, three density levels — all driven by CSS variables and DOM attributes. Works with any framework. Zero runtime unless you want it.
+Void Energy's design system brain as a **framework-agnostic Tailwind CSS v4 preset**. Four built-in atmospheres, three physics presets, two color modes, three density levels — plus a consumer config layer that lets you replace VE's themes with your own and ship them as first-class defaults. Works with any framework. Zero runtime unless you want it.
 
-> **Status:** Phase 1 complete. Not yet published to npm. See [SMOKE-REPORT.md](./SMOKE-REPORT.md) for the cross-framework validation run.
+> **Status:** Phase 1 complete (Sessions 1–9). Not yet published to npm.
 
 ---
 
@@ -12,7 +12,73 @@ Void Energy's design system brain as a **framework-agnostic Tailwind CSS v4 pres
 npm install @void-energy/tailwind tailwindcss@^4
 ```
 
-## Quick start
+## Recommended setup — full path (config file + Vite plugin)
+
+Five files, under two minutes to a working branded app with your own atmospheres and fonts rendered as permanent defaults.
+
+**1. `void.config.ts`** (project root) — declare your atmospheres and fonts:
+
+```ts
+import { defineConfig, defineAtmosphere } from '@void-energy/tailwind/config';
+
+export default defineConfig({
+  atmospheres: {
+    midnight: defineAtmosphere({
+      physics: 'glass',
+      mode: 'dark',
+      label: 'Midnight',
+      tokens: { '--bg-canvas': '#05060b', '--energy-primary': '#7c5cff' },
+    }),
+  },
+  fonts: [
+    { family: 'Orbitron', src: '/fonts/Orbitron.woff2', weight: '400 900' },
+  ],
+  fontAssignments: { heading: 'Orbitron' },
+  defaults: { atmosphere: 'midnight' },
+});
+```
+
+**2. `vite.config.ts`** — register the plugin:
+
+```ts
+import { voidEnergy } from '@void-energy/tailwind/vite';
+export default { plugins: [voidEnergy()] };
+```
+
+**3. `app.css`** — import the preset plus the generated virtual module:
+
+```css
+@import 'tailwindcss';
+@import '@void-energy/tailwind/theme.css';
+@import 'virtual:void-energy/generated.css';
+```
+
+**4. App entry** — hand the manifest to the runtime:
+
+```ts
+import { init } from '@void-energy/tailwind/runtime';
+import manifest from 'virtual:void-energy/manifest.json';
+init({ manifest });
+```
+
+**5. FOUC script** in `<head>` — see Step 2 below.
+
+Your theme picker now renders built-ins plus your config atmospheres as permanent cards (no X button). Only `registerAtmosphere()`-registered themes are end-user-removable. See [CONFIG.md](./CONFIG.md) for the schema reference and [INTEGRATIONS.md](./INTEGRATIONS.md) for Next.js (CLI `--watch`) and Astro recipes.
+
+Not using Vite? Use the CLI:
+
+```bash
+npx void-energy build            # one-shot
+npx void-energy build --watch    # chokidar-backed rebuilds
+```
+
+The CLI writes `void.generated.css` + `void.manifest.json` to the config's `outDir` (default `src/styles`). Output is byte-identical to the Vite plugin for the same config.
+
+---
+
+## Minimal setup — no config file
+
+If you just want VE's four built-in atmospheres without any customization:
 
 **1. Import the preset.** In your top-level CSS file:
 
@@ -112,19 +178,33 @@ import {
   setDensity,
   init,
   getAtmospheres,
+  getAtmosphereBySource,
+  registerAtmosphere,
+  unregisterAtmosphere,
+  getCustomAtmospheres,
+  getState,
+  subscribe,
   STORAGE_KEYS,
+  MANIFEST_SCHEMA_VERSION,
 } from '@void-energy/tailwind/runtime';
 ```
 
 | Function | Signature | Notes |
 |---|---|---|
-| `setAtmosphere` | `(name: string) => void` | Also cascades the atmosphere's default physics + mode. |
+| `setAtmosphere` | `(name: string) => void` | Cascades the atmosphere's default physics + mode. |
 | `setPhysics` | `(p: 'glass'\|'flat'\|'retro') => void` | `glass` and `retro` force `mode=dark`. |
 | `setMode` | `(m: 'light'\|'dark'\|'auto') => void` | `auto` resolves via `prefers-color-scheme`; persists raw `'auto'`. |
 | `setDensity` | `(d: 'compact'\|'default'\|'comfortable') => void` | Multipliers: 0.75, 1, 1.25. |
-| `init` | `(defaults?) => void` | Restore persisted state from `localStorage`; call once on first render. |
-| `getAtmospheres` | `() => Record<name, {physics, mode}>` | Returns a copy of the built-in manifest. |
-| `STORAGE_KEYS` | `{atmosphere, physics, mode, density}` | The four `localStorage` keys: `ve-atmosphere`, `ve-physics`, `ve-mode`, `ve-density`. |
+| `init` | `({ manifest?, atmosphere?, physics?, mode?, density? }?) => void` | Hydrate manifest + restore persisted state. Default-resolution chain: `localStorage` > `manifest.defaults` > `init({ defaults })` > L0 fallback. |
+| `getAtmospheres` | `() => AtmosphereEntry[]` | `[{ name, source, physics, mode, label? }, …]`. Runtime > config > builtin when names collide. |
+| `getAtmosphereBySource` | `(source: 'builtin'\|'config'\|'runtime') => AtmosphereEntry[]` | Filter the directory — use `'runtime'` to decide where to render the X button. |
+| `registerAtmosphere` | `(name, { physics, mode, tokens }) => void` | End-user-added themes. Injects a scoped `<style>` tag, persists to `localStorage`. |
+| `unregisterAtmosphere` | `(name) => void` | Removes a runtime atmosphere. |
+| `getCustomAtmospheres` | `() => string[]` | Names of currently-registered runtime atmospheres. |
+| `getState` | `() => { atmosphere, physics, mode, density }` | Snapshot of the four `data-*` attributes on `<html>`. |
+| `subscribe` | `(listener) => unsubscribe` | One notification per logical transaction (`setAtmosphere` coalesces its internal setters). |
+| `STORAGE_KEYS` | `{atmosphere, physics, mode, density, customAtmospheres}` | The five `localStorage` keys (`ve-*`). |
+| `MANIFEST_SCHEMA_VERSION` | `1` | The schema version the runtime accepts. Mismatches log one error and fall back to built-ins. |
 
 All setters are SSR-safe: silent no-op when `document` is unavailable. All `localStorage` access is try/caught.
 
@@ -137,6 +217,41 @@ import { FOUC_SCRIPT, STORAGE_KEYS } from '@void-energy/tailwind/head';
 `FOUC_SCRIPT` is a string-literal IIFE for inline injection in `<head>`. `STORAGE_KEYS` is re-exported from the runtime so the two surfaces can't drift.
 
 See [INTEGRATIONS.md](./INTEGRATIONS.md) for Next.js / Nuxt / Astro / SvelteKit / Vite injection recipes.
+
+### `@void-energy/tailwind/config`
+
+```ts
+import { defineConfig, defineAtmosphere } from '@void-energy/tailwind/config';
+import type { VoidConfig, AtmosphereDef, FontSource } from '@void-energy/tailwind/config';
+```
+
+Identity functions + types for `void.config.ts`. Zero runtime cost. See [CONFIG.md](./CONFIG.md).
+
+### `@void-energy/tailwind/generator`
+
+```ts
+import { generate } from '@void-energy/tailwind/generator';
+```
+
+Pure `(config, builtins) => { css, manifest }`. Shared by the Vite plugin and CLI. No I/O. Useful for custom build integrations.
+
+### `@void-energy/tailwind/vite`
+
+```ts
+import { voidEnergy } from '@void-energy/tailwind/vite';
+```
+
+Vite plugin. Auto-discovers `void.config.{ts,mts,js,mjs,cjs}` at project root (configurable via `voidEnergy({ config })`). Exposes two virtual modules — `virtual:void-energy/generated.css` and `virtual:void-energy/manifest.json` — and HMRs on config changes. Plugin instance carries a `.manifest` getter for SSR code paths.
+
+### `void-energy` CLI
+
+```bash
+npx void-energy build [--watch] [--config <path>] [--out <dir>] [--cwd <dir>]
+npx void-energy --version
+npx void-energy --help
+```
+
+Writes `void.generated.css` + `void.manifest.json` to `<outDir>` (default `src/styles`). Output byte-identical to the Vite plugin for the same config.
 
 ### `@void-energy/tailwind/atmospheres.json`
 
@@ -171,11 +286,12 @@ You will need to re-author the `@theme` bridge yourself if you skip `theme.css`.
 
 ## Documentation
 
+- [**ARCHITECTURE.md**](./ARCHITECTURE.md) — what L0 is, what ships in `node_modules`, the cascade model, L0 vs L1
+- [**CONFIG.md**](./CONFIG.md) — Consumer Config Layer: replace built-in atmospheres, ship custom fonts, provenance tiers
 - [**ATMOSPHERES.md**](./ATMOSPHERES.md) — the four built-in atmospheres with palettes
 - [**TOKENS.md**](./TOKENS.md) — every CSS variable, what it does, where it's overridden
 - [**INTEGRATIONS.md**](./INTEGRATIONS.md) — framework recipes (Vite, Next.js, Nuxt, Astro, SvelteKit, plain HTML) + shadcn bridge
 - [**MIGRATION.md**](./MIGRATION.md) — converting existing Tailwind codebases to VE tokens
-- [**SMOKE-REPORT.md**](./SMOKE-REPORT.md) — cross-framework validation run + known rough edges
 
 ---
 

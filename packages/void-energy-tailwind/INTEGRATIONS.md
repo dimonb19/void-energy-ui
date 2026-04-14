@@ -6,6 +6,155 @@ How to wire `@void-energy/tailwind` into each major framework. The three moving 
 2. **FOUC injection** — inline the `FOUC_SCRIPT` in `<head>` before any stylesheet loads.
 3. **Runtime calls** — import from `@void-energy/tailwind/runtime` for atmosphere/physics/density switching.
 
+If you also use the **Consumer Config Layer** (`void.config.ts`) to replace or extend built-in atmospheres, there's one more step:
+
+- **Vite projects**: add the `voidEnergy()` plugin (auto-emits `virtual:void-energy/generated.css` + `virtual:void-energy/manifest.json`).
+- **Non-Vite projects**: run `npx void-energy build` (or `build --watch`) alongside your dev server. The CLI writes `void.generated.css` + `void.manifest.json` to `outDir` (default `src/styles`). Import the CSS; `import manifest from './src/styles/void.manifest.json'` and pass to `init({ manifest })`.
+
+See [CONFIG.md](./CONFIG.md) for the schema and [ATMOSPHERES.md](./ATMOSPHERES.md) for the three provenance tiers (builtin / config / runtime).
+
+---
+
+## Vite plugin (recommended for Vite-based apps)
+
+The plugin auto-discovers `void.config.{ts,mts,js,mjs,cjs}` at the project root and emits two virtual modules. HMR is wired automatically — edit the config, the app reloads.
+
+`vite.config.ts`:
+
+```ts
+import { defineConfig } from 'vite';
+import tailwindcss from '@tailwindcss/vite';
+import { voidEnergy } from '@void-energy/tailwind/vite';
+
+export default defineConfig({
+  plugins: [tailwindcss(), voidEnergy()],
+});
+```
+
+`app.css`:
+
+```css
+@import 'tailwindcss';
+@import '@void-energy/tailwind/theme.css';
+@import 'virtual:void-energy/generated.css';
+```
+
+App entry:
+
+```ts
+import { init } from '@void-energy/tailwind/runtime';
+import manifest from 'virtual:void-energy/manifest.json';
+init({ manifest });
+```
+
+**Options:**
+- `voidEnergy({ config: './configs/void.prod.ts' })` — explicit config path.
+- `plugin.manifest` — SSR-side getter returning the currently-loaded manifest. Useful for Astro's `getStaticPaths` / Nuxt's `useAsyncData` paths that need the manifest at build time without a round trip through the virtual module graph.
+
+---
+
+## Astro
+
+Astro runs on Vite under the hood; the plugin drops in cleanly.
+
+`astro.config.mjs`:
+
+```ts
+import { defineConfig } from 'astro/config';
+import { voidEnergy } from '@void-energy/tailwind/vite';
+
+export default defineConfig({
+  vite: { plugins: [voidEnergy()] },
+});
+```
+
+FOUC script — inline inside your base layout before any stylesheet:
+
+```astro
+---
+import { FOUC_SCRIPT } from '@void-energy/tailwind/head';
+---
+<!doctype html>
+<html>
+  <head>
+    <script is:inline set:html={FOUC_SCRIPT}></script>
+    <link rel="stylesheet" href="/src/app.css" />
+  </head>
+  <body><slot /></body>
+</html>
+```
+
+---
+
+## Next.js (App Router) — CLI watch via `concurrently`
+
+Next.js uses Turbopack or Webpack depending on the version, neither of which runs Vite plugins. The CLI path is the reliable option: run `void-energy build --watch` alongside `next dev` and import the physical output file.
+
+`package.json`:
+
+```json
+{
+  "scripts": {
+    "dev": "concurrently \"void-energy build --watch\" \"next dev\"",
+    "build": "void-energy build && next build"
+  },
+  "devDependencies": {
+    "@void-energy/tailwind": "...",
+    "concurrently": "^9"
+  }
+}
+```
+
+`app/globals.css`:
+
+```css
+@import 'tailwindcss';
+@import '@void-energy/tailwind/theme.css';
+@import '../src/styles/void.generated.css';
+```
+
+`app/layout.tsx`:
+
+```tsx
+import { FOUC_SCRIPT } from '@void-energy/tailwind/head';
+import manifest from '../src/styles/void.manifest.json';
+import './globals.css';
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        <script
+          id="ve-fouc"
+          dangerouslySetInnerHTML={{ __html: FOUC_SCRIPT }}
+        />
+      </head>
+      <body>
+        <ClientBoot manifest={manifest} />
+        {children}
+      </body>
+    </html>
+  );
+}
+```
+
+`app/client-boot.tsx` (a client component):
+
+```tsx
+'use client';
+import { useEffect } from 'react';
+import { init } from '@void-energy/tailwind/runtime';
+
+export function ClientBoot({ manifest }: { manifest: unknown }) {
+  useEffect(() => {
+    init({ manifest: manifest as Parameters<typeof init>[0]['manifest'] });
+  }, [manifest]);
+  return null;
+}
+```
+
+> **Turbopack note:** The `void.generated.css` + `void.manifest.json` files ship as physical disk I/O from the CLI. HMR works by Turbopack picking up the file writes — the reload cost is a single dev-server refresh per config edit.
+
 ---
 
 ## Plain HTML (no framework)
@@ -115,46 +264,7 @@ export function App() {
 }
 ```
 
-See `/tmp/ve-l0-smoke/` in the monorepo's SMOKE-REPORT.md for a working example.
-
----
-
-## Next.js (App Router)
-
-### FOUC injection in root layout
-
-```tsx
-// app/layout.tsx
-import Script from 'next/script';
-import { FOUC_SCRIPT } from '@void-energy/tailwind/head';
-import './globals.css';
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <Script
-          id="ve-fouc"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: FOUC_SCRIPT }}
-        />
-      </head>
-      <body>{children}</body>
-    </html>
-  );
-}
-```
-
-`suppressHydrationWarning` is load-bearing: the FOUC script writes `data-*` attributes on `<html>` before React hydrates, and React would otherwise complain about the client-server attribute mismatch.
-
-`app/globals.css`:
-
-```css
-@import 'tailwindcss';
-@import '@void-energy/tailwind/theme.css';
-```
-
-### Runtime usage
+### Runtime usage in Next.js
 
 Only from client components (`'use client'`):
 
@@ -163,7 +273,7 @@ Only from client components (`'use client'`):
 import { setAtmosphere } from '@void-energy/tailwind/runtime';
 ```
 
-The runtime is SSR-safe (no-ops in Node) so importing from a server component is harmless, but there's nothing for it to do there.
+The runtime is SSR-safe (no-ops in Node) so importing from a server component is harmless, but there's nothing for it to do there. The `suppressHydrationWarning` on `<html>` in the layout above is load-bearing: the FOUC script writes `data-*` attributes before React hydrates, and React would otherwise complain about the mismatch.
 
 ---
 
@@ -267,6 +377,83 @@ SvelteKit's `app.html` is a static template, so the FOUC script has to be inline
 
 <button onclick={() => setAtmosphere('meridian')}>Meridian</button>
 ```
+
+---
+
+## Reactivity — React, Vue, and everything else
+
+The runtime exposes `subscribe(listener)` and `getState()` so non-Svelte frameworks can re-render when atmosphere / physics / mode / density change. Each logical transaction fires the listener exactly once: `setAtmosphere('meridian')` triggers one notification, not three (the internal `setPhysics` + `setMode` calls are batched).
+
+### React (`useSyncExternalStore`)
+
+```tsx
+import { useSyncExternalStore } from 'react';
+import { subscribe, getState } from '@void-energy/tailwind/runtime';
+
+export function useVoidState() {
+  return useSyncExternalStore(subscribe, getState, getState);
+}
+
+export function AtmosphereBadge() {
+  const { atmosphere, physics } = useVoidState();
+  return <span>{atmosphere} · {physics}</span>;
+}
+```
+
+`useSyncExternalStore` is the correct primitive here — it handles SSR (the third arg returns the initial state during server render) and avoids the stale-closure issues of a naive `useEffect` + `useState` pair.
+
+### Vue 3
+
+```ts
+import { ref, onUnmounted } from 'vue';
+import { subscribe, getState, type VoidState } from '@void-energy/tailwind/runtime';
+
+export function useVoidState() {
+  const state = ref<VoidState>(getState());
+  const off = subscribe((s) => (state.value = s));
+  onUnmounted(off);
+  return state;
+}
+```
+
+### Vanilla / anything else
+
+```ts
+import { subscribe, getState } from '@void-energy/tailwind/runtime';
+
+const badge = document.querySelector('#atmosphere-badge');
+const render = ({ atmosphere }) => (badge.textContent = atmosphere ?? '');
+render(getState());
+subscribe(render);
+```
+
+### Registering a custom atmosphere at runtime
+
+```ts
+import {
+  registerAtmosphere,
+  setAtmosphere,
+  getAtmospheres,
+  getAtmosphereBySource,
+} from '@void-energy/tailwind/runtime';
+
+registerAtmosphere('acme', {
+  physics: 'flat',
+  mode: 'dark',
+  tokens: { /* full token set — see ATMOSPHERES.md */ },
+});
+
+// Enumerate for a theme picker — array of { name, source, physics, mode, label? }.
+getAtmospheres().map((a) => a.name);
+// ['acme', 'frost', 'slate', 'terminal', 'meridian']
+
+// Only show the X button on runtime-added themes.
+getAtmosphereBySource('runtime'); // [{ name: 'acme', source: 'runtime', … }]
+
+setAtmosphere('acme');
+```
+
+The custom atmosphere persists across reloads via localStorage and is re-injected by the FOUC script before first paint. See [ATMOSPHERES.md](./ATMOSPHERES.md#registering-custom-atmospheres) for the full contract.
 
 ---
 

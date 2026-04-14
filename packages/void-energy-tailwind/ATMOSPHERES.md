@@ -4,6 +4,44 @@ Four built-in atmospheres ship with `@void-energy/tailwind`. Each is a full pale
 
 The manifest lives at `@void-energy/tailwind/atmospheres.json`.
 
+---
+
+## Three sources: builtin, config, runtime
+
+Every atmosphere in the runtime's directory carries a `source` tag. Theme pickers read this tag to decide whether to render a remove affordance.
+
+| Source | Origin | Permanence | UI affordance |
+|---|---|---|---|
+| `builtin` | Ships with L0 (the four atmospheres below). | Permanent. | No X button. |
+| `config` | Declared in `void.config.ts`, emitted into `void.generated.css` at build time. See [CONFIG.md](./CONFIG.md). | Permanent from the end-user's perspective. | No X button. |
+| `runtime` | Registered via `registerAtmosphere()` in a running app. | Removable by the user who added it. | X button. |
+
+```ts
+import {
+  getAtmospheres,
+  getAtmosphereBySource,
+} from '@void-energy/tailwind/runtime';
+
+getAtmospheres();
+// [
+//   { name: 'frost',    source: 'builtin', physics: 'glass', mode: 'dark', label: 'Frost' },
+//   { name: 'midnight', source: 'config',  physics: 'glass', mode: 'dark', label: 'Midnight' },
+//   { name: 'user-a',   source: 'runtime', physics: 'flat',  mode: 'dark' },
+// ]
+
+getAtmosphereBySource('runtime'); // → only end-user-added themes
+```
+
+### When to pick which
+
+- **Built-in is what you get by default.** Four production-ready atmospheres covering all 3 physics × both modes. Works without a config file.
+- **Config is how you ship a branded product.** Replace the four built-ins entirely (`atmospheres: {...}`), extend them (`extendAtmospheres`), or drop some (`omitBuiltins`). Emitted as first-class defaults — no end-user affordance to remove them.
+- **Runtime is how your end-users add their own.** For apps with a "create a theme" flow — AI-generated palettes, imported JSON, user-scoped themes.
+
+Config wins over built-in when names collide. Runtime wins over both.
+
+See [CONFIG.md](./CONFIG.md) for config-layer schema + the flagship "replace 4 with 10" scenario.
+
 | Atmosphere | Physics | Mode | Vibe |
 |---|---|---|---|
 | [`slate`](#slate) | `flat` | `dark` | Professional / Clean |
@@ -133,3 +171,83 @@ Every semantic color (`premium`, `system`, `success`, `error`) also ships `-ligh
 ```
 
 These are defined per-atmosphere in the corresponding `atmospheres/{name}.css`.
+
+---
+
+## Registering custom atmospheres
+
+Beyond the four built-ins you can register any number of additional atmospheres at runtime. A custom atmosphere is **a name, a preferred physics preset, a preferred color mode, and a map of CSS tokens** — the same shape the built-ins use, just scoped to a different selector.
+
+```ts
+import { registerAtmosphere, setAtmosphere } from '@void-energy/tailwind/runtime';
+
+registerAtmosphere('acme', {
+  physics: 'flat',
+  mode: 'dark',
+  tokens: {
+    '--bg-canvas': '#0a0e1a',
+    '--bg-surface': '#131a2a',
+    '--bg-sunk': '#05080f',
+    '--energy-primary': '#ff5a8a',
+    '--energy-secondary': '#9ca3b3',
+    '--text-main': '#edf2f7',
+    '--text-dim': '#a0b0c0',
+    '--text-mute': '#60708a',
+    '--border-color': 'rgba(255, 90, 138, 0.2)',
+    '--color-premium': '#ffb020',
+    '--color-success': '#22c55e',
+    '--color-error': '#ef4444',
+    '--color-system': '#8b5cf6',
+    // …full token list in TOKENS.md
+  },
+});
+
+setAtmosphere('acme');
+```
+
+### What happens under the hood
+
+- A shared `<style id="ve-custom-atmospheres">` element is injected into `<head>` with `[data-atmosphere='acme'] { … }` rules. Re-registering rewrites the block; unregistering removes it.
+- The definition is persisted to `localStorage['ve-custom-atmospheres']` as JSON.
+- The FOUC script reads the same key on the next page load and inlines the `<style>` tag **before first paint**, so persisted custom atmospheres never flash through a built-in palette.
+- `setAtmosphere('acme')` looks up the registered meta and cascades `data-physics="flat"` + `data-mode="dark"` automatically — identical to the built-in cascade.
+- `getAtmospheres()` returns the merged view (built-ins + customs), which is what theme-picker UIs should enumerate.
+
+### v1 scope notes
+
+- **No Safety Merge at runtime.** The runtime `registerAtmosphere` primitive accepts the complete token set. The `extends` field is parsed by the type but not merged — partial defs leave unspecified tokens resolving from `:root`, which is usually not what you want. Pass the full list. If you want merge semantics, declare the atmosphere in `void.config.ts` instead (the config layer **does** Safety-Merge against a base — see [CONFIG.md](./CONFIG.md#safety-merge-semantics)).
+- **Name constraints.** Atmosphere names must match `/^[a-zA-Z0-9_-]+$/` — letters, digits, underscores, hyphens. Anything else is silently rejected to prevent CSS selector injection.
+- **No external loading primitive.** There is no `loadAtmosphereFromUrl`. Fetch, validate, and call `registerAtmosphere` yourself if you need remote themes. That layer belongs in L2.
+
+### Removing a custom atmosphere
+
+```ts
+import { unregisterAtmosphere } from '@void-energy/tailwind/runtime';
+
+unregisterAtmosphere('acme');
+```
+
+The `<style>` block is updated, localStorage is pruned, and the atmosphere disappears from `getAtmospheres()`. If the user is currently viewing the atmosphere you just removed, switch them back to a built-in first — there is no automatic fallback.
+
+### Enumerating atmospheres for a picker UI
+
+```ts
+import {
+  getAtmospheres,
+  getAtmosphereBySource,
+  getCustomAtmospheres,
+} from '@void-energy/tailwind/runtime';
+
+const all = getAtmospheres();
+// [
+//   { name: 'acme',     source: 'runtime', physics: 'flat',  mode: 'dark' },
+//   { name: 'frost',    source: 'builtin', physics: 'glass', mode: 'dark', label: 'Frost' },
+//   { name: 'slate',    source: 'builtin', physics: 'flat',  mode: 'dark', label: 'Slate' },
+//   …
+// ]
+
+const runtimeOnly = getAtmosphereBySource('runtime'); // render X buttons on these
+const customs     = getCustomAtmospheres();           // ['acme']
+```
+
+`getAtmospheres()` always returns a fresh array — caller mutation does not leak into the registry. Each entry's `source` drives theme-picker UI: `'builtin'` and `'config'` are permanent (no X button), `'runtime'` is end-user-removable.

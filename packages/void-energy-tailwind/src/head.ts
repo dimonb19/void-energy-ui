@@ -27,6 +27,14 @@ import { STORAGE_KEYS } from './runtime';
  * scopes the same declaration to [data-density="default"]. Setting the
  * attribute eliminates a cascade ambiguity when any element further down the
  * tree carries a more specific density attribute.
+ *
+ * Custom atmosphere re-injection: if the consumer has registered any custom
+ * atmospheres via runtime.registerAtmosphere, their definitions live in the
+ * `ve-custom-atmospheres` storage key as JSON. The script re-emits the
+ * matching <style id="ve-custom-atmospheres"> tag before first paint so a
+ * persisted custom atmosphere does not flash through the built-in palette on
+ * reload. Names are validated against /^[a-zA-Z0-9_-]+$/ to prevent selector
+ * injection from hostile storage content.
  */
 export const FOUC_SCRIPT = `
 (function(){
@@ -37,6 +45,30 @@ export const FOUC_SCRIPT = `
     r.setAttribute('data-physics',    s.getItem('${STORAGE_KEYS.physics}')    || 'glass');
     r.setAttribute('data-mode',       s.getItem('${STORAGE_KEYS.mode}')       || 'dark');
     r.setAttribute('data-density',    s.getItem('${STORAGE_KEYS.density}')    || 'default');
+    var raw = s.getItem('${STORAGE_KEYS.customAtmospheres}');
+    if (raw) {
+      var defs = JSON.parse(raw);
+      var css = '';
+      var pat = /^[a-zA-Z0-9_-]+$/;
+      for (var n in defs) {
+        if (!Object.prototype.hasOwnProperty.call(defs, n)) continue;
+        if (!pat.test(n)) continue;
+        var d = defs[n];
+        if (!d || !d.tokens) continue;
+        css += "[data-atmosphere='" + n + "']{";
+        for (var k in d.tokens) {
+          if (!Object.prototype.hasOwnProperty.call(d.tokens, k)) continue;
+          css += k + ':' + d.tokens[k] + ';';
+        }
+        css += '}';
+      }
+      if (css) {
+        var el = document.createElement('style');
+        el.id = 've-custom-atmospheres';
+        el.textContent = css;
+        (document.head || document.documentElement).appendChild(el);
+      }
+    }
   } catch(e) {}
 })();
 `.trim();

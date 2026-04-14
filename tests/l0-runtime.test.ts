@@ -23,12 +23,19 @@ const ATMOSPHERES_JSON = path.join(PKG, 'dist/atmospheres.json');
 
 const EXPECTED_EXPORTS = [
   'STORAGE_KEYS',
+  'MANIFEST_SCHEMA_VERSION',
   'setAtmosphere',
   'setPhysics',
   'setMode',
   'setDensity',
   'init',
   'getAtmospheres',
+  'getAtmosphereBySource',
+  'registerAtmosphere',
+  'unregisterAtmosphere',
+  'getCustomAtmospheres',
+  'getState',
+  'subscribe',
 ];
 
 const EXPECTED_STORAGE_KEYS = {
@@ -36,6 +43,7 @@ const EXPECTED_STORAGE_KEYS = {
   physics: 've-physics',
   mode: 've-mode',
   density: 've-density',
+  customAtmospheres: 've-custom-atmospheres',
 };
 
 // Spawning Node with no jsdom gives us an authentic SSR environment where
@@ -120,6 +128,11 @@ describe('L0 runtime — SSR safety (no document / no localStorage)', () => {
       `m.setMode('auto');`,
       `m.setDensity('comfortable');`,
       `m.init({ atmosphere: 'slate' });`,
+      `m.registerAtmosphere('noop', { physics: 'flat', mode: 'dark', tokens: {} });`,
+      `m.unregisterAtmosphere('noop');`,
+      `m.getCustomAtmospheres();`,
+      `m.getState();`,
+      `const off = m.subscribe(() => {}); off();`,
       `process.stdout.write('ok');`,
     ].join(' ');
     expect(runInNodeCJS(code)).toBe('ok');
@@ -135,6 +148,11 @@ describe('L0 runtime — SSR safety (no document / no localStorage)', () => {
       m.setMode('auto');
       m.setDensity('comfortable');
       m.init({ atmosphere: 'slate' });
+      m.registerAtmosphere('noop', { physics: 'flat', mode: 'dark', tokens: {} });
+      m.unregisterAtmosphere('noop');
+      m.getCustomAtmospheres();
+      m.getState();
+      const off = m.subscribe(() => {}); off();
       process.stdout.write('ok');
     `;
     expect(runInNode(code).stdout).toBe('ok');
@@ -155,7 +173,13 @@ describe('L0 runtime — SSR safety (no document / no localStorage)', () => {
       }));
     `;
     const result = JSON.parse(runInNode(code).stdout);
-    expect(result.keys).toEqual(['atmosphere', 'density', 'mode', 'physics']);
+    expect(result.keys).toEqual([
+      'atmosphere',
+      'customAtmospheres',
+      'density',
+      'mode',
+      'physics',
+    ]);
     expect(result.atmosphere).toBe('ve-atmosphere');
   });
 });
@@ -166,30 +190,34 @@ describe('L0 runtime — atmosphere manifest drift guard', () => {
       fs.readFileSync(ATMOSPHERES_JSON, 'utf8'),
     ) as Record<string, { physics: string; mode: string; tagline?: string }>;
     const runtime = await import(RUNTIME_JS);
-    const runtimeMeta = runtime.getAtmospheres() as Record<
-      string,
-      { physics: string; mode: string }
-    >;
+    const entries = runtime.getAtmospheres() as Array<{
+      name: string;
+      physics: string;
+      mode: string;
+      source: string;
+    }>;
 
-    // Same atmosphere keys
-    expect(Object.keys(runtimeMeta).sort()).toEqual(
-      Object.keys(manifest).sort(),
-    );
+    // Same atmosphere names
+    const runtimeNames = entries.map((e) => e.name).sort();
+    expect(runtimeNames).toEqual(Object.keys(manifest).sort());
 
     // Same physics + mode per atmosphere (runtime intentionally omits tagline)
-    for (const [name, meta] of Object.entries(manifest)) {
-      expect(runtimeMeta[name]).toBeDefined();
-      expect(runtimeMeta[name].physics).toBe(meta.physics);
-      expect(runtimeMeta[name].mode).toBe(meta.mode);
+    for (const entry of entries) {
+      const m = manifest[entry.name];
+      expect(m).toBeDefined();
+      expect(entry.physics).toBe(m.physics);
+      expect(entry.mode).toBe(m.mode);
+      expect(entry.source).toBe('builtin');
     }
   });
 
-  it('getAtmospheres() returns a copy — caller mutation does not leak', async () => {
+  it('getAtmospheres() returns a fresh array — caller mutation does not leak', async () => {
     const runtime = await import(RUNTIME_JS);
     const first = runtime.getAtmospheres();
-    delete first.frost;
+    first.pop();
+    first.length = 0;
     const second = runtime.getAtmospheres();
-    expect(second.frost).toBeDefined();
+    expect(second.length).toBe(4);
   });
 });
 
@@ -319,5 +347,469 @@ describe('L0 runtime — DOM behavior (jsdom)', () => {
     } finally {
       Storage.prototype.setItem = original;
     }
+  });
+});
+
+describe('L0 runtime — custom atmospheres + reactivity (jsdom)', () => {
+  let runtime: typeof import('../packages/void-energy-tailwind/dist/runtime.js');
+
+  beforeEach(async () => {
+    runtime = await import('../packages/void-energy-tailwind/dist/runtime.js');
+  });
+
+  afterEach(() => {
+    for (const name of runtime.getCustomAtmospheres()) {
+      runtime.unregisterAtmosphere(name);
+    }
+    const root = document.documentElement;
+    root.removeAttribute('data-atmosphere');
+    root.removeAttribute('data-physics');
+    root.removeAttribute('data-mode');
+    root.removeAttribute('data-density');
+    document.getElementById('ve-custom-atmospheres')?.remove();
+    localStorage.clear();
+  });
+
+  it('registerAtmosphere injects a <style> tag scoped to [data-atmosphere]', () => {
+    runtime.registerAtmosphere('acme', {
+      physics: 'flat',
+      mode: 'dark',
+      tokens: { '--bg-canvas': '#0a0e1a', '--energy-primary': '#ff5a8a' },
+    });
+    const el = document.getElementById('ve-custom-atmospheres');
+    expect(el).not.toBeNull();
+    expect(el!.textContent).toContain("[data-atmosphere='acme']");
+    expect(el!.textContent).toContain('--bg-canvas: #0a0e1a');
+    expect(el!.textContent).toContain('--energy-primary: #ff5a8a');
+  });
+
+  it('registerAtmosphere persists definition to localStorage', () => {
+    runtime.registerAtmosphere('acme', {
+      physics: 'flat',
+      mode: 'dark',
+      tokens: { '--bg-canvas': '#0a0e1a' },
+    });
+    const raw = localStorage.getItem('ve-custom-atmospheres');
+    expect(raw).not.toBeNull();
+    const parsed = JSON.parse(raw!);
+    expect(parsed.acme.physics).toBe('flat');
+    expect(parsed.acme.tokens['--bg-canvas']).toBe('#0a0e1a');
+  });
+
+  it('unregisterAtmosphere removes from style tag and storage', () => {
+    runtime.registerAtmosphere('acme', {
+      physics: 'flat',
+      mode: 'dark',
+      tokens: { '--bg-canvas': '#0a0e1a' },
+    });
+    runtime.unregisterAtmosphere('acme');
+    expect(document.getElementById('ve-custom-atmospheres')).toBeNull();
+    expect(localStorage.getItem('ve-custom-atmospheres')).toBeNull();
+  });
+
+  it('getAtmospheres merges built-ins with customs', () => {
+    runtime.registerAtmosphere('acme', {
+      physics: 'retro',
+      mode: 'dark',
+      tokens: {},
+    });
+    const all = runtime.getAtmospheres();
+    const byName = Object.fromEntries(all.map((e) => [e.name, e]));
+    expect(byName.frost).toBeDefined();
+    expect(byName.frost.source).toBe('builtin');
+    expect(byName.acme).toMatchObject({
+      physics: 'retro',
+      mode: 'dark',
+      source: 'runtime',
+    });
+  });
+
+  it('getCustomAtmospheres returns only custom names', () => {
+    expect(runtime.getCustomAtmospheres()).toEqual([]);
+    runtime.registerAtmosphere('acme', {
+      physics: 'flat',
+      mode: 'dark',
+      tokens: {},
+    });
+    runtime.registerAtmosphere('widgets', {
+      physics: 'flat',
+      mode: 'light',
+      tokens: {},
+    });
+    expect(runtime.getCustomAtmospheres().sort()).toEqual(['acme', 'widgets']);
+  });
+
+  it('setAtmosphere on a custom name cascades its physics and mode', () => {
+    runtime.registerAtmosphere('acme', {
+      physics: 'retro',
+      mode: 'dark',
+      tokens: {},
+    });
+    runtime.setAtmosphere('acme');
+    expect(document.documentElement.getAttribute('data-atmosphere')).toBe(
+      'acme',
+    );
+    expect(document.documentElement.getAttribute('data-physics')).toBe('retro');
+    expect(document.documentElement.getAttribute('data-mode')).toBe('dark');
+  });
+
+  it('invalid atmosphere names are silently rejected', () => {
+    runtime.registerAtmosphere("bad'; body{display:none}", {
+      physics: 'flat',
+      mode: 'dark',
+      tokens: { '--bg-canvas': 'red' },
+    });
+    expect(document.getElementById('ve-custom-atmospheres')).toBeNull();
+    expect(runtime.getCustomAtmospheres()).toEqual([]);
+  });
+
+  it('subscribe fires on setAtmosphere / setPhysics / setMode / setDensity', () => {
+    const calls: string[] = [];
+    const off = runtime.subscribe((state) =>
+      calls.push(state.atmosphere ?? ''),
+    );
+    runtime.setAtmosphere('slate');
+    runtime.setDensity('compact');
+    off();
+    runtime.setDensity('comfortable');
+    expect(calls).toEqual(['slate', 'slate']);
+  });
+
+  it('subscribe fires exactly once per setAtmosphere (batched)', () => {
+    let count = 0;
+    const off = runtime.subscribe(() => count++);
+    runtime.setAtmosphere('meridian');
+    off();
+    // setAtmosphere internally calls setPhysics + setMode; the batch must
+    // coalesce those into a single notification.
+    expect(count).toBe(1);
+  });
+
+  it('subscribe fires exactly once per init (batched)', () => {
+    let count = 0;
+    const off = runtime.subscribe(() => count++);
+    runtime.init({ atmosphere: 'slate' });
+    off();
+    expect(count).toBe(1);
+  });
+
+  it('subscribe returns an unsubscribe that is idempotent', () => {
+    let count = 0;
+    const off = runtime.subscribe(() => count++);
+    off();
+    off();
+    runtime.setAtmosphere('slate');
+    expect(count).toBe(0);
+  });
+
+  it('getState reflects the current <html> attributes', () => {
+    runtime.setAtmosphere('terminal');
+    expect(runtime.getState()).toEqual({
+      atmosphere: 'terminal',
+      physics: 'retro',
+      mode: 'dark',
+      density: null,
+    });
+  });
+
+  it('init() re-registers persisted custom atmospheres from localStorage', () => {
+    localStorage.setItem(
+      've-custom-atmospheres',
+      JSON.stringify({
+        acme: {
+          physics: 'flat',
+          mode: 'dark',
+          tokens: { '--bg-canvas': '#0a0e1a' },
+        },
+      }),
+    );
+    runtime.init();
+    expect(runtime.getCustomAtmospheres()).toEqual(['acme']);
+    const el = document.getElementById('ve-custom-atmospheres');
+    expect(el!.textContent).toContain("[data-atmosphere='acme']");
+  });
+
+  it('a listener that throws does not break other listeners', () => {
+    const calls: string[] = [];
+    const offBad = runtime.subscribe(() => {
+      throw new Error('boom');
+    });
+    const offGood = runtime.subscribe((state) =>
+      calls.push(state.atmosphere ?? ''),
+    );
+    runtime.setAtmosphere('slate');
+    offBad();
+    offGood();
+    expect(calls).toEqual(['slate']);
+  });
+
+  it('init() re-hydrate clears stale custom atmospheres (Finding 4)', () => {
+    // Seed storage, init to load, then remove storage and re-init.
+    // The registry must reflect the current storage state, not keep the
+    // prior session's entries around.
+    localStorage.setItem(
+      've-custom-atmospheres',
+      JSON.stringify({
+        acme: {
+          physics: 'flat',
+          mode: 'dark',
+          tokens: { '--bg-canvas': '#0a0e1a' },
+        },
+      }),
+    );
+    runtime.init();
+    expect(runtime.getCustomAtmospheres()).toEqual(['acme']);
+
+    localStorage.removeItem('ve-custom-atmospheres');
+    runtime.init();
+    expect(runtime.getCustomAtmospheres()).toEqual([]);
+  });
+});
+
+describe('L0 runtime — manifest integration (jsdom)', () => {
+  let runtime: typeof import('../packages/void-energy-tailwind/dist/runtime.js');
+
+  beforeEach(async () => {
+    runtime = await import('../packages/void-energy-tailwind/dist/runtime.js');
+  });
+
+  afterEach(() => {
+    for (const name of runtime.getCustomAtmospheres()) {
+      runtime.unregisterAtmosphere(name);
+    }
+    const root = document.documentElement;
+    root.removeAttribute('data-atmosphere');
+    root.removeAttribute('data-physics');
+    root.removeAttribute('data-mode');
+    root.removeAttribute('data-density');
+    document.getElementById('ve-custom-atmospheres')?.remove();
+    localStorage.clear();
+  });
+
+  it('init({ manifest }) loads config atmospheres tagged source=config', () => {
+    runtime.init({
+      manifest: {
+        schemaVersion: 1,
+        atmospheres: {
+          midnight: {
+            source: 'config',
+            physics: 'glass',
+            mode: 'dark',
+            label: 'Midnight',
+          },
+        },
+      },
+    });
+    const all = runtime.getAtmospheres();
+    const byName = Object.fromEntries(all.map((e) => [e.name, e]));
+    expect(byName.midnight).toMatchObject({
+      source: 'config',
+      physics: 'glass',
+      mode: 'dark',
+      label: 'Midnight',
+    });
+    // Built-ins from ATMOSPHERES_META are NOT merged when a manifest is
+    // loaded — the manifest is the authoritative directory.
+    expect(byName.frost).toBeUndefined();
+  });
+
+  it('manifest.defaults feeds the default-resolution chain', () => {
+    runtime.init({
+      manifest: {
+        schemaVersion: 1,
+        defaults: { atmosphere: 'midnight', density: 'comfortable' },
+        atmospheres: {
+          midnight: {
+            source: 'config',
+            physics: 'glass',
+            mode: 'dark',
+          },
+        },
+      },
+    });
+    expect(document.documentElement.getAttribute('data-atmosphere')).toBe(
+      'midnight',
+    );
+    expect(document.documentElement.getAttribute('data-density')).toBe(
+      'comfortable',
+    );
+    // Glass cascades dark mode.
+    expect(document.documentElement.getAttribute('data-physics')).toBe('glass');
+    expect(document.documentElement.getAttribute('data-mode')).toBe('dark');
+  });
+
+  it('localStorage wins over manifest.defaults wins over init defaults', () => {
+    localStorage.setItem('ve-atmosphere', 'slate');
+    runtime.init({
+      atmosphere: 'frost',
+      manifest: {
+        schemaVersion: 1,
+        defaults: { atmosphere: 'meridian' },
+        atmospheres: {
+          slate: { source: 'builtin', physics: 'flat', mode: 'dark' },
+          meridian: { source: 'builtin', physics: 'flat', mode: 'light' },
+        },
+      },
+    });
+    expect(document.documentElement.getAttribute('data-atmosphere')).toBe(
+      'slate',
+    );
+  });
+
+  it('schema-version mismatch logs an error and falls back to built-ins', () => {
+    const errors: string[] = [];
+    const original = console.error;
+    console.error = (...args: unknown[]) => {
+      errors.push(args.map(String).join(' '));
+    };
+    try {
+      runtime.init({
+        manifest: {
+          schemaVersion: 999,
+          atmospheres: {
+            midnight: { source: 'config', physics: 'glass', mode: 'dark' },
+          },
+        },
+      });
+    } finally {
+      console.error = original;
+    }
+    expect(errors.length).toBeGreaterThan(0);
+    expect(errors[0]).toMatch(/manifest schema version mismatch/);
+    // Rejected manifest → built-ins remain visible.
+    const byName = Object.fromEntries(
+      runtime.getAtmospheres().map((e) => [e.name, e]),
+    );
+    expect(byName.frost).toBeDefined();
+    expect(byName.midnight).toBeUndefined();
+  });
+
+  it('config atmosphere wins over built-in when names collide', () => {
+    runtime.init({
+      manifest: {
+        schemaVersion: 1,
+        atmospheres: {
+          frost: {
+            source: 'config',
+            physics: 'flat',
+            mode: 'dark',
+            label: 'Frost (Custom)',
+          },
+        },
+      },
+    });
+    const all = runtime.getAtmospheres();
+    expect(all).toHaveLength(1);
+    expect(all[0]).toMatchObject({
+      name: 'frost',
+      source: 'config',
+      physics: 'flat',
+      label: 'Frost (Custom)',
+    });
+  });
+
+  it('runtime-registered atmospheres win over manifest entries on collision', () => {
+    runtime.init({
+      manifest: {
+        schemaVersion: 1,
+        atmospheres: {
+          midnight: { source: 'config', physics: 'glass', mode: 'dark' },
+        },
+      },
+    });
+    runtime.registerAtmosphere('midnight', {
+      physics: 'retro',
+      mode: 'dark',
+      tokens: {},
+    });
+    const byName = Object.fromEntries(
+      runtime.getAtmospheres().map((e) => [e.name, e]),
+    );
+    expect(byName.midnight.source).toBe('runtime');
+    expect(byName.midnight.physics).toBe('retro');
+  });
+
+  it('getAtmosphereBySource filters correctly for theme-picker UIs', () => {
+    runtime.init({
+      manifest: {
+        schemaVersion: 1,
+        atmospheres: {
+          frost: {
+            source: 'builtin',
+            physics: 'glass',
+            mode: 'dark',
+            label: 'Frost',
+          },
+          midnight: {
+            source: 'config',
+            physics: 'glass',
+            mode: 'dark',
+          },
+        },
+      },
+    });
+    runtime.registerAtmosphere('user-theme', {
+      physics: 'flat',
+      mode: 'dark',
+      tokens: {},
+    });
+
+    expect(runtime.getAtmosphereBySource('builtin').map((a) => a.name)).toEqual(
+      ['frost'],
+    );
+    expect(runtime.getAtmosphereBySource('config').map((a) => a.name)).toEqual([
+      'midnight',
+    ]);
+    expect(runtime.getAtmosphereBySource('runtime').map((a) => a.name)).toEqual(
+      ['user-theme'],
+    );
+  });
+
+  it('setAtmosphere on a config atmosphere cascades physics + mode', () => {
+    runtime.init({
+      manifest: {
+        schemaVersion: 1,
+        atmospheres: {
+          midnight: { source: 'config', physics: 'retro', mode: 'dark' },
+        },
+      },
+    });
+    runtime.setAtmosphere('midnight');
+    expect(document.documentElement.getAttribute('data-physics')).toBe('retro');
+    expect(document.documentElement.getAttribute('data-mode')).toBe('dark');
+  });
+});
+
+describe('L0 runtime — SSR state isolation (Finding 2)', () => {
+  // registerAtmosphere / unregisterAtmosphere / subscribe must not mutate
+  // module-global state when document is unavailable. Otherwise SSR servers
+  // would leak per-request themes and listeners across requests.
+  it('Node: registerAtmosphere does not leak into module state', () => {
+    const code = `
+      import * as m from '${RUNTIME_JS}';
+      m.registerAtmosphere('srv', { physics: 'flat', mode: 'dark', tokens: {} });
+      const custom = m.getCustomAtmospheres();
+      const all = m.getAtmospheres();
+      process.stdout.write(JSON.stringify({
+        custom,
+        allNames: all.map(a => a.name),
+      }));
+    `;
+    const out = JSON.parse(runInNode(code).stdout);
+    expect(out.custom).toEqual([]);
+    // getAtmospheres still reports built-ins (manifest not loaded) but no
+    // srv entry leaked in from registerAtmosphere.
+    expect(out.allNames).not.toContain('srv');
+  });
+
+  it('Node: subscribe returns a no-op unsubscribe without side effects', () => {
+    const code = `
+      import * as m from '${RUNTIME_JS}';
+      const off = m.subscribe(() => {});
+      off();
+      off();
+      process.stdout.write('ok');
+    `;
+    expect(runInNode(code).stdout).toBe('ok');
   });
 });

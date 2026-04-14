@@ -133,6 +133,7 @@ describe('L0 head — script execution (jsdom)', () => {
     root.removeAttribute('data-physics');
     root.removeAttribute('data-mode');
     root.removeAttribute('data-density');
+    document.getElementById('ve-custom-atmospheres')?.remove();
     localStorage.clear();
   });
 
@@ -176,5 +177,52 @@ describe('L0 head — script execution (jsdom)', () => {
     } finally {
       Storage.prototype.getItem = original;
     }
+  });
+
+  it('re-injects <style id="ve-custom-atmospheres"> from persisted storage', async () => {
+    localStorage.setItem(
+      've-custom-atmospheres',
+      JSON.stringify({
+        acme: {
+          physics: 'flat',
+          mode: 'dark',
+          tokens: { '--bg-canvas': '#0a0e1a', '--energy-primary': '#ff5a8a' },
+        },
+      }),
+    );
+    await runScript();
+    const el = document.getElementById('ve-custom-atmospheres');
+    expect(el).not.toBeNull();
+    expect(el!.textContent).toContain("[data-atmosphere='acme']");
+    expect(el!.textContent).toContain('--bg-canvas:#0a0e1a');
+    expect(el!.textContent).toContain('--energy-primary:#ff5a8a');
+    el!.remove();
+  });
+
+  it('skips malformed custom atmosphere JSON silently', async () => {
+    localStorage.setItem('ve-custom-atmospheres', '{not valid json');
+    await expect(runScript()).resolves.not.toThrow();
+    expect(document.getElementById('ve-custom-atmospheres')).toBeNull();
+  });
+
+  it('rejects atmosphere names with unsafe characters (selector injection)', async () => {
+    localStorage.setItem(
+      've-custom-atmospheres',
+      JSON.stringify({
+        "bad']{display:none}body[x='y": {
+          physics: 'flat',
+          mode: 'dark',
+          tokens: { '--bg-canvas': 'red' },
+        },
+      }),
+    );
+    await runScript();
+    // The name fails the validation pattern, so no <style> tag is created.
+    expect(document.getElementById('ve-custom-atmospheres')).toBeNull();
+  });
+
+  it('does not create an empty <style> tag when storage is absent', async () => {
+    await runScript();
+    expect(document.getElementById('ve-custom-atmospheres')).toBeNull();
   });
 });
