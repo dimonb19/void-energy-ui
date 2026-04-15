@@ -130,6 +130,14 @@
     waitlistEmail = '';
     waitlistSubmitting = false;
   }
+
+  // ── Business contact (obfuscated to avoid scraping) ──────────────────
+  function openBusinessContact(e: MouseEvent) {
+    e.preventDefault();
+    const user = ['b', 'i', 'z'].join('');
+    const domain = ['dgrslabs', 'ink'].join('.');
+    window.location.href = `mailto:${user}@${domain}`;
+  }
 </script>
 
 {#snippet waitlistForm(message: string)}
@@ -152,8 +160,9 @@
       </button>
     </div>
     <p class="text-caption text-mute">
-      Building a platform? <a href="mailto:biz@dgrslabs.ink" class="link"
-        >biz@dgrslabs.ink</a
+      Building a platform?
+      <a href="#contact" class="link" onclick={openBusinessContact}
+        >Contact us</a
       >
     </p>
   </form>
