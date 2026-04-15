@@ -40,7 +40,8 @@ function compare(generatedRel: string, goldenRel: string): void {
 }
 
 describe('L0 — foundation tokens.css', () => {
-  it('matches golden', () => compare('dist/tokens.css', 'test/tokens.css.golden'));
+  it('matches golden', () =>
+    compare('dist/tokens.css', 'test/tokens.css.golden'));
 });
 
 describe('L0 — physics presets', () => {

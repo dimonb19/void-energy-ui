@@ -32,7 +32,10 @@ if (!projectRoot) {
 interface FakeServer {
   watcher: {
     add: (p: string) => void;
-    on: (event: string, listener: (file: string) => void | Promise<void>) => void;
+    on: (
+      event: string,
+      listener: (file: string) => void | Promise<void>,
+    ) => void;
   };
   moduleGraph: {
     getModuleById: (id: string) => { id: string } | undefined;
@@ -73,7 +76,8 @@ try {
     plugin.configureServer(server as never);
     const before = plugin.load('\0virtual:void-energy/generated.css');
 
-    if (!cfgPath) throw new Error('runner: configureServer did not register a path');
+    if (!cfgPath)
+      throw new Error('runner: configureServer did not register a path');
     if (mutateContent) fs.writeFileSync(cfgPath, mutateContent);
 
     const change = handlers.get('change');
@@ -81,9 +85,7 @@ try {
     await change(cfgPath);
 
     const after = plugin.load('\0virtual:void-energy/generated.css');
-    process.stdout.write(
-      JSON.stringify({ ok: { before, after, wsEvents } }),
-    );
+    process.stdout.write(JSON.stringify({ ok: { before, after, wsEvents } }));
     process.exit(0);
   }
 
