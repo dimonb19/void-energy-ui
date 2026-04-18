@@ -81,9 +81,11 @@ export { createVoidEnergyTextStyleSnapshot } from './adapters/void-energy-host.j
 export type {
   CueTrigger,
   KineticSkeletonProps,
+  KineticTextControls,
   ModePreset,
   PhysicsPreset,
   ReducedMotionMode,
+  RevealMark,
   RevealMode,
   RevealStyle,
   StaggerPattern,

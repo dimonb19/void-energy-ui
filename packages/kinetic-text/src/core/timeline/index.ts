@@ -15,7 +15,7 @@ import {
   clearCharParams,
 } from '../effects/params';
 import { createPRNG, hashSeed } from './prng';
-import { computeStaggerDelays } from './stagger';
+import { computeStaggerDelays, marksToDelays } from './stagger';
 
 // ── Decode charsets ──────────────────────────────────────────────
 
@@ -83,6 +83,15 @@ export class RevealTimeline {
   private decodeResolved: boolean[] = [];
   private decodePassCount: number[] = [];
 
+  // Word boundary tracking (for onrevealword)
+  /** Word index assigned to each position (-1 for pure-space groups). */
+  private wordIndexOf: number[] = [];
+  /** The globalIndex at which each word starts (non-space groups only). */
+  private wordFirstIndex: number[] = [];
+  /** Concatenated text for each word, by wordIndex. */
+  private wordTexts: string[] = [];
+  private wordsRevealed = new Set<number>();
+
   // Cue tracking
   private sortedCues: KineticCue[] = [];
   private firedCues = new Set<string>();
@@ -106,6 +115,8 @@ export class RevealTimeline {
   ) {
     this.totalUnits = positions.length;
     this.revealed = new Array(this.totalUnits).fill(false);
+
+    this.buildWordIndex();
 
     // Sort cues: at-time ascending first, then on-complete.
     // Filter out cues with out-of-range targets and warn in dev.
@@ -144,8 +155,14 @@ export class RevealTimeline {
   start(): void {
     if (this.state !== 'idle') return;
 
-    // Reduced motion: skip to end immediately
+    // Reduced motion path. When external marks are provided the user has asked
+    // us to respect external timing (e.g. TTS audio) — we keep the timing but
+    // skip per-char animation, revealing each word as a block at its start.
     if (this.config.reducedMotion) {
+      if (this.config.revealMarks && this.config.revealMarks.length > 0) {
+        this.startReducedMotionWithMarks();
+        return;
+      }
       this.skipToEnd();
       return;
     }
@@ -168,6 +185,16 @@ export class RevealTimeline {
 
     this.state = 'running';
     this.startTime = performance.now();
+
+    // External-clock mode: hold at elapsed=0 until the consumer (or a
+    // synchronizer like syncAudioToKT) resumes us. Skip the first RAF tick
+    // so no marks with timeMs near 0 fire before the clock engages.
+    if (this.config.startPaused) {
+      this.state = 'paused';
+      this.pauseTime = this.startTime;
+      return;
+    }
+
     this.tick(this.startTime);
   }
 
@@ -193,15 +220,39 @@ export class RevealTimeline {
 
     const wasPaused = this.state === 'paused';
 
+    // Cancel any running RAF before we rewrite state — a stale tick that
+    // lands between the reset and the post-seek restart would double-fire
+    // reveals at unstable elapsed values.
+    if (this.rafId !== null) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
+
+    // Clear any pending fallback "revealing → visible" timers so animations
+    // from before the seek don't flip post-seek glyphs to visible.
+    for (const timerId of this.fallbackTimers.values()) {
+      clearTimeout(timerId);
+    }
+    this.fallbackTimers.clear();
+
     // Reset state
     this.revealedCount = 0;
     this.lastRevealedIndex = -1;
     this.revealed.fill(false);
     this.firedCues.clear();
+    this.wordsRevealed.clear();
+    this.pendingRevealAnimations = 0;
+    this.effectsCompleteFired = false;
 
     // Reset all glyphs to hidden
     for (let i = 0; i < this.totalUnits; i++) {
       this.renderer.setGlyphState(i, 'hidden');
+    }
+
+    // Seeks from a 'complete' state re-engage the timeline — callers may
+    // scrub audio back after it finished. Treat it like a fresh run.
+    if (this.state === 'complete') {
+      this.state = wasPaused ? 'paused' : 'running';
     }
 
     // Adjust start time so elapsed = ms
@@ -213,6 +264,13 @@ export class RevealTimeline {
     if (wasPaused) {
       this.state = 'paused';
       this.pauseTime = performance.now();
+      return;
+    }
+
+    // Restart RAF if we're still short of the end — processFrame cancels
+    // when fully revealed, so only restart when there's more to do.
+    if (this.revealedCount < this.totalUnits && this.rafId === null) {
+      this.rafId = requestAnimationFrame((t) => this.tick(t));
     }
   }
 
@@ -244,6 +302,7 @@ export class RevealTimeline {
       if (!this.revealed[i]) {
         this.renderer.setGlyphState(i, 'visible');
         this.revealed[i] = true;
+        this.notifyWordReveal(i);
       }
     }
     this.revealedCount = this.totalUnits;
@@ -433,6 +492,7 @@ export class RevealTimeline {
         this.revealed[i] = true;
         this.revealedCount++;
         if (i > this.lastRevealedIndex) this.lastRevealedIndex = i;
+        this.notifyWordReveal(i);
       } else if (elapsed >= this.delays[i]) {
         // Cycle through scrambled characters
         const newPass = Math.floor((elapsed - this.delays[i]) / passInterval);
@@ -453,6 +513,8 @@ export class RevealTimeline {
     this.revealed[index] = true;
     this.revealedCount++;
     if (index > this.lastRevealedIndex) this.lastRevealedIndex = index;
+
+    this.notifyWordReveal(index);
 
     if (this.config.revealStyle === 'instant') {
       // Instant: skip revealing state, go straight to visible
@@ -544,11 +606,121 @@ export class RevealTimeline {
   // ── Delay computation ─────────────────────────────────────
 
   private computeDelays(): number[] {
+    if (this.config.revealMarks && this.config.revealMarks.length > 0) {
+      return marksToDelays(this.positions, this.config.revealMarks);
+    }
     return computeStaggerDelays(
       this.positions,
       this.config.staggerPattern,
       this.config.stagger,
     );
+  }
+
+  // ── Word index (drives onrevealword) ─────────────────────────
+
+  private buildWordIndex(): void {
+    const groups = splitWords(this.positions);
+    this.wordIndexOf = new Array(this.totalUnits).fill(-1);
+    this.wordFirstIndex = [];
+    this.wordTexts = [];
+
+    let wordIdx = 0;
+    for (const group of groups) {
+      // splitWords returns runs of all-space or all-non-space units.
+      // Only non-space runs count as words.
+      if (group.length === 0) continue;
+      const isSpaceRun = this.positions[group[0]].isSpace;
+      if (isSpaceRun) continue;
+
+      let text = '';
+      for (const idx of group) {
+        this.wordIndexOf[idx] = wordIdx;
+        text += this.positions[idx].char;
+      }
+      this.wordFirstIndex.push(group[0]);
+      this.wordTexts.push(text);
+      wordIdx++;
+    }
+  }
+
+  private notifyWordReveal(index: number): void {
+    const cb = this.config.onrevealword;
+    if (!cb) return;
+    const w = this.wordIndexOf[index];
+    if (w < 0) return;
+    if (this.wordsRevealed.has(w)) return;
+    this.wordsRevealed.add(w);
+    cb(w, this.wordTexts[w]);
+  }
+
+  // ── Reduced-motion + revealMarks: word-block reveal at word start times ──
+
+  private startReducedMotionWithMarks(): void {
+    // Build per-char delays, derive each word's start time (min of its chars),
+    // schedule a single setTimeout per word that flips all its glyphs to
+    // visible at once — preserves external timing without any animation.
+    const delays = marksToDelays(this.positions, this.config.revealMarks ?? []);
+
+    this.state = 'running';
+    this.startTime = performance.now();
+
+    // Reveal pure-space groups immediately — they have no narrative weight
+    // and animating them adds nothing under reduced motion.
+    for (let i = 0; i < this.totalUnits; i++) {
+      if (this.positions[i].isSpace) {
+        this.renderer.setGlyphState(i, 'visible');
+        this.revealed[i] = true;
+        this.revealedCount++;
+        if (i > this.lastRevealedIndex) this.lastRevealedIndex = i;
+      }
+    }
+
+    for (let w = 0; w < this.wordFirstIndex.length; w++) {
+      const first = this.wordFirstIndex[w];
+      // All chars in a word share the same word index
+      let startMs = delays[first];
+      for (let i = first + 1; i < this.totalUnits; i++) {
+        if (this.wordIndexOf[i] !== w) break;
+        if (delays[i] < startMs) startMs = delays[i];
+      }
+
+      const timerId = window.setTimeout(
+        () => {
+          this.fallbackTimers.delete(first);
+          if (this.state === 'aborted' || this.state === 'complete') return;
+
+          for (let i = 0; i < this.totalUnits; i++) {
+            if (this.wordIndexOf[i] !== w) continue;
+            if (this.revealed[i]) continue;
+            this.renderer.setGlyphState(i, 'visible');
+            this.revealed[i] = true;
+            this.revealedCount++;
+            if (i > this.lastRevealedIndex) this.lastRevealedIndex = i;
+          }
+
+          // Fire word-reveal callback for the group (once, cheap)
+          this.notifyWordReveal(first);
+
+          // Time-triggered cues may be due by now — process them
+          const elapsed =
+            performance.now() - this.startTime - this.pausedDuration;
+          this.fireTimeCues(elapsed);
+
+          if (this.revealedCount >= this.totalUnits) {
+            this._finalElapsed = elapsed;
+            this.completeReveal();
+          }
+        },
+        Math.max(0, startMs),
+      );
+      this.fallbackTimers.set(first, timerId);
+    }
+
+    // No words at all (empty or all-space text) — complete immediately.
+    if (this.wordFirstIndex.length === 0) {
+      this._finalElapsed = 0;
+      this.completeReveal();
+    }
   }
 
   // ── Cue dispatching ───────────────────────────────────────

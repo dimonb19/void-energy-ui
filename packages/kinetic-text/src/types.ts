@@ -206,8 +206,50 @@ export interface TimelineConfig {
   seed: number;
   reducedMotion: boolean;
   cues: KineticCue[];
+  /** External per-character reveal marks. When present, overrides computed stagger. */
+  revealMarks?: RevealMark[];
+  /** Start the timeline in paused state at elapsed=0. Useful when an external clock (e.g. TTS audio) will drive playback. */
+  startPaused?: boolean;
   onrevealcomplete?: () => void;
   oneffectscomplete?: () => void;
+  onrevealword?: (wordIndex: number, word: string) => void;
+}
+
+/**
+ * External timing mark for a single character. Used to drive reveal from a
+ * precise source — e.g. TTS word/char timestamps mapped to char indices.
+ *
+ * When `KineticText` receives `revealMarks`, the timeline uses these instead of
+ * the computed stagger. Characters between explicit marks are micro-staggered
+ * by linear interpolation between the surrounding marks.
+ */
+export interface RevealMark {
+  /** Global character index (0-based, across the full text). */
+  index: number;
+  /** Time in ms from reveal start when this character should reveal. */
+  timeMs: number;
+}
+
+/**
+ * Imperative control surface for an active reveal timeline.
+ *
+ * Obtained via `bind:controls` on `<KineticText>`. The consumer can pause,
+ * resume, seek, or skip the timeline — most commonly used to keep reveal
+ * in sync with an external clock such as a TTS `<audio>` element.
+ *
+ * Getters are live — they reflect the current timeline state at call time.
+ * The object identity is stable across re-layouts so consumer `$effect`s
+ * don't re-run when internal positions recompute.
+ */
+export interface KineticTextControls {
+  pause(): void;
+  resume(): void;
+  seek(ms: number): void;
+  skipToEnd(): void;
+  readonly progress: number;
+  readonly elapsed: number;
+  readonly isPaused: boolean;
+  readonly isComplete: boolean;
 }
 
 // ── Public types ──────────────────────────────────────────────────
@@ -265,8 +307,34 @@ export interface KineticTextProps {
   skeletonLastLineWidth?: number;
   /** Start with all text visible — skip reveal entirely. Useful for showcasing effects without the reveal animation. */
   preRevealed?: boolean;
+  /**
+   * External per-character reveal marks. When present, overrides computed
+   * stagger — the timeline reveals each character at the specified time.
+   * Typical source: TTS word/character timestamps mapped to char indices.
+   */
+  revealMarks?: RevealMark[];
+  /**
+   * When true, the reveal timeline starts paused at elapsed=0 and waits for
+   * a consumer to call `controls.resume()` (or flip this prop back to false).
+   * Use this when an external clock owns playback — e.g. TTS audio where
+   * the reveal should wait for `audio.play()` before advancing. Reactive:
+   * flipping true→false resumes, false→true pauses.
+   */
+  paused?: boolean;
+  /**
+   * Imperative control surface for the active timeline. Bind with
+   * `bind:controls={…}` to pause, resume, seek, or skip the reveal from
+   * outside the component — e.g. to keep it in sync with audio playback.
+   */
+  controls?: KineticTextControls;
   onrevealcomplete?: () => void;
   oneffectscomplete?: () => void;
+  /**
+   * Fires the first time a character belonging to a new word reveals.
+   * Emits the word index (0-based, counting only non-space groups) and
+   * the word string. Useful for transcript highlighting.
+   */
+  onrevealword?: (wordIndex: number, word: string) => void;
   as?: string;
   class?: string;
 }

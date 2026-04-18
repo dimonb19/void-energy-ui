@@ -4,6 +4,7 @@
   import StoryFeed from './conexus/StoryFeed.svelte';
   import ReorderShowcase from './conexus/ReorderShowcase.svelte';
   import PortalLoaderDemo from './conexus/PortalLoaderDemo.svelte';
+  import VibeMachine from './conexus/VibeMachine.svelte';
 
   function interceptDemoLink(e: MouseEvent | KeyboardEvent) {
     if (e instanceof KeyboardEvent && e.key !== 'Enter') return;
@@ -23,6 +24,13 @@
   }
 </script>
 
+<!--
+  VibeMachine lives OUTSIDE PullRefresh. Its ambient layers use `position: fixed`
+  and must attach to the viewport. `.pull-content` has a `transform` rule that
+  makes it the containing block for any fixed descendant — which stretches the
+  ambient layers to the full page height instead of 100vh. Keeping VibeMachine
+  a sibling of PullRefresh restores viewport-scoped positioning.
+-->
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <PullRefresh onrefresh={handleRefresh} onerror={handleRefreshError}>
   <div
@@ -43,3 +51,7 @@
     <PortalLoaderDemo />
   </div>
 </PullRefresh>
+
+<hr />
+
+<VibeMachine />

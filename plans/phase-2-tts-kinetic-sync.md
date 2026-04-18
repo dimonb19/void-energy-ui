@@ -1,522 +1,318 @@
-# Phase 2 — TTS + Kinetic Text Synchronization
+# Phase 2 — Vibe Machine: AI-Orchestrated Story Atmospheres
 
-> Extend the Kinetic Text premium package with a timeline-driven reveal mode that syncs character/word reveal to TTS audio playback, using InWorld TTS as the reference provider.
+> A single-page AI vibe generator living on `/conexus`. Click "Generate vibe" → Claude invents a fresh atmospheric beat (ambient layer mix + kinetic-text recipe + 3–5 sentence text). If an InWorld API key is saved, the text narrates in sync with the reveal — audio drives the kinetic timeline, ambient bursts fire on dramatic words. This file reflects what actually shipped and supersedes every earlier draft.
 
-**Status:** Planning
-**Priority:** Phase 2 (after L0 Tailwind preset, before AI automation foundation)
-**Depends on:** Phase 1 (L0 shipped). KT package already exists at `packages/kinetic-text/` with working build + RevealTimeline engine.
-**Blocks:** Phase 6 narrative orchestration (CoNexus needs synced KT + TTS for its reading experience)
-**Related:** [phase-4b-premium-packages.md](phase-4b-premium-packages.md) (KT package), [phase-6-conexus-migration.md](phase-6-conexus-migration.md) (consumer)
-
----
-
-## Goal
-
-A consumer can play an InWorld TTS audio clip alongside a `<KineticText>` component and have characters reveal in precise sync with the spoken words — no drift, no estimation. One-shot effects (shatter, glitch, etc.) fire at exact moments keyed to the audio timeline.
-
-After Phase 2:
-- KT accepts externally-provided timing marks and reveals by them instead of computed stagger
-- A thin integration layer converts InWorld TTS timestamps to KT's format
-- Audio playback events (play, pause, seek) propagate to the KT timeline
-- One-shot effect cues can be authored inline in story text and resolved to audio timestamps
-- The entire sync system is provider-agnostic at the KT layer — InWorld is one adapter
+**Status:** Shipped 2026-04-18. This document was rewritten from scratch to reflect the implementation; prior drafts described a branching "choose-your-path" game and a full per-beat theme swap, both of which were dropped during build (see [Dropped from earlier drafts](#dropped-from-earlier-drafts)).
+**Depends on:** Phase 1 (L0 shipped).
+**Blocks:** Phase 3 (AI automation) inherits the prompt/tool-use pattern. Phase 6 (CoNexus migration) promotes this into the real narrative engine — at which point the dropped branching/theme features will likely come back, with actual gameplay justifying them.
+**Related:** [phase-3-ai-automation.md](phase-3-ai-automation.md), [phase-4b-premium-packages.md](phase-4b-premium-packages.md), [phase-6-conexus-migration.md](phase-6-conexus-migration.md)
 
 ---
 
-## Why this is a separate phase
+## Goal, as built
 
-TTS sync is not repo restructuring (Phase 4) and not CoNexus app code (Phase 6). It's a **capability enhancement** to the KT premium package that must land before CoNexus can build its narrative reading experience. The KT package already exists locally at `packages/kinetic-text/` with a working build and RevealTimeline engine — no monorepo restructure required. Building it now while the package is in the current repo means the TTS integration ships with KT when Phase 4 lifts it into the premium monorepo.
+A visitor lands on `/conexus`, scrolls past the existing demos, and meets the **Vibe Machine** card. One button:
+
+1. **idle** — card shows a muted "Your vibe will appear here." + the Generate button.
+2. Click **Generate vibe** → **loading** — skeleton shimmer in the text well, Claude + (optionally) InWorld fetch in parallel.
+3. **playing** — ambient layers mount, the kinetic reveal starts, audio plays, one-shot kinetic effects + ambient action bursts fire on pre-selected dramatic words. If TTS is active the reveal is word-aligned to the voice; otherwise it runs on a stagger clock.
+4. **done** — reveal complete. Button swaps to "Generate another vibe". A **Replay vibe** button appears. After 30s of idle the ambient layers release (text stays) so laptops don't spin fans forever.
+
+No choices, no branching, no theme swap. One click = one fresh vibe, shown once.
 
 ---
 
-## Research findings
+## What's in the ambient-layers + kinetic-text packages (all prerequisites)
 
-### InWorld TTS capabilities (verified 2026-04-11)
+These shipped before Phase 2 and are treated as read-only API surface by the consumer layer. Listed so future phases know what they can reach for.
 
-- **Word + character timestamps:** `timestampType: 'WORD'` or `'CHARACTER'` in the API request. Response includes parallel arrays: `words[]`, `wordStartTimeSeconds[]`, `wordEndTimeSeconds[]` (or char equivalents).
-- **Transport modes:** `SYNC` (audio + timestamps arrive together per chunk — required for real-time reveal) and `ASYNC` (timestamps trail audio — only for pre-rendered).
-- **Latency:** ~100ms added when timestamps are enabled. Negligible for narration.
-- **Language:** English stable, others experimental.
-- **SSML:** supports pronunciation/pitch/speed/emotion markup. `<mark name="..."/>` event support is **unconfirmed** — do not rely on it for effect cues.
-- **Inline audio tags:** `[happy]`, `[sad]`, `[whisper]`, `[cough]`, `[sigh]` — experimental, English only. These control vocal delivery, not timing events.
+### KT package additions ([`packages/kinetic-text/src/`](../packages/kinetic-text/src/))
 
-### TTS provider landscape (timestamp support)
+- **`revealMarks?: RevealMark[]`** — external per-character timing. When present, bypasses `computeStaggerDelays()` via `marksToDelays()` (linear interpolation between marks).
+- **`paused?: boolean`** + **`startPaused`** timeline config — external-clock gating. Flipping `paused` live pauses/resumes without rebuilding the timeline.
+- **`bind:controls`** — exposes `KineticTextControls = { pause, resume, seek, skipToEnd, progress, elapsed, isPaused, isComplete }`. The control surface is a stable proxy closure; its identity doesn't change across re-layouts, so consumer `$effect`s that depend on `controls` don't thrash.
+- **`onrevealword?: (wordIndex, word) => void`** — fires once on the first-char reveal of each non-space word group.
+- **Reduced-motion + revealMarks** path (`startReducedMotionWithMarks`) — respects external timing but reveals each word as a block, one `setTimeout` per word.
+- **Seek hardening** — RAF cancelled, fallback timers cleared, and `pendingRevealAnimations` reset before re-anchoring `startTime`. Prevents stale reveals when audio is scrubbed.
 
-The architecture is provider-agnostic, but not all providers are equal. This table documents which providers can drive precise sync (timestamps) vs which need the estimated pacing fallback.
+### TTS core + InWorld adapter ([`packages/kinetic-text/src/tts/`](../packages/kinetic-text/src/tts/))
 
-| Provider | Timestamp support | Mechanism | SSML `<mark>` events | Notes |
-|---|---|---|---|---|
-| **InWorld** | Word + character | `timestampType: 'WORD'`/`'CHARACTER'` in request, parallel arrays in response | Unconfirmed | Reference provider for Phase 2. ~100ms latency added. |
-| **ElevenLabs** | Per-character | `/v1/text-to-speech/{id}/with-timestamps` returns start/end per char | N/A | Strong candidate for second adapter. |
-| **Azure Speech** | Word boundaries | `WordBoundary` events fire during playback (real-time) | Yes — robust support | Best `<mark>` support of any provider. Good for effect cues via SSML. |
-| **Google Cloud TTS** | Word-level | `timepoints[]` in response when `SSML` input used | Yes — via `<mark name="..."/>` | Requires SSML input format for timepoints. |
-| **OpenAI TTS** | None | No native timestamp support | No | **Blocker for precise sync.** Must use estimated pacing fallback or post-hoc alignment. |
-| **Browser SpeechSynthesis** | Word boundaries | `onboundary` event | No | Quality/consistency varies by OS. Unreliable for production sync. |
+- `types.ts` — `TTSResult`, `WordTimestamp`, `TTSProvider`.
+- `marks.ts` — `wordTimesToRevealMarks(text, wordTimestamps) → RevealMark[]`. Case-insensitive word matching so providers that capitalize sentence starts still align.
+- `sync.ts` — `syncAudioToKT({ audio, controls, driftThreshold? }) → cleanup`. Audio is master clock. Seeks on `play`/`seeked`, corrects drift >250ms on `timeupdate`, skips to end on `ended`.
+- `cues.ts` — `stripEffectTokens(raw)` + `resolveEffectCues(tokens, cleanText, wordTimestamps)`. **Not used by the Vibe Machine** (beats use `kinetic.oneShots` from the schema, not inline `{{fx:…}}` tokens). Kept for future consumers.
+- `fallback.ts` — `estimateCharSpeed(audioDurationMs, text)`. **Not used by the Vibe Machine** either; see [Known gaps](#known-gaps--rough-edges).
+- `providers/inworld.ts` — `inworldSynthesize(text, { voiceId, apiKey, … }) → TTSResult`. Normalizes InWorld's base64 audio + `timestampInfo.wordAlignment` into `{ audioBlob, audioUrl, wordTimestamps, durationMs }`. Caller owns `URL.revokeObjectURL`.
+- Sub-path exports: `@dgrslabs/void-energy-kinetic-text/tts` and `/tts/providers`.
+- Tests: [`kt-tts-cues.test.ts`](../tests/kt-tts-cues.test.ts), [`kt-tts-marks.test.ts`](../tests/kt-tts-marks.test.ts), [`kt-tts-inworld.test.ts`](../tests/kt-tts-inworld.test.ts), [`kt-tts-fallback.test.ts`](../tests/kt-tts-fallback.test.ts).
 
-**Implication:** InWorld, ElevenLabs, Azure, and Google all support precise sync. OpenAI TTS and browser SpeechSynthesis require the estimated pacing fallback (see below). When adding future provider adapters, the adapter returns `TTSResult` with `wordTimestamps` populated (precise) or empty (triggers fallback).
+### Ambient-layers package
 
-### Current KT architecture (relevant parts)
+The `godRays` ambient layer was removed before this phase landed — types and params registrations pulled; the effect file never existed. Four layer components remain: `EnvironmentLayer`, `AtmosphereLayer`, `PsychologyLayer`, `ActionLayer`. See `packages/ambient-layers/` for the complete list.
 
-- **RevealTimeline** uses RAF loop with `elapsed` tracking from `performance.now()`.
-- **Reveal timing** is computed once upfront via `computeStaggerDelays()` — returns a `delays[]` array where `delays[i]` = ms when char `i` should reveal.
-- **`seek(ms)`** jumps to any point and reprocesses all glyph states. Works but resets from zero each call — too expensive for 60fps external clock driving.
-- **`pause()` / `resume()`** freeze/unfreeze the internal clock.
-- **`KineticCue[]`** with `trigger: 'at-time'` + `atMs` already fires effects at precise timestamps during the RAF loop.
-- **Per-character DOM:** `kt-glyph` > `kt-unit` > `kt-word` > `kt-line` — all addressable.
-- **RevealTimeline is not exposed** to consumers — it's internal to `KineticText.svelte`.
+---
 
-### Sync strategy decision
+## Architecture — what actually shipped
 
-**Chosen: timestamp-derived delays (Strategy B).** Convert InWorld's word timestamps into the same `delays[]` array format the timeline already uses, then let the RAF loop run normally. The internal clock and audio clock reference the same duration — for pre-rendered audio this is sufficient.
+Three concerns, three files:
 
-**Rejected: seek-driven (Strategy A).** Calling `seek()` every frame is architecturally wrong — it resets all glyph states and reprocesses from zero each time. Would require rewriting seek to be incremental, which is a larger change for no benefit over Strategy B.
-
-**Audio drift mitigation:** for pre-rendered audio (not streaming), both clocks start from the same moment and run at wall-clock speed. Drift is sub-frame. For pause/resume, the KT timeline pauses when audio pauses — clocks stay aligned. For seek (user scrubs audio), a single `seek()` call realigns. This is the only case where `seek()` fires, and it's user-initiated so the per-call cost is fine.
-
-### Estimated pacing fallback (no-timestamp providers)
-
-Not all TTS providers return timestamps (notably OpenAI TTS). For these, a simple fallback:
-
-1. Measure the audio's total `duration` (from the `<audio>` element's `loadedmetadata` event or the API response).
-2. Compute `charSpeed = duration / charCount`.
-3. Feed that as a uniform `charSpeed` to KT's existing computed stagger path — no `revealMarks` needed.
-
-This produces linear, evenly-paced reveal that roughly follows the audio. It drifts on long passages (speakers don't talk at constant speed) and can't fire effects at precise moments, but it's good enough for ambient narration where the audio sets the mood rather than demanding frame-perfect sync.
-
-**Implementation:** a helper function in the TTS core module:
-
-```ts
-// packages/kinetic-text/src/tts/fallback.ts
-function estimateCharSpeed(audioDurationMs: number, text: string): number;
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  Consumer — src/components/conexus/VibeMachine.svelte            │
+│  Owns status state machine, InWorld key UI, replay cache,        │
+│  snapshot/observer wiring, and the declarative ambient-layer     │
+│  render from engine.activeAmbient.                               │
+└──────────────────────────┬───────────────────────────────────────┘
+                           │ uses
+┌──────────────────────────▼───────────────────────────────────────┐
+│  Orchestration — src/lib/story-beat-engine.svelte.ts             │
+│  ~35 lines. Two $state fields (`currentBeat`, `activeAmbient`),  │
+│  three methods (`applyBeat`, `releaseAmbient`, `release`). No    │
+│  theme stacking, no history — just reactive state the consumer   │
+│  reads from.                                                     │
+└──────────────────────────┬───────────────────────────────────────┘
+                           │ calls
+┌──────────────────────────▼───────────────────────────────────────┐
+│  Transport — src/lib/story-beat-client.ts                        │
+│  Browser-side: POST /api/generate-story-beat, defensive Zod      │
+│  re-validate, return VoidResult<StoryBeat, BoundaryError>.       │
+│                                                                  │
+│  Server — src/pages/api/generate-story-beat.ts                   │
+│  Reads ANTHROPIC_API_KEY via resolveAIConfig('BEAT'), calls      │
+│  Anthropic tool-use, re-validates with the same Zod schema,      │
+│  retries ONCE on schema failure.                                 │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
-Returns a `charSpeed` value (ms per character) that KT's existing `computeStaggerDelays()` consumes directly. The consumer checks whether their `TTSResult` has `wordTimestamps` — if yes, use `wordTimesToRevealMarks()` for precise sync; if no, use `estimateCharSpeed()` for approximate pacing.
+All types/enums derive from the same literal tuples in [`src/lib/story-beat-types.ts`](../src/lib/story-beat-types.ts), so the prompt, the JSONSchema tool input, and the Zod validator can't drift.
+
+The Anthropic call is server-side. The InWorld call is browser-side with a user-pasted key (saved to `localStorage` under `vibe-machine-inworld-key`) — see [TTS: browser-direct is intentional](#tts-browser-direct-is-intentional).
+
+---
+
+## The `StoryBeat` contract — what Claude actually emits
+
+Defined in [`src/lib/story-beat-types.ts`](../src/lib/story-beat-types.ts). No theme, no choices, no history.
 
 ```ts
-// Consumer decision:
-if (tts.wordTimestamps.length > 0) {
-  // Precise sync — timestamp-driven
-  const revealMarks = wordTimesToRevealMarks(cleanText, tts.wordTimestamps);
-  // pass revealMarks to <KineticText>
-} else {
-  // Estimated pacing — no timestamps available
-  const charSpeed = estimateCharSpeed(tts.durationMs, cleanText);
-  // pass charSpeed to <KineticText> (existing prop)
+export interface StoryBeat {
+  id: string;                 // kebab-case, 1–48 chars
+  title: string;              // 1–64 chars, shown in the card header
+  tagline?: string;           // optional 2–6 word vibe description, shown under title
+  text: string;               // 150–550 chars, 3–5 sentences
+  ambient: StoryAmbient;
+  kinetic: StoryKinetic;
+}
+
+interface StoryAmbient {
+  environment?: Array<{ layer: EnvironmentLayer; intensity: AmbientIntensity }>;  // exactly 1
+  atmosphere?:  Array<{ layer: AtmosphereLayer;  intensity: AmbientIntensity }>;  // at most 1, XOR psychology
+  psychology?:  Array<{ layer: PsychologyLayer;  intensity: AmbientIntensity }>;  // at most 1, XOR atmosphere
+  actions?:     Array<{ atWord: number; variant: ActionLayer; intensity: AmbientIntensity }>;  // exactly 1
+}
+
+interface StoryKinetic {
+  revealStyle: RevealStyle;              // required
+  continuous?: KineticTextEffect;        // optional looping effect
+  speed?: KineticSpeedPreset;            // slow | default | fast
+  oneShots?: Array<{ atWord: number; effect: KineticTextEffect }>;  // exactly 1
 }
 ```
 
-**Scope:** the fallback helper ships in Phase 2. No provider adapter is required to use it — it works with any audio source, even a local file with known duration.
+Enforced-at-schema coherence rules ([`story-beat-schema.ts`](../src/lib/story-beat-schema.ts)):
+
+- `ambient.atmosphere` XOR `ambient.psychology` — one ambient signal per beat, never both.
+- `ambient.actions` must contain exactly 1 entry (the beat's money moment).
+- `kinetic.oneShots` must contain exactly 1 entry (same money-moment idea, kinetic side).
+- **GPU budget gate:** if `kinetic.continuous` is set, `ambient.atmosphere` cannot be one of `{heat, underwater, fog}` and `ambient.psychology` cannot be one of `{dizzy, haze}`. These layers warp the whole backdrop via SVG filters or large blurs; stacking a continuous kinetic effect on top re-composites the filter pipeline per frame and janks low-end GPUs (M1 Air was the reference target). The `HEAVY_*` lists live in `story-beat-types.ts`.
+- `atWord` fields are capped at 0–200 but **not** validated against the actual word count of `text`. Out-of-range indices silently clamp to the last word's start via `wordStartTimes` in [`story-beat-cues.ts`](../src/lib/story-beat-cues.ts).
 
 ---
 
-## Architecture
+## Orchestration — `storyBeatEngine`
 
-Three layers, clean separation:
+[`src/lib/story-beat-engine.svelte.ts`](../src/lib/story-beat-engine.svelte.ts) is intentionally narrow:
 
-```
-┌──────────────────────────────────────────────────────┐
-│  Layer 3 — Narrative Pipeline (Phase 6 / CoNexus)    │
-│  LLM streams text → strips {{fx}} tokens → sends     │
-│  clean text to TTS → feeds audio + marks to Layer 2   │
-└──────────────────────┬───────────────────────────────┘
-                       │ consumes
-┌──────────────────────▼───────────────────────────────┐
-│  Layer 2 — TTS Integration (this phase)               │
-│                                                       │
-│  ┌─ Core (provider-agnostic) ──────────────────────┐ │
-│  │  marks.ts    — wordTimesToRevealMarks            │ │
-│  │  sync.ts     — syncAudioToKT                    │ │
-│  │  cues.ts     — stripEffectTokens, resolveEffects│ │
-│  │  types.ts    — TTSResult, WordTimestamp          │ │
-│  └─────────────────────────────────────────────────┘ │
-│  ┌─ Providers (one file per TTS model) ────────────┐ │
-│  │  providers/inworld.ts  → TTSResult              │ │
-│  │  providers/elevenlabs.ts  (future)              │ │
-│  │  providers/azure.ts       (future)              │ │
-│  └─────────────────────────────────────────────────┘ │
-└──────────────────────┬───────────────────────────────┘
-                       │ drives
-┌──────────────────────▼───────────────────────────────┐
-│  Layer 1 — KT Package Changes (this phase)            │
-│  revealMarks prop, exposed timeline control,          │
-│  optional onrevealword callback                       │
-└───────────────────────────────────────────────────────┘
+```ts
+class StoryBeatEngine {
+  currentBeat  = $state<StoryBeat | null>(null);
+  activeAmbient = $state<StoryAmbient>({});
+
+  applyBeat(beat: StoryBeat): void {
+    this.currentBeat = beat;
+    this.activeAmbient = beat.ambient;
+  }
+
+  /** Keep text on screen, stop the always-on GPU cost. */
+  releaseAmbient(): void { this.activeAmbient = {}; }
+
+  release(): void { this.currentBeat = null; this.activeAmbient = {}; }
+}
 ```
 
-**Layer 1** changes the KT package (premium). **Layer 2** is a new integration module — lives inside the KT package as optional sub-exports. The core (`@dgrslabs/void-energy-kinetic-text/tts`) is provider-agnostic. Providers (`@dgrslabs/void-energy-kinetic-text/tts/providers`) are one-file adapters that normalize API responses to the universal `TTSResult` type. Switching TTS models = swap one import. **Layer 3** is CoNexus-specific app code built in Phase 6.
+No ephemeral theme registration. No temporary-theme stack push. No `history[]`. The consumer reads `currentBeat` + `activeAmbient` directly as reactive state and renders layer components declaratively via `{#each activeAmbient.atmosphere}` etc.
+
+Why so thin: the Vibe Machine showcases the ambient + kinetic systems on top of the user's existing theme. Preserving the host palette means visitors can pick a theme they like from the main theme switcher, then see how the effects layer over it. Swapping the whole palette per beat was tried on paper and dropped — it fights the user's taste choice and makes the demo feel like a random-theme generator rather than an effects showcase.
 
 ---
 
-## Layer 1 — KT Package Changes
+## Transport
 
-### 1.1 New prop: `revealMarks`
+### Browser — [`src/lib/story-beat-client.ts`](../src/lib/story-beat-client.ts)
 
-```ts
-interface RevealMark {
-  /** Character index (0-based, global across full text) */
-  index: number;
-  /** Time in ms from start when this character should reveal */
-  timeMs: number;
-}
+- `generateNextBeat({ recentTitles?, signal? }) → Promise<VoidResult<StoryBeat, BoundaryError>>`.
+- POSTs `{ recentTitles }` to `/api/generate-story-beat`.
+- Defensively re-validates the server response with the same `StoryBeatSchema` Zod — a misconfigured server can never inject a malformed beat into the engine.
+- Maps HTTP status codes to user-facing messages (401 invalid key, 429 rate limit, 502/504 upstream, 529 busy, etc.).
+- `AbortError` surfaces as `{ code: 'network', message: 'Generation cancelled.' }` so the UI can silently swallow it.
 
-// On KineticTextProps:
-revealMarks?: RevealMark[];
-```
+### Server — [`src/pages/api/generate-story-beat.ts`](../src/pages/api/generate-story-beat.ts)
 
-When `revealMarks` is provided, `computeDelays()` uses these instead of `computeStaggerDelays()`. Each mark maps directly to a `delays[i]` entry. Characters between explicit marks get micro-staggered (linear interpolation between surrounding marks) so they don't all pop at once.
+- Reads `ANTHROPIC_API_KEY` via `resolveAIConfig('BEAT')`. Per-pipeline env overrides: `BEAT_AI_MODEL`, `BEAT_AI_PROVIDER` (must stay `anthropic` — tool-use is what guarantees schema shape).
+- Calls Anthropic with the `emit_story_beat` tool ([`beat-tool-schema.ts`](../src/service/beat-tool-schema.ts)), `tool_choice` forced to that tool, `max_tokens: 1536`.
+- Retries **once** on schema-validation failure (`status === 502 && attempt.issues`). The LLM occasionally emits an out-of-range intensity or an incomplete ambient object; re-rolling almost always fixes it. Does not retry on other failures (network, upstream 5xx, parse errors).
 
-**Word-level marks are the common case.** InWorld returns word timestamps; the converter (Layer 2) expands them to char-level marks by distributing each word's duration across its characters. The KT package doesn't need to know about words — it only sees char-index + timeMs.
+### Prompt — [`src/service/beat-prompts.ts`](../src/service/beat-prompts.ts)
 
-### 1.2 Expose timeline control
+`buildSystemPrompt()` emits enum lists derived from the same literal tuples as the Zod schema. Key rules it teaches the model:
 
-Add a `bind:controls` prop that exposes a subset of RevealTimeline:
+- `text`: 3–5 sentences, 150–550 chars, present tense, sensory, no dialogue/Markdown/effect tokens.
+- Ambient: one `environment` baseline, then `atmosphere` XOR `psychology`, plus exactly one action burst.
+- Kinetic: one `revealStyle`, optional `continuous`, exactly one one-shot on the beat's most dramatic word.
+- GPU gate: `continuous` omitted when ambient is HEAVY.
+- Two few-shot example beats (Static Garden + Kitchen at Dawn) anchor on quality.
+- Host's colors/rendering stay untouched — the beat is effects + mood, not a full page re-skin.
 
-```ts
-interface KineticTextControls {
-  pause(): void;
-  resume(): void;
-  seek(ms: number): void;
-  skipToEnd(): void;
-  readonly progress: number;
-  readonly elapsed: number;
-  readonly isPaused: boolean;
-  readonly isComplete: boolean;
-}
-
-// On KineticTextProps:
-controls?: KineticTextControls;  // $bindable()
-```
-
-The component populates this object once the timeline is created. Consumer can then wire audio events to `controls.pause()`, `controls.resume()`, `controls.seek()`.
-
-### 1.3 Optional callback: `onrevealword`
-
-```ts
-// On KineticTextProps:
-onrevealword?: (wordIndex: number, word: string) => void;
-```
-
-Fires when the first character of a new word reveals. Useful for transcript highlighting (active word indicator in a sidebar). Implementation: in the RAF tick, when a unit reveals and it's the first char of its `kt-word` group, fire the callback.
-
-### 1.4 Reduced-motion handling
-
-When `revealMarks` is provided and `reducedMotion` resolves to `true`, skip animation but still respect timing — reveal each word as a block at the word's start time. The audio is the primary experience; text appearing on time matters even without animation.
-
-### Summary of KT package changes
-
-| Change | Files touched | Effort |
-|--------|---------------|--------|
-| `revealMarks` prop + delay override | `types.ts`, `KineticText.svelte`, `timeline/index.ts`, `timeline/stagger.ts` | ~80 lines |
-| `bind:controls` | `types.ts`, `KineticText.svelte` | ~30 lines |
-| `onrevealword` callback | `types.ts`, `KineticText.svelte`, `timeline/index.ts` | ~40 lines |
-| Reduced-motion adjustment | `KineticText.svelte` | ~15 lines |
-
-**Total: ~165 lines of additive code. No changes to existing reveal paths.**
+`buildUserPrompt(recentTitles)` carries the last 10 titles the session has seen so Claude can steer away from repetition. Anything beyond 10 is collapsed to a count prefix.
 
 ---
 
-## Layer 2 — TTS Integration Module
+## TTS integration — how the audio drives the reveal
 
-Split into a **provider-agnostic core** and **provider-specific adapters**. The core handles everything that doesn't touch a TTS API. Adapters are thin wrappers that normalize a specific provider's response into the core's universal types.
+Entirely client-side. The VibeMachine owns the choreography:
 
-### File structure
+1. **Synth:** `inworldSynthesize(text, { voiceId, apiKey })`. Returns `{ audioBlob, audioUrl, wordTimestamps, durationMs }`.
+2. **Token guard:** `ttsGeneration++` on each synth start; late-returning responses compare their captured token against the current one and bail if a newer beat has started.
+3. **Timestamps:** prefer InWorld's `wordTimestamps`. When the provider returns empty alignment (happens occasionally on some voices), `synthesizeEvenTimestamps` distributes words evenly across the actual audio duration. Requires `loadedmetadata` first (`waitForAudioDuration` awaits it).
+4. **Marks:** `wordTimesToRevealMarks(text, timestamps) → RevealMark[]`. If the mark list is empty (no alignment AND no duration), the path falls through to the stagger fallback so the reveal doesn't collapse to t=0.
+5. **One-shots + actions:** `wordStartTimes(text, speed, timestamps)` + `buildCuesFromOneShots` + `scheduleActions` ([`story-beat-cues.ts`](../src/lib/story-beat-cues.ts)). One-shots become `KineticCue[]` handed to KT; actions become `setTimeout` handles that push entries into `liveActions` at the right moment.
+6. **Mount order:** the KT remount is keyed by `${beat.id}-${ttsGeneration}` and `paused` is set to `true` before assigning `audioEl`. An `await tick()` ensures fresh KT mounts and writes its controls back through `bind:controls` before the sync `$effect` reads them. Without that `tick`, the effect fires with stale controls and misses the audio `play` event.
+7. **Sync lifecycle:** `syncAudioToKT` runs inside a `$effect` keyed on `{audio, controls, marks}`. Cleanup detaches listeners; the next attach starts fresh.
+8. **Replay cache:** on successful setup, `cacheForReplay({ beat, audioUrl, marks, cues, wordStarts })`. `handleReplay` re-creates an `Audio` element from the cached blob URL, bumps `ttsGeneration` to remount KT, and reuses the pre-computed cues — no second Claude/InWorld call.
+9. **Blob URL ownership:** `replayCache` owns the URL. `cleanupAudio` detaches the element; `discardReplayCache` revokes. The two are deliberately separate.
 
-```
-packages/kinetic-text/src/tts/
-├── index.ts                  ← core re-exports (provider-agnostic)
-├── types.ts                  ← shared types (TTSResult, WordTimestamp, etc.)
-├── marks.ts                  ← wordTimesToRevealMarks (pure function)
-├── sync.ts                   ← syncAudioToKT (event wiring)
-├── cues.ts                   ← stripEffectTokens, resolveEffectCues
-├── fallback.ts               ← estimateCharSpeed (no-timestamp providers)
-└── providers/
-    ├── index.ts              ← provider re-exports
-    └── inworld.ts            ← InWorld adapter (the only one for now)
-```
+### Fallback paths
 
-### 2.1 Universal types
+- **No InWorld key, or Narrate toggled off:** `playWithoutTts(beat)` — stagger reveal with `speedPreset`, no audio. One-shots and action bursts still fire on estimated word-start times.
+- **TTS failed (auth, network, quota):** surface the error via toast, fall through to `playWithoutTts`.
+- **TTS succeeded, audio loaded, but zero usable marks:** `playWithoutTts(beat, preloadedAudio, preloadedAudioUrl)` — audio plays in parallel with a stagger reveal. Not word-perfect, but the voice still accompanies the beat and the replay cache still works.
 
-```ts
-// packages/kinetic-text/src/tts/types.ts
+### TTS: browser-direct is intentional
 
-/** Provider-agnostic TTS result. Every adapter normalizes to this. */
-interface TTSResult {
-  audioBlob: Blob;
-  audioUrl: string;              // Object URL, caller must revoke
-  wordTimestamps: WordTimestamp[];
-  durationMs: number;
-}
-
-interface WordTimestamp {
-  word: string;
-  startMs: number;
-  endMs: number;
-}
-
-/** Contract that every provider adapter implements. */
-interface TTSProvider {
-  synthesize(text: string, options: Record<string, unknown>): Promise<TTSResult>;
-}
-```
-
-`TTSResult` is the universal currency. The core never sees provider-specific shapes — only `TTSResult`. Adding a new provider means writing one file that returns `TTSResult`. Nothing else changes.
-
-### 2.2 InWorld adapter (first provider)
-
-```ts
-// packages/kinetic-text/src/tts/providers/inworld.ts
-
-interface InWorldOptions {
-  voiceId: string;
-  apiKey: string;
-  timestampType?: 'WORD' | 'CHARACTER';  // default: 'WORD'
-  transportStrategy?: 'SYNC' | 'ASYNC';  // default: 'SYNC'
-}
-
-/** Normalize InWorld's response arrays into TTSResult. */
-async function synthesize(text: string, options: InWorldOptions): Promise<TTSResult>;
-```
-
-Thin wrapper around InWorld's API. Converts `startTimeSeconds` → ms, zips parallel arrays into `WordTimestamp[]`, creates an Object URL. Future providers (ElevenLabs, Azure, Google) each get their own file in `providers/` with the same `(text, options) → TTSResult` shape.
-
-### 2.3 Timestamp-to-marks converter (core, provider-agnostic)
-
-```ts
-// packages/kinetic-text/src/tts/marks.ts
-
-/**
- * Convert word-level timestamps to character-level RevealMark[].
- * Each char within a word gets a micro-staggered time:
- *   charTime = wordStart + (charIndexInWord / wordLength) * (wordEnd - wordStart)
- * Spaces between words reveal at the preceding word's endMs.
- */
-function wordTimesToRevealMarks(
-  text: string,
-  wordTimestamps: WordTimestamp[]
-): RevealMark[];
-```
-
-Takes the universal `WordTimestamp[]` — doesn't matter which provider produced it. Pure function, no side effects, easily testable.
-
-### 2.4 Audio-KT synchronizer (core, provider-agnostic)
-
-```ts
-// packages/kinetic-text/src/tts/sync.ts
-
-interface SyncOptions {
-  audio: HTMLAudioElement;
-  controls: KineticTextControls;
-  /** Tolerance in ms before forcing a seek (default: 150) */
-  driftThreshold?: number;
-}
-
-/**
- * Binds audio playback events to KT timeline controls.
- * Returns a cleanup function.
- *
- * - audio.play   → controls.resume() (or start on first play)
- * - audio.pause  → controls.pause()
- * - audio.seeked → controls.seek(audio.currentTime * 1000)
- * - audio.ended  → controls.skipToEnd() (if not already complete)
- *
- * Optionally monitors drift: if |audio.currentTime*1000 - controls.elapsed| > driftThreshold,
- * issues a corrective seek. Checked on timeupdate events (~4Hz).
- */
-function syncAudioToKT(options: SyncOptions): () => void;
-```
-
-Works with any `HTMLAudioElement` — the audio could come from InWorld, ElevenLabs, or a local file. The synchronizer doesn't care where the audio originated.
-
-### 2.5 Effect cue resolver (core, provider-agnostic)
-
-```ts
-// packages/kinetic-text/src/tts/cues.ts
-
-interface InlineEffectToken {
-  /** Original position in the raw text (before stripping) */
-  rawIndex: number;
-  /** Effect name from {{fx:name}} */
-  effect: string;
-}
-
-/**
- * Strip {{fx:name}} tokens from text.
- * Returns clean text (for TTS) and extracted tokens with positions.
- */
-function stripEffectTokens(rawText: string): {
-  cleanText: string;
-  tokens: InlineEffectToken[];
-};
-
-/**
- * Resolve stripped tokens to KineticCue[] using word timestamps.
- * Maps each token's position to the nearest word boundary,
- * then uses that word's startMs as the cue's atMs.
- */
-function resolveEffectCues(
-  tokens: InlineEffectToken[],
-  cleanText: string,
-  wordTimestamps: WordTimestamp[]
-): KineticCue[];
-```
-
-Takes universal `WordTimestamp[]`. The `{{fx:token}}` format and resolution logic are provider-agnostic by nature — they operate on text positions and timestamps, not API responses.
-
-### Module export structure
-
-Two entry points — core and providers are separate imports:
-
-```ts
-// packages/kinetic-text/src/tts/index.ts  (core — provider-agnostic)
-export type { TTSResult, WordTimestamp, TTSProvider } from './types';
-export { wordTimesToRevealMarks } from './marks';
-export { syncAudioToKT, type SyncOptions } from './sync';
-export { stripEffectTokens, resolveEffectCues, type InlineEffectToken } from './cues';
-export { estimateCharSpeed } from './fallback';
-
-// packages/kinetic-text/src/tts/providers/index.ts
-export { synthesize as inworldSynthesize, type InWorldOptions } from './inworld';
-```
-
-Consumer imports:
-```ts
-// Core utilities — never change when switching providers
-import { wordTimesToRevealMarks, syncAudioToKT, stripEffectTokens, resolveEffectCues } from '@dgrslabs/void-energy-kinetic-text/tts';
-
-// Provider-specific — swap this one import when switching TTS models
-import { inworldSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
-```
-
-### Adding a future provider
-
-To add ElevenLabs (or any other provider):
-
-1. Create `providers/elevenlabs.ts` — implement `(text, options) → TTSResult`
-2. Re-export from `providers/index.ts`
-3. Done. The consumer swaps one import line. Core utilities, sync logic, effect cues — all unchanged.
-
-```ts
-// providers/elevenlabs.ts (future, not Phase 2 scope)
-interface ElevenLabsOptions {
-  voiceId: string;
-  apiKey: string;
-  modelId?: string;
-}
-
-async function synthesize(text: string, options: ElevenLabsOptions): Promise<TTSResult>;
-```
+The InWorld call bypasses the server and uses a user-pasted key stored in `localStorage`. The UI copy makes this explicit ("Stored only in your browser's localStorage. Sent directly to InWorld's API from your browser — never to our servers."). Anthropic goes server-side because the Vibe Machine can't work without it — everyone hitting `/conexus` needs an anonymous generate button. InWorld is optional polish — users bring their own key if they want narration. When this graduates to CoNexus proper, InWorld will likely move server-side behind billing.
 
 ---
 
-## Consumer usage (preview of Phase 6 wiring)
+## UI — [`src/components/conexus/VibeMachine.svelte`](../src/components/conexus/VibeMachine.svelte)
 
-This is **not** Phase 2 scope — it's here to validate that the API shape works for CoNexus.
+Single Svelte file (~950 lines). The chunks, in rough order:
 
-```svelte
-<script lang="ts">
-  import { KineticText } from '@dgrslabs/void-energy-kinetic-text';
+- **State machine:** `status: 'idle' | 'loading' | 'playing' | 'done'`.
+- **Ambient render block:** declarative `{#each activeAmbient.*}` at the top of the template, outside the card. Keyed by `${layer}-${intensity}` so intensity changes remount cleanly. One-shot action bursts render as `<ActionLayer>` from a `liveActions` array with `onEnd` cleanup.
+- **Card body:** header (title + optional tagline + "Now playing" caption), text well (skeleton | `<KineticText>` | muted idle text), chip row (shows the active `revealStyle`/`continuous`/`speed`/environment/atmosphere/psychology/one-shots/actions so viewers can read the recipe), button row (Generate + conditional Replay).
+- **TTS section:** three states — no key (password input + Save), have key (mask + Remove), always (voice Selector + Narrate toggle).
+- **Snapshot plumbing:** `snapshotEl` bound to the text well; `createVoidEnergyTextStyleSnapshot` feeds `<KineticText>`. A MutationObserver on `<html>` watches `data-atmosphere`, `data-physics`, `data-mode` and bumps `snapshotTick` so the snapshot re-reads when the user changes theme mid-playback.
+- **Cleanup on unmount:** disconnects the observer, aborts any in-flight generation, cleans up audio, revokes the blob URL, clears action timers, resets `liveActions`, calls `storyBeatEngine.release()`.
 
-  // Core utilities — provider-agnostic, never change when switching TTS
-  import {
-    wordTimesToRevealMarks,
-    syncAudioToKT,
-    stripEffectTokens,
-    resolveEffectCues
-  } from '@dgrslabs/void-energy-kinetic-text/tts';
+### Placement in `/conexus`
 
-  // Provider — swap this one import to switch TTS models
-  import { inworldSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
-
-  // 1. Author or LLM provides raw text with effect tokens
-  const rawScript = "The glass {{fx:shatter}}shattered into a thousand pieces.";
-
-  // 2. Strip tokens, get clean text for TTS
-  const { cleanText, tokens } = stripEffectTokens(rawScript);
-  // cleanText = "The glass shattered into a thousand pieces."
-
-  // 3. Synthesize speech + get timestamps (provider-specific call)
-  const tts = await inworldSynthesize(cleanText, {
-    voiceId: 'narrator-deep',
-    apiKey: INWORLD_API_KEY,
-  });
-
-  // 4. Convert universal TTSResult to char-level reveal marks
-  const revealMarks = wordTimesToRevealMarks(cleanText, tts.wordTimestamps);
-
-  // 5. Resolve effect tokens to timed cues (uses same universal wordTimestamps)
-  const cues = resolveEffectCues(tokens, cleanText, tts.wordTimestamps);
-
-  // 6. Set up audio
-  let audio: HTMLAudioElement;
-  let controls: KineticTextControls;
-
-  $effect(() => {
-    if (audio && controls) {
-      const cleanup = syncAudioToKT({ audio, controls });
-      return cleanup;
-    }
-  });
-</script>
-
-<audio bind:this={audio} src={tts.audioUrl}></audio>
-
-<KineticText
-  text={cleanText}
-  styleSnapshot={snapshot}
-  revealMarks={revealMarks}
-  cues={cues}
-  bind:controls={controls}
-/>
-
-<button onclick={() => audio.play()}>Play</button>
-```
+In [`src/components/CoNexus.svelte`](../src/components/CoNexus.svelte), `<VibeMachine />` is mounted as a sibling of `<PullRefresh>`, not inside it. Why: `.ambient-layer` uses `position: fixed; inset: 0;`, but `.pull-content` has `transform: translateY(var(--pull-distance))` applied at all times (even with distance=0). A non-none `transform` on an ancestor creates a containing block for fixed descendants, which would stretch the ambient layers across the full page height instead of the viewport. Keeping VibeMachine outside `<PullRefresh>` restores viewport-scoped positioning. **Do not move it back inside.**
 
 ---
 
-## What this does NOT include
+## Dropped from earlier drafts
 
-- **Streaming TTS.** Phase 2 assumes pre-rendered audio (call API, get full response, play). Streaming reveal (audio chunks arrive while playing) is a future enhancement if needed. The architecture doesn't preclude it — `revealMarks` could be updated incrementally — but it's not designed or tested for it here.
-- **Forced alignment (Whisper).** If a TTS provider returns no timestamps, a Whisper-based forced aligner could recover precise word timings post-hoc. Out of scope — the estimated pacing fallback (see above) covers no-timestamp providers cheaply. Forced alignment is a future option if fallback quality proves insufficient.
-- **Additional provider adapters.** Only the InWorld adapter ships in Phase 2. The architecture is provider-agnostic (`TTSResult`, `WordTimestamp`, `TTSProvider` interface) — adding ElevenLabs or Azure is one file in `providers/` — but writing those adapters is not Phase 2 scope.
-- **Lip sync / viseme data.** InWorld supports viseme timestamps. Not needed for text reveal ��� potentially useful for character portraits in CoNexus but that's Phase 6 scope.
-- **SSML `<mark>` event cues for effects.** Azure and Google Cloud TTS support `<mark name="..."/>` events natively — the cleanest mechanism for firing one-shot effects with zero drift. InWorld's SSML mark support is unconfirmed. Phase 2 uses the `{{fx:token}}` approach which is provider-agnostic and works regardless. A future provider adapter for Azure/Google could use SSML marks as an alternative to `{{fx:token}}` stripping.
-- **Narrative pipeline / LLM streaming.** That's Layer 3, which is CoNexus-specific Phase 6 work.
+Earlier versions of this plan described features that were cut during implementation. Listing them so readers don't wonder where they went:
 
----
-
-## Implementation order
-
-1. **Layer 1 first — KT package changes.** These are small, additive, and testable in isolation with mock data. Wire up `revealMarks` → `delays[]` override, expose `bind:controls`, add `onrevealword`.
-2. **Layer 2 second — TTS integration module.** Start with the converter (`wordTimesToRevealMarks`) and cue resolver — these are pure functions, easy to unit test. Then the InWorld adapter (needs API key). Then the audio-KT synchronizer.
-3. **Integration test.** Build a minimal demo page (in the KT package's dev environment or the showcase) that synthesizes a sentence via InWorld, plays the audio, and reveals KT in sync. Verify across physics presets.
-4. **Effect cue test.** Add `{{fx:shatter}}` to the demo text, verify the cue fires at the correct audio moment.
+| Dropped | Why |
+|---|---|
+| **Choices / branching gameplay** | The Vibe Machine is a non-interactive atmosphere generator, not a story game. Branching belongs in Phase 6 (CoNexus) where actual narrative justifies it. |
+| **Full theme swap per beat** (palette, physics, mode) | Fights the user's theme choice. The demo shows effects layered over the user's theme, which reads as "additive capability" rather than "random skin generator." The server tool-use, Zod schema, prompt, types, and example beats all dropped the `theme` field in commit [ref]. |
+| **`choiceId` on `generateNextBeat`** | Moot without choices. |
+| **`history[]` on the engine** | `StoryBeatEngine` keeps only `currentBeat`. The consumer tracks `recentTitles` locally for anti-repetition. |
+| **Curated opening** | The idle state is a single muted line. No cold-path pre-generated beat. |
+| **Story-trail breadcrumb** | Linear `history[]` was dropped; there's nothing to breadcrumb. |
+| **Materialization transition** (ambience-dim + title card during generation) | Replaced by a simpler skeleton shimmer in the text well. Loading feels fast enough with the 2–4s Sonnet latency that the extra choreography wasn't worth it. |
+| **Server-routed InWorld** | Stayed client-side with a user-pasted key — see [TTS: browser-direct is intentional](#tts-browser-direct-is-intentional). |
+| **`engine.releaseAll()`** | Renamed `release()` for the narrower contract (no stack to unwind). |
 
 ---
 
-## Open questions
+## Added during build (not in any earlier draft)
 
-1. **Where does the InWorld API key live?** Session-first (user provides in UI) like the AI theme generator, or server-side only? For Phase 2 demo/testing, a `.env` variable is fine. CoNexus production architecture is Phase 6's problem.
-2. **Sub-export or separate package?** Current plan: `@dgrslabs/void-energy-kinetic-text/tts` sub-export. Alternative: a separate `@dgrslabs/void-energy-tts` package. Sub-export is simpler and avoids a fifth premium package, but it does couple TTS to KT at the package level. Decision: **sub-export** unless we discover TTS integration is useful independent of KT (unlikely in the near term).
-3. **Drift threshold tuning.** The synchronizer has a configurable `driftThreshold` (default 150ms). This may need tuning based on real InWorld response latency. Flag for testing.
-4. **Char-level vs word-level timestamps from InWorld.** Word-level is more reliable and lower overhead. Char-level exists but adds more data per response. Start with word-level + micro-stagger interpolation; switch to char-level only if interpolation quality is insufficient.
+- **Recent-titles anti-repetition.** Session-local array capped at 10 entries, passed to the prompt builder so Claude steers away from recent vibes.
+- **30-second idle ambient release.** After `status === 'done'` sits for 30s with no interaction, `releaseAmbient()` clears the GPU-intensive layers. Text stays on screen.
+- **Replay cache.** One-click replay of the last beat using the cached blob URL — no paid re-generation.
+- **Environment layer as a required third ambient category.** The original plan had atmosphere + psychology only. Environment (night/neon/dawn/dusk/candlelit/etc.) ended up required-and-exactly-one, providing the sticky baseline tint.
+- **Ambient action bursts** (`ambient.actions`). One-shot bursts timed to a spoken word — the ambient-side counterpart to `kinetic.oneShots`. Exactly one per beat.
+- **GPU budget gate** at the schema level. Enforced for the LLM (via prompt + tool schema + Zod) so the model can never emit a beat that stacks HEAVY ambient with `kinetic.continuous`.
+- **Skeleton shimmer during loading.** Replaces the dropped materialization transition.
+- **`MutationObserver` on `<html>`** for live theme changes. The reveal re-reads its style snapshot when the user switches atmosphere mid-playback.
+- **Defensive `ttsGeneration` token.** Guards the TTS path against late-returning syntheses hijacking a newer beat.
 
 ---
 
-## Verification checklist
+## Known gaps / rough edges
 
-- [ ] `revealMarks` prop accepted by `<KineticText>`, overrides computed stagger
-- [ ] Mock reveal marks produce correct char-by-char timing (unit test)
-- [ ] `bind:controls` exposes pause/resume/seek to consumer
-- [ ] `onrevealword` fires at correct word boundaries
-- [ ] `wordTimesToRevealMarks()` correctly distributes word times to char-level marks (unit test)
-- [ ] `stripEffectTokens()` extracts `{{fx:name}}` tokens and returns clean text (unit test)
-- [ ] `resolveEffectCues()` maps tokens to correct `atMs` values (unit test)
-- [ ] InWorld adapter successfully synthesizes audio with word timestamps
-- [ ] Audio ↔ KT sync: play/pause/seek propagate correctly
-- [ ] One-shot effects fire at correct audio moments
-- [ ] Works across all 3 physics presets (glass, flat, retro)
-- [ ] Reduced motion: text still reveals on time, animations suppressed
-- [ ] `estimateCharSpeed()` produces reasonable pacing for audio without timestamps (unit test)
-- [ ] Fallback path works end-to-end: audio with no timestamps still drives reveal at approximate pace
-- [ ] Consumers who don't use TTS are unaffected (no bundle cost, no API changes)
-- [ ] Demo page demonstrates end-to-end sync with real InWorld audio
+Things that work but would benefit from a follow-up. None block the demo.
+
+1. **`estimateCharSpeed` is exported but unused.** The consumer uses a local `synthesizeEvenTimestamps` that achieves roughly the same thing. Two paths to the same goal. Either delete the shipped helper or replace the consumer's inline copy with it.
+2. **`stripEffectTokens` / `resolveEffectCues` are exported but unused here.** The Vibe Machine uses the schema's `kinetic.oneShots`, not inline `{{fx:…}}` tokens. The token path is kept for future consumers (CoNexus text-with-embedded-FX), but right now it's dead weight in this phase.
+3. **Server retry policy is narrow.** Only retries on `502 + issues` (Zod validation). Transient upstream errors (503, 504, 529) surface directly. A single retry with small backoff on those would reduce user-visible flake.
+4. **`atWord` can exceed actual word count.** Schema caps at 0–200, but doesn't cross-validate against `text.split(/\s+/).length`. `wordStartTimes` clamps silently. Fine for a demo, but a "post-parse" refinement that caps `atWord` to actual word count would catch LLM off-by-ones cleanly.
+5. **No streaming.** A full Sonnet + tool-use response is 2–4s. Skeleton shimmer is adequate but a streamed title (fast first token) would feel faster. Anthropic tool-use does support streaming; not wired up.
+6. **Ambient auto-release is silent.** After 30s the rain stops and the viewer may not know why. A tiny "Effects paused — generate another vibe to resume" hint near the card, or a re-engage-on-interaction handler, would close the loop.
+7. **Voice list is static.** Eight curated InWorld voice IDs hardcoded in the component. InWorld has more; a fetched voice list or free-form text input would let users experiment.
+8. **`storyBeatEngine` is a singleton exported from `.svelte.ts`.** That's fine for this page where only one Vibe Machine exists at a time, but nested or side-by-side vibes (Phase 6?) would fight. Revisit when CoNexus needs multiple simultaneous scenes.
+9. **Test fixtures are hand-minimal.** They cover schema rules and engine state transitions, but there's no end-to-end replay of a full beat through the `<KineticText>` DOM. Good integration coverage would catch regressions in the tick-await-mount dance (see step 6 of [TTS integration](#tts-integration--how-the-audio-drives-the-reveal)).
+
+---
+
+## Verification checklist (for replaying this phase)
+
+### Contract
+- [x] `StoryBeatSchema` rejects out-of-range intensities, unknown layers, missing required fields.
+- [x] `atmosphere` + `psychology` together is rejected.
+- [x] `kinetic.continuous` + HEAVY ambient is rejected.
+- [x] `tagline`, `continuous`, `speed` are optional; everything else the schema requires is strictly required.
+
+### Engine
+- [x] `applyBeat` sets `currentBeat` and `activeAmbient` atomically.
+- [x] `releaseAmbient` clears ambient but keeps `currentBeat` on screen.
+- [x] `release` resets both fields.
+
+### Transport
+- [x] Server returns a valid beat end-to-end against a real `ANTHROPIC_API_KEY`.
+- [x] Client defensively re-validates server responses.
+- [x] One retry on schema failure; two consecutive failures surface via toast.
+- [x] AbortError surfaces as "Generation cancelled." (soft error, no toast).
+
+### UI
+- [x] `/conexus` renders `VibeMachine` below existing demos as a sibling of `PullRefresh`.
+- [x] Ambient layers cover the viewport (100vh), not the full scrolling page height.
+- [x] Idle state is a muted one-liner, no network call.
+- [x] Generate transitions `idle → loading → playing → done`.
+- [x] Chips row reflects the beat's actual effect recipe.
+- [x] Replay button skips Claude + InWorld and re-runs from the cache.
+- [x] TTS key is masked in the connected-state UI; Remove clears `localStorage`.
+- [x] 30s idle in `done` releases ambient; text stays.
+- [x] Theme change mid-playback re-reads the KT style snapshot.
+- [x] Escape cancels an in-flight generation.
+
+### TTS
+- [x] With InWorld key + Narrate on: reveal is word-aligned to the voice.
+- [x] Without a key: stagger reveal with audio off.
+- [x] Missing word timestamps: fall through to even-distribution, then to stagger-with-audio.
+- [x] Replay reuses the cached blob URL; no second synth.
+- [x] Blob URL revoked on new generation or unmount.
+- [x] Reduced motion: reveal still lands at word-start times, one `setTimeout` per word.

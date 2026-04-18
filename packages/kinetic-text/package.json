@@ -35,6 +35,14 @@
     "./styles": {
       "types": "./dist/styles/styles.d.ts",
       "default": "./dist/styles/kinetic-text.css"
+    },
+    "./tts": {
+      "types": "./dist/tts/index.d.ts",
+      "default": "./dist/tts/index.js"
+    },
+    "./tts/providers": {
+      "types": "./dist/tts/providers/index.d.ts",
+      "default": "./dist/tts/providers/index.js"
     }
   },
   "dependencies": {

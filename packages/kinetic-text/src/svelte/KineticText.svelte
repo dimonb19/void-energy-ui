@@ -3,6 +3,7 @@
     KineticTextProps,
     TimelineConfig,
     CharPosition,
+    KineticTextControls,
   } from '../types';
   import { revealStyleForPhysics, SPEED_PRESETS } from '../types';
   import { PretextLayout } from '../core/layout/index';
@@ -38,11 +39,39 @@
     skeletonLines = 3,
     skeletonLastLineWidth = 0.7,
     preRevealed = false,
+    revealMarks,
+    paused = false,
+    controls = $bindable(),
     onrevealcomplete,
     oneffectscomplete,
+    onrevealword,
     as = 'span',
     class: className = '',
   }: KineticTextProps = $props();
+
+  // Stable control-surface proxy. Identity never changes across re-layouts —
+  // the live `timeline` instance is captured at call time via the outer
+  // closure, so parent `$effect`s that depend on `controls` don't re-run when
+  // the timeline is rebuilt (e.g. on resize or text change).
+  const controlSurface: KineticTextControls = {
+    pause: () => timeline?.pause(),
+    resume: () => timeline?.resume(),
+    seek: (ms: number) => timeline?.seek(ms),
+    skipToEnd: () => timeline?.skipToEnd(),
+    get progress() {
+      return timeline?.progress ?? 0;
+    },
+    get elapsed() {
+      return timeline?.elapsed ?? 0;
+    },
+    get isPaused() {
+      return timeline?.isPaused ?? false;
+    },
+    get isComplete() {
+      return timeline?.isComplete ?? false;
+    },
+  };
+  controls = controlSurface;
 
   const cueCount = $derived(cues.length);
 
@@ -145,6 +174,22 @@
       applyContinuousEffect(r, effect, seed);
     } else {
       clearContinuousEffect(r);
+    }
+  });
+
+  // ── Reactive pause/resume ───────────────────────────────────
+  // The `paused` prop is used by external-clock consumers (e.g. TTS
+  // sync) to gate reveal on audio playback. `startPaused` in the
+  // timeline config handles the initial state; this effect keeps the
+  // prop live so consumers can flip it without rebuilding the timeline.
+  $effect(() => {
+    const t = timeline;
+    const p = paused;
+    if (!t) return;
+    if (p && !t.isPaused && !t.isComplete) {
+      t.pause();
+    } else if (!p && t.isPaused) {
+      t.resume();
     }
   });
 
@@ -271,8 +316,11 @@
       seed: resolvedSeed,
       reducedMotion: isReducedMotion,
       cues,
+      revealMarks,
+      startPaused: paused,
       onrevealcomplete,
       oneffectscomplete,
+      onrevealword,
     };
 
     timeline = new RevealTimeline(renderer, positions, config);
@@ -342,13 +390,14 @@
     const el = rootEl;
     if (!el) return;
 
-    // Run layout on mount and whenever text or style inputs change
+    // Run layout on mount and whenever text, style inputs, or reveal marks change
     // Access reactive deps explicitly to track them
     const _text = text;
     const _font = styleSnapshot.font;
     const _lh = styleSnapshot.lineHeight;
     const _density = styleSnapshot.density;
     const _scale = styleSnapshot.scale;
+    const _marks = revealMarks;
 
     pretextLayout.invalidate();
     runLayout(el);

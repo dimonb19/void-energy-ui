@@ -16,7 +16,6 @@
     KineticCue,
     TextStyleSnapshot,
   } from '@dgrslabs/void-energy-kinetic-text/types';
-  import { emerge, dissolve } from '@lib/transitions.svelte';
   import { morph } from '@actions/morph';
 
   // ── Snapshot ─────────────────────────────────────────────────────
