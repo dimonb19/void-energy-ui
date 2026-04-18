@@ -44,6 +44,10 @@ export function syncAudioToKT(options: SyncOptions): () => void {
   // audio playback.
   const initialMs = Math.max(0, audio.currentTime * 1000);
   controls.seek(initialMs);
+  // Inherit the audio element's playback rate so the reveal advances at the
+  // same speed as narration. Without this, a 2× audio leaves the timeline at
+  // 1× and we'd visibly catch up via drift-correcting seeks every 250ms.
+  controls.setRate(audio.playbackRate);
   if (!controls.isPaused && !controls.isComplete) {
     controls.pause();
   }
@@ -80,7 +84,14 @@ export function syncAudioToKT(options: SyncOptions): () => void {
     if (controls.isComplete || controls.isPaused || audio.paused) return;
     const audioMs = audio.currentTime * 1000;
     const drift = Math.abs(audioMs - controls.elapsed);
-    if (drift > driftThreshold) controls.seek(audioMs);
+    // Use `nudge` instead of `seek` — drift correction during synced
+    // playback shouldn't wipe glyphs and re-fire cues. `seek` is reserved
+    // for the user-driven `seeked` event below where the wipe is wanted.
+    if (drift > driftThreshold) controls.nudge(audioMs);
+  };
+
+  const onRateChange = () => {
+    controls.setRate(audio.playbackRate);
   };
 
   audio.addEventListener('play', onPlay);
@@ -88,6 +99,7 @@ export function syncAudioToKT(options: SyncOptions): () => void {
   audio.addEventListener('seeked', onSeeked);
   audio.addEventListener('ended', onEnded);
   audio.addEventListener('timeupdate', onTimeUpdate);
+  audio.addEventListener('ratechange', onRateChange);
 
   return () => {
     audio.removeEventListener('play', onPlay);
@@ -95,5 +107,6 @@ export function syncAudioToKT(options: SyncOptions): () => void {
     audio.removeEventListener('seeked', onSeeked);
     audio.removeEventListener('ended', onEnded);
     audio.removeEventListener('timeupdate', onTimeUpdate);
+    audio.removeEventListener('ratechange', onRateChange);
   };
 }

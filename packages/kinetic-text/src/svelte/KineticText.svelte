@@ -57,7 +57,9 @@
     pause: () => timeline?.pause(),
     resume: () => timeline?.resume(),
     seek: (ms: number) => timeline?.seek(ms),
+    nudge: (ms: number) => timeline?.nudge(ms),
     skipToEnd: () => timeline?.skipToEnd(),
+    setRate: (rate: number) => timeline?.setRate(rate),
     get progress() {
       return timeline?.progress ?? 0;
     },
@@ -69,6 +71,9 @@
     },
     get isComplete() {
       return timeline?.isComplete ?? false;
+    },
+    get rate() {
+      return timeline?.rate ?? 1;
     },
   };
   controls = controlSurface;

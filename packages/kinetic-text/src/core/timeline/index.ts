@@ -67,10 +67,15 @@ export class RevealTimeline {
   private state: TimelineState = 'idle';
   private rafId: number | null = null;
 
-  // Timing
-  private startTime = 0;
-  private pauseTime = 0;
-  private pausedDuration = 0;
+  // Timing — virtual-time accumulator. `virtualElapsed` is "timeline time" in
+  // ms, `lastWall` is the wall-clock `performance.now()` at which it was last
+  // settled, `_rate` is the playback multiplier (1 = real time). Each tick
+  // adds `(now - lastWall) * _rate` to `virtualElapsed`. Decoupling from
+  // wall-clock arithmetic is what makes `setRate(2)` smooth instead of the
+  // old "drift then jump" pattern when audio runs at 2×.
+  private virtualElapsed = 0;
+  private lastWall = 0;
+  private _rate = 1;
 
   // Per-unit scheduling
   private delays: number[] = [];
@@ -184,24 +189,27 @@ export class RevealTimeline {
     }
 
     this.state = 'running';
-    this.startTime = performance.now();
+    this.virtualElapsed = 0;
+    this.lastWall = performance.now();
 
     // External-clock mode: hold at elapsed=0 until the consumer (or a
     // synchronizer like syncAudioToKT) resumes us. Skip the first RAF tick
     // so no marks with timeMs near 0 fire before the clock engages.
     if (this.config.startPaused) {
       this.state = 'paused';
-      this.pauseTime = this.startTime;
       return;
     }
 
-    this.tick(this.startTime);
+    this.tick(this.lastWall);
   }
 
   pause(): void {
     if (this.state !== 'running') return;
+    // Settle the accumulator so `elapsed` is current at the pause boundary.
+    const now = performance.now();
+    this.virtualElapsed += (now - this.lastWall) * this._rate;
+    this.lastWall = now;
     this.state = 'paused';
-    this.pauseTime = performance.now();
     if (this.rafId !== null) {
       cancelAnimationFrame(this.rafId);
       this.rafId = null;
@@ -210,7 +218,7 @@ export class RevealTimeline {
 
   resume(): void {
     if (this.state !== 'paused') return;
-    this.pausedDuration += performance.now() - this.pauseTime;
+    this.lastWall = performance.now();
     this.state = 'running';
     this.rafId = requestAnimationFrame((t) => this.tick(t));
   }
@@ -255,15 +263,15 @@ export class RevealTimeline {
       this.state = wasPaused ? 'paused' : 'running';
     }
 
-    // Adjust start time so elapsed = ms
-    this.startTime = performance.now() - ms - this.pausedDuration;
+    // Pin virtual time to the seek target.
+    this.virtualElapsed = ms;
+    this.lastWall = performance.now();
 
     // Process up to the seeked time
     this.processFrame(ms);
 
     if (wasPaused) {
       this.state = 'paused';
-      this.pauseTime = performance.now();
       return;
     }
 
@@ -332,13 +340,14 @@ export class RevealTimeline {
 
   get elapsed(): number {
     if (this.state === 'idle') return 0;
-    if (this.state === 'paused') {
-      return this.pauseTime - this.startTime - this.pausedDuration;
-    }
+    if (this.state === 'paused') return this.virtualElapsed;
     if (this.state === 'complete' || this.state === 'aborted') {
       return this._finalElapsed;
     }
-    return performance.now() - this.startTime - this.pausedDuration;
+    // Running: project from the last settled wall-clock checkpoint.
+    return (
+      this.virtualElapsed + (performance.now() - this.lastWall) * this._rate
+    );
   }
 
   get isComplete(): boolean {
@@ -349,6 +358,49 @@ export class RevealTimeline {
     return this.state === 'paused';
   }
 
+  get rate(): number {
+    return this._rate;
+  }
+
+  /**
+   * Non-destructive clock pin. Pin `virtualElapsed` to `ms` and process
+   * forward, but do NOT wipe glyphs or fired cues. Reveals any glyphs whose
+   * delays are now due, fires any time-cues whose `atMs` is now due (the
+   * existing `firedCues` guard prevents duplicates).
+   *
+   * For drift correction during synced playback (`syncAudioToKT`), this is
+   * what you want — `seek()` would otherwise wipe and re-reveal everything,
+   * causing visible blinks. Reserve `seek()` for actual user scrubs where
+   * the consumer wants the wipe-and-replay behavior.
+   */
+  nudge(ms: number): void {
+    if (this.state === 'idle' || this.state === 'aborted') return;
+    if (this.state === 'complete') return;
+    this.virtualElapsed = Math.max(0, ms);
+    this.lastWall = performance.now();
+    this.processFrame(this.virtualElapsed);
+  }
+
+  /**
+   * Set the timeline playback rate. 1 = real time. The rate scales how fast
+   * `elapsed` advances per wall-clock ms — useful for syncing to an audio
+   * element that is itself running at non-1× `playbackRate`. Cue and reveal
+   * timings (in `atMs`/`startMs`) stay in timeline-time and don't need to
+   * be rewritten when the rate changes. Clamped to [0.1, 4].
+   */
+  setRate(rate: number): void {
+    const clamped = Math.max(0.1, Math.min(4, rate));
+    if (clamped === this._rate) return;
+    if (this.state === 'running') {
+      // Settle the accumulator at the current rate before switching, so the
+      // new rate applies only to elapsed wall-time from this moment forward.
+      const now = performance.now();
+      this.virtualElapsed += (now - this.lastWall) * this._rate;
+      this.lastWall = now;
+    }
+    this._rate = clamped;
+  }
+
   // ── Internal ─────────────────────────────────────────────────
 
   private _finalElapsed = 0;
@@ -356,8 +408,10 @@ export class RevealTimeline {
   private tick(now: number): void {
     if (this.state !== 'running') return;
 
-    const elapsed = now - this.startTime - this.pausedDuration;
-    this.processFrame(elapsed);
+    this.virtualElapsed += (now - this.lastWall) * this._rate;
+    this.lastWall = now;
+
+    this.processFrame(this.virtualElapsed);
 
     if (this.revealedCount < this.totalUnits) {
       this.rafId = requestAnimationFrame((t) => this.tick(t));
@@ -662,7 +716,8 @@ export class RevealTimeline {
     const delays = marksToDelays(this.positions, this.config.revealMarks ?? []);
 
     this.state = 'running';
-    this.startTime = performance.now();
+    this.virtualElapsed = 0;
+    this.lastWall = performance.now();
 
     // Reveal pure-space groups immediately — they have no narrative weight
     // and animating them adds nothing under reduced motion.
@@ -701,9 +756,10 @@ export class RevealTimeline {
           // Fire word-reveal callback for the group (once, cheap)
           this.notifyWordReveal(first);
 
-          // Time-triggered cues may be due by now — process them
-          const elapsed =
-            performance.now() - this.startTime - this.pausedDuration;
+          // Time-triggered cues may be due by now — process them. Use the
+          // public elapsed getter so reduced-motion respects the same
+          // virtual-time accumulator everything else does.
+          const elapsed = this.elapsed;
           this.fireTimeCues(elapsed);
 
           if (this.revealedCount >= this.totalUnits) {

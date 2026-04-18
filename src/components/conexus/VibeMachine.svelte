@@ -81,6 +81,16 @@
   /** Ms of idle time in `status === 'done'` before ambient layers auto-release. */
   const IDLE_AMBIENT_TIMEOUT_MS = 30_000;
 
+  /** Playback rate presets. 1 is real time. The kinetic-text package
+   * inherits these via syncAudioToKT (audio element `ratechange` event). */
+  const RATE_OPTIONS = [
+    { value: 0.75, label: '0.75× — slower' },
+    { value: 1, label: '1× — real time' },
+    { value: 1.25, label: '1.25× — brisk' },
+    { value: 1.5, label: '1.5× — fast' },
+    { value: 2, label: '2× — double' },
+  ];
+
   /** Curated InWorld voice presets. Users can experiment — all InWorld voices
    * work, these are just the well-known starting points. */
   const VOICE_OPTIONS = [
@@ -106,6 +116,9 @@
   let draftKey = $state('');
   let ttsVoiceId = $state<string | number | null>(DEFAULT_VOICE);
   let narrate = $state(true);
+  /** Audio playback rate. Propagates to `audioEl.playbackRate` via $effect;
+   * the package's syncAudioToKT inherits the rate from `ratechange` events. */
+  let playbackRate = $state<string | number | null>(1);
   let ttsStatus = $state<TtsStatus>('idle');
   // Token guards against a late-returning synth hijacking a newer beat.
   let ttsGeneration = 0;
@@ -123,6 +136,10 @@
   let paused = $state(false);
   let ktControls = $state<KineticTextControls | undefined>(undefined);
   let actionTimers: number[] = [];
+  // Detach handle for the audio-driven burst dispatcher (see
+  // attachAudioActionDispatcher). Set when bursts ride the audio clock,
+  // null when they fall back to setTimeout (no-audio stagger reveal).
+  let actionDispatcherDetach: (() => void) | null = null;
   let liveActions = $state<Array<{ id: number; action: StoryAction }>>([]);
   let nextLiveActionId = 0;
   // Spontaneous bursts/one-shots picked at playback time (see
@@ -186,6 +203,8 @@
   function clearActionTimers() {
     for (const t of actionTimers) clearTimeout(t);
     actionTimers = [];
+    actionDispatcherDetach?.();
+    actionDispatcherDetach = null;
   }
 
   function cleanupAudio() {
@@ -242,6 +261,69 @@
       }, delayMs);
       actionTimers.push(timerId);
     }
+  }
+
+  /**
+   * Audio-driven burst dispatcher. Fires actions when `audio.currentTime`
+   * crosses each `atMs` threshold, instead of pre-scheduling wall-clock
+   * `setTimeout`s. Three reasons it's better than the setTimeout path when
+   * audio exists:
+   *
+   *   1. Rate-aware. At `audio.playbackRate = 2`, `currentTime` advances
+   *      twice as fast in wall clock, so bursts fire at the correct spoken
+   *      word — the dispatcher inherits the rate change automatically.
+   *   2. Pause/resume safe. Bursts only fire while audio is actually
+   *      playing; pausing audio pauses the burst stream too.
+   *   3. Scrub-safe. On `seeked`, the pointer realigns to the new audio
+   *      position so we don't re-fire bursts that already landed (or skip
+   *      ones the user scrubbed back over).
+   *
+   * Stores its detach in `actionDispatcherDetach` so `clearActionTimers`
+   * can tear it down alongside any setTimeout-scheduled timers.
+   */
+  function attachAudioActionDispatcher(
+    audio: HTMLAudioElement,
+    actions: StoryAction[] | undefined,
+    wordStarts: number[],
+  ) {
+    clearActionTimers();
+    if (!actions || actions.length === 0) return;
+    const sorted = scheduleActions(actions, wordStarts).sort(
+      (a, b) => a.atMs - b.atMs,
+    );
+    if (sorted.length === 0) return;
+
+    let nextIndex = 0;
+
+    function realignFromAudio() {
+      const audioMs = audio.currentTime * 1000;
+      const found = sorted.findIndex((s) => s.atMs > audioMs);
+      nextIndex = found === -1 ? sorted.length : found;
+    }
+
+    function fireDue() {
+      const audioMs = audio.currentTime * 1000;
+      while (nextIndex < sorted.length && audioMs >= sorted[nextIndex].atMs) {
+        const id = nextLiveActionId++;
+        liveActions = [
+          ...liveActions,
+          { id, action: sorted[nextIndex].action },
+        ];
+        nextIndex++;
+      }
+    }
+
+    // Align in case the audio was already past some actions when we attached
+    // (e.g. user scrubbed forward before pressing play).
+    realignFromAudio();
+
+    audio.addEventListener('timeupdate', fireDue);
+    audio.addEventListener('seeked', realignFromAudio);
+
+    actionDispatcherDetach = () => {
+      audio.removeEventListener('timeupdate', fireDue);
+      audio.removeEventListener('seeked', realignFromAudio);
+    };
   }
 
   function removeLiveAction(id: number) {
@@ -373,6 +455,15 @@
       storyBeatEngine.releaseAmbient();
     }, IDLE_AMBIENT_TIMEOUT_MS);
     return () => clearTimeout(timerId);
+  });
+
+  // Push the user's selected playback rate onto the live audio element. The
+  // package's syncAudioToKT picks up the resulting `ratechange` event and
+  // calls controls.setRate, so the kinetic reveal accelerates/slows in step.
+  // Burst dispatch is already audio-driven, so it follows automatically.
+  $effect(() => {
+    const rate = typeof playbackRate === 'number' ? playbackRate : 1;
+    if (audioEl) audioEl.playbackRate = rate;
   });
 
   // ── Generate flow ────────────────────────────────────────────────────
@@ -510,6 +601,7 @@
       const el = new Audio();
       el.preload = 'auto';
       el.src = synthResult.audioUrl;
+      el.playbackRate = typeof playbackRate === 'number' ? playbackRate : 1;
 
       // Decide on timestamps. Prefer InWorld's alignment when present;
       // otherwise derive even spacing from the actual audio duration.
@@ -554,7 +646,9 @@
       paused = true;
       currentExtras = extras;
 
-      scheduleBeatActions(allActions, wordStarts, 0);
+      // Attach burst dispatch to the audio clock so bursts stay in sync with
+      // narration regardless of playbackRate, pause/resume, or scrubbing.
+      attachAudioActionDispatcher(el, allActions, wordStarts);
 
       status = 'playing';
 
@@ -615,7 +709,13 @@
     currentExtras = extras;
     ttsGeneration++;
 
-    scheduleBeatActions(allActions, wordStarts, 0);
+    // With audio: ride the audio clock so rate/pause/scrub stays in sync.
+    // Without audio: pure stagger reveal, fall back to wall-clock setTimeout.
+    if (preloadedAudio) {
+      attachAudioActionDispatcher(preloadedAudio, allActions, wordStarts);
+    } else {
+      scheduleBeatActions(allActions, wordStarts, 0);
+    }
 
     status = 'playing';
 
@@ -679,7 +779,6 @@
     ktRemountCounter++;
 
     const allActions = [...(beat.ambient.actions ?? []), ...extras.actions];
-    scheduleBeatActions(allActions, wordStarts, 0);
     storyBeatEngine.applyBeat(beat);
     status = 'playing';
 
@@ -687,6 +786,11 @@
       const el = new Audio();
       el.preload = 'auto';
       el.src = audioUrl;
+      el.playbackRate = typeof playbackRate === 'number' ? playbackRate : 1;
+      // Attach burst dispatcher BEFORE play() so listeners are armed when the
+      // first timeupdate fires. Works for both aligned (TTS sync) and
+      // stagger-with-audio replays — bursts ride the audio clock either way.
+      attachAudioActionDispatcher(el, allActions, wordStarts);
       await tick();
       if (hasAlignedAudio) {
         // Sync $effect will start playback once KT remounts and writes
@@ -698,6 +802,9 @@
         audioEl = el;
         el.play().catch(() => {});
       }
+    } else {
+      // No audio: pure stagger reveal, schedule bursts on wall clock.
+      scheduleBeatActions(allActions, wordStarts, 0);
     }
   }
 </script>
@@ -1009,7 +1116,30 @@
           </p>
         </div>
       {:else}
-        <div class="flex items-center justify-between gap-md">
+        <div class="flex flex-row flex-wrap justify-center gap-sm items-center large-desktop:justify-between" in:materialize out:dematerialize>
+          <span class="flex flex-col gap-sm small-desktop:flex-row">
+            <Selector
+              label="Voice"
+              options={VOICE_OPTIONS}
+              bind:value={ttsVoiceId}
+              disabled={!hasStoredKey}
+            />
+            <Selector
+              label="Playback speed"
+              options={RATE_OPTIONS}
+              bind:value={playbackRate}
+              disabled={!hasStoredKey}
+            />
+          </span>
+          <Toggle
+            checked={narrate}
+            onchange={(v) => (narrate = v ?? false)}
+            disabled={!hasStoredKey}
+            label="Narrate each new vibe"
+          />
+        </div>
+
+        <div class="surface-spotlight p-md flex items-center justify-between gap-md" in:materialize out:dematerialize>
           <div class="flex flex-col gap-xs">
             <p class="text-small">
               <span class="text-success">InWorld TTS narration</span>
@@ -1024,20 +1154,6 @@
           </button>
         </div>
       {/if}
-
-      <Selector
-        label="Voice"
-        options={VOICE_OPTIONS}
-        bind:value={ttsVoiceId}
-        disabled={!hasStoredKey}
-      />
-
-      <Toggle
-        checked={narrate}
-        onchange={(v) => (narrate = v ?? false)}
-        disabled={!hasStoredKey}
-        label="Narrate each new vibe"
-      />
     </div>
   </div>
 </section>

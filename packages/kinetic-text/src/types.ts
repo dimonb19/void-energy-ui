@@ -245,11 +245,27 @@ export interface KineticTextControls {
   pause(): void;
   resume(): void;
   seek(ms: number): void;
+  /**
+   * Non-destructive clock pin. Sets the timeline's elapsed clock to `ms`
+   * and reveals any newly-due glyphs / fires any newly-due cues, without
+   * wiping the already-revealed state. Use for drift correction during
+   * synced playback. For user scrubs (where the wipe is desired), use `seek`.
+   */
+  nudge(ms: number): void;
   skipToEnd(): void;
+  /**
+   * Set the timeline playback rate. 1 = real time. The rate scales how fast
+   * `elapsed` advances per wall-clock ms — useful for syncing to an audio
+   * element with a non-1× `playbackRate`. Cue and reveal timings stay in
+   * timeline-time, so existing `atMs`/`startMs` values do not need to be
+   * rewritten when the rate changes. Clamped to [0.1, 4].
+   */
+  setRate(rate: number): void;
   readonly progress: number;
   readonly elapsed: number;
   readonly isPaused: boolean;
   readonly isComplete: boolean;
+  readonly rate: number;
 }
 
 // ── Public types ──────────────────────────────────────────────────
