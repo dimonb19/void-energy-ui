@@ -95,9 +95,9 @@ export const STORY_BEAT_TOOL_INPUT_SCHEMA = {
         actions: {
           type: 'array',
           description:
-            "Exactly ONE ambient action burst timed to the beat's dramatic word.",
-          minItems: 1,
-          maxItems: 1,
+            'TWO to FOUR ambient action bursts, spread across the text. Each tied to a sensory or dramatic word.',
+          minItems: 2,
+          maxItems: 4,
           items: {
             type: 'object',
             additionalProperties: false,
@@ -126,9 +126,9 @@ export const STORY_BEAT_TOOL_INPUT_SCHEMA = {
         oneShots: {
           type: 'array',
           description:
-            "Exactly ONE one-shot kinetic effect on the beat's most dramatic word.",
-          minItems: 1,
-          maxItems: 1,
+            'TWO to FOUR one-shot kinetic effects, spread across the text. Each effect should dramatize the meaning of its word.',
+          minItems: 2,
+          maxItems: 4,
           items: {
             type: 'object',
             additionalProperties: false,

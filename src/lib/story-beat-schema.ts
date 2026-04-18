@@ -64,7 +64,7 @@ const StoryKineticSchema = z
     revealStyle: enumFromReadonly(REVEAL_STYLES),
     continuous: enumFromReadonly(KINETIC_EFFECTS).optional(),
     speed: enumFromReadonly(SPEED_PRESETS).optional(),
-    oneShots: z.array(StoryOneShotSchema).max(1).optional(),
+    oneShots: z.array(StoryOneShotSchema).max(4).optional(),
   })
   .strict();
 
@@ -75,7 +75,7 @@ const StoryAmbientSchema = z
     // Atmosphere XOR psychology — never both. One clear signal beats a pile-on.
     atmosphere: z.array(AtmosphereActivationSchema).max(1).optional(),
     psychology: z.array(PsychologyActivationSchema).max(1).optional(),
-    actions: z.array(StoryActionSchema).max(1).optional(),
+    actions: z.array(StoryActionSchema).max(4).optional(),
   })
   .strict()
   .refine((a) => !(a.atmosphere?.length && a.psychology?.length), {

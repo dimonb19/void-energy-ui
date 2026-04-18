@@ -151,16 +151,14 @@ function pick<T>(pool: readonly T[], rng: () => number): T {
 }
 
 /**
- * Generate 1–3 random extras — ambient action bursts + kinetic one-shots —
- * scheduled to random word indices that the beat didn't already claim. The
- * caller appends these to `beat.ambient.actions` / `beat.kinetic.oneShots`
- * before running through `buildCuesFromOneShots` / `scheduleActions`, so the
- * extras ride the same TTS-synced `wordStarts` clock as the scheduled ones.
+ * Filler-only safety net. The beat already carries 2–4 deliberately placed
+ * one-shots and 2–4 deliberately placed ambient bursts (schema-enforced); the
+ * deliberate set carries the experience. This function tops it up with at
+ * most 1–2 small surprises, and only when the deliberate set is sparse.
  *
  * Reserves the first ~2 words (too early to register) and the last word
  * (reveal-complete handlers are about to fire). Skips word indices already
- * claimed by scheduled effects so spontaneous bursts never double up on the
- * dramatic moment.
+ * claimed by scheduled effects so extras never double up on a deliberate moment.
  *
  * `rng` is injected so tests can seed it; defaults to `Math.random`.
  */
@@ -170,6 +168,13 @@ export function generateSpontaneousExtras(
   rng: () => number = Math.random,
 ): { actions: StoryAction[]; oneShots: StoryOneShot[] } {
   if (wordCount < 10) return { actions: [], oneShots: [] };
+
+  const scheduledCount =
+    (beat.ambient.actions?.length ?? 0) + (beat.kinetic.oneShots?.length ?? 0);
+  // FLOOR: only top up if the beat shipped sparse. With the current schema
+  // (2–4 each) Claude almost always lands ≥4 total, so extras stay rare.
+  const FLOOR = 4;
+  if (scheduledCount >= FLOOR) return { actions: [], oneShots: [] };
 
   const claimed = new Set<number>([
     ...(beat.ambient.actions ?? []).map((a) => a.atWord),
@@ -182,7 +187,8 @@ export function generateSpontaneousExtras(
   }
   if (available.length === 0) return { actions: [], oneShots: [] };
 
-  const target = wordCount >= 60 ? 3 : wordCount >= 30 ? 2 : 1;
+  // Top up to FLOOR, capped at 2 extras max — extras are seasoning, not main act.
+  const target = Math.min(FLOOR - scheduledCount, 2);
   const count = Math.min(target, available.length);
 
   // Fisher–Yates on a copy, then take the first `count`.

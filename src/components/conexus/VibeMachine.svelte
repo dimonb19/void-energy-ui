@@ -44,7 +44,11 @@
   import { toast } from '@stores/toast.svelte';
   import { storyBeatEngine } from '@lib/story-beat-engine.svelte';
   import { generateNextBeat } from '@lib/story-beat-client';
-  import type { StoryAction, StoryBeat } from '@lib/story-beat-types';
+  import type {
+    StoryAction,
+    StoryBeat,
+    StoryOneShot,
+  } from '@lib/story-beat-types';
   import {
     buildCuesFromOneShots,
     generateSpontaneousExtras,
@@ -61,7 +65,12 @@
   import Sparkle from '@components/icons/Sparkle.svelte';
   import Restart from '@components/icons/Restart.svelte';
   import { Trash2, FastForward } from '@lucide/svelte';
-  import LoadingTextCycler from '../../../packages/dgrs/src/components/LoadingTextCycler.svelte';
+  import {
+    dematerialize,
+    dissolve,
+    emerge,
+    materialize,
+  } from '@lib/transitions.svelte';
 
   type Status = 'idle' | 'loading' | 'playing' | 'done';
   type TtsStatus = 'idle' | 'synthesizing' | 'playing' | 'error';
@@ -116,6 +125,13 @@
   let actionTimers: number[] = [];
   let liveActions = $state<Array<{ id: number; action: StoryAction }>>([]);
   let nextLiveActionId = 0;
+  // Spontaneous bursts/one-shots picked at playback time (see
+  // generateSpontaneousExtras). Surfaced in the "Active effects" table so the
+  // showcase reflects what's actually firing — not just the beat-declared set.
+  let currentExtras = $state<{
+    actions: StoryAction[];
+    oneShots: StoryOneShot[];
+  } | null>(null);
 
   // ── Replay cache ─────────────────────────────────────────────────────
   // Owns the synthesized blob URL across replays. Cleared (and the URL
@@ -127,10 +143,10 @@
     marks: RevealMark[] | undefined;
     cues: KineticCue[];
     wordStarts: number[];
-    // Spontaneous ambient bursts generated at playback time. Cached so replay
-    // fires the same surprises at the same word indices — replay should be
-    // deterministic against the vibe the user just heard.
-    extraActions: StoryAction[];
+    // Spontaneous bursts + one-shots generated at playback time. Cached so
+    // replay fires the same surprises at the same word indices — replay
+    // should be deterministic against the vibe the user just heard.
+    extras: { actions: StoryAction[]; oneShots: StoryOneShot[] };
   };
   let replayCache = $state<ReplayPayload | null>(null);
 
@@ -256,6 +272,7 @@
       discardReplayCache();
       clearActionTimers();
       liveActions = [];
+      currentExtras = null;
       storyBeatEngine.release();
     };
   });
@@ -367,6 +384,7 @@
     discardReplayCache();
     clearActionTimers();
     liveActions = [];
+    currentExtras = null;
     revealMarks = undefined;
     kineticCues = [];
     paused = false;
@@ -375,7 +393,7 @@
     // The template routes on `currentBeat`: keeping the old one through
     // Claude gen would render the KT skeleton for the old text under the
     // old title. Releasing here puts us back in a clean "no beat" state
-    // so the LoadingTextCycler shows until the new beat arrives.
+    // so the default-size skeleton shows until the new beat arrives.
     storyBeatEngine.release();
 
     status = 'loading';
@@ -534,6 +552,7 @@
       revealMarks = marks;
       kineticCues = cues;
       paused = true;
+      currentExtras = extras;
 
       scheduleBeatActions(allActions, wordStarts, 0);
 
@@ -545,7 +564,7 @@
         marks,
         cues,
         wordStarts,
-        extraActions: extras.actions,
+        extras,
       });
 
       // Let fresh KT mount and write its controls back via bind:controls
@@ -593,6 +612,7 @@
     revealMarks = undefined;
     kineticCues = cues;
     paused = false;
+    currentExtras = extras;
     ttsGeneration++;
 
     scheduleBeatActions(allActions, wordStarts, 0);
@@ -605,7 +625,7 @@
       marks: undefined,
       cues,
       wordStarts,
-      extraActions: extras.actions,
+      extras,
     });
 
     // Best-effort: if the TTS path already loaded audio, play it alongside
@@ -645,20 +665,20 @@
     liveActions = [];
     ttsStatus = 'idle';
 
-    const { beat, audioUrl, marks, cues, wordStarts, extraActions } =
-      replayCache;
+    const { beat, audioUrl, marks, cues, wordStarts, extras } = replayCache;
     const hasAlignedAudio = !!audioUrl && !!marks && marks.length > 0;
 
     revealMarks = marks;
     kineticCues = cues;
     paused = hasAlignedAudio;
+    currentExtras = extras;
     ttsGeneration++;
     // Replay reuses the same beat.id — bump the remount counter so KT gets a
     // fresh timeline instead of one stuck in the post-reveal `isComplete`
     // state, which would cause the audio sync handler to early-return.
     ktRemountCounter++;
 
-    const allActions = [...(beat.ambient.actions ?? []), ...extraActions];
+    const allActions = [...(beat.ambient.actions ?? []), ...extras.actions];
     scheduleBeatActions(allActions, wordStarts, 0);
     storyBeatEngine.applyBeat(beat);
     status = 'playing';
@@ -722,21 +742,18 @@
   />
 {/each}
 
-<section class="container py-2xl flex flex-col gap-xl items-center">
-  <div class="flex flex-col gap-xs text-center max-w-2xl">
-    <h1 class="text-h2">Vibe Machine</h1>
-    <p class="text-dim text-body">
+<section class="container py-2xl flex flex-col gap-lg">
+  <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
+    <h3 class="text-dim">Vibe Machine</h3>
+    <p class="text-small text-mute">
       Claude invents a fresh vibe on every click — new ambient layers, new
       kinetic text, one-shot bursts on dramatic words.
     </p>
   </div>
 
-  <div
-    class="surface-raised p-lg flex flex-col gap-lg w-full max-w-4xl"
-    use:morph
-  >
+  <div class="surface-raised p-lg flex flex-col gap-lg" use:morph>
     {#if currentBeat}
-      <header class="flex flex-col gap-xs text-center">
+      <header class="flex flex-col gap-xs text-center" in:emerge out:dissolve>
         <h2 class="text-h3">{currentBeat.title}</h2>
         {#if currentBeat.tagline}
           <p class="text-small text-dim">{currentBeat.tagline}</p>
@@ -754,11 +771,20 @@
         </p>
       {:else if status === 'loading' && !currentBeat}
         <!-- Pre-beat phase: text is not known yet (Claude still generating).
-             Once the beat returns the branch below takes over with a
-             pretext-measured skeleton sized to the real text. -->
-        <div class="flex justify-center p-lg">
-          <LoadingTextCycler />
-        </div>
+             Render the same skeleton geometry KineticText uses in its
+             pre-measurement state (3 lines, last at 70%). When the beat
+             arrives and KT mounts, it starts with the same defaults, then
+             reflows to pretext-measured geometry — no cycler-to-skeleton
+             jump, just a subtle settle into the real line count. -->
+        <span class="kt-skeleton-layer" data-kt-skeleton="visible">
+          {#each Array(3) as _, i}
+            <span
+              class="kt-skeleton-line"
+              style:height="{snapshot?.lineHeight ?? 24}px"
+              style:width={i === 2 ? '70%' : '100%'}
+            ></span>
+          {/each}
+        </span>
       {:else if snapshot && currentBeat}
         {#key ktKey}
           <KineticText
@@ -782,78 +808,161 @@
     </div>
 
     {#if currentBeat && (status === 'playing' || status === 'done')}
-      <div
-        class="flex flex-wrap justify-center gap-xs"
-        aria-label="Active effects"
-      >
-        <span
-          class="inline-flex items-center gap-xs px-sm py-xs text-caption border border-border rounded-full bg-sunk"
-        >
-          <span class="text-mute">reveal</span>
-          <span class="text-main">{currentBeat.kinetic.revealStyle}</span>
-        </span>
-        {#if currentBeat.kinetic.continuous}
-          <span
-            class="inline-flex items-center gap-xs px-sm py-xs text-caption border border-border rounded-full bg-sunk"
-          >
-            <span class="text-mute">continuous</span>
-            <span class="text-main">{currentBeat.kinetic.continuous}</span>
-          </span>
-        {/if}
-        {#if currentBeat.kinetic.speed}
-          <span
-            class="inline-flex items-center gap-xs px-sm py-xs text-caption border border-border rounded-full bg-sunk"
-          >
-            <span class="text-mute">speed</span>
-            <span class="text-main">{currentBeat.kinetic.speed}</span>
-          </span>
-        {/if}
-        {#each currentBeat.ambient.environment ?? [] as e (e.layer)}
-          <span
-            class="inline-flex items-center gap-xs px-sm py-xs text-caption border border-border rounded-full bg-sunk"
-          >
-            <span class="text-mute">environment</span>
-            <span class="text-main">{e.layer}</span>
-            <span class="text-dim">· {e.intensity}</span>
-          </span>
-        {/each}
-        {#each currentBeat.ambient.atmosphere ?? [] as a (a.layer)}
-          <span
-            class="inline-flex items-center gap-xs px-sm py-xs text-caption border border-border rounded-full bg-sunk"
-          >
-            <span class="text-mute">atmosphere</span>
-            <span class="text-main">{a.layer}</span>
-            <span class="text-dim">· {a.intensity}</span>
-          </span>
-        {/each}
-        {#each currentBeat.ambient.psychology ?? [] as p (p.layer)}
-          <span
-            class="inline-flex items-center gap-xs px-sm py-xs text-caption border border-border rounded-full bg-sunk"
-          >
-            <span class="text-mute">psychology</span>
-            <span class="text-main">{p.layer}</span>
-            <span class="text-dim">· {p.intensity}</span>
-          </span>
-        {/each}
-        {#each currentBeat.kinetic.oneShots ?? [] as o, i (`${o.effect}-${o.atWord}-${i}`)}
-          <span
-            class="inline-flex items-center gap-xs px-sm py-xs text-caption border border-premium-subtle rounded-full bg-sunk"
-          >
-            <span class="text-mute">one-shot</span>
-            <span class="text-premium">{o.effect}</span>
-            <span class="text-dim">@word {o.atWord}</span>
-          </span>
-        {/each}
-        {#each currentBeat.ambient.actions ?? [] as a, i (`${a.variant}-${a.atWord}-${i}`)}
-          <span
-            class="inline-flex items-center gap-xs px-sm py-xs text-caption border border-premium-subtle rounded-full bg-sunk"
-          >
-            <span class="text-mute">burst</span>
-            <span class="text-premium">{a.variant}</span>
-            <span class="text-dim">· {a.intensity} @word {a.atWord}</span>
-          </span>
-        {/each}
-      </div>
+      {@const k = currentBeat.kinetic}
+      {@const env = currentBeat.ambient.environment ?? []}
+      {@const atm = currentBeat.ambient.atmosphere ?? []}
+      {@const psy = currentBeat.ambient.psychology ?? []}
+      {@const beatOnes = k.oneShots ?? []}
+      {@const beatBursts = currentBeat.ambient.actions ?? []}
+      {@const extraOnes = currentExtras?.oneShots ?? []}
+      {@const extraBursts = currentExtras?.actions ?? []}
+      {@const wordCount = wordSpansOf(currentBeat.text).length}
+      {@const timeline = [
+        ...beatOnes.map((o) => ({
+          atWord: o.atWord,
+          channel: 'kinetic' as const,
+          name: o.effect as string,
+          detail: '',
+          extra: false,
+        })),
+        ...extraOnes.map((o) => ({
+          atWord: o.atWord,
+          channel: 'kinetic' as const,
+          name: o.effect as string,
+          detail: '',
+          extra: true,
+        })),
+        ...beatBursts.map((b) => ({
+          atWord: b.atWord,
+          channel: 'ambient' as const,
+          name: b.variant as string,
+          detail: b.intensity as string,
+          extra: false,
+        })),
+        ...extraBursts.map((b) => ({
+          atWord: b.atWord,
+          channel: 'ambient' as const,
+          name: b.variant as string,
+          detail: b.intensity as string,
+          extra: true,
+        })),
+      ].sort((a, b) => a.atWord - b.atWord)}
+      {@const sceneRows = env.length + atm.length + psy.length}
+      {@const revealRows = 1 + (k.continuous ? 1 : 0) + (k.speed ? 1 : 0)}
+      {@const total = sceneRows + revealRows + timeline.length}
+      <details in:emerge out:dissolve>
+        <summary>Active effects · {total}</summary>
+        <div class="p-md flex flex-col gap-lg">
+          <!-- SCENE: sticky backdrop layers -->
+          {#if sceneRows > 0}
+            <div class="flex flex-col gap-xs">
+              <p class="text-caption text-mute uppercase">Scene</p>
+              <div class="table-responsive">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Layer</th>
+                      <th>Variant</th>
+                      <th>Intensity</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {#each env as e (e.layer)}
+                      <tr>
+                        <td>environment</td>
+                        <td class="text-main">{e.layer}</td>
+                        <td>{e.intensity}</td>
+                      </tr>
+                    {/each}
+                    {#each atm as a (a.layer)}
+                      <tr>
+                        <td>atmosphere</td>
+                        <td class="text-main">{a.layer}</td>
+                        <td>{a.intensity}</td>
+                      </tr>
+                    {/each}
+                    {#each psy as p (p.layer)}
+                      <tr>
+                        <td>psychology</td>
+                        <td class="text-main">{p.layer}</td>
+                        <td>{p.intensity}</td>
+                      </tr>
+                    {/each}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          {/if}
+
+          <!-- TEXT: how the text behaves throughout -->
+          <div class="flex flex-col gap-xs">
+            <p class="text-caption text-mute uppercase">Text</p>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Behavior</th>
+                    <th>Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>reveal style</td>
+                    <td class="text-main">{k.revealStyle}</td>
+                  </tr>
+                  {#if k.continuous}
+                    <tr>
+                      <td>continuous</td>
+                      <td class="text-main">{k.continuous}</td>
+                    </tr>
+                  {/if}
+                  {#if k.speed}
+                    <tr>
+                      <td>speed</td>
+                      <td class="text-main">{k.speed}</td>
+                    </tr>
+                  {/if}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TIMELINE: word-timed effects in playback order -->
+          {#if timeline.length > 0}
+            <div class="flex flex-col gap-xs">
+              <p class="text-caption text-mute uppercase">
+                Timeline · {timeline.length}
+              </p>
+              <div class="table-responsive">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Position</th>
+                      <th>Channel</th>
+                      <th>Effect</th>
+                      <th>Detail</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {#each timeline as t, i (`${t.channel}-${t.atWord}-${t.name}-${i}`)}
+                      <tr>
+                        <td>@ word {t.atWord} / {wordCount}</td>
+                        <td>{t.channel}</td>
+                        <td class="text-premium">
+                          {t.name}{#if t.extra}<span class="text-mute">
+                              · extra</span
+                            >{/if}
+                        </td>
+                        <td>{t.detail || '—'}</td>
+                      </tr>
+                    {/each}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          {/if}
+        </div>
+      </details>
     {/if}
 
     <div class="flex flex-wrap justify-center gap-md">
@@ -865,18 +974,13 @@
         disabled={status === 'loading'}
       />
       {#if replayCache && status === 'done'}
-        <ActionBtn icon={Restart} text="Replay vibe" onclick={handleReplay} />
+        <span in:materialize out:dematerialize>
+          <ActionBtn icon={Restart} text="Replay vibe" onclick={handleReplay} />
+        </span>
       {/if}
     </div>
 
     <div class="surface-sunk p-md flex flex-col gap-md">
-      <div class="flex flex-col gap-xs">
-        <p class="text-small text-dim">InWorld TTS narration</p>
-        <p class="text-caption text-mute">
-          Optional — spoken voice with reveal word-timed to the audio.
-        </p>
-      </div>
-
       {#if !hasStoredKey}
         <div class="flex flex-col gap-xs">
           <label class="text-small text-dim" for="vibe-tts-key">
@@ -892,7 +996,7 @@
               class="flex-1"
             />
             <ActionBtn
-              class="btn-system"
+              class="btn-success"
               icon={Sparkle}
               text="Save"
               onclick={saveKey}
@@ -908,7 +1012,7 @@
         <div class="flex items-center justify-between gap-md">
           <div class="flex flex-col gap-xs">
             <p class="text-small">
-              <span class="text-success">Connected to InWorld</span>
+              <span class="text-success">InWorld TTS narration</span>
             </p>
             <p class="text-caption text-mute">
               Key: <code>{maskKey(storedKey)}</code>
