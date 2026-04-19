@@ -19,6 +19,11 @@
       "svelte": "./dist/svelte/KineticText.svelte",
       "default": "./dist/svelte/KineticText.svelte"
     },
+    "./tts-block": {
+      "types": "./dist/svelte/TtsKineticBlock.svelte",
+      "svelte": "./dist/svelte/TtsKineticBlock.svelte",
+      "default": "./dist/svelte/TtsKineticBlock.svelte"
+    },
     "./types": {
       "types": "./dist/types.d.ts",
       "default": "./dist/types.js"

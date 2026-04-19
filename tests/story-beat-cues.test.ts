@@ -1,8 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  buildCuesFromOneShots,
   generateSpontaneousExtras,
-  scheduleActions,
   wordSpansOf,
   wordStartTimes,
 } from '../src/lib/story-beat-cues';
@@ -87,86 +85,6 @@ describe('wordStartTimes — TTS path', () => {
     // Fallback extends from the last known startMs
     expect(starts[1]).toBe(100 + 260);
     expect(starts[2]).toBe(100 + 260 * 2);
-  });
-});
-
-describe('buildCuesFromOneShots', () => {
-  const starts = [0, 260, 520, 780];
-
-  it('maps each one-shot to a KineticCue with atMs from word starts', () => {
-    const cues = buildCuesFromOneShots(
-      [
-        { atWord: 1, effect: 'shake' },
-        { atWord: 3, effect: 'shatter' },
-      ],
-      starts,
-    );
-    expect(cues).toHaveLength(2);
-    expect(cues[0]).toMatchObject({
-      effect: 'shake',
-      trigger: 'at-time',
-      atMs: 260,
-    });
-    expect(cues[1]).toMatchObject({ effect: 'shatter', atMs: 780 });
-  });
-
-  it('emits unique cue ids so the timeline does not dedupe same-effect cues', () => {
-    const cues = buildCuesFromOneShots(
-      [
-        { atWord: 0, effect: 'shake' },
-        { atWord: 2, effect: 'shake' },
-      ],
-      starts,
-    );
-    expect(cues[0].id).not.toBe(cues[1].id);
-  });
-
-  it('returns [] for undefined or empty input', () => {
-    expect(buildCuesFromOneShots(undefined, starts)).toEqual([]);
-    expect(buildCuesFromOneShots([], starts)).toEqual([]);
-  });
-
-  it('clamps out-of-range atWord to atMs=0 so the cue still fires', () => {
-    const cues = buildCuesFromOneShots(
-      [{ atWord: 99, effect: 'flash' }],
-      starts,
-    );
-    expect(cues[0].atMs).toBe(0);
-  });
-});
-
-describe('scheduleActions', () => {
-  const starts = [0, 260, 520];
-
-  it('returns atMs + action tuples in input order', () => {
-    const scheduled = scheduleActions(
-      [
-        { atWord: 1, variant: 'glitch', intensity: 'medium' },
-        { atWord: 2, variant: 'flash', intensity: 'high' },
-      ],
-      starts,
-    );
-    expect(scheduled).toHaveLength(2);
-    expect(scheduled[0]).toEqual({
-      atMs: 260,
-      action: { atWord: 1, variant: 'glitch', intensity: 'medium' },
-    });
-    expect(scheduled[1].atMs).toBe(520);
-  });
-
-  it('clamps out-of-range atWord to the last known word start', () => {
-    const scheduled = scheduleActions(
-      [{ atWord: 99, variant: 'impact', intensity: 'low' }],
-      starts,
-    );
-    expect(scheduled[0].atMs).toBe(520);
-  });
-
-  it('returns [] when actions are empty or word starts are empty', () => {
-    expect(scheduleActions([], starts)).toEqual([]);
-    expect(
-      scheduleActions([{ atWord: 0, variant: 'flash', intensity: 'low' }], []),
-    ).toEqual([]);
   });
 });
 

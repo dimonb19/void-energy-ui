@@ -97,6 +97,83 @@ Guideline:
 
 - Pair every chart with a visible title, short description, and value-format explanation
 
+## Narrative UI (TTS + Kinetic + Ambient)
+
+Use when a block of text should unfold at the cadence of spoken audio with timed visual effects — story beats, AI narration, cinematic UI, read-aloud tutorials.
+
+Three packages collaborate and the wiring is a single component:
+
+- `@dgrslabs/void-energy-kinetic-text/tts-block` — `<TtsKineticBlock>` owns reveal sync, audio-driven action dispatch, and blob-URL lifecycle
+- `@dgrslabs/void-energy-kinetic-text/tts/providers` — provider-agnostic TTS adapters. Built-in: `inworldSynthesize`, `elevenLabsSynthesize`, `openaiSynthesize`. Adding a new provider (Deepgram, Cartesia, your backend, etc.) is a single file — see the kinetic-text README's "TTS providers" section
+- `@dgrslabs/void-energy-ambient-layers` — `ambient.fire(variant, intensity)` triggers one-shot backdrop bursts; `ambient.push(category, variant, intensity)` mounts persistent backdrop layers
+
+Minimum viable composition:
+
+```svelte
+<script lang="ts">
+  import TtsKineticBlock from '@dgrslabs/void-energy-kinetic-text/tts-block';
+  // Any built-in or custom adapter works — swap this one import to change vendor.
+  import { elevenLabsSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+  import { createVoidEnergyTextStyleSnapshot } from '@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host';
+  import type {
+    TimedAction,
+    TimedCue,
+  } from '@dgrslabs/void-energy-kinetic-text/tts';
+  import { ambient } from '@dgrslabs/void-energy-ambient-layers';
+  import '@dgrslabs/void-energy-kinetic-text/styles';
+
+  const text = 'The reactor hums awake, then roars.';
+  type Burst = { variant: 'impact' | 'flash'; intensity: 'high' };
+  const cues: TimedCue[] = [{ atWord: 5, effect: 'shake' }];
+  const actions: TimedAction<Burst>[] = [
+    { atWord: 5, payload: { variant: 'impact', intensity: 'high' } },
+  ];
+
+  let audio = $state<Blob | null>(null);
+  let wordTimestamps = $state();
+  let el = $state<HTMLElement>();
+  const snapshot = $derived(el ? createVoidEnergyTextStyleSnapshot(el) : null);
+
+  async function start() {
+    const r = await elevenLabsSynthesize(text, { voiceId: '...', apiKey: '...' });
+    URL.revokeObjectURL(r.audioUrl);
+    audio = r.audioBlob;
+    wordTimestamps = r.wordTimestamps.length ? r.wordTimestamps : undefined;
+    // Optional: mount a persistent backdrop while the beat plays.
+    ambient.push('atmosphere', 'heat', 'medium');
+  }
+</script>
+
+<div bind:this={el} class="surface-sunk p-lg flex flex-col gap-lg">
+  {#if snapshot && audio}
+    <TtsKineticBlock
+      {text}
+      {audio}
+      {wordTimestamps}
+      styleSnapshot={snapshot}
+      {cues}
+      {actions}
+      revealStyle="drop"
+      activeEffect="pulse"
+      onaction={(p) => ambient.fire(p.variant, p.intensity)}
+    />
+  {/if}
+</div>
+```
+
+Notes:
+
+- `<AmbientHost />` must be mounted once at the layout level — already wired into `src/layouts/Layout.astro`
+- Replay the same block by keying on a counter: `{#key replay}<TtsKineticBlock …/>{/key}`
+- When TTS is unavailable or the user hasn't provided a key, omit `audio` and `wordTimestamps` — the reveal runs on `speedPreset` alone and actions fire on a wall-clock `setTimeout`. Every other prop works unchanged
+- A working end-to-end example is `src/components/conexus/VibeMachine.svelte`
+
+Avoid:
+
+- Wiring `syncAudioToKT` and `attachAudioActions` by hand unless `<TtsKineticBlock>` can't express what you need — the component handles pause/resume, rate changes, scrub, drift correction, blob-URL lifecycle, and autoplay errors
+- Using `ambient.fire` in a `setInterval` to "beat" an effect — push a persistent layer instead and let physics own the loop
+- Passing TTS timestamps as raw ms offsets — use `WordTimestamp[]` so the reveal marks stay character-accurate
+
 ## Auth / Onboarding
 
 Use when the page is focused on one primary task.

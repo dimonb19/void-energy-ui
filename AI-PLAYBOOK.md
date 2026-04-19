@@ -52,6 +52,7 @@ If the request sounds like this, use the shipped system first:
 - Data display: `tile`, `stat-card`, `line-chart`, `bar-chart`, `donut-chart`
 - Motion: `tooltip`, `morph`, `kinetic`, `narrative`
 - Drag and reorder: `draggable`, `dropTarget`, `reorderByDrop`, `resolveReorderByDrop`
+- TTS-synced narrative reveal: `TtsKineticBlock` (kinetic-text package) — wires `<audio>`, reveal timing, and timed action dispatch together. See `COMPOSITION-RECIPES.md › Narrative UI`.
 
 If the request still appears uncovered, prove it by checking the registry first and naming the missing capability explicitly.
 

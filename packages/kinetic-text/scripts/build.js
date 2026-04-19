@@ -49,6 +49,10 @@ cpSync(
   resolve(root, 'src/svelte/KineticSkeleton.svelte'),
   resolve(dist, 'svelte/KineticSkeleton.svelte'),
 );
+cpSync(
+  resolve(root, 'src/svelte/TtsKineticBlock.svelte'),
+  resolve(dist, 'svelte/TtsKineticBlock.svelte'),
+);
 
 // 5. Write barrel index.js
 writeFileSync(
@@ -56,8 +60,9 @@ writeFileSync(
   `// Generated barrel — re-exports public API
 export { default as KineticText } from './svelte/KineticText.svelte';
 export { default as KineticSkeleton } from './svelte/KineticSkeleton.svelte';
+export { default as TtsKineticBlock } from './svelte/TtsKineticBlock.svelte';
 export { createVoidEnergyTextStyleSnapshot } from './adapters/void-energy-host.js';
-export {} from './types.js';
+export { SPEED_PRESETS } from './types.js';
 `,
 );
 
@@ -70,12 +75,16 @@ writeFileSync(
 // function parameter (\`internals: ComponentInternals\`) as the JSX props.
 export { default as KineticText } from './svelte/KineticText.svelte';
 export { default as KineticSkeleton } from './svelte/KineticSkeleton.svelte';
+export { default as TtsKineticBlock } from './svelte/TtsKineticBlock.svelte';
 
 export { createVoidEnergyTextStyleSnapshot } from './adapters/void-energy-host.js';
+
+export { SPEED_PRESETS } from './types.js';
 
 export type {
   CueTrigger,
   KineticSkeletonProps,
+  KineticSpeedPreset,
   KineticTextControls,
   ModePreset,
   PhysicsPreset,

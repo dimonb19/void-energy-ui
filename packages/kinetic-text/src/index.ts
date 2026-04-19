@@ -38,6 +38,7 @@
  */
 export { default as KineticText } from './svelte/KineticText.svelte';
 export { default as KineticSkeleton } from './svelte/KineticSkeleton.svelte';
+export { default as TtsKineticBlock } from './svelte/TtsKineticBlock.svelte';
 export { createVoidEnergyTextStyleSnapshot } from './adapters/void-energy-host';
 
 export { SPEED_PRESETS } from './types';

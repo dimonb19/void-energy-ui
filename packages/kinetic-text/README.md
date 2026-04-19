@@ -361,15 +361,398 @@ The visual layer is set to `user-select: none` — animated text cannot be selec
 
 Each character receives unique CSS custom properties (`--kt-dx`, `--kt-dy`, `--kt-rotate`, `--kt-scale`, `--kt-phase`, etc.) computed by a seeded PRNG. Parametric keyframes read these variables, so the same animation produces different motion per character.
 
+## TTS-synced playback
+
+`<TtsKineticBlock>` is a drop-in component that pairs `<KineticText>` with spoken audio so the reveal unfolds at the same cadence as the voice, and arbitrary side effects fire on timed words. Three concerns are owned by the component: audio↔reveal sync, blob-URL lifecycle, and audio-driven action dispatch.
+
+### Minimum setup
+
+```svelte
+<script lang="ts">
+  import TtsKineticBlock from '@dgrslabs/void-energy-kinetic-text/tts-block';
+  // Pick any built-in provider — inworld / elevenLabs / openai — or write your own.
+  // The core doesn't know which one you pick; swapping is a one-import change.
+  import { elevenLabsSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+  import { createVoidEnergyTextStyleSnapshot } from '@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host';
+  import '@dgrslabs/void-energy-kinetic-text/styles';
+
+  let text = 'The reactor hums awake, then roars.';
+  let audio = $state<Blob | null>(null);
+  let wordTimestamps = $state();
+
+  let el = $state<HTMLElement>();
+  const snapshot = $derived(el ? createVoidEnergyTextStyleSnapshot(el) : null);
+
+  async function prepare() {
+    const r = await elevenLabsSynthesize(text, { voiceId: '...', apiKey: '...' });
+    // Provider pre-creates an ObjectURL we won't use — revoke it so the Blob
+    // isn't pinned twice. TtsKineticBlock creates its own URL from the Blob.
+    URL.revokeObjectURL(r.audioUrl);
+    audio = r.audioBlob;
+    wordTimestamps = r.wordTimestamps.length ? r.wordTimestamps : undefined;
+  }
+</script>
+
+<div bind:this={el}>
+  {#if snapshot && audio}
+    <TtsKineticBlock
+      {text}
+      {audio}
+      {wordTimestamps}
+      styleSnapshot={snapshot}
+      revealStyle="drop"
+      activeEffect="pulse"
+    />
+  {/if}
+</div>
+```
+
+> **Provider-agnostic.** See the [TTS providers](#tts-providers) section below for built-in adapters, the platform matrix, and how to add a new provider in a single file.
+
+`audio` accepts `HTMLAudioElement | Blob | string | null`. When you pass a `Blob`, the component owns the resulting ObjectURL and revokes it on unmount. When you pass an `HTMLAudioElement` or `string`, the consumer owns the lifecycle.
+
+When `wordTimestamps` is omitted, the component waits for audio metadata and falls back to even-distribution word timing across the clip's duration. When `audio` is also omitted, the reveal runs on `speedPreset` alone — still usable for kinetic effects, just no voice.
+
+### Timed cues and actions
+
+Two timeline channels: `cues` fire kinetic effects, `actions` fire arbitrary payloads at timed words or absolute times.
+
+```svelte
+<script lang="ts">
+  import type {
+    TimedAction,
+    TimedCue,
+  } from '@dgrslabs/void-energy-kinetic-text/tts';
+  import { ambient } from '@dgrslabs/void-energy-ambient-layers';
+
+  const cues: TimedCue[] = [
+    { atWord: 3, effect: 'flash' },           // kinetic effect on word 3
+    { atMs: 2500, effect: 'shake' },          // kinetic effect at 2.5s
+    { onComplete: true, effect: 'surge' },    // on reveal finish
+  ];
+
+  type BurstPayload = { variant: 'impact' | 'flash'; intensity: 'high' };
+  const actions: TimedAction<BurstPayload>[] = [
+    { atWord: 5, payload: { variant: 'impact', intensity: 'high' } },
+    { atMs: 4000, payload: { variant: 'flash', intensity: 'high' } },
+  ];
+</script>
+
+<TtsKineticBlock
+  {text}
+  {audio}
+  {wordTimestamps}
+  styleSnapshot={snapshot}
+  {cues}
+  {actions}
+  onaction={(p) => ambient.fire(p.variant, p.intensity)}
+/>
+```
+
+`onaction` fires on the same clock as the audio — rate changes, pauses, and user scrubs keep it in step. With no audio, actions fire on a wall-clock `setTimeout` at the estimated `atMs` instead.
+
+### Replaying the same block
+
+`<KineticText>` does not reset from its post-reveal `isComplete` state, so replaying the same beat requires a fresh mount. Key the block from the parent:
+
+```svelte
+{#key `${beat.id}-${replayCounter}`}
+  <TtsKineticBlock … />
+{/key}
+```
+
+### TTS providers
+
+The package is **provider-agnostic**. The core (`syncAudioToKT`, `wordTimesToRevealMarks`, `attachAudioActions`, `TtsKineticBlock`) never imports any provider. Each provider is a single file that normalizes its vendor's API into the universal `TTSResult` shape:
+
+```typescript
+interface TTSResult {
+  audioBlob: Blob;          // the rendered speech
+  audioUrl: string;          // pre-made ObjectURL (caller owns the lifecycle)
+  wordTimestamps: WordTimestamp[];   // [] when the provider can't produce them
+  durationMs: number;        // total clip duration
+}
+
+interface WordTimestamp {
+  word: string;
+  startMs: number;
+  endMs: number;
+}
+```
+
+Swapping providers = swapping one import. Everything downstream works unchanged.
+
+#### Built-in providers
+
+Six adapters ship with the package, covering the biggest browser-feasible TTS platforms. Each is an independent file — tree-shaking drops unused ones from your bundle.
+
+| Adapter | Word timestamps | Auth pattern |
+|---------|-----------------|--------------|
+| `inworldSynthesize` | Yes | Basic (user-provided key) |
+| `elevenLabsSynthesize` | Yes (char → word) | `xi-api-key` header |
+| `openaiSynthesize` | No — uses duration fallback | Bearer (prefer proxy in prod) |
+| `azureSynthesize` | No — uses duration fallback | `Ocp-Apim-Subscription-Key` |
+| `googleSynthesize` | No — uses duration fallback | API key (REST path) |
+| `deepgramSynthesize` | No — uses duration fallback | `Authorization: Token <key>` |
+
+##### InWorld TTS
+
+Game-focused, expressive voices, per-word alignment in the response.
+
+```typescript
+import { inworldSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+
+const r = await inworldSynthesize('The reactor hums awake.', {
+  voiceId: 'Ashley',
+  apiKey: '...',
+  // modelId, audioEncoding, sampleRateHertz, includeWordTimestamps — all optional
+});
+```
+
+##### ElevenLabs
+
+Industry leader for natural voices and voice cloning. Uses the `/with-timestamps` endpoint; the adapter aggregates character-level alignment into word timestamps.
+
+```typescript
+import { elevenLabsSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+
+const r = await elevenLabsSynthesize('The reactor hums awake.', {
+  voiceId: 'EXAVITQu4vr4xnSDxMaL',   // from ElevenLabs dashboard → VoiceLab
+  apiKey: '...',
+  // modelId — default 'eleven_multilingual_v2'
+  // outputFormat — default 'mp3_44100_128'
+  // useNormalizedAlignment — default true (recommended)
+});
+```
+
+##### OpenAI TTS
+
+Cheap and fast, widely adopted. **No word timestamps.** When no timestamps are available, `<TtsKineticBlock>` falls back to even-distribution word timing across the clip's audible duration — the reveal stays paced to the voice, just not character-accurate.
+
+```typescript
+import { openaiSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+
+const r = await openaiSynthesize('The reactor hums awake.', {
+  voice: 'nova',
+  apiKey: '...',
+  // model — default 'gpt-4o-mini-tts'
+  // responseFormat — default 'mp3'
+  // speed, instructions — optional
+});
+```
+
+##### Azure Speech (REST)
+
+Enterprise-grade, large voice catalog (incl. neural and multilingual). Simple subscription-key auth. **No word timestamps via REST** (WordBoundary is streaming-SDK-only) — duration fallback.
+
+```typescript
+import { azureSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+
+const r = await azureSynthesize('The reactor hums awake.', {
+  subscriptionKey: '...',
+  region: 'eastus',
+  voice: 'en-US-JennyNeural',
+  // outputFormat — default 'audio-24khz-160kbitrate-mono-mp3'
+  // prosody — optional { rate, pitch, volume } SSML prosody
+});
+```
+
+##### Google Cloud Text-to-Speech (REST)
+
+Huge voice catalog (Wavenet, Neural2, Chirp). **No word timestamps** via the REST path — duration fallback. Uses a restricted API key, not OAuth service accounts (those paths require a server proxy).
+
+```typescript
+import { googleSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+
+const r = await googleSynthesize('The reactor hums awake.', {
+  apiKey: '...',
+  voiceName: 'en-US-Wavenet-D',
+  // audioEncoding — default 'MP3'
+  // speakingRate, pitch, volumeGainDb — optional
+});
+```
+
+##### Deepgram Aura
+
+New-generation realtime TTS, low latency. **No word timestamps from the speak endpoint** — duration fallback. Token-based auth, browser-safe when the key is short-lived.
+
+```typescript
+import { deepgramSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+
+const r = await deepgramSynthesize('The reactor hums awake.', {
+  apiKey: '...',
+  model: 'aura-2-asteria-en',
+  // encoding — default 'mp3'
+  // sampleRate — optional
+});
+```
+
+#### Platform matrix
+
+How each major TTS service fits the adapter pattern:
+
+| Provider | Word timestamps | Browser-safe auth | Status | Integration notes |
+|----------|-----------------|-------------------|--------|-------------------|
+| **InWorld** | Yes | Yes (basic auth) | ✅ Built in | `inworldSynthesize` |
+| **ElevenLabs** | Yes (char-level → word) | Yes (`xi-api-key`) | ✅ Built in | `elevenLabsSynthesize` |
+| **OpenAI TTS** | No | Yes (bearer) | ✅ Built in (fallback) | `openaiSynthesize` — duration-estimate |
+| **Azure Speech (REST)** | No (streaming SDK only) | Yes (subscription key) | ✅ Built in (fallback) | `azureSynthesize` — duration-estimate |
+| **Google Cloud TTS** | No (SSML marks only) | Yes (API key) | ✅ Built in (fallback) | `googleSynthesize` — REST + API key. OAuth service-account paths need a proxy |
+| **Deepgram Aura** | No (speak endpoint) | Yes (API token) | ✅ Built in (fallback) | `deepgramSynthesize` |
+| **Cartesia** | Yes (streaming only) | Yes (API key) | ⚙️ Follow ElevenLabs pattern | Timings come from `/tts/sse`; REST bytes endpoint has audio-only |
+| **Play.ht** | Yes | Yes (API key + user id) | ⚙️ Follow ElevenLabs pattern | Job-poll API, receive word-level timings |
+| **Amazon Polly** | Yes (via `SpeechMarks`) | SigV4 (**not browser-safe**) | ⚠️ Use server-proxy | Call through your backend; aggregate `SpeechMarks` response into `WordTimestamp[]` |
+| **Web Speech API** | Yes (`onboundary`) | Native | ❌ Doesn't fit | Browser-native, produces no Blob; use `KineticText` directly with manual `revealMarks` |
+
+#### Adding a new provider
+
+A provider adapter is a single file that calls its vendor's API and returns `TTSResult`. Nothing else in the package needs to change.
+
+**Step 1** — Create `src/tts/providers/<name>.ts`:
+
+```typescript
+import type { TTSResult, WordTimestamp } from '../types';
+
+export interface MyProviderOptions {
+  voiceId: string;
+  apiKey: string;
+  // whatever else your provider needs
+}
+
+export async function synthesize(
+  text: string,
+  options: MyProviderOptions,
+): Promise<TTSResult> {
+  const response = await fetch('https://api.myprovider.com/tts', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${options.apiKey}` },
+    body: JSON.stringify({ text, voice: options.voiceId }),
+  });
+  if (!response.ok) throw new Error(`MyProvider TTS failed: ${response.status}`);
+
+  const json = await response.json();
+  const audioBlob = /* decode base64 / fetch audio bytes */;
+  const audioUrl = URL.createObjectURL(audioBlob);
+
+  // Normalize to WordTimestamp[] — or return [] if the provider doesn't
+  // expose alignment, and rely on <TtsKineticBlock>'s duration fallback.
+  const wordTimestamps: WordTimestamp[] = normalizeAlignment(json);
+
+  return {
+    audioBlob,
+    audioUrl,
+    wordTimestamps,
+    durationMs: wordTimestamps[wordTimestamps.length - 1]?.endMs ?? 0,
+  };
+}
+```
+
+**Step 2** — Add to the barrel `src/tts/providers/index.ts`:
+
+```typescript
+export {
+  synthesize as myProviderSynthesize,
+  type MyProviderOptions,
+} from './my-provider';
+```
+
+That's the entire integration. `<TtsKineticBlock>` receives `audioBlob` + `wordTimestamps` and does the rest.
+
+#### Char-level alignment → word timestamps
+
+If your provider exposes only character-level timings (ElevenLabs, some others), collapse whitespace runs the same way the built-in ElevenLabs adapter does:
+
+```typescript
+export function aggregateCharTimestamps(
+  chars: string[],
+  starts: number[], // seconds
+  ends: number[],
+): WordTimestamp[] {
+  const n = Math.min(chars.length, starts.length, ends.length);
+  const words: WordTimestamp[] = [];
+  let i = 0;
+  while (i < n) {
+    while (i < n && /\s/.test(chars[i])) i++;
+    if (i >= n) break;
+    const wordStart = starts[i];
+    let wordEnd = ends[i];
+    let word = chars[i++];
+    while (i < n && !/\s/.test(chars[i])) {
+      word += chars[i];
+      wordEnd = ends[i++];
+    }
+    words.push({ word, startMs: wordStart * 1000, endMs: wordEnd * 1000 });
+  }
+  return words;
+}
+```
+
+Using the same whitespace rule as `wordSpansOf` keeps the downstream helpers (`wordStartTimes`, `buildKineticCues`, `resolveActionTimes`) aligned to the same word indices authors author against.
+
+#### Server-proxy pattern (for auth-heavy providers)
+
+Polly (SigV4), Google Cloud (OAuth service account), and any production app hiding API keys should proxy TTS through your backend:
+
+```typescript
+// providers/my-backend.ts
+export interface MyBackendOptions {
+  sessionToken: string;  // short-lived, app-issued
+  voiceId: string;
+}
+
+export async function synthesize(
+  text: string,
+  options: MyBackendOptions,
+): Promise<TTSResult> {
+  const response = await fetch('/api/tts', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${options.sessionToken}`,
+    },
+    body: JSON.stringify({ text, voiceId: options.voiceId }),
+  });
+  const { audioBase64, wordTimestamps } = await response.json();
+  const audioBlob = base64ToBlob(audioBase64, 'audio/mpeg');
+  return {
+    audioBlob,
+    audioUrl: URL.createObjectURL(audioBlob),
+    wordTimestamps,
+    durationMs: wordTimestamps[wordTimestamps.length - 1]?.endMs ?? 0,
+  };
+}
+```
+
+Your backend endpoint owns the vendor API key, calls the real provider (Polly, Google, whatever), normalizes the response, and streams it back. From the package's perspective this is just another adapter.
+
+#### Providers without Blob output (Web Speech API)
+
+The browser's native `SpeechSynthesis` plays audio directly — it doesn't produce a `Blob`, so it can't satisfy the `TTSResult` contract. Integrate it differently: call `speechSynthesis.speak(utterance)` alongside `<KineticText>` and feed `onboundary` events into a manually-built `RevealMark[]`. This bypasses `<TtsKineticBlock>` but still gives you synced reveal.
+
+### Using the helpers directly
+
+If the component is too opinionated for your case, the building blocks are individually exported from `/tts`:
+
+- `wordTimesToRevealMarks(text, timestamps)` — TTS word times → per-character `RevealMark[]` for `<KineticText>` `revealMarks` prop
+- `wordStartTimes(text, speedPreset, timestamps?)` — the timestamp-or-fallback word clock
+- `buildKineticCues(cues, wordStarts)` — resolve `TimedCue[]` → `KineticCue[]`
+- `resolveActionTimes(actions, wordStarts)` — resolve `TimedAction<T>[]` → sorted `{atMs, payload}[]`
+- `syncAudioToKT({ audio, controls })` — bind `<audio>` events to `KineticTextControls`
+- `attachAudioActions(audio, scheduled, onFire)` — rate/pause/scrub-safe dispatcher
+- `estimateCharSpeed(durationMs, text)` — uniform charSpeed for providers without word timestamps
+
 ## Exports
 
 | Export path | Contents |
 |-------------|----------|
-| `@dgrslabs/void-energy-kinetic-text` | `KineticText`, `KineticSkeleton` components, `createVoidEnergyTextStyleSnapshot` adapter, all public types |
+| `@dgrslabs/void-energy-kinetic-text` | `KineticText`, `KineticSkeleton`, `TtsKineticBlock` components, `createVoidEnergyTextStyleSnapshot` adapter, all public types |
 | `@dgrslabs/void-energy-kinetic-text/component` | `KineticText` Svelte component only |
 | `@dgrslabs/void-energy-kinetic-text/skeleton` | `KineticSkeleton` Svelte component only |
+| `@dgrslabs/void-energy-kinetic-text/tts-block` | `TtsKineticBlock` Svelte component only |
 | `@dgrslabs/void-energy-kinetic-text/types` | Type-only exports |
 | `@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host` | `createVoidEnergyTextStyleSnapshot` function |
+| `@dgrslabs/void-energy-kinetic-text/tts` | `syncAudioToKT`, `wordTimesToRevealMarks`, `wordStartTimes`, `buildKineticCues`, `resolveActionTimes`, `attachAudioActions`, `estimateCharSpeed`, `stripEffectTokens`, `resolveEffectCues`, plus `TimedCue`, `TimedAction`, `TTSResult`, `WordTimestamp` types |
+| `@dgrslabs/void-energy-kinetic-text/tts/providers` | Provider adapters: `inworldSynthesize`, `elevenLabsSynthesize`, `openaiSynthesize`, `azureSynthesize`, `googleSynthesize`, `deepgramSynthesize` + their `*Options` types |
 | `@dgrslabs/void-energy-kinetic-text/styles` | Compiled CSS stylesheet |
 
 ## License

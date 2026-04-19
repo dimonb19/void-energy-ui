@@ -19,3 +19,13 @@ export {
   type InlineEffectToken,
 } from './cues';
 export { estimateCharSpeed } from './fallback';
+export {
+  SPEED_TO_WORD_MS,
+  wordSpansOf,
+  wordStartTimes,
+  buildKineticCues,
+  resolveActionTimes,
+  type TimedCue,
+  type TimedAction,
+} from './timeline';
+export { attachAudioActions } from './dispatch';

@@ -10,3 +10,14 @@ export {
   synthesize as inworldSynthesize,
   type InWorldOptions,
 } from './inworld';
+export {
+  synthesize as elevenLabsSynthesize,
+  type ElevenLabsOptions,
+} from './elevenlabs';
+export { synthesize as openaiSynthesize, type OpenAIOptions } from './openai';
+export { synthesize as azureSynthesize, type AzureOptions } from './azure';
+export { synthesize as googleSynthesize, type GoogleOptions } from './google';
+export {
+  synthesize as deepgramSynthesize,
+  type DeepgramOptions,
+} from './deepgram';
