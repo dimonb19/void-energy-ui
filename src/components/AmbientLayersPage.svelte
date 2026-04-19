@@ -1,29 +1,19 @@
 <script lang="ts">
-  import {
-    AtmosphereLayer,
-    PsychologyLayer,
-    ActionLayer,
-    EnvironmentLayer,
-  } from '@dgrslabs/void-energy-ambient-layers';
+  import { ambient } from '@dgrslabs/void-energy-ambient-layers';
   import type {
     AtmosphereLayerId,
     PsychologyLayerId,
     ActionLayerId,
     EnvironmentLayerId,
     AmbientIntensity,
-    AmbientLevel,
   } from '@dgrslabs/void-energy-ambient-layers';
-  import '@dgrslabs/void-energy-ambient-layers/styles';
 
   import Switcher from '@components/ui/Switcher.svelte';
-  import Toggle from '@components/ui/Toggle.svelte';
   import ActionBtn from '@components/ui/ActionBtn.svelte';
   import { morph } from '@actions/morph';
   import Remove from '@components/icons/Remove.svelte';
-  import Restart from '@components/icons/Restart.svelte';
   import { dissolve, emerge } from '@lib/transitions.svelte';
 
-  // ── Tabs ────────────────────────────────────────────────────────────
   // ── Atmosphere controls ────────────────────────────────────────────
   const atmosphereVariants: {
     value: AtmosphereLayerId;
@@ -91,12 +81,11 @@
         'Soft drifting lights for summer nights, tranquil clearings, and quiet wonder.',
     },
   ];
-  let atmosphereEnabled = $state(false);
+
   let atmosphereVariant = $state<AtmosphereLayerId>('rain');
   let atmosphereIntensity = $state<AmbientIntensity>('medium');
-  let atmosphereReplayKey = $state(0);
-  let atmosphereDecayOn = $state(false);
-  let atmosphereLiveLevel = $state<AmbientLevel>('medium');
+  let atmosphereHandle = $state<number | null>(null);
+  const atmosphereEnabled = $derived(atmosphereHandle !== null);
 
   // ── Psychology controls ────────────────────────────────────────────
   const psychologyVariants: {
@@ -177,12 +166,11 @@
         'Desaturated cool vignette for held grief, bittersweet endings, and loss.',
     },
   ];
-  let psychologyEnabled = $state(false);
+
   let psychologyVariant = $state<PsychologyLayerId>('danger');
   let psychologyIntensity = $state<AmbientIntensity>('medium');
-  let psychologyReplayKey = $state(0);
-  let psychologyDecayOn = $state(false);
-  let psychologyLiveLevel = $state<AmbientLevel>('medium');
+  let psychologyHandle = $state<number | null>(null);
+  const psychologyEnabled = $derived(psychologyHandle !== null);
 
   // ── Action controls ────────────────────────────────────────────────
   const actionVariants: {
@@ -246,14 +234,10 @@
   ];
   let actionVariant = $state<ActionLayerId>('impact');
   let actionIntensity = $state<AmbientIntensity>('medium');
-  let actionActive = $state(false);
-  let actionFireKey = $state(0);
 
   function fireActionVariant(v: ActionLayerId) {
     actionVariant = v;
-    // Remount via key so consecutive fires always replay cleanly.
-    actionFireKey++;
-    actionActive = true;
+    ambient.fire(v, actionIntensity);
   }
   function setActionIntensity(v: string | number | null) {
     presetIndex = null;
@@ -321,13 +305,22 @@
         'Flat desaturated wash for bleak exteriors, cemeteries, and emotional numbness.',
     },
   ];
-  let environmentEnabled = $state(false);
+
   let environmentVariant = $state<EnvironmentLayerId>('night');
   let environmentIntensity = $state<AmbientIntensity>('medium');
+  let environmentHandle = $state<number | null>(null);
+  const environmentEnabled = $derived(environmentHandle !== null);
 
   function setEnvironmentIntensity(v: string | number | null) {
     presetIndex = null;
     environmentIntensity = v as AmbientIntensity;
+    if (environmentHandle !== null) {
+      ambient.update(
+        environmentHandle,
+        environmentVariant,
+        environmentIntensity,
+      );
+    }
   }
 
   // ── Preset showcase ─────────────────────────────────────────────────
@@ -392,77 +385,118 @@
     presetIndex !== null ? presets[presetIndex] : null,
   );
 
+  // ── Handle helpers ──────────────────────────────────────────────────
+  // Push-or-update is the common mutation pattern: if no handle exists for
+  // the category, push one; otherwise mutate the live entry in place so
+  // AmbientHost's {#key variant-intensity} block handles the remount.
+  function setAtmosphere(
+    variant: AtmosphereLayerId,
+    intensity: AmbientIntensity,
+  ) {
+    atmosphereVariant = variant;
+    atmosphereIntensity = intensity;
+    if (atmosphereHandle === null) {
+      atmosphereHandle = ambient.push('atmosphere', variant, intensity);
+    } else {
+      ambient.update(atmosphereHandle, variant, intensity);
+    }
+  }
+  function setPsychology(
+    variant: PsychologyLayerId,
+    intensity: AmbientIntensity,
+  ) {
+    psychologyVariant = variant;
+    psychologyIntensity = intensity;
+    if (psychologyHandle === null) {
+      psychologyHandle = ambient.push('psychology', variant, intensity);
+    } else {
+      ambient.update(psychologyHandle, variant, intensity);
+    }
+  }
+  function setEnvironment(
+    variant: EnvironmentLayerId,
+    intensity: AmbientIntensity,
+  ) {
+    environmentVariant = variant;
+    environmentIntensity = intensity;
+    if (environmentHandle === null) {
+      environmentHandle = ambient.push('environment', variant, intensity);
+    } else {
+      ambient.update(environmentHandle, variant, intensity);
+    }
+  }
+
+  function clearAtmosphere() {
+    if (atmosphereHandle !== null) {
+      ambient.release(atmosphereHandle);
+      atmosphereHandle = null;
+    }
+  }
+  function clearPsychology() {
+    if (psychologyHandle !== null) {
+      ambient.release(psychologyHandle);
+      psychologyHandle = null;
+    }
+  }
+  function clearEnvironment() {
+    if (environmentHandle !== null) {
+      ambient.release(environmentHandle);
+      environmentHandle = null;
+    }
+  }
+
   function setPreset(v: string | number | null) {
     presetIndex = v as number | null;
     const preset = v !== null ? presets[v as number] : null;
     if (!preset) return;
 
-    // Sync preset choices into individual controls — single rendering path
     if (preset.atmosphere) {
-      atmosphereVariant = preset.atmosphere.variant;
-      atmosphereIntensity = preset.atmosphere.intensity;
-      atmosphereEnabled = true;
-      atmosphereDecayOn = false;
-      atmosphereReplayKey++;
+      setAtmosphere(preset.atmosphere.variant, preset.atmosphere.intensity);
     } else {
-      atmosphereEnabled = false;
+      clearAtmosphere();
     }
 
     if (preset.psychology) {
-      psychologyVariant = preset.psychology.variant;
-      psychologyIntensity = preset.psychology.intensity;
-      psychologyEnabled = true;
-      psychologyDecayOn = false;
-      psychologyReplayKey++;
+      setPsychology(preset.psychology.variant, preset.psychology.intensity);
     } else {
-      psychologyEnabled = false;
+      clearPsychology();
     }
 
     if (preset.environment) {
-      environmentVariant = preset.environment.variant;
-      environmentIntensity = preset.environment.intensity;
-      environmentEnabled = true;
+      setEnvironment(preset.environment.variant, preset.environment.intensity);
     } else {
-      environmentEnabled = false;
+      clearEnvironment();
     }
   }
 
   function clearPreset() {
     presetIndex = null;
-    atmosphereEnabled = false;
-    psychologyEnabled = false;
-    environmentEnabled = false;
+    clearAtmosphere();
+    clearPsychology();
+    clearEnvironment();
   }
 
   // Switcher coerces to string|number; wrap setters for type narrowing.
   // Selecting any variant activates that section's layer.
   function setAtmosphereVariant(v: string | number | null) {
-    presetIndex = null; // clear preset when using individual controls
-    atmosphereVariant = v as AtmosphereLayerId;
-    atmosphereEnabled = true;
-    // Remount so decay restarts from full intensity on the new variant.
-    atmosphereReplayKey++;
+    presetIndex = null;
+    setAtmosphere(v as AtmosphereLayerId, atmosphereIntensity);
   }
   function setPsychologyVariant(v: string | number | null) {
     presetIndex = null;
-    psychologyVariant = v as PsychologyLayerId;
-    psychologyEnabled = true;
-    psychologyReplayKey++;
+    setPsychology(v as PsychologyLayerId, psychologyIntensity);
   }
   function setEnvironmentVariant(v: string | number | null) {
     presetIndex = null;
-    environmentVariant = v as EnvironmentLayerId;
-    environmentEnabled = true;
+    setEnvironment(v as EnvironmentLayerId, environmentIntensity);
   }
   function setAtmosphereIntensity(v: string | number | null) {
     presetIndex = null;
-    atmosphereIntensity = v as AmbientIntensity;
-    atmosphereReplayKey++;
+    setAtmosphere(atmosphereVariant, v as AmbientIntensity);
   }
   function setPsychologyIntensity(v: string | number | null) {
     presetIndex = null;
-    psychologyIntensity = v as AmbientIntensity;
-    psychologyReplayKey++;
+    setPsychology(psychologyVariant, v as AmbientIntensity);
   }
 
   const intensityOptions: { value: AmbientIntensity; label: string }[] = [
@@ -487,47 +521,19 @@
   const actionCaption = $derived(
     actionVariants.find((v) => v.value === actionVariant)?.description ?? '',
   );
+
+  // Release every handle on unmount so the showcase never leaks layers into
+  // the next route. Actions are one-shot and self-clear, but clearing them
+  // on unmount avoids a flicker if the user navigates mid-burst.
+  $effect(() => {
+    return () => {
+      clearAtmosphere();
+      clearPsychology();
+      clearEnvironment();
+      ambient.clear('action');
+    };
+  });
 </script>
-
-<!-- Live ambient layers — mounted at page root, pointer-events:none -->
-{#if environmentEnabled}
-  <EnvironmentLayer
-    variant={environmentVariant}
-    intensity={environmentIntensity}
-  />
-{/if}
-
-{#if atmosphereEnabled}
-  {#key atmosphereReplayKey}
-    <AtmosphereLayer
-      variant={atmosphereVariant}
-      intensity={atmosphereIntensity}
-      durationMs={atmosphereDecayOn ? undefined : 0}
-      onChange={(l: AmbientLevel) => (atmosphereLiveLevel = l)}
-    />
-  {/key}
-{/if}
-
-{#if psychologyEnabled}
-  {#key psychologyReplayKey}
-    <PsychologyLayer
-      variant={psychologyVariant}
-      intensity={psychologyIntensity}
-      durationMs={psychologyDecayOn ? undefined : 0}
-      onChange={(l: AmbientLevel) => (psychologyLiveLevel = l)}
-    />
-  {/key}
-{/if}
-
-{#if actionActive}
-  {#key actionFireKey}
-    <ActionLayer
-      variant={actionVariant}
-      intensity={actionIntensity}
-      onEnd={() => (actionActive = false)}
-    />
-  {/key}
-{/if}
 
 <div class="container flex flex-col gap-2xl py-2xl">
   <header class="flex flex-col gap-lg items-center text-center">
@@ -725,38 +731,13 @@
             />
           </div>
 
-          <div class="flex flex-col gap-xs">
-            <Toggle bind:checked={atmosphereDecayOn} label="Auto-decay" />
-            <div use:morph class="text-caption text-mute">
-              {#if atmosphereDecayOn}
-                {#if atmosphereEnabled && atmosphereLiveLevel !== 'off'}
-                  Decaying — {atmosphereLiveLevel}
-                {:else if atmosphereEnabled}
-                  Faded out
-                {:else}
-                  Will fade out high → medium → low → off after firing
-                {/if}
-              {:else}
-                Pinned at the chosen intensity
-              {/if}
-            </div>
-          </div>
-
-          <div class="flex flex-row gap-md">
-            <ActionBtn
-              icon={Restart}
-              text="Replay"
-              disabled={!atmosphereEnabled}
-              onclick={() => atmosphereReplayKey++}
-            />
-            <ActionBtn
-              icon={Remove}
-              text="Clear"
-              class="btn-ghost btn-error"
-              disabled={!atmosphereEnabled}
-              onclick={() => (atmosphereEnabled = false)}
-            />
-          </div>
+          <ActionBtn
+            icon={Remove}
+            text="Clear"
+            class="btn-ghost btn-error self-start"
+            disabled={!atmosphereEnabled}
+            onclick={clearAtmosphere}
+          />
         </div>
 
         <div class="surface-sunk p-md flex flex-col gap-md">
@@ -790,38 +771,13 @@
             />
           </div>
 
-          <div class="flex flex-col gap-xs">
-            <Toggle bind:checked={psychologyDecayOn} label="Auto-decay" />
-            <div use:morph class="text-caption text-mute">
-              {#if psychologyDecayOn}
-                {#if psychologyEnabled && psychologyLiveLevel !== 'off'}
-                  Decaying — {psychologyLiveLevel}
-                {:else if psychologyEnabled}
-                  Faded out
-                {:else}
-                  Will fade out high → medium → low → off after firing
-                {/if}
-              {:else}
-                Pinned at the chosen intensity
-              {/if}
-            </div>
-          </div>
-
-          <div class="flex flex-row gap-md">
-            <ActionBtn
-              icon={Restart}
-              text="Replay"
-              disabled={!psychologyEnabled}
-              onclick={() => psychologyReplayKey++}
-            />
-            <ActionBtn
-              icon={Remove}
-              text="Clear"
-              class="btn-ghost btn-error"
-              disabled={!psychologyEnabled}
-              onclick={() => (psychologyEnabled = false)}
-            />
-          </div>
+          <ActionBtn
+            icon={Remove}
+            text="Clear"
+            class="btn-ghost btn-error self-start"
+            disabled={!psychologyEnabled}
+            onclick={clearPsychology}
+          />
         </div>
 
         <div class="surface-sunk p-md flex flex-col gap-md">
@@ -855,15 +811,13 @@
             />
           </div>
 
-          <div class="flex flex-row gap-md">
-            <ActionBtn
-              icon={Remove}
-              text="Clear"
-              class="btn-ghost btn-error"
-              disabled={!environmentEnabled}
-              onclick={() => (environmentEnabled = false)}
-            />
-          </div>
+          <ActionBtn
+            icon={Remove}
+            text="Clear"
+            class="btn-ghost btn-error self-start"
+            disabled={!environmentEnabled}
+            onclick={clearEnvironment}
+          />
         </div>
 
         <div class="surface-sunk p-md flex flex-col gap-md">
@@ -884,8 +838,8 @@
               {/each}
             </div>
 
-            <p use:morph class="text-caption text-dim text-center">
-              {#if actionActive}{actionCaption}{/if}
+            <p class="text-caption text-dim text-center">
+              {actionCaption}
             </p>
 
             <Switcher

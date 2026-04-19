@@ -20,7 +20,46 @@ No runtime dependencies. No host adapter required — layers read the global `<h
 
 ## Quick start
 
-### Void Energy hosts
+Two APIs ship side-by-side. The **singleton API** is the recommended path for apps — one global host renders every active layer, consumers imperatively `push` / `fire` from anywhere. The **raw components** remain exported for showcases and consumers that need direct control over decay, `onChange`, or per-instance props.
+
+### Singleton API — recommended
+
+Mount `<AmbientHost />` once in your app shell, then drive it from any component. Handle-stack semantics mean nested scopes compose cleanly (page pushes `rain`, modal opens and pushes `calm`, modal closes → `rain` returns).
+
+```svelte
+<!-- src/layouts/Layout.astro (or App.svelte root) -->
+<script lang="ts">
+  import { AmbientHost } from '@dgrslabs/void-energy-ambient-layers';
+  import '@dgrslabs/void-energy-ambient-layers/styles';
+</script>
+
+<!-- renders at the end of your shell, alongside Modal / Toast -->
+<AmbientHost />
+```
+
+```svelte
+<!-- anywhere else -->
+<script lang="ts">
+  import { ambient } from '@dgrslabs/void-energy-ambient-layers';
+
+  // Persistent layer scoped to component lifecycle.
+  $effect(() => {
+    const h = ambient.push('atmosphere', 'rain', 'medium');
+    return () => ambient.release(h);
+  });
+
+  // One-shot burst — self-clears when the animation ends.
+  function onHit() {
+    ambient.fire('impact', 'high');
+  }
+</script>
+```
+
+See [Singleton API](#singleton-api) for the full surface.
+
+### Raw components — direct control
+
+The four category components remain exported. Use them when you need decay callbacks, per-instance `durationMs`, or when the singleton's global model is wrong for your case (e.g. a showcase demonstrating auto-decay).
 
 ```svelte
 <script lang="ts">
@@ -176,6 +215,95 @@ Sticky baseline color grades. No decay, no animation (or very slow drift). Use t
 | `toxic` | Saturated irradiated green, even chemical cast |
 | `underground` | Dark cool-grey radial with heavy edge darkening |
 
+## Singleton API
+
+Imperative reactive store backed by Svelte 5 runes. One instance, one renderer (`<AmbientHost />`), global availability.
+
+### Mount the host once
+
+```svelte
+<!-- in your app shell, rendered once — typically next to Modal and Toast -->
+<AmbientHost />
+```
+
+`<AmbientHost />` reads the singleton's state and renders the 4 category blocks in deepest-to-top z-order (environment → atmosphere → psychology → action). Persistent layers render with `durationMs={0}` — the singleton's handle-stack owns lifecycle, not the layer's built-in auto-decay.
+
+### Driving state
+
+```ts
+import { ambient } from '@dgrslabs/void-energy-ambient-layers';
+
+// Persistent layers — returns a handle you release later.
+const h1 = ambient.push('environment', 'night');
+const h2 = ambient.push('atmosphere', 'rain', 'medium');
+const h3 = ambient.push('psychology', 'tension', 'high');
+
+// Mutate in place — preserves the handle, keys to variant-intensity change.
+ambient.update(h2, 'storm', 'high');
+
+// Release.
+ambient.release(h1);
+
+// One-shot burst — no handle, auto-clears when the animation finishes.
+ambient.fire('impact', 'high');
+
+// Escape hatch.
+ambient.clear('atmosphere');       // clear one category
+ambient.clear();                   // clear everything
+```
+
+### Surface
+
+| Member | Signature | Notes |
+|---|---|---|
+| `push` | `(category, variant, intensity?) → number` | Returns a numeric handle. Overloaded per category so `variant` narrows to the right union. |
+| `update` | `(handle, variant, intensity?) → boolean` | Mutates the entry in place. Returns `false` if the handle is stale. |
+| `release` | `(handle) → void` | Idempotent. Safe to call on stale handles. |
+| `fire` | `(variant, intensity?) → void` | One-shot action. Returns nothing — singleton owns the lifecycle. |
+| `clear` | `(category?) → void` | Omit for all. Accepts `'atmosphere'`, `'psychology'`, `'environment'`, `'action'`, or `'all'`. |
+| `atmosphere`, `psychology`, `environment`, `actions` | readable `$state.raw` arrays | Reactive snapshots, primarily for debug / UI introspection. |
+
+Entry shapes are typed via `AtmosphereEntry`, `PsychologyEntry`, `EnvironmentEntry`, `ActionEntry`.
+
+### Scoped lifecycle with `$effect`
+
+The intended pattern: push on mount, release on cleanup. The cleanup runs in untrack mode, so the release cannot loop the effect.
+
+```ts
+$effect(() => {
+  const h = ambient.push('atmosphere', 'rain', 'medium');
+  return () => ambient.release(h);
+});
+```
+
+Nested scopes compose naturally: each scope pushes its own handle and releases on unmount. There is no single "active" variant per category — the arrays are multi-stack.
+
+### Multi-stack semantics
+
+Each persistent category is a stack. Pushing twice pushes two entries, both of which render. This is intentional — it lets a modal overlay its own mood on top of the page's baseline without fighting for a single slot.
+
+If you want single-slot-per-category behavior (one and only one atmosphere at a time), track your handle and `update` instead of pushing a second time:
+
+```ts
+let handle: number | null = null;
+
+function setAtmosphere(variant: AtmosphereLayerId, intensity: AmbientIntensity) {
+  if (handle === null) handle = ambient.push('atmosphere', variant, intensity);
+  else ambient.update(handle, variant, intensity);
+}
+```
+
+### Singleton vs raw components
+
+| | Singleton (`ambient` + `<AmbientHost />`) | Raw (`<AtmosphereLayer />` etc.) |
+|---|---|---|
+| Mount site | Once, in app shell | Anywhere the effect should render |
+| Lifecycle | Handle-stack, `release()` | Component mount/unmount |
+| Decay | None (durationMs=0 forced) | Yes (configurable via `durationMs`) |
+| `onChange` / `onEnd` callbacks | Not exposed | Available |
+| Style import | Once, in app shell | Once per app (deduped) |
+| Best for | Apps, pages, modals, feature screens | Showcases, component-level demos, consumers that need decay |
+
 ## Composition recipes
 
 Ambient Layers has **no director or manager** — composition is consumer-owned. Mount the layers you want as siblings and drive their props from your own state. Swapping one layer does not affect the others.
@@ -304,13 +432,20 @@ All layers are `aria-hidden` and never trap pointer events — they do not affec
 
 | Export path | Contents |
 |---|---|
-| `@dgrslabs/void-energy-ambient-layers` | All four layer components + public types |
+| `@dgrslabs/void-energy-ambient-layers` | `AmbientHost`, `ambient` (singleton) + 4 raw layer components + public types |
 | `@dgrslabs/void-energy-ambient-layers/atmosphere` | `AtmosphereLayer` Svelte component only |
 | `@dgrslabs/void-energy-ambient-layers/psychology` | `PsychologyLayer` Svelte component only |
 | `@dgrslabs/void-energy-ambient-layers/action` | `ActionLayer` Svelte component only |
 | `@dgrslabs/void-energy-ambient-layers/environment` | `EnvironmentLayer` Svelte component only |
 | `@dgrslabs/void-energy-ambient-layers/types` | Type-only exports (`AmbientLevel`, `AtmosphereLayer`, etc.) |
 | `@dgrslabs/void-energy-ambient-layers/styles` | Compiled CSS stylesheet |
+
+**From the top-level export, also available:**
+
+- `ambient` — singleton instance
+- `Ambient` — singleton class (for `instanceof` checks / testing)
+- `AmbientHost` — the renderer component
+- Entry type exports: `AtmosphereEntry`, `PsychologyEntry`, `EnvironmentEntry`, `ActionEntry`, `PersistentCategory`
 
 ## Build
 

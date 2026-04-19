@@ -8,6 +8,8 @@ import LiquidGlassFilter from '@components/core/LiquidGlassFilter.svelte';
 import Navigation from '@components/Navigation.svelte';
 import Modal from '@components/Modal.svelte';
 import Toast from '@components/Toast.svelte';
+import { AmbientHost } from '@dgrslabs/void-energy-ambient-layers';
+import '@dgrslabs/void-energy-ambient-layers/styles';
 
 interface Props {
   title?: string;
@@ -48,5 +50,6 @@ const { title = 'Void Energy UI', breadcrumbs } = Astro.props;
 
     <Modal client:idle />
     <Toast client:idle />
+    <AmbientHost client:idle />
   </body>
 </html>

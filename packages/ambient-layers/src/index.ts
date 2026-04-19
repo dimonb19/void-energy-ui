@@ -31,6 +31,16 @@ export { default as AtmosphereLayer } from './svelte/AtmosphereLayer.svelte';
 export { default as PsychologyLayer } from './svelte/PsychologyLayer.svelte';
 export { default as ActionLayer } from './svelte/ActionLayer.svelte';
 export { default as EnvironmentLayer } from './svelte/EnvironmentLayer.svelte';
+export { default as AmbientHost } from './svelte/AmbientHost.svelte';
+
+export { ambient, Ambient } from './svelte/ambient.svelte';
+export type {
+  PersistentCategory,
+  AtmosphereEntry,
+  PsychologyEntry,
+  EnvironmentEntry,
+  ActionEntry,
+} from './svelte/ambient.svelte';
 
 export type {
   AmbientCategory,

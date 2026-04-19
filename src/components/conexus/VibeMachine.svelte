@@ -31,13 +31,7 @@
     wordTimesToRevealMarks,
   } from '@dgrslabs/void-energy-kinetic-text/tts';
   import { inworldSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
-  import {
-    ActionLayer,
-    AtmosphereLayer,
-    EnvironmentLayer,
-    PsychologyLayer,
-  } from '@dgrslabs/void-energy-ambient-layers';
-  import '@dgrslabs/void-energy-ambient-layers/styles';
+  import { ambient } from '@dgrslabs/void-energy-ambient-layers';
   import '@dgrslabs/void-energy-kinetic-text/styles';
 
   import { tick } from 'svelte';
@@ -64,6 +58,7 @@
   import Toggle from '@components/ui/Toggle.svelte';
   import Sparkle from '@components/icons/Sparkle.svelte';
   import Restart from '@components/icons/Restart.svelte';
+  import Remove from '@components/icons/Remove.svelte';
   import { Trash2, FastForward } from '@lucide/svelte';
   import {
     dematerialize,
@@ -140,8 +135,6 @@
   // attachAudioActionDispatcher). Set when bursts ride the audio clock,
   // null when they fall back to setTimeout (no-audio stagger reveal).
   let actionDispatcherDetach: (() => void) | null = null;
-  let liveActions = $state<Array<{ id: number; action: StoryAction }>>([]);
-  let nextLiveActionId = 0;
   // Spontaneous bursts/one-shots picked at playback time (see
   // generateSpontaneousExtras). Surfaced in the "Active effects" table so the
   // showcase reflects what's actually firing — not just the beat-declared set.
@@ -177,7 +170,6 @@
   );
 
   const currentBeat = $derived<StoryBeat | null>(storyBeatEngine.currentBeat);
-  const activeAmbient = $derived(storyBeatEngine.activeAmbient);
 
   // Remount only on new-beat or explicit replay. We intentionally do NOT key
   // on `ttsGeneration` — it bumps mid-synth as a guard token, and keying on
@@ -256,8 +248,7 @@
     for (const { atMs, action } of scheduled) {
       const delayMs = Math.max(0, atMs - audioStartMs);
       const timerId = window.setTimeout(() => {
-        const id = nextLiveActionId++;
-        liveActions = [...liveActions, { id, action }];
+        ambient.fire(action.variant, action.intensity);
       }, delayMs);
       actionTimers.push(timerId);
     }
@@ -304,11 +295,8 @@
     function fireDue() {
       const audioMs = audio.currentTime * 1000;
       while (nextIndex < sorted.length && audioMs >= sorted[nextIndex].atMs) {
-        const id = nextLiveActionId++;
-        liveActions = [
-          ...liveActions,
-          { id, action: sorted[nextIndex].action },
-        ];
+        const { action } = sorted[nextIndex];
+        ambient.fire(action.variant, action.intensity);
         nextIndex++;
       }
     }
@@ -324,10 +312,6 @@
       audio.removeEventListener('timeupdate', fireDue);
       audio.removeEventListener('seeked', realignFromAudio);
     };
-  }
-
-  function removeLiveAction(id: number) {
-    liveActions = liveActions.filter((e) => e.id !== id);
   }
 
   // ── Mount / unmount ──────────────────────────────────────────────────
@@ -353,7 +337,7 @@
       cleanupAudio();
       discardReplayCache();
       clearActionTimers();
-      liveActions = [];
+      ambient.clear('action');
       currentExtras = null;
       storyBeatEngine.release();
     };
@@ -474,7 +458,7 @@
     cleanupAudio();
     discardReplayCache();
     clearActionTimers();
-    liveActions = [];
+    ambient.clear('action');
     currentExtras = null;
     revealMarks = undefined;
     kineticCues = [];
@@ -749,6 +733,28 @@
   }
 
   /**
+   * Clear everything and return to the idle state. Mirrors the unmount
+   * cleanup but keeps the component mounted — used by the Clear button
+   * once a vibe is active. Aborts any in-flight generation, kills audio
+   * and timers, drops the replay cache (the old blob URL would otherwise
+   * leak), and releases all ambient layers.
+   */
+  function handleClear() {
+    abortController?.abort();
+    cleanupAudio();
+    discardReplayCache();
+    clearActionTimers();
+    ambient.clear('action');
+    currentExtras = null;
+    revealMarks = undefined;
+    kineticCues = [];
+    paused = false;
+    ttsStatus = 'idle';
+    storyBeatEngine.release();
+    status = 'idle';
+  }
+
+  /**
    * Re-runs the last beat from cache: same text, same audio buffer, same
    * action schedule. Skips Claude + InWorld entirely — both calls are
    * paid, and the user just wants to re-experience what they already saw.
@@ -762,7 +768,7 @@
 
     cleanupAudio();
     clearActionTimers();
-    liveActions = [];
+    ambient.clear('action');
     ttsStatus = 'idle';
 
     const { beat, audioUrl, marks, cues, wordStarts, extras } = replayCache;
@@ -808,46 +814,6 @@
     }
   }
 </script>
-
-<!-- Persistent ambient layers — mounted declaratively from engine.activeAmbient. -->
-{#if activeAmbient.environment}
-  {#each activeAmbient.environment as entry (entry.layer)}
-    {#key `${entry.layer}-${entry.intensity}`}
-      <EnvironmentLayer variant={entry.layer} intensity={entry.intensity} />
-    {/key}
-  {/each}
-{/if}
-{#if activeAmbient.atmosphere}
-  {#each activeAmbient.atmosphere as entry (entry.layer)}
-    {#key `${entry.layer}-${entry.intensity}`}
-      <AtmosphereLayer
-        variant={entry.layer}
-        intensity={entry.intensity}
-        durationMs={0}
-      />
-    {/key}
-  {/each}
-{/if}
-{#if activeAmbient.psychology}
-  {#each activeAmbient.psychology as entry (entry.layer)}
-    {#key `${entry.layer}-${entry.intensity}`}
-      <PsychologyLayer
-        variant={entry.layer}
-        intensity={entry.intensity}
-        durationMs={0}
-      />
-    {/key}
-  {/each}
-{/if}
-
-<!-- One-shot ambient action bursts (scheduled to spoken words). -->
-{#each liveActions as entry (entry.id)}
-  <ActionLayer
-    variant={entry.action.variant}
-    intensity={entry.action.intensity}
-    onEnd={() => removeLiveAction(entry.id)}
-  />
-{/each}
 
 <section class="container py-2xl flex flex-col gap-lg">
   <div class="flex flex-col gap-sm border-l-2 border-primary pl-md">
@@ -1085,6 +1051,16 @@
           <ActionBtn icon={Restart} text="Replay vibe" onclick={handleReplay} />
         </span>
       {/if}
+      {#if currentBeat && (status === 'playing' || status === 'done')}
+        <span in:materialize out:dematerialize>
+          <ActionBtn
+            class="btn-ghost btn-error"
+            icon={Remove}
+            text="Clear vibe"
+            onclick={handleClear}
+          />
+        </span>
+      {/if}
     </div>
 
     <div class="surface-sunk p-md flex flex-col gap-md">
@@ -1116,7 +1092,11 @@
           </p>
         </div>
       {:else}
-        <div class="flex flex-row flex-wrap justify-center gap-sm items-center large-desktop:justify-between" in:materialize out:dematerialize>
+        <div
+          class="flex flex-row flex-wrap justify-center gap-sm items-center large-desktop:justify-between"
+          in:materialize
+          out:dematerialize
+        >
           <span class="flex flex-col gap-sm small-desktop:flex-row">
             <Selector
               label="Voice"
@@ -1139,7 +1119,11 @@
           />
         </div>
 
-        <div class="surface-spotlight p-md flex items-center justify-between gap-md" in:materialize out:dematerialize>
+        <div
+          class="surface-spotlight p-md flex items-center justify-between gap-md"
+          in:materialize
+          out:dematerialize
+        >
           <div class="flex flex-col gap-xs">
             <p class="text-small">
               <span class="text-success">InWorld TTS narration</span>

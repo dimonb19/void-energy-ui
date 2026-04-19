@@ -1,6 +1,6 @@
 {
   "name": "@dgrslabs/void-energy-ambient-layers",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "type": "module",
   "license": "UNLICENSED",
   "description": "Immersive full-viewport overlay layers for Void Energy (Atmosphere, Psychology, Action, Environment)",

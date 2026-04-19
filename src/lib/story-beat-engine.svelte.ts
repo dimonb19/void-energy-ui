@@ -1,18 +1,23 @@
 import type { StoryAmbient, StoryBeat } from '@lib/story-beat-types';
+import { ambient } from '@dgrslabs/void-energy-ambient-layers';
 
 /**
- * StoryBeatEngine — holds the currently-playing beat and its ambient layer
- * configuration. Theme application is intentionally omitted: the Vibe Machine
- * showcases kinetic text reveal + ambient effects on top of the host's
- * existing atmosphere rather than replacing it per beat.
+ * StoryBeatEngine — holds the currently-playing beat. Ambient layers are
+ * pushed onto the global `ambient` singleton via handles so they render
+ * through <AmbientHost /> regardless of where the beat was applied from.
+ * Theme application is intentionally omitted: the Vibe Machine showcases
+ * kinetic text reveal + ambient effects on top of the host's existing
+ * atmosphere rather than replacing it per beat.
  */
 class StoryBeatEngine {
   currentBeat = $state<StoryBeat | null>(null);
-  activeAmbient = $state<StoryAmbient>({});
+
+  #handles: number[] = [];
 
   applyBeat(beat: StoryBeat): void {
+    this.#releaseAmbientHandles();
     this.currentBeat = beat;
-    this.activeAmbient = beat.ambient;
+    this.#pushAmbient(beat.ambient);
   }
 
   /**
@@ -22,12 +27,29 @@ class StoryBeatEngine {
    * effects go quiet.
    */
   releaseAmbient(): void {
-    this.activeAmbient = {};
+    this.#releaseAmbientHandles();
   }
 
   release(): void {
     this.currentBeat = null;
-    this.activeAmbient = {};
+    this.#releaseAmbientHandles();
+  }
+
+  #pushAmbient(amb: StoryAmbient): void {
+    for (const e of amb.environment ?? []) {
+      this.#handles.push(ambient.push('environment', e.layer, e.intensity));
+    }
+    for (const a of amb.atmosphere ?? []) {
+      this.#handles.push(ambient.push('atmosphere', a.layer, a.intensity));
+    }
+    for (const p of amb.psychology ?? []) {
+      this.#handles.push(ambient.push('psychology', p.layer, p.intensity));
+    }
+  }
+
+  #releaseAmbientHandles(): void {
+    for (const h of this.#handles) ambient.release(h);
+    this.#handles = [];
   }
 }
 

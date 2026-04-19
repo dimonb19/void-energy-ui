@@ -10,5 +10,5 @@
     "allowImportingTsExtensions": false
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["dist", "src/**/*.svelte", "src/index.ts"]
+  "exclude": ["dist", "src/**/*.svelte", "src/**/*.svelte.ts", "src/index.ts"]
 }

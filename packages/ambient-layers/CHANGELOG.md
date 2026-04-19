@@ -1,5 +1,40 @@
 # Changelog
 
+## 0.4.0
+
+### Added — singleton API
+
+- **`ambient` singleton** — reactive store for driving layers from anywhere in
+  a consumer app. Handle-stack lifecycle so nested scopes compose cleanly;
+  multi-stack per category so modals can layer their own mood on top of a
+  page's baseline without fighting for a single slot.
+  - `push(category, variant, intensity?) → handle` (overloaded per category)
+  - `update(handle, variant, intensity?) → boolean` (mutate in place)
+  - `release(handle) → void` (idempotent)
+  - `fire(variant, intensity?) → void` (one-shot action, self-clears)
+  - `clear(category?)` (escape hatch)
+- **`<AmbientHost />`** — renderer component. Mount once in your app shell;
+  reads the singleton's state and renders all four category blocks in
+  z-order. Persistent layers render with `durationMs={0}` — singleton owns
+  lifecycle, not the layer's auto-decay.
+- **Entry types exported** — `AtmosphereEntry`, `PsychologyEntry`,
+  `EnvironmentEntry`, `ActionEntry`, `PersistentCategory`.
+
+### Internal
+
+- `.svelte.ts` files now pass through the build pipeline as source (copied,
+  not compiled), matching the existing `.svelte` handling. `tsconfig.build.json`
+  excludes them; `scripts/build.js` copies them alongside the component files.
+- `build.js` barrel (`dist/index.{js,d.ts}`) extended with hand-written
+  declarations for the singleton class and its instance.
+
+### Non-breaking
+
+All four raw layer components remain exported and unchanged. Existing
+consumers continue to work. The singleton is additive — opt in by mounting
+`<AmbientHost />` and calling `ambient.push/fire` instead of rendering
+components directly.
+
 ## 0.3.0
 
 ### Breaking — API reconciliation

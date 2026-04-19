@@ -40,19 +40,26 @@ writeFileSync(
   `// Side-effect CSS import\nexport {};\n`,
 );
 
-// 4. Copy Svelte source files
+// 4. Copy Svelte source files (consumers compile them)
 mkdirSync(resolve(dist, 'svelte'), { recursive: true });
 for (const name of [
   'AtmosphereLayer',
   'PsychologyLayer',
   'ActionLayer',
   'EnvironmentLayer',
+  'AmbientHost',
 ]) {
   cpSync(
     resolve(root, `src/svelte/${name}.svelte`),
     resolve(dist, `svelte/${name}.svelte`),
   );
 }
+
+// 4b. Copy runes source files (.svelte.ts — consumers compile them too)
+cpSync(
+  resolve(root, 'src/svelte/ambient.svelte.ts'),
+  resolve(dist, 'svelte/ambient.svelte.ts'),
+);
 
 // 5. Barrel index.js
 writeFileSync(
@@ -62,6 +69,8 @@ export { default as AtmosphereLayer } from './svelte/AtmosphereLayer.svelte';
 export { default as PsychologyLayer } from './svelte/PsychologyLayer.svelte';
 export { default as ActionLayer } from './svelte/ActionLayer.svelte';
 export { default as EnvironmentLayer } from './svelte/EnvironmentLayer.svelte';
+export { default as AmbientHost } from './svelte/AmbientHost.svelte';
+export { ambient, Ambient } from './svelte/ambient.svelte.ts';
 export {} from './types.js';
 `,
 );
@@ -75,6 +84,11 @@ import type {
   PsychologyLayerProps,
   ActionLayerProps,
   EnvironmentLayerProps,
+  AmbientIntensity,
+  AtmosphereLayer as AtmosphereLayerId,
+  PsychologyLayer as PsychologyLayerId,
+  EnvironmentLayer as EnvironmentLayerId,
+  ActionLayer as ActionLayerId,
 } from './types.js';
 
 /** Atmosphere category layer - weather/sensory variants (rain, snow, ash, fog, underwater, heat). */
@@ -85,7 +99,57 @@ declare const PsychologyLayer: typeof SvelteComponent<PsychologyLayerProps>;
 declare const ActionLayer: typeof SvelteComponent<ActionLayerProps>;
 /** Environment category layer - sticky baseline tint variants (night, neon, dawn, dusk, sickly, toxic, underground, candlelit). */
 declare const EnvironmentLayer: typeof SvelteComponent<EnvironmentLayerProps>;
-export { AtmosphereLayer, PsychologyLayer, ActionLayer, EnvironmentLayer };
+/** Ambient host - mount once in your app shell to render the active ambient state. */
+declare const AmbientHost: typeof SvelteComponent<Record<string, never>>;
+export { AtmosphereLayer, PsychologyLayer, ActionLayer, EnvironmentLayer, AmbientHost };
+
+export type PersistentCategory = 'atmosphere' | 'psychology' | 'environment';
+
+export interface AtmosphereEntry {
+  handle: number;
+  variant: AtmosphereLayerId;
+  intensity: AmbientIntensity;
+}
+export interface PsychologyEntry {
+  handle: number;
+  variant: PsychologyLayerId;
+  intensity: AmbientIntensity;
+}
+export interface EnvironmentEntry {
+  handle: number;
+  variant: EnvironmentLayerId;
+  intensity: AmbientIntensity;
+}
+export interface ActionEntry {
+  id: number;
+  variant: ActionLayerId;
+  intensity: AmbientIntensity;
+}
+
+/**
+ * Reactive singleton: drives <AmbientHost /> from anywhere in the app.
+ * Use push/release handles for persistent layers, fire() for one-shot actions.
+ */
+export declare class Ambient {
+  atmosphere: AtmosphereEntry[];
+  psychology: PsychologyEntry[];
+  environment: EnvironmentEntry[];
+  actions: ActionEntry[];
+
+  push(category: 'atmosphere', variant: AtmosphereLayerId, intensity?: AmbientIntensity): number;
+  push(category: 'psychology', variant: PsychologyLayerId, intensity?: AmbientIntensity): number;
+  push(category: 'environment', variant: EnvironmentLayerId, intensity?: AmbientIntensity): number;
+  update(
+    handle: number,
+    variant: AtmosphereLayerId | PsychologyLayerId | EnvironmentLayerId,
+    intensity?: AmbientIntensity,
+  ): boolean;
+  release(handle: number): void;
+  fire(variant: ActionLayerId, intensity?: AmbientIntensity): void;
+  clear(category?: PersistentCategory | 'action' | 'all'): void;
+}
+
+export declare const ambient: Ambient;
 
 export type {
   AmbientCategory,

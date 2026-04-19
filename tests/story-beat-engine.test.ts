@@ -3,6 +3,7 @@ import {
   storyBeatEngine,
   StoryBeatEngine,
 } from '../src/lib/story-beat-engine.svelte';
+import { ambient } from '@dgrslabs/void-energy-ambient-layers';
 import type { StoryBeat } from '../src/lib/story-beat-types';
 
 function quietConsole() {
@@ -29,25 +30,31 @@ describe('StoryBeatEngine — applyBeat', () => {
 
   beforeEach(() => {
     quietConsole();
+    ambient.clear();
     engine = new StoryBeatEngine();
   });
 
-  it('records the current beat and mirrors its ambient config', () => {
+  it('records the current beat and pushes its ambient config through the singleton', () => {
     const beat = makeBeat('first');
     engine.applyBeat(beat);
 
     expect(engine.currentBeat?.id).toBe('first');
-    expect(engine.activeAmbient).toEqual(beat.ambient);
+    expect(ambient.atmosphere).toHaveLength(1);
+    expect(ambient.atmosphere[0]).toMatchObject({
+      variant: 'fog',
+      intensity: 'medium',
+    });
   });
 
-  it('swaps activeAmbient atomically on each subsequent beat', () => {
+  it('releases prior handles atomically on each subsequent beat', () => {
     engine.applyBeat(
       makeBeat('a', {
         ambient: { atmosphere: [{ layer: 'rain', intensity: 'high' }] },
       }),
     );
-    expect(engine.activeAmbient.atmosphere?.[0]).toEqual({
-      layer: 'rain',
+    expect(ambient.atmosphere).toHaveLength(1);
+    expect(ambient.atmosphere[0]).toMatchObject({
+      variant: 'rain',
       intensity: 'high',
     });
 
@@ -56,9 +63,10 @@ describe('StoryBeatEngine — applyBeat', () => {
         ambient: { psychology: [{ layer: 'tension', intensity: 'low' }] },
       }),
     );
-    expect(engine.activeAmbient.atmosphere).toBeUndefined();
-    expect(engine.activeAmbient.psychology?.[0]).toEqual({
-      layer: 'tension',
+    expect(ambient.atmosphere).toHaveLength(0);
+    expect(ambient.psychology).toHaveLength(1);
+    expect(ambient.psychology[0]).toMatchObject({
+      variant: 'tension',
       intensity: 'low',
     });
   });
@@ -69,6 +77,7 @@ describe('StoryBeatEngine — releaseAmbient', () => {
 
   beforeEach(() => {
     quietConsole();
+    ambient.clear();
     engine = new StoryBeatEngine();
   });
 
@@ -78,7 +87,9 @@ describe('StoryBeatEngine — releaseAmbient', () => {
     engine.releaseAmbient();
 
     expect(engine.currentBeat?.id).toBe('idle');
-    expect(engine.activeAmbient).toEqual({});
+    expect(ambient.atmosphere).toHaveLength(0);
+    expect(ambient.psychology).toHaveLength(0);
+    expect(ambient.environment).toHaveLength(0);
   });
 });
 
@@ -87,15 +98,18 @@ describe('StoryBeatEngine — release', () => {
 
   beforeEach(() => {
     quietConsole();
+    ambient.clear();
     engine = new StoryBeatEngine();
   });
 
-  it('resets both currentBeat and activeAmbient', () => {
+  it('resets both currentBeat and the ambient singleton', () => {
     engine.applyBeat(makeBeat('a'));
     engine.release();
 
     expect(engine.currentBeat).toBeNull();
-    expect(engine.activeAmbient).toEqual({});
+    expect(ambient.atmosphere).toHaveLength(0);
+    expect(ambient.psychology).toHaveLength(0);
+    expect(ambient.environment).toHaveLength(0);
   });
 
   it('is safe to call on an empty engine', () => {
@@ -109,7 +123,7 @@ describe('StoryBeatEngine — release', () => {
     engine.applyBeat(makeBeat('b'));
 
     expect(engine.currentBeat?.id).toBe('b');
-    expect(engine.activeAmbient.atmosphere?.[0].layer).toBe('fog');
+    expect(ambient.atmosphere[0]).toMatchObject({ variant: 'fog' });
   });
 });
 
@@ -117,11 +131,12 @@ describe('StoryBeatEngine — default export', () => {
   beforeEach(() => {
     quietConsole();
     storyBeatEngine.release();
+    ambient.clear();
   });
 
   it('the default singleton is a StoryBeatEngine with empty state', () => {
     expect(storyBeatEngine).toBeInstanceOf(StoryBeatEngine);
     expect(storyBeatEngine.currentBeat).toBeNull();
-    expect(storyBeatEngine.activeAmbient).toEqual({});
+    expect(ambient.atmosphere).toHaveLength(0);
   });
 });
