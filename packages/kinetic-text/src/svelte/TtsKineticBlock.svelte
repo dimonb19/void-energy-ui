@@ -87,6 +87,14 @@
      * reveal stagger and the fallback `atWord` resolution for cues/actions.
      */
     speedPreset?: KineticSpeedPreset;
+    /**
+     * Shift the reveal ahead of narration by this many source characters.
+     * Each char inherits the time of the char `leadChars` later, giving the
+     * eye a small reading runway so the reveal doesn't feel like it's
+     * catching up to the audio. Default 4 — noticeable lead without running
+     * ahead of the spoken word. Set to 0 for strict character-level sync.
+     */
+    leadChars?: number;
     reducedMotion?: ReducedMotionMode;
     seed?: number;
     loading?: boolean;
@@ -131,6 +139,7 @@
     revealStyle,
     activeEffect = null,
     speedPreset = 'default',
+    leadChars = 4,
     reducedMotion = 'auto',
     seed,
     loading = false,
@@ -243,7 +252,7 @@
   // and KineticText falls back to its computed stagger from speedPreset.
   const revealMarks = $derived<RevealMark[] | undefined>(
     effectiveTimestamps && effectiveTimestamps.length > 0
-      ? wordTimesToRevealMarks(text, effectiveTimestamps)
+      ? wordTimesToRevealMarks(text, effectiveTimestamps, leadChars)
       : undefined,
   );
 
@@ -274,8 +283,11 @@
   // ── Stagger-only fallback (no audio): wall-clock action dispatch ────
   // When there's no audio to ride, actions fire on setTimeout at estimated
   // atMs. Rate/pause/seek semantics don't apply — there's nothing to ride.
+  // Gated on `loading`: a consumer pre-mounting the block with null audio
+  // while a TTS synth request is in flight must not see bursts fire during
+  // the wait (the reveal hasn't started yet — neither should its side effects).
   $effect(() => {
-    if (audioEl) return;
+    if (audioEl || loading) return;
     const scheduled = resolveActionTimes(actions, wordStarts);
     if (scheduled.length === 0 || !onaction) return;
     const timers: number[] = [];

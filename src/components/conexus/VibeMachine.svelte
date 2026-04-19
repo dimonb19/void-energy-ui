@@ -347,6 +347,20 @@
       extras.actions,
     );
 
+    // Mount the block now with no audio yet. TtsKineticBlock measures `beat.text`
+    // and shows a correctly-sized skeleton while TTS synth is in flight.
+    // Audio/timestamps get patched in when synthesis resolves; blockKey is keyed
+    // on beat.id + replayCounter so this prop update never remounts — the
+    // skeleton crossfades straight into the reveal.
+    playbackData = {
+      beat,
+      audio: null,
+      wordTimestamps: undefined,
+      cues,
+      actions,
+      extras,
+    };
+
     if (shouldNarrate) {
       loadingToast.update('Synthesizing voice…');
       try {
@@ -376,26 +390,11 @@
         const message =
           e instanceof Error ? e.message : 'TTS synthesis failed.';
         loadingToast.error(message);
-        // Fall through to non-narrated playback so the user still sees the vibe.
-        playbackData = {
-          beat,
-          audio: null,
-          wordTimestamps: undefined,
-          cues,
-          actions,
-          extras,
-        };
+        // Fall through to non-narrated playback — playbackData already holds
+        // the null-audio shape, so just flip status and KT starts the stagger reveal.
         status = 'playing';
       }
     } else {
-      playbackData = {
-        beat,
-        audio: null,
-        wordTimestamps: undefined,
-        cues,
-        actions,
-        extras,
-      };
       status = 'playing';
       loadingToast.success(`"${beat.title}" is playing.`);
     }
@@ -760,5 +759,99 @@
         </div>
       {/if}
     </div>
+
+    <details>
+      <summary>How the sync works</summary>
+      <div class="p-md flex flex-col gap-lg">
+        <div class="flex flex-col gap-xs">
+          <p class="text-caption text-mute uppercase">Clock</p>
+          <p class="text-small text-dim">
+            When <code>audio</code> is present it's the
+            <span class="text-main">master clock</span>. Per-word timestamps
+            spread linearly across each word's glyphs so characters reveal in
+            lock-step with the voice; ambient actions ride the same clock.
+            Reveal and actions follow <code>play</code>, <code>pause</code>,
+            <code>seeked</code>, <code>ratechange</code>, and auto-nudge on
+            drift &gt; 250 ms. No audio → reveal runs on
+            <code>speedPreset</code>.
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-xs">
+          <p class="text-caption text-mute uppercase">Three effect layers</p>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Layer</th>
+                  <th>What it does</th>
+                  <th>Driven by</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Reveal</td>
+                  <td>
+                    Per-glyph entrance (<code>pop</code>, <code>drop</code>,
+                    <code>scramble</code>)
+                  </td>
+                  <td><code>revealStyle</code> + reveal marks</td>
+                </tr>
+                <tr>
+                  <td>Continuous</td>
+                  <td>
+                    Sustained loop (<code>pulse</code>, <code>drift</code>,
+                    <code>breathe</code>)
+                  </td>
+                  <td><code>activeEffect</code></td>
+                </tr>
+                <tr>
+                  <td>One-shot</td>
+                  <td>
+                    Punctuating hits (<code>shake</code>, <code>flash</code>,
+                    <code>surge</code>) at word positions
+                  </td>
+                  <td><code>cues: TimedCue[]</code></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="text-caption text-mute">
+            All three compose — swapping one never interrupts the others.
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-xs">
+          <p class="text-caption text-mute uppercase">Fallbacks</p>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Situation</th>
+                  <th>Behavior</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Audio + word timestamps</td>
+                  <td>Character-accurate sync (ideal path)</td>
+                </tr>
+                <tr>
+                  <td>Audio, no timestamps</td>
+                  <td>Distribute words evenly across clip duration</td>
+                </tr>
+                <tr>
+                  <td>No audio</td>
+                  <td>
+                    Stagger reveal on <code>speedPreset</code>; actions fire on
+                    <code>setTimeout</code>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </details>
   </div>
 </section>

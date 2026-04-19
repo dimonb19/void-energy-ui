@@ -2,6 +2,8 @@
 
 Void Energy's design system brain as a **framework-agnostic Tailwind CSS v4 preset**. Four built-in atmospheres, three physics presets, two color modes, three density levels — plus a consumer config layer that lets you replace VE's themes with your own and ship them as first-class defaults. Works with any framework. Zero runtime unless you want it.
 
+**See it live:** [void.dgrslabs.ink](https://void.dgrslabs.ink) — every atmosphere, physics preset, and density level, switchable in the browser.
+
 > **Status:** Phase 1 complete (Sessions 1–9). Not yet published to npm.
 
 ---
@@ -12,9 +14,25 @@ Void Energy's design system brain as a **framework-agnostic Tailwind CSS v4 pres
 npm install @void-energy/tailwind tailwindcss@^4
 ```
 
+---
+
+## Three ways to adopt
+
+Import `theme.css` once, then pick (or mix) how components get styled. All three are pure CSS imports — no runtime, no wrappers, no build step.
+
+| Path | Add to your CSS | Use when |
+|---|---|---|
+| **Tokens only** | just `theme.css` | You're bringing your own components or writing bare HTML with Tailwind utilities. Every `bg-surface`, `p-lg`, `rounded`, `font-heading` resolves to semantic VE tokens. |
+| **Components bundle** | `+ components.css` (~18 KB gzip) | You want zero-config styled native HTML: `<button class="btn">`, styled `<input>`, styled `<dialog>`, toasts, tabs, dropdowns — without installing a component library. |
+| **Ecosystem bridge** | `+ bridges/shadcn.css` (or `radix-themes.css` / `mantine.css`) | You're already using shadcn/ui, Radix Themes, or Mantine. The bridge aliases the library's CSS variables onto VE tokens — every component repaints on `setAtmosphere()` with no code changes. |
+
+You can combine them — e.g. `components.css` for native HTML plus a shadcn bridge for composite components. See [INTEGRATIONS.md](./INTEGRATIONS.md) for ecosystem bridges and the components bundle, and the two setup paths below for bootstrapping the preset.
+
+---
+
 ## Recommended setup — full path (config file + Vite plugin)
 
-Five files, under two minutes to a working branded app with your own atmospheres and fonts rendered as permanent defaults.
+Five files to a working branded app with your own atmospheres and fonts rendered as permanent defaults.
 
 **1. `void.config.ts`** (project root) — declare your atmospheres and fonts:
 
@@ -61,9 +79,9 @@ import manifest from 'virtual:void-energy/manifest.json';
 init({ manifest });
 ```
 
-**5. FOUC script** in `<head>` — see Step 2 below.
+**5. FOUC script** in `<head>` — inline the bootloader so atmosphere/physics attributes pin before first paint. The verbatim script lives in the **Minimal setup** section below, or import `FOUC_SCRIPT` from `@void-energy/tailwind/head` and inject it via your framework (see [INTEGRATIONS.md](./INTEGRATIONS.md)).
 
-Your theme picker now renders built-ins plus your config atmospheres as permanent cards (no X button). Only `registerAtmosphere()`-registered themes are end-user-removable. See [CONFIG.md](./CONFIG.md) for the schema reference and [INTEGRATIONS.md](./INTEGRATIONS.md) for Next.js (CLI `--watch`) and Astro recipes.
+Your theme picker now renders built-ins plus your config atmospheres as permanent cards (no X button). Only `registerAtmosphere()`-registered themes are end-user-removable. See [CONFIG.md](./CONFIG.md) for the schema reference and [INTEGRATIONS.md](./INTEGRATIONS.md) for per-framework recipes (Vite, Next.js CLI `--watch`, Nuxt, Astro, SvelteKit).
 
 Not using Vite? Use the CLI:
 
@@ -87,7 +105,7 @@ If you just want VE's four built-in atmospheres without any customization:
 @import '@void-energy/tailwind/theme.css';
 ```
 
-**2. Inject the FOUC script.** In your HTML `<head>`, **before any stylesheet link**, inline the bootloader so atmosphere/physics attributes are pinned before first paint:
+**2. Inject the FOUC script.** (FOUC = Flash of Unstyled Content.) In your HTML `<head>`, **before any stylesheet link**, inline the bootloader so atmosphere/physics attributes are pinned before first paint:
 
 ```html
 <script>
@@ -132,7 +150,7 @@ setDensity('comfortable');   // 0.75 | 1 | 1.25 spacing multiplier
 |---|---|
 | **4 atmospheres** | `slate`, `terminal`, `meridian`, `frost` — see [ATMOSPHERES.md](./ATMOSPHERES.md) |
 | **3 physics presets** | `glass` (atmospheric blur + lift), `flat` (modern minimal), `retro` (hard edges, no motion) |
-| **2 color modes** | `dark`, `light` (glass + retro force dark; flat supports both) |
+| **2 color modes** | `dark`, `light` (glass + retro force dark; flat supports both). Of the four built-ins, **only `meridian` ships in light mode** — the others are dark-first because their physics demands it. |
 | **3 density levels** | `compact` (0.75×), `default` (1×), `comfortable` (1.25×) |
 | **Semantic tokens** | `--bg-canvas`, `--energy-primary`, `--color-premium`, `--control-height`, … — see [TOKENS.md](./TOKENS.md) |
 | **Tailwind utilities** | `bg-surface`, `p-lg`, `rounded`, `border`, `min-h-control`, `font-heading`, … |
@@ -165,6 +183,22 @@ This also means atmosphere switching works with SSR, static sites, and server-re
 The preset. Import **after** `tailwindcss`. Pulls in `tokens.css`, the default atmosphere (`frost`), the default physics (`glass`), and `density.css`, then registers `@theme` bindings so Tailwind utilities resolve to VE tokens.
 
 Also ships `@void-energy/tailwind/theme-no-container.css` — identical but with the `.container` override stripped, for apps that want to define their own container rules.
+
+### `@void-energy/tailwind/components.css`
+
+Optional precompiled component styles (~18 KB gzipped). Import after `theme.css` to style native HTML elements — `<button class="btn">`, `<input>`, `<dialog>`, toasts, dropdowns, chips, badges, pagination, tabs, and ~70 other classes — with VE physics already applied. Pure CSS, no JS. Generated from L1's `src/styles/components/**` sources; shipped with L0 for convenience.
+
+Consumers using an ecosystem bridge (shadcn, Radix, Mantine) typically don't need this — the bridge already styles the library's components. See [Components bundle](./INTEGRATIONS.md#components-bundle-optional) for the full list.
+
+### `@void-energy/tailwind/bridges/*`
+
+Pre-built ecosystem bridges — pure CSS alias layers that map a third-party library's CSS variables onto VE tokens. No runtime, no wrappers. Three ship today:
+
+- `@void-energy/tailwind/bridges/shadcn.css` — shadcn/ui
+- `@void-energy/tailwind/bridges/radix-themes.css` — Radix Themes
+- `@void-energy/tailwind/bridges/mantine.css` — Mantine
+
+Import after `theme.css` and every component in the target library repaints on atmosphere change. See [Ecosystem bridges](./INTEGRATIONS.md#ecosystem-bridges) for per-library recipes and edge cases.
 
 ### `@void-energy/tailwind/runtime`
 
@@ -290,7 +324,7 @@ You will need to re-author the `@theme` bridge yourself if you skip `theme.css`.
 - [**CONFIG.md**](./CONFIG.md) — Consumer Config Layer: replace built-in atmospheres, ship custom fonts, provenance tiers
 - [**ATMOSPHERES.md**](./ATMOSPHERES.md) — the four built-in atmospheres with palettes
 - [**TOKENS.md**](./TOKENS.md) — every CSS variable, what it does, where it's overridden
-- [**INTEGRATIONS.md**](./INTEGRATIONS.md) — framework recipes (Vite, Next.js, Nuxt, Astro, SvelteKit, plain HTML) + shadcn bridge
+- [**INTEGRATIONS.md**](./INTEGRATIONS.md) — framework recipes (Vite, Next.js, Nuxt, Astro, SvelteKit, plain HTML), ecosystem bridges (shadcn, Radix Themes, Mantine), and the components bundle
 - [**MIGRATION.md**](./MIGRATION.md) — converting existing Tailwind codebases to VE tokens
 
 ---

@@ -64,9 +64,38 @@ init({ manifest });
 
 ## Astro
 
-Astro runs on Vite under the hood; the plugin drops in cleanly.
+Astro runs on Vite under the hood, so both setup shapes drop in cleanly.
 
-`astro.config.mjs`:
+### Minimal — just the built-in atmospheres
+
+`src/layouts/BaseLayout.astro`:
+
+```astro
+---
+import { FOUC_SCRIPT } from '@void-energy/tailwind/head';
+import '../styles/globals.css';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <script is:inline set:html={FOUC_SCRIPT}></script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+```
+
+`src/styles/globals.css`:
+
+```css
+@import 'tailwindcss';
+@import '@void-energy/tailwind/theme.css';
+```
+
+### With the Consumer Config Layer — replace built-ins, ship your own fonts
+
+Add the Vite plugin in `astro.config.mjs`:
 
 ```ts
 import { defineConfig } from 'astro/config';
@@ -77,21 +106,23 @@ export default defineConfig({
 });
 ```
 
-FOUC script — inline inside your base layout before any stylesheet:
+Add the generated virtual module to `globals.css`:
 
-```astro
----
-import { FOUC_SCRIPT } from '@void-energy/tailwind/head';
----
-<!doctype html>
-<html>
-  <head>
-    <script is:inline set:html={FOUC_SCRIPT}></script>
-    <link rel="stylesheet" href="/src/app.css" />
-  </head>
-  <body><slot /></body>
-</html>
+```css
+@import 'tailwindcss';
+@import '@void-energy/tailwind/theme.css';
+@import 'virtual:void-energy/generated.css';
 ```
+
+Wire the manifest into the runtime from a client script (e.g. `src/boot.ts`, included via `<script>` in your layout):
+
+```ts
+import { init } from '@void-energy/tailwind/runtime';
+import manifest from 'virtual:void-energy/manifest.json';
+init({ manifest });
+```
+
+See [CONFIG.md](./CONFIG.md) for the `void.config.ts` schema.
 
 ---
 
@@ -131,7 +162,7 @@ import './globals.css';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <script
           id="ve-fouc"
@@ -163,6 +194,10 @@ export function ClientBoot({ manifest }: { manifest: unknown }) {
 ```
 
 > **Turbopack note:** The `void.generated.css` + `void.manifest.json` files ship as physical disk I/O from the CLI. HMR works by Turbopack picking up the file writes — the reload cost is a single dev-server refresh per config edit.
+
+> **`suppressHydrationWarning` is load-bearing.** The FOUC script writes `data-*` attributes on `<html>` before React hydrates. Without the prop, React flags the attribute mismatch. This only needs to be set on the root `<html>` element, not anywhere else.
+
+> **Runtime imports are client-only.** Import `setAtmosphere`, `setPhysics`, etc. from inside `'use client'` components. The runtime is SSR-safe (no-ops in Node), so importing from a server component is harmless but useless.
 
 ---
 
@@ -273,25 +308,13 @@ export function App() {
 }
 ```
 
-### Runtime usage in Next.js
-
-Only from client components (`'use client'`):
-
-```tsx
-'use client';
-import { setAtmosphere } from '@void-energy/tailwind/runtime';
-```
-
-The runtime is SSR-safe (no-ops in Node) so importing from a server component is harmless, but there's nothing for it to do there. The `suppressHydrationWarning` on `<html>` in the layout above is load-bearing: the FOUC script writes `data-*` attributes before React hydrates, and React would otherwise complain about the mismatch.
-
 ---
 
 ## Nuxt 3 / 4
 
-### `app.vue` or `nuxt.config.ts`
+### `nuxt.config.ts` — inject the FOUC script
 
 ```ts
-// nuxt.config.ts
 import { FOUC_SCRIPT } from '@void-energy/tailwind/head';
 
 export default defineNuxtConfig({
@@ -311,32 +334,37 @@ export default defineNuxtConfig({
 @import '@void-energy/tailwind/theme.css';
 ```
 
----
+### Runtime — initialize on client
 
-## Astro
+Create a client-only plugin so the runtime only boots in the browser:
 
-```astro
----
-// src/layouts/BaseLayout.astro
-import { FOUC_SCRIPT } from '@void-energy/tailwind/head';
-import '../styles/globals.css';
----
-<!doctype html>
-<html lang="en">
-  <head>
-    <script is:inline set:html={FOUC_SCRIPT}></script>
-  </head>
-  <body>
-    <slot />
-  </body>
-</html>
+```ts
+// plugins/void-energy.client.ts
+import { init } from '@void-energy/tailwind/runtime';
+
+export default defineNuxtPlugin(() => {
+  init();
+});
 ```
 
-`src/styles/globals.css`:
+Switching atmospheres works anywhere on the client — e.g. in a composable:
 
-```css
-@import 'tailwindcss';
-@import '@void-energy/tailwind/theme.css';
+```ts
+// composables/useAtmosphere.ts
+import { setAtmosphere } from '@void-energy/tailwind/runtime';
+
+export const useAtmosphere = () => ({ setAtmosphere });
+```
+
+If you use the Consumer Config Layer, import the manifest and pass it to `init()`:
+
+```ts
+import { init } from '@void-energy/tailwind/runtime';
+import manifest from '~/styles/void.manifest.json';
+
+export default defineNuxtPlugin(() => {
+  init({ manifest });
+});
 ```
 
 ---

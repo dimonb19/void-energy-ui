@@ -39,11 +39,22 @@ function indexOfIgnoreCase(
  * — punctuation stripped, contractions split) are silently skipped;
  * interpolation in `marksToDelays` fills their gaps.
  *
+ * `leadChars` shifts the reveal ahead of the audio: every timeMs is
+ * pulled backward by `leadChars × average-char-duration` and floored at
+ * 0. At audio time T, the reveal shows ~`leadChars` more chars than
+ * strict sync would — giving the eye a small reading runway so the text
+ * doesn't feel like it's "catching up" to narration. Because we floor
+ * at 0, any silent intro (first word at t=300ms) becomes a head-start:
+ * the leading chars reveal during that silence instead of waiting for
+ * the first spoken word. Reveal therefore finishes `~leadChars` worth
+ * of time before the audio ends.
+ *
  * Pure — deterministic for identical input.
  */
 export function wordTimesToRevealMarks(
   text: string,
   wordTimestamps: WordTimestamp[],
+  leadChars = 0,
 ): RevealMark[] {
   if (text.length === 0 || wordTimestamps.length === 0) return [];
 
@@ -84,6 +95,18 @@ export function wordTimesToRevealMarks(
   // Trailing characters after the last word (punctuation, final newline)
   for (let i = searchFrom; i < text.length; i++) {
     marks.push({ index: i, timeMs: lastEndMs });
+  }
+
+  if (leadChars > 0 && marks.length > 1) {
+    const first = marks[0].timeMs;
+    const last = marks[marks.length - 1].timeMs;
+    const avgCharMs = (last - first) / (marks.length - 1);
+    if (avgCharMs > 0) {
+      const leadMs = avgCharMs * leadChars;
+      for (let i = 0; i < marks.length; i++) {
+        marks[i].timeMs = Math.max(0, marks[i].timeMs - leadMs);
+      }
+    }
   }
 
   return marks;

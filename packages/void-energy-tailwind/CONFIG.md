@@ -293,7 +293,7 @@ For the flagship scenario above, the generator produces two files (default `outD
 }
 ```
 
-Note that `frost`, `slate`, `terminal`, `meridian` are absent from `atmospheres` — MODE A omits them. Their CSS still loads but is invisible to the runtime.
+Note that `frost`, `slate`, `terminal`, `meridian` are absent from `atmospheres` — this is **Replace mode** (see [The three replacement modes](#the-three-replacement-modes) above). Their CSS still loads but is invisible to the runtime.
 
 ---
 
