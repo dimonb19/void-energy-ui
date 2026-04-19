@@ -349,7 +349,8 @@ button:not(.btn-void, .btn-icon, .tabs-trigger),
     }
   }
 
-  &:disabled {
+  &:disabled,
+  &[aria-disabled='true'] {
     background: alpha(var(--text-mute), 0.1);
     border-color: alpha(var(--text-mute), 0.25);
     color: var(--text-mute);

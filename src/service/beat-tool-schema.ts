@@ -95,9 +95,9 @@ export const STORY_BEAT_TOOL_INPUT_SCHEMA = {
         actions: {
           type: 'array',
           description:
-            'TWO to FOUR ambient action bursts, spread across the text. Each tied to a sensory or dramatic word.',
+            'TWO or THREE ambient action bursts, spread across the text. Each tied to a sensory or dramatic word. Prefer pairing the peak with a kinetic oneShot at the SAME atWord — overlapping reads as one bigger landed moment.',
           minItems: 2,
-          maxItems: 4,
+          maxItems: 3,
           items: {
             type: 'object',
             additionalProperties: false,
@@ -126,9 +126,9 @@ export const STORY_BEAT_TOOL_INPUT_SCHEMA = {
         oneShots: {
           type: 'array',
           description:
-            'TWO to FOUR one-shot kinetic effects, spread across the text. Each effect should dramatize the meaning of its word.',
+            'TWO or THREE one-shot kinetic effects, spread across the text. Each effect must dramatize the meaning of its anchor word (shatter on "glass", freeze on "still"). Prefer pairing the peak with an ambient action at the SAME atWord — overlapping reads as one bigger landed moment.',
           minItems: 2,
-          maxItems: 4,
+          maxItems: 3,
           items: {
             type: 'object',
             additionalProperties: false,

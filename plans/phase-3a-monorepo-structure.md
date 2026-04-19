@@ -1,12 +1,12 @@
-# Phase 4a — Public Monorepo Structure
+# Phase 3a — Public Monorepo Structure
 
 > Restructure Void Energy into its production home: a public monorepo following Pattern A, producing two npm packages, housing the showcase site, and providing the starter template.
 
-**Status:** Planning — blocked on Phase 3 (L2 AI Automation) completion
-**Priority:** Phase 4 (after L0 preset, TTS sync, and L2 AI automation ship)
-**Depends on:** Phase 1 (L0 Tailwind Preset), Phase 2 (TTS + KT Sync), Phase 3 (AI Automation Foundation)
-**Blocks:** Phase 6 (CoNexus migration)
-**Related:** [phase-4b-premium-packages.md](phase-4b-premium-packages.md), [phase-3-ai-automation.md](phase-3-ai-automation.md)
+**Status:** Planning — blocked on Phase 1 (L2 AI Automation) and Phase 2 (Mobile Deployment) completion
+**Priority:** Phase 3 (after mobile capability is proven in the current repo)
+**Depends on:** L0 Tailwind preset (shipped), TTS + KT sync (shipped), Phase 1 (AI Automation Foundation), Phase 2 (Mobile Deployment — provides the mobile-ready state that `apps/starter-template` is cloned from)
+**Blocks:** Phase 4 (CoNexus migration)
+**Related:** [phase-3b-premium-packages.md](phase-3b-premium-packages.md), [phase-1-ai-automation.md](phase-1-ai-automation.md), [phase-2-mobile-deployment.md](phase-2-mobile-deployment.md)
 
 ---
 
@@ -23,7 +23,7 @@ Transform the current two-repo situation (`void-energy-ui` monorepo + standalone
 - Deploys `apps/showcase` to Vercel
 - Retires the standalone `void-energy-starter` repo on Desktop
 
-After Phase 4a, there is **one public repo** and **two npm packages**, with the showcase and starter template both living inside the monorepo and always running against the local working copy of the library.
+After Phase 3a, there is **one public repo** and **two npm packages**, with the showcase and starter template both living inside the monorepo and always running against the local working copy of the library.
 
 ---
 
@@ -220,7 +220,7 @@ A **tiny CLI package** (~50–100 lines) whose only job is to copy `apps/starter
 - Zero GitHub workflows (see [decisions.md §D13](decisions.md#d13--no-cicd-workflows-in-the-starter-template))
 - No pre-built showcase pages, no component demos — this is the blank canvas
 
-**Why this matters for AI automation:** when a user runs `npm create void-energy@latest my-app` and opens it in Claude Code, the AI immediately reads the template's `CLAUDE.md` and starts composing pages using the installed `void-energy` package. The template is optimized for AI-driven app construction on a blank canvas. See [phase-3-ai-automation.md](phase-3-ai-automation.md).
+**Why this matters for AI automation:** when a user runs `npm create void-energy@latest my-app` and opens it in Claude Code, the AI immediately reads the template's `CLAUDE.md` and starts composing pages using the installed `void-energy` package. The template is optimized for AI-driven app construction on a blank canvas. See [phase-1-ai-automation.md](phase-1-ai-automation.md).
 
 **Dev mode:** the starter template runs as a regular workspace (`npm run dev` from `apps/starter-template/`), using `workspace:*` to link the library. This lets us dev-test the template alongside the library.
 
@@ -380,9 +380,10 @@ The migration path:
 
 ---
 
-## Out of scope for Phase 4a
+## Out of scope for Phase 3a
 
-- **CoNexus migration** — that's Phase 6. Do not touch CoNexus code during Phase 4.
-- **Premium package development** — the premium repo and its packages are covered in [phase-4b-premium-packages.md](phase-4b-premium-packages.md). They are a parallel workstream.
-- **New features in the library** — Phase 4a is pure plumbing. No new components, no new physics, no new actions. If something feels missing, note it and defer.
+- **CoNexus migration** — that's Phase 4. Do not touch CoNexus code during Phase 3.
+- **Premium package development** — the premium repo and its packages are covered in [phase-3b-premium-packages.md](phase-3b-premium-packages.md). They are a parallel workstream.
+- **Mobile capability work** — Capacitor integration, safe-area audit, cloud build pipeline were all done in Phase 2. Phase 3a only extracts and relocates that work into the monorepo layout.
+- **New features in the library** — Phase 3a is pure plumbing. No new components, no new physics, no new actions. If something feels missing, note it and defer.
 - **Docs site beyond the current showcase** — the current `/components` and `/themes` pages are enough. A dedicated docs site can come later.

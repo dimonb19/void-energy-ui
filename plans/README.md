@@ -1,7 +1,7 @@
 # Void Energy — Plans
 
 > The complete launch and architecture plan for Void Energy, organized by priority.
-> Last updated: 2026-04-12 (Phase 0 + 0a + 0b complete; TTS sync moved to Phase 2, right after L0)
+> Last updated: 2026-04-19 (mobile deployment pulled ahead of monorepo; i18n moved to `future/`; phases now four in order)
 
 ---
 
@@ -38,67 +38,69 @@ The UI/UX premium feel is our only differentiator right now — no userbase, no 
 
 ---
 
+## Completed Foundation
+
+The following work has already shipped and is no longer tracked as a numbered phase. It is the substrate every remaining phase builds on.
+
+- **Tailwind CSS v4 migration** — existing codebase migrated from Tailwind v3.4 to v4 with a `@theme`-based CSS config. Follow-up patched the v4 footguns (`@theme inline` vs `@theme reference`, namespace strategy). Canonical reference: [src/styles/tailwind-theme.css](../src/styles/tailwind-theme.css).
+- **Design language modernization** — visual language aligned with 2025-2026 best practices (MD3, shadcn/ui, Linear, Radix). Sentence-case buttons, 8px flat radius, tint-only flat hover, refined active press and glass glow.
+- **L0: framework-agnostic Tailwind preset** — `@void-energy/tailwind` extracted as a Tailwind CSS v4 preset with atmosphere switching, physics presets, density scaling, semantic tokens, and a vanilla JS runtime. Works with any framework.
+- **TTS + Kinetic Text synchronization** — `revealMarks` prop on `<KineticText>` for externally-timed reveal, provider-agnostic TTS adapters (ElevenLabs, OpenAI, Azure, Google, Deepgram), audio-KT synchronizer, and inline effect cue resolver, shipped as a `@dgrslabs/void-energy-kinetic-text/tts` sub-export.
+
+---
+
 ## Phases (in order)
 
-Work is organized into six phases. **Each phase ships before the next begins.** No split focus.
+Work is organized into four remaining phases. **Each phase ships before the next begins.** No split focus.
 
-### Phase 0 — Tailwind CSS v4 Migration ✓ COMPLETE
-The existing codebase migrated from Tailwind v3.4 to v4 with a `@theme`-based CSS config. Phase 0a follow-up patched the v4 footguns surfaced after the swap. Both phases are landed; the canonical reference for v4 namespace strategy and footgun fixes lives in [src/styles/tailwind-theme.css](../src/styles/tailwind-theme.css).
-
-### Phase 0b — Design Language Modernization ✓ COMPLETE
-Updated the visual language to align with 2025-2026 best practices (MD3, shadcn/ui, Linear, Radix). Key changes: sentence-case buttons, 8px flat radius, tint-only flat hover, refined active press and glass glow. Must land before Phase 1 so L0 ships with modern defaults.
-
-### Phase 1 — L0: Framework-Agnostic Tailwind Preset
-**Why first remaining:** This is the adoption unlock. VE is currently Svelte-only (~3% of frontend devs). Extracting the design system brain as a Tailwind v4 preset makes every Tailwind user a potential VE user. Low effort (the token system already exists), high reach (millions of Tailwind users across every framework).
-
-**Deliverable:** `@void-energy/tailwind` — a Tailwind CSS v4 preset with atmosphere switching, physics presets, density scaling, semantic tokens, and a tiny vanilla JS runtime. Works with any framework.
-
-**Plan:** [phase-1-l0-tailwind-preset.md](phase-1-l0-tailwind-preset.md)
-
-### Phase 2 — TTS + Kinetic Text Synchronization
-**Why second:** KT needs timeline-driven reveal before CoNexus can build its narrative reading experience. The KT package already exists at `packages/kinetic-text/` with a working RevealTimeline engine — everything the TTS sync needs to hook into is in place. No monorepo restructure required.
-
-**Deliverable:** `revealMarks` prop on `<KineticText>` for externally-timed reveal, an InWorld TTS adapter, audio-KT synchronizer, and inline effect cue resolver — all shipped as a `@dgrslabs/void-energy-kinetic-text/tts` sub-export.
-
-**Plan:** [phase-2-tts-kinetic-sync.md](phase-2-tts-kinetic-sync.md)
-
-### Phase 3 — L2: AI Automation Foundation
-**Why third:** AI automation is the primary differentiator of how Void Energy is consumed. The demo that sells VE isn't "look at our components" — it's "I told Claude to build a settings page and it came out perfect." Landing the foundation in the current monorepo first means Phase 4 inherits a working system and only has to redistribute it across workspaces.
+### Phase 1 — L2: AI Automation Foundation
+**Why first:** AI automation is the primary differentiator of how Void Energy is consumed. The demo that sells VE isn't "look at our components" — it's "I told Claude to build a settings page and it came out perfect." Landing the foundation in the current monorepo first means every phase that follows inherits a working system instead of inventing rules and restructuring simultaneously.
 
 **Deliverable:** Layered `CLAUDE.md` + `.claude/` system inside the current monorepo with strict per-directory rules, a complete enforced `component-registry.json`, package-level CLAUDE.md for every workspace package (including L0), and AI-readable catalogs.
 
-**Plan:** [phase-3-ai-automation.md](phase-3-ai-automation.md)
+**Plan:** [phase-1-ai-automation.md](phase-1-ai-automation.md)
 
-### Phase 4 — Core Repo Restructure + Premium Packages
-**Why fourth:** Once the system has its adoption layer (Phase 1), KT's TTS capability (Phase 2), and AI foundation (Phase 3), we restructure everything into its production home: a public monorepo for the core library + L0, a private monorepo for premium packages, and the npm distribution that ties them together.
+### Phase 2 — Mobile Deployment (Capacitor)
+**Why second (before the monorepo):** Mobile surfaces load-bearing constraints — the shape of a `capacitor.ts` helper in `void-energy`, which safe-area utilities belong in `@void-energy/tailwind`, and the default mobile physics preset after glass perf testing — that the Phase 3 monorepo needs to bake into package boundaries. Proving these in the current flat repo first means Phase 3 only relocates working files, and the first shippable Void Energy mobile app (the DGRS app or an early CoNexus build) lands months sooner.
+
+**Deliverable:** Mobile capability wired directly into the current `void-energy-ui` repo — Capacitor integrated, safe areas audited, status bar sync, haptics wrapper, glass perf decision made, cloud build pipeline proven end-to-end with the first shipped app. Phase 3 will extract the template layer from this proven setup.
+
+**Plan:** [phase-2-mobile-deployment.md](phase-2-mobile-deployment.md)
+
+### Phase 3 — Core Repo Restructure + Premium Packages
+**Why third:** Once the system has both its AI foundation (Phase 1) and proven mobile capability (Phase 2), we restructure everything into its production home: a public monorepo for the core library + L0, a private monorepo for premium packages, and the npm distribution that ties them together. The mobile work from Phase 2 gets extracted into `apps/starter-template/` and a `capacitor.ts` subpath export on `void-energy`.
 
 **Deliverables:**
 - Public `dgrslabs/void-energy` monorepo (Pattern A: `packages/` + `apps/`)
-- `void-energy` npm package (L1 — Svelte components)
-- `@void-energy/tailwind` npm package (L0 — Tailwind preset)
+- `void-energy` npm package (L1 — Svelte components; includes `capacitor.ts` helper)
+- `@void-energy/tailwind` npm package (L0 — Tailwind preset; includes mobile-ready safe-area utilities)
 - `create-void-energy` npm package (scaffolder)
 - `apps/showcase` deployed to `void.dgrslabs.ink`
-- `apps/starter-template` as the self-contained fork/scaffold target
+- `apps/starter-template` as the self-contained, mobile-ready fork/scaffold target
 - Private `dgrslabs/void-energy-premium` monorepo with 4 packages: Kinetic Text, DGRS, Ambient, Rive
-- AI automation foundation from Phase 3 redistributed across the new workspace layout
+- AI automation foundation from Phase 1 and mobile integration from Phase 2 redistributed across the new workspace layout
 
 **Plans:**
-- [phase-4a-monorepo-structure.md](phase-4a-monorepo-structure.md) — the public repo shape, workspaces, `npm install` vs `npm create`
-- [phase-4b-premium-packages.md](phase-4b-premium-packages.md) — the private premium repo and its 4 packages
+- [phase-3a-monorepo-structure.md](phase-3a-monorepo-structure.md) — the public repo shape, workspaces, `npm install` vs `npm create`
+- [phase-3b-premium-packages.md](phase-3b-premium-packages.md) — the private premium repo and its 4 packages
 
-### Phase 5 — Mobile Deployment (Capacitor)
-**Why here:** App Store and Play Store distribution is critical for the core DGRS app (Go backend) and potentially CoNexus. The mobile deployment template must be ready before the CoNexus migration so the flagship app can target mobile from day one.
+### Phase 4 — CoNexus Migration
+**Why last:** CoNexus is an existing Astro+Svelte+SCSS app with a Go backend. Its frontend will be refactored to consume Void Energy. This is the definitive proof that the system works for real applications — the complete design system, AI foundation, mobile capability, and premium packages must be shipped first so there's no need to go back and remake or add anything later.
 
-**Deliverable:** `ve-app-template` — a ready-to-clone Astro + Svelte + Void Energy + Capacitor project with cloud build scripts. Builders work only in `src/` with Claude Code; native compilation and signing happens in the cloud. No Mac, Xcode, or Android Studio required.
+**Deliverable:** `dgrslabs/conexus` private repo — the existing app refactored to consume public `void-energy` from npmjs.org and the premium packages from GitHub Packages. Ships to mobile via the template pattern established in Phases 2 and 3.
 
-**Plan:** [phase-5-mobile-deployment.md](phase-5-mobile-deployment.md)
+**Plan:** [phase-4-conexus-migration.md](phase-4-conexus-migration.md)
 
-### Phase 6 — CoNexus Migration
-**Why last:** CoNexus is an existing Astro+Svelte+SCSS app with a Go backend. Its frontend will be refactored to consume Void Energy. This must be the final step — the complete system (L0, L1, L2, premium packages, TTS sync, mobile template) must be shipped first so there's no need to go back and remake or add anything later. The migration itself becomes the definitive proof that the system works for real applications.
+---
 
-**Deliverable:** `dgrslabs/conexus` private repo — the existing app refactored to consume public `void-energy` from npmjs.org and the premium packages from GitHub Packages.
+## Future / Parked
 
-**Plan:** [phase-6-conexus-migration.md](phase-6-conexus-migration.md)
+Research and exploration for work that isn't scheduled as a phase. Captured so findings aren't lost, revisited once the roadmap phases ship.
+
+- [future/i18n.md](future/i18n.md) — Internationalization substrate + premium `@void-energy/i18n` package. Ships after all four phases. Additive, not foundational. Some substrate prep (logical properties, `--direction-sign`, injectable KT segmenter) can be pulled forward opportunistically.
+- [future/rive.md](future/rive.md) — Rive package content: cinematic animated CTA buttons by Eric Jordan. Phase 3b reserves the scaffold; real content ships only after all four phases land, on Eric's decoupled timeline.
+- [future/haptics.md](future/haptics.md) — Premium `@dgrslabs/void-energy-haptics` package: iOS Core Haptics (AHAP) + Android VibrationEffect primitives + Kinetic Text accent sync + Ambient Layers continuous drones. Phase 2 ships the stock `@capacitor/haptics` wrapper floor; this is the depth layer on top.
+- [future/webgl.md](future/webgl.md) — Premium `@dgrslabs/void-energy-webgl` package: shader-driven ambient enrichment, hero/showcase scene canvases, cinematic page transitions. Three surfaces only. OGL-first bundle discipline. Ships after all four phases land.
 
 ---
 
@@ -121,7 +123,7 @@ conexus ----------> void-energy-premium ------> void-energy (L1)
 
 ---
 
-## Repository Map (target end state after Phase 4)
+## Repository Map (target end state after Phase 3)
 
 ```
 github.com/dgrslabs/void-energy             PUBLIC (BSL 1.1)
@@ -168,16 +170,18 @@ All architectural and strategic decisions with rationale are documented in [deci
 |-----|-------|
 | [README.md](README.md) | This index |
 | [decisions.md](decisions.md) | Canonical decisions log with rationale |
-| [phase-1-l0-tailwind-preset.md](phase-1-l0-tailwind-preset.md) | Phase 1: `@void-energy/tailwind` — framework-agnostic Tailwind preset |
-| [phase-2-tts-kinetic-sync.md](phase-2-tts-kinetic-sync.md) | Phase 2: TTS + Kinetic Text sync (InWorld adapter, timeline-driven reveal) |
-| [phase-3-ai-automation.md](phase-3-ai-automation.md) | Phase 3: L2 AI automation foundation in current monorepo |
-| [phase-4a-monorepo-structure.md](phase-4a-monorepo-structure.md) | Phase 4: public monorepo, npm packages, scaffolder |
-| [phase-4b-premium-packages.md](phase-4b-premium-packages.md) | Phase 4: private premium repo, KT/DGRS/Ambient/Rive |
-| [phase-5-mobile-deployment.md](phase-5-mobile-deployment.md) | Phase 5: Capacitor mobile template + cloud builds for App Store / Play Store |
-| [phase-6-conexus-migration.md](phase-6-conexus-migration.md) | Phase 6: CoNexus frontend refactor to Void Energy (final phase) |
+| [phase-1-ai-automation.md](phase-1-ai-automation.md) | Phase 1: L2 AI automation foundation in current monorepo |
+| [phase-2-mobile-deployment.md](phase-2-mobile-deployment.md) | Phase 2: Capacitor mobile capability wired into current repo + first shipped app |
+| [phase-3a-monorepo-structure.md](phase-3a-monorepo-structure.md) | Phase 3: public monorepo, npm packages, scaffolder |
+| [phase-3b-premium-packages.md](phase-3b-premium-packages.md) | Phase 3: private premium repo, KT/DGRS/Ambient/Rive |
+| [phase-4-conexus-migration.md](phase-4-conexus-migration.md) | Phase 4: CoNexus frontend refactor to Void Energy |
+| [future/i18n.md](future/i18n.md) | Future: i18n substrate + premium `@void-energy/i18n` package (parked) |
+| [future/rive.md](future/rive.md) | Future: Rive animated CTA button package content + Eric Jordan partnership integration (parked) |
+| [future/haptics.md](future/haptics.md) | Future: premium `@dgrslabs/void-energy-haptics` package — Core Haptics + AHAP + KT/Ambient sync (parked) |
+| [future/webgl.md](future/webgl.md) | Future: premium `@dgrslabs/void-energy-webgl` package — shader-driven ambient + hero scenes + page transitions (parked) |
 
 ---
 
 ## One-Line Priority
 
-**~~Migrate to Tailwind v4~~ ✓ -> ship L0 Tailwind preset -> TTS + KT sync -> land L2 AI automation foundation -> restructure into public/premium monorepos + ship npm packages -> mobile deployment template (Capacitor) -> refactor CoNexus frontend to VE. One phase at a time, no split focus.**
+**~~Tailwind v4 migration~~ ✓ -> ~~L0 Tailwind preset~~ ✓ -> ~~TTS + KT sync~~ ✓ -> land L2 AI automation foundation -> wire Capacitor into the current repo and ship the first mobile app -> restructure into public/premium monorepos + ship npm packages -> refactor CoNexus frontend to VE. One phase at a time, no split focus. i18n and Rive content are parked — see [future/](future/).**

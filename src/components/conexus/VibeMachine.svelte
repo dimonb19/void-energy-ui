@@ -33,6 +33,7 @@
     WordTimestamp,
   } from '@dgrslabs/void-energy-kinetic-text/tts';
   import TtsKineticBlock from '@dgrslabs/void-energy-kinetic-text/tts-block';
+  import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
   import { inworldSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
   import { ambient } from '@dgrslabs/void-energy-ambient-layers';
   import '@dgrslabs/void-energy-kinetic-text/styles';
@@ -81,12 +82,16 @@
 
   const VOICE_OPTIONS = [
     { value: 'Ashley', label: 'Ashley — warm, female' },
+    { value: 'Olivia', label: 'Olivia — upbeat British, female' },
+    { value: 'Julia', label: 'Julia — calm, female' },
+    { value: 'Emma', label: 'Emma — bright, female' },
+    { value: 'Sarah', label: 'Sarah — female' },
+    { value: 'Chloe', label: 'Chloe — female' },
     { value: 'Alex', label: 'Alex — clear, male' },
+    { value: 'Edward', label: 'Edward — fast-talking, male' },
     { value: 'Dennis', label: 'Dennis — deep, male' },
     { value: 'Hades', label: 'Hades — dark, male' },
     { value: 'Dominus', label: 'Dominus — authoritative, male' },
-    { value: 'Julia', label: 'Julia — calm, female' },
-    { value: 'Emma', label: 'Emma — bright, female' },
     { value: 'Craig', label: 'Craig — gravelly, male' },
   ];
 
@@ -125,10 +130,22 @@
 
   // ── Snapshot target — KT reads typography from this element ──────────
   let snapshotEl: HTMLElement | undefined = $state();
+  let titleEl: HTMLElement | undefined = $state();
+  let taglineEl: HTMLElement | undefined = $state();
   let snapshotTick = $state(0);
   const snapshot: TextStyleSnapshot | null = $derived(
     snapshotEl && snapshotTick >= 0
       ? createVoidEnergyTextStyleSnapshot(snapshotEl)
+      : null,
+  );
+  const titleSnapshot: TextStyleSnapshot | null = $derived(
+    titleEl && snapshotTick >= 0
+      ? createVoidEnergyTextStyleSnapshot(titleEl)
+      : null,
+  );
+  const taglineSnapshot: TextStyleSnapshot | null = $derived(
+    taglineEl && snapshotTick >= 0
+      ? createVoidEnergyTextStyleSnapshot(taglineEl)
       : null,
   );
 
@@ -336,8 +353,14 @@
     const voice = typeof ttsVoiceId === 'string' ? ttsVoiceId.trim() : '';
     const shouldNarrate = narrate && !!key && !!voice;
 
+    // Spontaneous extras are filler cues unrelated to the voiced narration.
+    // During TTS they compete with the deliberate, semantically-anchored
+    // moments the LLM placed on dramatic words — so we only use them on the
+    // silent fallback path, where there's no narration for them to fight with.
     const wordCount = wordSpansOf(beat.text).length;
-    const extras = generateSpontaneousExtras(beat, wordCount);
+    const extras = shouldNarrate
+      ? { actions: [] as StoryAction[], oneShots: [] as StoryOneShot[] }
+      : generateSpontaneousExtras(beat, wordCount);
     const cues = buildCuesFromBeat(
       beat.kinetic.oneShots ?? [],
       extras.oneShots,
@@ -447,14 +470,32 @@
   </div>
 
   <div class="surface-raised p-lg flex flex-col gap-lg" use:morph>
-    {#if currentBeat}
-      <header class="flex flex-col gap-xs text-center" in:emerge out:dissolve>
-        <h2 class="text-h3">{currentBeat.title}</h2>
-        {#if currentBeat.tagline}
-          <p class="text-small text-dim">{currentBeat.tagline}</p>
+    <header class="flex flex-col gap-xs text-center">
+      <h2 class="text-h3" bind:this={titleEl}>
+        {#if currentBeat && titleSnapshot}
+          {#key currentBeat.title}
+            <KineticText
+              text={currentBeat.title}
+              styleSnapshot={titleSnapshot}
+            />
+          {/key}
+        {:else}
+          Vibe Machine
         {/if}
-      </header>
-    {/if}
+      </h2>
+      <p class="text-small text-dim" bind:this={taglineEl}>
+        {#if currentBeat?.tagline && taglineSnapshot}
+          {#key currentBeat.tagline}
+            <KineticText
+              text={currentBeat.tagline}
+              styleSnapshot={taglineSnapshot}
+            />
+          {/key}
+        {:else}
+          A fresh atmosphere, invented on demand.
+        {/if}
+      </p>
+    </header>
 
     <div
       class="surface-sunk p-lg flex flex-col gap-lg text-body"

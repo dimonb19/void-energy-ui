@@ -276,3 +276,47 @@ describe('StoryBeatSchema — direct safeParse parity', () => {
     expect(parsed.success).toBe(true);
   });
 });
+
+describe('StoryBeatSchema — one-shot and action count caps', () => {
+  it('accepts up to 3 oneShots', () => {
+    const good = clone(baseBeat);
+    good.kinetic.oneShots = [
+      { atWord: 1, effect: 'flicker' },
+      { atWord: 5, effect: 'ripple' },
+      { atWord: 10, effect: 'tremble' },
+    ];
+    expect(parseStoryBeat(good).ok).toBe(true);
+  });
+
+  it('rejects 4 oneShots — deliberate moments only, density hurts', () => {
+    const bad = clone(baseBeat);
+    bad.kinetic.oneShots = [
+      { atWord: 1, effect: 'flicker' },
+      { atWord: 3, effect: 'ripple' },
+      { atWord: 7, effect: 'jolt' },
+      { atWord: 11, effect: 'tremble' },
+    ];
+    expect(parseStoryBeat(bad).ok).toBe(false);
+  });
+
+  it('accepts up to 3 actions', () => {
+    const good = clone(baseBeat);
+    good.ambient.actions = [
+      { atWord: 2, variant: 'flash', intensity: 'low' },
+      { atWord: 6, variant: 'reveal', intensity: 'low' },
+      { atWord: 11, variant: 'impact', intensity: 'medium' },
+    ];
+    expect(parseStoryBeat(good).ok).toBe(true);
+  });
+
+  it('rejects 4 actions — deliberate moments only, density hurts', () => {
+    const bad = clone(baseBeat);
+    bad.ambient.actions = [
+      { atWord: 2, variant: 'flash', intensity: 'low' },
+      { atWord: 5, variant: 'reveal', intensity: 'low' },
+      { atWord: 8, variant: 'dissolve', intensity: 'medium' },
+      { atWord: 11, variant: 'impact', intensity: 'high' },
+    ];
+    expect(parseStoryBeat(bad).ok).toBe(false);
+  });
+});

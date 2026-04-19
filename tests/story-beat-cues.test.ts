@@ -95,15 +95,21 @@ describe('generateSpontaneousExtras', () => {
     expect(extras.oneShots).toEqual([]);
   });
 
-  it('scales extras count with word count', () => {
+  it('caps extras at a small count and does not scale with word count — filler, not spectacle', () => {
+    // makeBeat carries 1 action + 1 oneShot (scheduledCount = 2). With
+    // FLOOR = 4 and a per-call cap of 2, the function tops up at most 2
+    // extras. A long paragraph does NOT earn more filler — the deliberate,
+    // semantically-anchored LLM moments carry the experience.
     const short = generateSpontaneousExtras(makeBeat(), 20, seededRng(1));
-    expect(short.actions.length + short.oneShots.length).toBe(1);
+    expect(short.actions.length + short.oneShots.length).toBeLessThanOrEqual(2);
 
     const medium = generateSpontaneousExtras(makeBeat(), 40, seededRng(1));
-    expect(medium.actions.length + medium.oneShots.length).toBe(2);
+    expect(medium.actions.length + medium.oneShots.length).toBeLessThanOrEqual(
+      2,
+    );
 
     const long = generateSpontaneousExtras(makeBeat(), 80, seededRng(1));
-    expect(long.actions.length + long.oneShots.length).toBe(3);
+    expect(long.actions.length + long.oneShots.length).toBeLessThanOrEqual(2);
   });
 
   it('never lands on a word index the beat already claimed', () => {

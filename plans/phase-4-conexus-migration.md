@@ -1,10 +1,10 @@
-# Phase 6 — CoNexus Migration
+# Phase 4 — CoNexus Migration
 
 > Refactor the existing CoNexus Astro+Svelte+SCSS frontend to consume `void-energy` from public npm and premium packages from GitHub Packages, exactly the way any external customer would. This is the last step — the complete system must be shipped first.
 
 **Status:** Planning — blocked on all prior phases
-**Priority:** Phase 6 (final phase — intentionally last so the system is complete before the flagship app migrates)
-**Depends on:** Phase 4 (monorepo + premium packages), Phase 5 (mobile deployment). Also requires Phase 2 (TTS sync) for narrative features.
+**Priority:** Phase 4 (final phase — intentionally last so the system is complete before the flagship app migrates)
+**Depends on:** Phase 1 (AI automation foundation), Phase 2 (mobile deployment), Phase 3 (monorepo + premium packages). Also requires TTS sync (shipped) for narrative features.
 **Blocks:** nothing — this is the last phase
 
 ---
@@ -19,7 +19,7 @@ Create `github.com/dgrslabs/conexus` as a private repository containing a single
 - Has zero local copies of library code — everything is a dependency
 - Is the living proof that Void Energy works end-to-end for a real application
 
-After Phase 6, the existing CoNexus frontend has been refactored to Void Energy, and the system is complete: three repos in a clean dependency hierarchy, with each repo serving its defined purpose.
+After Phase 4, the existing CoNexus frontend has been refactored to Void Energy, and the system is complete: three repos in a clean dependency hierarchy, with each repo serving its defined purpose.
 
 ---
 
@@ -191,7 +191,7 @@ CoNexus is the primary consumer — its entire reading experience is rendered th
 
 ## CoNexus AI Automation Layer
 
-CoNexus extends the base VE automation (Phase 3's `SYSTEM-PROMPT.md`) with a narrative-specific layer. This sits ABOVE the general Void Energy rules and makes CoNexus development faster by teaching the AI about the storytelling domain.
+CoNexus extends the base VE automation (Phase 1's `SYSTEM-PROMPT.md`) with a narrative-specific layer. This sits ABOVE the general Void Energy rules and makes CoNexus development faster by teaching the AI about the storytelling domain.
 
 ### `SYSTEM-PROMPT.md` (CoNexus-specific)
 
@@ -229,7 +229,7 @@ These rules only apply inside the CoNexus repo. They never leak into the public 
 
 4. **Identify any code that "feels library-worthy" but is currently CoNexus-only:**
    - If it's generically useful, it should probably be promoted to `void-energy` or to a premium package
-   - Discuss case-by-case; defer promotion if it delays Phase 6
+   - Discuss case-by-case; defer promotion if it delays Phase 4
    - For the migration itself, keep questionable code in CoNexus and promote later
 
 5. **Wire up imports:**
@@ -265,17 +265,17 @@ These rules only apply inside the CoNexus repo. They never leak into the public 
 
 11. **Retire CoNexus code from the current monorepo:**
     - After CoNexus runs cleanly from its new repo, delete the CoNexus-specific code from the old monorepo
-    - The old monorepo's fate is already sealed by Phase 4a — it's replaced by the new public `void-energy` monorepo. Phase 6 just ensures no dangling CoNexus references remain.
+    - The old monorepo's fate is already sealed by Phase 3a — it's replaced by the new public `void-energy` monorepo. Phase 4 just ensures no dangling CoNexus references remain.
 
 ---
 
 ## What changes about CoNexus
 
-### Before Phase 6
+### Before Phase 4
 
 CoNexus code is scattered throughout `void-energy-ui/` mixed with library code. Pages, components, story engine, library primitives, DGRS atmospheres — all in one git tree. Library changes and CoNexus changes are indistinguishable in the commit log.
 
-### After Phase 6
+### After Phase 4
 
 CoNexus is a thin app. Every library primitive is imported. Every atmosphere comes from a package. The CoNexus repo contains only the story engine, narrative logic, and CoNexus-specific pages. Commits in the CoNexus repo are CoNexus commits, not library commits.
 
@@ -313,17 +313,17 @@ CoNexus is a thin app. Every library primitive is imported. Every atmosphere com
 
 ---
 
-## Out of scope for Phase 6
+## Out of scope for Phase 4
 
-- **New CoNexus features.** Phase 6 is migration only. Any new story features, new narrative effects, or new gameplay mechanics come after Phase 6 ships.
+- **New CoNexus features.** Phase 4 is migration only. Any new story features, new narrative effects, or new gameplay mechanics come after Phase 4 ships.
 - **Promoting CoNexus-only code to the library.** If something feels library-worthy, note it and defer. Promoting during migration creates scope creep.
-- **Changing the library to fit CoNexus.** If the library is missing something CoNexus needs, work around it in CoNexus. Library changes happen in a separate cycle after Phase 6.
+- **Changing the library to fit CoNexus.** If the library is missing something CoNexus needs, work around it in CoNexus. Library changes happen in a separate cycle after Phase 4.
 - **Automated story generation improvements.** The story engine is imported as-is. No AI/prompting work.
-- **Public CoNexus beta or launch.** Phase 6 is migration. Launch planning is a separate effort.
+- **Public CoNexus beta or launch.** Phase 4 is migration. Launch planning is a separate effort.
 
 ---
 
-## After Phase 6 — the end state
+## After Phase 4 — the end state
 
 Three repos, three roles, clean dependency direction:
 

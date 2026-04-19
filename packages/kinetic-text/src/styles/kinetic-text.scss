@@ -21,6 +21,14 @@
   display: flex;
   flex-direction: column;
   position: relative;
+
+  // Pretext measures character widths with Canvas, which ignores
+  // letter-spacing. Inheriting non-zero tracking from an ancestor drifts
+  // the rendered line past the measured width and the last word gets
+  // clipped by .kt-line's overflow: hidden. Reset here so layout and
+  // render agree. Per-char inline-block already breaks native kerning,
+  // so the visual change is imperceptible.
+  letter-spacing: 0;
 }
 
 // ── Visual layer ─────────────────────────────────────────────────

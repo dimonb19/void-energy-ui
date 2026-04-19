@@ -266,8 +266,12 @@ button,
 }
 
 // Disabled states.
+// Checkboxes and radios are excluded: when they're visible, browsers mute the
+// native chrome themselves; when they're visually hidden inside a custom wrapper
+// (Toggle, Switcher), forcing bg/border here would paint a square on top of the
+// wrapper's own disabled styling.
 button:disabled,
-input:disabled,
+input:disabled:not([type='checkbox'], [type='radio']),
 select:disabled,
 textarea:disabled {
   cursor: not-allowed;

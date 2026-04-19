@@ -31,6 +31,33 @@ describe('buildSystemPrompt', () => {
     expect(prompt).not.toMatch(/physics/i);
     expect(prompt).not.toMatch(/`theme`/i);
   });
+
+  it('caps oneShots and actions at 3, not 4 — dense moments dilute the sync', () => {
+    const prompt = buildSystemPrompt();
+    expect(prompt).toContain('2–3 entries');
+    expect(prompt).toContain('NEVER more than 3');
+    expect(prompt).not.toMatch(/2[–-]4 entries/);
+  });
+
+  it('documents the anchoring contract with hard filter + bad/good examples', () => {
+    const prompt = buildSystemPrompt();
+    expect(prompt).toMatch(/Anchoring contract/);
+    expect(prompt).toMatch(/concrete sensory noun\/verb\/adjective/);
+    // Explicit examples of disallowed parts of speech.
+    expect(prompt).toMatch(/articles/i);
+    expect(prompt).toMatch(/prepositions/i);
+    expect(prompt).toMatch(/pronouns/i);
+    // Inline ❌/✅ examples anchor the rule.
+    expect(prompt).toContain('❌');
+    expect(prompt).toContain('✅');
+  });
+
+  it('documents the climax rule — overlapping oneShot + action in the final sentence', () => {
+    const prompt = buildSystemPrompt();
+    expect(prompt).toMatch(/climax/i);
+    expect(prompt).toMatch(/SAME `atWord`/);
+    expect(prompt).toMatch(/final sentence/);
+  });
 });
 
 describe('buildUserPrompt', () => {

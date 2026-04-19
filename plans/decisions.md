@@ -1,7 +1,20 @@
 # Canonical Decisions
 
 > Every architectural and strategic decision that shapes the plan, with the reasoning behind it. Do not re-litigate these without updating this file.
-> Last updated: 2026-04-12
+> Last updated: 2026-04-19 (mobile pulled ahead of monorepo; i18n moved to `future/`)
+
+**Renumbering note:** mobile deployment has been pulled ahead of the monorepo restructure so that mobile-specific constraints (safe areas, `capacitor.ts` helper shape, default mobile physics after glass testing) are proven in the current flat repo before Phase 3 freezes the package boundaries. The previous Phase 0 / 0a / 0b (Tailwind v4 + design modernization), Phase 1 (L0 Tailwind preset), and Phase 2 (TTS + KT sync) shipped earlier and are no longer tracked as numbered phases. The i18n plan has been moved to `plans/future/i18n.md` — it is not a scheduled phase.
+
+| Former | Current |
+|---|---|
+| Phase 3 — AI Automation Foundation | **Phase 1** (unchanged since last renumber) |
+| Phase 5 — Mobile Deployment | **Phase 2** (pulled ahead of monorepo) |
+| Phase 4a — Public Monorepo Structure | **Phase 3a** |
+| Phase 4b — Premium Packages Repo | **Phase 3b** |
+| Phase 6 — CoNexus Migration | **Phase 4** (unchanged) |
+| Phase 7 — Internationalization (i18n) | Parked in `plans/future/i18n.md` |
+
+Historical decisions below retain their original prose, but "How to apply" lines, cross-references, and phase numbers have been updated to match the current numbering. Decisions about shipped work (D24, D25, and the shipped portions of D22) are preserved as historical records.
 
 ---
 
@@ -27,7 +40,7 @@
 - **Pattern B (rejected):** separate library repo and separate consumer/docs repo. Every library change requires two PRs and a publish step between them. High friction for a solo dev.
 - **Pattern C (rejected):** "staging vs prod" with manual sync script. Known anti-pattern — the sync rots, public repo falls behind, final syncs become huge unrelated diffs.
 
-**How to apply:** see [phase-4a-monorepo-structure.md](phase-4a-monorepo-structure.md). The premium repo uses the same pattern.
+**How to apply:** see [phase-3a-monorepo-structure.md](phase-3a-monorepo-structure.md). The premium repo uses the same pattern.
 
 ---
 
@@ -57,11 +70,11 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 ## D5 — Showcase site is `apps/showcase`, lives in the public monorepo
 
-**Decision:** the existing `void.dgrslabs.ink` showcase site becomes `apps/showcase/` inside the public monorepo. The current standalone `void-energy-ui` repo is retired at the end of Phase 2.
+**Decision:** the existing `void.dgrslabs.ink` showcase site becomes `apps/showcase/` inside the public monorepo. The current standalone `void-energy-ui` repo is retired at the end of Phase 3.
 
 **Why:** keeping the showcase separate from the library creates drift. Pattern A solves this by having the showcase import the library via `workspace:*` so every change is reflected instantly and atomically. This is how Radix, Svelte, Astro, and Tailwind all work.
 
-**How to apply:** showcase imports `void-energy` via `workspace:*`. For premium demos it installs the premium packages from GitHub Packages (Phase 2). Deploys to Vercel from the monorepo; Vercel supports workspaces natively.
+**How to apply:** showcase imports `void-energy` via `workspace:*`. For premium demos it installs the premium packages from GitHub Packages (Phase 3). Deploys to Vercel from the monorepo; Vercel supports workspaces natively.
 
 ---
 
@@ -71,15 +84,15 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 **Why:** consistency with the public repo, and because premium packages share tooling (token pipeline, type generation, test setup). One repo means one version cadence and one CI.
 
-**How to apply:** all four premium packages declare `void-energy` as a peer dependency installed from public npm. Each has its own `package.json` with a `publishConfig` that can be flipped from private (GitHub Packages) to public (npmjs.org) independently. See [phase-4b-premium-packages.md](phase-4b-premium-packages.md).
+**How to apply:** all four premium packages declare `void-energy` as a peer dependency installed from public npm. Each has its own `package.json` with a `publishConfig` that can be flipped from private (GitHub Packages) to public (npmjs.org) independently. See [phase-3b-premium-packages.md](phase-3b-premium-packages.md).
 
 ---
 
 ## D7 — Ambient Layers ships first, as a dedicated package from day one
 
-**Decision:** Phase 1 = Ambient Layers, built as `@dgrslabs/void-energy-ambient-layers` inside the current monorepo's `packages/` folder from the first commit — not as loose files in `src/` that get lifted later.
+**Decision:** Ambient Layers was built as `@dgrslabs/void-energy-ambient-layers` inside the current monorepo's `packages/` folder from the first commit — not as loose files in `src/` that get lifted later.
 
-**Why:** Kinetic Text was built this way and the pattern works. Starting as a package enforces API discipline (must import via public exports only), enables independent versioning, and means Phase 3 lifts the package into the premium repo with zero refactoring — just a file move and a version pin. The alternative (build in `src/` first, extract later) creates refactoring debt and breaks API boundaries during development.
+**Why:** Kinetic Text was built this way and the pattern works. Starting as a package enforces API discipline (must import via public exports only), enables independent versioning, and means Phase 3b lifts the package into the premium repo with zero refactoring — just a file move and a version pin. The alternative (build in `src/` first, extract later) creates refactoring debt and breaks API boundaries during development.
 
 **How to apply:** create `packages/ambient/` mirroring the existing `packages/kinetic-text/` layout. Peer-depend on `void-energy` via `workspace:*`. All core imports go through public `void-energy/*` exports, never relative paths.
 
@@ -87,21 +100,21 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 ## D8 — AI automation foundation lands before the monorepo restructure
 
-**Decision:** Phase 3 = AI automation foundation, built in the current monorepo after L0 and TTS sync ship but before Phase 4 touches the directory structure.
+**Decision:** Phase 1 = AI automation foundation, built in the current monorepo after L0 and TTS sync shipped but before Phase 3 touches the directory structure. Phase 2 (mobile deployment) runs between the two and extends the AI rules with mobile-specific guidance but does not move any files.
 
-**Why:** AI automation is not a cosmetic polish pass. It is the primary way Void Energy is consumed — by AI agents building apps on top of it. If the AI hallucinates components, forgets the 5 Laws, or recreates primitives that already exist, the system fails at its job. Landing the foundation while the current monorepo is stable means Phase 4 inherits a working system and only has to redistribute its files across workspaces, rather than inventing and restructuring simultaneously.
+**Why:** AI automation is not a cosmetic polish pass. It is the primary way Void Energy is consumed — by AI agents building apps on top of it. If the AI hallucinates components, forgets the 5 Laws, or recreates primitives that already exist, the system fails at its job. Landing the foundation while the current monorepo is stable means both Phase 2 (mobile) and Phase 3 (monorepo) inherit a working system — Phase 2 only adds mobile rules, and Phase 3 redistributes files across workspaces without inventing and restructuring simultaneously.
 
-**How to apply:** inside the current monorepo, build layered `CLAUDE.md` files (root, `src/`, `src/pages/`, `packages/*/`), complete the `component-registry.json`, formalize rules in `.claude/rules/`, and audit the existing `AI-PLAYBOOK.md`, `COMPOSITION-RECIPES.md`, `CHEAT-SHEET.md`. Phase 4 will move the files without rewriting the content.
+**How to apply:** inside the current monorepo, build layered `CLAUDE.md` files (root, `src/`, `src/pages/`, `packages/*/`), complete the `component-registry.json`, formalize rules in `.claude/rules/`, and audit the existing `AI-PLAYBOOK.md`, `COMPOSITION-RECIPES.md`, `CHEAT-SHEET.md`. Phase 3 will move the files without rewriting the content.
 
 ---
 
 ## D9 — CoNexus migrates last
 
-**Decision:** Phase 6 = CoNexus migration. Nothing CoNexus-related touches Phases 1–5.
+**Decision:** Phase 4 = CoNexus migration. Nothing CoNexus-related touches Phases 1–3.
 
 **Why:** CoNexus is the consumer. Migrating it earlier would force architectural decisions based on one app's needs and pollute the library with assumptions. Migrating last means the library has to be cleanly usable by any external consumer, which is the right pressure to keep the APIs honest.
 
-**How to apply:** during Phases 1–5, CoNexus changes are on hold. When Phase 6 begins, CoNexus is rebuilt as a thin app consuming `void-energy` from public npm and `@dgrslabs/void-energy-*` from GitHub Packages.
+**How to apply:** during Phases 1–3, CoNexus changes are on hold. When Phase 4 begins, CoNexus is rebuilt as a thin app consuming `void-energy` from public npm and `@dgrslabs/void-energy-*` from GitHub Packages.
 
 ---
 
@@ -113,7 +126,7 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 **Why:** the free tier must be complete and useful on its own — no feature degradation, no "buy the atmosphere pack" upsell. The AI generator removes any reason to gate atmospheres. The premium packages are all additive immersion layers that real apps (CoNexus) need but that small projects do not.
 
-**How to apply:** the public repo never contains premium code. Premium packages live only in the private repo and install as optional dependencies. See [phase-4b-premium-packages.md](phase-4b-premium-packages.md).
+**How to apply:** the public repo never contains premium code. Premium packages live only in the private repo and install as optional dependencies. See [phase-3b-premium-packages.md](phase-3b-premium-packages.md).
 
 ---
 
@@ -155,7 +168,7 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 **Why:** consumer AI (Claude Code running in a user's project) needs to read the registry from `node_modules/void-energy/` to know what components exist without inventing new ones. `SYSTEM-PROMPT.md` enables any automation tool (not just Claude Code) to generate correct VE code. Shipping `.claude/` would bloat the tarball and leak monorepo-specific rules.
 
-**How to apply:** see [phase-3-ai-automation.md](phase-3-ai-automation.md) for the foundation and [phase-4a-monorepo-structure.md](phase-4a-monorepo-structure.md) for the distribution layout.
+**How to apply:** see [phase-1-ai-automation.md](phase-1-ai-automation.md) for the foundation and [phase-3a-monorepo-structure.md](phase-3a-monorepo-structure.md) for the distribution layout.
 
 ---
 
@@ -175,7 +188,7 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 **Why:** these four cover the range CoNexus needs (horror/intensity, cold/isolation, mood/weather, mystery/obscurity) and demonstrate the system's physics adaptation across all four classic ambient effect categories.
 
-**How to apply:** Ambient Layers is complete and ships in `packages/ambient-layers/`. Phase 4b lifts it into the premium repo.
+**How to apply:** Ambient Layers is complete and ships in `packages/ambient-layers/`. Phase 3b lifts it into the premium repo.
 
 ---
 
@@ -195,7 +208,7 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 **Why:** equity sets a bad precedent for future collaborators and dilutes the core team. Revenue share aligns incentives without giving up ownership. Scope is limited to Rive specifically, not Void Energy as a whole.
 
-**How to apply:** present deal after Phase 3 ships. Rive package timeline is decoupled from the main phases.
+**How to apply:** present deal after Phase 1 ships. Rive package timeline is decoupled from the main phases.
 
 ---
 
@@ -220,7 +233,7 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 **Why:** consumers who only want tokens should not install Svelte as a peer dependency. Keeping L0 as a separate package means its dependency graph is: Tailwind CSS v4, nothing else. A React developer never sees Svelte in their `node_modules`. The package name also signals clearly what it is — a Tailwind preset, not a component library.
 
-**How to apply:** both packages live in the public monorepo (`packages/void-energy/` and `packages/void-energy-tailwind/`). Published independently to npm. The monorepo structure in [phase-4a-monorepo-structure.md](phase-4a-monorepo-structure.md) updated to include L0 as a workspace package.
+**How to apply:** both packages live in the public monorepo (`packages/void-energy/` and `packages/void-energy-tailwind/`). Published independently to npm. The monorepo structure in [phase-3a-monorepo-structure.md](phase-3a-monorepo-structure.md) updated to include L0 as a workspace package.
 
 ---
 
@@ -234,13 +247,13 @@ Forcing one to use the other creates friction: `install` users would have to ext
 
 ---
 
-## D22 — Phase order: L0 (1), TTS (2), L2 (3) — Ambient complete
+## D22 — Phase order: L0, TTS, L2 — Ambient complete (HISTORICAL)
 
-**Decision:** Phase 1 is now the L0 Tailwind preset extraction. Phase 2 is TTS + KT sync. Phase 3 is the L2 AI automation foundation. Ambient Layers (previously Phase 1) is complete and shipped.
+**Decision:** At the time this decision was committed, the remaining order was L0 Tailwind preset extraction → TTS + KT sync → L2 AI automation foundation. Ambient Layers (an even earlier phase) was already complete.
 
-**Why:** with Ambient Layers done, the next highest-leverage move is expanding VE's addressable market. L0 is low effort (the token system already exists and is well-structured for extraction) with outsized reach (millions of Tailwind users across every framework). TTS sync follows because KT needs timeline-driven reveal before CoNexus can build its narrative reading experience. L2 depends on understanding the L0/L1 split to provide correct context at each layer.
+**Why:** with Ambient Layers done, the next highest-leverage move was expanding VE's addressable market. L0 was low effort (the token system already existed and was well-structured for extraction) with outsized reach (millions of Tailwind users across every framework). TTS sync followed because KT needed timeline-driven reveal before CoNexus could build its narrative reading experience. L2 depends on understanding the L0/L1 split to provide correct context at each layer.
 
-**How to apply:** see [phase-1-l0-tailwind-preset.md](phase-1-l0-tailwind-preset.md), [phase-2-tts-kinetic-sync.md](phase-2-tts-kinetic-sync.md), and [phase-3-ai-automation.md](phase-3-ai-automation.md).
+**Status:** L0 Tailwind preset and TTS + KT sync have both shipped. L2 AI automation foundation is the current Phase 1. See [phase-1-ai-automation.md](phase-1-ai-automation.md).
 
 ---
 
@@ -270,13 +283,13 @@ Forcing one to use the other creates friction: `install` users would have to ext
 4. `.container` shadowed by Tailwind v4's built-in container utility — fixed via `void-overrides` layer
 5. `--max-width > --spacing > --container` fallback chain shadowing container queries — fixed via explicit `--max-width-*` declarations
 
-The Phase 0a fixes also surfaced the **`@theme inline` vs `@theme reference` distinction** as the load-bearing learning for L0: any token whose name SCSS/atmosphere/physics CSS already defines on `:root` must use `@theme reference` to avoid a self-reference cycle. The full namespace strategy and footgun inventory are documented in [phase-1-l0-tailwind-preset.md](phase-1-l0-tailwind-preset.md), which absorbs all Phase 0/0a learnings.
+The Phase 0a fixes also surfaced the **`@theme inline` vs `@theme reference` distinction** as the load-bearing learning for L0: any token whose name SCSS/atmosphere/physics CSS already defines on `:root` must use `@theme reference` to avoid a self-reference cycle. The full namespace strategy and footgun inventory are now documented directly in [src/styles/tailwind-theme.css](../src/styles/tailwind-theme.css) — the shipped L0 preset absorbed all Phase 0/0a learnings.
 
 ---
 
 ## D25 — Design language modernization before L0 extraction (Phase 0b) ✓ COMPLETE
 
-**Decision:** Update the visual language to 2025-2026 best practices before Phase 1 extracts L0.
+**Decision:** Update the visual language to 2025-2026 best practices before the L0 Tailwind preset was extracted.
 
 **Why:** L0 will bake these values into `@void-energy/tailwind` — shipping MD2-era uppercase buttons and 4px flat radius as the default for all Tailwind consumers would hurt adoption. The system's architecture is modern; only the surface-level styling was dated.
 
@@ -292,20 +305,20 @@ The Phase 0a fixes also surfaced the **`@theme inline` vs `@theme reference` dis
 
 ---
 
-## D26 — Mobile deployment via Capacitor + cloud builds (Phase 5)
+## D26 — Mobile deployment via Capacitor + cloud builds (Phase 2)
 
-**Decision:** Ship Void Energy apps to App Store and Google Play using Capacitor as the native WebView wrapper, with cloud build services (Capawesome/Appflow/Codemagic) handling compilation and signing. Deliver as a `ve-app-template` — a ready-to-clone project that builders use without touching native code.
+**Decision:** Ship Void Energy apps to App Store and Google Play using Capacitor as the native WebView wrapper, with cloud build services (Capawesome/Appflow/Codemagic) handling compilation and signing. Wire mobile capability into the current `void-energy-ui` repo first, ship the first mobile app from there, and only then (in Phase 3) promote the proven setup into the monorepo's `apps/starter-template/`.
 
-**Why:** VE apps are web apps; app stores require native binaries. Capacitor is the mature, Ionic-backed bridge for this exact use case. Cloud builds eliminate the Mac/Xcode requirement so any team member on any OS can ship to both stores. The template approach means the native configuration is done once by the maintainer, not reinvented per app.
+**Why:** VE apps are web apps; app stores require native binaries. Capacitor is the mature, Ionic-backed bridge for this exact use case. Cloud builds eliminate the Mac/Xcode requirement so any team member on any OS can ship to both stores. Doing this **before** the monorepo restructure surfaces load-bearing constraints — the shape of a `capacitor.ts` helper in `void-energy`, which safe-area utilities belong in `@void-energy/tailwind`, and the default mobile physics preset after glass perf testing — so Phase 3 can bake them into the package boundaries instead of retrofitting them.
 
 **Key constraints:**
-- Mobile apps use `output: 'static'` (WebView can't run Node); backend stays hosted (Go API / Vercel SSR)
+- Mobile apps use `output: 'static'` or `'hybrid'` (WebView can't run Node); backend stays hosted (Go API / Vercel SSR)
 - Glass physics (`backdrop-filter`) must be tested on mid-range Android before shipping — if it can't sustain 60fps, flat becomes the mobile default
 - Safe-area tokens already exist in `_reset.scss`; layout primitives must consume them
 - Status bar color must sync with the active atmosphere/mode
 - Keyboard resize mode must be `ionic` to avoid breaking `dvh` layouts
 
-**How to apply:** Phase 5 executes after Phase 4 (monorepo restructure + premium packages), before Phase 6 (CoNexus migration). The plan is written now so Phases 1–4 can account for mobile concerns (L0 safe-area utilities, capacitor helper exports). See [phase-5-mobile-deployment.md](phase-5-mobile-deployment.md).
+**How to apply:** Phase 2 executes after Phase 1 (AI automation), before Phase 3 (monorepo restructure + premium packages) and Phase 4 (CoNexus migration). The deliverable is mobile capability wired into the current repo plus the first shipped app; Phase 3 then extracts this into the monorepo template layer. See [phase-2-mobile-deployment.md](phase-2-mobile-deployment.md).
 
 ---
 
@@ -319,7 +332,7 @@ The Phase 0a fixes also surfaced the **`@theme inline` vs `@theme reference` dis
 
 **What it does NOT contain:** Claude Code-specific mechanics, development workflow instructions (pre-flight audit, analog matching), premium package details, monorepo structure.
 
-**How to apply:** `SYSTEM-PROMPT.md` ships in the npm tarball alongside `component-registry.json` and the other catalogs. CoNexus extends it with a CoNexus-specific `SYSTEM-PROMPT.md` that references the base from `node_modules/void-energy/`. See [phase-3-ai-automation.md](phase-3-ai-automation.md).
+**How to apply:** `SYSTEM-PROMPT.md` ships in the npm tarball alongside `component-registry.json` and the other catalogs. CoNexus extends it with a CoNexus-specific `SYSTEM-PROMPT.md` that references the base from `node_modules/void-energy/`. See [phase-1-ai-automation.md](phase-1-ai-automation.md).
 
 ---
 
@@ -334,8 +347,8 @@ The Phase 0a fixes also surfaced the **`@theme inline` vs `@theme reference` dis
 | D5 | Showcase in `apps/showcase` | Committed |
 | D6 | Premium repo uses Pattern A | Committed |
 | D7 | Ambient Layers as dedicated package from day one | Committed (shipped) |
-| D8 | AI automation foundation lands in current monorepo (Phase 3) | Committed |
-| D9 | CoNexus migrates last (Phase 6) | Committed |
+| D8 | AI automation foundation lands in current monorepo (Phase 1) | Committed |
+| D9 | CoNexus migrates last (Phase 4) | Committed |
 | D10 | Free vs premium split | Committed |
 | D11 | KT base free, engine premium | Committed |
 | D12 | BSL 1.1 with lawyer review | Pending lawyer |
@@ -348,9 +361,9 @@ The Phase 0a fixes also surfaced the **`@theme inline` vs `@theme reference` dis
 | D19 | Layer architecture: L0 / L1 / L2 | Committed |
 | D20 | L0 as separate `@void-energy/tailwind` package | Committed |
 | D21 | No L0.5 CSS component classes | Committed |
-| D22 | L0 Phase 1, TTS Phase 2, L2 Phase 3 (Ambient complete) | Committed |
+| D22 | Phase order: L0 → TTS → L2 (Ambient complete) | Historical — L0 and TTS shipped |
 | D23 | L0 includes only free atmospheres | Committed |
 | D24 | Tailwind v4 migration before L0 (Phase 0) | Committed (shipped) |
 | D25 | Design language modernization before L0 (Phase 0b) | Committed (shipped) |
-| D26 | Mobile deployment via Capacitor + cloud builds (Phase 5) | Planned |
+| D26 | Mobile deployment via Capacitor + cloud builds (Phase 2, ahead of monorepo) | Planned |
 | D27 | Tool-agnostic `SYSTEM-PROMPT.md`, no `.void/` config directory | Committed |
