@@ -13,6 +13,15 @@ If you also use the **Consumer Config Layer** (`void.config.ts`) to replace or e
 
 See [CONFIG.md](./CONFIG.md) for the schema and [ATMOSPHERES.md](./ATMOSPHERES.md) for the three provenance tiers (builtin / config / runtime).
 
+### Two optional extras
+
+Void Energy L0 is designed to sit **underneath** your existing component library, not replace it. Two opt-in imports cover the most common adoption shapes:
+
+- **Ecosystem bridges** (`@void-energy/tailwind/bridges/shadcn.css`, `.../radix-themes.css`, `.../mantine.css`) — alias a 3rd-party component library's CSS variable contract onto Void Energy tokens, so every component in that library repaints on atmosphere change without any code changes. See [Ecosystem bridges](#ecosystem-bridges).
+- **Components bundle** (`@void-energy/tailwind/components.css`) — a precompiled ~18 KB gzipped CSS file with VE physics applied to native HTML (`.btn`, styled `<input>`, styled `<dialog>`, ...). For consumers who don't want to bring a component library at all. See [Components bundle](#components-bundle-optional).
+
+Both are pure CSS — no runtime, no build step, no wrappers. Import or don't.
+
 ---
 
 ## Vite plugin (recommended for Vite-based apps)
@@ -457,46 +466,112 @@ The custom atmosphere persists across reloads via localStorage and is re-injecte
 
 ---
 
-## shadcn/ui bridge
+## Ecosystem bridges
 
-shadcn components ship with their own CSS variable contract (`--primary`, `--background`, `--foreground`, `--muted`, `--card`, etc.). To make them adopt VE atmospheres, bridge the shadcn variable names to VE tokens in your consumer CSS **after** the theme import:
+Void Energy's tokens are framework-agnostic, but the React ecosystem's component libraries each define their own CSS variable contract. A **bridge** is a one-line CSS import that aliases one of those contracts onto VE tokens — after the import, every component in that library re-themes automatically when `setAtmosphere` runs. No component changes, no wrappers, no forks.
+
+The L0 package ships three pre-built bridges. Each is a pure alias layer: zero new surfaces, no new utility classes, no runtime code. Remove the import and the bridge is gone.
+
+| Bridge | For | File |
+|---|---|---|
+| `shadcn` | [shadcn/ui](https://ui.shadcn.com) — copies components into your project; reads `--primary`, `--background`, `--card`, ... | `@void-energy/tailwind/bridges/shadcn.css` |
+| `radix-themes` | [Radix Themes](https://www.radix-ui.com/themes) — 12-step scale via `--accent-{1..12}`, `--gray-{1..12}` | `@void-energy/tailwind/bridges/radix-themes.css` |
+| `mantine` | [Mantine](https://mantine.dev) — `--mantine-color-{name}-{0..9}`, surface/text tokens | `@void-energy/tailwind/bridges/mantine.css` |
+
+### shadcn/ui
+
+```css
+/* app.css */
+@import 'tailwindcss';
+@import '@void-energy/tailwind/theme.css';
+@import '@void-energy/tailwind/bridges/shadcn.css';
+```
+
+That's it. Keep using shadcn components unchanged — `<Button>`, `<Card>`, `<Input>`, `<Dialog>`, etc. When you call `setAtmosphere('terminal')`, both your VE surfaces and every shadcn component repaint in one cascade.
+
+**Known edges:**
+
+- Works with shadcn's classic hex palette. If you opted into the newer OKLCH theme, either switch back to hex or extend the bridge yourself.
+- `--radius` bridges to `--radius-base`, which collapses to 0 in retro physics — shadcn components also go square-cornered in retro. Almost always desired; document for your team.
+- shadcn's `<Dialog>` / `<Sheet>` ship with a `bg-black/80` backdrop that clashes with glass atmospheres. Override in your global CSS if it bothers you.
+
+### Radix Themes
+
+```css
+/* app.css */
+@import 'tailwindcss';
+@import '@void-energy/tailwind/theme.css';
+@import '@radix-ui/themes/styles.css';
+@import '@void-energy/tailwind/bridges/radix-themes.css';
+```
+
+The bridge must come **after** `@radix-ui/themes/styles.css` — its selectors override Radix's default accent palette.
+
+The 12-step accent scale (`--accent-1` … `--accent-12`) is synthesized from `--energy-primary` at runtime via `color-mix()`. The 12-step `--gray-*` scale is derived from VE's surface + text tokens. Requires a browser with `color-mix()` support (Chrome 111+, Firefox 113+, Safari 16.2+).
+
+Per-component accent overrides (`[data-accent-color="crimson"]`) are not bridged — they keep Radix's built-in palette. If you need a VE atmosphere to drive them, scope the bridge inside your own selector.
+
+### Mantine
+
+```css
+/* app.css */
+@import 'tailwindcss';
+@import '@void-energy/tailwind/theme.css';
+@import '@mantine/core/styles.css';
+@import '@void-energy/tailwind/bridges/mantine.css';
+```
+
+Set the Mantine primary color to `'void'` in your provider:
+
+```tsx
+<MantineProvider theme={{ primaryColor: 'void' }}>
+```
+
+The bridge defines `--mantine-color-void-{0..9}` synthesized from `--energy-primary`, plus `--mantine-color-body`, `--mantine-color-text`, `--mantine-color-default`, and the `--mantine-radius-*` scale.
+
+**Dark mode sync.** Mantine reads `[data-mantine-color-scheme]` from `<html>`. VE writes `[data-mode]`. In your app entry, mirror VE's value:
+
+```ts
+import { init } from '@void-energy/tailwind/runtime';
+init();
+new MutationObserver(() => {
+  const mode = document.documentElement.getAttribute('data-mode') ?? 'dark';
+  document.documentElement.setAttribute('data-mantine-color-scheme', mode);
+}).observe(document.documentElement, { attributes: true, attributeFilter: ['data-mode'] });
+```
+
+### Writing a bridge for another library
+
+If your component library reads a CSS variable contract we don't ship a bridge for (Chakra, Ant Design, Park UI, ...), write a 30-line CSS file that aliases its variables to VE tokens. The shadcn bridge at [src/bridges/shadcn.css](./src/bridges/shadcn.css) is a good template — copy it, swap the variable names, done. No PR needed on our end; the bridge lives in your consumer CSS.
+
+---
+
+## Components bundle (optional)
+
+For consumers who want zero-config styled native HTML — `<button>`, `<input>`, `<dialog>` — without installing a component library at all, the L0 package ships a precompiled components bundle:
 
 ```css
 @import 'tailwindcss';
 @import '@void-energy/tailwind/theme.css';
-
-:root {
-  /* shadcn → VE bridge. These propagate atmosphere changes into shadcn. */
-  --background: var(--bg-canvas);
-  --foreground: var(--text-main);
-  --card: var(--bg-surface);
-  --card-foreground: var(--text-main);
-  --popover: var(--bg-surface);
-  --popover-foreground: var(--text-main);
-  --primary: var(--energy-primary);
-  --primary-foreground: var(--text-main);
-  --secondary: var(--energy-secondary);
-  --secondary-foreground: var(--text-main);
-  --muted: var(--bg-sunk);
-  --muted-foreground: var(--text-dim);
-  --accent: var(--color-premium);
-  --accent-foreground: var(--text-main);
-  --destructive: var(--color-error);
-  --destructive-foreground: var(--text-main);
-  --border: var(--border-color);
-  --input: var(--border-color);
-  --ring: var(--energy-primary);
-  --radius: var(--radius-md);
-}
+@import '@void-energy/tailwind/components.css';
 ```
 
-Now `<Button>`, `<Card>`, `<Input>` etc. from shadcn will re-paint when `setAtmosphere` runs. The bridge is idempotent — VE doesn't care that shadcn reads its tokens, and shadcn doesn't know it's being fed VE values.
+Now bare HTML picks up Void Energy physics:
 
-**Known edges:**
+```html
+<button class="btn">Submit</button>
+<button class="btn btn-cta">Launch</button>
+<input type="text" placeholder="Email" />
+<dialog>...</dialog>
+```
 
-- shadcn's OKLCH color variables (if you opted into the newer shadcn theme) will not work with VE's hex + rgba values. Either stick to shadcn's hex variant, or convert VE palette to OKLCH in the bridge (rarely worth it).
-- shadcn's `--radius` is a single value, but VE's `--radius-base` goes to 0 in retro physics. Bridging `--radius: var(--radius-base)` makes shadcn components also go square-cornered in retro, which is usually what you want.
-- The shadcn `<Dialog>` and `<Sheet>` use a semi-transparent backdrop (`bg-black/80`) that clashes with glass atmospheres. Override the backdrop in your global CSS if it bothers you.
+**What's in the bundle.** 17 component layers, compiled to ~18 KB gzipped: buttons, inputs, fields, toggle, dialogs, toasts, tooltips, dropdown, containers, navigation, chips, badges, anchors, effects, tabs, pagination, stat-card.
+
+**What's not in the bundle.** Anything that needs JS co-authorship to be meaningful — interactive icons (the L1 animated SVG components), kinetic typography, drag-and-drop, command palette, combobox, page sidebar, pull-to-refresh, charts. Those remain L1-only.
+
+**SSOT.** The bundle is compiled from `src/styles/components/**` on the L1 side. Edit there, run `npm run build:tokens`, commit both sources and the regenerated `dist/components.css`. There is no separate L0 styling file to maintain — the compile is one-way.
+
+**Using both.** The components bundle and an ecosystem bridge are orthogonal. A consumer can import both; `.btn` (VE) and `<Button>` (shadcn) coexist without overlap. Pick one per UI primitive, or mix — VE's `.btn` for primary actions, shadcn for complex composites like `<Popover>` or `<DropdownMenu>`.
 
 ---
 

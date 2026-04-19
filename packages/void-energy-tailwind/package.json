@@ -20,8 +20,10 @@
     "./theme-no-container.css": "./dist/theme-no-container.css",
     "./tokens.css": "./dist/tokens.css",
     "./density.css": "./dist/density.css",
+    "./components.css": "./dist/components.css",
     "./atmospheres/*": "./dist/atmospheres/*",
     "./physics/*": "./dist/physics/*",
+    "./bridges/*": "./dist/bridges/*",
     "./atmospheres.json": "./dist/atmospheres.json",
     "./builtins.json": "./dist/builtins.json",
     "./runtime": {

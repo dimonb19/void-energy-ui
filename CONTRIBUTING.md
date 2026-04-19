@@ -7,12 +7,14 @@ Thank you for considering contributing to Void Energy UI! This design system pow
 ## Table of Contents
 
 1. [Code of Conduct](#1-code-of-conduct)
-2. [Getting Started](#2-getting-started)
-3. [Development Workflow](#3-development-workflow)
-4. [Adding a Premium Package](#4-adding-a-premium-package)
-5. [Architecture & Discipline](#5-architecture--discipline)
-6. [Pull Request Process](#6-pull-request-process)
-7. [Style Guidelines](#7-style-guidelines)
+2. [Contributor License Agreement](#2-contributor-license-agreement)
+3. [Getting Started](#3-getting-started)
+4. [Development Workflow](#4-development-workflow)
+5. [Adding a Premium Package](#5-adding-a-premium-package)
+6. [Architecture & Discipline](#6-architecture--discipline)
+7. [Pull Request Process](#7-pull-request-process)
+8. [Style Guidelines](#8-style-guidelines)
+9. [Reporting Security Issues](#9-reporting-security-issues)
 
 ---
 
@@ -41,7 +43,37 @@ Instances of unacceptable behavior may be reported by opening an issue or contac
 
 ---
 
-## 2. Getting Started
+## 2. Contributor License Agreement
+
+Before we can accept your contribution, you must sign the **Void Energy UI Contributor License Agreement (CLA)**.
+
+### Why a CLA?
+
+Void Energy UI is distributed under the [Business Source License 1.1](./LICENSE.md), which will convert to Apache 2.0 on the Change Date. For the project to be able to license your contribution under both the current BSL and the future Apache 2.0 terms — and to defend the project against IP claims — DGRS Labs Pte. Ltd. needs an explicit grant of rights from every contributor. A CLA is how that grant is recorded.
+
+The Void Energy UI CLA is based on standard industry agreements (similar to the Apache ICLA / Google CLA) and does **not** transfer ownership of your code. You retain full copyright. You are granting DGRS Labs a license to use, modify, and relicense your contribution under the project's current and future licenses.
+
+### How to Sign
+
+- **Individual contributors:** On your first pull request, our CLA bot will comment with a link to sign. Signing is a one-click process backed by your GitHub account and is valid for all future contributions.
+- **Corporate contributors:** If you are contributing on behalf of an employer, your employer must sign the Corporate CLA. Contact [biz@dgrslabs.com](mailto:biz@dgrslabs.com) for the CCLA template.
+
+Pull requests will remain open but **cannot be merged** until the CLA is on file.
+
+### What You Are Agreeing To
+
+By signing, you confirm that:
+
+- You have the legal right to submit the contribution
+- Your contribution is your original work, or you have the rights to submit it
+- You grant DGRS Labs a perpetual, worldwide, non-exclusive, royalty-free license to use, reproduce, modify, distribute, and sublicense your contribution as part of Void Energy UI
+- Your contribution is provided "as is" without warranties
+
+The full CLA text is presented at signing time. If you have questions before signing, email [biz@dgrslabs.com](mailto:biz@dgrslabs.com).
+
+---
+
+## 3. Getting Started
 
 ### Prerequisites
 
@@ -72,7 +104,7 @@ Open [http://localhost:4321](http://localhost:4321) in your browser.
 
 ---
 
-## 3. Development Workflow
+## 4. Development Workflow
 
 ### Before You Start
 
@@ -108,7 +140,7 @@ Branch naming conventions:
 
 #### 2. Make Your Changes
 
-Follow the [Architecture & Discipline](#4-architecture--discipline) rules strictly.
+Follow the [Architecture & Discipline](#6-architecture--discipline) rules strictly.
 
 #### 3. Test Thoroughly
 
@@ -205,7 +237,7 @@ Follow the step-by-step guide in [THEME-GUIDE.md](./THEME-GUIDE.md).
 
 ---
 
-## 4. Adding a Premium Package
+## 5. Adding a Premium Package
 
 Void Energy UI supports **premium packages** — self-contained feature modules that build on the core design system and are distributed separately via private npm registry. Packages live in `packages/` and have their own `package.json`, types, styles, and documentation.
 
@@ -347,7 +379,7 @@ Use the existing `KineticTextPage.svelte` as the reference pattern.
 
 ---
 
-## 5. Architecture & Discipline
+## 6. Architecture & Discipline
 
 ### ⚠️ You MUST Follow These Rules
 
@@ -531,7 +563,7 @@ See [CLAUDE.md → Native-First Protocol](./CLAUDE.md#5-native-first-protocol) f
 
 ---
 
-## 6. Pull Request Process
+## 7. Pull Request Process
 
 ### Before Submitting
 
@@ -603,7 +635,7 @@ When you open a PR, use this template:
 
 ---
 
-## 7. Style Guidelines
+## 8. Style Guidelines
 
 ### TypeScript
 
@@ -733,11 +765,20 @@ interface CardProps {
 
 ---
 
+## 9. Reporting Security Issues
+
+**Do not file public issues or pull requests for security-sensitive reports.**
+
+See [SECURITY.md](./SECURITY.md) for the private disclosure process, response SLAs, supported versions, and safe-harbor terms.
+
+---
+
 ## Questions?
 
 - **Documentation:** [CHEAT-SHEET.md](./CHEAT-SHEET.md), [THEME-GUIDE.md](./THEME-GUIDE.md), [README.md](./README.md)
 - **Repository:** [github.com/dimonb19/void-energy-ui](https://github.com/dimonb19/void-energy-ui)
 - **Issues:** Open an issue in the repository with context, screenshots, and reproduction steps when relevant
+- **Security:** See [SECURITY.md](./SECURITY.md) for private vulnerability reporting
 
 ---
 

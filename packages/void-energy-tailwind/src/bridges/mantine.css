@@ -1,0 +1,112 @@
+/* =============================================================================
+ * Void Energy → Mantine bridge
+ * =============================================================================
+ *
+ * WHAT THIS DOES
+ *   Mantine (https://mantine.dev) reads theming from `--mantine-color-*`
+ *   variables. The primary color is stored under the active theme's name
+ *   (e.g. `--mantine-color-blue-6`), and surface colors live under fixed
+ *   names like `--mantine-color-body` and `--mantine-color-default`.
+ *
+ *   This file routes the most common Mantine tokens through Void Energy,
+ *   so Mantine components (Button, Card, TextInput, Modal, ...) repaint on
+ *   atmosphere change.
+ *
+ * USAGE (in your app.css, after Mantine's own styles):
+ *     @import "tailwindcss";
+ *     @import "@void-energy/tailwind/theme.css";
+ *     @import "@mantine/core/styles.css";
+ *     @import "@void-energy/tailwind/bridges/mantine.css";
+ *
+ *   Set the Mantine primary color to "void" in your MantineProvider:
+ *
+ *   <MantineProvider theme={{ primaryColor: 'void' }}>
+ *
+ *   Mantine will then look up `--mantine-color-void-{0..9}` — which this
+ *   file defines from `--energy-primary`.
+ *
+ * HOW IT WORKS
+ *   Mantine colors are a 10-step scale (0 = lightest, 9 = boldest).
+ *   `color-mix()` synthesizes the scale from `--energy-primary`, matching
+ *   Mantine's perceptual curve. Surface tokens (`body`, `default`, etc.)
+ *   map to VE canvas/surface tokens.
+ *
+ * CONSTRAINTS
+ *   • Requires `color-mix()` support (Chrome 111+, FF 113+, Safari 16.2+).
+ *   • Only the primary scale is synthesized. If you need multiple brand
+ *     colors, define them in your MantineProvider as usual — Mantine's
+ *     built-in palette will coexist with this bridge.
+ *   • Mantine's dark-mode detection uses `[data-mantine-color-scheme]`.
+ *     Sync it with VE's mode attribute in your app entry:
+ *       document.documentElement.setAttribute(
+ *         'data-mantine-color-scheme',
+ *         document.documentElement.getAttribute('data-mode')
+ *       );
+ * ========================================================================== */
+
+:root {
+  /* ——— Primary color scale ('void') synthesized from --energy-primary ———— */
+  --mantine-color-void-0: color-mix(
+    in oklch,
+    var(--energy-primary) 6%,
+    var(--bg-canvas)
+  );
+  --mantine-color-void-1: color-mix(
+    in oklch,
+    var(--energy-primary) 14%,
+    var(--bg-canvas)
+  );
+  --mantine-color-void-2: color-mix(
+    in oklch,
+    var(--energy-primary) 24%,
+    var(--bg-canvas)
+  );
+  --mantine-color-void-3: color-mix(
+    in oklch,
+    var(--energy-primary) 38%,
+    var(--bg-canvas)
+  );
+  --mantine-color-void-4: color-mix(
+    in oklch,
+    var(--energy-primary) 56%,
+    var(--bg-canvas)
+  );
+  --mantine-color-void-5: color-mix(
+    in oklch,
+    var(--energy-primary) 78%,
+    var(--bg-canvas)
+  );
+  --mantine-color-void-6: var(--energy-primary);
+  --mantine-color-void-7: color-mix(in oklch, var(--energy-primary) 88%, white);
+  --mantine-color-void-8: color-mix(in oklch, var(--energy-primary) 75%, white);
+  --mantine-color-void-9: color-mix(in oklch, var(--energy-primary) 60%, white);
+
+  /* ——— Surfaces and text ———————————————————————————————————————————————— */
+  --mantine-color-body: var(--bg-canvas);
+  --mantine-color-text: var(--text-main);
+  --mantine-color-dimmed: var(--text-mute);
+  --mantine-color-default: var(--bg-surface);
+  --mantine-color-default-hover: color-mix(
+    in oklch,
+    var(--bg-surface) 85%,
+    var(--energy-primary)
+  );
+  --mantine-color-default-color: var(--text-main);
+  --mantine-color-default-border: var(--border-color);
+
+  /* ——— Anchors + placeholders ——————————————————————————————————————————— */
+  --mantine-color-anchor: var(--energy-primary);
+  --mantine-color-placeholder: var(--text-mute);
+
+  /* ——— Error + success semantic states —————————————————————————————————— */
+  --mantine-color-error: var(--color-error);
+  --mantine-color-success: var(--color-success);
+
+  /* ——— Radius scale ————————————————————————————————————————————————————— */
+  --mantine-radius-default: var(--radius-base);
+  --mantine-radius-xs: var(--radius-sm);
+  --mantine-radius-sm: var(--radius-sm);
+  --mantine-radius-md: var(--radius-base);
+  --mantine-radius-lg: var(--radius-md);
+  --mantine-radius-xl: var(--radius-lg);
+}

@@ -78,12 +78,7 @@ export {} from './types.js';
 // 6. Barrel index.d.ts
 writeFileSync(
   resolve(dist, 'index.d.ts'),
-  `import { SvelteComponent } from 'svelte';
-import type {
-  AtmosphereLayerProps,
-  PsychologyLayerProps,
-  ActionLayerProps,
-  EnvironmentLayerProps,
+  `import type {
   AmbientIntensity,
   AtmosphereLayer as AtmosphereLayerId,
   PsychologyLayer as PsychologyLayerId,
@@ -91,17 +86,16 @@ import type {
   ActionLayer as ActionLayerId,
 } from './types.js';
 
-/** Atmosphere category layer - weather/sensory variants (rain, snow, ash, fog, underwater, heat). */
-declare const AtmosphereLayer: typeof SvelteComponent<AtmosphereLayerProps>;
-/** Psychology category layer - edge-framed mental variants (danger, tension, dizzy, focus, filmGrain, haze). */
-declare const PsychologyLayer: typeof SvelteComponent<PsychologyLayerProps>;
-/** Action category layer - one-shot transient variants (impact, speed, glitch, flash, reveal). */
-declare const ActionLayer: typeof SvelteComponent<ActionLayerProps>;
-/** Environment category layer - sticky baseline tint variants (night, neon, dawn, dusk, sickly, toxic, underground, candlelit). */
-declare const EnvironmentLayer: typeof SvelteComponent<EnvironmentLayerProps>;
-/** Ambient host - mount once in your app shell to render the active ambient state. */
-declare const AmbientHost: typeof SvelteComponent<Record<string, never>>;
-export { AtmosphereLayer, PsychologyLayer, ActionLayer, EnvironmentLayer, AmbientHost };
+// Re-export the .svelte modules directly so Svelte language-tools wraps them in
+// an isomorphic component type (class + function signatures). Consumers in Astro
+// / Svelte 5 projects then get correct JSX prop inference. A hand-declared
+// \`Component<Props>\` barrel breaks Astro's JSX check because TS picks the first
+// function parameter (\`internals: ComponentInternals\`) as the JSX props.
+export { default as AtmosphereLayer } from './svelte/AtmosphereLayer.svelte';
+export { default as PsychologyLayer } from './svelte/PsychologyLayer.svelte';
+export { default as ActionLayer } from './svelte/ActionLayer.svelte';
+export { default as EnvironmentLayer } from './svelte/EnvironmentLayer.svelte';
+export { default as AmbientHost } from './svelte/AmbientHost.svelte';
 
 export type PersistentCategory = 'atmosphere' | 'psychology' | 'environment';
 

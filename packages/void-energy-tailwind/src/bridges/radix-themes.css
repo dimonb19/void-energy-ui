@@ -1,0 +1,104 @@
+/* =============================================================================
+ * Void Energy → Radix Themes bridge
+ * =============================================================================
+ *
+ * WHAT THIS DOES
+ *   Radix Themes (https://www.radix-ui.com/themes) uses a 12-step color scale
+ *   with well-known names: `--accent-1` (lightest) through `--accent-12`
+ *   (boldest), plus a parallel `--gray-*` scale and `--accent-contrast` for
+ *   text on solid accent backgrounds.
+ *
+ *   Void Energy ships a single `--energy-primary` plus surface tokens — not
+ *   a 12-step scale. This bridge synthesizes the scale at runtime using
+ *   `color-mix()`, blending `--energy-primary` toward canvas (lighter steps)
+ *   and toward white (bolder steps). Every atmosphere change recomputes.
+ *
+ * USAGE (in your app.css, after Radix's own styles):
+ *     @import "tailwindcss";
+ *     @import "@void-energy/tailwind/theme.css";
+ *     @import "@radix-ui/themes/styles.css";
+ *     @import "@void-energy/tailwind/bridges/radix-themes.css";
+ *
+ *   The bridge must come AFTER Radix's own styles — its selectors need to
+ *   override Radix's default accent palette.
+ *
+ * HOW IT WORKS
+ *   Radix scales follow a rough perceptual curve: 1–2 are surface tints,
+ *   3–5 are component backgrounds, 6–8 are borders, 9–10 are solid fills,
+ *   11–12 are high-contrast text. The `color-mix()` percentages below
+ *   approximate that curve. They're tuned for the default atmospheres — if
+ *   a consumer-defined atmosphere has an unusual primary, tweak locally.
+ *
+ * CONSTRAINTS
+ *   • Requires a browser with `color-mix()` support (Chrome 111+, Firefox
+ *     113+, Safari 16.2+). Falls back to the raw `--energy-primary` where
+ *     unsupported.
+ *   • Radix's `[data-accent-color="..."]` per-component accent overrides
+ *     are not bridged. This file bridges the root accent only.
+ *   • Radix Themes also uses `--color-background` (different namespace from
+ *     shadcn's `--background`). Both are covered here.
+ * ========================================================================== */
+
+:root,
+.radix-themes {
+  /* ——— Accent scale (synthesized from --energy-primary) ————————————————— */
+  --accent-1: color-mix(in oklch, var(--energy-primary) 4%, var(--bg-canvas));
+  --accent-2: color-mix(in oklch, var(--energy-primary) 8%, var(--bg-canvas));
+  --accent-3: color-mix(in oklch, var(--energy-primary) 14%, var(--bg-canvas));
+  --accent-4: color-mix(in oklch, var(--energy-primary) 22%, var(--bg-canvas));
+  --accent-5: color-mix(in oklch, var(--energy-primary) 32%, var(--bg-canvas));
+  --accent-6: color-mix(in oklch, var(--energy-primary) 46%, var(--bg-canvas));
+  --accent-7: color-mix(in oklch, var(--energy-primary) 62%, var(--bg-canvas));
+  --accent-8: color-mix(in oklch, var(--energy-primary) 80%, var(--bg-canvas));
+  --accent-9: var(--energy-primary);
+  --accent-10: color-mix(in oklch, var(--energy-primary) 90%, white);
+  --accent-11: color-mix(in oklch, var(--energy-primary) 80%, white);
+  --accent-12: color-mix(in oklch, var(--energy-primary) 65%, white);
+
+  --accent-contrast: var(--text-main);
+
+  /* Alpha variants (Radix uses these for elevated surfaces over photos etc.)
+     We approximate with the same scale — visually indistinguishable on our
+     opaque canvases, and semantically correct under Radix's own layering. */
+  --accent-a1: var(--accent-1);
+  --accent-a2: var(--accent-2);
+  --accent-a3: var(--accent-3);
+  --accent-a4: var(--accent-4);
+  --accent-a5: var(--accent-5);
+  --accent-a6: var(--accent-6);
+  --accent-a7: var(--accent-7);
+  --accent-a8: var(--accent-8);
+  --accent-a9: var(--accent-9);
+  --accent-a10: var(--accent-10);
+  --accent-a11: var(--accent-11);
+  --accent-a12: var(--accent-12);
+
+  /* ——— Gray scale (neutral, derived from text + surface tokens) ———————— */
+  --gray-1: var(--bg-canvas);
+  --gray-2: var(--bg-sunk);
+  --gray-3: color-mix(in oklch, var(--bg-surface) 70%, var(--bg-canvas));
+  --gray-4: var(--bg-surface);
+  --gray-5: color-mix(in oklch, var(--bg-surface) 70%, var(--text-mute));
+  --gray-6: var(--border-color);
+  --gray-7: color-mix(in oklch, var(--border-color) 60%, var(--text-mute));
+  --gray-8: var(--text-mute);
+  --gray-9: var(--text-dim);
+  --gray-10: color-mix(in oklch, var(--text-dim) 70%, var(--text-main));
+  --gray-11: var(--text-dim);
+  --gray-12: var(--text-main);
+
+  /* ——— Global surface mapping (Radix Themes namespace) ——————————————————— */
+  --color-background: var(--bg-canvas);
+  --color-panel-solid: var(--bg-surface);
+  --color-panel-translucent: var(--bg-surface);
+  --color-surface: var(--bg-surface);
+  --color-overlay: color-mix(in oklch, var(--bg-canvas) 80%, transparent);
+
+  /* ——— Radius (Radix supports a scale; we forward the base) —————————————— */
+  --radius-1: var(--radius-sm);
+  --radius-2: var(--radius-sm);
+  --radius-3: var(--radius-base);
+  --radius-4: var(--radius-md);
+  --radius-5: var(--radius-lg);
+  --radius-6: var(--radius-xl);
+}

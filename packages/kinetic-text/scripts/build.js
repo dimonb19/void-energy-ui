@@ -64,17 +64,12 @@ export {} from './types.js';
 // 6. Write barrel index.d.ts
 writeFileSync(
   resolve(dist, 'index.d.ts'),
-  `import { SvelteComponent } from 'svelte';
-import type { KineticTextProps } from './types.js';
-
-/** Kinetic text component — character-level reveal animations with physics-aware rendering. */
-declare const KineticText: typeof SvelteComponent<KineticTextProps>;
-export { KineticText };
-
-import type { KineticSkeletonProps } from './types.js';
-/** Standalone skeleton placeholder — lightweight, no animation engine. */
-declare const KineticSkeleton: typeof SvelteComponent<KineticSkeletonProps>;
-export { KineticSkeleton };
+  `// Re-export the .svelte modules directly so Svelte language-tools wraps them in
+// an isomorphic component type (class + function signatures). A hand-declared
+// \`Component<Props>\` barrel breaks Astro's JSX check because TS picks the first
+// function parameter (\`internals: ComponentInternals\`) as the JSX props.
+export { default as KineticText } from './svelte/KineticText.svelte';
+export { default as KineticSkeleton } from './svelte/KineticSkeleton.svelte';
 
 export { createVoidEnergyTextStyleSnapshot } from './adapters/void-energy-host.js';
 

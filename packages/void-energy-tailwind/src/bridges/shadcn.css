@@ -1,0 +1,75 @@
+/* =============================================================================
+ * Void Energy → shadcn/ui bridge
+ * =============================================================================
+ *
+ * WHAT THIS DOES
+ *   shadcn components read their colors and geometry from CSS variables with
+ *   well-known names (`--background`, `--primary`, `--radius`, etc.). This
+ *   file aliases each of those names to a Void Energy token, so every shadcn
+ *   component re-themes automatically when the VE atmosphere changes.
+ *
+ * USAGE (in your app.css, after the tailwindcss + theme imports):
+ *     @import "tailwindcss";
+ *     @import "@void-energy/tailwind/theme.css";
+ *     @import "@void-energy/tailwind/bridges/shadcn.css";    ← this file
+ *
+ *   That's it. Keep using shadcn components unchanged (<Button>, <Card>,
+ *   <Input>, <Dialog>, ...). Running `setAtmosphere('terminal')` now repaints
+ *   both your Void Energy UI and every shadcn component in one cascade.
+ *
+ * HOW IT WORKS
+ *   shadcn's variables live on :root. This file re-assigns them to `var(...)`
+ *   references pointing at Void Energy tokens. Because VE tokens themselves
+ *   swap per atmosphere/physics/mode, the forwarded values follow.
+ *
+ *   This is a pure alias layer. It adds no new surfaces, no new components,
+ *   no new utilities. You can remove it at any time by deleting the import.
+ *
+ * CONSTRAINTS & EDGE CASES
+ *   • Works with shadcn's classic hex palette. If you opted into the newer
+ *     OKLCH theme, either switch back to hex or extend this bridge yourself.
+ *   • `--radius` bridges to `--radius-base`, which collapses to 0 in retro
+ *     physics. shadcn components also go square-cornered in retro — this is
+ *     almost always the intended behavior, but document it on your end.
+ *   • The shadcn <Dialog> / <Sheet> ship with a `bg-black/80` backdrop that
+ *     clashes with glass atmospheres. Override in your global CSS if needed.
+ *
+ * IDEMPOTENCY
+ *   Safe to import more than once. Safe to layer with consumer overrides —
+ *   anything declared after this import wins by normal cascade rules.
+ * ========================================================================== */
+
+:root {
+  /* ——— Surface + text ——————————————————————————————————————————————————— */
+  --background: var(--bg-canvas);
+  --foreground: var(--text-main);
+
+  --card: var(--bg-surface);
+  --card-foreground: var(--text-main);
+
+  --popover: var(--bg-surface);
+  --popover-foreground: var(--text-main);
+
+  /* ——— Semantic action colors ———————————————————————————————————————————— */
+  --primary: var(--energy-primary);
+  --primary-foreground: var(--text-main);
+
+  --secondary: var(--bg-sunk);
+  --secondary-foreground: var(--text-main);
+
+  --muted: var(--bg-sunk);
+  --muted-foreground: var(--text-mute);
+
+  --accent: var(--energy-secondary);
+  --accent-foreground: var(--text-main);
+
+  --destructive: var(--color-error);
+  --destructive-foreground: var(--text-main);
+
+  /* ——— Structure ———————————————————————————————————————————————————————— */
+  --border: var(--border-color);
+  --input: var(--border-color);
+  --ring: var(--energy-primary);
+
+  --radius: var(--radius-base);
+}
