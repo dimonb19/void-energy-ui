@@ -11,6 +11,7 @@ import {
   PSYCHOLOGY_LAYERS,
   REVEAL_STYLES,
   SPEED_PRESETS,
+  STYLE_KINDS,
   type StoryBeat,
 } from './story-beat-types';
 
@@ -59,12 +60,25 @@ const StoryActionSchema = z
   })
   .strict();
 
+const StoryStyleSpanSchema = z
+  .object({
+    fromWord: z.number().int().min(0).max(200),
+    toWord: z.number().int().min(0).max(200),
+    kind: enumFromReadonly(STYLE_KINDS),
+  })
+  .strict()
+  .refine((s) => s.toWord >= s.fromWord, {
+    message: 'toWord must be ≥ fromWord.',
+    path: ['toWord'],
+  });
+
 const StoryKineticSchema = z
   .object({
     revealStyle: enumFromReadonly(REVEAL_STYLES),
     continuous: enumFromReadonly(KINETIC_EFFECTS).optional(),
     speed: enumFromReadonly(SPEED_PRESETS).optional(),
-    oneShots: z.array(StoryOneShotSchema).max(3).optional(),
+    // At least the climax one-shot; up to two quieter supplementary ones.
+    oneShots: z.array(StoryOneShotSchema).min(1).max(3),
   })
   .strict();
 
@@ -75,7 +89,10 @@ const StoryAmbientSchema = z
     // Atmosphere XOR psychology — never both. One clear signal beats a pile-on.
     atmosphere: z.array(AtmosphereActivationSchema).max(1).optional(),
     psychology: z.array(PsychologyActivationSchema).max(1).optional(),
-    actions: z.array(StoryActionSchema).max(3).optional(),
+    // Exactly one ambient burst — the climax moment. Scene-wide effects are
+    // loud; one per beat is plenty. Pairs with the climax oneShot at the
+    // same atWord so text + scene land as one bigger moment.
+    actions: z.array(StoryActionSchema).length(1),
   })
   .strict()
   .refine((a) => !(a.atmosphere?.length && a.psychology?.length), {
@@ -98,6 +115,17 @@ export const StoryBeatSchema = z
     text: z.string().min(8).max(600),
     ambient: StoryAmbientSchema,
     kinetic: StoryKineticSchema,
+    // 0–3 ranges, all sharing a single `kind`. A styled beat is ONE showcase:
+    // multiple speech ranges (dialogue + explanation + dialogue) are fine;
+    // mixing speech + emphasis is not. Most beats emit no styles at all.
+    styles: z
+      .array(StoryStyleSpanSchema)
+      .max(3)
+      .refine((spans) => new Set(spans.map((s) => s.kind)).size <= 1, {
+        message:
+          'All style spans must share the same kind — one showcase per beat.',
+      })
+      .optional(),
   })
   .strict()
   .refine(

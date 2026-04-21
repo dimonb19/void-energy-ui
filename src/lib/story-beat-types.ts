@@ -8,6 +8,7 @@ import type {
   RevealStyle,
   KineticTextEffect,
   KineticSpeedPreset,
+  KineticStyleKind,
 } from '@dgrslabs/void-energy-kinetic-text/types';
 
 // The literal tuples below are hand-synced with the package type unions. The
@@ -134,6 +135,22 @@ export const ACTION_LAYERS = [
 ] as const satisfies readonly ActionLayer[];
 
 /**
+ * Inline visual styles applied to word ranges inside `text`. Applied on the
+ * `kt-word` wrapper as a `data-kt-style` attribute; composes with kinetic
+ * effects (a styled word can still carry a one-shot). Curly quote marks for
+ * `speech` are rendered by CSS `::before` / `::after`, not typed into `text`.
+ */
+export const STYLE_KINDS = [
+  'speech',
+  'aside',
+  'emphasis',
+  'underline',
+  'code',
+] as const satisfies readonly KineticStyleKind[];
+
+export type StoryStyleKind = (typeof STYLE_KINDS)[number];
+
+/**
  * Ambient layers that warp the backdrop via full-viewport SVG filters or
  * large animated blurs. On integrated GPUs (e.g. M1 Air) each one alone eats
  * most of a frame's raster budget, and stacking them with a `kinetic.continuous`
@@ -156,6 +173,18 @@ export interface StoryOneShot {
   /** 0-indexed word in `text` where the effect should fire. */
   atWord: number;
   effect: KineticTextEffect;
+}
+
+/**
+ * A span of words inside `text` that carries a visual style treatment. Word
+ * indices use the same 0-indexed whitespace-word system as `atWord` on
+ * `StoryOneShot` / `StoryAction`. `fromWord` and `toWord` are inclusive, and
+ * a single-word span has `fromWord === toWord`.
+ */
+export interface StoryStyleSpan {
+  fromWord: number;
+  toWord: number;
+  kind: StoryStyleKind;
 }
 
 export interface StoryAction {
@@ -211,4 +240,10 @@ export interface StoryBeat {
   text: string;
   ambient: StoryAmbient;
   kinetic: StoryKinetic;
+  /**
+   * Inline styled word ranges (dialogue, asides, emphasis, underline).
+   * Composable with effects — a styled word can still be a oneShot target.
+   * Omitted on most beats; styles are spice, not staple.
+   */
+  styles?: StoryStyleSpan[];
 }

@@ -7,6 +7,7 @@ import {
   PSYCHOLOGY_LAYERS,
   REVEAL_STYLES,
   SPEED_PRESETS,
+  STYLE_KINDS,
 } from '@lib/story-beat-types';
 
 /**
@@ -39,7 +40,7 @@ export const STORY_BEAT_TOOL_INPUT_SCHEMA = {
     text: {
       type: 'string',
       description:
-        '1–2 sentences. 40–220 chars. Present tense, sensory, specific. No Markdown, no dialogue.',
+        '3–5 sentences. 150–550 chars. Present tense, sensory, specific. No Markdown. Dialogue is allowed but rare — when it serves the vibe, wrap the spoken phrase in a `speech` style span. Never type quote marks in `text`; the `speech` style adds curly quotes automatically.',
     },
     ambient: {
       type: 'object',
@@ -95,9 +96,9 @@ export const STORY_BEAT_TOOL_INPUT_SCHEMA = {
         actions: {
           type: 'array',
           description:
-            'TWO or THREE ambient action bursts, spread across the text. Each tied to a sensory or dramatic word. Prefer pairing the peak with a kinetic oneShot at the SAME atWord — overlapping reads as one bigger landed moment.',
-          minItems: 2,
-          maxItems: 3,
+            "EXACTLY ONE ambient action burst — the climax moment. Scene-wide effects are loud; one is plenty. MUST fire at the same atWord as a kinetic oneShot so text + scene land together as one bigger moment. Pick the beat's single most dramatic word for this.",
+          minItems: 1,
+          maxItems: 1,
           items: {
             type: 'object',
             additionalProperties: false,
@@ -126,8 +127,8 @@ export const STORY_BEAT_TOOL_INPUT_SCHEMA = {
         oneShots: {
           type: 'array',
           description:
-            'TWO or THREE one-shot kinetic effects, spread across the text. Each effect must dramatize the meaning of its anchor word (shatter on "glass", freeze on "still"). Prefer pairing the peak with an ambient action at the SAME atWord — overlapping reads as one bigger landed moment.',
-          minItems: 2,
+            'ONE to THREE one-shot kinetic effects. At LEAST one must fire at the climax (same atWord as the single ambient action — text + scene landing together). The other 0–2 entries are quieter supplementary shots earlier in the text. Each effect must dramatize the meaning of its anchor word (shatter on "glass", freeze on "still").',
+          minItems: 1,
           maxItems: 3,
           items: {
             type: 'object',
@@ -142,6 +143,32 @@ export const STORY_BEAT_TOOL_INPUT_SCHEMA = {
               effect: { type: 'string', enum: [...KINETIC_EFFECTS] },
             },
           },
+        },
+      },
+    },
+    styles: {
+      type: 'array',
+      description:
+        'ZERO to THREE inline style spans. A styled beat is ONE showcase — ALL ranges in this array MUST share the same `kind` (e.g. two `speech` ranges for a beat with two dialogue moments is fine; mixing `speech` + `emphasis` is not). OMIT ENTIRELY on most beats — plain prose is the default. Emit spans only when the text naturally invites a SINGLE treatment: a voice speaks → `speech`; a sign or screen reads → `code`; one word carries the whole weight → `emphasis`. Rotate across beats: if the last beat used `speech`, let this one be plain or try a different kind. Kind details: `speech` = italic + auto curly quotes (do NOT type quotes in `text`); `aside` = muted color only; `emphasis` = bold, at most ONE range per beat; `underline` = stark callout, at most TWO ranges per beat and never more than 2 words each; `code` = recessed inline chip (mono + subtle background), prefer single-word.',
+      maxItems: 3,
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['fromWord', 'toWord', 'kind'],
+        properties: {
+          fromWord: {
+            type: 'integer',
+            minimum: 0,
+            description:
+              '0-indexed first word of the styled range (inclusive).',
+          },
+          toWord: {
+            type: 'integer',
+            minimum: 0,
+            description:
+              '0-indexed last word of the styled range (inclusive). Must be ≥ fromWord.',
+          },
+          kind: { type: 'string', enum: [...STYLE_KINDS] },
         },
       },
     },

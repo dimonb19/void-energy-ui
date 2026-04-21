@@ -92,6 +92,30 @@ export function revealStyleForPhysics(_physics: PhysicsPreset): RevealStyle {
 export type ReducedMotionMode = 'auto' | 'always' | 'never';
 export type CueTrigger = 'at-time' | 'on-complete';
 
+/**
+ * Inline visual style kinds applied to word ranges via `styleSpans`. Rendered
+ * as `data-kt-style` on the `kt-word` wrapper; SCSS owns the visual treatment.
+ * Composes with kinetic effects — a styled word can still carry a one-shot.
+ */
+export type KineticStyleKind =
+  | 'speech'
+  | 'aside'
+  | 'emphasis'
+  | 'underline'
+  | 'code';
+
+/**
+ * A range of words (inclusive, 0-indexed) to style inline. Word indices use
+ * the same whitespace-split scheme as the text — `fromWord === toWord` marks
+ * a single word. Curly quotes for `speech` are added by CSS `::before` /
+ * `::after`; do not include quote characters in `text`.
+ */
+export interface StyleSpan {
+  fromWord: number;
+  toWord: number;
+  kind: KineticStyleKind;
+}
+
 export interface TextRange {
   start: number;
   end: number;
@@ -351,6 +375,12 @@ export interface KineticTextProps {
    * the word string. Useful for transcript highlighting.
    */
   onrevealword?: (wordIndex: number, word: string) => void;
+  /**
+   * Inline style spans applied to word ranges (dialogue, asides, emphasis,
+   * underline). Each span sets `data-kt-style` + `data-kt-style-pos` on the
+   * `kt-word` wrappers in range; SCSS does the rest.
+   */
+  styleSpans?: StyleSpan[];
   as?: string;
   class?: string;
 }

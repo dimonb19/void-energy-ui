@@ -9,11 +9,13 @@ const baseBeat: StoryBeat = {
   text: 'Salt wind cuts the indigo air. Something far out hums like an idling engine.',
   ambient: {
     atmosphere: [{ layer: 'rain', intensity: 'medium' }],
+    actions: [{ atWord: 12, variant: 'impact', intensity: 'medium' }],
   },
   kinetic: {
     revealStyle: 'blur',
     continuous: 'breathe',
     speed: 'default',
+    oneShots: [{ atWord: 12, effect: 'surge' }],
   },
 };
 
@@ -28,13 +30,18 @@ describe('StoryBeatSchema — happy path', () => {
     if (result.ok) expect(result.data).toEqual(baseBeat);
   });
 
-  it('accepts a beat with optional fields omitted', () => {
+  it('accepts a beat with all optional fields omitted — just the required minimum', () => {
     const minimal: StoryBeat = {
       id: 'minimal',
       title: 'Minimal',
       text: 'A shorter beat with only the required pieces.',
-      ambient: {},
-      kinetic: { revealStyle: 'pop' },
+      ambient: {
+        actions: [{ atWord: 5, variant: 'impact', intensity: 'medium' }],
+      },
+      kinetic: {
+        revealStyle: 'pop',
+        oneShots: [{ atWord: 5, effect: 'pulse' }],
+      },
     };
     const result = parseStoryBeat(minimal);
     expect(result.ok).toBe(true);
@@ -181,9 +188,11 @@ describe('StoryBeatSchema — ambient bounds', () => {
     expect(parseStoryBeat(bad).ok).toBe(false);
   });
 
-  it('accepts empty ambient (silence sells the mood)', () => {
+  it('accepts ambient with only the required action (no environment / atmosphere / psychology)', () => {
     const good = clone(baseBeat);
-    good.ambient = {};
+    good.ambient = {
+      actions: [{ atWord: 5, variant: 'impact', intensity: 'medium' }],
+    };
     expect(parseStoryBeat(good).ok).toBe(true);
   });
 });
@@ -278,6 +287,12 @@ describe('StoryBeatSchema — direct safeParse parity', () => {
 });
 
 describe('StoryBeatSchema — one-shot and action count caps', () => {
+  it('accepts a single oneShot (lean beat — just the climax)', () => {
+    const good = clone(baseBeat);
+    good.kinetic.oneShots = [{ atWord: 5, effect: 'tremble' }];
+    expect(parseStoryBeat(good).ok).toBe(true);
+  });
+
   it('accepts up to 3 oneShots', () => {
     const good = clone(baseBeat);
     good.kinetic.oneShots = [
@@ -286,6 +301,12 @@ describe('StoryBeatSchema — one-shot and action count caps', () => {
       { atWord: 10, effect: 'tremble' },
     ];
     expect(parseStoryBeat(good).ok).toBe(true);
+  });
+
+  it('rejects 0 oneShots — at least the climax is required', () => {
+    const bad = clone(baseBeat);
+    bad.kinetic.oneShots = [];
+    expect(parseStoryBeat(bad).ok).toBe(false);
   });
 
   it('rejects 4 oneShots — deliberate moments only, density hurts', () => {
@@ -299,24 +320,109 @@ describe('StoryBeatSchema — one-shot and action count caps', () => {
     expect(parseStoryBeat(bad).ok).toBe(false);
   });
 
-  it('accepts up to 3 actions', () => {
+  it('accepts exactly 1 action', () => {
     const good = clone(baseBeat);
     good.ambient.actions = [
-      { atWord: 2, variant: 'flash', intensity: 'low' },
-      { atWord: 6, variant: 'reveal', intensity: 'low' },
       { atWord: 11, variant: 'impact', intensity: 'medium' },
     ];
     expect(parseStoryBeat(good).ok).toBe(true);
   });
 
-  it('rejects 4 actions — deliberate moments only, density hurts', () => {
+  it('rejects 0 actions — the climax burst is required', () => {
+    const bad = clone(baseBeat);
+    bad.ambient.actions = [];
+    expect(parseStoryBeat(bad).ok).toBe(false);
+  });
+
+  it('rejects 2 actions — exactly one scene burst per beat', () => {
     const bad = clone(baseBeat);
     bad.ambient.actions = [
       { atWord: 2, variant: 'flash', intensity: 'low' },
-      { atWord: 5, variant: 'reveal', intensity: 'low' },
-      { atWord: 8, variant: 'dissolve', intensity: 'medium' },
-      { atWord: 11, variant: 'impact', intensity: 'high' },
+      { atWord: 11, variant: 'impact', intensity: 'medium' },
     ];
+    expect(parseStoryBeat(bad).ok).toBe(false);
+  });
+});
+
+describe('StoryBeatSchema — styles', () => {
+  it('accepts a beat with no styles field (the common case)', () => {
+    const good = clone(baseBeat);
+    expect(parseStoryBeat(good).ok).toBe(true);
+  });
+
+  it('accepts a single-word emphasis span', () => {
+    const good = clone(baseBeat);
+    good.styles = [{ fromWord: 3, toWord: 3, kind: 'emphasis' }];
+    expect(parseStoryBeat(good).ok).toBe(true);
+  });
+
+  it('accepts a multi-word speech span', () => {
+    const good = clone(baseBeat);
+    good.styles = [{ fromWord: 2, toWord: 5, kind: 'speech' }];
+    expect(parseStoryBeat(good).ok).toBe(true);
+  });
+
+  it('accepts a code span (monospace system-voice fragment)', () => {
+    const good = clone(baseBeat);
+    good.styles = [{ fromWord: 1, toWord: 2, kind: 'code' }];
+    expect(parseStoryBeat(good).ok).toBe(true);
+  });
+
+  it('accepts multiple same-kind ranges — dialogue + narration + dialogue', () => {
+    const good = clone(baseBeat);
+    good.styles = [
+      { fromWord: 0, toWord: 1, kind: 'speech' },
+      { fromWord: 5, toWord: 5, kind: 'speech' },
+    ];
+    expect(parseStoryBeat(good).ok).toBe(true);
+  });
+
+  it('accepts up to 3 same-kind ranges', () => {
+    const good = clone(baseBeat);
+    good.styles = [
+      { fromWord: 0, toWord: 1, kind: 'code' },
+      { fromWord: 4, toWord: 4, kind: 'code' },
+      { fromWord: 6, toWord: 7, kind: 'code' },
+    ];
+    expect(parseStoryBeat(good).ok).toBe(true);
+  });
+
+  it('rejects mixed kinds — a styled beat is ONE showcase', () => {
+    const bad = clone(baseBeat);
+    bad.styles = [
+      { fromWord: 0, toWord: 1, kind: 'speech' },
+      { fromWord: 4, toWord: 4, kind: 'emphasis' },
+    ];
+    expect(parseStoryBeat(bad).ok).toBe(false);
+  });
+
+  it('rejects 4 style spans — spice, not staple', () => {
+    const bad = clone(baseBeat);
+    bad.styles = [
+      { fromWord: 0, toWord: 0, kind: 'speech' },
+      { fromWord: 2, toWord: 2, kind: 'speech' },
+      { fromWord: 4, toWord: 4, kind: 'speech' },
+      { fromWord: 6, toWord: 6, kind: 'speech' },
+    ];
+    expect(parseStoryBeat(bad).ok).toBe(false);
+  });
+
+  it('rejects toWord < fromWord (invalid range)', () => {
+    const bad = clone(baseBeat);
+    bad.styles = [{ fromWord: 5, toWord: 2, kind: 'speech' }];
+    expect(parseStoryBeat(bad).ok).toBe(false);
+  });
+
+  it('rejects an unknown style kind', () => {
+    const bad = clone(baseBeat);
+    // deliberately wrong: force unknown kind through the parser
+    bad.styles = [{ fromWord: 0, toWord: 1, kind: 'whisper' as 'speech' }];
+    expect(parseStoryBeat(bad).ok).toBe(false);
+  });
+
+  it('rejects negative word indices', () => {
+    const bad = clone(baseBeat);
+    bad.styles = [{ fromWord: -1, toWord: 2, kind: 'speech' }];
     expect(parseStoryBeat(bad).ok).toBe(false);
   });
 });

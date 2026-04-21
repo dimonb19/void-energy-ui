@@ -7,8 +7,16 @@ const validBeat: StoryBeat = {
   title: 'Static Garden',
   tagline: 'CRT garden / unease',
   text: 'The hedges hum at a frequency just below hearing, and every leaf is the same shade of television grey.',
-  ambient: { atmosphere: [{ layer: 'rain', intensity: 'low' }] },
-  kinetic: { revealStyle: 'scramble', continuous: 'static', speed: 'slow' },
+  ambient: {
+    atmosphere: [{ layer: 'rain', intensity: 'low' }],
+    actions: [{ atWord: 17, variant: 'shake', intensity: 'medium' }],
+  },
+  kinetic: {
+    revealStyle: 'scramble',
+    continuous: 'static',
+    speed: 'slow',
+    oneShots: [{ atWord: 17, effect: 'tremble' }],
+  },
 };
 
 function mockFetchJson(body: unknown, init?: ResponseInit) {

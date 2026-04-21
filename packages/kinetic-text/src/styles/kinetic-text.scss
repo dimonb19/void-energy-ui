@@ -2052,6 +2052,119 @@
 }
 
 // ═══════════════════════════════════════════════════════════════════
+// INLINE STYLE SPANS (on .kt-word)
+// ═══════════════════════════════════════════════════════════════════
+// Word-range treatments for dialogue, asides, emphasis, and underline.
+// Applied via `data-kt-style` (kind) and `data-kt-style-pos` (start /
+// middle / end / single) set by KineticText after render()/rerender().
+//
+// Curly quote marks for `speech` are rendered by CSS on the first/last
+// word of the range, so the author never types quote characters into
+// `text` (keeps whitespace-word indices stable across effects).
+//
+// Motion-neutral: these rules do not touch transform / opacity / filter,
+// so they compose cleanly with reveal animations, one-shots, and
+// continuous effects on the same word.
+
+.kt-word[data-kt-style='speech'] {
+  font-style: italic;
+}
+
+// `aside` is the volume-down counterpart to `emphasis` — muted color only,
+// no italic. Italic is reserved for `speech` so the two never blur together
+// (italic-with-quotes vs italic-without-quotes is a weak distinction; color
+// contrast is a strong one).
+.kt-word[data-kt-style='aside'] {
+  color: var(--text-mute);
+}
+
+.kt-word[data-kt-style='emphasis'] {
+  font-weight: var(--font-weight-bold);
+}
+
+.kt-word[data-kt-style='underline'] {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+// `code` renders as a recessed inline chip — mono font + subtle background +
+// rounded corners + em-based padding. Matches the native <code> element
+// pattern from the host typography layer so the register shift (prose →
+// system artifact) reads at a glance. Mono-font alone was too subtle a cue.
+//
+// Reveal-gated: padding + radius + nowrap are always applied so line-breaks
+// stay stable between pre-reveal and reveal. Background + border-color fade
+// in with the first glyph (same :has() pattern as speech quotes) so empty
+// recessed boxes don't announce themselves before their text arrives.
+//
+// Multi-word spans render as separate adjacent chips (kt-word wrappers are
+// per-word; spaces sit between them at the kt-line level). Reads as "two
+// system tokens" for 2-word spans; 3+ words look busy — the prompt prefers
+// single-word `code` for that reason.
+.kt-word[data-kt-style='code'] {
+  font-family: var(--font-code);
+  padding: 0.125em 0.375em;
+  border-radius: calc(var(--radius-base) * 0.5);
+  white-space: nowrap;
+
+  background: transparent;
+  border: var(--physics-border-width) solid transparent;
+  transition:
+    background var(--speed-fast) var(--ease-flow),
+    border-color var(--speed-fast) var(--ease-flow);
+}
+
+.kt-word[data-kt-style='code']:has(
+    .kt-unit:first-child .kt-glyph:not([data-kt-state='hidden'])
+  ) {
+  background: var(--bg-sunk);
+  border-color: var(--border-color);
+}
+
+// Curly double quotes wrap the `speech` range — LEFT on start/single, RIGHT
+// on end/single. Single-word spans get both marks on the same element.
+//
+// Reveal-gated: the marks are present in layout immediately (so surrounding
+// text doesn't shift when they appear), but held at opacity 0 until their
+// neighboring glyph starts revealing. `:has()` lets the outer `.kt-word`
+// react to its inner glyph state — opening mark fades in with the word's
+// FIRST glyph; closing mark waits for the LAST glyph. This keeps the quotes
+// in sync with the reveal instead of sitting there announcing words that
+// haven't appeared yet.
+.kt-word[data-kt-style='speech'][data-kt-style-pos='start']::before,
+.kt-word[data-kt-style='speech'][data-kt-style-pos='single']::before {
+  content: '\201C';
+  opacity: 0;
+  transition: opacity var(--speed-fast) var(--ease-flow);
+}
+.kt-word[data-kt-style='speech'][data-kt-style-pos='end']::after,
+.kt-word[data-kt-style='speech'][data-kt-style-pos='single']::after {
+  content: '\201D';
+  opacity: 0;
+  transition: opacity var(--speed-fast) var(--ease-flow);
+}
+
+// Opening mark: reveal when the first glyph of the word is no longer hidden.
+.kt-word[data-kt-style='speech'][data-kt-style-pos='start']:has(
+    .kt-unit:first-child .kt-glyph:not([data-kt-state='hidden'])
+  )::before,
+.kt-word[data-kt-style='speech'][data-kt-style-pos='single']:has(
+    .kt-unit:first-child .kt-glyph:not([data-kt-state='hidden'])
+  )::before {
+  opacity: 1;
+}
+
+// Closing mark: wait until the last glyph of the word is fully visible.
+.kt-word[data-kt-style='speech'][data-kt-style-pos='end']:has(
+    .kt-unit:last-child .kt-glyph[data-kt-state='visible']
+  )::after,
+.kt-word[data-kt-style='speech'][data-kt-style-pos='single']:has(
+    .kt-unit:last-child .kt-glyph[data-kt-state='visible']
+  )::after {
+  opacity: 1;
+}
+
+// ═══════════════════════════════════════════════════════════════════
 // SECONDARY HARMONIC ANIMATION LAYERS (on .kt-word)
 // ═══════════════════════════════════════════════════════════════════
 // Applied on the kt-word wrapper element, which sits ABOVE kt-unit in

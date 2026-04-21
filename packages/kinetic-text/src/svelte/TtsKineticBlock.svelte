@@ -45,6 +45,7 @@
     RevealMark,
     RevealMode,
     RevealStyle,
+    StyleSpan,
     TextStyleSnapshot,
   } from '../types';
   import type { WordTimestamp } from '../tts/types';
@@ -101,6 +102,15 @@
     preRevealed?: boolean;
     skeletonLines?: number;
     skeletonLastLineWidth?: number;
+    /** Inline style spans forwarded to KineticText (dialogue, asides, emphasis, underline). */
+    styleSpans?: StyleSpan[];
+    /**
+     * Audio playback rate (1 = real time). Applied to the internal audio
+     * element when audio is present; the `ratechange` event then scales the
+     * reveal timeline (via syncAudioToKT) so text + voice stay in lock-step.
+     * Clamped by HTMLAudioElement to [0.0625, 16] but 0.5–2 is the usable range.
+     */
+    playbackRate?: number;
 
     // Playback state.
     /**
@@ -146,6 +156,8 @@
     preRevealed = false,
     skeletonLines = 3,
     skeletonLastLineWidth = 0.7,
+    styleSpans,
+    playbackRate = 1,
     paused = $bindable(false),
     status = $bindable('idle'),
     onrevealcomplete,
@@ -187,6 +199,17 @@
       ownedUrl = null;
     }
   }
+
+  // Push the consumer's playbackRate onto the internal audio element
+  // whenever either changes. The audio's own `ratechange` event then scales
+  // the reveal timeline via syncAudioToKT — text + voice stay in lock-step
+  // without the consumer having to reach into the DOM.
+  $effect(() => {
+    const el = audioEl;
+    const rate = playbackRate;
+    if (!el) return;
+    if (el.playbackRate !== rate) el.playbackRate = rate;
+  });
 
   // Whenever the `audio` prop changes identity, resolve it and — when the
   // consumer didn't supply word timestamps — wait for metadata to derive
@@ -417,6 +440,7 @@
   {revealMarks}
   cues={kineticCues}
   paused={ktPaused}
+  {styleSpans}
   bind:controls={ktControls}
   onrevealcomplete={handleRevealComplete}
   onrevealword={onword}

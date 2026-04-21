@@ -123,10 +123,12 @@
   let replayCounter = $state(0);
   let paused = $state(false);
 
-  // Audio element reference captured by TtsKineticBlock when it resolves a
-  // source. We need it to push the consumer-selected playbackRate onto the
-  // live element — TtsKineticBlock inherits the rate via `ratechange` events.
-  let audioElRef = $state<HTMLAudioElement | null>(null);
+  // Normalized numeric rate pushed straight to TtsKineticBlock as a prop.
+  // The block applies it to its internal audio element and the `ratechange`
+  // event inside the package scales the reveal timeline in lock-step.
+  const resolvedPlaybackRate = $derived(
+    typeof playbackRate === 'number' ? playbackRate : 1,
+  );
 
   // ── Snapshot target — KT reads typography from this element ──────────
   let snapshotEl: HTMLElement | undefined = $state();
@@ -196,7 +198,6 @@
 
   function discardPlayback() {
     playbackData = null;
-    audioElRef = null;
   }
 
   // ── Mount / unmount ──────────────────────────────────────────────────
@@ -282,29 +283,6 @@
     }, IDLE_AMBIENT_TIMEOUT_MS);
     return () => clearTimeout(timerId);
   });
-
-  // Push the consumer's selected playback rate onto the live audio element.
-  // TtsKineticBlock / syncAudioToKT pick up the `ratechange` event and scale
-  // the reveal cadence accordingly; burst dispatch rides the audio clock, so
-  // it follows automatically.
-  $effect(() => {
-    const rate = typeof playbackRate === 'number' ? playbackRate : 1;
-    if (audioElRef) audioElRef.playbackRate = rate;
-  });
-
-  // Capture TtsKineticBlock's audio element as soon as it's resolved so the
-  // playback-rate effect above has something to write to. MutationObserver on
-  // the block container would work, but TtsKineticBlock emits `onplay` once
-  // the audio is actually playing — by then the <audio> exists in the DOM.
-  function handlePlay() {
-    if (!snapshotEl) return;
-    const el = snapshotEl.querySelector<HTMLAudioElement>('audio');
-    audioElRef = el ?? null;
-    if (audioElRef) {
-      audioElRef.playbackRate =
-        typeof playbackRate === 'number' ? playbackRate : 1;
-    }
-  }
 
   // ── Generate flow ────────────────────────────────────────────────────
   async function handleGenerate() {
@@ -428,14 +406,11 @@
   }
 
   function handleSkip() {
-    if (status !== 'playing' || !audioElRef) {
-      // No audio — mark done; the reveal-complete handler will have fired
-      // once KT's timeline finishes its stagger pass.
-      status = 'done';
-      return;
-    }
-    audioElRef.currentTime = audioElRef.duration || audioElRef.currentTime;
-    audioElRef.pause();
+    // Audio lives inside TtsKineticBlock (constructed via `new Audio()`, not
+    // in the DOM) and is not currently exposed to consumers — so we can only
+    // mark status done here. Audio will continue playing in the background
+    // until the clip ends. A follow-up should expose a skipToEnd() method on
+    // TtsKineticBlock so the consumer can properly silence audio on skip.
     status = 'done';
   }
 
@@ -534,11 +509,12 @@
             speedPreset={ttsEnabled ? undefined : fallbackSpeed}
             cues={playbackData.cues}
             actions={playbackData.actions}
+            styleSpans={beat.styles}
+            playbackRate={resolvedPlaybackRate}
             onaction={dispatchAmbientAction}
             loading={status === 'loading'}
             bind:paused
             onrevealcomplete={onRevealComplete}
-            onplay={handlePlay}
           />
         {/key}
       {/if}
@@ -584,9 +560,11 @@
           extra: true,
         })),
       ].sort((a, b) => a.atWord - b.atWord)}
+      {@const spans = currentBeat.styles ?? []}
+      {@const wordRanges = wordSpansOf(currentBeat.text)}
       {@const sceneRows = env.length + atm.length + psy.length}
       {@const revealRows = 1 + (k.continuous ? 1 : 0) + (k.speed ? 1 : 0)}
-      {@const total = sceneRows + revealRows + timeline.length}
+      {@const total = sceneRows + revealRows + timeline.length + spans.length}
       <details in:emerge out:dissolve>
         <summary>Active effects · {total}</summary>
         <div class="p-md flex flex-col gap-lg">
@@ -661,6 +639,46 @@
               </table>
             </div>
           </div>
+
+          {#if spans.length > 0}
+            <div class="flex flex-col gap-xs">
+              <p class="text-caption text-mute uppercase">
+                Styles · {spans.length}
+              </p>
+              <div class="table-responsive">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Range</th>
+                      <th>Kind</th>
+                      <th>Phrase</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {#each spans as s, i (`${s.kind}-${s.fromWord}-${s.toWord}-${i}`)}
+                      {@const from = wordRanges[s.fromWord]}
+                      {@const to = wordRanges[s.toWord]}
+                      {@const phrase =
+                        from && to
+                          ? currentBeat.text.slice(from.start, to.end)
+                          : '—'}
+                      <tr>
+                        <td>
+                          {#if s.fromWord === s.toWord}
+                            @ word {s.fromWord}
+                          {:else}
+                            words {s.fromWord}–{s.toWord}
+                          {/if}
+                        </td>
+                        <td class="text-premium">{s.kind}</td>
+                        <td>{phrase}</td>
+                      </tr>
+                    {/each}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          {/if}
 
           {#if timeline.length > 0}
             <div class="flex flex-col gap-xs">
@@ -886,6 +904,75 @@
                   <td>
                     Stagger reveal on <code>speedPreset</code>; actions fire on
                     <code>setTimeout</code>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-xs">
+          <p class="text-caption text-mute uppercase">Inline text styles</p>
+          <p class="text-small text-dim">
+            Claude can tag word ranges with one of five inline visual
+            treatments. Zero to three per beat. Applied on the
+            <code>kt-word</code> wrapper as <code>data-kt-style</code>; composes
+            with effects — a styled word can still carry a one-shot at the same
+            position.
+          </p>
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Style</th>
+                  <th>Example</th>
+                  <th>When Claude reaches for it</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="text-premium">speech</td>
+                  <td>a voice says <em>&ldquo;come home&rdquo;</em></td>
+                  <td>
+                    Direct dialogue — a voice, command, or remembered phrase.
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-premium">aside</td>
+                  <td>
+                    the house settles,
+                    <span class="text-mute">tired of morning</span>
+                  </td>
+                  <td>
+                    Hushed parenthetical or second-layer detail. Volume-down
+                    pair to <em>emphasis</em>.
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-premium">emphasis</td>
+                  <td>
+                    the world <span class="font-bold">tilts</span>
+                  </td>
+                  <td>
+                    The single load-bearing word the beat pivots on. At most
+                    once per beat.
+                  </td>
+                </tr>
+                <tr>
+                  <td class="text-premium">underline</td>
+                  <td>
+                    the sign reads <span class="underline">KEEP OUT</span>
+                  </td>
+                  <td>Stark callout. Rare. Never more than two words.</td>
+                </tr>
+                <tr>
+                  <td class="text-premium">code</td>
+                  <td>
+                    a notification surfaces: <code>OFFLINE</code>
+                  </td>
+                  <td>
+                    System / machine voice — terminal lines, screen labels,
+                    signage. Prefer single word; 2 is fine, 3+ rare.
                   </td>
                 </tr>
               </tbody>

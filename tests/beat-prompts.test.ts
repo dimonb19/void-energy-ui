@@ -32,11 +32,11 @@ describe('buildSystemPrompt', () => {
     expect(prompt).not.toMatch(/`theme`/i);
   });
 
-  it('caps oneShots and actions at 3, not 4 — dense moments dilute the sync', () => {
+  it('declares the new bounds: actions exactly 1, oneShots 1–3, styles same-kind', () => {
     const prompt = buildSystemPrompt();
-    expect(prompt).toContain('2–3 entries');
-    expect(prompt).toContain('NEVER more than 3');
-    expect(prompt).not.toMatch(/2[–-]4 entries/);
+    expect(prompt).toContain('EXACTLY ONE entry');
+    expect(prompt).toContain('1–3 entries');
+    expect(prompt).toMatch(/ALL entries MUST share the same `kind`/);
   });
 
   it('documents the anchoring contract with hard filter + bad/good examples', () => {

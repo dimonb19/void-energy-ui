@@ -51,10 +51,12 @@ function pick<T>(pool: readonly T[], rng: () => number): T {
 }
 
 /**
- * Filler-only safety net. The beat already carries 2–4 deliberately placed
- * one-shots and 2–4 deliberately placed ambient bursts (schema-enforced); the
- * deliberate set carries the experience. This function tops it up with at
- * most 1–2 small surprises, and only when the deliberate set is sparse.
+ * Filler-only safety net for silent playback. The beat carries exactly 1
+ * ambient action + 1–3 kinetic one-shots (schema-enforced). This function
+ * tops up to FLOOR=3 with at most 1–2 small surprises, only when the
+ * deliberate set is sparse. The goal is cinematic restraint — not every
+ * beat needs to hit the floor. Gated off during TTS playback by the caller
+ * (see VibeMachine.svelte) so narrated beats stay clean.
  *
  * Reserves the first ~2 words (too early to register) and the last word
  * (reveal-complete handlers are about to fire). Skips word indices already
@@ -71,7 +73,7 @@ export function generateSpontaneousExtras(
 
   const scheduledCount =
     (beat.ambient.actions?.length ?? 0) + (beat.kinetic.oneShots?.length ?? 0);
-  const FLOOR = 4;
+  const FLOOR = 3;
   if (scheduledCount >= FLOOR) return { actions: [], oneShots: [] };
 
   const claimed = new Set<number>([

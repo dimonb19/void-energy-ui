@@ -4,6 +4,7 @@
     TimelineConfig,
     CharPosition,
     KineticTextControls,
+    StyleSpan,
   } from '../types';
   import { revealStyleForPhysics, SPEED_PRESETS } from '../types';
   import { PretextLayout } from '../core/layout/index';
@@ -45,6 +46,7 @@
     onrevealcomplete,
     oneffectscomplete,
     onrevealword,
+    styleSpans,
     as = 'span',
     class: className = '',
   }: KineticTextProps = $props();
@@ -224,6 +226,52 @@
     );
   });
 
+  // ── Inline style spans ──────────────────────────────────────
+  // Applied on kt-word wrappers as data-kt-style + data-kt-style-pos. Called
+  // after each render()/rerender() so resize and layout changes reapply the
+  // spans on freshly built DOM. SCSS owns the visual treatment (italic, quote
+  // marks, underline, etc.).
+  function applyStyleSpans(
+    r: CharacterRenderer,
+    spans: StyleSpan[] | undefined,
+  ) {
+    const words = r.getAllWordElements();
+    for (const word of words) {
+      word.removeAttribute('data-kt-style');
+      word.removeAttribute('data-kt-style-pos');
+    }
+    if (!spans || spans.length === 0) return;
+    for (const span of spans) {
+      const from = Math.max(0, span.fromWord);
+      const to = Math.min(words.length - 1, span.toWord);
+      if (to < from) continue;
+      for (let i = from; i <= to; i++) {
+        const word = words[i];
+        if (!word) continue;
+        const pos =
+          from === to
+            ? 'single'
+            : i === from
+              ? 'start'
+              : i === to
+                ? 'end'
+                : 'middle';
+        word.setAttribute('data-kt-style', span.kind);
+        word.setAttribute('data-kt-style-pos', pos);
+      }
+    }
+  }
+
+  // React to prop changes after the initial render — e.g. a consumer swaps
+  // styleSpans on the same beat. The render/rerender paths apply spans inline
+  // for their own fresh DOM; this effect covers the mid-life prop-update case.
+  $effect(() => {
+    const r = renderer;
+    const spans = styleSpans;
+    if (!r) return;
+    applyStyleSpans(r, spans);
+  });
+
   // ── Layout pipeline ──────────────────────────────────────────
 
   /** Measure text layout and derive skeleton geometry. Does NOT build DOM. */
@@ -278,6 +326,7 @@
       text,
     );
     renderer.render();
+    applyStyleSpans(renderer, styleSpans);
 
     // Pre-revealed: skip timeline entirely, fire callbacks immediately
     if (preRevealed) {
@@ -387,6 +436,7 @@
     // Only re-render DOM if not in loading state
     if (!loading) {
       renderer?.rerender(result.positions);
+      if (renderer) applyStyleSpans(renderer, styleSpans);
     }
   }
 
