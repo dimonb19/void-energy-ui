@@ -1,6 +1,7 @@
 # build output
 dist/
 .vercel/
+
 # generated types
 .astro/
 
@@ -26,10 +27,6 @@ pnpm-debug.log*
 # package lock files
 package-lock.json
 
-# context for AI
-scripts/generate_context.py
-void_context.md
-
 # css map files
 global.css
 global.css.map
@@ -39,3 +36,6 @@ global.css.map
 /src/config/void-*.json
 /src/styles/config/*
 .vercel
+
+#plans
+plans/
