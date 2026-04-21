@@ -178,6 +178,56 @@ These fire once when the text finishes revealing. Use them to punctuate key narr
 
 ---
 
+## Inline Style Spans — Word-Range Decoration
+
+A fourth, motion-neutral layer. The AI may tag 0–3 word ranges inside `text` with a visual `kind`. Applied as `data-kt-style` (+ `data-kt-style-pos` for position within the range) on the matching `kt-word` wrappers; SCSS owns the visual treatment. Composes cleanly with reveal, continuous, and one-shot — a styled word can still be a cue target at the same word.
+
+Passed to `<KineticText>` as the `styleSpans` prop:
+
+```typescript
+import type { StyleSpan } from '@dgrslabs/void-energy-kinetic-text/types';
+
+const styleSpans: StyleSpan[] = [
+  { fromWord: 6, toWord: 7,  kind: 'speech' },
+  { fromWord: 21, toWord: 21, kind: 'speech' },
+];
+```
+
+### Kinds (5)
+
+| Kind | Treatment | Use When |
+|------|-----------|----------|
+| `speech` | Italic + **automatic curly quotes** (never type `"` in `text`) | A character speaks — dialogue, remembered phrase, radio voice |
+| `aside` | Muted color only (no italic — reserved for `speech`) | Hushed parenthetical, second-layer detail, volume-down pair to `emphasis` |
+| `emphasis` | Bold | One single load-bearing word — the beat's pivot. **Max 1 per beat.** |
+| `underline` | Text-decoration underline | Stark callouts, signage the character reads. **Max 2 ranges, ≤2 words each.** |
+| `code` | Mono + recessed inline chip (`--bg-sunk` bg + border + rounded) | System / machine voice — terminal lines, screen labels, signage. Prefer single word. |
+
+### Schema rules (enforced)
+
+- **0–3 spans per beat.** Default zero — plain prose is the baseline.
+- **One kind per beat.** All spans in `styleSpans` MUST share the same `kind`. Mixing (e.g. `speech` + `emphasis`) is rejected.
+- **Word indices are 0-indexed, inclusive.** `fromWord === toWord` is a single-word span. `toWord` must be `≥ fromWord`.
+- **Rotate across beats.** If the previous beat used `speech`, don't use `speech` again this beat — let variety breathe across the session.
+
+### Author rules (taste)
+
+- `emphasis` — **ONE range maximum** per beat. Pick the one word that carries the weight.
+- `underline` — rare; ≤2 ranges per beat; each ≤2 words.
+- `code` — prefer 1-word spans; 2 is fine; 3+ reads as busy adjacent chips.
+- `speech` — NEVER include quote characters in `text`. The renderer adds curly quotes via CSS `::before` / `::after`, synced to the reveal so marks don't announce unrevealed words.
+- Styles are motion-neutral (no `transform` / `opacity` / `filter`), so they compose with kinetic effects on the same word.
+
+### Composition examples
+
+| Scenario | `styleSpans` | Notes |
+|----------|--------------|-------|
+| Pivot word + climax one-shot | `[{ fromWord: 9, toWord: 9, kind: 'emphasis' }]` + cue at word 9 | Bold + effect on same word = one bigger landed moment |
+| Two-phrase dialogue | `[{ fromWord: 6, toWord: 7, kind: 'speech' }, { fromWord: 21, toWord: 21, kind: 'speech' }]` | Attribution ("she says") sits OUTSIDE the ranges |
+| Two signs speaking | `[{ fromWord: 2, toWord: 2, kind: 'code' }, { fromWord: 5, toWord: 6, kind: 'code' }]` | Each word renders as its own chip |
+
+---
+
 ## Valid Values — Quick Reference
 
 ### revealStyle (7)
@@ -191,3 +241,6 @@ These fire once when the text finishes revealing. Use them to punctuate key narr
 
 ### punctuation — one-shot (16)
 `"shake"` `"quake"` `"jolt"` `"glitch"` `"surge"` `"warp"` `"explode"` `"collapse"` `"scatter"` `"spin"` `"bounce"` `"flash"` `"shatter"` `"vortex"` `"ripple"` `"slam"`
+
+### styleSpans.kind (5)
+`"speech"` `"aside"` `"emphasis"` `"underline"` `"code"`

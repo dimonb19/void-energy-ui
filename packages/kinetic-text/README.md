@@ -92,6 +92,7 @@ This provides all reveal keyframes, effect animations, physics-variant easing, a
 | `cues` | `KineticCue[]` | `[]` | One-shot effect cues triggered during or after reveal. |
 | `oneShotEffect` | `KineticTextEffect \| null` | `null` | Imperative one-shot effect. Fires when `oneShotTrigger` increments. |
 | `oneShotTrigger` | `number` | `0` | Counter — increment to fire the `oneShotEffect`. Value of 0 is ignored. |
+| `styleSpans` | `StyleSpan[]` | `[]` | Inline visual styles applied to word ranges (dialogue, asides, emphasis, underline, code). Motion-neutral — composes with reveal + effects. See [AI-REFERENCE.md § Inline Style Spans](./AI-REFERENCE.md#inline-style-spans--word-range-decoration). |
 | `loading` | `boolean` | `false` | Show skeleton loading state. Skeleton geometry is derived from real layout. Reveal is deferred until `loading` becomes `false`. |
 | `skeletonLines` | `number` | `3` | Hint: number of skeleton lines before layout completes. Overridden by actual layout. |
 | `skeletonLastLineWidth` | `number` | `0.7` | Hint: width ratio (0–1) of the last skeleton line. Overridden by actual layout. |
@@ -115,6 +116,8 @@ Kinetic Text runs three independent effect layers simultaneously on every block 
 3. **One-shot** — dramatic punctuation moments fired on demand. Triggered via `cues` (timeline-driven) or `oneShotEffect` + `oneShotTrigger` (imperative).
 
 Swapping one layer does not interrupt the others.
+
+A fourth, motion-neutral layer — **inline style spans** (`styleSpans` prop) — decorates word ranges with dialogue quotes, emphasis, underline, or monospace chips. See [AI-REFERENCE.md § Inline Style Spans](./AI-REFERENCE.md#inline-style-spans--word-range-decoration).
 
 ## Effects
 
@@ -587,6 +590,41 @@ const r = await deepgramSynthesize('The reactor hums awake.', {
 });
 ```
 
+##### xAI Grok TTS
+
+xAI's TTS API (same `XAI_API_KEY` as the Grok chat API). **No word timestamps** — duration fallback. 5 built-in voices (`eve`, `ara`, `rex`, `sal`, `leo`), 20 languages, and inline expressive tags (`[laugh]`, `[sigh]`, `[breath]`, `<whisper>…</whisper>`, `<emphasis>…</emphasis>`) that pass through `text` untouched — useful ammunition for AI-generated story beats. **Browser-origin note:** xAI's chat API historically does not set permissive CORS headers; test from your actual origin before relying on direct browser calls, a backend proxy may be required.
+
+```typescript
+import { xaiSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+
+const r = await xaiSynthesize('She paused. [sigh] <whisper>Not like this.</whisper>', {
+  apiKey: '...',
+  voiceId: 'eve',
+  // language — default 'en'; 'auto' for auto-detect
+  // codec — default 'mp3'; also 'wav', 'pcm', 'mulaw', 'alaw'
+  // sampleRate — default 24000
+  // bitRate — default 128000 (mp3 only)
+});
+```
+
+##### Kokoro (self-hosted via Kokoro-FastAPI)
+
+Apache-2.0 82M-param open-weight TTS model by [hexgrad](https://huggingface.co/hexgrad/Kokoro-82M), competitive with hosted providers on English naturalness and ~free to run. The adapter targets [remsky/Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) — a ready-to-deploy wrapper with OpenAI-compatible endpoints and a dev endpoint for word timestamps. **Default mode `'captioned'` returns real per-word timings** via `POST /dev/captioned_speech`. Switch to `mode: 'plain'` to call the OpenAI-compatible `POST /v1/audio/speech` endpoint when the dev path is unavailable (proxies that whitelist only the public path). 54 voices; voice-blending supported via the native FastAPI syntax `'af_bella(2)+af_sky(1)'`.
+
+```typescript
+import { kokoroSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+
+const r = await kokoroSynthesize('The reactor hums awake.', {
+  // endpoint — default 'http://localhost:8880' (your Kokoro-FastAPI instance)
+  voice: 'af_bella',
+  // mode — default 'captioned' (real word timestamps); 'plain' for /v1/audio/speech
+  // responseFormat — default 'mp3'; also wav, opus, flac, m4a, pcm
+  // speed — 0.25–4.0, default 1.0
+  // language — optional override; inferred from the voice prefix
+  // apiKey — optional bearer token if your deployment sits behind an auth proxy
+});
+```
+
 #### Platform matrix
 
 How each major TTS service fits the adapter pattern:
@@ -599,6 +637,8 @@ How each major TTS service fits the adapter pattern:
 | **Azure Speech (REST)** | No (streaming SDK only) | Yes (subscription key) | ✅ Built in (fallback) | `azureSynthesize` — duration-estimate |
 | **Google Cloud TTS** | No (SSML marks only) | Yes (API key) | ✅ Built in (fallback) | `googleSynthesize` — REST + API key. OAuth service-account paths need a proxy |
 | **Deepgram Aura** | No (speak endpoint) | Yes (API token) | ✅ Built in (fallback) | `deepgramSynthesize` |
+| **Kokoro (Kokoro-FastAPI)** | Yes (`/dev/captioned_speech`) | Yes (optional bearer) | ✅ Built in | `kokoroSynthesize` — self-host open-source, Apache-2.0, OpenAI-compatible path also supported |
+| **xAI Grok TTS** | No | Yes (bearer) — CORS caveat | ✅ Built in (fallback) | `xaiSynthesize` — 5 voices, expressive tags (`[laugh]`, `<whisper>`, `<emphasis>`); may require backend proxy for browser calls |
 | **Cartesia** | Yes (streaming only) | Yes (API key) | ⚙️ Follow ElevenLabs pattern | Timings come from `/tts/sse`; REST bytes endpoint has audio-only |
 | **Play.ht** | Yes | Yes (API key + user id) | ⚙️ Follow ElevenLabs pattern | Job-poll API, receive word-level timings |
 | **Amazon Polly** | Yes (via `SpeechMarks`) | SigV4 (**not browser-safe**) | ⚠️ Use server-proxy | Call through your backend; aggregate `SpeechMarks` response into `WordTimestamp[]` |

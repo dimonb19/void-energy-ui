@@ -21,3 +21,5 @@ export {
   synthesize as deepgramSynthesize,
   type DeepgramOptions,
 } from './deepgram';
+export { synthesize as kokoroSynthesize, type KokoroOptions } from './kokoro';
+export { synthesize as xaiSynthesize, type XaiOptions } from './xai';

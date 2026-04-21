@@ -5416,6 +5416,37 @@ A standalone `<KineticSkeleton>` component is also exported for lightweight plac
 
 The `use:kinetic` action remains available for direct usage (cycle mode for loading states).
 
+#### Inline Text Styles (`styleSpans`)
+
+A fourth, motion-neutral layer on top of reveal + continuous + one-shot. The `styleSpans` prop decorates word ranges with five inline `kind`s: `speech` (italic + auto curly quotes), `aside` (muted color), `emphasis` (bold), `underline` (decoration), `code` (mono + recessed chip). Full taste rules and per-kind caps live in [TEXT-STYLES.md](TEXT-STYLES.md).
+
+```svelte
+<script lang="ts">
+  import type { StyleSpan } from '@dgrslabs/void-energy-kinetic-text/types';
+
+  const styleSpans: StyleSpan[] = [
+    { fromWord: 6,  toWord: 7,  kind: 'speech' },
+    { fromWord: 21, toWord: 21, kind: 'speech' },
+  ];
+</script>
+
+<KineticText text={beat.text} styleSnapshot={snapshot} {styleSpans} />
+```
+
+| Kind | Treatment | Max ranges / beat | Taste |
+|------|-----------|-------------------|-------|
+| `speech` | Italic + auto curly quotes | 3 | NEVER type `"` in `text` — renderer adds them |
+| `aside` | `color: var(--text-mute)` | 3 | No italic — italic is reserved for `speech` |
+| `emphasis` | `font-weight: bold` | **1** | The single pivot word of the beat |
+| `underline` | `text-decoration: underline` | 2 (≤2 words each) | Rare — signage, callouts |
+| `code` | Mono + `--bg-sunk` chip | 3 | Prefer 1 word; 2 fine; 3+ busy |
+
+**Schema enforcement:** all spans in `styleSpans` MUST share the same `kind` — mixing (e.g. `speech` + `emphasis`) is rejected. Word indices are 0-indexed, inclusive.
+
+**Composes with effects:** style spans are motion-neutral (no `transform` / `opacity` / `filter`), so a styled word can still carry a one-shot cue at the same word index. Emphasis + climax one-shot on the same `atWord` is a natural composition.
+
+**Reveal-gated decoration:** `speech` quote marks and `code` chip backgrounds fade in alongside their underlying glyphs — they don't announce unrevealed text.
+
 ---
 
 ### V. User State Hydration
