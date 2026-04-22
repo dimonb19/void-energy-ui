@@ -1,7 +1,7 @@
-# DESIGN.md — Void Energy UI
+# SYSTEM-PROMPT.md — Void Energy UI
 
-> A portable, agent-readable specification of the Void Energy design system.
-> This file is the contract any coding agent — Claude, Cursor, v0, Codex, Copilot, or a future autonomous system — must honor when designing, composing, or extending a Void Energy UI.
+> The portable system prompt for Void Energy. Any LLM — Claude, GPT, Gemini, or a future model — can consume this file via API as a system prompt and produce constraint-following Void Energy code.
+> This file is **tool-agnostic**. It does not describe the Claude Code harness, the `.claude/` directory, hooks, or rules. Those exist in their own layer. This file is the contract the AI must honor when generating Void Energy UI code.
 > If a single document in this repo could be passed to an AI with the instruction _"build on this,"_ it is this one.
 
 ---
@@ -49,7 +49,7 @@ The UI reads three attributes on the `<html>` element and reacts instantly when 
 
 ## 3. The Five Laws
 
-These are non-negotiable. Every component, every page, every contribution honors them.
+These are non-negotiable. Every component, every page, every generated output honors them.
 
 ### Law 1 — Hybrid Protocol
 
@@ -91,6 +91,7 @@ Runes only. No legacy patterns.
 ❌ export let value;
 ❌ $: reactive = value * 2;
 ❌ onMount / onDestroy / createEventDispatcher
+❌ writable / readable / derived from 'svelte/store'
 ```
 
 ### Law 4 — State Protocol
@@ -124,7 +125,7 @@ This guarantees enter/exit transitions fire through the Physics Engine rather th
 
 ## 4. The Token Dictionary
 
-All values flow from [src/config/design-tokens.ts](src/config/design-tokens.ts) and are exposed as CSS custom properties. Pick from the dictionary; do not invent.
+All values flow from a single source and are exposed as CSS custom properties. Pick from the dictionary; do not invent.
 
 ### Spacing (4px base, density-scaled 0.75× – 1.25×)
 
@@ -199,13 +200,11 @@ Void Energy is **native-first**. Components are thin wrappers around native HTML
 | Field composition                 | `FormField` (label + slot + hint + error)                                                       |
 | Buttons                           | `<button class="btn-*">`, `ActionBtn`, `IconBtn`, `ProfileBtn`, `ThemesBtn`                     |
 | Overlays                          | `Modal`, `Dropdown`, `Sidebar`                                                                  |
-| Feedback                          | `toast`, `modal.alert`, `modal.confirm`, `Skeleton`, `PortalLoader`, `ProgressRing`             |
+| Feedback                          | `toast`, `modal.alert`, `modal.confirm`, `Skeleton`, `ProgressRing`                             |
 | Navigation                        | `Sidebar`, `Breadcrumbs`, `Tabs`, `Pagination`, `LoadMore`, `use:navlink`                       |
-| Data display                      | `Tile`, `StatCard`, `LineChart`, `BarChart`, `DonutChart`                                       |
+| Data display                      | `StatCard`, `LineChart`, `BarChart`, `DonutChart`, `Sparkline`                                   |
 | Motion                            | `use:tooltip`, `use:morph`, `use:kinetic`, `use:narrative`                                      |
-| Drag & reorder                    | `use:draggable`, `use:dropTarget`, `reorderByDrop`, `resolveReorderByDrop`                      |
-
-The authoritative, machine-readable inventory lives at [src/config/component-registry.json](src/config/component-registry.json). Check it before assuming something is missing.
+| Drag & reorder                    | `use:draggable`, `use:dropTarget`, `reorderByDrop`                                              |
 
 ### When to build new
 
@@ -217,25 +216,96 @@ Only when **all three** are true:
 
 Otherwise, compose with what already ships.
 
-### Singletons (import, never re-instantiate)
+---
 
+## 6. Import Paths
+
+All UI primitives import from a single alias root. Pattern: `@components/ui/<ComponentName>.svelte`.
+
+```ts
+// Fields
+import SearchField from '@components/ui/SearchField.svelte';
+import EditField from '@components/ui/EditField.svelte';
+import EditTextarea from '@components/ui/EditTextarea.svelte';
+import PasswordField from '@components/ui/PasswordField.svelte';
+import PasswordMeter from '@components/ui/PasswordMeter.svelte';
+import PasswordChecklist from '@components/ui/PasswordChecklist.svelte';
+import ColorField from '@components/ui/ColorField.svelte';
+import CopyField from '@components/ui/CopyField.svelte';
+import SliderField from '@components/ui/SliderField.svelte';
+import GenerateField from '@components/ui/GenerateField.svelte';
+import GenerateTextarea from '@components/ui/GenerateTextarea.svelte';
+import Toggle from '@components/ui/Toggle.svelte';
+import Switcher from '@components/ui/Switcher.svelte';
+import Selector from '@components/ui/Selector.svelte';
+import Combobox from '@components/ui/Combobox.svelte';
+import DropZone from '@components/ui/DropZone.svelte';
+import FormField from '@components/ui/FormField.svelte';
+import MediaSlider from '@components/ui/MediaSlider.svelte';
+
+// Buttons
+import ActionBtn from '@components/ui/ActionBtn.svelte';
+import IconBtn from '@components/ui/IconBtn.svelte';
+import ThemesBtn from '@components/ui/ThemesBtn.svelte';
+import ProfileBtn from '@components/ui/ProfileBtn.svelte';
+
+// Overlays
+import Dropdown from '@components/ui/Dropdown.svelte';
+import Sidebar from '@components/ui/Sidebar.svelte';
+
+// Navigation
+import Tabs from '@components/ui/Tabs.svelte';
+import Pagination from '@components/ui/Pagination.svelte';
+import LoadMore from '@components/ui/LoadMore.svelte';
+import Breadcrumbs from '@components/ui/Breadcrumbs.svelte';
+
+// Layout + feedback
+import SettingsRow from '@components/ui/SettingsRow.svelte';
+import PullRefresh from '@components/ui/PullRefresh.svelte';
+import Skeleton from '@components/ui/Skeleton.svelte';
+
+// Charts
+import ProgressRing from '@components/ui/ProgressRing.svelte';
+import Sparkline from '@components/ui/Sparkline.svelte';
+import StatCard from '@components/ui/StatCard.svelte';
+import DonutChart from '@components/ui/DonutChart.svelte';
+import LineChart from '@components/ui/LineChart.svelte';
+import BarChart from '@components/ui/BarChart.svelte';
+
+// Theme
+import AtmosphereScope from '@components/core/AtmosphereScope.svelte';
+import LiquidGlassFilter from '@components/core/LiquidGlassFilter.svelte';
+
+// Singletons (import, never re-instantiate)
+import { voidEngine } from '@adapters/void-engine.svelte';
+import { modal } from '@lib/modal-manager.svelte';
+import { toast } from '@stores/toast.svelte';
+import { layerStack } from '@lib/layer-stack.svelte';
+import { shortcutRegistry } from '@lib/shortcut-registry.svelte';
+import { user } from '@stores/user.svelte';
+
+// Actions
+import { morph } from '@actions/morph';
+import { tooltip } from '@actions/tooltip';
+import { navlink } from '@actions/navlink';
+import { kinetic } from '@actions/kinetic';
+import { narrative, isOneShotEffect } from '@actions/narrative';
+import { draggable, dropTarget, reorderByDrop } from '@actions/drag';
+
+// Transitions
+import { emerge, dissolve, materialize, dematerialize, implode, live } from '@lib/transitions.svelte';
 ```
-voidEngine         @adapters/void-engine.svelte     theme / physics / mode runtime
-modal              @lib/modal-manager.svelte        dialog orchestration
-toast              @stores/toast.svelte             notification queue
-layerStack         @lib/layer-stack.svelte          Escape-key LIFO dismissal
-shortcutRegistry   @lib/shortcut-registry.svelte    keyboard shortcut catalog
-user               @stores/user.svelte              auth state and role flags
-```
+
+The complete machine-readable inventory (props, slots, compose guidance, examples) lives in [src/config/component-registry.json](src/config/component-registry.json). Read that file when you need exact prop shapes.
 
 ---
 
-## 6. The Build Procedure
+## 7. The Build Procedure
 
-When a user asks for a page, screen, or feature:
+When asked for a page, screen, or feature:
 
 1. **Parse the request.** Goals, content blocks, interactions, mood.
-2. **Check the registry.** [src/config/component-registry.json](src/config/component-registry.json) lists every shipped primitive, action, and singleton.
+2. **Check the registry.** `component-registry.json` lists every shipped primitive, action, and singleton.
 3. **Find the nearest analog.** An existing page or component that matches the shape. Read it before writing anything.
 4. **Pick tokens from the dictionary.** Spacing, color, motion — all semantic.
 5. **Compose, don't construct.** Assemble shipped primitives with Tailwind for layout. Reach for SCSS only when the task is system-level.
@@ -288,7 +358,7 @@ When a user asks for a page, screen, or feature:
 
 ---
 
-## 7. Hard Prohibitions
+## 8. Hard Prohibitions
 
 These break the system. Do not ship them.
 
@@ -298,28 +368,28 @@ These break the system. Do not ship them.
 - **Classes for state.** `.active`, `.open`, `.selected`, `.is-*`, `.has-*`.
 - **Legacy Svelte.** `export let`, `$:`, `onMount`, `onDestroy`, `createEventDispatcher`, stores from `svelte/store` (use runes).
 - **New primitives when one ships.** Rebuilding `<select>`, `<dialog>`, or any shipped UI component from scratch.
-- **Editing generated files.** [src/styles/config/_generated-themes.scss](src/styles/config/_generated-themes.scss), [src/styles/config/_fonts.scss](src/styles/config/_fonts.scss), [src/config/void-registry.json](src/config/void-registry.json), [src/config/void-physics.json](src/config/void-physics.json), [src/config/font-registry.ts](src/config/font-registry.ts). Edit [src/config/design-tokens.ts](src/config/design-tokens.ts) and run `npm run build:tokens`.
+- **Editing generated files.** `src/styles/config/_generated-themes.scss`, `src/styles/config/_fonts.scss`, `src/config/void-registry.json`, `src/config/void-physics.json`, `src/config/font-registry.ts`. Edit `src/config/design-tokens.ts` instead.
 - **Invalid physics combinations.** Manually setting `physics="glass"` with `mode="light"`, or `physics="retro"` with `mode="light"`.
 - **Inline styles for visuals.** Use a token-backed class. Inline styles are reserved for runtime positioning and browser APIs.
 
 ---
 
-## 8. Verification
+## 9. Acceptance Criteria
 
-A Void Energy change is complete when:
+A Void Energy output is complete when:
 
-- `npm run check` passes — TypeScript, Svelte, and component registry all valid.
-- `npm run scan` reports no raw-value violations in touched files.
-- `npm run test` passes when logic, stores, or utilities changed.
-- The result renders correctly in `glass`, `flat`, **and** `retro`.
-- The result renders correctly in both `light` and `dark` where the active physics permits.
-- No new `// void-ignore` annotations without a written justification.
+- **Types check.** All Svelte and TypeScript types resolve.
+- **Registry aligns.** Every component use matches the registry's props and imports.
+- **No raw values.** No hardcoded px, hex, rgb, hsl in touched files (exceptions carry `// void-ignore` with justification).
+- **Renders across physics.** Works in `glass`, `flat`, **and** `retro`.
+- **Renders across modes.** Works in both `light` and `dark` where the active physics permits (glass + retro are dark-only).
+- **No new `// void-ignore` annotations without a written justification.**
 
 For UI work, "looks right in one physics" is never enough. The system is the three intersecting presets — verify all of them.
 
 ---
 
-## 9. Extension
+## 10. Extension
 
 ### Register a custom theme at runtime
 
@@ -355,11 +425,9 @@ const result = await voidEngine.loadExternalTheme('https://example.com/theme.jso
 
 The active guardrail system still applies. If the payload requests `physics: 'glass'` with `mode: 'light'`, the engine silently corrects physics to `flat` to preserve legibility.
 
-Full palette contract, WCAG minimums, and semantic-collision rules live in [THEME-GUIDE.md](THEME-GUIDE.md).
-
 ---
 
-## 10. The Philosophy, Compact
+## 11. The Philosophy, Compact
 
 - **Composition is separate from material.** Layout is a consumer concern; physics is a system concern.
 - **Tokens are the only vocabulary.** Raw values are a failure of imagination.
@@ -374,13 +442,11 @@ Full palette contract, WCAG minimums, and semantic-collision rules live in [THEM
 
 ## Cross-References
 
-For depth beyond this contract:
+For depth beyond this contract — available to agents with file-system access:
 
-- [README.md](README.md) — project overview, triad architecture, API integration.
 - [CHEAT-SHEET.md](CHEAT-SHEET.md) — complete developer reference: mixins, patterns, actions, transitions.
-- [THEME-GUIDE.md](THEME-GUIDE.md) — building and validating custom themes (palette contract, WCAG, collisions).
 - [COMPOSITION-RECIPES.md](COMPOSITION-RECIPES.md) — page archetypes composed from shipped primitives.
 - [AI-PLAYBOOK.md](AI-PLAYBOOK.md) — compact operating guide for agents building consumer pages.
-- [CONTRIBUTING.md](CONTRIBUTING.md) — PR process and contribution standards.
+- [THEME-GUIDE.md](THEME-GUIDE.md) — building and validating custom themes (palette contract, WCAG, collisions).
 - [src/config/component-registry.json](src/config/component-registry.json) — machine-readable inventory of shipped primitives.
 - [src/config/design-tokens.ts](src/config/design-tokens.ts) — single source of truth for every token value.

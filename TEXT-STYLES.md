@@ -2,7 +2,7 @@
 
 Structured reference for the AI that generates CoNexus story beats. Each entry describes exactly when to tag a word range inside `text` with a given inline style `kind`. Embed this document (or the JSON array below) as system-level context for the story generation model.
 
-Text styles are the **third** layer the AI controls per beat, alongside [narrative effects](NARRATIVE-EFFECTS.md) (kinetic motion on the letters) and [ambient effects](AMBIENT-EFFECTS.md) (scene-level atmosphere). Styles decorate word *ranges* — they do not move, pulse, or animate. They compose cleanly with reveal animations, one-shots, and continuous effects on the same word.
+Text styles are the **third** layer the AI controls per beat, alongside [narrative effects](packages/kinetic-text/AI-REFERENCE.md) (kinetic motion on the letters) and [ambient effects](packages/ambient-layers/AI-REFERENCE.md) (scene-level atmosphere). Styles decorate word *ranges* — they do not move, pulse, or animate. They compose cleanly with reveal animations, one-shots, and continuous effects on the same word.
 
 ## Schema
 
