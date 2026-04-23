@@ -1,5 +1,5 @@
 import type { StoryAmbient, StoryBeat } from '@lib/story-beat-types';
-import { ambient } from '@dgrslabs/void-energy-ambient-layers';
+import { ambient } from '@void-energy/ambient-layers';
 
 /**
  * StoryBeatEngine — holds the currently-playing beat. Ambient layers are

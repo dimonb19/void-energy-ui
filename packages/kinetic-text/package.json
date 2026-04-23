@@ -1,12 +1,32 @@
 {
-  "name": "@dgrslabs/void-energy-kinetic-text",
-  "version": "0.1.0",
+  "name": "@void-energy/kinetic-text",
+  "version": "0.2.0",
   "type": "module",
-  "license": "UNLICENSED",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "description": "Premium kinetic text engine for Void Energy — character-level reveals, effects library, and TTS sync.",
+  "author": "DGRS Labs Pte. Ltd. <biz@dgrslabs.com>",
+  "homepage": "https://github.com/voidenergy/void-energy-premium#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/voidenergy/void-energy-premium.git",
+    "directory": "packages/kinetic-text"
+  },
+  "bugs": {
+    "url": "https://github.com/voidenergy/void-energy-premium/issues"
+  },
+  "keywords": [
+    "kinetic-text",
+    "text-reveal",
+    "svelte",
+    "animation",
+    "tts",
+    "void-energy"
+  ],
   "files": [
     "dist",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "LICENSE.md"
   ],
   "exports": {
     ".": {
@@ -55,6 +75,10 @@
   },
   "peerDependencies": {
     "svelte": "^5.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   },
   "devDependencies": {
     "sass-embedded": "^1.93.0",

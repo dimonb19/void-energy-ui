@@ -717,7 +717,7 @@ A fourth, motion-neutral layer. The AI may tag 0–3 word ranges inside `text` w
 Passed to `<KineticText>` as the `styleSpans` prop:
 
 ```typescript
-import type { StyleSpan } from '@dgrslabs/void-energy-kinetic-text/types';
+import type { StyleSpan } from '@void-energy/kinetic-text/types';
 
 const styleSpans: StyleSpan[] = [
   { fromWord: 6, toWord: 7,  kind: 'speech' },

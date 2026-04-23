@@ -22,21 +22,21 @@
   - TTS: user-provided InWorld key, stored in localStorage.
 -->
 <script lang="ts">
-  import { createVoidEnergyTextStyleSnapshot } from '@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host';
+  import { createVoidEnergyTextStyleSnapshot } from '@void-energy/kinetic-text/adapters/void-energy-host';
   import type {
     TextStyleSnapshot,
     KineticSpeedPreset,
-  } from '@dgrslabs/void-energy-kinetic-text/types';
+  } from '@void-energy/kinetic-text/types';
   import type {
     TimedAction,
     TimedCue,
     WordTimestamp,
-  } from '@dgrslabs/void-energy-kinetic-text/tts';
-  import TtsKineticBlock from '@dgrslabs/void-energy-kinetic-text/tts-block';
-  import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
-  import { inworldSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
-  import { ambient } from '@dgrslabs/void-energy-ambient-layers';
-  import '@dgrslabs/void-energy-kinetic-text/styles';
+  } from '@void-energy/kinetic-text/tts';
+  import TtsKineticBlock from '@void-energy/kinetic-text/tts-block';
+  import KineticText from '@void-energy/kinetic-text/component';
+  import { inworldSynthesize } from '@void-energy/kinetic-text/tts/providers';
+  import { ambient } from '@void-energy/ambient-layers';
+  import '@void-energy/kinetic-text/styles';
 
   import { toast } from '@stores/toast.svelte';
   import { storyBeatEngine } from '@lib/story-beat-engine.svelte';

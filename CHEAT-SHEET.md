@@ -3529,7 +3529,7 @@ Physics-aware visual effects for loading states and skeleton loaders.
 
 #### `<KineticText>` — REMOVED
 
-**Status:** Removed. Replaced by `@dgrslabs/void-energy-kinetic-text` (premium package with character-level DOM, scoped effects, cue system). For simple loading cyclers, use `<LoadingTextCycler>`. The `use:kinetic` action remains available for direct usage.
+**Status:** Removed. Replaced by `@void-energy/kinetic-text` (premium package with character-level DOM, scoped effects, cue system). For simple loading cyclers, use `<LoadingTextCycler>`. The `use:kinetic` action remains available for direct usage.
 
 **Showcase:** [/kinetic-text](src/pages/kinetic-text.astro)
 
@@ -5375,7 +5375,7 @@ No manual body padding or scroll offset adjustments needed — `data-has-breadcr
 
 ### U. Kinetic Text
 
-**Premium package:** `@dgrslabs/void-energy-kinetic-text` — character-level DOM, 3 reveal modes (char, word, decode), 8 reveal styles (pop, scramble, rise, drop, scale, blur, random, instant), 37 effects (16 one-shot + 21 continuous) with per-character animation, three-layer composability (reveal + continuous + one-shot simultaneously), cue system for TTS sync, built-in skeleton loading. See [/kinetic-text](src/pages/kinetic-text.astro) for full showcase.
+**Premium package:** `@void-energy/kinetic-text` — character-level DOM, 3 reveal modes (char, word, decode), 8 reveal styles (pop, scramble, rise, drop, scale, blur, random, instant), 37 effects (16 one-shot + 21 continuous) with per-character animation, three-layer composability (reveal + continuous + one-shot simultaneously), cue system for TTS sync, built-in skeleton loading. See [/kinetic-text](src/pages/kinetic-text.astro) for full showcase.
 
 #### Skeleton Loading
 
@@ -5398,7 +5398,7 @@ A standalone `<KineticSkeleton>` component is also exported for lightweight plac
 
 ```svelte
 <script lang="ts">
-  import { KineticSkeleton } from '@dgrslabs/void-energy-kinetic-text';
+  import { KineticSkeleton } from '@void-energy/kinetic-text';
 </script>
 
 <KineticSkeleton lines={4} lineHeight={24} styleSnapshot={snapshot} />
@@ -5422,7 +5422,7 @@ A fourth, motion-neutral layer on top of reveal + continuous + one-shot. The `st
 
 ```svelte
 <script lang="ts">
-  import type { StyleSpan } from '@dgrslabs/void-energy-kinetic-text/types';
+  import type { StyleSpan } from '@void-energy/kinetic-text/types';
 
   const styleSpans: StyleSpan[] = [
     { fromWord: 6,  toWord: 7,  kind: 'speech' },

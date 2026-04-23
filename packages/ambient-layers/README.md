@@ -1,4 +1,4 @@
-# @dgrslabs/void-energy-ambient-layers
+# @void-energy/ambient-layers
 
 Full-viewport ambient overlay system for Void Energy hosts and standalone consumers. Four composable layer categories — **Atmosphere**, **Psychology**, **Action**, **Environment** — with 39 effects across weather, mood, impact, and color grading. Physics-aware, reduced-motion-safe, and driven by a unified `variant` + `intensity` vocabulary.
 
@@ -7,7 +7,7 @@ Full-viewport ambient overlay system for Void Energy hosts and standalone consum
 ## Installation
 
 ```bash
-npm install @dgrslabs/void-energy-ambient-layers
+npm install @void-energy/ambient-layers
 ```
 
 ### Peer dependencies
@@ -29,8 +29,8 @@ Mount `<AmbientHost />` once in your app shell, then drive it from any component
 ```svelte
 <!-- src/layouts/Layout.astro (or App.svelte root) -->
 <script lang="ts">
-  import { AmbientHost } from '@dgrslabs/void-energy-ambient-layers';
-  import '@dgrslabs/void-energy-ambient-layers/styles';
+  import { AmbientHost } from '@void-energy/ambient-layers';
+  import '@void-energy/ambient-layers/styles';
 </script>
 
 <!-- renders at the end of your shell, alongside Modal / Toast -->
@@ -40,7 +40,7 @@ Mount `<AmbientHost />` once in your app shell, then drive it from any component
 ```svelte
 <!-- anywhere else -->
 <script lang="ts">
-  import { ambient } from '@dgrslabs/void-energy-ambient-layers';
+  import { ambient } from '@void-energy/ambient-layers';
 
   // Persistent layer scoped to component lifecycle.
   $effect(() => {
@@ -68,8 +68,8 @@ The four category components remain exported. Use them when you need decay callb
     PsychologyLayer,
     ActionLayer,
     EnvironmentLayer,
-  } from '@dgrslabs/void-energy-ambient-layers';
-  import '@dgrslabs/void-energy-ambient-layers/styles';
+  } from '@void-energy/ambient-layers';
+  import '@void-energy/ambient-layers/styles';
 
   let showImpact = $state(false);
 </script>
@@ -93,8 +93,8 @@ No adapter, no snapshot, no initialization. The same import works standalone —
 
 ```svelte
 <script lang="ts">
-  import { AtmosphereLayer } from '@dgrslabs/void-energy-ambient-layers';
-  import '@dgrslabs/void-energy-ambient-layers/styles';
+  import { AtmosphereLayer } from '@void-energy/ambient-layers';
+  import '@void-energy/ambient-layers/styles';
 </script>
 
 <AtmosphereLayer variant="fog" />
@@ -105,7 +105,7 @@ No adapter, no snapshot, no initialization. The same import works standalone —
 Import the stylesheet once in your entry point or layout:
 
 ```js
-import '@dgrslabs/void-energy-ambient-layers/styles';
+import '@void-energy/ambient-layers/styles';
 ```
 
 This provides all layer positioning, particle keyframes, SVG-filter definitions, vignette blends, environment tints, physics-variant easing, and reduced-motion overrides.
@@ -231,7 +231,7 @@ Imperative reactive store backed by Svelte 5 runes. One instance, one renderer (
 ### Driving state
 
 ```ts
-import { ambient } from '@dgrslabs/void-energy-ambient-layers';
+import { ambient } from '@void-energy/ambient-layers';
 
 // Persistent layers — returns a handle you release later.
 const h1 = ambient.push('environment', 'night');
@@ -432,13 +432,13 @@ All layers are `aria-hidden` and never trap pointer events — they do not affec
 
 | Export path | Contents |
 |---|---|
-| `@dgrslabs/void-energy-ambient-layers` | `AmbientHost`, `ambient` (singleton) + 4 raw layer components + public types |
-| `@dgrslabs/void-energy-ambient-layers/atmosphere` | `AtmosphereLayer` Svelte component only |
-| `@dgrslabs/void-energy-ambient-layers/psychology` | `PsychologyLayer` Svelte component only |
-| `@dgrslabs/void-energy-ambient-layers/action` | `ActionLayer` Svelte component only |
-| `@dgrslabs/void-energy-ambient-layers/environment` | `EnvironmentLayer` Svelte component only |
-| `@dgrslabs/void-energy-ambient-layers/types` | Type-only exports (`AmbientLevel`, `AtmosphereLayer`, etc.) |
-| `@dgrslabs/void-energy-ambient-layers/styles` | Compiled CSS stylesheet |
+| `@void-energy/ambient-layers` | `AmbientHost`, `ambient` (singleton) + 4 raw layer components + public types |
+| `@void-energy/ambient-layers/atmosphere` | `AtmosphereLayer` Svelte component only |
+| `@void-energy/ambient-layers/psychology` | `PsychologyLayer` Svelte component only |
+| `@void-energy/ambient-layers/action` | `ActionLayer` Svelte component only |
+| `@void-energy/ambient-layers/environment` | `EnvironmentLayer` Svelte component only |
+| `@void-energy/ambient-layers/types` | Type-only exports (`AmbientLevel`, `AtmosphereLayer`, etc.) |
+| `@void-energy/ambient-layers/styles` | Compiled CSS stylesheet |
 
 **From the top-level export, also available:**
 
@@ -450,7 +450,7 @@ All layers are `aria-hidden` and never trap pointer events — they do not affec
 ## Build
 
 ```
-npm --workspace @dgrslabs/void-energy-ambient-layers run build
+npm --workspace @void-energy/ambient-layers run build
 ```
 
 ## License

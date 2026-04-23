@@ -103,24 +103,24 @@ Use when a block of text should unfold at the cadence of spoken audio with timed
 
 Three packages collaborate and the wiring is a single component:
 
-- `@dgrslabs/void-energy-kinetic-text/tts-block` — `<TtsKineticBlock>` owns reveal sync, audio-driven action dispatch, and blob-URL lifecycle
-- `@dgrslabs/void-energy-kinetic-text/tts/providers` — provider-agnostic TTS adapters. Built-in: `inworldSynthesize`, `elevenLabsSynthesize`, `openaiSynthesize`. Adding a new provider (Deepgram, Cartesia, your backend, etc.) is a single file — see the kinetic-text README's "TTS providers" section
-- `@dgrslabs/void-energy-ambient-layers` — `ambient.fire(variant, intensity)` triggers one-shot backdrop bursts; `ambient.push(category, variant, intensity)` mounts persistent backdrop layers
+- `@void-energy/kinetic-text/tts-block` — `<TtsKineticBlock>` owns reveal sync, audio-driven action dispatch, and blob-URL lifecycle
+- `@void-energy/kinetic-text/tts/providers` — provider-agnostic TTS adapters. Built-in: `inworldSynthesize`, `elevenLabsSynthesize`, `openaiSynthesize`. Adding a new provider (Deepgram, Cartesia, your backend, etc.) is a single file — see the kinetic-text README's "TTS providers" section
+- `@void-energy/ambient-layers` — `ambient.fire(variant, intensity)` triggers one-shot backdrop bursts; `ambient.push(category, variant, intensity)` mounts persistent backdrop layers
 
 Minimum viable composition:
 
 ```svelte
 <script lang="ts">
-  import TtsKineticBlock from '@dgrslabs/void-energy-kinetic-text/tts-block';
+  import TtsKineticBlock from '@void-energy/kinetic-text/tts-block';
   // Any built-in or custom adapter works — swap this one import to change vendor.
-  import { elevenLabsSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
-  import { createVoidEnergyTextStyleSnapshot } from '@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host';
+  import { elevenLabsSynthesize } from '@void-energy/kinetic-text/tts/providers';
+  import { createVoidEnergyTextStyleSnapshot } from '@void-energy/kinetic-text/adapters/void-energy-host';
   import type {
     TimedAction,
     TimedCue,
-  } from '@dgrslabs/void-energy-kinetic-text/tts';
-  import { ambient } from '@dgrslabs/void-energy-ambient-layers';
-  import '@dgrslabs/void-energy-kinetic-text/styles';
+  } from '@void-energy/kinetic-text/tts';
+  import { ambient } from '@void-energy/ambient-layers';
+  import '@void-energy/kinetic-text/styles';
 
   const text = 'The reactor hums awake, then roars.';
   type Burst = { variant: 'impact' | 'flash'; intensity: 'high' };

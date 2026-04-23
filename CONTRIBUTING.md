@@ -291,7 +291,7 @@ packages/
 
 ### Example: Kinetic Text
 
-`@dgrslabs/void-energy-kinetic-text` is the reference implementation for premium packages. It demonstrates every pattern above:
+`@void-energy/kinetic-text` is the reference implementation for premium packages. It demonstrates every pattern above:
 
 - **3 reveal modes** (char, word, decode), **8 reveal styles** (pop, scramble, rise, drop, scale, blur, random, instant)
 - **37 effects** — 16 one-shot (shake, explode, vortex...) + 21 continuous (breathe, haunt, sparkle...)
@@ -304,9 +304,9 @@ packages/
 
 ```svelte
 <script lang="ts">
-  import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
-  import { createVoidEnergyTextStyleSnapshot } from '@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host';
-  import '@dgrslabs/void-energy-kinetic-text/styles';
+  import KineticText from '@void-energy/kinetic-text/component';
+  import { createVoidEnergyTextStyleSnapshot } from '@void-energy/kinetic-text/adapters/void-energy-host';
+  import '@void-energy/kinetic-text/styles';
 
   let el = $state<HTMLElement>();
   const snapshot = $derived(el ? createVoidEnergyTextStyleSnapshot(el) : null);
@@ -329,8 +329,8 @@ packages/
 
 ```svelte
 <script lang="ts">
-  import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
-  import '@dgrslabs/void-energy-kinetic-text/styles';
+  import KineticText from '@void-energy/kinetic-text/component';
+  import '@void-energy/kinetic-text/styles';
 
   const snapshot = {
     font: '16px "Inter", sans-serif',
@@ -366,7 +366,7 @@ Use the existing `KineticTextPage.svelte` as the reference pattern.
 ### Checklist for New Packages
 
 - [ ] Package lives in `packages/your-package/`
-- [ ] `package.json` has scoped name (`@dgrslabs/void-energy-*`), `UNLICENSED` license, Svelte 5 peer dep
+- [ ] `package.json` has scoped name (`@void-energy/*`), `SEE LICENSE IN LICENSE.md` license, Svelte 5 peer dep
 - [ ] Export map provides `.`, `./component`, `./types`, `./adapters/void-energy-host`, `./styles`
 - [ ] Adapter reads `data-physics`, `data-mode`, computed font, and CSS variables from host DOM
 - [ ] Component adapts to all 3 physics presets (glass, flat, retro) and both color modes

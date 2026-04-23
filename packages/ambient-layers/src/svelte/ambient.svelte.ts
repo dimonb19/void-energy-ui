@@ -5,7 +5,7 @@
  * `<AmbientHost />` once in your app shell, then drive it from anywhere:
  *
  * ```ts
- * import { ambient } from '@dgrslabs/void-energy-ambient-layers';
+ * import { ambient } from '@void-energy/ambient-layers';
  *
  * // Persistent layer — returns a handle; call release(handle) to remove.
  * const h = ambient.push('atmosphere', 'rain', 'medium');

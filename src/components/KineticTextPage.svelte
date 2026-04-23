@@ -7,15 +7,15 @@
   import ActionBtn from '@components/ui/ActionBtn.svelte';
   import IconBtn from '@components/ui/IconBtn.svelte';
   import PlayPause from '@components/icons/PlayPause.svelte';
-  import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
-  import { createVoidEnergyTextStyleSnapshot } from '@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host';
+  import KineticText from '@void-energy/kinetic-text/component';
+  import { createVoidEnergyTextStyleSnapshot } from '@void-energy/kinetic-text/adapters/void-energy-host';
   import type {
     KineticTextEffect,
     RevealMode,
     RevealStyle,
     KineticCue,
     TextStyleSnapshot,
-  } from '@dgrslabs/void-energy-kinetic-text/types';
+  } from '@void-energy/kinetic-text/types';
   import { morph } from '@actions/morph';
 
   // ── Snapshot ─────────────────────────────────────────────────────

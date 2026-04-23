@@ -1,5 +1,5 @@
-import type { KineticTextEffect } from '@dgrslabs/void-energy-kinetic-text/types';
-import type { ActionLayer } from '@dgrslabs/void-energy-ambient-layers/types';
+import type { KineticTextEffect } from '@void-energy/kinetic-text/types';
+import type { ActionLayer } from '@void-energy/ambient-layers/types';
 import type {
   AmbientIntensity,
   StoryAction,
@@ -13,7 +13,7 @@ export {
   wordSpansOf,
   wordStartTimes,
   SPEED_TO_WORD_MS,
-} from '@dgrslabs/void-energy-kinetic-text/tts';
+} from '@void-energy/kinetic-text/tts';
 
 // Curated pools for spontaneous extras. Picked to be tasteful surprises, not
 // scene-changing money moments — those stay on the schema-enforced action +

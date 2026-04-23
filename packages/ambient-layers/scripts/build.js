@@ -1,5 +1,5 @@
 /**
- * Build script for @dgrslabs/void-energy-ambient-layers.
+ * Build script for @void-energy/ambient-layers.
  *
  * Mirrors packages/kinetic-text/scripts/build.js:
  * 1. Clean dist/

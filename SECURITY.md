@@ -52,7 +52,7 @@ During the 0.x development phase, only the **latest minor release** receives sec
 **In scope:**
 
 - Code in this repository (`src/`, `packages/`, `scripts/`, build tooling)
-- Published npm packages under `@dgrslabs/void-energy-*`
+- Published npm packages under `@void-energy/*`
 - The showcase site if hosted by DGRS Labs
 
 **Out of scope:**

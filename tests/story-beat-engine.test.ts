@@ -3,7 +3,7 @@ import {
   storyBeatEngine,
   StoryBeatEngine,
 } from '../src/lib/story-beat-engine.svelte';
-import { ambient } from '@dgrslabs/void-energy-ambient-layers';
+import { ambient } from '@void-energy/ambient-layers';
 import type { StoryBeat } from '../src/lib/story-beat-types';
 
 function quietConsole() {

@@ -1,8 +1,8 @@
 /**
- * Public types for @dgrslabs/void-energy-ambient-layers.
+ * Public types for @void-energy/ambient-layers.
  *
  * SSOT for every layer id, category, and prop shape. Mirrors the flat-union
- * pattern used by `@dgrslabs/void-energy-kinetic-text` (`KineticTextEffect`).
+ * pattern used by `@void-energy/kinetic-text` (`KineticTextEffect`).
  */
 
 export type ReducedMotionMode = 'respect' | 'ignore';

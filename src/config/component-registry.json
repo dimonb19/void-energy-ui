@@ -1241,7 +1241,7 @@
       "args": ["config: KineticConfig"],
       "returns": ["{ update(newConfig), destroy() }"],
       "related": ["typewrite"],
-      "compose": "Use for declarative text reveal effects in markup. The action restarts whenever the config object reference changes. For premium character-level reveals, use @dgrslabs/void-energy-kinetic-text instead.",
+      "compose": "Use for declarative text reveal effects in markup. The action restarts whenever the config object reference changes. For premium character-level reveals, use @void-energy/kinetic-text instead.",
       "example": "<span use:kinetic={{ text: 'SYSTEM ONLINE', mode: 'decode' }} />"
     },
     "navlink": {

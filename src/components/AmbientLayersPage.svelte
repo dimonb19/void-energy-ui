@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { ambient } from '@dgrslabs/void-energy-ambient-layers';
+  import { ambient } from '@void-energy/ambient-layers';
   import type {
     AtmosphereLayerId,
     PsychologyLayerId,
     ActionLayerId,
     EnvironmentLayerId,
     AmbientIntensity,
-  } from '@dgrslabs/void-energy-ambient-layers';
+  } from '@void-energy/ambient-layers';
 
   import Switcher from '@components/ui/Switcher.svelte';
   import ActionBtn from '@components/ui/ActionBtn.svelte';

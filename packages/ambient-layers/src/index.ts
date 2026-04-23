@@ -1,10 +1,10 @@
 /**
- * @dgrslabs/void-energy-ambient-layers — Premium full-viewport ambient overlay
+ * @void-energy/ambient-layers — Premium full-viewport ambient overlay
  * layers for Void Energy hosts.
  *
  * Four category components, each driven by a `variant` prop that selects the
  * concrete layer within its category. Mirrors the structural pattern of
- * `@dgrslabs/void-energy-kinetic-text` (one component, flat variant union).
+ * `@void-energy/kinetic-text` (one component, flat variant union).
  *
  * ```svelte
  * <script lang="ts">
@@ -13,8 +13,8 @@
  *     PsychologyLayer,
  *     ActionLayer,
  *     EnvironmentLayer,
- *   } from '@dgrslabs/void-energy-ambient-layers';
- *   import '@dgrslabs/void-energy-ambient-layers/styles';
+ *   } from '@void-energy/ambient-layers';
+ *   import '@void-energy/ambient-layers/styles';
  * </script>
  *
  * <EnvironmentLayer variant="night" />

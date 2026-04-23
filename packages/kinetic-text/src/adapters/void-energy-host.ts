@@ -68,7 +68,7 @@ function resolveRequiredVars(
  *
  * ```svelte
  * <script lang="ts">
- *   import { createVoidEnergyTextStyleSnapshot } from '@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host';
+ *   import { createVoidEnergyTextStyleSnapshot } from '@void-energy/kinetic-text/adapters/void-energy-host';
  *
  *   let containerEl = $state<HTMLElement>();
  *

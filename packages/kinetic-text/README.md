@@ -1,4 +1,4 @@
-# @dgrslabs/void-energy-kinetic-text
+# @void-energy/kinetic-text
 
 Character-level kinetic typography for Void Energy hosts and standalone consumers. Pretext-based layout with per-character reveal animations, 37 narrative effects (16 one-shot + 21 continuous), and physics-aware rendering.
 
@@ -7,7 +7,7 @@ Character-level kinetic typography for Void Energy hosts and standalone consumer
 ## Installation
 
 ```bash
-npm install @dgrslabs/void-energy-kinetic-text
+npm install @void-energy/kinetic-text
 ```
 
 ### Peer dependencies
@@ -26,9 +26,9 @@ Use the built-in adapter to resolve styles from the live DOM:
 
 ```svelte
 <script lang="ts">
-  import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
-  import { createVoidEnergyTextStyleSnapshot } from '@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host';
-  import '@dgrslabs/void-energy-kinetic-text/styles';
+  import KineticText from '@void-energy/kinetic-text/component';
+  import { createVoidEnergyTextStyleSnapshot } from '@void-energy/kinetic-text/adapters/void-energy-host';
+  import '@void-energy/kinetic-text/styles';
 
   let el = $state<HTMLElement>();
   const snapshot = $derived(el ? createVoidEnergyTextStyleSnapshot(el) : null);
@@ -49,8 +49,8 @@ Construct `TextStyleSnapshot` manually — no adapter needed:
 
 ```svelte
 <script lang="ts">
-  import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
-  import '@dgrslabs/void-energy-kinetic-text/styles';
+  import KineticText from '@void-energy/kinetic-text/component';
+  import '@void-energy/kinetic-text/styles';
 
   const snapshot = {
     font: '16px "Inter", sans-serif',
@@ -71,7 +71,7 @@ Construct `TextStyleSnapshot` manually — no adapter needed:
 Import the stylesheet in your entry point or layout:
 
 ```js
-import '@dgrslabs/void-energy-kinetic-text/styles';
+import '@void-energy/kinetic-text/styles';
 ```
 
 This provides all reveal keyframes, effect animations, physics-variant easing, and reduced-motion overrides.
@@ -191,7 +191,7 @@ Effects marked **Secondary Harmonic** apply an additional animation layer on wor
 Cues trigger one-shot effects during or after the reveal timeline.
 
 ```typescript
-import type { KineticCue } from '@dgrslabs/void-energy-kinetic-text/types';
+import type { KineticCue } from '@void-energy/kinetic-text/types';
 
 const cues: KineticCue[] = [
   // Fire shake on a word range at 1.2s into reveal
@@ -293,7 +293,7 @@ The `<KineticSkeleton>` component renders shimmer line-blocks without the animat
 
 ```svelte
 <script lang="ts">
-  import { KineticSkeleton } from '@dgrslabs/void-energy-kinetic-text';
+  import { KineticSkeleton } from '@void-energy/kinetic-text';
 </script>
 
 <KineticSkeleton lines={4} lineHeight={24} styleSnapshot={snapshot} />
@@ -372,12 +372,12 @@ Each character receives unique CSS custom properties (`--kt-dx`, `--kt-dy`, `--k
 
 ```svelte
 <script lang="ts">
-  import TtsKineticBlock from '@dgrslabs/void-energy-kinetic-text/tts-block';
+  import TtsKineticBlock from '@void-energy/kinetic-text/tts-block';
   // Pick any built-in provider — inworld / elevenLabs / openai — or write your own.
   // The core doesn't know which one you pick; swapping is a one-import change.
-  import { elevenLabsSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
-  import { createVoidEnergyTextStyleSnapshot } from '@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host';
-  import '@dgrslabs/void-energy-kinetic-text/styles';
+  import { elevenLabsSynthesize } from '@void-energy/kinetic-text/tts/providers';
+  import { createVoidEnergyTextStyleSnapshot } from '@void-energy/kinetic-text/adapters/void-energy-host';
+  import '@void-energy/kinetic-text/styles';
 
   let text = 'The reactor hums awake, then roars.';
   let audio = $state<Blob | null>(null);
@@ -425,8 +425,8 @@ Two timeline channels: `cues` fire kinetic effects, `actions` fire arbitrary pay
   import type {
     TimedAction,
     TimedCue,
-  } from '@dgrslabs/void-energy-kinetic-text/tts';
-  import { ambient } from '@dgrslabs/void-energy-ambient-layers';
+  } from '@void-energy/kinetic-text/tts';
+  import { ambient } from '@void-energy/ambient-layers';
 
   const cues: TimedCue[] = [
     { atWord: 3, effect: 'flash' },           // kinetic effect on word 3
@@ -503,7 +503,7 @@ Six adapters ship with the package, covering the biggest browser-feasible TTS pl
 Game-focused, expressive voices, per-word alignment in the response.
 
 ```typescript
-import { inworldSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+import { inworldSynthesize } from '@void-energy/kinetic-text/tts/providers';
 
 const r = await inworldSynthesize('The reactor hums awake.', {
   voiceId: 'Ashley',
@@ -517,7 +517,7 @@ const r = await inworldSynthesize('The reactor hums awake.', {
 Industry leader for natural voices and voice cloning. Uses the `/with-timestamps` endpoint; the adapter aggregates character-level alignment into word timestamps.
 
 ```typescript
-import { elevenLabsSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+import { elevenLabsSynthesize } from '@void-energy/kinetic-text/tts/providers';
 
 const r = await elevenLabsSynthesize('The reactor hums awake.', {
   voiceId: 'EXAVITQu4vr4xnSDxMaL',   // from ElevenLabs dashboard → VoiceLab
@@ -533,7 +533,7 @@ const r = await elevenLabsSynthesize('The reactor hums awake.', {
 Cheap and fast, widely adopted. **No word timestamps.** When no timestamps are available, `<TtsKineticBlock>` falls back to even-distribution word timing across the clip's audible duration — the reveal stays paced to the voice, just not character-accurate.
 
 ```typescript
-import { openaiSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+import { openaiSynthesize } from '@void-energy/kinetic-text/tts/providers';
 
 const r = await openaiSynthesize('The reactor hums awake.', {
   voice: 'nova',
@@ -549,7 +549,7 @@ const r = await openaiSynthesize('The reactor hums awake.', {
 Enterprise-grade, large voice catalog (incl. neural and multilingual). Simple subscription-key auth. **No word timestamps via REST** (WordBoundary is streaming-SDK-only) — duration fallback.
 
 ```typescript
-import { azureSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+import { azureSynthesize } from '@void-energy/kinetic-text/tts/providers';
 
 const r = await azureSynthesize('The reactor hums awake.', {
   subscriptionKey: '...',
@@ -565,7 +565,7 @@ const r = await azureSynthesize('The reactor hums awake.', {
 Huge voice catalog (Wavenet, Neural2, Chirp). **No word timestamps** via the REST path — duration fallback. Uses a restricted API key, not OAuth service accounts (those paths require a server proxy).
 
 ```typescript
-import { googleSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+import { googleSynthesize } from '@void-energy/kinetic-text/tts/providers';
 
 const r = await googleSynthesize('The reactor hums awake.', {
   apiKey: '...',
@@ -580,7 +580,7 @@ const r = await googleSynthesize('The reactor hums awake.', {
 New-generation realtime TTS, low latency. **No word timestamps from the speak endpoint** — duration fallback. Token-based auth, browser-safe when the key is short-lived.
 
 ```typescript
-import { deepgramSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+import { deepgramSynthesize } from '@void-energy/kinetic-text/tts/providers';
 
 const r = await deepgramSynthesize('The reactor hums awake.', {
   apiKey: '...',
@@ -595,7 +595,7 @@ const r = await deepgramSynthesize('The reactor hums awake.', {
 xAI's TTS API (same `XAI_API_KEY` as the Grok chat API). **No word timestamps** — duration fallback. 5 built-in voices (`eve`, `ara`, `rex`, `sal`, `leo`), 20 languages, and inline expressive tags (`[laugh]`, `[sigh]`, `[breath]`, `<whisper>…</whisper>`, `<emphasis>…</emphasis>`) that pass through `text` untouched — useful ammunition for AI-generated story beats. **Browser-origin note:** xAI's chat API historically does not set permissive CORS headers; test from your actual origin before relying on direct browser calls, a backend proxy may be required.
 
 ```typescript
-import { xaiSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+import { xaiSynthesize } from '@void-energy/kinetic-text/tts/providers';
 
 const r = await xaiSynthesize('She paused. [sigh] <whisper>Not like this.</whisper>', {
   apiKey: '...',
@@ -612,7 +612,7 @@ const r = await xaiSynthesize('She paused. [sigh] <whisper>Not like this.</whisp
 Apache-2.0 82M-param open-weight TTS model by [hexgrad](https://huggingface.co/hexgrad/Kokoro-82M), competitive with hosted providers on English naturalness and ~free to run. The adapter targets [remsky/Kokoro-FastAPI](https://github.com/remsky/Kokoro-FastAPI) — a ready-to-deploy wrapper with OpenAI-compatible endpoints and a dev endpoint for word timestamps. **Default mode `'captioned'` returns real per-word timings** via `POST /dev/captioned_speech`. Switch to `mode: 'plain'` to call the OpenAI-compatible `POST /v1/audio/speech` endpoint when the dev path is unavailable (proxies that whitelist only the public path). 54 voices; voice-blending supported via the native FastAPI syntax `'af_bella(2)+af_sky(1)'`.
 
 ```typescript
-import { kokoroSynthesize } from '@dgrslabs/void-energy-kinetic-text/tts/providers';
+import { kokoroSynthesize } from '@void-energy/kinetic-text/tts/providers';
 
 const r = await kokoroSynthesize('The reactor hums awake.', {
   // endpoint — default 'http://localhost:8880' (your Kokoro-FastAPI instance)
@@ -785,15 +785,15 @@ If the component is too opinionated for your case, the building blocks are indiv
 
 | Export path | Contents |
 |-------------|----------|
-| `@dgrslabs/void-energy-kinetic-text` | `KineticText`, `KineticSkeleton`, `TtsKineticBlock` components, `createVoidEnergyTextStyleSnapshot` adapter, all public types |
-| `@dgrslabs/void-energy-kinetic-text/component` | `KineticText` Svelte component only |
-| `@dgrslabs/void-energy-kinetic-text/skeleton` | `KineticSkeleton` Svelte component only |
-| `@dgrslabs/void-energy-kinetic-text/tts-block` | `TtsKineticBlock` Svelte component only |
-| `@dgrslabs/void-energy-kinetic-text/types` | Type-only exports |
-| `@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host` | `createVoidEnergyTextStyleSnapshot` function |
-| `@dgrslabs/void-energy-kinetic-text/tts` | `syncAudioToKT`, `wordTimesToRevealMarks`, `wordStartTimes`, `buildKineticCues`, `resolveActionTimes`, `attachAudioActions`, `estimateCharSpeed`, `stripEffectTokens`, `resolveEffectCues`, plus `TimedCue`, `TimedAction`, `TTSResult`, `WordTimestamp` types |
-| `@dgrslabs/void-energy-kinetic-text/tts/providers` | Provider adapters: `inworldSynthesize`, `elevenLabsSynthesize`, `openaiSynthesize`, `azureSynthesize`, `googleSynthesize`, `deepgramSynthesize` + their `*Options` types |
-| `@dgrslabs/void-energy-kinetic-text/styles` | Compiled CSS stylesheet |
+| `@void-energy/kinetic-text` | `KineticText`, `KineticSkeleton`, `TtsKineticBlock` components, `createVoidEnergyTextStyleSnapshot` adapter, all public types |
+| `@void-energy/kinetic-text/component` | `KineticText` Svelte component only |
+| `@void-energy/kinetic-text/skeleton` | `KineticSkeleton` Svelte component only |
+| `@void-energy/kinetic-text/tts-block` | `TtsKineticBlock` Svelte component only |
+| `@void-energy/kinetic-text/types` | Type-only exports |
+| `@void-energy/kinetic-text/adapters/void-energy-host` | `createVoidEnergyTextStyleSnapshot` function |
+| `@void-energy/kinetic-text/tts` | `syncAudioToKT`, `wordTimesToRevealMarks`, `wordStartTimes`, `buildKineticCues`, `resolveActionTimes`, `attachAudioActions`, `estimateCharSpeed`, `stripEffectTokens`, `resolveEffectCues`, plus `TimedCue`, `TimedAction`, `TTSResult`, `WordTimestamp` types |
+| `@void-energy/kinetic-text/tts/providers` | Provider adapters: `inworldSynthesize`, `elevenLabsSynthesize`, `openaiSynthesize`, `azureSynthesize`, `googleSynthesize`, `deepgramSynthesize` + their `*Options` types |
+| `@void-energy/kinetic-text/styles` | Compiled CSS stylesheet |
 
 ## License
 

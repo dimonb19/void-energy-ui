@@ -1,5 +1,5 @@
 /**
- * Build script for @dgrslabs/void-energy-kinetic-text.
+ * Build script for @void-energy/kinetic-text.
  *
  * Steps:
  * 1. Clean dist/

@@ -1,13 +1,32 @@
 {
-  "name": "@dgrslabs/void-energy-ambient-layers",
-  "version": "0.4.0",
+  "name": "@void-energy/ambient-layers",
+  "version": "0.5.0",
   "type": "module",
-  "license": "UNLICENSED",
-  "description": "Immersive full-viewport overlay layers for Void Energy (Atmosphere, Psychology, Action, Environment)",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "description": "Immersive full-viewport overlay layers for Void Energy (Atmosphere, Psychology, Action, Environment).",
+  "author": "DGRS Labs Pte. Ltd. <biz@dgrslabs.com>",
+  "homepage": "https://github.com/voidenergy/void-energy-premium#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/voidenergy/void-energy-premium.git",
+    "directory": "packages/ambient-layers"
+  },
+  "bugs": {
+    "url": "https://github.com/voidenergy/void-energy-premium/issues"
+  },
+  "keywords": [
+    "ambient",
+    "overlay",
+    "weather-effects",
+    "svelte",
+    "canvas",
+    "void-energy"
+  ],
   "files": [
     "dist",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "LICENSE.md"
   ],
   "exports": {
     ".": {
@@ -46,6 +65,10 @@
   },
   "peerDependencies": {
     "svelte": "^5.0.0"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com",
+    "access": "restricted"
   },
   "devDependencies": {
     "sass-embedded": "^1.93.0",

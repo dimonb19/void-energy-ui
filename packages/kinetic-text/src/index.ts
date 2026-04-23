@@ -1,5 +1,5 @@
 /**
- * @dgrslabs/void-energy-kinetic-text — Premium kinetic text for Void Energy hosts.
+ * @void-energy/kinetic-text — Premium kinetic text for Void Energy hosts.
  *
  * ## Void Energy hosts
  *
@@ -7,8 +7,8 @@
  *
  * ```svelte
  * <script lang="ts">
- *   import KineticText from '@dgrslabs/void-energy-kinetic-text/component';
- *   import { createVoidEnergyTextStyleSnapshot } from '@dgrslabs/void-energy-kinetic-text/adapters/void-energy-host';
+ *   import KineticText from '@void-energy/kinetic-text/component';
+ *   import { createVoidEnergyTextStyleSnapshot } from '@void-energy/kinetic-text/adapters/void-energy-host';
  *   let el = $state<HTMLElement>();
  *   const snapshot = $derived(el ? createVoidEnergyTextStyleSnapshot(el) : null);
  * </script>
@@ -22,7 +22,7 @@
  * Construct `TextStyleSnapshot` manually — no adapter needed:
  *
  * ```typescript
- * import { KineticText } from '@dgrslabs/void-energy-kinetic-text';
+ * import { KineticText } from '@void-energy/kinetic-text';
  * const snapshot = {
  *   font: '16px "Inter", sans-serif',
  *   lineHeight: 24,

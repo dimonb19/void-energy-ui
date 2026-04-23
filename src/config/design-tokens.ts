@@ -128,7 +128,7 @@ export const VOID_RADIUS = {
 /**
  * AMBIENT LAYER TOKENS
  *
- * Global constants consumed by @dgrslabs/void-energy-ambient-layers.
+ * Global constants consumed by @void-energy/ambient-layers.
  * These are intentional raw colors (sepia tint, glitch RGB-split, night/warm/neon
  * environment washes) that previously lived inline as `// void-ignore` values in
  * the package's SCSS. Exposing them as CSS variables lets consumers retheme

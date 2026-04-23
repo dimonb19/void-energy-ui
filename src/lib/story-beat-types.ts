@@ -3,13 +3,13 @@ import type {
   AtmosphereLayer,
   EnvironmentLayer,
   PsychologyLayer,
-} from '@dgrslabs/void-energy-ambient-layers/types';
+} from '@void-energy/ambient-layers/types';
 import type {
   RevealStyle,
   KineticTextEffect,
   KineticSpeedPreset,
   KineticStyleKind,
-} from '@dgrslabs/void-energy-kinetic-text/types';
+} from '@void-energy/kinetic-text/types';
 
 // The literal tuples below are hand-synced with the package type unions. The
 // `satisfies readonly X[]` guard catches deletions from the source union
