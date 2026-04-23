@@ -319,7 +319,7 @@ const DESCRIPTION =
   'Grotesk for headings, Inter for body. Generous whitespace, sentence-case ' +
   'controls, semantic color tokens. This snapshot describes one of several ' +
   'atmospheres; the live system is physics-reactive (glass / flat / retro) ' +
-  'and mode-aware (light / dark). See https://voidenergy.dev for the full runtime.';
+  'and mode-aware (light / dark). See https://void.dgrslabs.ink for the full runtime.';
 
 export function serializeFrostSpecFrontmatter(): string {
   const src = readFrostSource();

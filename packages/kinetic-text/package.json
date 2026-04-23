@@ -5,14 +5,14 @@
   "license": "SEE LICENSE IN LICENSE.md",
   "description": "Premium kinetic text engine for Void Energy — character-level reveals, effects library, and TTS sync.",
   "author": "DGRS Labs Pte. Ltd. <biz@dgrslabs.com>",
-  "homepage": "https://github.com/voidenergy/void-energy-premium#readme",
+  "homepage": "https://github.com/void-energy/void-energy-premium#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/voidenergy/void-energy-premium.git",
+    "url": "git+https://github.com/void-energy/void-energy-premium.git",
     "directory": "packages/kinetic-text"
   },
   "bugs": {
-    "url": "https://github.com/voidenergy/void-energy-premium/issues"
+    "url": "https://github.com/void-energy/void-energy-premium/issues"
   },
   "keywords": [
     "kinetic-text",

@@ -5,14 +5,14 @@
   "license": "SEE LICENSE IN LICENSE.md",
   "description": "Immersive full-viewport overlay layers for Void Energy (Atmosphere, Psychology, Action, Environment).",
   "author": "DGRS Labs Pte. Ltd. <biz@dgrslabs.com>",
-  "homepage": "https://github.com/voidenergy/void-energy-premium#readme",
+  "homepage": "https://github.com/void-energy/void-energy-premium#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/voidenergy/void-energy-premium.git",
+    "url": "git+https://github.com/void-energy/void-energy-premium.git",
     "directory": "packages/ambient-layers"
   },
   "bugs": {
-    "url": "https://github.com/voidenergy/void-energy-premium/issues"
+    "url": "https://github.com/void-energy/void-energy-premium/issues"
   },
   "keywords": [
     "ambient",

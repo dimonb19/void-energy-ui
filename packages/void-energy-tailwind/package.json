@@ -5,14 +5,14 @@
   "type": "module",
   "license": "BUSL-1.1",
   "author": "DGRS Labs Pte. Ltd. <biz@dgrslabs.com>",
-  "homepage": "https://github.com/voidenergy/void-energy#readme",
+  "homepage": "https://github.com/void-energy/void-energy#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/voidenergy/void-energy.git",
+    "url": "git+https://github.com/void-energy/void-energy.git",
     "directory": "packages/void-energy-tailwind"
   },
   "bugs": {
-    "url": "https://github.com/voidenergy/void-energy/issues"
+    "url": "https://github.com/void-energy/void-energy/issues"
   },
   "keywords": [
     "tailwind",
