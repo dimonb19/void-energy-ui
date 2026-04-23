@@ -1,10 +1,14 @@
 /*
- * DESIGN.md <-> VE atmosphere converter.
+ * Atmosphere markdown <-> VE atmosphere converter.
  *
  * Pure functions, no Svelte, no DOM. Serializes a VoidThemeDefinition to a
- * DESIGN.md document (YAML frontmatter + markdown sections) and parses a
- * DESIGN.md document back to a PartialThemeDefinition payload suitable for
+ * single-atmosphere markdown document (YAML frontmatter + markdown sections)
+ * and parses it back to a PartialThemeDefinition payload suitable for
  * voidEngine.registerTheme().
+ *
+ * This format describes ONE atmosphere — not a design system. For the
+ * external, spec-compliant design-system snapshot see src/lib/spec-design-md.ts
+ * and the repo-root DESIGN.md.
  *
  * Frontmatter is flat key: value only. No nesting, no arrays, no multi-line
  * strings. That covers the atmosphere metadata (id, mode, physics, tagline,
@@ -17,7 +21,7 @@
  */
 
 import { parseExternalThemePayload } from '@lib/boundary';
-import { err, ok } from '@lib/result';
+import { err } from '@lib/result';
 
 // Palette keys in canonical emit order. Parsing accepts any order and
 // whitespace; this order is only for deterministic serialization.
@@ -75,9 +79,9 @@ export interface SerializeOptions {
 }
 
 /**
- * Emit a DESIGN.md document describing a single VE atmosphere.
+ * Emit an atmosphere markdown document describing a single VE atmosphere.
  */
-export function serializeAtmosphereToDesignMd(
+export function serializeAtmosphereMd(
   definition: VoidThemeDefinition,
   options: SerializeOptions = {},
 ): string {
@@ -123,7 +127,10 @@ interface ParsedDocument {
 function splitFrontmatter(content: string): ParsedDocument | null {
   // A valid document starts with `---` followed by a newline, then key/value
   // lines, then a closing `---` on its own line. Accept LF or CRLF.
-  const normalized = content.replace(/\r\n/g, '\n');
+  // Strip UTF-8 BOM if present so BOM-prefixed files parse identically.
+  const stripped =
+    content.charCodeAt(0) === 0xfeff ? content.slice(1) : content;
+  const normalized = stripped.replace(/\r\n/g, '\n');
   if (!normalized.startsWith('---\n')) return null;
 
   const rest = normalized.slice(4);
@@ -154,9 +161,13 @@ function splitFrontmatter(content: string): ParsedDocument | null {
   return { frontmatter, body };
 }
 
+function escapeRegex(input: string): string {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 function extractSection(body: string, heading: string): string | null {
   const lines = body.split('\n');
-  const headingPattern = new RegExp(`^##\\s+${heading}\\s*$`, 'i');
+  const headingPattern = new RegExp(`^##\\s+${escapeRegex(heading)}\\s*$`, 'i');
   const nextHeadingPattern = /^#{1,2}\s+/;
   let start = -1;
   for (let i = 0; i < lines.length; i++) {
@@ -218,15 +229,15 @@ function parseTypographyList(section: string): {
 }
 
 /**
- * Parse a DESIGN.md document into a PartialThemeDefinition payload.
+ * Parse an atmosphere markdown document into a PartialThemeDefinition payload.
  *
  * Missing palette keys are allowed (Safety Merge fills them in downstream
  * via voidEngine.registerTheme). Missing id / mode / physics yields an
  * invalid_shape error because they can't be safely defaulted.
  */
-export function parseDesignMd(
+export function parseAtmosphereMd(
   content: string,
-  source = 'DESIGN.md',
+  source = 'atmosphere.md',
 ): VoidResult<
   { id: string; definition: PartialThemeDefinition },
   BoundaryError

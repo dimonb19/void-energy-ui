@@ -450,3 +450,4 @@ For depth beyond this contract — available to agents with file-system access:
 - [THEME-GUIDE.md](THEME-GUIDE.md) — building and validating custom themes (palette contract, WCAG, collisions).
 - [src/config/component-registry.json](src/config/component-registry.json) — machine-readable inventory of shipped primitives.
 - [src/config/design-tokens.ts](src/config/design-tokens.ts) — single source of truth for every token value.
+- [DESIGN.md](DESIGN.md) — aesthetic snapshot (Frost) for agents building VE-inspired UI without installing VE. Tool-agnostic. Not the AI-build contract — that's this file.

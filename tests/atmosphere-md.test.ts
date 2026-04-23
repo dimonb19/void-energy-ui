@@ -2,7 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 
 import { VoidEngine } from '@adapters/void-engine.svelte';
 import { VOID_TOKENS } from '@config/design-tokens';
-import { parseDesignMd, serializeAtmosphereToDesignMd } from '@lib/design-md';
+import { parseAtmosphereMd, serializeAtmosphereMd } from '@lib/atmosphere-md';
 
 function silenceThemeConsole() {
   vi.spyOn(console, 'group').mockImplementation(() => {});
@@ -11,10 +11,10 @@ function silenceThemeConsole() {
   vi.spyOn(console, 'error').mockImplementation(() => {});
 }
 
-describe('design-md serialize', () => {
+describe('atmosphere-md serialize', () => {
   it('emits YAML frontmatter with id, mode, physics, and tagline', () => {
     const frost = VOID_TOKENS.themes.frost;
-    const md = serializeAtmosphereToDesignMd(frost, { id: 'frost' });
+    const md = serializeAtmosphereMd(frost, { id: 'frost' });
 
     expect(md.startsWith('---\n')).toBe(true);
     expect(md).toMatch(/^id: frost$/m);
@@ -25,7 +25,7 @@ describe('design-md serialize', () => {
 
   it('emits a Colors section with every non-font palette token', () => {
     const frost = VOID_TOKENS.themes.frost;
-    const md = serializeAtmosphereToDesignMd(frost, { id: 'frost' });
+    const md = serializeAtmosphereMd(frost, { id: 'frost' });
 
     expect(md).toMatch(/## Colors/);
     expect(md).toMatch(/\| bg-canvas \| #080c14 \|/);
@@ -35,7 +35,7 @@ describe('design-md serialize', () => {
 
   it('emits a Typography section with both font tokens', () => {
     const frost = VOID_TOKENS.themes.frost;
-    const md = serializeAtmosphereToDesignMd(frost, { id: 'frost' });
+    const md = serializeAtmosphereMd(frost, { id: 'frost' });
 
     expect(md).toMatch(/## Typography/);
     expect(md).toMatch(/- Heading font: `/);
@@ -43,7 +43,7 @@ describe('design-md serialize', () => {
   });
 });
 
-describe('design-md parse', () => {
+describe('atmosphere-md parse', () => {
   it('parses a minimal valid document', () => {
     const md = [
       '---',
@@ -60,7 +60,7 @@ describe('design-md parse', () => {
       '',
     ].join('\n');
 
-    const result = parseDesignMd(md);
+    const result = parseAtmosphereMd(md);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.data.id).toBe('custom');
@@ -70,7 +70,7 @@ describe('design-md parse', () => {
   });
 
   it('rejects a document with no frontmatter', () => {
-    const result = parseDesignMd('## Colors\n\n| foo | bar |\n');
+    const result = parseAtmosphereMd('## Colors\n\n| foo | bar |\n');
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.error.code).toBe('invalid_shape');
@@ -79,7 +79,7 @@ describe('design-md parse', () => {
   it('rejects a document missing required frontmatter fields', () => {
     const md =
       '---\nname: orphan\n---\n\n## Colors\n\n| energy-primary | #000 |\n';
-    const result = parseDesignMd(md);
+    const result = parseAtmosphereMd(md);
     expect(result.ok).toBe(false);
   });
 
@@ -99,7 +99,7 @@ describe('design-md parse', () => {
       '',
     ].join('\n');
 
-    const result = parseDesignMd(md);
+    const result = parseAtmosphereMd(md);
     expect(result.ok).toBe(true);
   });
 
@@ -122,7 +122,7 @@ describe('design-md parse', () => {
       '',
     ].join('\n');
 
-    const result = parseDesignMd(md);
+    const result = parseAtmosphereMd(md);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.data.definition.palette?.['font-atmos-heading']).toBe(
@@ -136,12 +136,80 @@ describe('design-md parse', () => {
   it('handles CRLF line endings', () => {
     const md =
       '---\r\nid: custom\r\nmode: dark\r\nphysics: flat\r\n---\r\n\r\n## Colors\r\n\r\n| energy-primary | #222 |\r\n';
-    const result = parseDesignMd(md);
+    const result = parseAtmosphereMd(md);
     expect(result.ok).toBe(true);
+  });
+
+  it('preserves colons in frontmatter values', () => {
+    const md = [
+      '---',
+      'id: custom',
+      'mode: dark',
+      'physics: flat',
+      "tagline: It's 4:20 somewhere",
+      '---',
+      '',
+      '## Colors',
+      '',
+      '| energy-primary | #333 |',
+      '',
+    ].join('\n');
+
+    const result = parseAtmosphereMd(md);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.definition.tagline).toBe("It's 4:20 somewhere");
+  });
+
+  it('does not truncate at a quoted "---" sequence inside a value', () => {
+    const md = [
+      '---',
+      'id: custom',
+      'mode: dark',
+      'physics: flat',
+      'tagline: "before --- after"',
+      '---',
+      '',
+      '## Colors',
+      '',
+      '| energy-primary | #444 |',
+      '',
+    ].join('\n');
+
+    const result = parseAtmosphereMd(md);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.data.definition.tagline).toBe('before --- after');
+  });
+
+  it('parses identically with and without a UTF-8 BOM prefix', () => {
+    const body = [
+      '---',
+      'id: custom',
+      'mode: dark',
+      'physics: flat',
+      '---',
+      '',
+      '## Colors',
+      '',
+      '| energy-primary | #555 |',
+      '',
+    ].join('\n');
+
+    const withoutBom = parseAtmosphereMd(body);
+    const withBom = parseAtmosphereMd(`﻿${body}`);
+
+    expect(withoutBom.ok).toBe(true);
+    expect(withBom.ok).toBe(true);
+    if (!withoutBom.ok || !withBom.ok) return;
+    expect(withBom.data.id).toBe(withoutBom.data.id);
+    expect(withBom.data.definition.palette?.['energy-primary']).toBe(
+      withoutBom.data.definition.palette?.['energy-primary'],
+    );
   });
 });
 
-describe('design-md round-trip', () => {
+describe('atmosphere-md round-trip', () => {
   it('built-in atmospheres survive serialize -> parse with palette intact', () => {
     const fixtures: Array<keyof typeof VOID_TOKENS.themes> = [
       'frost',
@@ -154,8 +222,8 @@ describe('design-md round-trip', () => {
       const definition = VOID_TOKENS.themes[id];
       if (!definition) continue;
 
-      const md = serializeAtmosphereToDesignMd(definition, { id });
-      const parsed = parseDesignMd(md);
+      const md = serializeAtmosphereMd(definition, { id: String(id) });
+      const parsed = parseAtmosphereMd(md);
 
       expect(parsed.ok).toBe(true);
       if (!parsed.ok) continue;
@@ -185,23 +253,23 @@ describe('design-md round-trip', () => {
   });
 });
 
-describe('voidEngine DESIGN.md integration', () => {
-  it('exportDesignMd returns null for unknown atmosphere', () => {
+describe('voidEngine atmosphere-md integration', () => {
+  it('exportAtmosphereMd returns null for unknown atmosphere', () => {
     silenceThemeConsole();
     const engine = new VoidEngine();
-    expect(engine.exportDesignMd('does-not-exist')).toBeNull();
+    expect(engine.exportAtmosphereMd('does-not-exist')).toBeNull();
   });
 
-  it('exportDesignMd defaults to the active atmosphere when no id passed', () => {
+  it('exportAtmosphereMd defaults to the active atmosphere when no id passed', () => {
     silenceThemeConsole();
     const engine = new VoidEngine();
-    const md = engine.exportDesignMd();
+    const md = engine.exportAtmosphereMd();
     expect(md).not.toBeNull();
     expect(md!.startsWith('---\n')).toBe(true);
     expect(md!).toMatch(new RegExp(`^id: ${engine.atmosphere}$`, 'm'));
   });
 
-  it('importDesignMd registers a partial atmosphere via Safety Merge', () => {
+  it('importAtmosphereMd registers a partial atmosphere via Safety Merge', () => {
     silenceThemeConsole();
     const engine = new VoidEngine();
 
@@ -219,7 +287,7 @@ describe('voidEngine DESIGN.md integration', () => {
       '',
     ].join('\n');
 
-    const result = engine.importDesignMd(md);
+    const result = engine.importAtmosphereMd(md);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.data.id).toBe('imported-test');
@@ -231,12 +299,12 @@ describe('voidEngine DESIGN.md integration', () => {
     expect(engine.registry['imported-test'].palette['bg-canvas']).toBeTruthy();
   });
 
-  it('importDesignMd rejects malformed input without registering', () => {
+  it('importAtmosphereMd rejects malformed input without registering', () => {
     silenceThemeConsole();
     const engine = new VoidEngine();
     const before = Object.keys(engine.registry).length;
 
-    const result = engine.importDesignMd('not a design.md');
+    const result = engine.importAtmosphereMd('not an atmosphere.md');
     expect(result.ok).toBe(false);
     expect(Object.keys(engine.registry).length).toBe(before);
   });
@@ -245,10 +313,10 @@ describe('voidEngine DESIGN.md integration', () => {
     silenceThemeConsole();
     const engine = new VoidEngine();
 
-    const exported = engine.exportDesignMd('frost');
+    const exported = engine.exportAtmosphereMd('frost');
     expect(exported).not.toBeNull();
 
-    const result = engine.importDesignMd(exported!);
+    const result = engine.importAtmosphereMd(exported!);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
     expect(result.data.id).toBe('frost');

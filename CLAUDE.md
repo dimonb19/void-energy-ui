@@ -98,9 +98,11 @@ RULE:     Generous whitespace > cramped density. If it looks tight, go up a size
 npm run dev            Start dev server (auto-generates tokens, watches changes)
 npm run build          Production build (runs build:tokens → astro build)
 npm run build:tokens   Regenerate _generated-themes.scss from design-tokens.ts
-npm run check          Run svelte-check (TypeScript + Svelte type checking)
+npm run check          Run full check chain: check:registry + svelte-check + lint:design-md + check:design-md
 npm run scan           Advisory scan for common raw pixel-value misses in SCSS/Svelte
-npm run design-md      DESIGN.md CLI: export/import/validate/list atmospheres (see `-- help`)
+npm run atmosphere-md  Atmosphere markdown CLI: export / import / validate / list / spec-export / spec-verify (see `-- help`)
+npm run lint:design-md Lint the root DESIGN.md against the Google `@google/design.md` spec (zero errors, zero warnings)
+npm run check:design-md Verify root DESIGN.md is byte-identical to `atmosphere-md spec-export` output (regenerability gate)
 npm run check:registry Verify component-registry.json is in sync with source files
 npm run test           Run unit tests (vitest — jsdom, no browser needed)
 npm run format         Prettier format all files
@@ -283,8 +285,8 @@ Import and use — never re-instantiate.
 .updateTemporaryTheme(h, id, label) Update an existing scoped handle in place
 .releaseTemporaryTheme(handle)      Release a specific scoped handle (idempotent, stack-safe)
 .loadExternalTheme(url)             Async: fetch + validate + register remote theme JSON (returns VoidResult)
-.exportDesignMd(id?)                Emit DESIGN.md for atmosphere id (defaults to active). Returns string or null.
-.importDesignMd(content)            Parse DESIGN.md + register via Safety Merge. Returns VoidResult<{ id }>.
+.exportAtmosphereMd(id?)            Emit atmosphere markdown (single-atmosphere, VE-internal) for id (defaults to active). Returns string or null.
+.importAtmosphereMd(content)        Parse atmosphere markdown + register via Safety Merge. Returns VoidResult<{ id }>.
 .availableAtmospheres               All registered theme IDs
 .builtInAtmospheres                 Static (non-runtime) theme IDs
 .customAtmospheres                  User-registered themes (excludes built-in and ephemeral)
@@ -433,6 +435,7 @@ Auth visibility utilities (FOUC-safe, set before first paint):
 ## 9. GOTCHAS
 
 - **Generated files are read-only.** Never edit `src/styles/config/_generated-themes.scss`, `src/config/void-registry.json`, or `src/config/void-physics.json`. Edit `src/config/design-tokens.ts` and run `npm run build:tokens`.
+- **Two "design.md" formats — do not conflate.** The root `DESIGN.md` is the external, spec-compliant (Google `@google/design.md`) snapshot of the Frost atmosphere for AI agents reading the public repo. The `atmosphere-md` format is the internal, lossless, per-atmosphere round-trip used by `voidEngine.exportAtmosphereMd` / `importAtmosphereMd`. Regenerate the root `DESIGN.md` via `npm run atmosphere-md -- spec-export --out DESIGN.md` (not the round-tripper). The regenerability invariant is enforced by `npm run check:design-md`.
 - **`npm run scan` is advisory.** It currently scans `.scss` and `.svelte` files for common raw pixel-value misses. Treat it as a helper, not a complete Token Law gate.
 - **Glass and retro require dark mode.** VoidEngine auto-corrects invalid physics+mode combos. Do not manually set light mode with glass or retro physics.
 - **SCSS import path:** Always `@use '../abstracts' as *;` — never import individual partial files.
