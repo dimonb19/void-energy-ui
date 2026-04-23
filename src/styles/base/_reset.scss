@@ -31,11 +31,24 @@
   --space-4xl: calc(32 * var(--unit) * var(--density, 1)); // 128px
   --space-5xl: calc(40 * var(--unit) * var(--density, 1)); // 160px
 
-  // Minimum touch target (WCAG).
+  // Minimum control footprint. 44px on coarse pointers (WCAG touch target),
+  // 36px on fine pointers (mouse/trackpad — modern desktop-SaaS convention).
   --size-touch-min: 2.75rem;
 
-  // Control height scales with density but never below 2.25rem.
-  --control-height: max(2.25rem, calc(2.75rem * var(--density, 1)));
+  // Control-height floor. Separate from --size-touch-min so Compact density
+  // can drop below 36px on desktop (32px is the modern compact floor).
+  --control-height-min: 2.25rem;
+
+  @media (pointer: fine) {
+    --size-touch-min: 2.25rem;
+    --control-height-min: 2rem;
+  }
+
+  // Control height scales with density, floored by the pointer-appropriate minimum.
+  --control-height: max(
+    var(--control-height-min),
+    calc(var(--size-touch-min) * var(--density, 1))
+  );
 
   // Control padding scales with density.
   --control-padding-x: var(--space-sm);

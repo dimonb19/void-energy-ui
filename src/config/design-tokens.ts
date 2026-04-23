@@ -173,12 +173,12 @@ export const VOID_TYPOGRAPHY = {
       letterSpacing: '0.01em',
     },
     body: {
-      fontSize: 'clamp(0.875rem, 0.8rem + 0.5vw, 1.125rem)',
+      fontSize: 'clamp(0.875rem, 0.8rem + 0.2vw, 1rem)',
       lineHeight: 1.5,
       letterSpacing: '0.005em',
     },
     h6: {
-      fontSize: 'clamp(0.875rem, 0.8rem + 0.5vw, 1.125rem)',
+      fontSize: 'clamp(0.875rem, 0.8rem + 0.2vw, 1rem)',
       lineHeight: 1.45,
       letterSpacing: '0.005em',
     },

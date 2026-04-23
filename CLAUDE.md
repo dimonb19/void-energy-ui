@@ -82,6 +82,7 @@ SCSS:     @include when-state('active') { ... }
 
 ### Law 5 — Spacing Gravity
 Default to generous spacing. When uncertain, go ONE size up, never down.
+This law governs surface padding and layout gaps (`p-*`, `gap-*`). Control sizing and typography follow the Modern-Chrome Defaults (Section 9).
 
 ```
 FLOOR:    Floating surface → p-lg gap-lg.    Sunk surface → p-md gap-md.
@@ -441,6 +442,7 @@ Auth visibility utilities (FOUC-safe, set before first paint):
 - **Modal dismiss buttons use `btn-ghost btn-error`** — not plain `btn-ghost`. Closing/canceling is a mildly destructive action; red ghost provides subtle signaling without the weight of a solid `btn-error`.
 - **`btn-icon` vs `btn-ghost`:** If a button contains **only an icon** (no text), use `btn-icon` — it provides square hit targets (`var(--control-height)`), centered flex layout, and icon-appropriate hover feedback. `btn-ghost` is for **text-based** secondary actions (Cancel, Dismiss, Skip). Never use `btn-ghost` on an icon-only button.
 - **Button typography is sentence case by default** (Phase 0b modernization, 2025-2026 alignment with MD3/shadcn/Linear). Buttons use `font-weight: medium` (500), `letter-spacing: 0.02em`, `text-transform: none`. CTA (`.btn-cta`) retains uppercase as a deliberate "shout." For consumers who need the old uppercase treatment, use `.btn-loud` (uppercase + 0.05em tracking + semibold).
+- **Modern-Chrome Defaults (out-of-the-box).** VE ships modern-balanced chrome: 16px body ceiling, 36px desktop control height (32px Compact, 44px touch), CTA matches regular button height (moving border + pill radius already carry the signal). Generosity lives in surface whitespace (Law 5), not chrome. Users who want larger chrome dial up via the scale preset (`userConfig.scale`) or density preset (`userConfig.density`). Do not "fix" tighter chrome to match old pre-2026 dimensions — those were deliberately modernized.
 - **Flat physics has no hover lift/scale.** Flat buttons use background tint changes only on hover (12% secondary blend) — no `translateY` or `scale()`. This matches the modern minimal UI pattern (shadcn, Linear). Glass retains lift (-3px) and scale (1.02). Retro has no transitions.
 - **Icon-backed actions:** If a labeled action would benefit from an icon, default to `ActionBtn` with a custom interactive icon instead of hand-rolling `<button><Icon />Label</button>`. AI/generation actions should default to `Sparkle` unless a more specific interactive icon already exists.
 - **`// void-ignore` annotation:** Some raw values in SCSS are intentional physical necessities (shimmer highlights, readability floors, scrollbar constants). These carry a `// void-ignore` comment and are exempt from Token Law enforcement by `npm run scan`. Do not replace them with tokens — they have been reviewed and confirmed as intentional.

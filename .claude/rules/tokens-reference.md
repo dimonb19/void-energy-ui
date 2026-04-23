@@ -54,7 +54,9 @@ Families: --font-heading  --font-body  --font-code
 
 ## Runtime Variables (set by reset/global, not design-tokens)
 ```
-Layout:   --nav-height(64px density-scaled)  --control-height  --size-touch-min(2.75rem)
+Layout:   --nav-height(64px density-scaled)  --control-height
+          --size-touch-min(2.75rem coarse / 2.25rem fine)
+          --control-height-min(2.25rem coarse / 2rem fine — Compact floor)
           --control-padding-x(--space-sm)  --control-padding-y  --scrollbar-width(6px)
           --breadcrumbs-height
 Safe:     --safe-top  --safe-bottom  --safe-left  --safe-right  (env(safe-area-inset-*))

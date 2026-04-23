@@ -9,6 +9,7 @@ paths:
 # Spacing Protocol
 
 Default generous. When unsure, go ONE size up.
+_Applies to surface padding and layout gaps. Control sizing and typography live under the Modern-Chrome Defaults in CLAUDE.md §9._
 
 ## Surface Spacing Floor
 
