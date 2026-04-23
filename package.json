@@ -17,6 +17,7 @@
     "preview": "astro preview",
     "build:tokens": "tsx scripts/generate-tokens.ts",
     "scan": "tsx scripts/scan-physics.ts",
+    "design-md": "tsx scripts/design-md.ts",
     "check:registry": "tsx scripts/check-component-registry.ts",
     "check:kinetic-text": "npm --workspace @dgrslabs/void-energy-kinetic-text run check",
     "check:ambient-layers": "npm --workspace @dgrslabs/void-energy-ambient-layers run check",

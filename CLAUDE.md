@@ -100,6 +100,7 @@ npm run build          Production build (runs build:tokens → astro build)
 npm run build:tokens   Regenerate _generated-themes.scss from design-tokens.ts
 npm run check          Run svelte-check (TypeScript + Svelte type checking)
 npm run scan           Advisory scan for common raw pixel-value misses in SCSS/Svelte
+npm run design-md      DESIGN.md CLI: export/import/validate/list atmospheres (see `-- help`)
 npm run check:registry Verify component-registry.json is in sync with source files
 npm run test           Run unit tests (vitest — jsdom, no browser needed)
 npm run format         Prettier format all files
@@ -282,6 +283,8 @@ Import and use — never re-instantiate.
 .updateTemporaryTheme(h, id, label) Update an existing scoped handle in place
 .releaseTemporaryTheme(handle)      Release a specific scoped handle (idempotent, stack-safe)
 .loadExternalTheme(url)             Async: fetch + validate + register remote theme JSON (returns VoidResult)
+.exportDesignMd(id?)                Emit DESIGN.md for atmosphere id (defaults to active). Returns string or null.
+.importDesignMd(content)            Parse DESIGN.md + register via Safety Merge. Returns VoidResult<{ id }>.
 .availableAtmospheres               All registered theme IDs
 .builtInAtmospheres                 Static (non-runtime) theme IDs
 .customAtmospheres                  User-registered themes (excludes built-in and ephemeral)

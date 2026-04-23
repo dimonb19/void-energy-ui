@@ -14,6 +14,7 @@ import {
   parseStoredThemeCache,
   parseStoredUserConfig,
 } from '@lib/boundary';
+import { parseDesignMd, serializeAtmosphereToDesignMd } from '@lib/design-md';
 import {
   applyTheme,
   applyPreferences,
@@ -249,6 +250,41 @@ export class VoidEngine {
         message: 'Failed to fetch external theme.',
       });
     }
+  }
+
+  /**
+   * Emit a DESIGN.md document for an atmosphere. Defaults to the currently
+   * active atmosphere if no id is passed. Returns null if the target
+   * atmosphere isn't registered.
+   *
+   * Built-in atmospheres source their palette from VOID_TOKENS because the
+   * runtime registry stays sparse until a theme is activated or hydrated.
+   */
+  exportDesignMd(atmosphereId?: string): string | null {
+    const id = atmosphereId ?? this.atmosphere;
+    const tokenEntry =
+      VOID_TOKENS.themes[id as keyof typeof VOID_TOKENS.themes];
+    const runtimeEntry = this.registry[id];
+    const source =
+      runtimeEntry && runtimeEntry.palette ? runtimeEntry : tokenEntry;
+    if (!source || !source.palette) return null;
+    return serializeAtmosphereToDesignMd(source as VoidThemeDefinition, { id });
+  }
+
+  /**
+   * Parse a DESIGN.md document, register it via Safety Merge, and return
+   * the resolved id. Does not auto-activate — caller decides whether to
+   * call setAtmosphere(). Validation runs through the shared boundary so
+   * rules stay consistent with loadExternalTheme().
+   */
+  importDesignMd(content: string): VoidResult<{ id: string }, BoundaryError> {
+    const parsed = parseDesignMd(content, 'VoidEngine.importDesignMd');
+    if (!parsed.ok) {
+      console.error(formatBoundaryError(parsed.error));
+      return parsed;
+    }
+    this.registerTheme(parsed.data.id, parsed.data.definition);
+    return ok({ id: parsed.data.id });
   }
 
   /**
