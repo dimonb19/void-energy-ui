@@ -284,7 +284,7 @@ ${outputSchema}
 ## Available Font Keys
 ${fontCatalog.map((f) => `- "${f.key}": ${f.name}`).join('\n')}
 
-## Reference Themes (12 built-in examples — for format reference, NOT creative constraint)
+## Reference Themes (4 built-in examples — for format reference, NOT creative constraint)
 These show the valid output structure and range. Do NOT treat them as the only valid design space.
 ${JSON.stringify(themeExamples, null, 2)}`;
 }

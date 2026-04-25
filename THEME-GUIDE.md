@@ -849,7 +849,7 @@ Increase opacity or adjust base color:
 
 ## 🎨 Built-in Atmospheres Reference
 
-The 12 built-in themes demonstrate every valid physics/mode combination and cover the full range of design intents. Study them before creating a new theme — the patterns and decisions made here are intentional.
+The 4 built-in themes demonstrate every valid physics/mode combination and cover the full range of design intents. Study them before creating a new theme — the patterns and decisions made here are intentional.
 
 | Theme | Mode | Physics | Concept |
 |---|---|---|---|

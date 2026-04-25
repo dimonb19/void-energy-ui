@@ -19,6 +19,26 @@ It combines the performance of **Tailwind CSS** (for Layout) with a bespoke **SC
 
 ---
 
+## 🤖 For AI coding agents
+
+Drop a copy of **[DESIGN.md](./DESIGN.md)** into your project root and prompt your agent:
+
+> Use `@DESIGN.md` to style my UI in the Void Energy "Frost" aesthetic.
+
+The file is spec-compliant with [Google DESIGN.md](https://github.com/google-labs-code/design.md) and linted against the official `@google/design.md` CLI as part of `npm run check`.
+
+**DESIGN.md is a taste of Void Energy, not the system.** It captures one atmosphere (Frost) as a static snapshot for agents that have nothing else to read. The full product is layered above it:
+
+| Layer | What it is | Where it works |
+| :--- | :--- | :--- |
+| **DESIGN.md** | Single markdown file. Frost only. No physics, no runtime, no motion. | Anywhere an agent can read a URL or a file. |
+| **L0 — framework-agnostic core** | Design tokens + SCSS physics engine + theme machinery. | Any stack, but functionality is bounded by static CSS. |
+| **L1 — Svelte component layer** | ~80 components with reactive atmosphere / physics / mode, density scaling, native-first wrappers, narrative motion. | Svelte 5 + Astro projects. The full system. |
+
+If your agent can install packages, prefer L1. If it's working only with markdown, DESIGN.md is the highest-fidelity single-file representation of Frost we can produce.
+
+---
+
 ## 🚀 The Triad Architecture
 
 Every pixel on screen is calculated by the intersection of three layers:

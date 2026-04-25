@@ -426,7 +426,7 @@ voidEngine.setAtmosphere('brand');`}</code
         <ul class="flex flex-col gap-sm">
           <li class="flex flex-row gap-sm items-center">
             <Check class="icon text-success shrink-0" data-size="sm" />
-            <span>12 built-in atmospheres with complete palettes</span>
+            <span>4 built-in atmospheres with complete palettes</span>
           </li>
           <li class="flex flex-row gap-sm items-center">
             <Check class="icon text-success shrink-0" data-size="sm" />
