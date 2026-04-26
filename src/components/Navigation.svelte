@@ -9,8 +9,8 @@
   import Breadcrumbs from './ui/Breadcrumbs.svelte';
 
   import { navlink } from '@actions/navlink';
-  import LogoDGRS from './icons/LogoDGRS.svelte';
-  import Quill from './icons/Quill.svelte';
+  import LogoDGRS from '@dgrs/icons/LogoDGRS.svelte';
+  import Quill from '@dgrs/icons/Quill.svelte';
   import { LayoutGrid, Type, CloudSnow } from '@lucide/svelte';
 
   // ─────────────────────────────────────────────────────────────────────────────

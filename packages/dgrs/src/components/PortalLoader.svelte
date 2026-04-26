@@ -1,7 +1,9 @@
 <script lang="ts">
-  import LoadingPortal from '@components/icons/LoadingPortal.svelte';
-  import LoadingQuill from '@components/icons/LoadingQuill.svelte';
+  import LoadingPortal from '../icons/LoadingPortal.svelte';
+  import LoadingQuill from '../icons/LoadingQuill.svelte';
   import LoadingTextCycler from './LoadingTextCycler.svelte';
+  import circuitsUrl from '../../assets/portal/circuits.webp?url';
+  import vignetteUrl from '../../assets/portal/vignette.webp?url';
 
   interface PortalLoaderProps {
     status?: 'idle' | 'loading';
@@ -13,7 +15,7 @@
 
 <div class="portal-loader {className ?? ''}" role="status">
   <img
-    src="/portal/circuits.webp"
+    src={circuitsUrl}
     alt=""
     class="portal-layer portal-circuits"
     width="2048"
@@ -21,7 +23,7 @@
     draggable="false"
   />
   <img
-    src="/portal/vignette.webp"
+    src={vignetteUrl}
     alt=""
     class="portal-layer shadow-vignette"
     width="2048"

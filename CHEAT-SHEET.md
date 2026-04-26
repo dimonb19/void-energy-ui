@@ -1774,7 +1774,7 @@ Native form submission serializes `String(option.value)`, while `bind:value` and
 </StoryCategory>
 ```
 
-**Showcase:** [/conexus → Story Categories](src/components/CoNexus.svelte)
+**Showcase:** [/conexus → Story Categories](packages/dgrs/src/components/CoNexus.svelte)
 
 ---
 
@@ -1812,7 +1812,7 @@ Two-axis pagination: categories load vertically (page scroll), tiles load horizo
 <LoadMore observer={userHasScrolled} class="hidden" ... />
 ```
 
-**Reference implementation:** [CoNexus.svelte](src/components/CoNexus.svelte)
+**Reference implementation:** [CoNexus.svelte](packages/dgrs/src/components/CoNexus.svelte)
 
 ---
 
@@ -3398,12 +3398,8 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 | Icon | Type | Notes |
 | :--- | :--- | :--- |
 | `LoadingSpin` | Animated (custom) | Data fetching, backend requests, async operations. CSS `@keyframes rotate`, retro: `steps(8)` |
-| `LoadingSparkle` | Animated (custom) | AI content generation and creative AI processes. Staggered twinkle cascade — main star → cross accent → dot accent — each pops in with `--ease-spring-bounce` and decays. `data-status="idle\|loading"`, retro: `steps(4)` |
-| `LoadingQuill` | Animated (custom) | CoNexus / story-game launching brand loader. Used inside `PortalLoader`. Multi-layer trace/fill/dot animation, `data-status="idle\|loading"`, retro: `steps(4-8)`. (CoNexus brand — slated to move into the DGRS package.) |
-| `LoadingPortal` | Animated (custom) | Portal loading scene circuitry. Non-square viewBox (2048×1228), staggered draw-on/draw-off path animation, `data-status="idle\|loading"`. Glass: bloom glow. Retro: stepped timing. Light: flat `--energy-primary` fill |
+| `LoadingSparkle` | Animated (custom) | AI content generation and creative AI processes. Continuous-breath cascade — main star → cross accent → dot accent — wave of brightness staggered across the three elements with `--ease-flow`. `data-status="idle\|loading"`, retro: `steps(4)` |
 | `PortalRing` | Animated (custom) | 404 page portal centerpiece. 6-layer parallax system (outer/mid/inner rings, orbitals, particles, core text) tracking pointer at different depths. **Props:** `intensity` (parallax multiplier, default `1`; `0` = static), `id`, `class`, `...rest` (SVG attrs). **Layers:** static void-depth gradient at center; rings wobble via damped sine composition. **Filters:** 3 SVG displacement filters — glass (warp + `drop-shadow` bloom), flat (subtle warp), text (gentle `scale="4"` warp). Applied via CSS custom properties. **Physics:** Glass: warp + glow. Flat: subtle warp. Retro: `steps()` timing, `--font-code` text, `filter: none`. **A11y:** `aria-hidden="true"`, `prefers-reduced-motion` freezes all animations + skips rAF. Fully responsive (`width: 100%`, `height: auto`) |
-| `LogoDGRS` | Logo (custom) | Non-square viewBox, `data-render="logo"` |
-| `LogoCoNexus` | Logo (custom) | Non-square viewBox, `data-render="logo"` |
 
 ---
 
@@ -3678,7 +3674,7 @@ Use `isOneShotEffect()` to branch. The effect can also arrive late (from API, ga
 
 **User Preference:** Persisted `narrativeEffects` boolean in `UserConfig`. Consumer passes `enabled` derived from `voidEngine.userConfig.narrativeEffects`. Toggle lives in the Themes modal Preferences section.
 
-**Showcase:** [/conexus → Narrative Effects](src/components/CoNexus.svelte)
+**Showcase:** [/conexus → Narrative Effects](packages/dgrs/src/components/CoNexus.svelte)
 
 ---
 
@@ -6044,7 +6040,7 @@ The drag system does **not** move DOM elements during drag. On drop, the consume
 **Purpose:** Post-reveal ambient text animations for interactive storytelling
 **Location:** [src/actions/narrative.ts](src/actions/narrative.ts)
 **CSS:** `[data-narrative]` attribute selectors ([src/styles/components/\_narrative.scss](src/styles/components/_narrative.scss))
-**Showcase:** [/conexus → Narrative Effects](src/components/CoNexus.svelte)
+**Showcase:** [/conexus → Narrative Effects](packages/dgrs/src/components/CoNexus.svelte)
 
 Block-level CSS animations applied to a container element via the `data-narrative` attribute. Provides both a Svelte action (`use:narrative`) and a standalone class (`NarrativeEngine`) for programmatic use. The action starts on mount, re-evaluates on config change, and cleans up on destroy. A `WeakMap` ensures only one engine per element — constructing a new engine auto-stops the previous one.
 

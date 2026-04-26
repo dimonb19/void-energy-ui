@@ -10,7 +10,8 @@
       "@lib/*": ["./src/lib/*"],
       "@service/*": ["./src/service/*"],
       "@stores/*": ["./src/stores/*"],
-      "@styles/*": ["./src/styles/*"]
+      "@styles/*": ["./src/styles/*"],
+      "@dgrs/*": ["./packages/dgrs/src/*"]
     }
   },
   "include": [".astro/types.d.ts", "**/*", "src/types/**/*.d.ts"],
