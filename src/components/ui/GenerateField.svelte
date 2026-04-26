@@ -22,12 +22,12 @@
 
   STATES:
   - idle: Input is editable, Sparkle icon shown on right
-  - generating: Input disabled with shimmer, LoadingQuill replaces Sparkle
+  - generating: Input disabled with shimmer, LoadingSparkle replaces Sparkle
 
   BEHAVIOR:
   - Input is always editable — user can type freely
   - Click Sparkle → calls ongenerate with current value + instructions
-  - Loading state: input disabled, shimmer overlay, LoadingQuill in slot
+  - Loading state: input disabled, shimmer overlay, LoadingSparkle in slot
   - On resolve → value updated with generated text
   - On error → toast notification, value unchanged
   - Escape during generation → aborts via a temporary document listener
@@ -41,7 +41,7 @@
 
   import IconBtn from './IconBtn.svelte';
   import Sparkle from '@components/icons/Sparkle.svelte';
-  import LoadingQuill from '@components/icons/LoadingQuill.svelte';
+  import LoadingSparkle from '@components/icons/LoadingSparkle.svelte';
 
   interface GenerateFieldProps
     extends Omit<HTMLInputAttributes, 'type' | 'value'> {
@@ -148,7 +148,7 @@
           aria-label="Generate"
         />
       {:else}
-        <LoadingQuill data-size="lg" aria-hidden="true" />
+        <LoadingSparkle data-size="lg" aria-hidden="true" />
       {/if}
     </span>
   {/key}

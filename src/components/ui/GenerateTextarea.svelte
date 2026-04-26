@@ -24,12 +24,12 @@
 
   STATES:
   - idle: Textarea is editable, Sparkle icon shown at top-right
-  - generating: Textarea disabled with shimmer, LoadingQuill replaces Sparkle
+  - generating: Textarea disabled with shimmer, LoadingSparkle replaces Sparkle
 
   BEHAVIOR:
   - Textarea is always editable — user can type freely
   - Click Sparkle → calls ongenerate with current value + instructions
-  - Loading state: textarea disabled, shimmer overlay, LoadingQuill in slot
+  - Loading state: textarea disabled, shimmer overlay, LoadingSparkle in slot
   - On resolve → value updated with generated text
   - On error → toast notification, value unchanged
   - Escape during generation → aborts via a temporary document listener
@@ -43,7 +43,7 @@
 
   import IconBtn from './IconBtn.svelte';
   import Sparkle from '@components/icons/Sparkle.svelte';
-  import LoadingQuill from '@components/icons/LoadingQuill.svelte';
+  import LoadingSparkle from '@components/icons/LoadingSparkle.svelte';
 
   interface GenerateTextareaProps
     extends Omit<HTMLTextareaAttributes, 'value'> {
@@ -152,7 +152,7 @@
           aria-label="Generate"
         />
       {:else}
-        <LoadingQuill data-size="lg" aria-hidden="true" />
+        <LoadingSparkle data-size="lg" aria-hidden="true" />
       {/if}
     </span>
   {/key}

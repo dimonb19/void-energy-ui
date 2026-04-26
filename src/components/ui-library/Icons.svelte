@@ -28,7 +28,7 @@
   import LoadingSpin from '@components/icons/LoadingSpin.svelte';
   import Switch from '@components/icons/Switch.svelte';
   import Voice from '@components/icons/Voice.svelte';
-  import LoadingQuill from '@components/icons/LoadingQuill.svelte';
+  import LoadingSparkle from '@components/icons/LoadingSparkle.svelte';
 
   // Lucide icons (static library examples)
   import {
@@ -382,18 +382,18 @@
         </div>
       </div>
 
-      <!-- LoadingQuill -->
+      <!-- LoadingSparkle -->
       <p class="text-small text-dim">
-        <strong>LoadingQuill</strong> — AI content generation, story game launching,
-        and creative AI processes. The animated quill signals that an AI is actively
+        <strong>LoadingSparkle</strong> — AI content generation and creative AI processes.
+        A staggered twinkle cascade (main → cross → dot) signals that an AI is actively
         authoring content.
       </p>
       <div
         class="surface-sunk p-md flex flex-wrap justify-center gap-md {iconColor}"
       >
         <div class="flex flex-col items-center gap-xs">
-          <LoadingQuill data-size={iconSize} />
-          <span class="text-caption text-mute">LoadingQuill</span>
+          <LoadingSparkle data-size={iconSize} />
+          <span class="text-caption text-mute">LoadingSparkle</span>
         </div>
       </div>
     </div>

@@ -2052,7 +2052,7 @@ const pv = createPasswordValidation(() => password);
 | `ongenerate` | `(ctx: GenerateContext) => Promise<string>` | *required* | Async handler receiving `{ currentValue, instructions, signal }` |
 | `...rest` | `HTMLInputAttributes` | — | Native input attributes (`name`, `form`, `required`, `aria-*`, etc.) |
 
-**States:** idle (editable + Sparkle icon) → generating (disabled + shimmer + LoadingQuill). Escape aborts generation through a temporary document-level listener, so parent modal/sidebar layers stay open. In-flight generation is also aborted on component teardown via `$effect` cleanup.
+**States:** idle (editable + Sparkle icon) → generating (disabled + shimmer + LoadingSparkle). Escape aborts generation through a temporary document-level listener, so parent modal/sidebar layers stay open. In-flight generation is also aborted on component teardown via `$effect` cleanup.
 
 **Usage:**
 
@@ -2085,7 +2085,7 @@ const pv = createPasswordValidation(() => password);
 | `ongenerate` | `(ctx: GenerateContext) => Promise<string>` | *required* | Async handler receiving `{ currentValue, instructions, signal }` |
 | `...rest` | `HTMLTextareaAttributes` | — | Native textarea attributes (`name`, `form`, `required`, `aria-*`, etc.) |
 
-**States:** idle (editable + Sparkle icon at top-right) → generating (disabled + shimmer + LoadingQuill). Escape aborts generation through a temporary document-level listener, so parent modal/sidebar layers stay open. In-flight generation is also aborted on component teardown via `$effect` cleanup.
+**States:** idle (editable + Sparkle icon at top-right) → generating (disabled + shimmer + LoadingSparkle). Escape aborts generation through a temporary document-level listener, so parent modal/sidebar layers stay open. In-flight generation is also aborted on component teardown via `$effect` cleanup.
 
 **Usage:**
 
@@ -3398,7 +3398,8 @@ Custom animated SVG components with state-driven CSS transitions, masks, and per
 | Icon | Type | Notes |
 | :--- | :--- | :--- |
 | `LoadingSpin` | Animated (custom) | Data fetching, backend requests, async operations. CSS `@keyframes rotate`, retro: `steps(8)` |
-| `LoadingQuill` | Animated (custom) | AI content generation, story game launching, creative AI processes. Multi-layer trace/fill/dot animation, `data-status="idle\|loading"`, retro: `steps(4-8)` |
+| `LoadingSparkle` | Animated (custom) | AI content generation and creative AI processes. Staggered twinkle cascade — main star → cross accent → dot accent — each pops in with `--ease-spring-bounce` and decays. `data-status="idle\|loading"`, retro: `steps(4)` |
+| `LoadingQuill` | Animated (custom) | CoNexus / story-game launching brand loader. Used inside `PortalLoader`. Multi-layer trace/fill/dot animation, `data-status="idle\|loading"`, retro: `steps(4-8)`. (CoNexus brand — slated to move into the DGRS package.) |
 | `LoadingPortal` | Animated (custom) | Portal loading scene circuitry. Non-square viewBox (2048×1228), staggered draw-on/draw-off path animation, `data-status="idle\|loading"`. Glass: bloom glow. Retro: stepped timing. Light: flat `--energy-primary` fill |
 | `PortalRing` | Animated (custom) | 404 page portal centerpiece. 6-layer parallax system (outer/mid/inner rings, orbitals, particles, core text) tracking pointer at different depths. **Props:** `intensity` (parallax multiplier, default `1`; `0` = static), `id`, `class`, `...rest` (SVG attrs). **Layers:** static void-depth gradient at center; rings wobble via damped sine composition. **Filters:** 3 SVG displacement filters — glass (warp + `drop-shadow` bloom), flat (subtle warp), text (gentle `scale="4"` warp). Applied via CSS custom properties. **Physics:** Glass: warp + glow. Flat: subtle warp. Retro: `steps()` timing, `--font-code` text, `filter: none`. **A11y:** `aria-hidden="true"`, `prefers-reduced-motion` freezes all animations + skips rAF. Fully responsive (`width: 100%`, `height: auto`) |
 | `LogoDGRS` | Logo (custom) | Non-square viewBox, `data-render="logo"` |

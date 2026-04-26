@@ -18,18 +18,20 @@
   <!-- Main 4-point star -->
   <path
     class="sparkle-main"
-    d="M12 2 L13.5 8.5 L20 10 L13.5 11.5 L12 18 L10.5 11.5 L4 10 L10.5 8.5 Z"
+    d="M12 4 L13.5 10.5 L20 12 L13.5 13.5 L12 20 L10.5 13.5 L4 12 L10.5 10.5 Z"
   />
-  <!-- Accent sparkle (top-right) -->
-  <path
-    class="sparkle-accent"
-    d="M19 2 L19.75 4.25 L22 5 L19.75 5.75 L19 8 L18.25 5.75 L16 5 L18.25 4.25 Z"
-  />
+  <!-- Accent: cross (top-right) -->
+  <g class="sparkle-accent sparkle-accent-tr">
+    <path d="M19 3v4" />
+    <path d="M21 5h-4" />
+  </g>
+  <!-- Accent: dot (bottom-left) -->
+  <circle class="sparkle-accent sparkle-accent-bl" cx="5" cy="19" r="1.5" />
 </svg>
 
 <style lang="scss">
   .sparkle-main {
-    transform-origin: 12px 10px; // void-ignore (SVG coordinate)
+    transform-origin: 12px 12px; // void-ignore (SVG coordinate)
     transition:
       transform var(--speed-base) var(--ease-spring-snappy),
       opacity var(--speed-base) var(--ease-spring-snappy);
@@ -41,6 +43,10 @@
     transition:
       transform var(--speed-base) var(--ease-spring-snappy),
       opacity var(--speed-base) var(--ease-spring-snappy);
+  }
+
+  .sparkle-accent.sparkle-accent-bl {
+    transform-origin: 5px 19px; // void-ignore (SVG coordinate)
   }
 
   :global(.icon-sparkle[data-state='active'] .sparkle-main) {

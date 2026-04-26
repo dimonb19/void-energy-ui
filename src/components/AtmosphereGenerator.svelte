@@ -53,7 +53,7 @@
   import Undo from './icons/Undo.svelte';
   import Copy from './icons/Copy.svelte';
   import IconBtn from './ui/IconBtn.svelte';
-  import LoadingQuill from './icons/LoadingQuill.svelte';
+  import LoadingSparkle from './icons/LoadingSparkle.svelte';
 
   interface AtmosphereGeneratorProps {
     class?: string;
@@ -763,7 +763,7 @@
         class="flex-1"
       />
       <ActionBtn
-        icon={generating ? LoadingQuill : Sparkle}
+        icon={generating ? LoadingSparkle : Sparkle}
         text={generating ? 'Generating...' : 'Generate'}
         type="submit"
         disabled={!canGenerate}
