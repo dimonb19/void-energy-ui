@@ -33,6 +33,19 @@
     | string
     | null
     | undefined;
+
+  /**
+   * Imperative control surface for an active TTS-kinetic playback. Obtained
+   * via `bind:controls`. Identity is stable across re-layouts.
+   */
+  export interface TtsKineticBlockControls {
+    /**
+     * Reveal all remaining glyphs immediately, stop the audio, and transition
+     * to `'done'`. Fires `onended` for parity with natural completion. Safe
+     * to call from any state — no-op once already done.
+     */
+    skipToEnd(): void;
+  }
 </script>
 
 <script lang="ts" generics="ActionPayload = unknown">
@@ -124,6 +137,11 @@
      * component's internal state machine (rare).
      */
     status?: TtsKineticStatus;
+    /**
+     * Bound imperative control surface. Use to skip the reveal to the end
+     * (text snaps complete, audio stops, status flips to `'done'`).
+     */
+    controls?: TtsKineticBlockControls;
 
     // Events.
     onrevealcomplete?: () => void;
@@ -160,6 +178,7 @@
     playbackRate = 1,
     paused = $bindable(false),
     status = $bindable('idle'),
+    controls = $bindable(),
     onrevealcomplete,
     onplay,
     onended,
@@ -175,6 +194,33 @@
   let audioEl = $state<HTMLAudioElement | null>(null);
   let ownedUrl: string | null = null;
   let ktControls = $state<KineticTextControls | undefined>(undefined);
+
+  // Stable proxy — outer-closure captures keep `audioEl` / `ktControls` live
+  // without re-creating the surface (parent `bind:controls` identity is fixed).
+  const controlSurface: TtsKineticBlockControls = {
+    skipToEnd: () => {
+      if (status === 'done') return;
+      ktControls?.skipToEnd();
+      const el = audioEl;
+      if (el) {
+        try {
+          el.pause();
+        } catch {
+          // pause can throw on element teardown — safe to ignore
+        }
+        if (Number.isFinite(el.duration) && el.duration > 0) {
+          try {
+            el.currentTime = el.duration;
+          } catch {
+            // seeking past end can throw on some browsers — ignored
+          }
+        }
+      }
+      status = 'done';
+      onended?.();
+    },
+  };
+  controls = controlSurface;
 
   // Resolve an audio source to an HTMLAudioElement. Records the ObjectURL
   // we create so we can revoke it on unmount — URLs the consumer owns

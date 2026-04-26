@@ -32,7 +32,9 @@
     TimedCue,
     WordTimestamp,
   } from '@void-energy/kinetic-text/tts';
-  import TtsKineticBlock from '@void-energy/kinetic-text/tts-block';
+  import TtsKineticBlock, {
+    type TtsKineticBlockControls,
+  } from '@void-energy/kinetic-text/tts-block';
   import KineticText from '@void-energy/kinetic-text/component';
   import { inworldSynthesize } from '@void-energy/kinetic-text/tts/providers';
   import { ambient } from '@void-energy/ambient-layers';
@@ -122,6 +124,7 @@
   let playbackData = $state<PlaybackData | null>(null);
   let replayCounter = $state(0);
   let paused = $state(false);
+  let ttsControls = $state<TtsKineticBlockControls | undefined>();
 
   // Normalized numeric rate pushed straight to TtsKineticBlock as a prop.
   // The block applies it to its internal audio element and the `ratechange`
@@ -406,11 +409,7 @@
   }
 
   function handleSkip() {
-    // Audio lives inside TtsKineticBlock (constructed via `new Audio()`, not
-    // in the DOM) and is not currently exposed to consumers — so we can only
-    // mark status done here. Audio will continue playing in the background
-    // until the clip ends. A follow-up should expose a skipToEnd() method on
-    // TtsKineticBlock so the consumer can properly silence audio on skip.
+    ttsControls?.skipToEnd();
     status = 'done';
   }
 
@@ -514,6 +513,7 @@
             onaction={dispatchAmbientAction}
             loading={status === 'loading'}
             bind:paused
+            bind:controls={ttsControls}
             onrevealcomplete={onRevealComplete}
           />
         {/key}
