@@ -85,16 +85,13 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
     transform var(--speed-base) var(--ease-spring-snappy);
 
   @include touch-only {
-    // Island nav + island toggle: panel becomes a floating island below the
-    // toggle. Inset from screen edges, capped height, rounded.
-    //   top = safe-top + (nav island top-gap + nav island height)
-    //               + (toggle gap + toggle island height)
-    //   The panel sits flush against toggle-bottom; the scale(0.96) +
-    //   translateY(-space-xs) transform below creates the "emerge from
-    //   toggle" animation origin, so no explicit panel gap is needed.
+    // Nav row carries logo + toggle + action all at the same Y. Dropdown
+    // sits one --space-xs gap below the row.
+    //   top = safe-top + (row top-gap) + (row height) + (gap below)
+    //       = safe-top + space-xs + size-touch-min + space-xs
     top: calc(
       var(--safe-top) + var(--space-xs) + var(--size-touch-min) +
-        var(--space-xs) + var(--size-touch-min)
+        var(--space-xs)
     );
     left: max(var(--space-lg), var(--safe-left));
     right: max(var(--space-lg), var(--safe-right));
@@ -401,12 +398,25 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
   background: var(--bg-surface);
   border-bottom: var(--physics-border-width) solid var(--border-color);
 
-  // ── Touch (< small-desktop): Floating island matching nav-bar pattern ──
-  // Vertical position is driven by .page-sidebar-header's sticky `top`;
-  // margin-top here would collapse into the header and never render.
+  // ── Touch (< small-desktop): Pill between top nav corner islands ──
+  // Promoted to position: fixed so it sits at the same Y as the .nav-island
+  // corner pills, spanning the full width between them with --space-xs gap
+  // on each side. Inner button truncates long section labels.
   @include touch-only {
-    margin-inline: max(var(--space-lg), var(--safe-left))
-      max(var(--space-lg), var(--safe-right));
+    position: fixed;
+    top: calc(var(--safe-top) + var(--space-xs));
+    // Stack: nav-bar inset (max(space-lg, safe)) + nav-bar inner px-xs
+    //        + corner pill width (size-touch-min) + space-xs gap = toggle edge
+    left: calc(
+      max(var(--space-lg), var(--safe-left)) + var(--space-xs) +
+        var(--size-touch-min) + var(--space-xs)
+    );
+    right: calc(
+      max(var(--space-lg), var(--safe-right)) + var(--space-xs) +
+        var(--size-touch-min) + var(--space-xs)
+    );
+    z-index: z('overlay');
+
     height: var(--size-touch-min);
     border: var(--physics-border-width) solid var(--border-color);
     border-radius: var(--radius-full);
@@ -414,8 +424,29 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
     overflow: hidden; // clip inner button corners
 
     button {
+      // Kill the inner border. Base button rules re-color it on :active
+      // (--energy-secondary), and the parent's pill clipping exposes that
+      // at the curved ends as "two dots." `border: none` wins by setting
+      // border-style: none — any later rule that only changes border-color
+      // is rendered moot.
+      border: none;
       border-radius: var(--radius-full);
       height: 100%;
+      min-width: 0; // enables span truncation inside flex
+
+      span {
+        @include text-truncate(1);
+      }
+
+      // Lift focus-ring to the parent pill — button's box-shadow would
+      // clip through `overflow: hidden` as asymmetric crescents.
+      &:focus-visible {
+        box-shadow: none;
+      }
+    }
+
+    &:has(:focus-visible) {
+      box-shadow: var(--shadow-float), var(--focus-ring);
     }
   }
 

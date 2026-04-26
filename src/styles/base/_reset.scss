@@ -67,7 +67,13 @@
   --scrollbar-width: 6px; // void-ignore (Scrollbar constant)
 
   // Breadcrumbs height (single-line trail with vertical padding).
+  // Zeroed on touch — breadcrumbs are hidden below small-desktop (bottom nav
+  // and page-sidebar toggle already cover location signaling).
   --breadcrumbs-height: calc(var(--space-md) + var(--space-xs) * 2);
+
+  @include touch-only {
+    --breadcrumbs-height: 0px;
+  }
 
   // Structural constants (component layout constraints).
   --modal-width-xs: #{map.get(

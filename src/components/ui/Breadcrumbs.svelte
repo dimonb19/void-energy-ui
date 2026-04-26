@@ -20,7 +20,7 @@
 
 {#if items.length > 0}
   <nav
-    class="breadcrumbs flex items-center px-sm {className}"
+    class="breadcrumbs hidden small-desktop:flex items-center px-sm {className}"
     aria-label="Breadcrumb"
     data-hidden={hidden}
   >

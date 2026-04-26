@@ -440,14 +440,14 @@
 <svelte:window {onscroll} {onmousemove} />
 
 <nav
-  class="nav-bar flex flex-row items-center justify-between gap-xs px-xs"
+  class="nav-bar flex flex-row items-center justify-between gap-xs px-xs small-desktop:px-md"
   aria-label="Navigation"
   data-hidden={navHidden}
 >
   <!-- Left zone: logo (+ tabs when tabsAlign === 'start') -->
-  <div class="flex items-center gap-xs small-desktop:flex-1">
-    <a class="tab" href="/" aria-label="Logo">
-      <LogoVoidEnergy class="text-primary" data-size="lg" />
+  <div class="nav-island flex items-center gap-xs small-desktop:flex-1">
+    <a class="btn-icon text-primary" href="/" aria-label="Home">
+      <LogoVoidEnergy data-size="lg" />
     </a>
 
     {#if tabsAlign === 'start'}
@@ -491,7 +491,9 @@
   {/if}
 
   <!-- Right zone: action icon (themes / burger) — primary color, mirrors logo -->
-  <div class="flex items-center small-desktop:flex-1 small-desktop:justify-end">
+  <div
+    class="nav-island flex items-center small-desktop:flex-1 small-desktop:justify-end"
+  >
     <ThemesBtn icon size="lg" class="text-primary" />
   </div>
 </nav>

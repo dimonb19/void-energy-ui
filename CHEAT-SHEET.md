@@ -478,8 +478,9 @@ These components already account for safe areas (no manual work needed):
 | **Nav menu** (`.nav-menu`) | Padding respects `--safe-right` (and `--safe-left` on mobile) |
 | **Toasts** (`.toast-region`) | Top offset includes `--safe-top`; width avoids landscape notch |
 | **Full-size dialogs** (`dialog[data-size="full"]`) | Dimensions account for all four safe area insets |
-| **Breadcrumbs** (`.breadcrumbs`) | Fixed below nav-bar; `top` includes `--safe-top`; hidden offset includes `--nav-height + --safe-top` |
-| **Body** | `padding-top` includes `--safe-top` (+ `--breadcrumbs-height` when breadcrumbs present); `padding-bottom` uses `--bottom-nav-clearance` on touch (< 1024px) |
+| **Page sidebar toggle** (`.page-sidebar-toggle-bar`) | Touch (< 1024px): fixed-positioned at the same Y as `.nav-island` corner pills (`top: calc(--safe-top + --space-xs)`); spans the width between corner pills, gap-aware via `--space-xs` and `max(--space-lg, --safe-left/right)`. Desktop (≥ 1024px): in-flow row inside `.page-sidebar-header`. |
+| **Breadcrumbs** (`.breadcrumbs`) | Desktop (≥ 1024px): fixed below nav-bar; `top` includes `--safe-top`; hidden offset includes `--nav-height + --safe-top`. Touch (< 1024px): `display: none` — bottom nav and page-sidebar toggle already cover location signaling. |
+| **Body** | `padding-top` includes `--safe-top` (+ `--breadcrumbs-height` when breadcrumbs present — automatically zeroed on touch via the `--breadcrumbs-height: 0px` override in `_reset.scss`); `padding-bottom` uses `--bottom-nav-clearance` on touch (< 1024px) |
 
 #### Usage in Custom Components
 
@@ -2400,32 +2401,46 @@ const pv = createPasswordValidation(() => password);
 
 #### Touch Navigation Islands — Dual Floating UI
 
-**Description:** On touch screens (below `small-desktop:` / < 1024px), both the top navigation bar and bottom navigation use a floating island pattern — pill-shaped, detached from viewport edges, visually symmetric. The content area sits between two floating surfaces, creating a cohesive "app within a browser" feel. On phone + tablet alike, the page sidebar toggle also takes the same island treatment, forming a three-island vertical stack at the top of the viewport.
+**Description:** On touch screens (below `small-desktop:` / < 1024px), the navigation chrome is a system of floating pill-shaped islands — pill-shaped, detached from viewport edges, visually symmetric.
+
+- **Top:** a row of three pills sharing the same Y-axis — logo (left corner), page-sidebar toggle (centered between corners, full-width with `--space-xs` gap on each side), and action button (right corner). The bar between corners is a transparent positioning frame; the surface lives on each pill independently. The middle slot is *contextual* — only present on pages that ship a sidebar toggle. On non-sidebar pages, the middle stays empty (logo and action sit alone in their corners).
+- **Bottom:** one centered pill carrying the navigation tabs + sliding indicator.
+- **Breadcrumbs:** hidden on touch (`display: none`). Bottom nav already shows the top-level page, and the page-sidebar toggle already shows the active section — a third location indicator is redundant on mobile.
+
+The content area sits between the top and bottom floating surfaces, creating a cohesive "app within a browser" feel.
 
 **Why islands instead of a full-width top bar?**
 
 The conventional mobile top bar is a full-width rectangle fused to the browser chrome — it looks like part of the OS, not the app. Apple's Dynamic Island (2022) normalized detached, floating elements at the top of the viewport. The industry is moving toward floating surfaces, but almost no one has applied this to the navigation bar itself yet.
 
-Void Energy adopts this pattern early — before it becomes the standard. When this design language becomes the norm, VE apps will have been doing it from the start. The bottom navigation was already an island; keeping the top bar as a full-width rectangle created a visual split — one half modern, the other conventional. Now both poles share the same floating language.
+Void Energy adopts this pattern early — before it becomes the standard. When this design language becomes the norm, VE apps will have been doing it from the start. The bottom navigation was already an island; keeping the top bar as a full-width rectangle created a visual split — one half modern, the other conventional. Both poles now share the same floating language.
+
+**Why two pills on top instead of one?**
+
+The top chrome on touch is *chrome* (brand anchor + a single action), not navigation — the bottom island carries the actual page nav. A single stretched top pill with center tabs hidden on touch leaves a visually empty middle that reads as "something should be here." Splitting the surface into two corner pills makes the chrome role explicit, mirrors the corner-control pattern from Apple Maps, Arc, and most camera apps, and lets each pill feel intentional rather than two lonely items in a long container. The two pills are functionally asymmetric (brand left, action right) but visually symmetric (identical pill geometry, identical `btn-icon` content).
 
 **How it works:**
 
-| Aspect | Top island (`.nav-bar`) | Bottom island (`.bottom-nav`) |
+| Aspect | Top corner pills (`.nav-island`) | Bottom island (`.bottom-nav`) |
 | --- | --- | --- |
-| Position | `top: calc(--space-xs + --safe-top)` | `bottom: calc(--space-xs + --safe-bottom)` |
-| Inset | `left: max(--space-lg, --safe-left); right: max(--space-lg, --safe-right)` | Same formula |
-| Width | `auto` (derived from inset) | Same |
-| Shape | `border-radius: var(--radius-full)` | Same |
-| Surface | `@include surface-raised` + `@include glass-blur` | Same |
-| Contents | Logo + ThemesBtn | Nav tab icons + sliding indicator |
+| Position | `top: calc(--space-xs + --safe-top)` (set on parent `.nav-bar`) | `bottom: calc(--space-xs + --safe-bottom)` |
+| Inset | Parent `.nav-bar` uses `left/right: max(--space-lg, --safe-left/right)` | Same formula |
+| Width | Parent `.nav-bar` is `width: auto`; pills are content-sized within `justify-between` | Same outer formula |
+| Shape | `border-radius: var(--radius-full)` (per pill) | Same |
+| Surface | `@include glass-blur` + `surface-raised`-equivalent properties on `.nav-island` | `@include surface-raised` + `@include glass-blur` on `.bottom-nav` |
+| Contents | Left: logo (`<a class="btn-icon">`). Right: ThemesBtn / burger / PFP. Both are square `btn-icon` children → circles inside a `radius-full` parent. | Nav tab icons + sliding indicator |
 
-The sidebar toggle (`.page-sidebar-toggle-bar`) uses `margin-inline` with the same `max(--space-lg, --safe-X)` expression — the inset semantics are unified across all three islands, just expressed as `inset-inline` for fixed-positioned elements and `margin-inline` for in-flow elements.
+`.nav-bar` on touch is a transparent positioning frame — no `background`, `border`, `box-shadow`, or `backdrop-filter`. The surface migrated to the children. `justify-between` on the bar pushes the two `.nav-island` pills to opposite corners.
+
+**Page sidebar toggle as the middle pill.** On pages that ship a sidebar (e.g., `/components`), the toggle promotes itself to a fixed-positioned middle pill on touch via the same `top: calc(--safe-top + --space-xs)` formula as the corner pills. Its `left` / `right` calc threads past the corner pills with `--space-xs` gap on each side: `left: calc(max(--space-lg, --safe-left) + --space-xs (nav-bar inner padding) + --size-touch-min (corner pill width) + --space-xs (visual gap))`, mirrored on the right. The label inside (active section name) uses `text-truncate(1)` since the available width is ~190–250px on phones. The dropdown that opens beneath sits one `--space-xs` gap below the row at `top: calc(--safe-top + --space-xs + --size-touch-min + --space-xs)`. CSS-only — markup in `Components.svelte` is unchanged.
 
 **Scroll behavior:**
-- **Touch (< 1024px):** Top island is always visible. Hide-on-scroll is disabled via CSS override (`data-hidden` has no effect). The "Fixed navigation" preference toggle is hidden on touch since it's irrelevant.
-- **Desktop (≥ 1024px):** Full-width bar with optional hide-on-scroll, unchanged.
+- **Touch (< 1024px):** Top pills are always visible. Hide-on-scroll has no effect (the touch default has no `transform` on the bar at all). The "Fixed navigation" preference toggle is hidden on touch since it's irrelevant.
+- **Desktop (≥ 1024px):** Full-width bar with optional hide-on-scroll, unchanged. Horizontal padding is `small-desktop:px-md` so the logo and action don't kiss the screen edges on wide monitors.
 
-**Technical approach:** CSS-only — no JS changes. The scroll-hide logic still runs; CSS ignores `data-hidden` on touch by keeping `transform: none` regardless of state.
+**Technical approach:** CSS-only — no JS changes. The SCSS for `.nav-bar` is structured *touch-first*: touch styles are the default, and desktop styles (full-width, `surface-raised`, `glass-blur`, hide-on-scroll transform) are nested behind `@include respond-up(small-desktop)`. This avoids specificity battles where mode/physics overrides (e.g., `@include when-light { box-shadow: --shadow-lift }` from the surface mixin) would otherwise re-apply box-shadow on top of any `box-shadow: none` override inside a touch-only block.
+
+**Logo as `btn-icon`:** The logo wrapper uses `<a class="btn-icon" href="/" aria-label="Home">` rather than `<a class="tab">`. An icon-only link should be `btn-icon` per the system convention (CLAUDE.md §9), and using it here gives perfect symmetry with the right-side icon button — both islands are identical circles.
 
 **Body clearance:** On touch, `body` padding-top accounts for the island offset: `var(--size-touch-min) + var(--space-xs) + var(--safe-top) + var(--space-xs)`.
 
@@ -2465,15 +2480,23 @@ interface BreadcrumbItem {
 
 | State | Attribute | Visual |
 | --- | --- | --- |
-| Hidden (scroll) | `data-hidden="true"` | Slides off-screen in sync with nav-bar |
+| Hidden (scroll) | `data-hidden="true"` | Slides off-screen in sync with nav-bar (desktop only — see Touch Visibility below) |
+
+**Touch Visibility:**
+
+Below `small-desktop:` (< 1024px) the breadcrumbs are hidden entirely (`display: none`). Bottom nav already shows the top-level page and the page-sidebar toggle already shows the active section, so a third location indicator is redundant on mobile. The hide is implemented via two coordinated overrides:
+
+- `.breadcrumbs { @include touch-only { display: none; } }` — element doesn't render (a11y tree stays clean).
+- `--breadcrumbs-height: 0px` on `:root` inside `@include touch-only` (set in `_reset.scss`) — this single token override automatically collapses body padding-top, `section[id]` scroll-margin-top, and the pull-refresh `--breadcrumbs-offset`. No per-consumer math needed.
 
 **Architecture:**
 
 | Decision | Rationale |
 | --- | --- |
-| Fixed below nav-bar | `position: fixed; top: calc(--nav-height + --safe-top)` — visually unified with nav-bar |
-| Body clearance via SSR | `Layout.astro` sets `data-has-breadcrumbs` on `<body>` at SSR time; CSS adds extra `padding-top` |
-| `--breadcrumbs-height` token | Defined in `_reset.scss` as `calc(--space-md + --space-xs * 2)` — shared by body padding and scroll offsets |
+| Fixed below nav-bar (desktop) | `position: fixed; top: calc(--nav-height + --safe-top)` — visually unified with nav-bar |
+| Hidden on touch | Bottom nav + page-sidebar toggle already cover location signaling; saves vertical real estate on phones |
+| Body clearance via SSR | `Layout.astro` sets `data-has-breadcrumbs` on `<body>` at SSR time; CSS adds extra `padding-top` (which automatically collapses on touch via the `--breadcrumbs-height: 0px` override) |
+| `--breadcrumbs-height` token | Defined in `_reset.scss` as `calc(--space-md + --space-xs * 2)` on desktop, `0px` on touch — shared by body padding, scroll offsets, and pull-refresh indicator |
 | Auto-width on desktop | Full-width mobile, `width: auto` with rounded corner at `tablet+` |
 
 **Usage:**

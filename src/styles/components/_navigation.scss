@@ -42,62 +42,73 @@
 // ==========================================================================
 
 .nav-bar {
-  @include surface-raised;
-  @include glass-blur;
-
-  height: calc(var(--nav-height) + var(--space-md) + var(--safe-top));
-  padding-top: calc(var(--space-md) + var(--safe-top));
-  background: var(--bg-surface);
-
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
   z-index: z('overlay');
 
-  // Remove rounded corners for full-width header
-  border-radius: 0;
-  border: none;
+  // ── Touch (default, < small-desktop): Transparent positioning frame ──
+  // Surface migrates from the bar to its children (.nav-island).
+  // justify-between pushes the two islands to opposite corners.
+  // No surface/blur/shadow on the bar itself — only positioning.
+  // pointer-events: none lets clicks pass through the empty gap between
+  // islands to the page content underneath; islands re-enable below.
+  top: calc(var(--space-xs) + var(--safe-top));
+  left: max(var(--space-lg), var(--safe-left));
+  right: max(var(--space-lg), var(--safe-right));
+  width: auto;
+  height: var(--size-touch-min);
+  pointer-events: none;
 
-  // Hide-on-scroll transition
-  transition: transform var(--speed-base) var(--ease-spring-bounce);
-  transform: translateY(calc(-1 * var(--space-md)));
+  // ── Desktop (≥ small-desktop): Full-width opaque header bar ──
+  @include respond-up(small-desktop) {
+    @include surface-raised;
+    @include glass-blur;
 
-  @include touch-only {
-    transition-timing-function: var(--ease-flow);
-  }
+    pointer-events: auto;
 
-  &[data-hidden='true'] {
-    transform: translateY(-100%);
-  }
-
-  @include when-retro {
-    transition-duration: 0.3s; // void-ignore (Stepped retro transition)
-  }
-
-  @include when-light {
-    box-shadow: var(--shadow-lift); // Subtle shadow for separation
-  }
-
-  // ── Touch (< small-desktop): Floating island (matches bottom-nav) ──
-  @include touch-only {
-    top: calc(var(--space-xs) + var(--safe-top));
-    left: max(var(--space-lg), var(--safe-left));
-    right: max(var(--space-lg), var(--safe-right));
-    width: auto;
-    height: var(--size-touch-min);
-    padding-top: 0;
-    border-radius: var(--radius-full);
-    transform: none;
-
-    // Restore surface-raised properties overridden by desktop nav-bar
+    height: calc(var(--nav-height) + var(--space-md) + var(--safe-top));
+    padding-top: calc(var(--space-md) + var(--safe-top));
     background: var(--bg-surface);
-    border: var(--physics-border-width) solid var(--border-color);
-    box-shadow: var(--shadow-float);
 
-    // Always visible — override hide-on-scroll
+    top: 0;
+    left: 0;
+    right: auto;
+    width: 100%;
+
+    // Remove rounded corners for full-width header
+    border-radius: 0;
+    border: none;
+
+    // Hide-on-scroll transition
+    transition: transform var(--speed-base) var(--ease-spring-bounce);
+    transform: translateY(calc(-1 * var(--space-md)));
+
     &[data-hidden='true'] {
-      transform: none;
+      transform: translateY(-100%);
+    }
+
+    @include when-retro {
+      transition-duration: 0.3s; // void-ignore (Stepped retro transition)
+    }
+
+    @include when-light {
+      box-shadow: var(--shadow-lift); // Subtle shadow for separation
+    }
+  }
+
+  // ── Touch corner islands ──
+  // Desktop: no-op (just a flex container).
+  // Touch:   each zone becomes its own floating pill, mirroring .bottom-nav.
+  .nav-island {
+    @include touch-only {
+      @include glass-blur;
+
+      height: 100%;
+      padding: 0;
+      border-radius: var(--radius-full);
+      background: var(--bg-surface);
+      border: var(--physics-border-width) solid var(--border-color);
+      box-shadow: var(--shadow-float);
+      pointer-events: auto;
     }
   }
 
@@ -458,6 +469,12 @@
 // ==========================================================================
 
 .breadcrumbs {
+  // Touch hide is handled by Tailwind `hidden small-desktop:flex` on the
+  // element itself — Tailwind's `utilities` layer outranks `void-scss`, so
+  // hiding from SCSS would lose the cascade. See --breadcrumbs-height
+  // override in _reset.scss for the matching body-padding / scroll-margin /
+  // pull-refresh adjustments.
+
   // --- A. Positioning ---
   position: fixed;
   top: calc(var(--nav-height) + var(--safe-top));
@@ -492,16 +509,14 @@
   }
 
   // --- F. Physics overrides ---
-  @include when-glass {
-    @include glass-blur;
+  @include when-dark {
+    background: transparent;
+    box-shadow: none;
   }
 
   @include when-retro {
     transition-duration: 0.3s; // void-ignore (Stepped retro transition)
-  }
-
-  @include when-dark {
-    background: var(--bg-sunk);
+    background: var(--bg-surface);
   }
 
   // --- G. List reset ---
