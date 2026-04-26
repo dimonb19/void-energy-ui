@@ -55,9 +55,16 @@
   let {
     pathname = '',
     breadcrumbs,
+    tabsAlign = 'center',
   }: {
     pathname?: string;
     breadcrumbs?: BreadcrumbItem[];
+    /**
+     * Desktop tab alignment.
+     * - `'center'` (default): logo left, tabs centered, action right — modern marketing-site layout.
+     * - `'start'`: logo + tabs clustered left, action right — classic app-shell layout.
+     */
+    tabsAlign?: 'center' | 'start';
   } = $props();
 
   function resolveTab(path: string): string {
@@ -338,10 +345,12 @@
   //
   //   onkeydown={(e) => { if (e.key === 'Escape' && menuOpen) menuOpen = false; }}
   //
-  // 8. REPLACE <ThemesBtn> IN NAV BAR with burger button:
+  // 8. REPLACE <ThemesBtn> IN THE RIGHT ZONE with burger button.
+  //    The burger occupies the same right-zone slot as ThemesBtn — same color
+  //    (text-primary) for symmetry with the logo on the left.
   //
   //   <button
-  //     class="btn-void text-primary tab ml-auto"
+  //     class="btn-icon text-primary"
   //     onclick={() => (menuOpen = !menuOpen)}
   //     aria-expanded={menuOpen}
   //     aria-label={menuOpen ? 'Close menu' : 'Open menu'}
@@ -431,33 +440,60 @@
 <svelte:window {onscroll} {onmousemove} />
 
 <nav
-  class="nav-bar flex flex-row items-center justify-between small-desktop:justify-normal gap-xs px-xs"
+  class="nav-bar flex flex-row items-center justify-between gap-xs px-xs"
   aria-label="Navigation"
   data-hidden={navHidden}
 >
-  <a class="tab" href="/" aria-label="Logo">
-    <LogoVoidEnergy class="text-primary" data-size="lg" />
-  </a>
+  <!-- Left zone: logo (+ tabs when tabsAlign === 'start') -->
+  <div class="flex items-center gap-xs small-desktop:flex-1">
+    <a class="tab" href="/" aria-label="Logo">
+      <LogoVoidEnergy class="text-primary" data-size="lg" />
+    </a>
 
-  <!-- Desktop Nav Links -->
-  <ul class="hidden small-desktop:flex items-center gap-xs">
-    {#each navItems as tab}
-      <li>
-        <a
-          class="tab"
-          href={tab.href}
-          aria-current={activeTab === tab.id ? 'page' : undefined}
-          data-state={activeTab === tab.id ? 'active' : ''}
-          onclick={(e) => selectTab(e, tab.id)}
-          use:navlink
-        >
-          {tab.label}
-        </a>
-      </li>
-    {/each}
-  </ul>
+    {#if tabsAlign === 'start'}
+      <ul class="hidden small-desktop:flex items-center gap-xs">
+        {#each navItems as tab}
+          <li>
+            <a
+              class="tab"
+              href={tab.href}
+              aria-current={activeTab === tab.id ? 'page' : undefined}
+              data-state={activeTab === tab.id ? 'active' : ''}
+              onclick={(e) => selectTab(e, tab.id)}
+              use:navlink
+            >
+              {tab.label}
+            </a>
+          </li>
+        {/each}
+      </ul>
+    {/if}
+  </div>
 
-  <ThemesBtn class="btn-void tab ml-auto flex-row-reverse gap-sm" />
+  <!-- Center zone: tabs (when tabsAlign === 'center') -->
+  {#if tabsAlign === 'center'}
+    <ul class="hidden small-desktop:flex items-center gap-xs">
+      {#each navItems as tab}
+        <li>
+          <a
+            class="tab"
+            href={tab.href}
+            aria-current={activeTab === tab.id ? 'page' : undefined}
+            data-state={activeTab === tab.id ? 'active' : ''}
+            onclick={(e) => selectTab(e, tab.id)}
+            use:navlink
+          >
+            {tab.label}
+          </a>
+        </li>
+      {/each}
+    </ul>
+  {/if}
+
+  <!-- Right zone: action icon (themes / burger) — primary color, mirrors logo -->
+  <div class="flex items-center small-desktop:flex-1 small-desktop:justify-end">
+    <ThemesBtn icon size="lg" class="text-primary" />
+  </div>
 </nav>
 
 <!-- Mobile/Tablet Nav Links (touch-screen island) -->

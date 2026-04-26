@@ -2349,6 +2349,35 @@ const pv = createPasswordValidation(() => password);
 
 ---
 
+#### Navigation Bar — Desktop Layout
+
+**Description:** At desktop widths (≥ `small-desktop` / 1024px), the nav bar uses a three-zone layout: logo on the left, tabs centered (default), and an action icon on the right. Logo and action icon both render in `text-primary` for visual symmetry — one primary-colored icon at each edge.
+**Location:** [src/components/Navigation.svelte](src/components/Navigation.svelte)
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `pathname` | `string` | `''` | Current URL pathname; resolves the active tab |
+| `breadcrumbs` | `BreadcrumbItem[]` | — | Optional breadcrumb trail rendered below the nav |
+| `tabsAlign` | `'center' \| 'start'` | `'center'` | Desktop tab alignment. `'center'` matches modern marketing-site layouts; `'start'` clusters tabs next to the logo (classic app-shell layout) |
+
+**Zones:**
+
+| Zone | Contents | Tailwind |
+| --- | --- | --- |
+| Left | Logo (always); tabs when `tabsAlign === 'start'` | `flex items-center gap-xs small-desktop:flex-1` |
+| Center | Tabs when `tabsAlign === 'center'` | `hidden small-desktop:flex items-center gap-xs` |
+| Right | `<ThemesBtn icon size="lg" class="text-primary" />` (or burger when nav-menu enabled) | `flex items-center small-desktop:flex-1 small-desktop:justify-end` |
+
+**Why `small-desktop:flex-1` on side zones?** Equal-share growth on left and right zones perfectly centers the middle zone — no JS, no absolute positioning. Gating with `small-desktop:` keeps the touch floating-island pill content-sized (`justify-between` packs logo and themes button to opposite edges).
+
+**Switching to left-aligned:** Pass `<Navigation tabsAlign="start" />` from your layout. Tabs render inside the left zone alongside the logo; the action icon stays right-aligned.
+
+**Right-zone burger swap:** When the nav-menu pattern is enabled (see "Nav Menu Pattern" recipe above), the burger button replaces ThemesBtn in the right zone, keeping `text-primary` for the same logo-icon symmetry.
+
+---
+
 #### Touch Bottom Nav — Sliding Pill Indicator
 
 **Description:** The touch-screen bottom navigation bar (`.bottom-nav`, visible below `small-desktop:` / < 1024px) uses a sliding pill indicator behind the active tab, following the same pattern as the `<Tabs>` component. The pill slides between tabs on navigation and fades in with a blur-to-clear animation on first paint.
