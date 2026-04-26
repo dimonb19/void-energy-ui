@@ -9,7 +9,7 @@
   import Breadcrumbs from './ui/Breadcrumbs.svelte';
 
   import { navlink } from '@actions/navlink';
-  import LogoDGRS from '@dgrs/icons/LogoDGRS.svelte';
+  import LogoVoidEnergy from './icons/LogoVoidEnergy.svelte';
   import Quill from '@dgrs/icons/Quill.svelte';
   import { LayoutGrid, Type, CloudSnow } from '@lucide/svelte';
 
@@ -436,7 +436,7 @@
   data-hidden={navHidden}
 >
   <a class="tab" href="/" aria-label="Logo">
-    <LogoDGRS class="text-primary w-4xl" />
+    <LogoVoidEnergy class="text-primary" data-size="lg" />
   </a>
 
   <!-- Desktop Nav Links -->
