@@ -165,6 +165,7 @@ Notes:
 
 - `<AmbientHost />` must be mounted once at the layout level — already wired into `src/layouts/Layout.astro`
 - Replay the same block by keying on a counter: `{#key replay}<TtsKineticBlock …/>{/key}`
+- Skip an in-flight reveal by binding `controls` (`TtsKineticBlockControls`) and calling `controls.skipToEnd()` — it snaps the text complete, stops audio, and fires `onended`
 - When TTS is unavailable or the user hasn't provided a key, omit `audio` and `wordTimestamps` — the reveal runs on `speedPreset` alone and actions fire on a wall-clock `setTimeout`. Every other prop works unchanged
 - A working end-to-end example is `src/components/conexus/VibeMachine.svelte`
 

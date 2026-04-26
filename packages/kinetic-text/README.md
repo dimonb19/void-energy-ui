@@ -464,6 +464,29 @@ Two timeline channels: `cues` fire kinetic effects, `actions` fire arbitrary pay
 {/key}
 ```
 
+### Imperative controls (skip to end)
+
+Bind to `controls` to obtain a `TtsKineticBlockControls` surface for imperative actions on the active playback. The handle's identity is stable across re-layouts.
+
+```svelte
+<script lang="ts">
+  import TtsKineticBlock, {
+    type TtsKineticBlockControls,
+  } from '@void-energy/kinetic-text/tts-block';
+
+  let controls = $state<TtsKineticBlockControls | undefined>();
+
+  function handleSkip() {
+    controls?.skipToEnd();
+  }
+</script>
+
+<TtsKineticBlock {text} {audio} {wordTimestamps} bind:controls={controls} />
+<button onclick={handleSkip}>Skip</button>
+```
+
+`skipToEnd()` reveals all remaining glyphs immediately, stops and seeks the audio to its end, flips `status` to `'done'`, and fires `onended` for parity with natural completion. Safe to call from any state — a no-op once already done.
+
 ### TTS providers
 
 The package is **provider-agnostic**. The core (`syncAudioToKT`, `wordTimesToRevealMarks`, `attachAudioActions`, `TtsKineticBlock`) never imports any provider. Each provider is a single file that normalizes its vendor's API into the universal `TTSResult` shape:
