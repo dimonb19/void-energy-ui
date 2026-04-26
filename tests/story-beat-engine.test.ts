@@ -46,7 +46,7 @@ describe('StoryBeatEngine — applyBeat', () => {
     });
   });
 
-  it('releases prior handles atomically on each subsequent beat', () => {
+  it('marks prior handles for fade-out on each subsequent beat (crossfade)', () => {
     engine.applyBeat(
       makeBeat('a', {
         ambient: { atmosphere: [{ layer: 'rain', intensity: 'high' }] },
@@ -63,12 +63,19 @@ describe('StoryBeatEngine — applyBeat', () => {
         ambient: { psychology: [{ layer: 'tension', intensity: 'low' }] },
       }),
     );
-    expect(ambient.atmosphere).toHaveLength(0);
+    // Old atmosphere entry persists, marked for fade — AmbientHost animates
+    // it out and the layer self-releases via onEnd. New psychology rises fresh.
+    expect(ambient.atmosphere).toHaveLength(1);
+    expect(ambient.atmosphere[0]).toMatchObject({
+      variant: 'rain',
+      fadeMs: 1000,
+    });
     expect(ambient.psychology).toHaveLength(1);
     expect(ambient.psychology[0]).toMatchObject({
       variant: 'tension',
       intensity: 'low',
     });
+    expect(ambient.psychology[0].fadeMs).toBeUndefined();
   });
 });
 
@@ -81,15 +88,58 @@ describe('StoryBeatEngine — releaseAmbient', () => {
     engine = new StoryBeatEngine();
   });
 
-  it('clears ambient state but keeps the beat so the text stays on screen', () => {
+  it('flips atmosphere/psychology entries to decay and keeps the beat on screen', () => {
     const beat = makeBeat('idle');
     engine.applyBeat(beat);
+    expect(ambient.atmosphere[0]).toMatchObject({ durationMs: 0 });
+
     engine.releaseAmbient();
 
     expect(engine.currentBeat?.id).toBe('idle');
-    expect(ambient.atmosphere).toHaveLength(0);
-    expect(ambient.psychology).toHaveLength(0);
-    expect(ambient.environment).toHaveLength(0);
+    // Entry persists — host animates it out and self-releases via onEnd.
+    expect(ambient.atmosphere).toHaveLength(1);
+    expect(ambient.atmosphere[0]).toMatchObject({
+      variant: 'fog',
+      durationMs: undefined,
+    });
+  });
+
+  it('fades environment entries since they have no decay path', () => {
+    engine.applyBeat(
+      makeBeat('env', {
+        ambient: { environment: [{ layer: 'night', intensity: 'medium' }] },
+      }),
+    );
+    expect(ambient.environment).toHaveLength(1);
+
+    engine.releaseAmbient();
+
+    // Env can't decay, so the engine falls through to `release(handle)` —
+    // which now fades by default. Entry persists marked fadeMs and
+    // self-releases via AmbientHost's onEnd once the fade completes.
+    expect(ambient.environment).toHaveLength(1);
+    expect(ambient.environment[0].fadeMs).toBeGreaterThan(0);
+  });
+
+  it('subsequent applyBeat marks any decaying entry for fade and pushes the new beat', () => {
+    engine.applyBeat(makeBeat('a'));
+    engine.releaseAmbient();
+    // Decaying entry still in store...
+    expect(ambient.atmosphere).toHaveLength(1);
+    expect(ambient.atmosphere[0]).toMatchObject({ durationMs: undefined });
+
+    engine.applyBeat(
+      makeBeat('b', {
+        ambient: { atmosphere: [{ layer: 'rain', intensity: 'low' }] },
+      }),
+    );
+    // The next beat fades the old entry (still present, now marked fadeMs)
+    // and pushes the new entry — crossfade rather than hard cut.
+    expect(ambient.atmosphere).toHaveLength(2);
+    const fading = ambient.atmosphere.find((e) => e.variant === 'fog');
+    const fresh = ambient.atmosphere.find((e) => e.variant === 'rain');
+    expect(fading?.fadeMs).toBe(1000);
+    expect(fresh).toMatchObject({ variant: 'rain', durationMs: 0 });
   });
 });
 
@@ -102,14 +152,16 @@ describe('StoryBeatEngine — release', () => {
     engine = new StoryBeatEngine();
   });
 
-  it('resets both currentBeat and the ambient singleton', () => {
+  it('clears currentBeat and marks prior layers for fade-out', () => {
     engine.applyBeat(makeBeat('a'));
     engine.release();
 
     expect(engine.currentBeat).toBeNull();
-    expect(ambient.atmosphere).toHaveLength(0);
-    expect(ambient.psychology).toHaveLength(0);
-    expect(ambient.environment).toHaveLength(0);
+    // Layers persist until the fade animation completes (in real usage,
+    // AmbientHost releases via onEnd). In tests jsdom doesn't render so
+    // we verify the entry is marked fadeMs instead of asserting empty.
+    expect(ambient.atmosphere).toHaveLength(1);
+    expect(ambient.atmosphere[0].fadeMs).toBe(1000);
   });
 
   it('is safe to call on an empty engine', () => {
@@ -117,13 +169,19 @@ describe('StoryBeatEngine — release', () => {
     expect(engine.currentBeat).toBeNull();
   });
 
-  it('release followed by applyBeat starts cleanly', () => {
+  it('release followed by applyBeat pushes the new beat alongside the fading old one', () => {
     engine.applyBeat(makeBeat('a'));
     engine.release();
     engine.applyBeat(makeBeat('b'));
 
     expect(engine.currentBeat?.id).toBe('b');
-    expect(ambient.atmosphere[0]).toMatchObject({ variant: 'fog' });
+    // Old fog (fading) + new fog (rising). Both are 'fog' variant; the old
+    // one carries fadeMs, the new one carries default durationMs:0 (pinned).
+    expect(ambient.atmosphere).toHaveLength(2);
+    const fading = ambient.atmosphere.find((e) => e.fadeMs === 1000);
+    const fresh = ambient.atmosphere.find((e) => e.fadeMs === undefined);
+    expect(fading).toMatchObject({ variant: 'fog' });
+    expect(fresh).toMatchObject({ variant: 'fog', durationMs: 0 });
   });
 });
 

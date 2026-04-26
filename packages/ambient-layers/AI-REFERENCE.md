@@ -61,10 +61,20 @@ The client maintains ambient state across story steps. The AI only needs to spec
 ### Auto-decay — what happens after each step
 
 - **Atmosphere** and **Psychology** start at the given intensity and smoothly fade to off over time. Heavy rain gradually becomes light rain, then clears. This is automatic — the AI doesn't manage it.
-- **Environment** never decays. Night stays night until the AI changes it.
+- **Environment** never auto-decays. Night stays night until the AI changes it.
 - **Action** fires once and disappears. No persistence.
 
 If the AI sets `"high"` rain at a dramatic beat, the reader experiences intense rain that naturally subsides. For sustained weather, the client can disable decay — but the AI doesn't control this.
+
+### Visual transitions
+
+Every persistent layer (Atmosphere, Psychology, Environment) has a smooth transition envelope — the AI doesn't think about this, but it's worth knowing:
+
+- **Mount:** layers rise from invisible up to the requested intensity over a per-variant `riseMs` (snappy for `rain` / `storm` / `danger`; slower for `fog` / `underwater` / `awe`). No pop-in.
+- **Clear (`null`):** layers fade out over ~1s and then unmount. No jump-cut.
+- **Crossfade:** when a category is replaced (e.g. `rain` → `snow`), the old layer fades while the new one rises. The transitions overlap smoothly.
+
+Action one-shots have their own self-contained animations (impact ring, flash pulse, etc.) — no rise / fade envelope.
 
 ---
 

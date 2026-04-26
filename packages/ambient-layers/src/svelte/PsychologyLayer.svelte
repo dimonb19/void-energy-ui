@@ -1,12 +1,14 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import type { PsychologyLayerProps, AmbientLevel } from '../types';
   import { PSYCHOLOGY_PARAMS } from '../core/effects/params';
-  import { startDecay } from '../core/runtime/decay';
+  import { startDecay, startFall, startRise } from '../core/runtime/decay';
 
   let {
     variant,
     intensity = 'medium',
     durationMs,
+    fadeMs,
     enabled = true,
     reducedMotion = 'respect',
     onChange,
@@ -19,17 +21,37 @@
   const dizzyFilterId = `ambient-psy-dizzy-${uid}`;
 
   // Semantic level drives mount/onChange; continuous float drives SCSS.
-  let level = $state<AmbientLevel>('medium');
-  let levelNum = $state<number>(2);
+  // Starts at 'off' and ramps up via `startRise` on mount.
+  let level = $state<AmbientLevel>('off');
+  let levelNum = $state<number>(0);
+  let phase = $state<'rising' | 'settled'>('rising');
 
+  // Phase 1: rise from 0 → intensity on mount. Bails when fading.
   $effect(() => {
-    level = intensity;
-    levelNum = intensity === 'low' ? 1 : intensity === 'medium' ? 2 : 3;
-    onChange?.(intensity);
+    if (fadeMs !== undefined) return;
+    const handle = startRise(
+      intensity,
+      PSYCHOLOGY_PARAMS[variant].riseMs,
+      (value, lvl) => {
+        levelNum = value;
+        if (lvl !== level) {
+          level = lvl;
+          onChange?.(lvl);
+        }
+      },
+      undefined,
+      () => {
+        phase = 'settled';
+      },
+    );
+    return () => handle.stop();
   });
 
+  // Phase 2: decay (or pinned) after rise completes. Bails when fading.
   $effect(() => {
+    if (phase !== 'settled' || fadeMs !== undefined) return;
     const ms = durationMs ?? PSYCHOLOGY_PARAMS[variant].durationMs;
+    if (ms <= 0) return;
     const handle = startDecay(
       intensity,
       ms,
@@ -40,6 +62,27 @@
         level = next;
         onChange?.(next);
       },
+      onEnd,
+    );
+    return () => handle.stop();
+  });
+
+  // Phase 3 (interruptive): fade. Animates current → 0 over flat fadeMs,
+  // then fires `onEnd`. Aborts rise/decay via the bails above.
+  $effect(() => {
+    if (fadeMs === undefined) return;
+    const from = untrack(() => levelNum);
+    const handle = startFall(
+      from,
+      fadeMs,
+      (value, lvl) => {
+        levelNum = value;
+        if (lvl !== level) {
+          level = lvl;
+          onChange?.(lvl);
+        }
+      },
+      undefined,
       onEnd,
     );
     return () => handle.stop();

@@ -42,7 +42,8 @@ Mount `<AmbientHost />` once in your app shell, then drive it from any component
 <script lang="ts">
   import { ambient } from '@void-energy/ambient-layers';
 
-  // Persistent layer scoped to component lifecycle.
+  // Persistent layer scoped to component lifecycle. The layer rises
+  // smoothly on mount and fades smoothly on cleanup — no visual pop.
   $effect(() => {
     const h = ambient.push('atmosphere', 'rain', 'medium');
     return () => ambient.release(h);
@@ -116,16 +117,22 @@ Each category has a distinct lifetime model and a dedicated z-lane. They compose
 
 | Category | Lifetime | Z-lane | Mental model |
 |---|---|---|---|
-| **Atmosphere** | Persistent + auto-decay | Behind content | Weather and physical sensory layers |
-| **Psychology** | Persistent + auto-decay | Above content, below UI | Edge-framed emotional / mental states |
+| **Atmosphere** | Persistent + smooth rise + optional auto-decay | Behind content | Weather and physical sensory layers |
+| **Psychology** | Persistent + smooth rise + optional auto-decay | Above content, below UI | Edge-framed emotional / mental states |
 | **Action** | One-shot, auto-unmount | Top | Single discrete beat (hit, flash, burst) |
-| **Environment** | Sticky (no decay) | Top (mix-blend) | Baseline color grade — hour and place |
+| **Environment** | Persistent + smooth rise (no auto-decay) | Top (mix-blend) | Baseline color grade — hour and place |
 
 ### Lifetime semantics
 
-- **Persistent + decay** (Atmosphere, Psychology): mounts at the given `intensity`, then steps down `high → medium → low → off` every `durationMs` ms. Set `durationMs={0}` to disable decay and stay sticky at the starting intensity.
-- **One-shot** (Action): plays once for `durationMs` (per-variant, per-intensity), then auto-unmounts. Intensity scales amplitude via the `--ambient-level` CSS variable.
-- **Sticky** (Environment): no decay, no animation lifecycle. Tint persists until the prop is changed or the component unmounts.
+Every persistent layer follows a three-phase lifecycle: **rise → settled → (decay or fade)**.
+
+- **Rise (mount):** Layers ramp from invisible up to the requested `intensity` over a per-variant `riseMs` (snappy for `rain` / `storm` / `danger`, slower for inertial effects like `fog` / `underwater` / `awe`). The full SCSS effect builds up smoothly — particles thicken, fog rolls in — driven by `--ambient-level` ramping `0 → target`. No pop-in.
+- **Settled:** Layer holds at the target intensity. Storm lightning, breathing vignettes, and other internal animations only start once the rise completes, so the first lightning strike lands on established rain rather than during the build-up.
+- **Decay (Atmosphere & Psychology only):** Auto-decay through the intensity ladder `high → medium → low → off`, one step per `durationMs` ms. Default `durationMs` is `0` (pinned — no decay) when used via the singleton; the per-variant default is used when used as a raw component without the singleton.
+- **Fade (any category):** Explicit clear via `release(handle)` ramps the layer down to zero over `totalMs` (default 1000ms) and self-cleans. Aborts any in-flight rise or decay. This is what `release()` does by default — pass `release(handle, 0)` for an immediate hard-cut.
+- **One-shot** (Action): plays once for `durationMs` (per-variant, per-intensity), then auto-unmounts. Intensity scales amplitude via `--ambient-level`.
+
+Environment is "sticky" in the auto-decay sense — it doesn't decay on its own — but it now rises smoothly on mount and fades smoothly on clear, just like the other categories.
 
 ## Unified props
 
@@ -135,16 +142,17 @@ All four layer components accept the same props interface. Only the `variant` un
 |------|------|---------|-------------|
 | `variant` | category-specific union | — | **Required.** Picks the concrete effect within the category. |
 | `intensity` | `'low' \| 'medium' \| 'high'` | `'medium'` | Intensity level. Scales opacity, particle counts, or animation amplitude depending on category. |
-| `durationMs` | `number` | per-variant | Persistent: time per decay step. Action: total animation duration. Environment: ignored. Set to `0` on persistent layers to disable decay. |
+| `durationMs` | `number` | per-variant or `0` | Persistent (Atmosphere / Psychology): time per decay step. `0` = pinned (no auto-decay). Action: total animation duration. Environment: ignored (env doesn't auto-decay). |
+| `fadeMs` | `number` | — | When set, the layer falls from its current level to `0` over this many ms (flat-time) and unmounts via `onEnd`. Driven by `release(handle)` — consumers rarely set this directly. Aborts any in-flight rise or decay. |
 | `enabled` | `boolean` | `true` | When `false`, the layer is not rendered. |
 | `reducedMotion` | `'respect' \| 'ignore'` | `'respect'` | `'respect'` freezes animations and halves opacity when the OS prefers reduced motion. `'ignore'` plays regardless. |
 | `onChange` | `(level: AmbientLevel) => void` | — | Fires on every intensity transition, including initial mount and final `'off'`. |
-| `onEnd` | `() => void` | — | Fires when a persistent layer reaches `'off'` or an Action layer finishes. Environment never fires. |
+| `onEnd` | `() => void` | — | Fires when a persistent layer reaches `'off'` (auto-decay or explicit fade) or an Action layer finishes. |
 | `class` | `string` | `''` | Extra CSS classes forwarded to the root layer element. |
 
 `AmbientLevel = 'light' | 'medium' | 'heavy' | 'off'`
 
-Per-variant tuning (default duration, particle counts, intensity ladders) lives in [`src/core/effects/params.ts`](src/core/effects/params.ts) — the SSOT registry.
+Per-variant tuning (rise duration, decay duration, particle counts) lives in [`src/core/effects/params.ts`](src/core/effects/params.ts) — the SSOT registry. Each Atmosphere / Psychology entry exposes `riseMs` (used at mount) and `durationMs` (used at decay) alongside `defaultIntensity`.
 
 ## Effects
 
@@ -233,21 +241,33 @@ Imperative reactive store backed by Svelte 5 runes. One instance, one renderer (
 ```ts
 import { ambient } from '@void-energy/ambient-layers';
 
-// Persistent layers — returns a handle you release later.
+// Persistent layers — returns a handle. The layer rises smoothly on mount.
 const h1 = ambient.push('environment', 'night');
 const h2 = ambient.push('atmosphere', 'rain', 'medium');
 const h3 = ambient.push('psychology', 'tension', 'high');
 
-// Mutate in place — preserves the handle, keys to variant-intensity change.
+// Change variant / intensity in place — preserves the handle and the
+// auto-decay state. Use this for "swap rain for storm" without affecting
+// the layer's lifecycle.
 ambient.update(h2, 'storm', 'high');
 
-// Release.
+// Toggle the auto-decay lifecycle. decay() = start decaying with the
+// variant default; decay(h, ms) = custom decay duration; decay(h, 0) = pin.
+// Works for atmosphere, psychology, AND environment (env has no built-in
+// decay, but you can drive one via decay(h, ms)).
+ambient.decay(h2);                 // start auto-decay
+ambient.decay(h2, 8000);           // custom decay step
+ambient.decay(h2, 0);              // pin at intensity
+
+// Remove a layer with a smooth fade (default 1000ms). Self-cleans via onEnd.
 ambient.release(h1);
+ambient.release(h2, 600);          // custom fade duration
+ambient.release(h3, 0);            // immediate hard-cut (no fade)
 
 // One-shot burst — no handle, auto-clears when the animation finishes.
 ambient.fire('impact', 'high');
 
-// Escape hatch.
+// Escape hatch — hard-cuts every entry in the category. No fade.
 ambient.clear('atmosphere');       // clear one category
 ambient.clear();                   // clear everything
 ```
@@ -256,11 +276,12 @@ ambient.clear();                   // clear everything
 
 | Member | Signature | Notes |
 |---|---|---|
-| `push` | `(category, variant, intensity?) → number` | Returns a numeric handle. Overloaded per category so `variant` narrows to the right union. |
-| `update` | `(handle, variant, intensity?) → boolean` | Mutates the entry in place. Returns `false` if the handle is stale. |
-| `release` | `(handle) → void` | Idempotent. Safe to call on stale handles. |
+| `push` | `(category, variant, intensity?, decay?) → number` | Returns a numeric handle. Overloaded per category so `variant` narrows to the right union. The `decay` flag (atmosphere / psychology only) opts in to auto-decay at mount; defaults to pinned. |
+| `update` | `(handle, variant, intensity?) → boolean` | Mutates variant / intensity in place. Preserves `durationMs` — use `decay()` for lifecycle changes. Returns `false` if the handle is stale. |
+| `decay` | `(handle, durationMs?) → boolean` | Flips the entry's auto-decay state. `decay(h)` = decay using variant default; `decay(h, ms)` = custom; `decay(h, 0)` = pin. Works for env too. |
+| `release` | `(handle, totalMs?) → boolean` | Removes a persistent entry by handle. Fades the layer out smoothly (default 1000ms) and self-cleans. Pass `totalMs: 0` for immediate hard-remove. Idempotent. |
 | `fire` | `(variant, intensity?) → void` | One-shot action. Returns nothing — singleton owns the lifecycle. |
-| `clear` | `(category?) → void` | Omit for all. Accepts `'atmosphere'`, `'psychology'`, `'environment'`, `'action'`, or `'all'`. |
+| `clear` | `(category?) → void` | **Hard-cut.** Omit for all. Accepts `'atmosphere'`, `'psychology'`, `'environment'`, `'action'`, or `'all'`. Use `release()` instead if you want layers to fade. |
 | `atmosphere`, `psychology`, `environment`, `actions` | readable `$state.raw` arrays | Reactive snapshots, primarily for debug / UI introspection. |
 
 Entry shapes are typed via `AtmosphereEntry`, `PsychologyEntry`, `EnvironmentEntry`, `ActionEntry`.
@@ -298,11 +319,12 @@ function setAtmosphere(variant: AtmosphereLayerId, intensity: AmbientIntensity) 
 | | Singleton (`ambient` + `<AmbientHost />`) | Raw (`<AtmosphereLayer />` etc.) |
 |---|---|---|
 | Mount site | Once, in app shell | Anywhere the effect should render |
-| Lifecycle | Handle-stack, `release()` | Component mount/unmount |
-| Decay | None (durationMs=0 forced) | Yes (configurable via `durationMs`) |
+| Lifecycle | Handle-stack, `release()` (fades by default) | Component mount/unmount (no fade) |
+| Rise on mount | Smooth ramp via `riseMs` | Same — built into the layer |
+| Decay | Off by default; opt in via `push(..., decay: true)` or `decay(handle)` | On by default; set `durationMs={0}` to pin |
 | `onChange` / `onEnd` callbacks | Not exposed | Available |
 | Style import | Once, in app shell | Once per app (deduped) |
-| Best for | Apps, pages, modals, feature screens | Showcases, component-level demos, consumers that need decay |
+| Best for | Apps, pages, modals, feature screens | Showcases, component-level demos, consumers that need decay callbacks |
 
 ## Composition recipes
 
@@ -421,10 +443,13 @@ Category class → z-lane:
 
 CSS custom properties set on the root:
 
-- `--ambient-level` — `1` / `2` / `3`, read by keyframes for amplitude and opacity
-- `--ambient-alpha` — derived scalar `calc(var(--ambient-level) / 3)`
-- `--ambient-duration` — Action layers only, the total animation duration in ms
-- `--ambient-env-level` — Environment layers only, the `0..1` tint strength scalar
+- `--ambient-level` — continuous float in `[0, 3]`, ramps during rise / decay / fade. Use this for **opacity / alpha / envelope** properties that should follow the visual lifecycle. The keyframes for amplitude and opacity read it.
+- `--ambient-alpha` — derived scalar `calc(var(--ambient-level) / 3)`. Convenience for opacity multipliers.
+- `--ambient-target-num` — locked numeric mirror of `intensity` (`1` / `2` / `3`). Stays static for the layer's lifetime — does not move during rise / decay / fade. Use this for **structural / geometric** properties that should snap-set per intensity, such as bubble tile size in underwater. Mixing this with structural calcs prevents geometry from morphing during the rise envelope (which would otherwise read as the effect speeding up or slowing down).
+- `--ambient-duration` — Action layers only, the total animation duration in ms.
+- `--ambient-env-level` — Environment layers only, the `0..1` tint strength scalar (also follows the rise / fade envelope).
+
+**Rule of thumb:** opacity and alpha → `--ambient-level` (or `--ambient-alpha`). Geometry, density, blur radius, structural offsets → `--ambient-target-num`.
 
 All layers are `aria-hidden` and never trap pointer events — they do not affect DOM semantics or interactivity.
 

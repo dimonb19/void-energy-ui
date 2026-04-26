@@ -132,6 +132,13 @@ export interface AtmosphereLayerProps
    * Default: per-variant value from `params.ts`.
    */
   durationMs?: number;
+  /**
+   * When set, the layer falls from its current level to 0 over this many
+   * milliseconds (flat-time, intensity-independent), then unmounts via
+   * `onEnd`. Used for explicit scene clears / transitions. Aborts any
+   * in-flight rise or auto-decay.
+   */
+  fadeMs?: number;
 }
 
 export interface PsychologyLayerProps
@@ -140,6 +147,7 @@ export interface PsychologyLayerProps
   variant: PsychologyLayer;
   intensity?: AmbientIntensity;
   durationMs?: number;
+  fadeMs?: number;
 }
 
 export interface ActionLayerProps extends AmbientBaseProps, AmbientLifecycle {
@@ -159,4 +167,11 @@ export interface EnvironmentLayerProps
   variant: EnvironmentLayer;
   /** Tint strength: 'low' | 'medium' | 'high'. Default 'medium'. */
   intensity?: AmbientIntensity;
+  /**
+   * When set, the layer falls from its current level to 0 over this many
+   * milliseconds, then unmounts via `onEnd`. Environment is sticky by
+   * default (no auto-decay), but explicit clears use this path so the
+   * tint fades out instead of popping.
+   */
+  fadeMs?: number;
 }

@@ -18,6 +18,10 @@
  * - `durationMs` — for persistent layers, time per decay step
  *   (high → medium → low → off). For action layers, total one-shot
  *   animation duration. Environment layers ignore duration (sticky).
+ * - `riseMs` (atmosphere/psychology) — total rise duration when a layer
+ *   first mounts. Flat-time, not per-step: rise feel is intensity-independent.
+ *   Tuned per variant — punchy effects (rain/storm/danger) snap on fast,
+ *   inertial effects (fog/underwater/awe) ramp up slowly.
  * - `defaultIntensity` — the intensity used when the consumer omits the
  *   `intensity` prop. Always `'medium'` today; reserved for future tuning.
  * - `counts` (atmosphere only) — particle counts per intensity for
@@ -36,6 +40,7 @@ type IntensityCounts = Record<AmbientIntensity, number>;
 interface PersistentEffectParams {
   defaultIntensity: AmbientIntensity;
   durationMs: number;
+  riseMs: number;
 }
 
 interface AtmosphereEffectParams extends PersistentEffectParams {
@@ -56,31 +61,37 @@ export const ATMOSPHERE_PARAMS: Record<
   rain: {
     defaultIntensity: 'medium',
     durationMs: 8000,
+    riseMs: 800,
     counts: { low: 60, medium: 140, high: 260 },
   },
   snow: {
     defaultIntensity: 'medium',
     durationMs: 10000,
+    riseMs: 1500,
     counts: { low: 30, medium: 70, high: 140 },
   },
   ash: {
     defaultIntensity: 'medium',
     durationMs: 12000,
+    riseMs: 1500,
     counts: { low: 20, medium: 50, high: 100 },
   },
   fog: {
     defaultIntensity: 'medium',
     durationMs: 12000,
+    riseMs: 2000,
     counts: { low: 3, medium: 5, high: 7 },
   },
   underwater: {
     defaultIntensity: 'medium',
     durationMs: 12000,
+    riseMs: 2200,
     counts: { low: 4, medium: 6, high: 8 },
   },
   heat: {
     defaultIntensity: 'medium',
     durationMs: 10000,
+    riseMs: 1500,
     counts: { low: 3, medium: 5, high: 7 },
   },
   // storm composes the rain particle system internally + lightning + wind drift.
@@ -88,12 +99,14 @@ export const ATMOSPHERE_PARAMS: Record<
   storm: {
     defaultIntensity: 'medium',
     durationMs: 12000,
+    riseMs: 700,
     counts: { low: 180, medium: 360, high: 640 },
   },
   // wind is a horizontal-streak field (dust/leaves) with no precipitation.
   wind: {
     defaultIntensity: 'medium',
     durationMs: 10000,
+    riseMs: 1200,
     counts: { low: 30, medium: 60, high: 100 },
   },
   // spores — warm drifting motes rising slowly. Sparser than ash — density
@@ -101,6 +114,7 @@ export const ATMOSPHERE_PARAMS: Record<
   spores: {
     defaultIntensity: 'medium',
     durationMs: 12000,
+    riseMs: 2000,
     counts: { low: 18, medium: 40, high: 80 },
   },
   // fireflies — point-light glows wandering and flickering. Sparsest of all
@@ -108,6 +122,7 @@ export const ATMOSPHERE_PARAMS: Record<
   fireflies: {
     defaultIntensity: 'medium',
     durationMs: 14000,
+    riseMs: 2200,
     counts: { low: 12, medium: 28, high: 55 },
   },
 };
@@ -117,18 +132,18 @@ export const PSYCHOLOGY_PARAMS: Record<
   PsychologyLayer,
   PersistentEffectParams
 > = {
-  danger: { defaultIntensity: 'medium', durationMs: 6000 },
-  tension: { defaultIntensity: 'medium', durationMs: 8000 },
-  dizzy: { defaultIntensity: 'medium', durationMs: 6000 },
-  focus: { defaultIntensity: 'medium', durationMs: 8000 },
-  filmGrain: { defaultIntensity: 'medium', durationMs: 10000 },
-  haze: { defaultIntensity: 'medium', durationMs: 12000 },
-  calm: { defaultIntensity: 'medium', durationMs: 10000 },
-  serenity: { defaultIntensity: 'medium', durationMs: 12000 },
-  success: { defaultIntensity: 'medium', durationMs: 8000 },
-  fail: { defaultIntensity: 'medium', durationMs: 8000 },
-  awe: { defaultIntensity: 'medium', durationMs: 12000 },
-  melancholy: { defaultIntensity: 'medium', durationMs: 10000 },
+  danger: { defaultIntensity: 'medium', durationMs: 6000, riseMs: 600 },
+  tension: { defaultIntensity: 'medium', durationMs: 8000, riseMs: 1000 },
+  dizzy: { defaultIntensity: 'medium', durationMs: 6000, riseMs: 1200 },
+  focus: { defaultIntensity: 'medium', durationMs: 8000, riseMs: 1000 },
+  filmGrain: { defaultIntensity: 'medium', durationMs: 10000, riseMs: 1200 },
+  haze: { defaultIntensity: 'medium', durationMs: 12000, riseMs: 1800 },
+  calm: { defaultIntensity: 'medium', durationMs: 10000, riseMs: 1500 },
+  serenity: { defaultIntensity: 'medium', durationMs: 12000, riseMs: 2000 },
+  success: { defaultIntensity: 'medium', durationMs: 8000, riseMs: 600 },
+  fail: { defaultIntensity: 'medium', durationMs: 8000, riseMs: 800 },
+  awe: { defaultIntensity: 'medium', durationMs: 12000, riseMs: 2000 },
+  melancholy: { defaultIntensity: 'medium', durationMs: 10000, riseMs: 1800 },
 };
 
 /** Action effect registry — one-shot duration per intensity, per variant. */

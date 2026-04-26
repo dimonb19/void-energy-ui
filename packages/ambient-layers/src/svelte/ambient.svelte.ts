@@ -40,16 +40,25 @@ export interface AtmosphereEntry {
   handle: number;
   variant: AtmosphereLayer;
   intensity: AmbientIntensity;
+  // 0 = pinned at intensity (default). undefined = decay using the variant's
+  // built-in duration. Any positive number overrides the per-step duration.
+  durationMs?: number;
+  // When set (via `release(handle, ms)`), the layer falls to 0 over this
+  // many ms flat and self-releases. Aborts any in-flight rise/decay.
+  fadeMs?: number;
 }
 export interface PsychologyEntry {
   handle: number;
   variant: PsychologyLayer;
   intensity: AmbientIntensity;
+  durationMs?: number;
+  fadeMs?: number;
 }
 export interface EnvironmentEntry {
   handle: number;
   variant: EnvironmentLayer;
   intensity: AmbientIntensity;
+  fadeMs?: number;
 }
 export interface ActionEntry {
   id: number;
@@ -73,11 +82,13 @@ export class Ambient {
     category: 'atmosphere',
     variant: AtmosphereLayer,
     intensity?: AmbientIntensity,
+    decay?: boolean,
   ): number;
   push(
     category: 'psychology',
     variant: PsychologyLayer,
     intensity?: AmbientIntensity,
+    decay?: boolean,
   ): number;
   push(
     category: 'environment',
@@ -88,17 +99,21 @@ export class Ambient {
     category: PersistentCategory,
     variant: AtmosphereLayer | PsychologyLayer | EnvironmentLayer,
     intensity: AmbientIntensity = 'medium',
+    decay: boolean = false,
   ): number {
     const handle = ++this.#handle;
+    // decay=false → durationMs:0 (pinned, default). decay=true → undefined,
+    // which AtmosphereLayer/PsychologyLayer resolve to the variant default.
+    const durationMs = decay ? undefined : 0;
     if (category === 'atmosphere') {
       this.atmosphere = [
         ...this.atmosphere,
-        { handle, variant: variant as AtmosphereLayer, intensity },
+        { handle, variant: variant as AtmosphereLayer, intensity, durationMs },
       ];
     } else if (category === 'psychology') {
       this.psychology = [
         ...this.psychology,
-        { handle, variant: variant as PsychologyLayer, intensity },
+        { handle, variant: variant as PsychologyLayer, intensity, durationMs },
       ];
     } else {
       this.environment = [
@@ -110,8 +125,11 @@ export class Ambient {
   }
 
   /**
-   * Mutate an existing entry in place. Render continuity is preserved while
-   * the handle stays the same (keyed by handle in AmbientHost).
+   * Mutate an existing entry's variant/intensity in place. Render
+   * continuity is preserved while the handle stays the same (keyed by
+   * handle in AmbientHost). `durationMs` is preserved — use `decay()` to
+   * change the auto-decay lifecycle independently.
+   *
    * Returns false if the handle is stale.
    */
   update(
@@ -122,10 +140,11 @@ export class Ambient {
     const a = this.atmosphere.findIndex((e) => e.handle === handle);
     if (a >= 0) {
       const next = [...this.atmosphere];
+      const cur = next[a];
       next[a] = {
-        ...next[a],
+        ...cur,
         variant: variant as AtmosphereLayer,
-        intensity: intensity ?? next[a].intensity,
+        intensity: intensity ?? cur.intensity,
       };
       this.atmosphere = next;
       return true;
@@ -133,10 +152,11 @@ export class Ambient {
     const p = this.psychology.findIndex((e) => e.handle === handle);
     if (p >= 0) {
       const next = [...this.psychology];
+      const cur = next[p];
       next[p] = {
-        ...next[p],
+        ...cur,
         variant: variant as PsychologyLayer,
-        intensity: intensity ?? next[p].intensity,
+        intensity: intensity ?? cur.intensity,
       };
       this.psychology = next;
       return true;
@@ -155,22 +175,94 @@ export class Ambient {
     return false;
   }
 
-  /** Remove an entry by handle. Idempotent — safe on stale handles. */
-  release(handle: number): void {
+  /**
+   * Convert a pinned atmosphere/psychology entry into a decaying one. The
+   * entry's `durationMs` flips to `undefined` (or the override), which
+   * AtmosphereLayer/PsychologyLayer pick up and animate to zero — when the
+   * fade completes, AmbientHost's `onEnd` releases the handle.
+   *
+   * Returns `false` if the handle is stale or points to an environment
+   * entry (Environment layers don't decay — caller should `release()`
+   * those directly).
+   */
+  decay(handle: number, durationMs?: number): boolean {
+    const a = this.atmosphere.findIndex((e) => e.handle === handle);
+    if (a >= 0) {
+      const next = [...this.atmosphere];
+      next[a] = { ...next[a], durationMs };
+      this.atmosphere = next;
+      return true;
+    }
+    const p = this.psychology.findIndex((e) => e.handle === handle);
+    if (p >= 0) {
+      const next = [...this.psychology];
+      next[p] = { ...next[p], durationMs };
+      this.psychology = next;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Remove a persistent entry by handle. Fades the layer out smoothly
+   * (default 1000ms) and self-cleans when the fade completes — so callers
+   * just say "release this" and the visual transition happens automatically.
+   *
+   * Pass `totalMs: 0` to remove the entry immediately (no fade). This is
+   * what AmbientHost uses internally after a fade finishes.
+   *
+   * Idempotent — safe on stale handles. Aborts any in-flight rise/decay.
+   */
+  release(handle: number, totalMs: number = 1000): boolean {
+    if (totalMs <= 0) return this._releaseImmediate(handle);
+    const a = this.atmosphere.findIndex((e) => e.handle === handle);
+    if (a >= 0) {
+      const next = [...this.atmosphere];
+      next[a] = { ...next[a], fadeMs: totalMs };
+      this.atmosphere = next;
+      return true;
+    }
+    const p = this.psychology.findIndex((e) => e.handle === handle);
+    if (p >= 0) {
+      const next = [...this.psychology];
+      next[p] = { ...next[p], fadeMs: totalMs };
+      this.psychology = next;
+      return true;
+    }
+    const env = this.environment.findIndex((e) => e.handle === handle);
+    if (env >= 0) {
+      const next = [...this.environment];
+      next[env] = { ...next[env], fadeMs: totalMs };
+      this.environment = next;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Hard-remove an entry from the store. Used by AmbientHost when a layer
+   * has finished its fade-out and is ready to truly unmount. Not for public
+   * use — call `release(handle)` instead.
+   *
+   * @internal
+   */
+  _releaseImmediate(handle: number): boolean {
     const a = this.atmosphere.filter((e) => e.handle !== handle);
     if (a.length !== this.atmosphere.length) {
       this.atmosphere = a;
-      return;
+      return true;
     }
     const p = this.psychology.filter((e) => e.handle !== handle);
     if (p.length !== this.psychology.length) {
       this.psychology = p;
-      return;
+      return true;
     }
     const env = this.environment.filter((e) => e.handle !== handle);
     if (env.length !== this.environment.length) {
       this.environment = env;
+      return true;
     }
+    return false;
   }
 
   /** Fire a one-shot action layer. Auto-clears when the animation ends. */

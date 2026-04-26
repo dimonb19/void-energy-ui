@@ -9,6 +9,7 @@
   } from '@void-energy/ambient-layers';
 
   import Switcher from '@components/ui/Switcher.svelte';
+  import Toggle from '@components/ui/Toggle.svelte';
   import ActionBtn from '@components/ui/ActionBtn.svelte';
   import { morph } from '@actions/morph';
   import Remove from '@components/icons/Remove.svelte';
@@ -85,6 +86,7 @@
   let atmosphereVariant = $state<AtmosphereLayerId>('rain');
   let atmosphereIntensity = $state<AmbientIntensity>('medium');
   let atmosphereHandle = $state<number | null>(null);
+  let atmosphereDecayOn = $state(false);
   const atmosphereEnabled = $derived(atmosphereHandle !== null);
 
   // ── Psychology controls ────────────────────────────────────────────
@@ -170,6 +172,7 @@
   let psychologyVariant = $state<PsychologyLayerId>('danger');
   let psychologyIntensity = $state<AmbientIntensity>('medium');
   let psychologyHandle = $state<number | null>(null);
+  let psychologyDecayOn = $state(false);
   const psychologyEnabled = $derived(psychologyHandle !== null);
 
   // ── Action controls ────────────────────────────────────────────────
@@ -396,8 +399,15 @@
     atmosphereVariant = variant;
     atmosphereIntensity = intensity;
     if (atmosphereHandle === null) {
-      atmosphereHandle = ambient.push('atmosphere', variant, intensity);
+      atmosphereHandle = ambient.push(
+        'atmosphere',
+        variant,
+        intensity,
+        atmosphereDecayOn,
+      );
     } else {
+      // update() preserves the entry's durationMs — decay state survives
+      // variant/intensity changes. Use decay() to flip the lifecycle.
       ambient.update(atmosphereHandle, variant, intensity);
     }
   }
@@ -408,9 +418,28 @@
     psychologyVariant = variant;
     psychologyIntensity = intensity;
     if (psychologyHandle === null) {
-      psychologyHandle = ambient.push('psychology', variant, intensity);
+      psychologyHandle = ambient.push(
+        'psychology',
+        variant,
+        intensity,
+        psychologyDecayOn,
+      );
     } else {
       ambient.update(psychologyHandle, variant, intensity);
+    }
+  }
+
+  function setAtmosphereDecay(checked?: boolean) {
+    atmosphereDecayOn = checked ?? false;
+    if (atmosphereHandle !== null) {
+      // decay(handle) → start auto-decaying. decay(handle, 0) → pin at intensity.
+      ambient.decay(atmosphereHandle, atmosphereDecayOn ? undefined : 0);
+    }
+  }
+  function setPsychologyDecay(checked?: boolean) {
+    psychologyDecayOn = checked ?? false;
+    if (psychologyHandle !== null) {
+      ambient.decay(psychologyHandle, psychologyDecayOn ? undefined : 0);
     }
   }
   function setEnvironment(
@@ -514,6 +543,28 @@
     psychologyVariants.find((v) => v.value === psychologyVariant)
       ?.description ?? '',
   );
+
+  // AmbientHost auto-releases atmosphere/psychology entries when their
+  // auto-decay finishes. Mirror that here so the Switcher and Clear button
+  // reflect reality — otherwise the variant stays "selected" even though
+  // the visible effect is gone.
+  $effect(() => {
+    if (
+      atmosphereHandle !== null &&
+      !ambient.atmosphere.some((e) => e.handle === atmosphereHandle)
+    ) {
+      atmosphereHandle = null;
+    }
+  });
+  $effect(() => {
+    if (
+      psychologyHandle !== null &&
+      !ambient.psychology.some((e) => e.handle === psychologyHandle)
+    ) {
+      psychologyHandle = null;
+    }
+  });
+
   const environmentCaption = $derived(
     environmentVariants.find((v) => v.value === environmentVariant)
       ?.description ?? '',
@@ -731,6 +782,21 @@
             />
           </div>
 
+          <div class="flex flex-col gap-xs">
+            <Toggle
+              checked={atmosphereDecayOn}
+              onchange={setAtmosphereDecay}
+              label="Auto-decay"
+            />
+            <div use:morph class="text-caption text-mute">
+              {#if atmosphereDecayOn}
+                Will fade out high → medium → low → off
+              {:else}
+                Pinned at the chosen intensity
+              {/if}
+            </div>
+          </div>
+
           <ActionBtn
             icon={Remove}
             text="Clear"
@@ -769,6 +835,21 @@
               value={psychologyIntensity}
               onchange={setPsychologyIntensity}
             />
+          </div>
+
+          <div class="flex flex-col gap-xs">
+            <Toggle
+              checked={psychologyDecayOn}
+              onchange={setPsychologyDecay}
+              label="Auto-decay"
+            />
+            <div use:morph class="text-caption text-mute">
+              {#if psychologyDecayOn}
+                Will fade out high → medium → low → off
+              {:else}
+                Pinned at the chosen intensity
+              {/if}
+            </div>
           </div>
 
           <ActionBtn

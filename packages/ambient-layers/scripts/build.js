@@ -103,16 +103,25 @@ export interface AtmosphereEntry {
   handle: number;
   variant: AtmosphereLayerId;
   intensity: AmbientIntensity;
+  // 0 = pinned at intensity (default). undefined = decay using the variant's
+  // built-in duration.
+  durationMs?: number;
+  // Set by \`release(handle, ms)\` — layer animates current → 0 over this
+  // many ms flat, then self-cleans via AmbientHost's onEnd.
+  fadeMs?: number;
 }
 export interface PsychologyEntry {
   handle: number;
   variant: PsychologyLayerId;
   intensity: AmbientIntensity;
+  durationMs?: number;
+  fadeMs?: number;
 }
 export interface EnvironmentEntry {
   handle: number;
   variant: EnvironmentLayerId;
   intensity: AmbientIntensity;
+  fadeMs?: number;
 }
 export interface ActionEntry {
   id: number;
@@ -130,15 +139,17 @@ export declare class Ambient {
   environment: EnvironmentEntry[];
   actions: ActionEntry[];
 
-  push(category: 'atmosphere', variant: AtmosphereLayerId, intensity?: AmbientIntensity): number;
-  push(category: 'psychology', variant: PsychologyLayerId, intensity?: AmbientIntensity): number;
+  push(category: 'atmosphere', variant: AtmosphereLayerId, intensity?: AmbientIntensity, decay?: boolean): number;
+  push(category: 'psychology', variant: PsychologyLayerId, intensity?: AmbientIntensity, decay?: boolean): number;
   push(category: 'environment', variant: EnvironmentLayerId, intensity?: AmbientIntensity): number;
   update(
     handle: number,
     variant: AtmosphereLayerId | PsychologyLayerId | EnvironmentLayerId,
     intensity?: AmbientIntensity,
   ): boolean;
-  release(handle: number): void;
+  decay(handle: number, durationMs?: number): boolean;
+  release(handle: number, totalMs?: number): boolean;
+  _releaseImmediate(handle: number): boolean;
   fire(variant: ActionLayerId, intensity?: AmbientIntensity): void;
   clear(category?: PersistentCategory | 'action' | 'all'): void;
 }

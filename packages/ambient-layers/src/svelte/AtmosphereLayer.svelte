@@ -1,12 +1,14 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import type { AtmosphereLayerProps, AmbientLevel } from '../types';
   import { ATMOSPHERE_PARAMS } from '../core/effects/params';
-  import { startDecay } from '../core/runtime/decay';
+  import { startDecay, startFall, startRise } from '../core/runtime/decay';
 
   let {
     variant,
     intensity = 'medium',
     durationMs,
+    fadeMs,
     enabled = true,
     reducedMotion = 'respect',
     onChange,
@@ -19,22 +21,50 @@
   const underwaterFilterId = `uw-distort-${uid}`;
 
   // Semantic level — used for mount gating, `onChange`, and locking the
-  // particle count. Starts at `intensity` and only flips to 'off' when the
-  // continuous fade reaches zero.
-  let level = $state<AmbientLevel>('medium');
+  // particle count. Starts at 'off' and ramps up via `startRise` on mount,
+  // then optionally decays back to 'off' if `durationMs > 0`.
+  let level = $state<AmbientLevel>('off');
   // Continuous float (0..3) driven by rAF. Fed to `--ambient-level` so every
   // SCSS `calc()` consumer scales smoothly instead of jumping between rungs.
-  let levelNum = $state<number>(2);
+  let levelNum = $state<number>(0);
+  // Lifecycle phase: 'rising' until rise completes, then 'settled'. Lets
+  // the decay $effect wait for rise to finish, and gates storm lightning.
+  let phase = $state<'rising' | 'settled'>('rising');
 
-  // Re-sync if the consumer changes `intensity` or `variant` prop.
+  // Phase 1: rise from 0 → intensity on mount. Bails out (and stops any
+  // rise in flight) the moment `fadeMs` is set — explicit clear takes
+  // priority over rise.
   $effect(() => {
-    level = intensity;
-    levelNum = intensity === 'low' ? 1 : intensity === 'medium' ? 2 : 3;
-    onChange?.(intensity);
+    if (fadeMs !== undefined) return;
+    const handle = startRise(
+      intensity,
+      ATMOSPHERE_PARAMS[variant].riseMs,
+      (value, lvl) => {
+        levelNum = value;
+        if (lvl !== level) {
+          level = lvl;
+          onChange?.(lvl);
+        }
+      },
+      undefined,
+      () => {
+        phase = 'settled';
+      },
+    );
+    return () => handle.stop();
   });
 
+  // Phase 2: decay (or stay pinned) once rise has completed. Re-runs when
+  // `durationMs` changes — e.g. `ambient.decay(handle)` flipping a pinned
+  // entry into a decaying one mid-life. Bails when fading.
   $effect(() => {
+    if (phase !== 'settled' || fadeMs !== undefined) return;
     const ms = durationMs ?? ATMOSPHERE_PARAMS[variant].durationMs;
+    if (ms <= 0) {
+      // Pinned at intensity — startDecay would no-op, skip it to avoid
+      // an extra synchronous onTick that re-emits 'medium' onChange.
+      return;
+    }
     const handle = startDecay(
       intensity,
       ms,
@@ -50,10 +80,43 @@
     return () => handle.stop();
   });
 
+  // Phase 3 (interruptive): fade. Runs whenever `fadeMs` is set — animates
+  // from the current `levelNum` down to 0 over flat time, then fires
+  // `onEnd`. The rise/decay effects above bail when fadeMs is set, and
+  // their cleanups stop their RAF handles, so we resume from wherever
+  // they left off.
+  $effect(() => {
+    if (fadeMs === undefined) return;
+    const from = untrack(() => levelNum);
+    const handle = startFall(
+      from,
+      fadeMs,
+      (value, lvl) => {
+        levelNum = value;
+        if (lvl !== level) {
+          level = lvl;
+          onChange?.(lvl);
+        }
+      },
+      undefined,
+      onEnd,
+    );
+    return () => handle.stop();
+  });
+
   // Particle count is locked to the *initial* intensity for the lifetime of
   // the layer. Regenerating particles mid-fade would pop; instead we spawn
   // the full field once and let `--ambient-level` fade it out continuously.
   const count = $derived(ATMOSPHERE_PARAMS[variant].counts[intensity]);
+
+  // Locked numeric mirror of the intensity prop — exposed as `--ambient-target-num`
+  // so SCSS rules that affect *structure* (e.g. underwater bubble tile size)
+  // can scale by intensity without morphing during the rise/decay envelope.
+  // Use this for any geometry/density that should snap-set per intensity;
+  // use `--ambient-level` for opacity/alpha that should follow the envelope.
+  const targetNum = $derived(
+    intensity === 'low' ? 1 : intensity === 'high' ? 3 : 2,
+  );
 
   // Particle-field variants share an x-y scatter model.
   // - rain/snow/ash/storm: vertical fall (storm reuses the rain particle shape).
@@ -122,7 +185,7 @@
   }
 
   $effect(() => {
-    if (variant !== 'storm' || level === 'off') return;
+    if (variant !== 'storm' || level === 'off' || phase !== 'settled') return;
     const timers: Array<ReturnType<typeof setTimeout>> = [];
     const at = (ms: number, fn: () => void) => {
       timers.push(setTimeout(fn, ms));
@@ -267,8 +330,8 @@
     data-reduced-motion={reducedMotion}
     data-lightning={variant === 'storm' && lightning ? 'true' : undefined}
     style={variant === 'underwater'
-      ? `--ambient-level: ${levelNum}; backdrop-filter: url(#${underwaterFilterId}); -webkit-backdrop-filter: url(#${underwaterFilterId});`
-      : `--ambient-level: ${levelNum};`}
+      ? `--ambient-level: ${levelNum}; --ambient-target-num: ${targetNum}; backdrop-filter: url(#${underwaterFilterId}); -webkit-backdrop-filter: url(#${underwaterFilterId});`
+      : `--ambient-level: ${levelNum}; --ambient-target-num: ${targetNum};`}
   >
     {#if isParticleField}
       {#each particles as p (p.i)}

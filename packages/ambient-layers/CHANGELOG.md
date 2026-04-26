@@ -1,5 +1,48 @@
 # Changelog
 
+## 0.5.0
+
+### Added — smooth lifecycle transitions
+
+Every persistent layer now has a three-phase lifecycle (rise → settled → optional decay) plus an explicit fade-out path. No more visual pop-in / pop-out on any category.
+
+- **Smooth rise on mount.** All three persistent categories (Atmosphere, Psychology, Environment) ramp from invisible up to the requested intensity over a per-variant `riseMs`. Punchy effects (`rain`, `storm`, `danger`) snap on fast (~700–800ms); inertial effects (`fog`, `underwater`, `awe`) ramp up slowly (~2000ms+). Storm lightning is gated on `phase === 'settled'` so the first strike lands on established rain rather than during the build-up.
+- **Smooth fade on clear.** `release(handle)` now fades the layer from its current level down to zero over a flat duration (default 1000ms) and self-cleans via `onEnd`. Pass `release(handle, 0)` for the previous hard-cut behavior.
+- **Environment now supports both** rise and fade-out. Was previously sticky-only with no transition envelope.
+- **`--ambient-target-num` CSS variable.** Locked numeric mirror of `intensity` (`1` / `2` / `3`) — stays static for the layer's lifetime. Use this for structural / geometric SCSS calcs that should snap-set per intensity (e.g. underwater bubble tile size). The existing `--ambient-level` continues to drive opacity / alpha and follows the rise / decay / fade envelope. Mixing structural calcs with `--ambient-level` causes geometry to morph during the rise envelope (visible as effects appearing to speed up or slow down) — `--ambient-target-num` prevents that.
+
+### Added — singleton API
+
+- **`decay(handle, durationMs?) → boolean`** — canonical lifecycle pivot. `decay(h)` starts auto-decay using the variant default; `decay(h, ms)` uses a custom step duration; `decay(h, 0)` pins at intensity. Now works for environment too (was atmosphere / psychology only).
+
+### Changed — singleton API
+
+- **`release(handle, totalMs?)` now fades by default.** Previous behavior (hard-remove) is available via `release(handle, 0)`. AmbientHost uses an internal hard-remove (`_releaseImmediate`) after the fade completes.
+- **`update(handle, variant, intensity?)` no longer takes a `decay` flag.** `update()` is purely about changing what's playing — it preserves the entry's `durationMs` so the lifecycle survives variant / intensity changes. Use the dedicated `decay()` method for lifecycle changes. Single-call sites that combined both concerns now make two calls.
+
+### Removed — singleton API
+
+- **`fade()` method.** Folded into `release(handle, totalMs)`. Migration: `ambient.fade(h, 600)` → `ambient.release(h, 600)`.
+
+### Internal
+
+- New ramp helpers in `core/runtime/decay.ts`: `startRise(target, totalMs, ...)` and `startFall(from, totalMs, ...)` alongside the existing `startDecay(initial, stepMs, ...)`. Rise and fall use flat-time pacing (intensity-independent); decay uses per-step pacing (each ladder transition takes the same wall-clock time).
+- `ATMOSPHERE_PARAMS` and `PSYCHOLOGY_PARAMS` entries gain a `riseMs` field (per-variant rise duration).
+- `AtmosphereLayer` and `PsychologyLayer` now run a state machine (`phase: 'rising' | 'settled'`) plus three `$effect` blocks: rise on mount, decay after settle, and an interruptive fade triggered by the `fadeMs` prop.
+- `EnvironmentLayer` mirrors the same pattern (rise + fade) with no decay phase.
+- Entry interfaces gain `fadeMs?: number` (atmosphere, psychology, environment).
+
+### Migration
+
+For most consumers, **no changes are required** — `ambient.push` / `ambient.release` continue to work and now look smoother out of the box.
+
+| Before | After | Why |
+|---|---|---|
+| `ambient.fade(h, ms)` | `ambient.release(h, ms)` | `fade()` removed; `release()` does it. |
+| `ambient.update(h, variant, intensity, true)` | `ambient.update(h, variant, intensity)` then `ambient.decay(h)` | `update()` no longer mixes lifecycle with content. |
+| `ambient.update(h, variant, intensity, false)` | `ambient.update(h, variant, intensity)` then `ambient.decay(h, 0)` | Same. |
+| `ambient.release(h)` (expecting hard-cut) | `ambient.release(h, 0)` | Default is now a soft fade. Pass `0` for the old behavior. |
+
 ## 0.4.0
 
 ### Added — singleton API

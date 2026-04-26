@@ -15,24 +15,32 @@ class StoryBeatEngine {
   #handles: number[] = [];
 
   applyBeat(beat: StoryBeat): void {
-    this.#releaseAmbientHandles();
+    // Old layers fade out (~600ms) and self-release; new layers rise
+    // immediately. The brief overlap reads as a crossfade rather than a cut.
+    this.#fadeAmbientHandles();
     this.currentBeat = beat;
     this.#pushAmbient(beat.ambient);
   }
 
   /**
-   * Clear ambient layers while keeping the beat's text visible. Used when a
-   * completed vibe idles long enough that the always-on GPU cost outweighs
-   * the atmospheric benefit — the reveal stays on screen, the backdrop
-   * effects go quiet.
+   * Soft-fade ambient layers while keeping the beat's text visible. Used
+   * when a completed vibe idles long enough that the always-on GPU cost
+   * outweighs the atmospheric benefit — the reveal stays on screen, the
+   * backdrop effects animate to zero and self-release. Environment layers
+   * have no decay path in the package, so they're cut hard.
+   *
+   * Handles are not cleared — a subsequent `applyBeat` or `release` aborts
+   * any in-flight decay via the singleton's idempotent `release()`.
    */
   releaseAmbient(): void {
-    this.#releaseAmbientHandles();
+    for (const h of this.#handles) {
+      if (!ambient.decay(h)) ambient.release(h);
+    }
   }
 
   release(): void {
     this.currentBeat = null;
-    this.#releaseAmbientHandles();
+    this.#fadeAmbientHandles();
   }
 
   #pushAmbient(amb: StoryAmbient): void {
@@ -47,7 +55,13 @@ class StoryBeatEngine {
     }
   }
 
-  #releaseAmbientHandles(): void {
+  /**
+   * Trigger a fast fade-out on each tracked handle. Layers self-release
+   * via `onEnd` when the fade completes, so we drop the handle list
+   * immediately — anything that subsequently mutates a faded handle hits
+   * the idempotent path in the singleton.
+   */
+  #fadeAmbientHandles(): void {
     for (const h of this.#handles) ambient.release(h);
     this.#handles = [];
   }

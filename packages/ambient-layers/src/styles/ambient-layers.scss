@@ -717,8 +717,11 @@
   // Tile MUST be smaller than viewport height so multiple tiles stack on
   // screen at once — otherwise the sparse sprite band reads as a wave with
   // a visible empty gap between cycles.
+  // Tile derives from the locked intensity (--ambient-target-num), not the
+  // live --ambient-level, so it doesn't shrink during the rise envelope —
+  // shrinking tile while animation duration is fixed reads as a slowdown.
   --bubble-tile: calc(
-    (38 - var(--ambient-level) * 5) * 1vh
+    (38 - var(--ambient-target-num, 2) * 5) * 1vh
   ); // void-ignore — density scale
   background-image:
     radial-gradient(
@@ -801,7 +804,7 @@
 .ambient-underwater::after {
   // Medium bubbles — offset phase, slower, different tile so layers never sync.
   --bubble-tile: calc(
-    (52 - var(--ambient-level) * 7) * 1vh
+    (52 - var(--ambient-target-num, 2) * 7) * 1vh
   ); // void-ignore — density scale
   background-image:
     radial-gradient(
