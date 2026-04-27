@@ -370,6 +370,48 @@ Pick the physics preset, color mode, tonal palette, and fonts that most naturall
   return message;
 }
 
+/**
+ * Build a brand-extraction user message for URL-sourced generation.
+ * Server passes a pre-fetched brand context blob (title, meta, headings,
+ * detected colors and font families) so Claude can ground its output in
+ * the actual brand identity rather than inventing one.
+ */
+export function buildUrlUserMessage(
+  url: string,
+  brandContext: string,
+  physics?: PhysicsPreference,
+  mode?: ModePreference,
+  retry = false,
+): string {
+  const directive = retry
+    ? `**Mode: BRAND_EXTRACTION (retry)** — your previous interpretation was rejected. Try a different angle on the SAME brand. Lean into a different physics preset, surface a secondary brand color, or shift the mood toward a different facet of the brand's identity.`
+    : `**Mode: BRAND_EXTRACTION** — extract a faithful atmosphere from a real brand.`;
+
+  let message = `${directive}
+
+Source URL: ${url}
+
+Brand context (extracted from the live page):
+${brandContext}
+
+Your job: produce a VE atmosphere that authentically captures THIS brand's identity. Match their actual color palette (prioritize colors detected in the brand context), typography feel (serif/sans/mono based on what they use or imply), and overall mood. Fidelity over creativity — do NOT reinterpret the brand into something it isn't.
+
+Mode hint: if the page reads dark, use dark mode; if light, use light. Physics hint: glass for premium / futuristic / luxury brands, flat for utilitarian / modern / SaaS, retro only when the brand has explicit retro aesthetics.
+
+Label: use the brand's name (extracted from the title or og:site_name — strip taglines and " | Home"-style suffixes).
+Tagline: "[Brand] / [adjective]" — 2-3 words capturing their identity.`;
+
+  const constraints: string[] = [];
+  if (physics) constraints.push(`physics MUST be exactly "${physics}"`);
+  if (mode) constraints.push(`mode MUST be exactly "${mode}"`);
+
+  if (constraints.length > 0) {
+    message += `\n\nIMPORTANT — User-locked preferences. You MUST follow them exactly:\n- ${constraints.join('\n- ')}`;
+  }
+
+  return message;
+}
+
 // ── Response Parsing & Validation ────────────────────────────────────────────
 
 /**
@@ -666,7 +708,7 @@ export function buildManualAtmosphere(
 export async function generateAtmosphere(
   options: GenerateOptions,
 ): Promise<VoidResult<GeneratedAtmosphere, BoundaryError>> {
-  const { vibe, physics, mode, retry, signal } = options;
+  const { vibe, source, physics, mode, retry, signal } = options;
 
   let response: Response;
   try {
@@ -676,6 +718,7 @@ export async function generateAtmosphere(
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         vibe,
+        source: source ?? 'vibe',
         physics,
         mode,
         retry,
@@ -698,38 +741,46 @@ export async function generateAtmosphere(
 
   if (!response.ok) {
     const status = response.status;
-    let message: string;
 
-    switch (status) {
-      case 401:
-        message = 'Invalid API key.';
-        break;
-      case 429:
-        message = 'Rate limited — try again in a moment.';
-        break;
-      case 500:
-        message = 'Server error — AI provider may not be configured.';
-        break;
-      case 502:
-        message = 'AI provider could not be reached — try again in a moment.';
-        break;
-      case 503:
-        message = 'Generation is temporarily unavailable.';
-        break;
-      case 504:
-        message = 'AI provider took too long to respond — try again.';
-        break;
-      case 529:
-        message = 'AI provider is busy — try again shortly.';
-        break;
-      default:
-        message = `API error (${status}).`;
+    // Prefer the server's descriptive message when present (e.g. "Invalid URL.",
+    // "Could not load that URL (timeout).", "No usable brand signal in that page.").
+    // Fall back to a status-keyed default for AI-provider errors that may not
+    // carry a body, or for unexpected statuses.
+    let serverMessage: string | undefined;
+    try {
+      const body = (await response.json()) as { error?: string };
+      if (typeof body.error === 'string' && body.error.trim().length > 0) {
+        serverMessage = body.error.trim();
+      }
+    } catch {
+      /* no body or non-JSON — fall through to the default */
     }
+
+    const fallback = ((): string => {
+      switch (status) {
+        case 401:
+          return 'Invalid API key.';
+        case 429:
+          return 'Rate limited — try again in a moment.';
+        case 500:
+          return 'Server error — AI provider may not be configured.';
+        case 502:
+          return 'AI provider could not be reached — try again in a moment.';
+        case 503:
+          return 'Generation is temporarily unavailable.';
+        case 504:
+          return 'AI provider took too long to respond — try again.';
+        case 529:
+          return 'AI provider is busy — try again shortly.';
+        default:
+          return `API error (${status}).`;
+      }
+    })();
 
     return err({
       code: 'http_error',
       source: 'AtmosphereGenerator.generate',
-      message,
+      message: serverMessage ?? fallback,
       status,
     });
   }

@@ -42,10 +42,12 @@
 
   import { untrack } from 'svelte';
   import { emerge, dissolve } from '@lib/transitions.svelte';
+  import { Type, Globe } from '@lucide/svelte';
 
   import ActionBtn from './ui/ActionBtn.svelte';
   import FormField from './ui/FormField.svelte';
   import Switcher from './ui/Switcher.svelte';
+  import Toggle from './ui/Toggle.svelte';
   import Selector from './ui/Selector.svelte';
   import SliderField from './ui/SliderField.svelte';
   import Sparkle from './icons/Sparkle.svelte';
@@ -54,6 +56,7 @@
   import Copy from './icons/Copy.svelte';
   import IconBtn from './ui/IconBtn.svelte';
   import LoadingSparkle from './icons/LoadingSparkle.svelte';
+  import { morph } from '@actions/morph';
 
   interface AtmosphereGeneratorProps {
     class?: string;
@@ -70,8 +73,27 @@
   // ── Generation State ───────────────────────────────────────────────────
 
   let vibe = $state('');
+  /** When true, the input is interpreted as a brand URL instead of a vibe description. */
+  let urlMode = $state(false);
   let generating = $state(false);
   let abortController = $state<AbortController | undefined>(undefined);
+
+  const trimmedInput = $derived(vibe.trim());
+
+  /** True when URL mode is on, the user has typed something, and it can't be parsed as a URL. */
+  const hasUrlError = $derived.by(() => {
+    if (!urlMode || trimmedInput.length === 0) return false;
+    const candidate = /^https?:\/\//i.test(trimmedInput)
+      ? trimmedInput
+      : `https://${trimmedInput}`;
+    return !URL.canParse(candidate);
+  });
+
+  const inputPlaceholder = $derived(
+    urlMode
+      ? 'Paste a brand URL — nike.com, stripe.com, linear.app…'
+      : "Describe a vibe... (e.g., 'underwater bioluminescence')",
+  );
 
   // Preview tracking
   let previewId = $state<string | null>(null);
@@ -137,7 +159,9 @@
     }
   });
 
-  let canGenerate = $derived(vibe.trim().length > 0 && !generating);
+  let canGenerate = $derived(
+    trimmedInput.length > 0 && !generating && !hasUrlError,
+  );
 
   // ── Abort on Escape ────────────────────────────────────────────────────
 
@@ -623,11 +647,14 @@
     const controller = new AbortController();
     abortController = controller;
     const loadingToast = toast.loading(
-      'Generating atmosphere... (Esc to cancel)',
+      urlMode
+        ? 'Analyzing brand and generating atmosphere... (Esc to cancel)'
+        : 'Generating atmosphere... (Esc to cancel)',
     );
 
     const result = await generateAtmosphere({
-      vibe: vibe.trim(),
+      source: urlMode ? 'url' : 'vibe',
+      vibe: trimmedInput,
       physics: selectedPhysics ?? undefined,
       mode: selectedMode ?? undefined,
       retry,
@@ -752,16 +779,31 @@
 </script>
 
 <div class="surface-raised p-lg flex flex-col gap-lg {className}">
-  <!-- ── Vibe Input ─────────────────────────────────────────────────── -->
+  <!-- ── Vibe / URL Input ───────────────────────────────────────────── -->
   <form class="flex flex-col gap-md items-center" onsubmit={handleSubmit}>
     <div class="w-full flex flex-col tablet:flex-row gap-sm">
-      <input
-        type="text"
-        bind:value={vibe}
-        placeholder="Describe a vibe... (e.g., 'underwater bioluminescence')"
-        disabled={generating}
-        class="flex-1"
-      />
+      <div class="flex flex-row items-center gap-sm flex-1">
+        <Toggle
+          bind:checked={urlMode}
+          iconOff={Type}
+          iconOn={Globe}
+          disabled={generating}
+          aria-label={urlMode
+            ? 'Switch to vibe mode'
+            : 'Switch to brand URL mode'}
+        />
+        <input
+          type="text"
+          bind:value={vibe}
+          placeholder={inputPlaceholder}
+          disabled={generating}
+          aria-invalid={hasUrlError || undefined}
+          autocomplete={urlMode ? 'url' : 'off'}
+          inputmode={urlMode ? 'url' : 'text'}
+          spellcheck={!urlMode}
+          class="flex-1"
+        />
+      </div>
       <ActionBtn
         icon={generating ? LoadingSparkle : Sparkle}
         text={generating ? 'Generating...' : 'Generate'}
@@ -770,6 +812,18 @@
         class="shrink-0"
       />
     </div>
+
+    {#if hasUrlError}
+      <p
+        class="text-error text-small text-center"
+        role="alert"
+        aria-live="polite"
+        in:emerge
+        out:dissolve
+      >
+        Enter a valid URL (e.g. nike.com or https://stripe.com).
+      </p>
+    {/if}
 
     <!-- ── Optional Preferences ──────────────────────────────────────── -->
     <div
@@ -798,7 +852,7 @@
   <!-- ── Preview Controls ───────────────────────────────────────────── -->
   {#if previewResult && previewHandle !== null}
     <div
-      class="surface-spotlight p-md flex flex-col-reverse small-desktop:flex-col gap-md items-center"
+      class="surface-sunk p-md flex flex-col-reverse small-desktop:flex-col gap-md items-center"
       in:emerge
       out:dissolve
     >
