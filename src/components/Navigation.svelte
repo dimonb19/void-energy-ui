@@ -358,7 +358,7 @@
   //     onpointerenter={openMenu}
   //     onpointerleave={closeMenuDelayed}
   //   >
-  //     <Burger data-size="2xl" data-state={menuOpen ? 'active' : ''} />
+  //     <Burger data-size="lg" data-state={menuOpen ? 'active' : ''} />
   //   </button>
   //
   // 9. ADD MENU DROPDOWN + SCRIM (after bottom-nav):
@@ -440,7 +440,7 @@
 <svelte:window {onscroll} {onmousemove} />
 
 <nav
-  class="nav-bar flex flex-row items-center justify-between gap-xs px-xs small-desktop:px-md"
+  class="nav-bar flex flex-row items-center justify-between gap-xs small-desktop:px-md"
   aria-label="Navigation"
   data-hidden={navHidden}
 >

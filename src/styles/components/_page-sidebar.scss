@@ -408,12 +408,12 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
     // Stack: nav-bar inset (max(space-lg, safe)) + nav-bar inner px-xs
     //        + corner pill width (size-touch-min) + space-xs gap = toggle edge
     left: calc(
-      max(var(--space-lg), var(--safe-left)) + var(--space-xs) +
-        var(--size-touch-min) + var(--space-xs)
+      max(var(--space-lg), var(--safe-left)) + var(--size-touch-min) +
+        var(--space-xs)
     );
     right: calc(
-      max(var(--space-lg), var(--safe-right)) + var(--space-xs) +
-        var(--size-touch-min) + var(--space-xs)
+      max(var(--space-lg), var(--safe-right)) + var(--size-touch-min) +
+        var(--space-xs)
     );
     z-index: z('overlay');
 

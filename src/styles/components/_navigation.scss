@@ -102,13 +102,51 @@
     @include touch-only {
       @include glass-blur;
 
+      // Square pill matching the bar height. aspect-ratio: 1 (paired with
+      // height: 100%) keeps width tied to --size-touch-min so the pill stays
+      // square regardless of pointer kind — without it, btn-icon's icon+padding
+      // (~40px) outgrows the bar height (36px on `pointer: fine`) and the
+      // pill renders as a rectangle on PC narrow viewports.
       height: 100%;
+      aspect-ratio: 1;
       padding: 0;
       border-radius: var(--radius-full);
       background: var(--bg-surface);
       border: var(--physics-border-width) solid var(--border-color);
       box-shadow: var(--shadow-float);
       pointer-events: auto;
+
+      // Direct child trigger (button or anchor) fills the pill. Zeroes the
+      // child's intrinsic min-width / min-height / padding so the icon
+      // centers cleanly inside the corner pill.
+      > button,
+      > a {
+        width: 100%;
+        height: 100%;
+        min-width: 0;
+        min-height: 0;
+        padding: 0;
+      }
+
+      // Tab-shaped right-zone triggers (e.g., ProfileBtn): hide the chevron
+      // affordance (round pill is its own affordance) and let the avatar
+      // fill the pill edge-to-edge. Outer .nav-island provides the border,
+      // so the inner avatar drops its own to avoid a double ring.
+      > button.tab {
+        gap: 0;
+        border-radius: var(--radius-full);
+
+        .icon[data-size='sm'] {
+          display: none;
+        }
+
+        .profile-avatar {
+          width: 100%;
+          height: 100%;
+          border: none;
+          font-size: var(--font-size-body);
+        }
+      }
     }
   }
 
@@ -250,6 +288,25 @@
   @include respond-up(tablet) {
     min-width: calc(var(--space-5xl) * 2);
     border-bottom-left-radius: var(--radius-base);
+  }
+
+  // ── Touch (< small-desktop): Floating island below the nav row ──
+  // Mirrors .page-sidebar's touch dropdown geometry: same horizontal inset
+  // as the nav-bar, sitting one --space-xs gap below the corner-pill row.
+  @include touch-only {
+    top: calc(
+      var(--safe-top) + var(--space-xs) + var(--size-touch-min) +
+        var(--space-xs)
+    );
+    left: max(var(--space-lg), var(--safe-left));
+    right: max(var(--space-lg), var(--safe-right));
+    min-width: 0;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: var(--space-sm);
+    border: var(--physics-border-width) solid var(--border-color);
+    border-radius: var(--radius-base);
+    box-shadow: var(--shadow-float);
   }
 
   @include when-glass {
