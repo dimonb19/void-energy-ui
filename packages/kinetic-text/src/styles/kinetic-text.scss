@@ -15,6 +15,60 @@
 //   --kt-opacity-min Minimum opacity during animation
 //   --kt-delay-offset Per-char animation delay stagger (ms)
 
+// ── @property registration ────────────────────────────────────────
+// WebKit/iOS Safari requires explicit type registration to interpolate
+// custom properties inside transform/filter keyframes. Without these
+// declarations, var(--kt-dy) etc. are treated as untyped tokens and
+// the browser snaps instead of animating, breaking every reveal style
+// except the one with displacements large enough to mask the snap
+// (scramble). Chrome/Firefox infer the type and are unaffected.
+
+@property --kt-dx {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px; // void-ignore
+}
+@property --kt-dy {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px; // void-ignore
+}
+@property --kt-rotate {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg; // void-ignore
+}
+@property --kt-scale {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+@property --kt-skew {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg; // void-ignore
+}
+@property --kt-opacity-min {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 1;
+}
+@property --kt-dx2 {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px; // void-ignore
+}
+@property --kt-dy2 {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px; // void-ignore
+}
+@property --kt-rotate2 {
+  syntax: '<angle>';
+  inherits: true;
+  initial-value: 0deg; // void-ignore
+}
+
 // ── Root ──────────────────────────────────────────────────────────
 
 .kinetic-text {

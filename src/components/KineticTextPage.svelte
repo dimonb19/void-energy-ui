@@ -792,7 +792,10 @@
               <div
                 class="kt-demo-card surface-sunk p-md flex flex-col gap-md h-full min-w-0"
                 onclick={() => oneShotReplay[demo.effect]++}
-                onpointerenter={() => oneShotReplay[demo.effect]++}
+                onpointerenter={(e) => {
+                  if (e.pointerType !== 'mouse') return;
+                  oneShotReplay[demo.effect]++;
+                }}
                 onkeydown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ')
                     oneShotReplay[demo.effect]++;
@@ -838,7 +841,8 @@
               <div
                 class="kt-demo-card surface-sunk p-md flex flex-col gap-md h-full min-w-0"
                 onclick={() => toggleContinuousLoop(demo.effect)}
-                onpointerenter={() => {
+                onpointerenter={(e) => {
+                  if (e.pointerType !== 'mouse') return;
                   if (!activeContinuousEffects[demo.effect])
                     activeContinuousEffects[demo.effect] = demo.effect;
                 }}
