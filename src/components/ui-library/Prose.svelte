@@ -599,9 +599,10 @@ E = mc&lt;sup&gt;2&lt;/sup&gt;
     <p class="text-caption text-mute px-xs">
       All prose elements adapt to glass, flat, and retro physics automatically.
       Switch the atmosphere or physics preset to see blockquote borders, list
-      markers, and highlight treatments change in real time. The <code
-        >.prose</code
-      > class is the recommended scope for user-generated or markdown-rendered content.
+      markers, and highlight treatments change in real time. <code>.prose</code>
+      is the scope for trusted rich text the app authors; for foreign HTML the app
+      does not control (rich-text-editor output, embedded third-party blocks) use
+      the <code>.prose-untrusted</code> quarantine scope instead.
     </p>
 
     <!-- ─── TABLES ───────────────────────────────────────────────────────── -->

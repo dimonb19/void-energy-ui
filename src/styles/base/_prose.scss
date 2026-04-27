@@ -2,12 +2,23 @@
  * BLOCK-LEVEL PROSE ELEMENTS
  * ==========================================================================
  *
- * Base styling for block content (blockquote, figure, address) and an opt-in
- * .prose scope class that re-enables list markers for long-form content.
+ * Base styling for block content (blockquote, figure, address) plus two
+ * opt-in scope classes:
+ *
+ *   .prose            Rich-text container for TRUSTED content (blogs,
+ *                     markdown, legal docs). Re-enables list markers and
+ *                     paragraph rhythm.
+ *   .prose-untrusted  Defensive container for UNTRUSTED content (rich-text
+ *                     editor output, embedded third-party blocks, markdown
+ *                     rendered from user input). Caps runaway media, wraps
+ *                     wide tables, and re-anchors inheritable typography
+ *                     so foreign styles cannot escape the scope. NOT a
+ *                     sanitization layer — caller must sanitize HTML
+ *                     separately (DOMPurify, trusted-types).
  *
  * List markers are globally stripped in _reset.scss (list-style: none) to
  * protect navigation menus and component lists. The .prose class safely
- * re-enables them for prose contexts (blogs, markdown, user content).
+ * re-enables them for prose contexts.
  *
  * .legal-content (in _typography.scss) remains the specialized wrapper
  * for legal documents with subordered counters and alpha variants.
@@ -208,5 +219,104 @@ address {
     margin-inline-start: var(--space-md);
     color: var(--text-dim);
     margin-top: calc(var(--space-xs) * 0.5);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 5. UGC QUARANTINE (.prose-untrusted scope)
+// ---------------------------------------------------------------------------
+// Usage: <div class="prose-untrusted">{ untrusted html }</div>
+//
+// Visual containment layer for foreign HTML the application does not control:
+// rich-text editor output, embedded third-party blocks, markdown rendered
+// from user input. Defends against three failure modes:
+//
+//   1. Inheritable property leak — foreign content nested under arbitrary
+//      ancestors picks up the wrong font/color/line-height. Re-anchored at
+//      the scope root.
+//   2. Layout break-out — oversized images, runaway tables, foreign
+//      out-of-flow content perturbing ancestor layout. Hard-capped via
+//      contain + isolation + dimensional caps with !important to defeat
+//      foreign unlayered <style> rules (cascade-layer priority guarantees
+//      our layered !important beats unlayered !important).
+//   3. Inline `style="color: red"` on the SCOPE WRAPPER leaking down. The
+//      scope re-asserts safe defaults at the root; descendant inline
+//      `style=""` still wins locally — that is a sanitization concern,
+//      not a CSS one.
+//
+// NOT a sanitization layer. Caller must strip <script>, <style>, event
+// handlers, and dangerous URL schemes via DOMPurify or trusted-types
+// before rendering inside this scope.
+//
+// Pairs with .prose for trusted rich text. Use .prose for content the
+// application controls; use .prose-untrusted for content it does not.
+
+.prose-untrusted {
+  // ---- Re-anchor inheritable typography ----
+  // No !important — descendants may legitimately set their own font/color
+  // (e.g., a foreign <pre> wanting a code font). The defense is against
+  // foreign content inheriting unintended values from the wrapping app.
+  font-family: var(--font-body);
+  line-height: var(--line-height-body);
+  color: var(--text-dim);
+
+  // ---- Containment ----
+  // Layout containment prevents foreign descendants from affecting ancestor
+  // layout calculations. Style containment scopes counter-increment and
+  // quotes. Isolation establishes a stacking context so foreign z-index
+  // values cannot escape the scope.
+  contain: layout style;
+  isolation: isolate;
+
+  // ---- Cap media (defeat foreign !important / unlayered <style>) ----
+  // Re-asserts the global _reset.scss media cap with !important. Foreign
+  // unlayered `<style>` rules with !important would otherwise win against
+  // our normal-priority layered reset.
+  img,
+  picture,
+  video,
+  iframe,
+  embed,
+  object,
+  svg {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  // ---- Wrap wide tables ----
+  // Foreign content with hardcoded wide tables (data dumps, mail-merge
+  // output) blows out the container width. Forcing display: block and
+  // overflow-x: auto turns the table into a horizontally scrollable
+  // region without modifying its semantics.
+  //
+  // !important on the layout-critical declarations only. cell-level
+  // border/padding stays normal so a foreign theme can override the look.
+  table {
+    display: block !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    border-collapse: collapse;
+  }
+
+  // ---- Long-text wrapping ----
+  // Foreign content often includes URLs, hashes, or no-space strings that
+  // would push the container width. Force soft-wrap inside the scope.
+  overflow-wrap: anywhere;
+  word-break: break-word;
+
+  // ---- Marker rendering for foreign lists ----
+  // The global reset strips list-style. Foreign content authored in HTML
+  // expects markers — restore them inside the scope so structure reads.
+  ul,
+  ol {
+    margin-block: var(--space-sm);
+    padding-inline-start: var(--space-md);
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+  ol {
+    list-style-type: decimal;
   }
 }

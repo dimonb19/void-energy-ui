@@ -687,6 +687,41 @@ Enables list markers and definition list formatting inside a scoped wrapper. Req
 </div>
 ```
 
+#### `.prose-untrusted` — UGC Quarantine Container
+
+Defensive scope for foreign HTML the application does not author: rich-text-editor output, embedded third-party blocks, markdown rendered from user input. Pairs with `.prose` (trusted) — use `.prose-untrusted` for content the app does **not** control.
+
+**Scope guarantees:**
+
+| Concern | Defense |
+| --- | --- |
+| Inheritable property leak (font, color, line-height) | Re-anchored at the scope root to `--font-body`, `--text-dim`, `--line-height-body` |
+| Layout break-out (foreign out-of-flow content perturbing ancestor layout) | `contain: layout style` + `isolation: isolate` |
+| Oversized media (`<img>` / `<video>` / `<iframe>` / `<svg>`) | `max-width: 100% !important; height: auto !important` |
+| Runaway tables | `display: block; max-width: 100%; overflow-x: auto` (all `!important`) |
+| Long unbroken strings (URLs, hashes) | `overflow-wrap: anywhere; word-break: break-word` |
+| Foreign `!important` in unlayered `<style>` tags | Beaten by our layered `!important` (cascade-layer priority) |
+| Stripped list markers (foreign HTML expects them) | Restored: `<ul>` disc, `<ol>` decimal, native indent |
+
+**What it does NOT do:**
+
+- **No HTML sanitization.** Strip `<script>`, `<style>`, event handlers, and dangerous URL schemes via DOMPurify or trusted-types **before** rendering inside this scope.
+- **No defense against inline `style="…"`** on foreign elements. The CSS specificity hierarchy explicitly grants inline styles priority — that is by design. Sanitize attributes the application does not need.
+- **No content transformation.** No filtering, tinting, desaturation, or pixel modification. The scope wraps and selects; it never touches pixels.
+
+**Usage:**
+
+```svelte
+<script>
+  import DOMPurify from 'isomorphic-dompurify';
+  let { userHtml }: { userHtml: string } = $props();
+</script>
+
+<div class="prose-untrusted">
+  {@html DOMPurify.sanitize(userHtml)}
+</div>
+```
+
 **HCM (High Contrast Mode):** `<mark>` maps to `Highlight`/`HighlightText`, `<blockquote>` border maps to `ButtonText`.
 
 ---
