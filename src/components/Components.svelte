@@ -19,6 +19,7 @@
   import UserState from './ui-library/UserState.svelte';
   import TabsShowcase from './ui-library/TabsShowcase.svelte';
   import PaginationShowcase from './ui-library/PaginationShowcase.svelte';
+  import Media from './ui-library/Media.svelte';
   // Overlays & Feedback
   import FloatingUI from './ui-library/FloatingUI.svelte';
   import Toasts from './ui-library/Toasts.svelte';
@@ -61,6 +62,7 @@
         { id: 'tabs', label: 'Tabs' },
         { id: 'pagination', label: 'Pagination' },
         { id: 'user-state', label: 'User State' },
+        { id: 'media', label: 'Image, Avatar & Video' },
       ],
     },
     {
@@ -256,6 +258,7 @@
           <TabsShowcase />
           <PaginationShowcase />
           <UserState />
+          <Media />
 
           <hr />
 

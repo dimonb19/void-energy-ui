@@ -3,6 +3,11 @@
   let { class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
 </script>
 
+<!--
+  Icon represents the ACTION the click will perform, not the current state.
+  - data-paused="false" (playing) → pause bars (click to pause)
+  - data-paused="true" or absent (paused / static trigger) → play triangle (click to play)
+-->
 <svg
   xmlns="http://www.w3.org/2000/svg"
   viewBox="-100 -100 200 200"
@@ -15,9 +20,9 @@
   aria-hidden="true"
   {...rest}
 >
-  <!-- Play triangle — visible when not paused (default) -->
+  <!-- Play triangle — visible when paused or no state set (click to play) -->
   <polygon class="play-shape" points="-26 -36 -26 36 36 0" />
-  <!-- Pause bars — visible when paused -->
+  <!-- Pause bars — visible when playing (click to pause) -->
   <line class="pause-shape" x1="-20" y1="-30" x2="-20" y2="30" />
   <line class="pause-shape" x1="20" y1="-30" x2="20" y2="30" />
   <!-- Shared circle ring -->
@@ -32,7 +37,7 @@
       transform var(--speed-base) var(--ease-spring-snappy);
   }
 
-  /* Default: play visible, pause hidden */
+  /* Default (no attribute or data-paused='true'): play visible, pause hidden */
   .play-shape {
     opacity: 1;
   }
@@ -42,8 +47,8 @@
     transform: scaleY(0.6);
   }
 
-  /* Paused: pause visible, play hidden */
-  :global(.icon-play-pause[data-paused='true']) {
+  /* Playing: pause visible, play hidden */
+  :global(.icon-play-pause[data-paused='false']) {
     .play-shape {
       opacity: 0;
       transform: scale(0.6);
@@ -77,8 +82,8 @@
     }
   }
 
-  /* Hover while paused — play shape stays hidden */
-  :global(.icon-play-pause[data-paused='true'][data-state='active']) {
+  /* Hover while playing — play shape stays hidden, pause bars scale up */
+  :global(.icon-play-pause[data-paused='false'][data-state='active']) {
     .play-shape {
       opacity: 0;
       transform: scale(0.6);

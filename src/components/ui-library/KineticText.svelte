@@ -54,7 +54,7 @@
 </script>
 
 <section id="kinetic-text" class="flex flex-col gap-md">
-  <h2>18 // KINETIC TEXT</h2>
+  <h2>19 // KINETIC TEXT</h2>
 
   <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">

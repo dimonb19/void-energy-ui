@@ -1,0 +1,47 @@
+@use '../abstracts' as *;
+
+// ==========================================================================
+// IMAGE — Native <img> wrapper with skeleton fallback and error state.
+// ==========================================================================
+
+.image {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  width: 100%;
+  background: var(--bg-sunk);
+  border-radius: var(--radius-base);
+
+  > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: var(--image-fit, cover);
+    opacity: 0;
+    transition: opacity var(--speed-base) var(--ease-flow);
+  }
+
+  // Note: 'loaded' is not in the when-state mixin's vocabulary, so this uses
+  // a literal data-state selector instead of @include when-state('loaded').
+  &[data-state='loaded'] > img {
+    opacity: 1;
+  }
+
+  // Skeleton fills the aspect-ratio wrapper instead of using its default 128px.
+  .image-skeleton {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  // Error state — muted icon centered over the sunk background.
+  .image-error {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-mute);
+  }
+}

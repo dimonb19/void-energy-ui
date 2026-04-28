@@ -1,0 +1,121 @@
+@use '../abstracts' as *;
+
+// ==========================================================================
+// AVATAR — Circular user representation: image or initials fallback.
+//
+// SIZE SCALE (data-size — coupled width/font via local --avatar-* vars)
+//   xs:  --space-md  (24px)  /  --font-size-caption
+//   sm:  --space-lg  (32px)  /  --font-size-caption
+//   md:  --space-xl  (48px)  /  --font-size-body      (default)
+//   lg:  --space-2xl (64px)  /  --font-size-h5
+//   xl:  --space-3xl (96px)  /  --font-size-h3
+//
+// Initials surface uses the energy-primary tinted treatment with retro + light
+// physics overrides. ProfileBtn composes this primitive at size="xs" inside
+// .nav-island corner pills (see _navigation.scss > button.tab override).
+// ==========================================================================
+
+.avatar {
+  --avatar-size: var(--space-xl);
+  --avatar-text: var(--font-size-body);
+
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: var(--radius-full);
+  overflow: visible; // presence dot needs to spill past the circle edge
+
+  &[data-size='xs'] {
+    --avatar-size: var(--space-md);
+    --avatar-text: var(--font-size-caption);
+  }
+
+  &[data-size='sm'] {
+    --avatar-size: var(--space-lg);
+    --avatar-text: var(--font-size-caption);
+  }
+
+  &[data-size='lg'] {
+    --avatar-size: var(--space-2xl);
+    --avatar-text: var(--font-size-h5);
+  }
+
+  &[data-size='xl'] {
+    --avatar-size: var(--space-3xl);
+    --avatar-text: var(--font-size-h3);
+  }
+
+  > img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+  }
+}
+
+// Initials fallback — energy-tinted circle with the initials centered.
+.avatar-initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+
+  background: alpha(var(--energy-primary), 15%);
+  color: var(--energy-primary);
+  border: var(--physics-border-width) solid alpha(var(--energy-primary), 30%);
+
+  font-size: var(--avatar-text);
+  font-weight: var(--font-weight-semibold);
+  line-height: 1;
+  text-transform: uppercase;
+  user-select: none;
+
+  transition:
+    background-color var(--speed-fast) var(--ease-spring-snappy),
+    border-color var(--speed-fast) var(--ease-spring-snappy),
+    color var(--speed-fast) var(--ease-spring-snappy);
+
+  @include when-retro {
+    background: var(--bg-canvas);
+    border-color: var(--energy-primary);
+  }
+
+  @include when-light {
+    background: alpha(var(--energy-primary), 10%);
+    border-color: alpha(var(--energy-primary), 40%);
+  }
+}
+
+// Presence dot — bottom-right, sized proportionally to the avatar.
+.avatar-presence {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: calc(var(--avatar-size) / 3);
+  height: calc(var(--avatar-size) / 3);
+  border-radius: var(--radius-full);
+  border: var(--physics-border-width) solid var(--bg-canvas);
+
+  &[data-presence='online'] {
+    background: var(--color-success);
+  }
+
+  &[data-presence='busy'] {
+    background: var(--color-error);
+  }
+
+  &[data-presence='away'] {
+    background: var(--color-premium);
+  }
+
+  &[data-presence='offline'] {
+    background: var(--text-mute);
+  }
+}

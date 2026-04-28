@@ -864,8 +864,8 @@
                       : 'Play'}
                     iconProps={{
                       'data-paused': activeContinuousEffects[demo.effect]
-                        ? 'true'
-                        : undefined,
+                        ? 'false'
+                        : 'true',
                     }}
                   />
                 </div>

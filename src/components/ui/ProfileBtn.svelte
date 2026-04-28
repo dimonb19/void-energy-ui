@@ -8,26 +8,30 @@
   USAGE
   -------------------------------------------------------------------------
   <ProfileBtn />
-  <ProfileBtn size="xl" onclick={toggleMenu} aria-expanded={menuOpen} />
+  <ProfileBtn onclick={toggleMenu} aria-expanded={menuOpen} />
   -------------------------------------------------------------------------
 
   PROPS:
-  - size: Icon data-size for the guest silhouette (default: 'lg')
   - class: Additional CSS classes on the button
   - ...rest: All native button attributes (onclick, disabled, aria-*, etc.)
 
   BEHAVIOR:
   - Uses auth-only / public-only CSS utilities for FOUC-safe state switching
-  - Avatar span is aria-hidden (label lives on the button via aria-label)
+  - Wrapping <button> carries the accessible name via aria-label; the inner
+    <Avatar> content is suppressed from SR by the button's name calculation
   - Chevron is always visible to signal dropdown affordance
+  - Auth-state Avatar and unauth-state silhouette icon are pinned to the
+    same 24px (--space-md) bounding box so logout/login swaps don't reflow
+    the parent button (btn-void opts out of global control-height min)
 
-  @see /src/styles/components/_navigation.scss (.profile-avatar)
+  @see /src/components/ui/Avatar.svelte (auth-state badge composes <Avatar size="xs">)
   @see /src/components/icons/Profile.svelte
 -->
 <script lang="ts">
   import type { HTMLButtonAttributes } from 'svelte/elements';
   import { user } from '@stores/user.svelte';
   import Profile from '../icons/Profile.svelte';
+  import Avatar from './Avatar.svelte';
   import { ChevronDown } from '@lucide/svelte';
 
   interface ProfileBtnProps extends HTMLButtonAttributes {
@@ -37,17 +41,13 @@
 
   let {
     class: className = '',
-    size = 'lg',
+    size = 'xl',
     ...rest
   }: ProfileBtnProps = $props();
 
-  const roleInitial = $derived.by(() => {
-    const role = user.current?.role_name;
-    if (!role) return null;
-    return role.charAt(0);
-  });
-
-  const isSignedIn = $derived(user.isAuthenticated && roleInitial !== null);
+  const isSignedIn = $derived(
+    user.isAuthenticated && Boolean(user.current?.role_name),
+  );
 
   const avatarUrl = $derived.by(() => {
     const role = user.current?.role_name;
@@ -65,16 +65,12 @@
     : 'Sign in'}
   {...rest}
 >
-  <span
-    class="profile-avatar auth-only flex items-center justify-center shrink-0 overflow-hidden"
-    aria-hidden="true"
-  >
-    {#if avatarUrl}
-      <img class="w-full h-full" src={avatarUrl} alt="" />
-    {:else if roleInitial}
-      {roleInitial}
-    {/if}
-  </span>
+  <Avatar
+    src={avatarUrl ?? undefined}
+    name={user.current?.role_name ?? '?'}
+    size="xs"
+    class="auth-only"
+  />
 
   <Profile data-size={size} class="public-only" />
 

@@ -45,7 +45,7 @@
       "nav": ["tabs", "pagination", "load-more", "breadcrumbs", "sidebar"],
       "layout": ["settings-row"],
       "interaction": ["pull-refresh"],
-      "feedback": ["skeleton"],
+      "feedback": ["skeleton", "image", "avatar", "video"],
       "chart": [
         "progress-ring",
         "sparkline",
@@ -765,14 +765,14 @@
       "example": "<ThemesBtn class='btn-cta' />"
     },
     "profile-button": {
-      "description": "Circular avatar button showing the user's photo or role-based fallback icon. Reads auth state from the user store automatically.",
+      "description": "Circular avatar button showing the user's photo or role-based fallback. Reads auth state from the user store automatically. Composes <Avatar size='xs'> for the auth-state badge and <Profile> icon for the unauthenticated state.",
       "category": "action",
       "component": "ProfileBtn",
       "import": "@components/ui/ProfileBtn.svelte",
       "props": ["size", "class", "...rest:button"],
       "slots": [],
-      "related": ["dropdown", "icon-button", "themes-button"],
-      "compose": "Usually use as a Dropdown trigger. It reads auth state from the user store and switches avatar or role badge automatically.",
+      "related": ["avatar", "dropdown", "icon-button", "themes-button"],
+      "compose": "Usually use as a Dropdown trigger. It reads auth state from the user store and switches between an Avatar (image or role-letter initials) and the Profile silhouette icon automatically. The auth-state Avatar is pinned to 24px (--space-md); the silhouette icon's data-size is controlled by the size prop (default 'xl').",
       "example": "<ProfileBtn onclick={toggleMenu} aria-expanded={menuOpen} />"
     },
     "dropdown": {
@@ -928,6 +928,57 @@
       "related": [],
       "compose": "Use shimmer placeholders during loading. paragraph renders multiple text rows automatically.",
       "example": "<Skeleton variant='paragraph' lines={3} />"
+    },
+    "image": {
+      "description": "Native <img> wrapper with skeleton fallback during load, muted error state on failure, lazy loading by default, and aspect-ratio wrapper for layout stability. Forwards native <img> attributes (width, height, decoding, srcset, sizes, etc.) via spread.",
+      "category": "feedback",
+      "component": "Image",
+      "import": "@components/ui/Image.svelte",
+      "props": [
+        "src",
+        "alt",
+        "aspectRatio",
+        "lazy",
+        "objectFit",
+        "class",
+        "...rest:HTMLImgAttributes"
+      ],
+      "slots": [],
+      "related": ["skeleton"],
+      "compose": "Use for content imagery (hero photos, thumbnails, avatars, illustrations). Pair aspectRatio with object-fit to lock layout. Naming: in .astro files where Astro's <Image> from astro:assets is also imported, alias one — `import { Image as VoidImage } from '@components/ui/Image.svelte'`. In .svelte files there is no collision.",
+      "example": "<Image src='/hero.jpg' alt='Hero' aspectRatio='16 / 9' />"
+    },
+    "avatar": {
+      "description": "Circular user representation. Renders an <img> when src is provided and loads successfully; falls back to initials derived from the name prop otherwise. Supports an optional presence dot (online/busy/away/offline) anchored to the bottom-right.",
+      "category": "feedback",
+      "component": "Avatar",
+      "import": "@components/ui/Avatar.svelte",
+      "variants": ["xs", "sm", "md", "lg", "xl"],
+      "props": ["src", "name", "size", "presence", "class"],
+      "slots": [],
+      "related": ["image", "profile-button", "skeleton"],
+      "compose": "Use anywhere a person is represented (comments, member lists, mentions, user pickers). The name prop is required — it derives initials (first + last initial, max 2 chars, uppercase) and supplies the accessible name in both image and initials modes. For navbar profile triggers with role badge + chevron, use ProfileBtn instead.",
+      "example": "<Avatar src='/jane.jpg' name='Jane Doe' size='lg' presence='online' />"
+    },
+    "video": {
+      "description": "Native <video> wrapper with skeleton fallback during metadata load, muted error state on failure, and aspect-ratio container for layout stability. Native browser controls by default (controls=true). Forwards native <video> attributes (autoplay, muted, loop, playsinline, crossorigin, etc.) via spread; <source> and <track> elements pass through as children.",
+      "category": "feedback",
+      "component": "Video",
+      "import": "@components/ui/Video.svelte",
+      "props": [
+        "src",
+        "poster",
+        "controls",
+        "preload",
+        "aspectRatio",
+        "element:bindable",
+        "class",
+        "...rest:HTMLVideoAttributes"
+      ],
+      "slots": ["children()"],
+      "related": ["image", "media-slider", "skeleton"],
+      "compose": "Use for embedded clips and hero videos. Default aspectRatio='16 / 9' and preload='metadata' (mobile-data-friendly). For custom playback chrome, set controls={false} and pair with <MediaSlider> bound to your own video ref. For accessibility, pass <track kind='captions'> as children.",
+      "example": "<Video src='/clip.mp4' poster='/poster.jpg' />"
     },
     "media-slider": {
       "description": "Horizontal volume/playback control bar with mute toggle, play/pause, and optional replay button. Icons animate between states.",

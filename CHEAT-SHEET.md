@@ -1295,6 +1295,270 @@ Preset components with built-in layout and physics.
 
 ---
 
+#### `<Image>` — Content image with skeleton fallback
+
+**Description:** Thin wrapper around native `<img>` that adds three things — a skeleton fallback during load, a muted icon error state on failure, and an `aspect-ratio` container that prevents layout shift. Lazy loading is on by default. All other native `<img>` attributes (`width`, `height`, `decoding`, `srcset`, `sizes`, `crossorigin`, etc.) are forwarded via spread.
+**Location:** [src/components/ui/Image.svelte](src/components/ui/Image.svelte)
+**CSS:** `.image` ([src/styles/components/\_image.scss](src/styles/components/_image.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `src` | `string` | — | Image source URL (required) |
+| `alt` | `string` | — | Alt text (required — accessibility) |
+| `aspectRatio` | `string` | — | CSS aspect-ratio (e.g., `'16 / 9'`, `'1 / 1'`) |
+| `lazy` | `boolean` | `true` | Native lazy loading |
+| `objectFit` | `'cover' \| 'contain' \| 'fill' \| 'none' \| 'scale-down'` | `'cover'` | How the image fills its wrapper |
+| `class` | `string` | `''` | Consumer classes on outer `.image` div |
+| `...rest` | `HTMLImgAttributes` | — | Forwarded to `<img>` |
+
+**States** (`data-state` on outer wrapper):
+
+| State | Visual |
+| --- | --- |
+| `loading` | `<Skeleton variant="card" />` fills the wrapper |
+| `loaded` | `<img>` fades in over `--speed-base` |
+| `error` | `ImageOff` icon centered, `--text-mute` color |
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+  import Image from '@components/ui/Image.svelte';
+</script>
+
+<!-- Hero -->
+<Image src="/hero.jpg" alt="Mountains at dusk" aspectRatio="16 / 9" />
+
+<!-- Square thumbnail -->
+<Image src="/thumb.jpg" alt="Product" aspectRatio="1 / 1" />
+
+<!-- Above-the-fold image (skip lazy) -->
+<Image src="/banner.jpg" alt="Banner" aspectRatio="21 / 9" lazy={false} />
+
+<!-- Contain instead of cover -->
+<Image src="/logo.svg" alt="Logo" aspectRatio="3 / 1" objectFit="contain" />
+```
+
+**Naming — Astro `<Image>` collision:**
+Astro 5+ ships `<Image>` from `astro:assets` for responsive srcset. Astro's `<Image>` is `.astro`-only — there is no collision in `.svelte` files. If both are needed in a single `.astro` file, alias one:
+
+```ts
+import { Image as VoidImage } from '@components/ui/Image.svelte';
+```
+
+Use Astro's `<Image>` when responsive srcset / build-time optimization is the priority. Use VE's `<Image>` when skeleton fallback, error state, and aspect-ratio stability are the priority.
+
+**Architecture Notes:**
+
+| Decision | Rationale |
+| --- | --- |
+| **Native `<img>` core** | The browser owns image decoding, lazy-loading, srcset selection, and accessibility. The wrapper only adds layout, fallback, and error chrome. |
+| **Skeleton composition** | Reuses `<Skeleton variant="card" />` instead of duplicating shimmer physics. The skeleton fills the wrapper via absolute positioning. |
+| **Aspect-ratio on wrapper, not img** | Setting `aspect-ratio` on the outer div makes the skeleton match the eventual image dimensions, preventing layout shift on load. |
+| **`alt` required** | TypeScript enforces it — there is no opt-out for screen readers, including in error state (`role="img" aria-label={alt}`). |
+| **`...rest` spread to `<img>`** | Native attributes like `srcset`, `sizes`, `decoding`, `crossorigin`, `referrerpolicy` work without VE knowing about them. |
+| **No filters / tints / processing** | Per D33: VE wraps and selects content, never modifies pixels. For physics/mode-aware decorative imagery, see `<AdaptiveImage>` (Phase 0c W3). |
+
+**Physics:** No physics-specific rules — the wrapper inherits `--radius-base` (8px glass/flat, 0 retro), `--bg-sunk` placeholder, and `--ease-flow` fade. Skeleton physics come from the composed `<Skeleton>`.
+
+---
+
+#### `<Avatar>` — User representation (image or initials)
+
+**Description:** Circular user marker. Renders `<img>` when `src` is provided and loads cleanly; otherwise renders initials derived from `name` (first + last initial, max 2 chars, uppercase). On image-load failure, swaps to initials. Optional presence dot anchors bottom-right with semantic color per status.
+**Location:** [src/components/ui/Avatar.svelte](src/components/ui/Avatar.svelte)
+**CSS:** `.avatar`, `.avatar-initials`, `.avatar-presence` ([src/styles/components/\_avatar.scss](src/styles/components/_avatar.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `src` | `string` | — | Image URL. If absent or fails to load, initials show. |
+| `name` | `string` | — | User name (required). Drives initials and accessible name. |
+| `size` | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'` | Size scale (24 / 32 / 48 / 64 / 96 px) |
+| `presence` | `'online' \| 'busy' \| 'away' \| 'offline'` | — | Optional status dot |
+| `class` | `string` | `''` | CSS passthrough |
+
+**Size Scale:**
+
+| `size` | Width / Height | Initials font |
+| --- | --- | --- |
+| `xs` | `--space-md` (24px) | `--font-size-caption` |
+| `sm` | `--space-lg` (32px) | `--font-size-caption` |
+| `md` | `--space-xl` (48px) | `--font-size-body` |
+| `lg` | `--space-2xl` (64px) | `--font-size-h5` |
+| `xl` | `--space-3xl` (96px) | `--font-size-h3` |
+
+**Presence Colors:**
+
+| `presence` | Color token |
+| --- | --- |
+| `online` | `--color-success` |
+| `busy` | `--color-error` |
+| `away` | `--color-premium` |
+| `offline` | `--text-mute` |
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+  import Avatar from '@components/ui/Avatar.svelte';
+</script>
+
+<!-- Initials only -->
+<Avatar name="Jane Doe" />
+
+<!-- With image, large -->
+<Avatar src="/jane.jpg" name="Jane Doe" size="lg" />
+
+<!-- With presence indicator -->
+<Avatar src="/jane.jpg" name="Jane Doe" presence="online" />
+
+<!-- Status dot only (initials fallback) -->
+<Avatar name="Quinn" size="xl" presence="busy" />
+
+<!-- In a list -->
+<div class="flex flex-col gap-md">
+  {#each members as member}
+    <div class="flex items-center gap-sm">
+      <Avatar src={member.avatar} name={member.name} size="sm" />
+      <span>{member.name}</span>
+    </div>
+  {/each}
+</div>
+```
+
+**Architecture Notes:**
+
+| Decision | Rationale |
+| --- | --- |
+| **Native `<img>`, not composed `<Image>`** | Avatar's load/fallback UX (initials during load, initials on error) differs fundamentally from Image's (skeleton during load, ImageOff icon on error). Direct `<img>` keeps the surface small and matches Native-First protocol. |
+| **`name` required** | Single source of truth for initials and accessible name. Eliminates the "alt vs name vs aria-label" footgun. |
+| **Initials surface mirrors `.profile-avatar`** | Energy-primary tint + retro/light overrides reuse the proven pattern from ProfileBtn instead of inventing a new fallback look. |
+| **`overflow: visible`** | Presence dot intentionally spills past the circle boundary, so the wrapper does not clip it. The image itself is clipped via `border-radius: inherit` on the inner `<img>`. |
+| **No filters / tints / pixel processing** | Per D33: VE wraps and selects content, never modifies pixels. |
+
+**Physics:** Initials surface follows `.profile-avatar` per-physics behavior — `alpha(--energy-primary, 15%)` glass/flat dark, `var(--bg-canvas)` retro with solid energy border, `alpha(--energy-primary, 10%)` light. The presence dot uses `--bg-canvas` for its border so it cleanly reads against any backdrop.
+
+---
+
+#### `<Video>` — Embedded video with skeleton fallback
+
+**Description:** Thin wrapper around native `<video>` that adds a skeleton during metadata load, a muted icon on error, and an `aspect-ratio` container so the skeleton has a height before the video reports its dimensions. Native browser controls are on by default. Custom playback chrome is deferred to `<MediaSlider>` bound to a consumer-owned video ref. `<source>` and `<track>` elements pass through as children.
+**Location:** [src/components/ui/Video.svelte](src/components/ui/Video.svelte)
+**CSS:** `.video` ([src/styles/components/\_video.scss](src/styles/components/_video.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `src` | `string` | — | Video source URL (required) |
+| `poster` | `string` | — | Poster image shown until playback starts |
+| `controls` | `boolean` | `true` | Native browser controls |
+| `preload` | `'none' \| 'metadata' \| 'auto'` | `'metadata'` | How aggressively the browser preloads |
+| `aspectRatio` | `string` | `'16 / 9'` | CSS aspect-ratio applied to the wrapper |
+| `element` | `HTMLVideoElement \| undefined` | `undefined` | Bindable ref to the inner `<video>` element (for custom controls) |
+| `class` | `string` | `''` | Consumer classes on outer `.video` div |
+| `children` | `Snippet` | — | `<source>` / `<track>` elements rendered inside `<video>` |
+| `...rest` | `HTMLVideoAttributes` | — | Forwarded to `<video>` |
+
+**States** (`data-state` on outer wrapper):
+
+| State | Visual | Trigger |
+| --- | --- | --- |
+| `loading` | `<Skeleton variant="card" />` fills the wrapper | initial / src change |
+| `ready` | `<video>` fades in (poster or first frame visible) | `loadedmetadata` event |
+| `error` | `VideoOff` icon centered, `--text-mute` color | `error` event on `<video>` |
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+  import Video from '@components/ui/Video.svelte';
+</script>
+
+<!-- Basic embedded clip with poster -->
+<Video src="/clip.mp4" poster="/poster.jpg" />
+
+<!-- Vertical / portrait clip -->
+<Video src="/short.mp4" aspectRatio="9 / 16" />
+
+<!-- Background loop (no controls, autoplay-friendly defaults) -->
+<Video src="/loop.mp4" controls={false} autoplay muted loop playsinline />
+
+<!-- With captions (accessibility) -->
+<Video src="/clip.mp4" poster="/poster.jpg">
+  <track kind="captions" src="/captions.vtt" srclang="en" label="English" default />
+</Video>
+
+<!-- Multiple sources -->
+<Video poster="/poster.jpg" controls>
+  <source src="/clip.webm" type="video/webm" />
+  <source src="/clip.mp4" type="video/mp4" />
+</Video>
+```
+
+**Custom controls** — pair with [`<MediaSlider>`](#mediaslider). Capture the inner `<video>` via `bind:element`, and sync MediaSlider state to it through `$effect` blocks:
+
+```svelte
+<script lang="ts">
+  import Video from '@components/ui/Video.svelte';
+  import MediaSlider from '@components/ui/MediaSlider.svelte';
+
+  let videoEl: HTMLVideoElement | undefined = $state();
+  let displayVolume = $state(50); // MediaSlider scale: 0–100
+  let muted = $state(true);
+  let paused = $state(true);
+
+  $effect(() => {
+    if (!videoEl) return;
+    videoEl.volume = displayVolume / 100;
+  });
+  $effect(() => {
+    if (!videoEl) return;
+    videoEl.muted = muted;
+  });
+  $effect(() => {
+    if (!videoEl) return;
+    if (paused) videoEl.pause();
+    else void videoEl.play().catch(() => (paused = true));
+  });
+
+  function replay() {
+    if (!videoEl) return;
+    videoEl.currentTime = 0;
+    paused = false;
+  }
+</script>
+
+<Video src="/clip.mp4" controls={false} bind:element={videoEl} />
+<MediaSlider
+  bind:volume={displayVolume}
+  bind:muted
+  bind:paused
+  playback
+  replay
+  onreplay={replay}
+/>
+```
+
+**Architecture Notes:**
+
+| Decision | Rationale |
+| --- | --- |
+| **Default `preload="metadata"`** | `auto` is too aggressive for mobile data; `none` prevents the loading→ready skeleton transition from working. `metadata` loads only enough to know dimensions and duration, which is exactly what the skeleton-to-content swap needs. |
+| **Default `controls={true}`** | A `<video>` without `controls` and without autoplay is essentially invisible to users. Consumers explicitly opt out for hero videos and background loops. |
+| **Default `aspectRatio="16 / 9"`** | The wrapper needs a height for the skeleton before metadata arrives. 16:9 is the dominant video ratio; consumers override per use case. |
+| **`data-state="ready"` (not `"loaded"`)** | The full file isn't loaded after `loadedmetadata` — only enough for the first frame. `ready` is more accurate. |
+| **Custom controls deferred to MediaSlider** | A custom playback UI is a separate primitive (already shipped). Video stays a wrapper, not a player. |
+| **No filters / tints / pixel processing** | Per D33: VE wraps and selects content, never modifies pixels. |
+
+**Physics:** Inherits `--radius-base` (8px glass/flat, 0 retro), `--bg-sunk` placeholder, and `--ease-flow` opacity fade. Skeleton physics come from the composed `<Skeleton>`.
+
+---
+
 #### `.chip`
 
 **Description:** Data chips (Premium, System, Success variants)

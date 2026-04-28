@@ -200,6 +200,7 @@ Void Energy is **native-first**. Components are thin wrappers around native HTML
 | Field composition                 | `FormField` (label + slot + hint + error)                                                       |
 | Buttons                           | `<button class="btn-*">`, `ActionBtn`, `IconBtn`, `ProfileBtn`, `ThemesBtn`                     |
 | Overlays                          | `Modal`, `Dropdown`, `Sidebar`                                                                  |
+| Media                             | `Image`, `Avatar`, `Video`                                                                       |
 | Feedback                          | `toast`, `modal.alert`, `modal.confirm`, `Skeleton`, `ProgressRing`                             |
 | Navigation                        | `Sidebar`, `Breadcrumbs`, `Tabs`, `Pagination`, `LoadMore`, `use:navlink`                       |
 | Data display                      | `StatCard`, `LineChart`, `BarChart`, `DonutChart`, `Sparkline`                                   |
@@ -263,6 +264,11 @@ import Breadcrumbs from '@components/ui/Breadcrumbs.svelte';
 import SettingsRow from '@components/ui/SettingsRow.svelte';
 import PullRefresh from '@components/ui/PullRefresh.svelte';
 import Skeleton from '@components/ui/Skeleton.svelte';
+
+// Media
+import Image from '@components/ui/Image.svelte';
+import Avatar from '@components/ui/Avatar.svelte';
+import Video from '@components/ui/Video.svelte';
 
 // Charts
 import ProgressRing from '@components/ui/ProgressRing.svelte';

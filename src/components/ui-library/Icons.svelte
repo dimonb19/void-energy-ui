@@ -250,11 +250,11 @@
           <IconBtn
             icon={PlayPause}
             size={iconSize}
-            iconProps={{ 'data-paused': true }}
+            iconProps={{ 'data-paused': 'false' }}
             aria-label="Pause"
           />
           <span class="text-caption text-mute"
-            >PlayPause <span class="text-xs">(paused)</span></span
+            >PlayPause <span class="text-xs">(playing)</span></span
           >
         </div>
 

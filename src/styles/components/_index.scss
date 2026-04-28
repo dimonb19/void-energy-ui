@@ -62,3 +62,6 @@
 @forward 'tabs'; // Horizontal tab interface (tablist/tab/tabpanel)
 @forward 'pagination'; // Page navigation (prev/next, numbered pages, ellipsis)
 @forward 'combobox'; // Combobox: filterable input/select hybrid with listbox panel
+@forward 'image'; // Image: native <img> wrapper with skeleton fallback and error state
+@forward 'avatar'; // Avatar: circular user representation, image or initials fallback
+@forward 'video'; // Video: native <video> wrapper with skeleton fallback and error state
