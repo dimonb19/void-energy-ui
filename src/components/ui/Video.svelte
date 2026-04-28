@@ -13,7 +13,7 @@
   -------------------------------------------------------------------------
 
   PROPS:
-  - src:         Video source URL (required)
+  - src:         Video source URL (optional when <source> children are supplied)
   - poster:      Poster image shown until playback starts
   - controls:    Native browser controls (default: true)
   - preload:     'none' | 'metadata' | 'auto' (default: 'metadata')
@@ -58,7 +58,7 @@
       HTMLVideoAttributes,
       'src' | 'poster' | 'preload' | 'controls' | 'class' | 'children'
     > {
-    src: string;
+    src?: string;
     poster?: string;
     controls?: boolean;
     preload?: 'none' | 'metadata' | 'auto';

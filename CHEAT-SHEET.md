@@ -1454,7 +1454,7 @@ Use Astro's `<Image>` when responsive srcset / build-time optimization is the pr
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `src` | `string` | — | Video source URL (required) |
+| `src` | `string` | — | Video source URL (optional when `<source>` children are supplied) |
 | `poster` | `string` | — | Poster image shown until playback starts |
 | `controls` | `boolean` | `true` | Native browser controls |
 | `preload` | `'none' \| 'metadata' \| 'auto'` | `'metadata'` | How aggressively the browser preloads |
