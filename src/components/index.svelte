@@ -15,7 +15,7 @@
 
   import { Check, Wrench, Repeat, Shuffle } from '@lucide/svelte';
   import Toggle from './ui/Toggle.svelte';
-  import AtmosphereGenerator from './AtmosphereGenerator.svelte';
+  import ThemeBuilder from './ui/ThemeBuilder.svelte';
 
   // ── Live Proof: atmosphere previewer ──────────────────────────────────
   const proofAtmospheres = [
@@ -209,7 +209,7 @@
       </p>
     </div>
 
-    <AtmosphereGenerator class="max-w-4xl mx-auto w-full" />
+    <ThemeBuilder class="max-w-4xl mx-auto w-full" />
 
     {@render waitlistForm('Get early access to the full system.')}
   </section>

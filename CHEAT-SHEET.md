@@ -4263,12 +4263,22 @@ Temporary themes override the user's selected atmosphere without persisting. The
 
 ---
 
-#### `AtmosphereGenerator` — AI theme generation from creative concepts
+#### `<ThemeBuilder>` — AI + manual theme creation surface
 
-**Location:** [src/components/AtmosphereGenerator.svelte](src/components/AtmosphereGenerator.svelte)
+**Location:** [src/components/ui/ThemeBuilder.svelte](src/components/ui/ThemeBuilder.svelte)
 **Engine:** [src/lib/atmosphere-generator.ts](src/lib/atmosphere-generator.ts)
 
-Generates complete `VoidThemeDefinition` palettes from natural language descriptions via the server-side AI pipeline (`/api/generate-atmosphere`). Provider-agnostic — supports Anthropic, OpenAI, and any OpenAI-compatible API. Lives in `src/components/` (not `ui/`) because it's a landing-page feature, not a registered primitive.
+Full theme creation primitive: AI vibe-to-atmosphere generation (or brand-URL inference) plus an inline palette editor for manual color, opacity, font, and semantic-color tweaking. Drop into a settings page, onboarding flow, or modal to give users full theme creation. Generates complete palettes from natural language via the server-side AI pipeline (`/api/generate-atmosphere`). Provider-agnostic — supports Anthropic, OpenAI, and any OpenAI-compatible API.
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `mode` | `'ai' \| 'manual' \| 'both'` | `'both'` | Which surface(s) to render. `both` = AI form on top + palette editor in `<details>`. `manual` = palette editor inline (no `<details>`, seeded on mount). `ai` = vibe input only. |
+| `initialVibe` | `string` | `''` | Seed value for the vibe input (one-shot — subsequent prop changes ignored by design). |
+| `onSave` | `(id: string, definition: PartialThemeDefinition) => void` | — | Invoked AFTER engine commit when the user clicks Keep (or when adaptation is disabled and the candidate auto-saves). |
+| `onCancel` | `() => void` | — | When provided, renders a "Done" affordance that cleans up the preview and invokes the callback. Use for modal/sheet hosts; omit when embedded in-page. |
+| `class` | `string` | `''` | Forwarded to the surface wrapper. |
 
 **Lifecycle:**
 
@@ -4276,15 +4286,18 @@ Generates complete `VoidThemeDefinition` palettes from natural language descript
 | --- | --- | --- |
 | Generate | `registerEphemeralTheme` → `pushTemporaryTheme` → preview | 1 |
 | Regenerate | `registerEphemeralTheme(new)` → `updateTemporaryTheme(handle)` → `unregisterEphemeralTheme(old)` | 1 (in-place swap) |
-| Keep | `unregisterEphemeralTheme` → `registerTheme` → `setAtmosphere` | 1 (`setAtmosphere` clears stack without restoring) |
+| Keep | `unregisterEphemeralTheme` → `registerTheme` → `setAtmosphere` → `onSave?.(id, def)` | 1 (`setAtmosphere` clears stack without restoring) |
 | Revert | `releaseTemporaryTheme` → `unregisterEphemeralTheme` | 1 (restores previous) |
+| Done (when `onCancel` set) | Same cleanup as Revert, then `onCancel()` | 1 |
+
+**Provenance:** Saved themes call `voidEngine.registerTheme()` and land in `voidEngine.customAtmospheres` — never in `voidEngine.builtInAtmospheres`. Built-in atmospheres (defined in `src/config/design-tokens.ts`) and ThemeBuilder-created runtime atmospheres coexist and are distinguishable via the partition.
 
 **API key handling:** Server-side only. The key never reaches the browser — requests go through `/api/generate-atmosphere` which proxies to the configured AI provider. Set `ANTHROPIC_API_KEY` (or `AI_API_KEY` for OpenAI-compatible providers) in your `.env` or hosting dashboard. See [AI-SERVICE.md](./AI-SERVICE.md) for full configuration.
 
 **Generation contract:** The AI returns `{ mode, physics, tagline, label, fontHeadingKey, fontBodyKey, palette }` with 10 core tokens. The route normalizes the response to `{ text, provider, model }`. The client-side parser auto-fills 12 semantic variant tokens from `SEMANTIC_DARK`/`SEMANTIC_LIGHT` and resolves font keys to CSS family strings.
 
 **Edge cases:**
-- `pushTemporaryTheme` returns `null` when `adaptAtmosphere` is off — promotes directly via `registerTheme` + `setAtmosphere`
+- `pushTemporaryTheme` returns `null` when `adaptAtmosphere` is off — promotes directly via `registerTheme` + `setAtmosphere` (the `onSave` callback still fires)
 - All preview controls disabled during generation to prevent race conditions
 - Escape key aborts in-flight generation via `AbortController`
 - CSS color values validated via `CSS.supports('color', value)` before registration
@@ -4293,10 +4306,20 @@ Generates complete `VoidThemeDefinition` palettes from natural language descript
 
 ```svelte
 <script lang="ts">
-  import AtmosphereGenerator from '@components/AtmosphereGenerator.svelte';
+  import ThemeBuilder from '@components/ui/ThemeBuilder.svelte';
 </script>
 
-<AtmosphereGenerator class="max-w-2xl mx-auto w-full" />
+<!-- Default: AI form + collapsible palette editor -->
+<ThemeBuilder class="max-w-2xl mx-auto w-full" />
+
+<!-- AI-only with seeded vibe -->
+<ThemeBuilder mode="ai" initialVibe="cyberpunk neon city" />
+
+<!-- Manual-only (palette editor inline, seeded from active atmosphere on mount) -->
+<ThemeBuilder mode="manual" onSave={(id) => navigate(`/themes/${id}`)} />
+
+<!-- Embedded in a modal / sheet — Done dismisses -->
+<ThemeBuilder onCancel={() => modal.close()} onSave={(id) => modal.close()} />
 ```
 
 ---

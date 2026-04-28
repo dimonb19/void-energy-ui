@@ -1,12 +1,10 @@
 <!--
-  ATMOSPHERE GENERATOR
-  "Type a vibe → get a complete atmosphere" — AI theme generation demo.
+  THEME BUILDER
+  "Type a vibe → get a complete atmosphere" — AI theme generation plus an
+  inline palette editor for manual color/font tweaking.
 
-  Uses the AI pipeline (server-side proxy at /api/generate-atmosphere)
-  to generate complete VoidThemeDefinitions from creative concept descriptions.
-
-  Includes an inline palette editor for manual color tweaking — either from
-  scratch or refining an AI-generated result.
+  Lifted from the landing-page AtmosphereGenerator into src/components/ui/
+  so consumers can drop a full theme-creation flow into their own apps.
 
   LIFECYCLE:
   Generate → validate → registerEphemeralTheme → pushTemporaryTheme → preview
@@ -14,9 +12,16 @@
   Revert  → releaseTemporaryTheme → unregisterEphemeralTheme
   Regen   → registerEphemeral(new) → updateTemporaryTheme(handle) → unregisterEphemeral(old)
 
-  PLACEMENT:
-  Lives in src/components/ (not ui/) because it's a landing-page feature,
-  not a registered primitive.
+  PROPS:
+  - mode: 'ai' | 'manual' | 'both' — which surface(s) to render. 'both' shows
+    the AI form on top and the palette editor in a <details>. 'manual'
+    inlines the palette editor (no <details>) and skips AI. 'ai' hides the
+    palette editor entirely.
+  - initialVibe: seed value for the vibe input.
+  - onSave: invoked AFTER the engine commit when the user clicks Keep.
+    Receives (id, definition).
+  - onCancel: when provided, renders a "Done" affordance that cleans up the
+    preview and invokes the callback (for consumers mounting this in a modal).
 -->
 <script lang="ts">
   import { voidEngine } from '@adapters/void-engine.svelte';
@@ -44,25 +49,38 @@
   import { emerge, dissolve } from '@lib/transitions.svelte';
   import { Type, Globe } from '@lucide/svelte';
 
-  import ActionBtn from './ui/ActionBtn.svelte';
-  import FormField from './ui/FormField.svelte';
-  import Switcher from './ui/Switcher.svelte';
-  import Toggle from './ui/Toggle.svelte';
-  import Selector from './ui/Selector.svelte';
-  import SliderField from './ui/SliderField.svelte';
-  import Sparkle from './icons/Sparkle.svelte';
-  import Refresh from './icons/Refresh.svelte';
-  import Undo from './icons/Undo.svelte';
-  import Copy from './icons/Copy.svelte';
-  import IconBtn from './ui/IconBtn.svelte';
-  import LoadingSparkle from './icons/LoadingSparkle.svelte';
-  import { morph } from '@actions/morph';
+  import ActionBtn from './ActionBtn.svelte';
+  import FormField from './FormField.svelte';
+  import Switcher from './Switcher.svelte';
+  import Toggle from './Toggle.svelte';
+  import Selector from './Selector.svelte';
+  import SliderField from './SliderField.svelte';
+  import Sparkle from '../icons/Sparkle.svelte';
+  import Refresh from '../icons/Refresh.svelte';
+  import Undo from '../icons/Undo.svelte';
+  import Copy from '../icons/Copy.svelte';
+  import IconBtn from './IconBtn.svelte';
+  import LoadingSparkle from '../icons/LoadingSparkle.svelte';
 
-  interface AtmosphereGeneratorProps {
+  interface ThemeBuilderProps {
+    mode?: 'ai' | 'manual' | 'both';
+    initialVibe?: string;
+    onSave?: (id: string, definition: PartialThemeDefinition) => void;
+    onCancel?: () => void;
     class?: string;
   }
 
-  let { class: className = '' }: AtmosphereGeneratorProps = $props();
+  let {
+    mode = 'both',
+    initialVibe = '',
+    onSave,
+    onCancel,
+    class: className = '',
+  }: ThemeBuilderProps = $props();
+
+  const showAi = $derived(mode !== 'manual');
+  const showManual = $derived(mode !== 'ai');
+  const manualInline = $derived(mode === 'manual');
 
   // ── Helpers ─────────────────────────────────────────────────────────────
 
@@ -72,7 +90,10 @@
 
   // ── Generation State ───────────────────────────────────────────────────
 
-  let vibe = $state('');
+  // initialVibe is a one-shot seed; subsequent prop changes are ignored
+  // by design. The user types over the value.
+  // svelte-ignore state_referenced_locally
+  let vibe = $state(initialVibe);
   /** When true, the input is interpreted as a brand URL instead of a vibe description. */
   let urlMode = $state(false);
   let generating = $state(false);
@@ -181,7 +202,10 @@
 
   // ── Inline Palette Editor State ────────────────────────────────────────
 
-  let paletteOpen = $state(false);
+  // In manual-only mode the editor is always open (no <details> wrapper).
+  // In 'both' mode the editor opens via the <details> toggle.
+  // svelte-ignore state_referenced_locally
+  let paletteOpen = $state(manualInline);
   let editLabel = $state('');
   let editTagline = $state('');
   let editPhysics = $state<PhysicsPreference>('flat');
@@ -423,12 +447,23 @@
       return;
     }
     const active = voidEngine.currentTheme;
-    if (active) {
+    // Guard against sparse registry entries (built-in themes may not yet have
+    // their palette hydrated when the engine has only seen module-level
+    // registration but not a paint-driven commit).
+    if (active && active.palette) {
       seedEditor(active, active.label ?? '', active.tagline ?? '');
     } else {
       seedFromModeDefault(editMode);
     }
   }
+
+  // Manual-only mode: seed the editor on mount instead of waiting for the
+  // <details> toggle (there is no <details> wrapper in this mode).
+  $effect(() => {
+    if (manualInline) {
+      untrack(() => seedFromCurrentTheme());
+    }
+  });
 
   function restoreGenerated() {
     if (generatedResult) {
@@ -592,6 +627,7 @@
       previewHandle = null;
       previewResult = result;
       toast.show(`"${result.label}" applied and saved.`, 'success');
+      onSave?.(result.id, result.definition);
       return;
     }
 
@@ -701,12 +737,20 @@
     generatedResult = null;
 
     toast.show(`"${result.label}" is now your atmosphere.`, 'success');
+    onSave?.(id, result.definition);
   }
 
   function revert() {
     if (generating) return;
     cleanupPreview();
     generatedResult = null;
+  }
+
+  function dismiss() {
+    if (generating) return;
+    cleanupPreview();
+    generatedResult = null;
+    onCancel?.();
   }
 
   function handleSubmit(e: SubmitEvent) {
@@ -778,76 +822,391 @@
   });
 </script>
 
-<div class="surface-raised p-lg flex flex-col gap-lg {className}">
-  <!-- ── Vibe / URL Input ───────────────────────────────────────────── -->
-  <form class="flex flex-col gap-md items-center" onsubmit={handleSubmit}>
-    <div class="w-full flex flex-col tablet:flex-row gap-sm">
-      <div class="flex flex-row items-center gap-sm flex-1">
-        <Toggle
-          bind:checked={urlMode}
-          iconOff={Type}
-          iconOn={Globe}
-          disabled={generating}
-          aria-label={urlMode
-            ? 'Switch to vibe mode'
-            : 'Switch to brand URL mode'}
-        />
-        <input
-          type="text"
-          bind:value={vibe}
-          placeholder={inputPlaceholder}
-          disabled={generating}
-          aria-invalid={hasUrlError || undefined}
-          autocomplete={urlMode ? 'url' : 'off'}
-          inputmode={urlMode ? 'url' : 'text'}
-          spellcheck={!urlMode}
+{#snippet paletteEditor()}
+  <div class="flex flex-col gap-lg p-md">
+    <!-- Identity -->
+    <div class="flex flex-col gap-md">
+      <h5 class="text-center">Identity</h5>
+      <div class="flex flex-col tablet:flex-row gap-sm">
+        <FormField
+          label="Name"
+          required
+          error={editDirty && !editLabel.trim()
+            ? 'Give your atmosphere a name to keep it'
+            : ''}
           class="flex-1"
-        />
+        >
+          {#snippet children({ fieldId, descriptionId, invalid })}
+            <input
+              type="text"
+              id={fieldId}
+              bind:value={editLabel}
+              oninput={() => (editDirty = true)}
+              placeholder="Atmosphere name"
+              maxlength={30}
+              required
+              aria-invalid={invalid}
+              aria-describedby={descriptionId}
+              class="w-full"
+            />
+          {/snippet}
+        </FormField>
+        <FormField label="Tagline" class="flex-1">
+          {#snippet children({ fieldId, descriptionId, invalid })}
+            <input
+              type="text"
+              id={fieldId}
+              bind:value={editTagline}
+              placeholder="Short description (e.g., Cyber / Synthwave)"
+              maxlength={40}
+              aria-invalid={invalid}
+              aria-describedby={descriptionId}
+              class="w-full"
+            />
+          {/snippet}
+        </FormField>
       </div>
-      <ActionBtn
-        icon={generating ? LoadingSparkle : Sparkle}
-        text={generating ? 'Generating...' : 'Generate'}
-        type="submit"
-        disabled={!canGenerate}
-        class="shrink-0"
-      />
     </div>
 
-    {#if hasUrlError}
+    <!-- Physics & Mode -->
+    <div class="flex flex-col gap-md">
+      <h5 class="text-center">Presets</h5>
+      <div class="flex flex-row gap-lg flex-wrap justify-center">
+        <Switcher
+          options={editPhysicsOptions}
+          bind:value={editPhysics}
+          label="Physics"
+        />
+        <Switcher
+          options={editModeOptions}
+          bind:value={editMode}
+          label="Mode"
+        />
+      </div>
+      <p class="text-caption text-mute text-center">
+        Glass and Retro require dark mode.
+      </p>
+    </div>
+
+    <!-- Core Palette -->
+    {#each PALETTE_GROUPS as group}
+      <div class="flex flex-col gap-md">
+        <h5 class="text-center">{group.heading}</h5>
+        {#if group.heading === 'Surfaces' && editPhysics !== 'flat'}
+          <p class="text-caption text-mute text-center" in:emerge out:dissolve>
+            {editPhysics === 'glass' ? 'Glass' : 'Retro'} surfaces need transparency.
+            Use the sliders to set opacity.
+          </p>
+        {/if}
+        <div
+          class="surface-spotlight p-md flex flex-col tablet:flex-row tablet:flex-wrap gap-md tablet:justify-center"
+        >
+          {#each group.fields as field}
+            <div class="flex flex-col items-stretch tablet:items-center gap-xs">
+              <span class="text-caption text-dim tablet:text-center"
+                >{field.label}</span
+              >
+              <div class="flex flex-row items-center gap-xs">
+                <input
+                  type="color"
+                  value={isValidHex(editPalette[field.key] ?? '')
+                    ? editPalette[field.key]
+                    : '#000000'}
+                  oninput={(e) => {
+                    editPalette[field.key] = (
+                      e.target as HTMLInputElement
+                    ).value;
+                    editDirty = true;
+                  }}
+                  class="palette-picker"
+                />
+                <input
+                  type="text"
+                  value={editPalette[field.key] ?? ''}
+                  oninput={(e) => handleHexInput(field.key, e)}
+                  maxlength={7}
+                  placeholder="#000000"
+                  spellcheck={false}
+                  autocomplete="off"
+                  aria-invalid={editPalette[field.key] &&
+                  !isValidHex(editPalette[field.key])
+                    ? true
+                    : undefined}
+                  class="palette-hex-input"
+                />
+              </div>
+              {#if field.hint}
+                <span class="text-caption text-mute tablet:text-center"
+                  >{field.hint}</span
+                >
+              {/if}
+              {#if editOpacityKeys.has(field.key)}
+                <!-- svelte-ignore a11y_no_static_element_interactions -->
+                <div
+                  class="flex items-center gap-xs"
+                  in:emerge
+                  out:dissolve
+                  oninput={() => (editDirty = true)}
+                >
+                  <SliderField
+                    bind:value={editOpacity[field.key]}
+                    min={5}
+                    max={100}
+                    step={5}
+                    class="w-full"
+                  />
+                  <span class="text-caption text-mute"
+                    >{editOpacity[field.key]}%</span
+                  >
+                </div>
+              {/if}
+            </div>
+          {/each}
+          {#if group.heading === 'Backgrounds' && editBgModeWarning}
+            <p
+              class="text-caption text-center text-premium"
+              in:emerge={{ y: -8 }}
+              out:dissolve={{ y: -8 }}
+            >
+              {editMode === 'dark'
+                ? 'Your backgrounds look light for a dark theme. Consider darker values or switching to light mode.'
+                : 'Your backgrounds look dark for a light theme. Consider lighter values or switching to dark mode.'}
+            </p>
+          {/if}
+          {#if group.heading === 'Text' && editTextModeWarning}
+            <p
+              class="text-caption text-center text-premium"
+              in:emerge={{ y: -8 }}
+              out:dissolve={{ y: -8 }}
+            >
+              {editMode === 'dark'
+                ? 'Some text colors look dark and may lack contrast on dark backgrounds.'
+                : 'Some text colors look light and may lack contrast on light backgrounds.'}
+            </p>
+          {/if}
+        </div>
+      </div>
+    {/each}
+
+    <!-- Semantic Color Overrides -->
+    <div class="flex flex-col gap-md">
+      <h5 class="text-center">Semantic Colors</h5>
+      <div class="surface-spotlight p-md flex flex-col gap-md">
+        <div
+          class="flex flex-col tablet:flex-row tablet:flex-wrap gap-md tablet:justify-center"
+        >
+          <div class="flex flex-col items-stretch tablet:items-center gap-xs">
+            <span class="text-caption text-dim tablet:text-center">Premium</span
+            >
+            <div class="flex flex-row items-center gap-xs">
+              <input
+                type="color"
+                value={isValidHex(editColorPremium)
+                  ? editColorPremium
+                  : '#000000'}
+                oninput={(e) => {
+                  editColorPremium = (e.target as HTMLInputElement).value;
+                  editDirty = true;
+                }}
+                class="palette-picker"
+              />
+              <input
+                type="text"
+                value={editColorPremium}
+                oninput={(e) =>
+                  handleSemanticHexInput((v) => (editColorPremium = v), e)}
+                maxlength={7}
+                placeholder="#000000"
+                spellcheck={false}
+                autocomplete="off"
+                aria-invalid={editColorPremium && !isValidHex(editColorPremium)
+                  ? true
+                  : undefined}
+                class="palette-hex-input"
+              />
+            </div>
+            <span class="text-caption text-mute tablet:text-center"
+              >Credits, badges, caution</span
+            >
+          </div>
+          <div class="flex flex-col items-stretch tablet:items-center gap-xs">
+            <span class="text-caption text-dim tablet:text-center">System</span>
+            <div class="flex flex-row items-center gap-xs">
+              <input
+                type="color"
+                value={isValidHex(editColorSystem)
+                  ? editColorSystem
+                  : '#000000'}
+                oninput={(e) => {
+                  editColorSystem = (e.target as HTMLInputElement).value;
+                  editDirty = true;
+                }}
+                class="palette-picker"
+              />
+              <input
+                type="text"
+                value={editColorSystem}
+                oninput={(e) =>
+                  handleSemanticHexInput((v) => (editColorSystem = v), e)}
+                maxlength={7}
+                placeholder="#000000"
+                spellcheck={false}
+                autocomplete="off"
+                aria-invalid={editColorSystem && !isValidHex(editColorSystem)
+                  ? true
+                  : undefined}
+                class="palette-hex-input"
+              />
+            </div>
+            <span class="text-caption text-mute tablet:text-center"
+              >AI features, platform alerts</span
+            >
+          </div>
+        </div>
+        {#if editPremiumCollision || editSystemCollision}
+          <p
+            class="text-caption text-center text-premium"
+            in:emerge={{ y: -8 }}
+            out:dissolve={{ y: -8 }}
+          >
+            {#if editPremiumCollision && editSystemCollision}
+              Your energy colors overlap with both premium and system defaults.
+              Pick distinct overrides to keep badges visible.
+            {:else if editPremiumCollision}
+              Your energy colors are in the gold/amber range and may blend with
+              premium badges. Pick a non-amber premium color.
+            {:else}
+              Your energy colors are in the purple range and may blend with
+              system indicators. Pick a non-purple system color.
+            {/if}
+          </p>
+        {/if}
+      </div>
+    </div>
+
+    <!-- Typography -->
+    <div class="flex flex-col gap-md">
+      <h5 class="text-center">Typography</h5>
+      <div class="flex flex-col small-desktop:flex-row justify-center gap-sm">
+        <Selector
+          label="Heading Font"
+          options={fontOptions}
+          bind:value={editFontHeadingKey}
+          onchange={() => (editDirty = true)}
+        />
+        <Selector
+          label="Body Font"
+          options={fontOptions}
+          bind:value={editFontBodyKey}
+          onchange={() => (editDirty = true)}
+        />
+      </div>
+    </div>
+
+    <!-- Error -->
+    {#if editError}
       <p
-        class="text-error text-small text-center"
-        role="alert"
-        aria-live="polite"
-        in:emerge
-        out:dissolve
+        class="text-error text-center text-small"
+        in:emerge={{ y: -8 }}
+        out:dissolve={{ y: -8 }}
       >
-        Enter a valid URL (e.g. nike.com or https://stripe.com).
+        {editError}
       </p>
     {/if}
 
-    <!-- ── Optional Preferences ──────────────────────────────────────── -->
-    <div
-      class="w-full flex flex-row gap-md flex-wrap justify-center small-desktop:gap-xl"
-    >
-      <Switcher
-        options={physicsOptions}
-        bind:value={selectedPhysics}
-        label="Physics"
-        disabled={generating}
-        class="items-center small-desktop:items-baseline"
+    <!-- Restore / Export -->
+    <div class="flex justify-center gap-md">
+      <ActionBtn
+        icon={Undo}
+        text={generatedResult ? 'Restore Generated' : 'Reset Colors'}
+        type="button"
+        class="btn-ghost"
+        onclick={restoreGenerated}
+        disabled={!editDirty}
       />
-      <Switcher
-        options={modeOptions}
-        bind:value={selectedMode}
-        label="Mode"
-        disabled={generating}
-        class="items-center small-desktop:items-baseline"
+      <IconBtn
+        icon={Copy}
+        iconProps={{ 'data-state': exportCopied ? 'active' : '' }}
+        onclick={copyExportCode}
+        disabled={!editLabel.trim()}
+        aria-label="Copy theme code"
       />
     </div>
-    <p class="text-caption text-mute text-center">
-      Glass and Retro require dark mode. Leave on Auto to let the AI decide.
-    </p>
-  </form>
+  </div>
+{/snippet}
+
+<div class="surface-raised p-lg flex flex-col gap-lg {className}">
+  <!-- ── Vibe / URL Input ───────────────────────────────────────────── -->
+  {#if showAi}
+    <form class="flex flex-col gap-md items-center" onsubmit={handleSubmit}>
+      <div class="w-full flex flex-col tablet:flex-row gap-sm">
+        <div class="flex flex-row items-center gap-sm flex-1">
+          <Toggle
+            bind:checked={urlMode}
+            iconOff={Type}
+            iconOn={Globe}
+            disabled={generating}
+            aria-label={urlMode
+              ? 'Switch to vibe mode'
+              : 'Switch to brand URL mode'}
+          />
+          <input
+            type="text"
+            bind:value={vibe}
+            placeholder={inputPlaceholder}
+            disabled={generating}
+            aria-invalid={hasUrlError || undefined}
+            autocomplete={urlMode ? 'url' : 'off'}
+            inputmode={urlMode ? 'url' : 'text'}
+            spellcheck={!urlMode}
+            class="flex-1"
+          />
+        </div>
+        <ActionBtn
+          icon={generating ? LoadingSparkle : Sparkle}
+          text={generating ? 'Generating...' : 'Generate'}
+          type="submit"
+          disabled={!canGenerate}
+          class="shrink-0"
+        />
+      </div>
+
+      {#if hasUrlError}
+        <p
+          class="text-error text-small text-center"
+          role="alert"
+          aria-live="polite"
+          in:emerge
+          out:dissolve
+        >
+          Enter a valid URL (e.g. nike.com or https://stripe.com).
+        </p>
+      {/if}
+
+      <!-- ── Optional Preferences ──────────────────────────────────────── -->
+      <div
+        class="w-full flex flex-row gap-md flex-wrap justify-center small-desktop:gap-xl"
+      >
+        <Switcher
+          options={physicsOptions}
+          bind:value={selectedPhysics}
+          label="Physics"
+          disabled={generating}
+          class="items-center small-desktop:items-baseline"
+        />
+        <Switcher
+          options={modeOptions}
+          bind:value={selectedMode}
+          label="Mode"
+          disabled={generating}
+          class="items-center small-desktop:items-baseline"
+        />
+      </div>
+      <p class="text-caption text-mute text-center">
+        Glass and Retro require dark mode. Leave on Auto to let the AI decide.
+      </p>
+    </form>
+  {/if}
 
   <!-- ── Preview Controls ───────────────────────────────────────────── -->
   {#if previewResult && previewHandle !== null}
@@ -860,14 +1219,16 @@
         <button class="btn-premium" onclick={keep} disabled={generating}>
           Keep This Atmosphere
         </button>
-        <ActionBtn
-          icon={Refresh}
-          text="Try Another"
-          type="button"
-          class="btn-ghost btn-system"
-          onclick={() => generate(true)}
-          disabled={generating}
-        />
+        {#if showAi}
+          <ActionBtn
+            icon={Refresh}
+            text="Try Another"
+            type="button"
+            class="btn-ghost btn-system"
+            onclick={() => generate(true)}
+            disabled={generating}
+          />
+        {/if}
         <ActionBtn
           icon={Undo}
           text="Revert"
@@ -892,329 +1253,16 @@
   {/if}
 
   <!-- ── Inline Palette Editor ──────────────────────────────────────── -->
-  <details ontoggle={handleDetailsToggle}>
-    <summary>Customize Colors</summary>
-    <div class="flex flex-col gap-lg p-md">
-      <!-- Identity -->
-      <div class="flex flex-col gap-md">
-        <h5 class="text-center">Identity</h5>
-        <div class="flex flex-col tablet:flex-row gap-sm">
-          <FormField
-            label="Name"
-            required
-            error={editDirty && !editLabel.trim()
-              ? 'Give your atmosphere a name to keep it'
-              : ''}
-            class="flex-1"
-          >
-            {#snippet children({ fieldId, descriptionId, invalid })}
-              <input
-                type="text"
-                id={fieldId}
-                bind:value={editLabel}
-                oninput={() => (editDirty = true)}
-                placeholder="Atmosphere name"
-                maxlength={30}
-                required
-                aria-invalid={invalid}
-                aria-describedby={descriptionId}
-                class="w-full"
-              />
-            {/snippet}
-          </FormField>
-          <FormField label="Tagline" class="flex-1">
-            {#snippet children({ fieldId, descriptionId, invalid })}
-              <input
-                type="text"
-                id={fieldId}
-                bind:value={editTagline}
-                placeholder="Short description (e.g., Cyber / Synthwave)"
-                maxlength={40}
-                aria-invalid={invalid}
-                aria-describedby={descriptionId}
-                class="w-full"
-              />
-            {/snippet}
-          </FormField>
-        </div>
-      </div>
-
-      <!-- Physics & Mode -->
-      <div class="flex flex-col gap-md">
-        <h5 class="text-center">Presets</h5>
-        <div class="flex flex-row gap-lg flex-wrap justify-center">
-          <Switcher
-            options={editPhysicsOptions}
-            bind:value={editPhysics}
-            label="Physics"
-          />
-          <Switcher
-            options={editModeOptions}
-            bind:value={editMode}
-            label="Mode"
-          />
-        </div>
-        <p class="text-caption text-mute text-center">
-          Glass and Retro require dark mode.
-        </p>
-      </div>
-
-      <!-- Core Palette -->
-      {#each PALETTE_GROUPS as group}
-        <div class="flex flex-col gap-md">
-          <h5 class="text-center">{group.heading}</h5>
-          {#if group.heading === 'Surfaces' && editPhysics !== 'flat'}
-            <p
-              class="text-caption text-mute text-center"
-              in:emerge
-              out:dissolve
-            >
-              {editPhysics === 'glass' ? 'Glass' : 'Retro'} surfaces need transparency.
-              Use the sliders to set opacity.
-            </p>
-          {/if}
-          <div
-            class="surface-spotlight p-md flex flex-col tablet:flex-row tablet:flex-wrap gap-md tablet:justify-center"
-          >
-            {#each group.fields as field}
-              <div
-                class="flex flex-col items-stretch tablet:items-center gap-xs"
-              >
-                <span class="text-caption text-dim tablet:text-center"
-                  >{field.label}</span
-                >
-                <div class="flex flex-row items-center gap-xs">
-                  <input
-                    type="color"
-                    value={isValidHex(editPalette[field.key] ?? '')
-                      ? editPalette[field.key]
-                      : '#000000'}
-                    oninput={(e) => {
-                      editPalette[field.key] = (
-                        e.target as HTMLInputElement
-                      ).value;
-                      editDirty = true;
-                    }}
-                    class="palette-picker"
-                  />
-                  <input
-                    type="text"
-                    value={editPalette[field.key] ?? ''}
-                    oninput={(e) => handleHexInput(field.key, e)}
-                    maxlength={7}
-                    placeholder="#000000"
-                    spellcheck={false}
-                    autocomplete="off"
-                    aria-invalid={editPalette[field.key] &&
-                    !isValidHex(editPalette[field.key])
-                      ? true
-                      : undefined}
-                    class="palette-hex-input"
-                  />
-                </div>
-                {#if field.hint}
-                  <span class="text-caption text-mute tablet:text-center"
-                    >{field.hint}</span
-                  >
-                {/if}
-                {#if editOpacityKeys.has(field.key)}
-                  <!-- svelte-ignore a11y_no_static_element_interactions -->
-                  <div
-                    class="flex items-center gap-xs"
-                    in:emerge
-                    out:dissolve
-                    oninput={() => (editDirty = true)}
-                  >
-                    <SliderField
-                      bind:value={editOpacity[field.key]}
-                      min={5}
-                      max={100}
-                      step={5}
-                      class="w-full"
-                    />
-                    <span class="text-caption text-mute"
-                      >{editOpacity[field.key]}%</span
-                    >
-                  </div>
-                {/if}
-              </div>
-            {/each}
-            {#if group.heading === 'Backgrounds' && editBgModeWarning}
-              <p
-                class="text-caption text-center text-premium"
-                in:emerge={{ y: -8 }}
-                out:dissolve={{ y: -8 }}
-              >
-                {editMode === 'dark'
-                  ? 'Your backgrounds look light for a dark theme. Consider darker values or switching to light mode.'
-                  : 'Your backgrounds look dark for a light theme. Consider lighter values or switching to dark mode.'}
-              </p>
-            {/if}
-            {#if group.heading === 'Text' && editTextModeWarning}
-              <p
-                class="text-caption text-center text-premium"
-                in:emerge={{ y: -8 }}
-                out:dissolve={{ y: -8 }}
-              >
-                {editMode === 'dark'
-                  ? 'Some text colors look dark and may lack contrast on dark backgrounds.'
-                  : 'Some text colors look light and may lack contrast on light backgrounds.'}
-              </p>
-            {/if}
-          </div>
-        </div>
-      {/each}
-
-      <!-- Semantic Color Overrides -->
-      <div class="flex flex-col gap-md">
-        <h5 class="text-center">Semantic Colors</h5>
-        <div class="surface-spotlight p-md flex flex-col gap-md">
-          <div
-            class="flex flex-col tablet:flex-row tablet:flex-wrap gap-md tablet:justify-center"
-          >
-            <div class="flex flex-col items-stretch tablet:items-center gap-xs">
-              <span class="text-caption text-dim tablet:text-center"
-                >Premium</span
-              >
-              <div class="flex flex-row items-center gap-xs">
-                <input
-                  type="color"
-                  value={isValidHex(editColorPremium)
-                    ? editColorPremium
-                    : '#000000'}
-                  oninput={(e) => {
-                    editColorPremium = (e.target as HTMLInputElement).value;
-                    editDirty = true;
-                  }}
-                  class="palette-picker"
-                />
-                <input
-                  type="text"
-                  value={editColorPremium}
-                  oninput={(e) =>
-                    handleSemanticHexInput((v) => (editColorPremium = v), e)}
-                  maxlength={7}
-                  placeholder="#000000"
-                  spellcheck={false}
-                  autocomplete="off"
-                  aria-invalid={editColorPremium &&
-                  !isValidHex(editColorPremium)
-                    ? true
-                    : undefined}
-                  class="palette-hex-input"
-                />
-              </div>
-              <span class="text-caption text-mute tablet:text-center"
-                >Credits, badges, caution</span
-              >
-            </div>
-            <div class="flex flex-col items-stretch tablet:items-center gap-xs">
-              <span class="text-caption text-dim tablet:text-center"
-                >System</span
-              >
-              <div class="flex flex-row items-center gap-xs">
-                <input
-                  type="color"
-                  value={isValidHex(editColorSystem)
-                    ? editColorSystem
-                    : '#000000'}
-                  oninput={(e) => {
-                    editColorSystem = (e.target as HTMLInputElement).value;
-                    editDirty = true;
-                  }}
-                  class="palette-picker"
-                />
-                <input
-                  type="text"
-                  value={editColorSystem}
-                  oninput={(e) =>
-                    handleSemanticHexInput((v) => (editColorSystem = v), e)}
-                  maxlength={7}
-                  placeholder="#000000"
-                  spellcheck={false}
-                  autocomplete="off"
-                  aria-invalid={editColorSystem && !isValidHex(editColorSystem)
-                    ? true
-                    : undefined}
-                  class="palette-hex-input"
-                />
-              </div>
-              <span class="text-caption text-mute tablet:text-center"
-                >AI features, platform alerts</span
-              >
-            </div>
-          </div>
-          {#if editPremiumCollision || editSystemCollision}
-            <p
-              class="text-caption text-center text-premium"
-              in:emerge={{ y: -8 }}
-              out:dissolve={{ y: -8 }}
-            >
-              {#if editPremiumCollision && editSystemCollision}
-                Your energy colors overlap with both premium and system
-                defaults. Pick distinct overrides to keep badges visible.
-              {:else if editPremiumCollision}
-                Your energy colors are in the gold/amber range and may blend
-                with premium badges. Pick a non-amber premium color.
-              {:else}
-                Your energy colors are in the purple range and may blend with
-                system indicators. Pick a non-purple system color.
-              {/if}
-            </p>
-          {/if}
-        </div>
-      </div>
-
-      <!-- Typography -->
-      <div class="flex flex-col gap-md">
-        <h5 class="text-center">Typography</h5>
-        <div class="flex flex-col small-desktop:flex-row justify-center gap-sm">
-          <Selector
-            label="Heading Font"
-            options={fontOptions}
-            bind:value={editFontHeadingKey}
-            onchange={() => (editDirty = true)}
-          />
-          <Selector
-            label="Body Font"
-            options={fontOptions}
-            bind:value={editFontBodyKey}
-            onchange={() => (editDirty = true)}
-          />
-        </div>
-      </div>
-
-      <!-- Error -->
-      {#if editError}
-        <p
-          class="text-error text-center text-small"
-          in:emerge={{ y: -8 }}
-          out:dissolve={{ y: -8 }}
-        >
-          {editError}
-        </p>
-      {/if}
-
-      <!-- Restore / Export -->
-      <div class="flex justify-center gap-md">
-        <ActionBtn
-          icon={Undo}
-          text={generatedResult ? 'Restore Generated' : 'Reset Colors'}
-          type="button"
-          class="btn-ghost"
-          onclick={restoreGenerated}
-          disabled={!editDirty}
-        />
-        <IconBtn
-          icon={Copy}
-          iconProps={{ 'data-state': exportCopied ? 'active' : '' }}
-          onclick={copyExportCode}
-          disabled={!editLabel.trim()}
-          aria-label="Copy theme code"
-        />
-      </div>
-    </div>
-  </details>
+  {#if showManual}
+    {#if manualInline}
+      {@render paletteEditor()}
+    {:else}
+      <details ontoggle={handleDetailsToggle}>
+        <summary>Customize Colors</summary>
+        {@render paletteEditor()}
+      </details>
+    {/if}
+  {/if}
 
   {#if !voidEngine.userConfig.adaptAtmosphere}
     <p class="text-caption text-mute text-center">
@@ -1223,10 +1271,23 @@
       theme overrides" in the Themes modal to preview before keeping.
     </p>
   {/if}
+
+  {#if onCancel}
+    <div class="flex justify-end">
+      <button
+        type="button"
+        class="btn-ghost"
+        onclick={dismiss}
+        disabled={generating}
+      >
+        Done
+      </button>
+    </div>
+  {/if}
 </div>
 
 <style lang="scss">
-  @use '../styles/abstracts' as *;
+  @use '../../styles/abstracts' as *;
 
   .palette-picker {
     width: var(--space-lg);

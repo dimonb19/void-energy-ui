@@ -201,6 +201,7 @@ Void Energy is **native-first**. Components are thin wrappers around native HTML
 | Buttons                           | `<button class="btn-*">`, `ActionBtn`, `IconBtn`, `ProfileBtn`, `ThemesBtn`                     |
 | Overlays                          | `Modal`, `Dropdown`, `Sidebar`                                                                  |
 | Media                             | `Image`, `Avatar`, `Video`, `AdaptiveImage`                                                      |
+| Theme creation (AI + manual)      | `ThemeBuilder`                                                                                  |
 | Feedback                          | `toast`, `modal.alert`, `modal.confirm`, `Skeleton`, `ProgressRing`                             |
 | Navigation                        | `Sidebar`, `Breadcrumbs`, `Tabs`, `Pagination`, `LoadMore`, `use:navlink`                       |
 | Data display                      | `StatCard`, `LineChart`, `BarChart`, `DonutChart`, `Sparkline`                                   |
@@ -282,6 +283,7 @@ import BarChart from '@components/ui/BarChart.svelte';
 // Theme
 import AtmosphereScope from '@components/core/AtmosphereScope.svelte';
 import LiquidGlassFilter from '@components/core/LiquidGlassFilter.svelte';
+import ThemeBuilder from '@components/ui/ThemeBuilder.svelte';
 
 // Singletons (import, never re-instantiate)
 import { voidEngine } from '@adapters/void-engine.svelte';
