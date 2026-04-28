@@ -59,6 +59,11 @@
       "import": "./dist/head.js",
       "require": "./dist/head.cjs"
     },
+    "./ssr": {
+      "types": "./dist/ssr.d.ts",
+      "import": "./dist/ssr.js",
+      "require": "./dist/ssr.cjs"
+    },
     "./config": {
       "types": "./dist/config.d.ts",
       "import": "./dist/config.js",

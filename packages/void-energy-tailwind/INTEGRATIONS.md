@@ -124,6 +124,87 @@ init({ manifest });
 
 See [CONFIG.md](./CONFIG.md) for the `void.config.ts` schema.
 
+### SSR — render with the user's persisted atmosphere baked in
+
+The FOUC script writes `data-*` on `<html>` before paint, but it runs *client-side* — the HTML the server emits still carries no atmosphere, so search-engine crawlers, social-card scrapers, and slow first paints all see the default. The SSR cookie bridge fixes this: middleware reads the user's atmosphere from a cookie, the layout writes it onto `<html>` during server render, and the client hydrates into the same state with no flash.
+
+**Requires `output: 'server'` or `output: 'hybrid'` in `astro.config.mjs`.** Pure `output: 'static'` runs middleware at build time, not per request, so per-user personalization is impossible — keep the FOUC-only setup above for static sites.
+
+`astro.config.mjs`:
+
+```ts
+import { defineConfig } from 'astro/config';
+
+export default defineConfig({
+  output: 'server', // or 'hybrid'
+});
+```
+
+`src/middleware.ts` — parse the cookie on every request:
+
+```ts
+import { defineMiddleware } from 'astro:middleware';
+import { readAtmosphereCookie } from '@void-energy/tailwind/ssr';
+
+export const onRequest = defineMiddleware((context, next) => {
+  context.locals.atmosphere = readAtmosphereCookie(
+    context.request.headers.get('cookie'),
+  );
+  return next();
+});
+```
+
+`src/env.d.ts` — type `Astro.locals` so the layout reads it without casts:
+
+```ts
+/// <reference types="astro/client" />
+import type { AtmosphereCookieState } from '@void-energy/tailwind/ssr';
+
+declare namespace App {
+  interface Locals {
+    atmosphere: AtmosphereCookieState;
+  }
+}
+```
+
+`src/layouts/BaseLayout.astro` — bind the four `data-*` attrs individually. Astro omits attributes whose value is `undefined`, so unset keys do not emit empty `data-physics=""` strings; the FOUC script fills the gap on the client.
+
+```astro
+---
+import { FOUC_SCRIPT } from '@void-energy/tailwind/head';
+import '../styles/globals.css';
+
+const { atmosphere, physics, mode, density } = Astro.locals.atmosphere;
+---
+<!doctype html>
+<html
+  lang="en"
+  data-atmosphere={atmosphere}
+  data-physics={physics}
+  data-mode={mode}
+  data-density={density}
+>
+  <head>
+    <script is:inline set:html={FOUC_SCRIPT}></script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+```
+
+**Keep the FOUC script alongside SSR.** Three cases the cookie bridge alone does not cover:
+
+1. **First-time visitors.** No cookie exists yet. The server emits no `data-*`; the FOUC script paints the default `frost`/`glass`/`dark`/`default` before stylesheets load.
+2. **Legacy users with localStorage but no cookie.** Anyone who used the app before the cookie bridge shipped has only `localStorage` state. Server emits no `data-*`; FOUC restores from localStorage; the next setter call (`setAtmosphere`, `setPhysics`, ...) writes both cookie and localStorage, and subsequent SSR renders see the user's state.
+3. **Runtime-registered custom atmospheres.** `registerAtmosphere()` lives in localStorage only — never in the cookie (size + selector-injection concerns). The server reads the *name* from the cookie if set, but cannot inject the custom token block. The FOUC script's `ve-custom-atmospheres` rehydration pass restores the `<style>` tag before paint; the runtime then takes over.
+
+Cookie + FOUC + localStorage are complementary: cookie gives the server the name, FOUC fills any gap and rehydrates custom themes, localStorage remains the client's source of truth. The runtime's dual-write (every `setAtmosphere`/`setPhysics`/`setMode`/`setDensity` writes both cookie and localStorage) keeps them aligned automatically.
+
+> **`renderRootAttributes` alternative.** If you prefer a single string injection — e.g. when wrapping `<html>` from a fragment helper — `renderRootAttributes(state)` returns `data-atmosphere="..." data-physics="..."` with unset keys omitted, ready to drop into a JSX/Astro raw-attribute slot. The four-binding form above is more idiomatic for Astro and is recommended.
+
+> **Atmospheres registered via `void.config.ts` work transparently.** The cookie carries the atmosphere *name* (e.g. `midnight`); the server emits `data-atmosphere="midnight"`; the matching token block ships in `void.generated.css` so the page paints correctly without any client JS. Runtime atmospheres registered via `registerAtmosphere()` need the FOUC rehydration as described above.
+
 ---
 
 ## Next.js (App Router) — CLI watch via `concurrently`

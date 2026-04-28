@@ -146,6 +146,28 @@ function persist(key: string, value: string): void {
   }
 }
 
+/**
+ * Mirror a state-key write to a cookie so SSR frameworks can read the user's
+ * persisted atmosphere on the next server render. Cookie format invariant:
+ * matches `serializeAtmosphereCookie` in ./ssr — `name=value; Path=/;
+ * Max-Age=31536000; SameSite=Lax[; Secure]`. The Secure flag is auto-set
+ * under HTTPS; on http://localhost it is omitted so dev cookies are
+ * accepted. A round-trip test in tests/l0-ssr.test.ts asserts this format
+ * stays in lockstep with the SSR module's parser.
+ */
+function persistCookie(key: string, value: string): void {
+  if (!isBrowser) return;
+  try {
+    const secure =
+      typeof location !== 'undefined' && location.protocol === 'https:';
+    document.cookie =
+      `${key}=${value}; Path=/; Max-Age=31536000; SameSite=Lax` +
+      (secure ? '; Secure' : '');
+  } catch {
+    /* sandboxed iframes, missing document.cookie setter — no-op */
+  }
+}
+
 function restore(key: string): string | null {
   if (!isBrowser) return null;
   try {
@@ -284,6 +306,7 @@ export function setAtmosphere(name: string): void {
   try {
     root.setAttribute('data-atmosphere', name);
     persist(STORAGE_KEYS.atmosphere, name);
+    persistCookie(STORAGE_KEYS.atmosphere, name);
     const meta = lookupMeta(name);
     if (meta?.physics) setPhysics(meta.physics);
     if (meta?.mode) setMode(meta.mode);
@@ -300,6 +323,7 @@ export function setPhysics(preset: Physics): void {
   try {
     root.setAttribute('data-physics', preset);
     persist(STORAGE_KEYS.physics, preset);
+    persistCookie(STORAGE_KEYS.physics, preset);
     const required = CONSTRAINTS[preset];
     if (required) setMode(required);
   } finally {
@@ -323,6 +347,10 @@ export function setMode(mode: Mode): void {
   }
   root.setAttribute('data-mode', resolved);
   persist(STORAGE_KEYS.mode, mode);
+  // Cookie carries the *resolved* light/dark value — 'auto' means nothing
+  // to a server that can't run matchMedia. localStorage retains 'auto' for
+  // the existing FOUC contract; only the SSR cookie diverges in this case.
+  persistCookie(STORAGE_KEYS.mode, resolved);
   notify();
 }
 
@@ -331,6 +359,7 @@ export function setDensity(level: Density): void {
   if (!root) return;
   root.setAttribute('data-density', level);
   persist(STORAGE_KEYS.density, level);
+  persistCookie(STORAGE_KEYS.density, level);
   notify();
 }
 
