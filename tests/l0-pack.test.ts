@@ -67,7 +67,9 @@ describe('L0 npm pack — metadata', () => {
   });
 
   it('files field limits the tarball to dist + bin + README (no src, no node_modules)', () => {
-    expect(pkg.files.sort()).toEqual(['README.md', 'bin', 'dist'].sort());
+    expect(pkg.files.sort()).toEqual(
+      ['README.md', 'CHANGELOG.md', 'LICENSE.md', 'bin', 'dist'].sort(),
+    );
     // Defensive: no source files should leak into the tarball.
     for (const entry of pack.files) {
       expect(entry.path).not.toMatch(/^src\//);

@@ -163,12 +163,12 @@ export const VOID_AMBIENT = {
 export const VOID_TYPOGRAPHY = {
   scales: {
     caption: {
-      fontSize: 'clamp(0.6875rem, 0.65rem + 0.25vw, 0.875rem)',
+      fontSize: 'clamp(0.6875rem, 0.66rem + 0.15vw, 0.75rem)',
       lineHeight: 1.4,
       letterSpacing: '0.02em',
     },
     small: {
-      fontSize: 'clamp(0.75rem, 0.7rem + 0.3vw, 1rem)',
+      fontSize: 'clamp(0.75rem, 0.7rem + 0.2vw, 0.875rem)',
       lineHeight: 1.5,
       letterSpacing: '0.01em',
     },

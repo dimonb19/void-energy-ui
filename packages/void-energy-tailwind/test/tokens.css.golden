@@ -52,10 +52,10 @@
   --z-overlay: 90;
 
   /* Font sizes — fluid clamps from design-tokens.ts. */
-  --font-size-caption: clamp(0.6875rem, 0.65rem + 0.25vw, 0.875rem);
-  --font-size-small: clamp(0.75rem, 0.7rem + 0.3vw, 1rem);
-  --font-size-body: clamp(0.875rem, 0.8rem + 0.5vw, 1.125rem);
-  --font-size-h6: clamp(0.875rem, 0.8rem + 0.5vw, 1.125rem);
+  --font-size-caption: clamp(0.6875rem, 0.66rem + 0.15vw, 0.75rem);
+  --font-size-small: clamp(0.75rem, 0.7rem + 0.2vw, 0.875rem);
+  --font-size-body: clamp(0.875rem, 0.8rem + 0.2vw, 1rem);
+  --font-size-h6: clamp(0.875rem, 0.8rem + 0.2vw, 1rem);
   --font-size-h5: clamp(1rem, 0.95rem + 0.5vw, 1.25rem);
   --font-size-h4: clamp(1.125rem, 1rem + 1vw, 1.5rem);
   --font-size-h3: clamp(1.25rem, 1.1rem + 1.5vw, 2rem);
