@@ -1559,6 +1559,85 @@ Use Astro's `<Image>` when responsive srcset / build-time optimization is the pr
 
 ---
 
+#### `<AdaptiveImage>` — Physics/mode-aware decorative image
+
+**Description:** Selects which pre-existing source URL to display based on the active atmosphere's **physics × mode** — the two finite axes (4 valid combinations: `glass-dark`, `flat-dark`, `flat-light`, `retro-dark`). Composes `<Image>`, inheriting skeleton fallback, error state, lazy loading, and aspect-ratio behavior. Per **D33**: never transforms pixels — only selects between consumer-provided URLs. Re-resolution on atmosphere change preloads the next variant before swapping, so the previous image stays painted until the new one is decoded.
+**Location:** [src/components/ui/AdaptiveImage.svelte](src/components/ui/AdaptiveImage.svelte)
+**CSS:** Inherits `.image` ([src/styles/components/\_image.scss](src/styles/components/_image.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `src` | `string` | — | Default fallback URL (required) |
+| `alt` | `string` | — | Alt text (required — accessibility) |
+| `dark` | `string` | — | URL used when active mode is `dark` and no physics prop matches |
+| `light` | `string` | — | URL used when active mode is `light` and no physics prop matches |
+| `glass` | `string` | — | URL used when active physics is `glass` |
+| `flat` | `string` | — | URL used when active physics is `flat` |
+| `retro` | `string` | — | URL used when active physics is `retro` |
+| `aspectRatio` | `string` | — | CSS aspect-ratio passed through to `<Image>` |
+| `lazy` | `boolean` | `true` | Native lazy loading (forwarded) |
+| `objectFit` | `'cover' \| 'contain' \| 'fill' \| 'none' \| 'scale-down'` | `'cover'` | Forwarded to `<Image>` |
+| `class` | `string` | `''` | Forwarded to the underlying `<Image>` wrapper |
+| `...rest` | `HTMLImgAttributes` | — | Forwarded to the underlying `<img>` |
+
+**Resolution precedence:**
+
+1. Physics-specific prop if set (`glass` / `flat` / `retro`)
+2. Mode-specific prop if set (`dark` / `light`)
+3. Default `src`
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+  import AdaptiveImage from '@components/ui/AdaptiveImage.svelte';
+</script>
+
+<!-- Full variant set -->
+<AdaptiveImage
+  src="/hero.jpg"
+  dark="/hero-dark.jpg"
+  light="/hero-light.jpg"
+  glass="/hero-glass.jpg"
+  flat="/hero-flat.jpg"
+  retro="/hero-retro.jpg"
+  alt="Hero"
+  aspectRatio="16 / 9"
+/>
+
+<!-- Single override (others fall through to src) -->
+<AdaptiveImage src="/hero.jpg" glass="/hero-glass.jpg" alt="Hero" aspectRatio="16 / 9" />
+
+<!-- Precedence: physics > mode > src -->
+<AdaptiveImage
+  src="/hero.jpg"
+  dark="/hero-dark.jpg"
+  glass="/hero-glass.jpg"
+  alt="Hero"
+  aspectRatio="16 / 9"
+/>
+```
+
+**Architecture Notes:**
+
+| Decision | Rationale |
+| --- | --- |
+| **Physics × mode keying, never atmosphere name** | Atmospheres are unbounded (4 built-in + unlimited config + unlimited runtime). Physics × mode is finite (4 valid combinations). Keying on the finite axis scales; keying on atmosphere does not. For per-atmosphere control, wrap AdaptiveImage in app code branching on `voidEngine.atmosphere`. |
+| **Mirrors `<Image>` (does not compose)** | Reuses the `.image` SCSS class for skeleton, error state, aspect-ratio, opacity fade, and `--bg-sunk` placeholder. Diverges from `<Image>` only by holding the previous frame across atmosphere-driven src swaps — `<Image>` deliberately resets to the loading state on every src change, which would defeat swap-without-flash. |
+| **Decode-then-swap (true crossfade)** | On atmosphere change the next variant is fetched and decoded off-DOM via `Image().decode()`; only after decode resolves does `displayedSrc` advance. The browser holds the previous frame on the `<img>` element across the src change, and the wrapper does not return to the loading state — no skeleton flash, no opacity reset, no missing-image gap. The skeleton is therefore only ever visible on initial mount, before any variant has loaded. |
+| **`<img>` is client-only (SSR / SEO trade-off)** | Pre-rendered HTML contains the skeleton wrapper but no `<img>` element — the `<img>` is gated on a client-only `mounted` flag. Search engines that don't execute JS, and visitors with JS disabled, see only the skeleton. Required because voidEngine has no localStorage knowledge on the server, so any SSR-emitted `<img>` would lock in the default-atmosphere variant and Svelte hydration would not update it (hydration trusts SSR HTML for static-equality bindings). For decorative atmosphere-aware imagery this is the right trade-off; for SEO-critical hero imagery without atmosphere variants, use plain `<Image>` instead. Revisit once the W5 SSR cookie bridge ships and the server can emit the correct variant. |
+| **Mode props only fire under flat physics for `light`** | Glass and retro both force dark mode (auto-corrected by the engine). The `light` prop only resolves under flat-light. The `dark` prop fires under flat-dark, retro-dark, and any glass atmosphere that doesn't have a physics-prop bound. |
+| **No pixel modification** | Per D33. No filters, tints, desaturation, blending, or runtime processing. |
+| **No atmosphere-name props** | `frost="..."` / `terminal="..."` rejected by design. Consumers who need this branch on `voidEngine.atmosphere` themselves. |
+| **No AI-generated fallback** | Missing variants fall through to `src`, never to a generated image. AI generation is a separate premium concern. |
+| **No automatic dark/light inversion** | If only `src` is provided and the user switches modes, the image does not change. Variants are explicit. |
+
+**Physics:** Inherits everything from the shared `.image` SCSS surface. AdaptiveImage adds zero visual physics.
+
+---
+
 #### `.chip`
 
 **Description:** Data chips (Premium, System, Success variants)

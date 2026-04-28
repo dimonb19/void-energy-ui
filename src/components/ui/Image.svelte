@@ -15,6 +15,7 @@
   - aspectRatio: CSS aspect-ratio value (e.g., "16 / 9", "1 / 1")
   - lazy:        Native lazy loading (default: true)
   - objectFit:   How the image fills the wrapper (default: "cover")
+  - progressive: Reveal bytes as they arrive instead of skeleton-then-pop (default: false)
   - class:       Consumer classes on outer .image div
   - ...rest:     Forwarded to <img> (width, height, decoding, srcset, sizes, etc.)
 
@@ -22,6 +23,13 @@
   - loading: skeleton visible, image hidden
   - loaded:  image faded in, skeleton removed
   - error:   muted ImageOff icon centered
+
+  PROGRESSIVE MODE:
+  Set progressive={true} when the server streams the image (baseline JPEG over
+  chunked transfer, or progressive JPEG). The skeleton + fade-in are suppressed
+  so the browser's native top-down paint is visible. Set aspectRatio to prevent
+  layout shift while bytes arrive. For frame-by-frame AI streaming over
+  SSE/WebSocket, this component is the wrong shape — use a streaming variant.
 
   NAMING NOTE — Astro <Image> collision:
   Astro 5+ ships <Image> from `astro:assets` for responsive srcset. If you
@@ -44,6 +52,7 @@
     aspectRatio?: string;
     lazy?: boolean;
     objectFit?: 'cover' | 'contain' | 'fill' | 'none' | 'scale-down';
+    progressive?: boolean;
     class?: string;
   }
 
@@ -53,6 +62,7 @@
     aspectRatio,
     lazy = true,
     objectFit = 'cover',
+    progressive = false,
     class: className = '',
     ...rest
   }: ImageProps = $props();
@@ -80,10 +90,11 @@
 <div
   class="image {className}"
   data-state={imageState}
+  data-progressive={progressive ? 'true' : undefined}
   style:aspect-ratio={aspectRatio}
   style:--image-fit={objectFit}
 >
-  {#if !loaded && !errored}
+  {#if !loaded && !errored && !progressive}
     <Skeleton variant="card" class="image-skeleton" />
   {/if}
 

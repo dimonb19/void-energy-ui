@@ -1,5 +1,6 @@
 <script lang="ts">
   import Image from '@components/ui/Image.svelte';
+  import AdaptiveImage from '@components/ui/AdaptiveImage.svelte';
   import Avatar from '@components/ui/Avatar.svelte';
   import Video from '@components/ui/Video.svelte';
   import MediaSlider from '@components/ui/MediaSlider.svelte';
@@ -53,16 +54,18 @@
 </script>
 
 <section id="media" class="flex flex-col gap-md">
-  <h2>13 // IMAGE, AVATAR &amp; VIDEO</h2>
+  <h2>13 // MEDIA</h2>
 
   <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
       Native-element wrappers for content media. <code>&lt;Image&gt;</code> and
       <code>&lt;Video&gt;</code> add a skeleton during load and a muted icon on
-      error; <code>&lt;Avatar&gt;</code> adds initials fallback and an optional presence
-      dot. All three inherit physics + mode from the active atmosphere &mdash; switch
-      atmospheres to see how the placeholder, skeleton shimmer, and error icons adapt
-      across glass, flat, and retro.
+      error; <code>&lt;Avatar&gt;</code> adds initials fallback and an optional
+      presence dot; <code>&lt;AdaptiveImage&gt;</code> selects between consumer-supplied
+      source URLs based on the active atmosphere's physics &times; mode. All four
+      inherit physics + mode from the active atmosphere &mdash; switch atmospheres
+      to see how the placeholder, skeleton shimmer, error icons, and adaptive variants
+      respond across glass, flat, and retro.
     </p>
 
     <details>
@@ -365,6 +368,137 @@
 &lt;Video src="/clip.mp4" controls=&#123;false&#125; bind:element=&#123;videoEl&#125; /&gt;
 &lt;MediaSlider
   bind:volume bind:muted bind:paused playback replay onreplay=&#123;replay&#125;
+/&gt;</code
+          ></pre>
+      </details>
+    </div>
+
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <!-- ADAPTIVE IMAGE                                                 -->
+    <!-- ─────────────────────────────────────────────────────────────── -->
+    <div class="flex flex-col gap-md">
+      <h5>Adaptive Image</h5>
+      <p class="text-small text-mute">
+        Selects between consumer-supplied source URLs based on the active
+        atmosphere's <strong>physics &times; mode</strong> &mdash; the two
+        finite axes (four valid combinations: <code>glass-dark</code>,
+        <code>flat-dark</code>, <code>flat-light</code>,
+        <code>retro-dark</code>). Built on the same <code>.image</code> SCSS
+        surface as <code>&lt;Image&gt;</code> (skeleton, error, aspect-ratio,
+        opacity fade) but holds the previous frame across atmosphere-driven
+        swaps via <code>Image().decode()</code> &mdash; no skeleton flash, no
+        opacity reset. Per <strong>D33</strong>: never modifies pixels &mdash;
+        selects only between URLs the consumer provides. The demo below binds
+        <code>glass</code>, <code>retro</code>, <code>dark</code>, and
+        <code>light</code> to distinct <code>picsum</code> seeds; the
+        <code>flat</code> physics-prop is intentionally omitted so flat atmospheres
+        fall through to the mode-prop &mdash; giving four visually distinct images,
+        one per valid physics &times; mode combination. Switch atmospheres via the
+        navigation to watch the resolver advance.
+      </p>
+
+      <AdaptiveImage
+        src="https://picsum.photos/seed/voidadaptive-default/800/450"
+        dark="https://picsum.photos/seed/voidadaptive-dark/800/450"
+        light="https://picsum.photos/seed/voidadaptive-light/800/450"
+        glass="https://picsum.photos/seed/voidadaptive-glass/800/450"
+        retro="https://picsum.photos/seed/voidadaptive-retro/800/450"
+        alt="Adaptive image — distinct variant per glass-dark, flat-dark, flat-light, retro-dark"
+        aspectRatio="16 / 9"
+      />
+
+      <details>
+        <summary>How resolution works</summary>
+        <div class="p-md flex flex-col gap-md">
+          <p>
+            <strong>Precedence: physics &gt; mode &gt; <code>src</code>.</strong
+            > On each atmosphere change the resolver checks props in this order and
+            stops at the first match.
+          </p>
+          <ol class="flex flex-col gap-xs">
+            <li>
+              If the active <code>data-physics</code> matches a physics-prop (<code
+                >glass</code
+              >, <code>flat</code>, <code>retro</code>) and that prop is bound,
+              that URL wins.
+            </li>
+            <li>
+              Otherwise, if the active <code>data-mode</code> matches (<code
+                >dark</code
+              >
+              or <code>light</code>) and that prop is bound, that URL wins.
+            </li>
+            <li>
+              Otherwise, the default <code>src</code> URL is used.
+            </li>
+          </ol>
+          <p>
+            <strong>Mode-prop reach.</strong> Glass and retro physics both force
+            dark mode (auto-corrected by the engine), so the <code>light</code>
+            prop only ever fires under flat physics. The <code>dark</code> prop fires
+            under flat-dark, retro-dark, and any glass atmosphere that doesn't have
+            a physics-prop bound.
+          </p>
+          <p>
+            <strong>Swap behaviour.</strong> On atmosphere change the next
+            variant is fetched and decoded off-DOM via
+            <code>Image().decode()</code>; only after decode resolves does the
+            visible <code>&lt;img&gt;</code> src advance. The browser holds the
+            previous frame on the element across the swap &mdash; the wrapper
+            does <em>not</em> return to the loading state, so no skeleton flash,
+            no opacity reset, no missing-image gap. The skeleton is therefore only
+            ever visible on initial mount, before any variant has loaded.
+          </p>
+          <p>
+            <strong>First-paint trade-off.</strong> The initial
+            <code>displayedSrc</code>
+            is the plain <code>src</code> prop (not the resolved variant) so SSR
+            HTML and first-client-render HTML stay identical regardless of the visitor's
+            persisted atmosphere. If their atmosphere matches a variant, the first
+            effect run after mount swaps to it via the same decode-then-swap path
+            &mdash; a one-time crossfade rather than a flash.
+          </p>
+          <p>
+            <strong>What it does <em>not</em> do.</strong> Never keys on
+            atmosphere name (atmospheres are unbounded; physics &times; mode is
+            finite); never applies filters, tints, or pixel processing; never
+            auto-inverts between light and dark. If only <code>src</code> is provided
+            and the user switches modes, the image does not change &mdash; variants
+            are explicit.
+          </p>
+        </div>
+      </details>
+
+      <details>
+        <summary>View AdaptiveImage Code</summary>
+        <pre><code
+            >&lt;!-- Full variant set --&gt;
+&lt;AdaptiveImage
+  src="/hero.jpg"
+  dark="/hero-dark.jpg"
+  light="/hero-light.jpg"
+  glass="/hero-glass.jpg"
+  flat="/hero-flat.jpg"
+  retro="/hero-retro.jpg"
+  alt="Hero image"
+  aspectRatio="16 / 9"
+/&gt;
+
+&lt;!-- Single override (others fall through to src) --&gt;
+&lt;AdaptiveImage
+  src="/hero.jpg"
+  glass="/hero-glass.jpg"
+  alt="Hero image"
+  aspectRatio="16 / 9"
+/&gt;
+
+&lt;!-- Precedence: physics &gt; mode &gt; src --&gt;
+&lt;AdaptiveImage
+  src="/hero.jpg"
+  dark="/hero-dark.jpg"
+  glass="/hero-glass.jpg"
+  alt="Hero image"
+  aspectRatio="16 / 9"
 /&gt;</code
           ></pre>
       </details>

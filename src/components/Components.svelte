@@ -62,7 +62,7 @@
         { id: 'tabs', label: 'Tabs' },
         { id: 'pagination', label: 'Pagination' },
         { id: 'user-state', label: 'User State' },
-        { id: 'media', label: 'Image, Avatar & Video' },
+        { id: 'media', label: 'Media' },
       ],
     },
     {

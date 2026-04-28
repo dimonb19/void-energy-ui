@@ -49,7 +49,7 @@ If the request sounds like this, use the shipped system first:
 - Navigation: `sidebar`, `breadcrumbs`, `tabs`, `dropdown`, `navlink`
 - Actions: native `<button>` with `btn-*`, `ActionBtn`, `IconBtn`
 - Feedback: `toast`, `modal`, `portal-loader`, `skeleton`, `progress-ring`
-- Media: `image`, `avatar`, `video`
+- Media: `image`, `avatar`, `video`, `adaptive-image` (physics/mode-aware decorative imagery — never branch on atmosphere name in app code)
 - Data display: `tile`, `stat-card`, `line-chart`, `bar-chart`, `donut-chart`
 - Motion: `tooltip`, `morph`, `kinetic`, `narrative`
 - Drag and reorder: `draggable`, `dropTarget`, `reorderByDrop`, `resolveReorderByDrop`

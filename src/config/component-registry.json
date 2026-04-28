@@ -930,7 +930,7 @@
       "example": "<Skeleton variant='paragraph' lines={3} />"
     },
     "image": {
-      "description": "Native <img> wrapper with skeleton fallback during load, muted error state on failure, lazy loading by default, and aspect-ratio wrapper for layout stability. Forwards native <img> attributes (width, height, decoding, srcset, sizes, etc.) via spread.",
+      "description": "Native <img> wrapper with skeleton fallback during load, muted error state on failure, lazy loading by default, and aspect-ratio wrapper for layout stability. Forwards native <img> attributes (width, height, decoding, srcset, sizes, etc.) via spread. Set progressive={true} to suppress the skeleton + fade-in so the browser's native top-down paint is visible while bytes stream in (baseline JPEG over chunked transfer, or progressive JPEG).",
       "category": "feedback",
       "component": "Image",
       "import": "@components/ui/Image.svelte",
@@ -940,13 +940,38 @@
         "aspectRatio",
         "lazy",
         "objectFit",
+        "progressive",
         "class",
         "...rest:HTMLImgAttributes"
       ],
       "slots": [],
-      "related": ["skeleton"],
-      "compose": "Use for content imagery (hero photos, thumbnails, avatars, illustrations). Pair aspectRatio with object-fit to lock layout. Naming: in .astro files where Astro's <Image> from astro:assets is also imported, alias one — `import { Image as VoidImage } from '@components/ui/Image.svelte'`. In .svelte files there is no collision.",
+      "related": ["adaptive-image", "skeleton"],
+      "compose": "Use for content imagery (hero photos, thumbnails, avatars, illustrations). Pair aspectRatio with object-fit to lock layout. Use progressive={true} when the server streams the image (set aspectRatio to prevent layout shift). Naming: in .astro files where Astro's <Image> from astro:assets is also imported, alias one — `import { Image as VoidImage } from '@components/ui/Image.svelte'`. In .svelte files there is no collision.",
       "example": "<Image src='/hero.jpg' alt='Hero' aspectRatio='16 / 9' />"
+    },
+    "adaptive-image": {
+      "description": "Physics/mode-aware decorative image. Selects which pre-existing source URL to display based on the active atmosphere's physics × mode (4 valid combinations: glass-dark, flat-dark, flat-light, retro-dark). Built on the same .image SCSS surface as <Image> (skeleton, error, aspect-ratio, opacity fade) but holds the previous frame across atmosphere-driven swaps: the next variant is decoded off-DOM via Image().decode() and only then does the visible <img>'s src advance, so the wrapper never returns to the loading state — no skeleton flash, no opacity reset. Resolution precedence: physics-specific prop wins, then mode-specific prop, then the default src fallback. Per D33: never transforms pixels — only selects between consumer-provided URLs. SSR / SEO trade-off: the <img> is client-only — pre-rendered HTML contains skeleton markup but no <img> tag (required to avoid locking in the default-atmosphere variant during hydration). For SEO-critical hero imagery without atmosphere variants, use plain <Image> instead.",
+      "category": "feedback",
+      "component": "AdaptiveImage",
+      "import": "@components/ui/AdaptiveImage.svelte",
+      "props": [
+        "src",
+        "alt",
+        "dark",
+        "light",
+        "glass",
+        "flat",
+        "retro",
+        "aspectRatio",
+        "lazy",
+        "objectFit",
+        "class",
+        "...rest:HTMLImgAttributes"
+      ],
+      "slots": [],
+      "related": ["image", "skeleton"],
+      "compose": "Use for decorative content that should adapt across atmospheres — hero photos, marketing imagery, empty-state illustrations, background patterns. Provide at most 5 source URLs (one per axis value plus the default fallback). Resolution keys on physics × mode, never on atmosphere name (atmospheres are unbounded; physics × mode is the finite axis). For per-atmosphere control, wrap AdaptiveImage in app code branching on voidEngine.atmosphere.",
+      "example": "<AdaptiveImage src='/hero.jpg' dark='/hero-dark.jpg' glass='/hero-glass.jpg' alt='Hero' aspectRatio='16 / 9' />"
     },
     "avatar": {
       "description": "Circular user representation. Renders an <img> when src is provided and loads successfully; falls back to initials derived from the name prop otherwise. Supports an optional presence dot (online/busy/away/offline) anchored to the bottom-right.",

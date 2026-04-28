@@ -27,6 +27,14 @@
     opacity: 1;
   }
 
+  // Progressive mode: server is streaming bytes (baseline JPEG over chunked
+  // transfer, or progressive JPEG). Show the <img> from byte 0 so the browser's
+  // native top-down paint isn't masked by our fade-in.
+  &[data-progressive='true'] > img {
+    opacity: 1;
+    transition: none;
+  }
+
   // Skeleton fills the aspect-ratio wrapper instead of using its default 128px.
   .image-skeleton {
     position: absolute;
