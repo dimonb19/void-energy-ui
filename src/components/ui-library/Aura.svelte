@@ -121,7 +121,7 @@
 </script>
 
 <section id="aura" class="flex flex-col gap-md">
-  <h2>22 // AURA</h2>
+  <h2>23 // AURA</h2>
 
   <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">

@@ -42,7 +42,7 @@
 </script>
 
 <section id="buttons" class="flex flex-col gap-md">
-  <h2>07 // BUTTONS, CHIPS & BADGES</h2>
+  <h2>08 // BUTTONS, CHIPS & BADGES</h2>
 
   <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">

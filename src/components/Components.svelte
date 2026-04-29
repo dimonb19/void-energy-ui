@@ -8,6 +8,7 @@
   import Surfaces from './ui-library/Surfaces.svelte';
   import Atmospheres from './ui-library/Atmospheres.svelte';
   import Prose from './ui-library/Prose.svelte';
+  import MarkdownShowcase from './ui-library/Markdown.svelte';
   import Globals from './ui-library/Globals.svelte';
   // Primitives
   import Icons from './ui-library/Icons.svelte';
@@ -42,6 +43,7 @@
         { id: 'surfaces', label: 'Surfaces' },
         { id: 'atmospheres', label: 'Atmospheres' },
         { id: 'prose', label: 'Prose & Content' },
+        { id: 'markdown', label: 'Markdown' },
         { id: 'globals', label: 'Global Treatments' },
       ],
     },
@@ -218,6 +220,7 @@
           <Surfaces />
           <Atmospheres />
           <Prose />
+          <MarkdownShowcase />
           <Globals />
 
           <hr />

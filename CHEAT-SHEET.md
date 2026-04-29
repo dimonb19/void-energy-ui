@@ -2480,6 +2480,44 @@ const pv = createPasswordValidation(() => password);
 
 ---
 
+#### `<Markdown>`
+
+**Description:** Renders a markdown string as styled, sanitized HTML inside a `.prose` wrapper. Bundles parser (`marked` + GFM) and sanitizer (`isomorphic-dompurify`) so consumers don't pick per-call. Safe by default; `trusted` bypasses sanitization for system-authored strings committed in source. External links auto-receive `target="_blank" rel="noopener noreferrer"`. Inline mode wraps in `<span>` (no leading `<p>`) for tooltip / label phrasing.
+**Location:** [src/components/ui/Markdown.svelte](src/components/ui/Markdown.svelte)
+**CSS Class:** `.prose` ([src/styles/base/\_prose.scss](src/styles/base/_prose.scss)) — primitive does not own its own SCSS surface; styling adapts via the `.prose` scope across all physics and modes.
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `source` | `string \| null \| undefined` | *required* | Markdown source. Empty/`null`/`undefined` renders an empty wrapper without throwing (covers AI pre-first-chunk states). |
+| `class` | `string` | `''` | Forwarded to the wrapper element. |
+| `trusted` | `boolean` | `false` | When `true`, bypasses the sanitizer. **Use only for strings committed in source** — treat the word `trusted` in any diff as a sanitizer-bypass review surface. |
+| `inline` | `boolean` | `false` | When `true`, parses with `marked.parseInline` and wraps in `<span>` (no leading `<p>`). Use for tooltip body / label text. |
+
+**When to use:** content arrives as a markdown string (AI-generated narrative, help text, changelog, CMS field, toast detail body). For plain text without markdown syntax, render directly.
+
+**Usage:**
+
+```svelte
+<script lang="ts">
+  import Markdown from '@components/ui/Markdown.svelte';
+</script>
+
+<!-- AI / untrusted content (default — sanitizer runs) -->
+<Markdown source={aiOutput} />
+
+<!-- System-authored / trusted content (sanitizer bypassed) -->
+<Markdown source={changelogMd} trusted />
+
+<!-- Inline phrasing (tooltip body, label text) -->
+<Markdown source={tooltipBody} inline />
+```
+
+**Decisions:** `plans/decisions.md` D34 — parser + sanitizer pinned to exact versions; no syntax highlighting, no streaming in v1; `trusted` flag is safe-by-default. **Phase 0c W1 transition:** wrapper currently emits `.prose` only on the sanitized path; when `.prose-untrusted` lands in `_prose.scss`, the class becomes `prose prose-untrusted` — sanitization runs identically in both states.
+
+---
+
 #### `<MediaSlider>`
 
 **Description:** Horizontal control bar with mute toggle, volume slider, optional playback (pause/play) toggle, and optional replay button.

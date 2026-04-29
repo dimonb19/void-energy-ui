@@ -275,6 +275,35 @@ Avoid:
 - Using `.prose-untrusted` on content the app authors — `.prose` is the right scope for trusted rich text
 - Skipping the sanitizer because the scope "looks safe" — visual containment is not script containment
 
+## Markdown Strings
+
+Use when the content arrives as a markdown string (AI-generated narrative, help text, changelog entries, CMS field, toast detail body). The `Markdown` primitive bundles parser + sanitizer + prose wrapper so consumers don't make those decisions per-call.
+
+```svelte
+<!-- AI / untrusted content (default — sanitizer runs) -->
+<Markdown source={aiOutput} />
+
+<!-- System-authored / trusted content (sanitizer bypassed) -->
+<Markdown source={changelogMd} trusted />
+
+<!-- Inline phrasing (tooltip body, label text — wrapper is <span>, no <p>) -->
+<Markdown source={tooltipBody} inline />
+```
+
+- Default is **safe**: bare `<Markdown source={x} />` sanitizes, scopes to `.prose`, and auto-applies `target="_blank" rel="noopener noreferrer"` to external links.
+- The `trusted` flag is for system-authored markdown committed in source (changelog, help copy, settings descriptions). Treat the word `trusted` in a diff as a sanitizer-bypass review surface.
+- Empty / `null` / `undefined` / whitespace-only sources render an empty wrapper without throwing — pre-first-chunk AI streaming is safe.
+- Markdown is **complete strings only** in v1; if a streaming surface needs incremental render of chunks, buffer them consumer-side until a sentence/paragraph boundary and pass the completed string.
+
+**Phase 0c W1 transition (active until `.prose-untrusted` lands in `_prose.scss`):** the primitive currently emits `.prose` only on the sanitized path. Sanitization runs and the security posture is identical to the final shape, but the UGC-vs-system styling-scope differentiation is deferred. When Phase 0c W1 ships `.prose-untrusted`, the wrapper class on the sanitized branch of `Markdown.svelte` becomes `prose prose-untrusted {className}` — a one-line change. Consumer code does not need to change.
+
+Avoid:
+
+- Hand-rolling `marked()` / `markdown-it()` + `{@html}` calls — the `Markdown` primitive is the system answer
+- Wrapping `<Markdown>` in your own sanitizer — the sanitizer already runs by default
+- Passing `trusted` for AI-generated, CMS-derived, or user-authored content — that's an XSS hole
+- Using `<Markdown>` for plain text that contains no markdown syntax — pass the string directly to a `<p>` instead
+
 ## Before Creating Something New
 
 Ask these in order:

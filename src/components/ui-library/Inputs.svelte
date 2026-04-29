@@ -75,7 +75,7 @@
 </script>
 
 <section id="inputs" class="flex flex-col gap-md">
-  <h2>08 // INPUTS & CONTROLS</h2>
+  <h2>09 // INPUTS & CONTROLS</h2>
 
   <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">

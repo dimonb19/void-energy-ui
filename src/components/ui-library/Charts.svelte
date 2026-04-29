@@ -176,7 +176,7 @@
 </script>
 
 <section id="charts" class="flex flex-col gap-md">
-  <h2>23 // CHARTS & DATA VISUALIZATION</h2>
+  <h2>24 // CHARTS & DATA VISUALIZATION</h2>
 
   <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">

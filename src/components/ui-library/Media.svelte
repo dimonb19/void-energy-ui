@@ -54,7 +54,7 @@
 </script>
 
 <section id="media" class="flex flex-col gap-md">
-  <h2>13 // MEDIA</h2>
+  <h2>14 // MEDIA</h2>
 
   <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">

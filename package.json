@@ -35,6 +35,8 @@
     "@lucide/svelte": "^0.564.0",
     "astro": "^5.16.0",
     "fast-average-color": "^9.5.2",
+    "isomorphic-dompurify": "3.11.0",
+    "marked": "18.0.2",
     "svelte": "^5.43.14",
     "zod": "^3.25.76"
   },

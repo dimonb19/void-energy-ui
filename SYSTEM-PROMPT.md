@@ -201,6 +201,7 @@ Void Energy is **native-first**. Components are thin wrappers around native HTML
 | Buttons                           | `<button class="btn-*">`, `ActionBtn`, `IconBtn`, `ProfileBtn`, `ThemesBtn`                     |
 | Overlays                          | `Modal`, `Dropdown`, `Sidebar`                                                                  |
 | Media                             | `Image`, `Avatar`, `Video`, `AdaptiveImage`                                                      |
+| Authored / formatted string content | `Markdown`                                                                                     |
 | Theme creation (AI + manual)      | `ThemeBuilder`                                                                                  |
 | Feedback                          | `toast`, `modal.alert`, `modal.confirm`, `Skeleton`, `ProgressRing`                             |
 | Navigation                        | `Sidebar`, `Breadcrumbs`, `Tabs`, `Pagination`, `LoadMore`, `use:navlink`                       |
@@ -212,6 +213,10 @@ Void Energy is **native-first**. Components are thin wrappers around native HTML
 ### Ambient light constraint (`use:aura`)
 
 Use `use:aura` **only** on image-backed or atmosphere-primary surfaces — story scenes, hero panels, album-cover-style cards. Do not attach Aura to dashboard tiles, form fields, navigation chrome, or generic cards. Multiple Auras in a single visible region produce rainbow-disco output; prefer one focal Aura per region. The `color` prop is optional — omit it for an atmosphere-driven glow (falls back to `--energy-primary`). Pair with `extractAura()` from `@lib/aura` only when the color must come from an image.
+
+### Markdown rendering constraint (`<Markdown>`)
+
+If the source string may contain markdown syntax (`**bold**`, `#`, `-`, fenced code, links), render it through `<Markdown source={...}>`. If it is guaranteed plain text, render directly into a `<p>` or other native element. Do not hand-roll `marked()` + `{@html}` or wrap output in your own sanitizer — the primitive already runs `marked` + `isomorphic-dompurify` and applies `.prose` styling. Default usage is **safe** (sanitizer runs on every call). The `trusted` flag bypasses the sanitizer and **must only be used for strings committed in source** (changelog, help copy, settings descriptions); when `trusted` appears in a diff, treat it as a sanitizer-bypass review surface and verify the source is system-authored, not AI / CMS / user input. For phrasing contexts (tooltip body, label text), pass `inline` so the wrapper is `<span>` and there is no leading `<p>`.
 
 ### When to build new
 

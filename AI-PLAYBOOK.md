@@ -50,6 +50,7 @@ If the request sounds like this, use the shipped system first:
 - Actions: native `<button>` with `btn-*`, `ActionBtn`, `IconBtn`
 - Feedback: `toast`, `modal`, `portal-loader`, `skeleton`, `progress-ring`
 - Media: `image`, `avatar`, `video`, `adaptive-image` (physics/mode-aware decorative imagery — never branch on atmosphere name in app code)
+- Markdown / formatted string content: `markdown` (do not hand-roll `marked()` + `{@html}`; pass `trusted` only for strings committed in source)
 - Data display: `tile`, `stat-card`, `line-chart`, `bar-chart`, `donut-chart`
 - Motion: `tooltip`, `morph`, `kinetic`, `narrative`, `aura`
 - Ambient color glow / color spill from image / scene tinting: `use:aura` (color optional — omit for atmosphere-driven glow) + `extractAura` (only when color must come from an image). Do NOT hand-write `box-shadow`, `radial-gradient`, `filter: blur()`, or sibling overlay divs to recreate the effect.

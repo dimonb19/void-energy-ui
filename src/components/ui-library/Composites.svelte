@@ -217,7 +217,7 @@
 </script>
 
 <section id="composites" class="flex flex-col gap-md">
-  <h2>09 // COMPOSITES</h2>
+  <h2>10 // COMPOSITES</h2>
 
   <div class="surface-raised p-lg flex flex-col gap-lg">
     <p class="text-dim">
