@@ -63,10 +63,10 @@ const BUILTINS: GeneratorBuiltins = {
       '--bg-surface': 'rgba(20, 30, 50, 0.45)',
       '--energy-primary': '#7ec8e3',
     }),
-    slate: builtin('flat', 'dark', 'Slate', {
-      '--bg-canvas': '#111118',
-      '--bg-surface': '#1e1e2a',
-      '--energy-primary': '#6ea1ff',
+    graphite: builtin('flat', 'dark', 'Graphite', {
+      '--bg-canvas': '#1f1f1f',
+      '--bg-surface': '#2a2a2c',
+      '--energy-primary': '#ececee',
     }),
     meridian: builtin('flat', 'light', 'Meridian', {
       '--bg-canvas': '#f4f6f9',
@@ -90,8 +90,8 @@ describe('L0 generator — empty config', () => {
     expect(manifest.schemaVersion).toBe(1);
     expect(Object.keys(manifest.atmospheres).sort()).toEqual([
       'frost',
+      'graphite',
       'meridian',
-      'slate',
       'terminal',
     ]);
     for (const entry of Object.values(manifest.atmospheres)) {
@@ -101,7 +101,7 @@ describe('L0 generator — empty config', () => {
     // Built-ins ship as part of the L0 package's own CSS — the generator
     // must not duplicate them into void.generated.css.
     expect(css).not.toContain("[data-atmosphere='frost']");
-    expect(css).not.toContain("[data-atmosphere='slate']");
+    expect(css).not.toContain("[data-atmosphere='graphite']");
   });
 });
 
@@ -208,8 +208,8 @@ describe('L0 generator — MODE B (extendAtmospheres)', () => {
     expect(Object.keys(manifest.atmospheres).sort()).toEqual([
       'crimson',
       'frost',
+      'graphite',
       'meridian',
-      'slate',
       'terminal',
     ]);
     expect(manifest.atmospheres.frost.source).toBe('builtin');
@@ -231,7 +231,7 @@ describe('L0 generator — MODE B (extendAtmospheres)', () => {
     );
     expect(css).toContain("[data-atmosphere='crimson']");
     expect(css).not.toContain("[data-atmosphere='frost']");
-    expect(css).not.toContain("[data-atmosphere='slate']");
+    expect(css).not.toContain("[data-atmosphere='graphite']");
   });
 });
 
@@ -243,8 +243,8 @@ describe('L0 generator — MODE C (omitBuiltins)', () => {
     );
     expect(Object.keys(manifest.atmospheres).sort()).toEqual([
       'frost',
+      'graphite',
       'meridian',
-      'slate',
     ]);
   });
 
@@ -265,7 +265,7 @@ describe('L0 generator — MODE C (omitBuiltins)', () => {
     expect(Object.keys(manifest.atmospheres).sort()).toEqual([
       'dawn',
       'frost',
-      'slate',
+      'graphite',
     ]);
   });
 });
@@ -645,11 +645,11 @@ describe('L0 generator — determinism', () => {
           mode: 'light',
           label: 'Meridian',
         },
-        slate: {
+        graphite: {
           source: 'builtin',
           physics: 'flat',
           mode: 'dark',
-          label: 'Slate',
+          label: 'Graphite',
         },
         terminal: {
           source: 'builtin',

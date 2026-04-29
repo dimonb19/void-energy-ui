@@ -42,7 +42,7 @@ const CANDIDATE_FILENAMES = [
 
 const BUILTINS: readonly BuiltinName[] = [
   'frost',
-  'slate',
+  'graphite',
   'terminal',
   'meridian',
 ] as const;

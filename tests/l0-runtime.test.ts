@@ -127,7 +127,7 @@ describe('L0 runtime — SSR safety (no document / no localStorage)', () => {
       `m.setMode('dark');`,
       `m.setMode('auto');`,
       `m.setDensity('comfortable');`,
-      `m.init({ atmosphere: 'slate' });`,
+      `m.init({ atmosphere: 'graphite' });`,
       `m.registerAtmosphere('noop', { physics: 'flat', mode: 'dark', tokens: {} });`,
       `m.unregisterAtmosphere('noop');`,
       `m.getCustomAtmospheres();`,
@@ -147,7 +147,7 @@ describe('L0 runtime — SSR safety (no document / no localStorage)', () => {
       m.setMode('dark');
       m.setMode('auto');
       m.setDensity('comfortable');
-      m.init({ atmosphere: 'slate' });
+      m.init({ atmosphere: 'graphite' });
       m.registerAtmosphere('noop', { physics: 'flat', mode: 'dark', tokens: {} });
       m.unregisterAtmosphere('noop');
       m.getCustomAtmospheres();
@@ -319,16 +319,16 @@ describe('L0 runtime — DOM behavior (jsdom)', () => {
   });
 
   it('init() restores persisted state from localStorage', () => {
-    localStorage.setItem('ve-atmosphere', 'slate');
+    localStorage.setItem('ve-atmosphere', 'graphite');
     localStorage.setItem('ve-density', 'compact');
     runtime.init();
     expect(document.documentElement.getAttribute('data-atmosphere')).toBe(
-      'slate',
+      'graphite',
     );
     expect(document.documentElement.getAttribute('data-density')).toBe(
       'compact',
     );
-    // slate → flat + dark
+    // graphite → flat + dark
     expect(document.documentElement.getAttribute('data-physics')).toBe('flat');
     expect(document.documentElement.getAttribute('data-mode')).toBe('dark');
   });
@@ -363,9 +363,9 @@ describe('L0 runtime — DOM behavior (jsdom)', () => {
       throw new Error('QuotaExceededError');
     };
     try {
-      expect(() => runtime.setAtmosphere('slate')).not.toThrow();
+      expect(() => runtime.setAtmosphere('graphite')).not.toThrow();
       expect(document.documentElement.getAttribute('data-atmosphere')).toBe(
-        'slate',
+        'graphite',
       );
     } finally {
       Storage.prototype.setItem = original;
@@ -491,11 +491,11 @@ describe('L0 runtime — custom atmospheres + reactivity (jsdom)', () => {
     const off = runtime.subscribe((state) =>
       calls.push(state.atmosphere ?? ''),
     );
-    runtime.setAtmosphere('slate');
+    runtime.setAtmosphere('graphite');
     runtime.setDensity('compact');
     off();
     runtime.setDensity('comfortable');
-    expect(calls).toEqual(['slate', 'slate']);
+    expect(calls).toEqual(['graphite', 'graphite']);
   });
 
   it('subscribe fires exactly once per setAtmosphere (batched)', () => {
@@ -511,7 +511,7 @@ describe('L0 runtime — custom atmospheres + reactivity (jsdom)', () => {
   it('subscribe fires exactly once per init (batched)', () => {
     let count = 0;
     const off = runtime.subscribe(() => count++);
-    runtime.init({ atmosphere: 'slate' });
+    runtime.init({ atmosphere: 'graphite' });
     off();
     expect(count).toBe(1);
   });
@@ -521,7 +521,7 @@ describe('L0 runtime — custom atmospheres + reactivity (jsdom)', () => {
     const off = runtime.subscribe(() => count++);
     off();
     off();
-    runtime.setAtmosphere('slate');
+    runtime.setAtmosphere('graphite');
     expect(count).toBe(0);
   });
 
@@ -560,10 +560,10 @@ describe('L0 runtime — custom atmospheres + reactivity (jsdom)', () => {
     const offGood = runtime.subscribe((state) =>
       calls.push(state.atmosphere ?? ''),
     );
-    runtime.setAtmosphere('slate');
+    runtime.setAtmosphere('graphite');
     offBad();
     offGood();
-    expect(calls).toEqual(['slate']);
+    expect(calls).toEqual(['graphite']);
   });
 
   it('init() re-hydrate clears stale custom atmospheres (Finding 4)', () => {
@@ -662,20 +662,20 @@ describe('L0 runtime — manifest integration (jsdom)', () => {
   });
 
   it('localStorage wins over manifest.defaults wins over init defaults', () => {
-    localStorage.setItem('ve-atmosphere', 'slate');
+    localStorage.setItem('ve-atmosphere', 'graphite');
     runtime.init({
       atmosphere: 'frost',
       manifest: {
         schemaVersion: 1,
         defaults: { atmosphere: 'meridian' },
         atmospheres: {
-          slate: { source: 'builtin', physics: 'flat', mode: 'dark' },
+          graphite: { source: 'builtin', physics: 'flat', mode: 'dark' },
           meridian: { source: 'builtin', physics: 'flat', mode: 'light' },
         },
       },
     });
     expect(document.documentElement.getAttribute('data-atmosphere')).toBe(
-      'slate',
+      'graphite',
     );
   });
 

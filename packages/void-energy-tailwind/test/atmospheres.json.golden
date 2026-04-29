@@ -1,8 +1,8 @@
 {
-  "slate": {
+  "graphite": {
     "physics": "flat",
     "mode": "dark",
-    "tagline": "Professional / Clean"
+    "tagline": "Editor / Neutral"
   },
   "terminal": {
     "physics": "retro",

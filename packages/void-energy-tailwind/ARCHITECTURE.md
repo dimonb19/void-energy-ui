@@ -41,7 +41,7 @@ node_modules/@void-energy/tailwind/
 ├── dist/
 │   ├── tokens.css                  Foundation variables on :root (spacing, radius, z-index, typography).
 │   ├── atmospheres/
-│   │   ├── slate.css               [data-atmosphere='slate']    — palette + mode declaration.
+│   │   ├── graphite.css            [data-atmosphere='graphite'] — palette + mode declaration.
 │   │   ├── terminal.css            [data-atmosphere='terminal']
 │   │   ├── meridian.css            [data-atmosphere='meridian']
 │   │   └── frost.css               [data-atmosphere='frost']

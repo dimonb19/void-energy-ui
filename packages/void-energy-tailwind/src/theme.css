@@ -41,7 +41,7 @@
 /*
  * L0 sub-files: foundation tokens + default atmosphere + default physics +
  * density. Consumers can switch atmosphere by also importing one of:
- *   @import "@void-energy/tailwind/atmospheres/slate.css"
+ *   @import "@void-energy/tailwind/atmospheres/graphite.css"
  *   @import "@void-energy/tailwind/atmospheres/terminal.css"
  *   @import "@void-energy/tailwind/atmospheres/meridian.css"
  * …and switch physics by importing physics/{flat,retro}.css. Then toggle at

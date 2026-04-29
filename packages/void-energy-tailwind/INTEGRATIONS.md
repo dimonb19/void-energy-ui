@@ -368,7 +368,7 @@ The runtime's dual-write (every `setAtmosphere`/`setPhysics`/`setMode`/`setDensi
     <script type="module">
       import { setAtmosphere } from 'https://esm.sh/@void-energy/tailwind/runtime';
       document.querySelector('#switch-dark')?.addEventListener('click', () => {
-        setAtmosphere('slate');
+        setAtmosphere('graphite');
       });
     </script>
   </body>
@@ -701,7 +701,7 @@ registerAtmosphere('acme', {
 
 // Enumerate for a theme picker — array of { name, source, physics, mode, label? }.
 getAtmospheres().map((a) => a.name);
-// ['acme', 'frost', 'slate', 'terminal', 'meridian']
+// ['acme', 'frost', 'graphite', 'terminal', 'meridian']
 
 // Only show the X button on runtime-added themes.
 getAtmosphereBySource('runtime'); // [{ name: 'acme', source: 'runtime', … }]

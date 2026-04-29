@@ -100,7 +100,7 @@ import manifest from 'virtual:void-energy/manifest.json';
 init({ manifest });
 ```
 
-That's the full setup. Five files, every theme picker now shows ten branded atmospheres, ten branded fonts loaded via `@font-face` with `font-display: swap`, and VE's frost / slate / terminal / meridian are invisible.
+That's the full setup. Five files, every theme picker now shows ten branded atmospheres, ten branded fonts loaded via `@font-face` with `font-display: swap`, and VE's frost / graphite / terminal / meridian are invisible.
 
 ---
 
@@ -135,7 +135,7 @@ export interface FontSource {
   unicodeRange?: string;
 }
 
-export type BuiltinName = 'frost' | 'slate' | 'terminal' | 'meridian';
+export type BuiltinName = 'frost' | 'graphite' | 'terminal' | 'meridian';
 
 export interface InitDefaults {
   atmosphere: string;
@@ -195,7 +195,7 @@ Every atmosphere in the runtime's directory carries a `source` tag:
 
 | Source | Origin | Permanence | UI affordance |
 |---|---|---|---|
-| `builtin` | Ships with L0 (frost, slate, terminal, meridian). | Permanent. | No X button. |
+| `builtin` | Ships with L0 (frost, graphite, terminal, meridian). | Permanent. | No X button. |
 | `config` | Declared in `void.config.ts`, emitted into `void.generated.css` at build time. | Permanent from the end-user's perspective. | No X button. |
 | `runtime` | Registered via `registerAtmosphere()` in a running app (end-user-added). | Removable by the user who added it. | X button. |
 
@@ -293,7 +293,7 @@ For the flagship scenario above, the generator produces two files (default `outD
 }
 ```
 
-Note that `frost`, `slate`, `terminal`, `meridian` are absent from `atmospheres` — this is **Replace mode** (see [The three replacement modes](#the-three-replacement-modes) above). Their CSS still loads but is invisible to the runtime.
+Note that `frost`, `graphite`, `terminal`, `meridian` are absent from `atmospheres` — this is **Replace mode** (see [The three replacement modes](#the-three-replacement-modes) above). Their CSS still loads but is invisible to the runtime.
 
 ---
 

@@ -512,8 +512,8 @@ Void Energy ships under the Business Source License (BSL 1.1). Source is visible
 
 This file describes the Frost atmosphere as a single snapshot. The live Void Energy runtime is larger:
 
-- **Four built-in atmospheres:** Slate (professional flat), Terminal (retro CRT), Meridian (fintech light), Frost (arctic glass — this snapshot).
-- **Three physics presets:** glass (Frost's default), flat (Slate, Meridian), retro (Terminal). Physics controls blur, border width, motion, and radius behavior — not color.
+- **Four built-in atmospheres:** Graphite (neutral editor flat), Terminal (retro CRT), Meridian (fintech light), Frost (arctic glass — this snapshot).
+- **Three physics presets:** glass (Frost's default), flat (Graphite, Meridian), retro (Terminal). Physics controls blur, border width, motion, and radius behavior — not color.
 - **Two color modes:** light and dark. Glass and retro require dark; flat works with both.
 - **Density scaling:** Compact / Standard / Comfortable, applied multiplicatively to the spacing scale.
 - **Component library:** ~80 Svelte 5 components (Runes) with a native-first pattern — wrappers around \`<button>\`, \`<input>\`, \`<select>\`, \`<dialog>\`, etc.

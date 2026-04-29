@@ -234,7 +234,7 @@ Override any token by redeclaring it under a higher-specificity rule:
   --energy-primary: #ff00ff;  /* global override */
 }
 
-[data-atmosphere='slate'] {
+[data-atmosphere='graphite'] {
   --energy-primary: #00ffff;  /* atmosphere-specific override */
 }
 

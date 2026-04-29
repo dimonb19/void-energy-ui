@@ -19,7 +19,7 @@
 
   // ── Live Proof: atmosphere previewer ──────────────────────────────────
   const proofAtmospheres = [
-    { value: 'slate', label: 'Slate' },
+    { value: 'graphite', label: 'Graphite' },
     { value: 'terminal', label: 'Terminal' },
     { value: 'meridian', label: 'Meridian' },
     { value: 'frost', label: 'Frost' },

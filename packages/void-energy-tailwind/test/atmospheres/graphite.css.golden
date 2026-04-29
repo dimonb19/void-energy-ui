@@ -1,11 +1,11 @@
 /*
  * 🤖 AUTO-GENERATED — DO NOT EDIT
- * @void-energy/tailwind — atmosphere: slate
- * Professional / Clean — dark / flat
+ * @void-energy/tailwind — atmosphere: graphite
+ * Editor / Neutral — dark / flat
  * Source of truth: src/config/atmospheres.ts
  */
 
-[data-atmosphere='slate'] {
+[data-atmosphere='graphite'] {
   color-scheme: dark;
 
   --color-premium: #ff8c00;
@@ -26,14 +26,14 @@
   --color-error-subtle: oklch(from #ff3c40 l c h / 0.15);
   --font-heading: 'Inter', sans-serif;
   --font-body: 'Inter', sans-serif;
-  --bg-canvas: #111118;
-  --bg-spotlight: #1c1c26;
-  --bg-surface: #1e1e2a;
-  --bg-sunk: #0c0c12;
-  --energy-primary: #6ea1ff;
-  --energy-secondary: #8b8fa3;
-  --border-color: rgba(110, 161, 255, 0.2);
-  --text-main: #e8e8ed;
-  --text-dim: #a0a0b0;
-  --text-mute: #64647a;
+  --bg-canvas: #1f1f1f;
+  --bg-spotlight: #1f1f1f;
+  --bg-surface: #2a2a2c;
+  --bg-sunk: #161617;
+  --energy-primary: #ececee;
+  --energy-secondary: #9ca0a6;
+  --border-color: rgba(255, 255, 255, 0.10);
+  --text-main: #ececee;
+  --text-dim: #b4b6bb;
+  --text-mute: #90949a;
 }

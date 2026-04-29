@@ -156,7 +156,7 @@ describe('L0 npm pack — required dist files are all present', () => {
     'dist/cli.cjs',
     'dist/cli.d.ts',
     'bin/void-energy.js',
-    'dist/atmospheres/slate.css',
+    'dist/atmospheres/graphite.css',
     'dist/atmospheres/terminal.css',
     'dist/atmospheres/meridian.css',
     'dist/atmospheres/frost.css',

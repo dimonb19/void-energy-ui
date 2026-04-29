@@ -44,7 +44,7 @@ See [CONFIG.md](./CONFIG.md) for config-layer schema + the flagship "replace 4 w
 
 | Atmosphere | Physics | Mode | Vibe |
 |---|---|---|---|
-| [`slate`](#slate) | `flat` | `dark` | Professional / Clean |
+| [`graphite`](#graphite) | `flat` | `dark` | Editor / Neutral |
 | [`terminal`](#terminal) | `retro` | `dark` | Hacker / Retro |
 | [`meridian`](#meridian) | `flat` | `light` | Fintech / Brand |
 | [`frost`](#frost) | `glass` | `dark` | Arctic / Glass |
@@ -53,25 +53,25 @@ All four atmospheres override the same set of semantic tokens. The table below c
 
 ---
 
-## `slate`
+## `graphite`
 
-Professional dark. Deep blue-purple canvas, muted lift, cool energy blue.
+Editor neutral. Charcoal canvas, no chromatic accent — the chrome blends with the OS the way ChatGPT, VS Code Dark Modern, and Vercel Geist do. Surface floats *up* in luminance for elevation (Apple/VS Code pattern).
 
 | Token | Value |
 |---|---|
-| `--bg-canvas` | `#111118` |
-| `--bg-surface` | `#1e1e2a` |
-| `--bg-sunk` | `#0c0c12` |
-| `--energy-primary` | `#6ea1ff` |
-| `--energy-secondary` | `#8b8fa3` |
-| `--text-main` | `#e8e8ed` |
-| `--text-dim` | `#a0a0b0` |
+| `--bg-canvas` | `#1f1f1f` |
+| `--bg-surface` | `#2a2a2c` |
+| `--bg-sunk` | `#161617` |
+| `--energy-primary` | `#ececee` |
+| `--energy-secondary` | `#9ca0a6` |
+| `--text-main` | `#ececee` |
+| `--text-dim` | `#b4b6bb` |
 | `--color-premium` | `#ff8c00` |
 | `--color-success` | `#00e055` |
 | `--color-error` | `#ff3c40` |
 | `--color-system` | `#a078ff` |
 
-Pairs with `flat` physics: no lift, minimal shadows, subtle hover tint. Best fit for SaaS dashboards, admin UI, modern B2B.
+Pairs with `flat` physics: no lift, minimal shadows, subtle hover tint. Best fit for editor-style tools, dev environments, OS-native productivity UIs where the chrome should disappear.
 
 ---
 
@@ -242,7 +242,7 @@ const all = getAtmospheres();
 // [
 //   { name: 'acme',     source: 'runtime', physics: 'flat',  mode: 'dark' },
 //   { name: 'frost',    source: 'builtin', physics: 'glass', mode: 'dark', label: 'Frost' },
-//   { name: 'slate',    source: 'builtin', physics: 'flat',  mode: 'dark', label: 'Slate' },
+//   { name: 'graphite', source: 'builtin', physics: 'flat',  mode: 'dark', label: 'Graphite' },
 //   …
 // ]
 

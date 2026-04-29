@@ -122,26 +122,30 @@ export interface AtmosphereDefinition {
 // ---------------------------------------------------------------------------
 
 export const ATMOSPHERES: Record<string, AtmosphereDefinition> = {
-  // 1. SLATE — Default / Professional (dark flat)
-  slate: {
+  // 1. GRAPHITE — Editor / Neutral (dark flat)
+  // Neutral-charcoal archetype (ChatGPT / VS Code Dark Modern / Vercel Geist family).
+  // Canvas + spotlight match — no gradient. Surface floats up in luminance for elevation
+  // (Apple/VS Code pattern). Energy is in the gray ramp by design — accent IS contrast,
+  // not hue.
+  graphite: {
     mode: 'dark',
     physics: 'flat',
-    tagline: 'Professional / Clean',
+    tagline: 'Editor / Neutral',
 
     palette: {
       ...SEMANTIC_DARK,
       'font-atmos-heading': FONTS.clean.family,
       'font-atmos-body': FONTS.clean.family,
-      'bg-canvas': '#111118',
-      'bg-spotlight': '#1c1c26',
-      'bg-surface': '#1e1e2a',
-      'bg-sunk': '#0c0c12',
-      'energy-primary': '#6ea1ff',
-      'energy-secondary': '#8b8fa3',
-      'border-color': 'rgba(110, 161, 255, 0.2)',
-      'text-main': '#e8e8ed',
-      'text-dim': '#a0a0b0',
-      'text-mute': '#64647a',
+      'bg-canvas': '#1f1f1f',
+      'bg-spotlight': '#1f1f1f',
+      'bg-surface': '#2a2a2c',
+      'bg-sunk': '#161617',
+      'energy-primary': '#ececee',
+      'energy-secondary': '#9ca0a6',
+      'border-color': 'rgba(255, 255, 255, 0.10)',
+      'text-main': '#ececee',
+      'text-dim': '#b4b6bb',
+      'text-mute': '#90949a',
     },
   },
 

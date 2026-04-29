@@ -214,11 +214,11 @@ describe('L0 dist parity — generator', () => {
         label: 'Frost',
         tokens: { '--bg-canvas': '#080c14' },
       },
-      slate: {
+      graphite: {
         physics: 'flat' as const,
         mode: 'dark' as const,
-        label: 'Slate',
-        tokens: { '--bg-canvas': '#111118' },
+        label: 'Graphite',
+        tokens: { '--bg-canvas': '#1f1f1f' },
       },
       meridian: {
         physics: 'flat' as const,

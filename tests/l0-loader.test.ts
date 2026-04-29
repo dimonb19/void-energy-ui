@@ -166,11 +166,11 @@ describe('L0 loader — omitBuiltins validation', () => {
 
   it('accepts all four built-in names', () => {
     const cfg = validate({
-      omitBuiltins: ['frost', 'slate', 'terminal', 'meridian'],
+      omitBuiltins: ['frost', 'graphite', 'terminal', 'meridian'],
     });
     expect(cfg.omitBuiltins).toEqual([
       'frost',
-      'slate',
+      'graphite',
       'terminal',
       'meridian',
     ]);

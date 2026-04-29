@@ -77,9 +77,9 @@ describe('ThemeBuilder', () => {
 
     // Built-in atmospheres remain on the other side of the partition.
     expect(voidEngine.builtInAtmospheres).toContain('frost');
-    expect(voidEngine.builtInAtmospheres).toContain('slate');
+    expect(voidEngine.builtInAtmospheres).toContain('graphite');
     expect(voidEngine.customAtmospheres).not.toContain('frost');
-    expect(voidEngine.customAtmospheres).not.toContain('slate');
+    expect(voidEngine.customAtmospheres).not.toContain('graphite');
   });
 
   it('built-in atmospheres cannot be unregistered (provenance is one-way)', () => {

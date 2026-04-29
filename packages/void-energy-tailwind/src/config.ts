@@ -20,7 +20,7 @@ export type Physics = 'glass' | 'flat' | 'retro';
 export type Mode = 'light' | 'dark' | 'auto';
 export type Density = 'compact' | 'default' | 'comfortable';
 
-export type BuiltinName = 'frost' | 'slate' | 'terminal' | 'meridian';
+export type BuiltinName = 'frost' | 'graphite' | 'terminal' | 'meridian';
 
 export interface FontSourceEntry {
   url: string;

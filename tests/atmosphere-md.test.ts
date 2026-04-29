@@ -215,7 +215,7 @@ describe('atmosphere-md round-trip', () => {
       'frost',
       'terminal',
       'meridian',
-      'slate',
+      'graphite',
     ];
 
     for (const id of fixtures) {

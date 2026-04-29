@@ -12,11 +12,12 @@
   // ── Built-in atmospheres table data ────────────────────────────────────
   const builtInAtmospheres = [
     {
-      id: 'slate',
+      id: 'graphite',
       physics: 'flat',
       mode: 'dark',
-      tagline: 'Professional / Clean',
-      concept: 'Calm dark workspace — neutral surfaces, blue accent',
+      tagline: 'Editor / Neutral',
+      concept:
+        'OS-native editor workspace — neutral charcoal surfaces, no chromatic accent',
     },
     {
       id: 'frost',
@@ -75,38 +76,38 @@
     voidEngine.setAtmosphere('cyberpunk');
   }
 
-  // 2. Dusk (dark flat — twilight rose)
-  let duskRegistered = $derived(
-    voidEngine.availableAtmospheres.includes('dusk'),
+  // 2. Slate (dark flat — calm blue workspace)
+  let slateRegistered = $derived(
+    voidEngine.availableAtmospheres.includes('slate'),
   );
 
-  function registerDusk() {
-    voidEngine.registerTheme('dusk', {
+  function registerSlate() {
+    voidEngine.registerTheme('slate', {
       mode: 'dark',
       physics: 'flat',
-      tagline: 'Twilight / Editorial',
+      tagline: 'Professional / Clean',
       palette: {
-        'font-atmos-heading': FONTS.elegant.family,
-        'font-atmos-body': FONTS.book.family,
-        'bg-canvas': '#16121a',
-        'bg-spotlight': '#241b2c',
-        'bg-surface': '#1e1726',
-        'bg-sunk': '#0e0a14',
-        'energy-primary': '#d97a8c',
-        'energy-secondary': '#5b9a92',
-        'border-color': 'rgba(217, 122, 140, 0.22)',
-        'text-main': '#f3ebef',
-        'text-dim': '#a99aa3',
-        'text-mute': '#6b5e66',
+        'font-atmos-heading': FONTS.clean.family,
+        'font-atmos-body': FONTS.clean.family,
+        'bg-canvas': '#111118',
+        'bg-spotlight': '#1c1c26',
+        'bg-surface': '#1e1e2a',
+        'bg-sunk': '#0c0c12',
+        'energy-primary': '#6ea1ff',
+        'energy-secondary': '#8b8fa3',
+        'border-color': 'rgba(110, 161, 255, 0.2)',
+        'text-main': '#e8e8ed',
+        'text-dim': '#a0a0b0',
+        'text-mute': '#64647a',
       },
     });
-    toast.undo('Dusk atmosphere registered', () =>
-      voidEngine.unregisterTheme('dusk'),
+    toast.undo('Slate atmosphere registered', () =>
+      voidEngine.unregisterTheme('slate'),
     );
   }
 
-  function applyDusk() {
-    voidEngine.setAtmosphere('dusk');
+  function applySlate() {
+    voidEngine.setAtmosphere('slate');
   }
 
   // 3. Linen (light flat — warm cream paper)
@@ -371,36 +372,36 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
         </div>
       </div>
 
-      <!-- Dusk (dark flat — twilight rose) -->
+      <!-- Slate (dark flat — calm blue workspace) -->
       <div class="surface-sunk p-md flex flex-col gap-md">
         <h5>
-          Dusk <span class="text-mute text-small">&mdash; dark flat</span>
+          Slate <span class="text-mute text-small">&mdash; dark flat</span>
         </h5>
         <p class="text-caption text-dim">
-          A twilight editorial atmosphere. Demonstrates the dark + flat
-          combination &mdash; opaque surfaces, no blur, dusty rose primary
-          against a warm-grey canvas.
+          A calm blue-tinted workspace atmosphere. Demonstrates the dark + flat
+          combination &mdash; opaque surfaces, no blur, periwinkle primary
+          against a cool slate canvas.
         </p>
         <details>
           <summary>View Palette Code</summary>
           <pre class="text-caption overflow-x-auto"><code
-              >{`voidEngine.registerTheme('dusk', {
+              >{`voidEngine.registerTheme('slate', {
   mode: 'dark',
   physics: 'flat',
-  tagline: 'Twilight / Editorial',
+  tagline: 'Professional / Clean',
   palette: {
-    'font-atmos-heading': "'Cormorant Garamond', serif",
-    'font-atmos-body':    "'Lora', serif",
-    'bg-canvas':          '#16121a',
-    'bg-spotlight':       '#241b2c',
-    'bg-surface':         '#1e1726',
-    'bg-sunk':            '#0e0a14',
-    'energy-primary':     '#d97a8c',
-    'energy-secondary':   '#5b9a92',
-    'border-color':       'rgba(217, 122, 140, 0.22)',
-    'text-main':          '#f3ebef',
-    'text-dim':           '#a99aa3',
-    'text-mute':          '#6b5e66',
+    'font-atmos-heading': "'Inter', sans-serif",
+    'font-atmos-body':    "'Inter', sans-serif",
+    'bg-canvas':          '#111118',
+    'bg-spotlight':       '#1c1c26',
+    'bg-surface':         '#1e1e2a',
+    'bg-sunk':            '#0c0c12',
+    'energy-primary':     '#6ea1ff',
+    'energy-secondary':   '#8b8fa3',
+    'border-color':       'rgba(110, 161, 255, 0.2)',
+    'text-main':          '#e8e8ed',
+    'text-dim':           '#a0a0b0',
+    'text-mute':          '#64647a',
   }
 });`}</code
             ></pre>
@@ -409,21 +410,21 @@ voidEngine.releaseTemporaryTheme(handle); // release specific handle</code
         <div class="flex flex-row gap-md flex-wrap">
           <ActionBtn
             icon={Sparkle}
-            text={duskRegistered ? 'Registered' : 'Register Dusk'}
-            onclick={registerDusk}
-            disabled={duskRegistered}
+            text={slateRegistered ? 'Registered' : 'Register Slate'}
+            onclick={registerSlate}
+            disabled={slateRegistered}
           />
 
-          {#if duskRegistered}
+          {#if slateRegistered}
             <span in:materialize out:dematerialize>
               <button
                 class="btn btn-premium"
-                onclick={applyDusk}
-                disabled={voidEngine.atmosphere === 'dusk'}
+                onclick={applySlate}
+                disabled={voidEngine.atmosphere === 'slate'}
               >
-                {voidEngine.atmosphere === 'dusk'
-                  ? 'Dusk Active'
-                  : 'Apply Dusk'}
+                {voidEngine.atmosphere === 'slate'
+                  ? 'Slate Active'
+                  : 'Apply Slate'}
               </button>
             </span>
           {/if}

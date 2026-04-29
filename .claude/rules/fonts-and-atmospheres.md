@@ -52,7 +52,7 @@ If these drift, users see a flash of wrong theme on first paint.
 
 | Theme | Physics | Mode | Font |
 |-------|---------|------|------|
-| slate | flat | dark | Inter (clean) |
+| graphite | flat | dark | Inter (clean) |
 | terminal | retro | dark | Courier Prime (code) |
 | meridian | flat | light | Open Sans (lab) + Inter (clean) |
 | frost | glass | dark | Space Grotesk (sharp) + Inter (clean) |
