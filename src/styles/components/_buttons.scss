@@ -25,7 +25,7 @@
  *
  * PHYSICS BEHAVIOR:
  * - Glass: Glowing hover states, blur effects, gradient CTA
- * - Flat:  Subtle shadows, no glow, no gradient animation
+ * - Flat:  Tint and border-color hover, no elevation shadow, no gradient animation
  * - Retro: Hard borders, instant transitions, pixel shadows
  *
  * DESIGN NOTES:
@@ -151,6 +151,11 @@
         text-shadow: 0 0 10px alpha($color-var, 40%); // void-ignore (Glow Physics)
       }
 
+      // Flat physics: no elevation shadow — colored border + 15% tint carry the signal.
+      @include when-flat {
+        box-shadow: none;
+      }
+
       @include when-light {
         color: $color-var; // Keep text readable in light mode
         text-shadow: none;
@@ -192,6 +197,11 @@
 
     @include when-glass {
       box-shadow: 0 0 12px alpha($color-var, 25%); // void-ignore (Glow Physics)
+    }
+
+    // Flat physics: no elevation shadow on selected state — solid 20% fill + colored border are the signal.
+    @include when-flat {
+      box-shadow: none;
     }
 
     @include when-light {
@@ -319,8 +329,11 @@ button:not(.btn-void, .btn-icon, .tabs-trigger),
       box-shadow: var(--shadow-lift);
 
       // Flat physics: stronger tint compensates for the removed lift/scale feedback.
+      // No elevation shadow — flat hover is signaled by tint and border alone;
+      // elevation shadows are reserved for raised surfaces.
       @include when-flat {
         background: blend(var(--bg-surface), var(--energy-secondary), 12%);
+        box-shadow: none;
       }
     }
   }
@@ -574,6 +587,11 @@ button:not(.btn-void, .btn-icon, .tabs-trigger),
 
     // 3. Glow Effect
     box-shadow: var(--shadow-lift);
+
+    // Flat physics: no elevation shadow on selected state — 15% fill + colored border are the signal.
+    @include when-flat {
+      box-shadow: none;
+    }
 
     // --- MODE EXCEPTIONS ---
     @include when-light {

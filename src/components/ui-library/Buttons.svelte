@@ -59,9 +59,10 @@
       <summary>Technical Details</summary>
       <p class="p-md">
         Buttons adapt to all 3 physics presets. Glass mode uses glowing hover
-        states and blur. Flat mode uses subtle shadows. Retro mode uses hard
-        borders and instant transitions. All buttons use semantic color tokens
-        and spring-based transitions. State is exposed via
+        states and blur. Flat mode signals hover with tint and border-color
+        shifts only — no elevation shadow. Retro mode uses hard borders and
+        instant transitions. All buttons use semantic color tokens and
+        spring-based transitions. State is exposed via
         <code>data-state</code> and <code>aria-pressed</code>, targeted in SCSS
         with <code>@include when-state('active')</code>.
       </p>
