@@ -647,7 +647,7 @@ Removes browser italic default. Uses `--text-dim` color.
 
 #### `.prose` — Opt-in Rich Text Container
 
-Enables list markers and definition list formatting inside a scoped wrapper. Required because the global reset strips `list-style: none` from all `<ul>`/`<ol>` (protecting nav menus and component lists).
+Restores prose rhythm inside a scoped wrapper: heading and block-element margins, paragraph spacing, list markers, and definition list formatting. Required because the global reset zeroes element margins (`* { margin: 0 }`) and strips list markers (`list-style: none`) to protect composed layouts — `.prose` re-enables them for authored long-form content. Headings also use `text-wrap: balance` for evenly distributed multi-line wrapping.
 
 **Complements `.legal-content`** (legal-specific counters) — `.prose` is general-purpose for blogs, markdown, and user content.
 

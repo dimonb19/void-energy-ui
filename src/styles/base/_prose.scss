@@ -6,8 +6,11 @@
  * opt-in scope classes:
  *
  *   .prose            Rich-text container for TRUSTED content (blogs,
- *                     markdown, legal docs). Re-enables list markers and
- *                     paragraph rhythm.
+ *                     markdown, legal docs). Restores prose rhythm
+ *                     (heading and block-element margins, paragraph
+ *                     spacing) and re-enables list markers — both
+ *                     stripped by the global reset to protect composed
+ *                     layouts.
  *   .prose-untrusted  Defensive container for UNTRUSTED content (rich-text
  *                     editor output, embedded third-party blocks, markdown
  *                     rendered from user input). Caps runaway media, wraps
@@ -120,9 +123,32 @@ address {
 // Complements .legal-content (legal-specific) — this is general-purpose.
 
 .prose {
+  // ---- Heading rhythm ----
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-top: var(--space-lg);
+    margin-bottom: var(--space-sm);
+    text-wrap: balance;
+  }
+
+  h1 {
+    margin-top: var(--space-xl);
+  }
+
   // ---- Paragraph spacing ----
   > p + p {
     margin-top: var(--space-sm);
+  }
+
+  // ---- Block element rhythm ----
+  pre,
+  table,
+  details {
+    margin-block: var(--space-sm);
   }
 
   // ---- Unordered lists ----
@@ -219,6 +245,11 @@ address {
     margin-inline-start: var(--space-md);
     color: var(--text-dim);
     margin-top: calc(var(--space-xs) * 0.5);
+  }
+
+  // ---- First child guard ----
+  > :first-child {
+    margin-top: 0;
   }
 }
 
