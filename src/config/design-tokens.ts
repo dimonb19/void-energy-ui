@@ -156,6 +156,21 @@ export const VOID_AMBIENT = {
   'ambient-dawn-horizon': 'rgba(255, 190, 150, 0.4)',
 } as const;
 
+/**
+ * AURA TOKENS
+ *
+ * Geometry + timing for the ambient colored glow primitive (use:aura). Single
+ * values — not physics-adaptive. Aura is active on dark glass and dark flat
+ * only; light mode and retro disable the effect at the SCSS layer.
+ */
+export const VOID_AURA = {
+  'aura-spread-near': '24px',
+  'aura-spread-far': '80px',
+  'aura-opacity-near': 0.45,
+  'aura-opacity-far': 0.25,
+  'aura-transition-duration': '1.5s',
+} as const;
+
 // --------------------------------------------------------------------------
 // TYPOGRAPHY TOKENS (Font Scales, Weights, Line Heights)
 // --------------------------------------------------------------------------
@@ -337,6 +352,10 @@ export const VOID_TOKENS = {
 
   ambient: {
     ...VOID_AMBIENT,
+  },
+
+  aura: {
+    ...VOID_AURA,
   },
 
   // Theme registry: atmospheres defined in src/config/atmospheres.ts

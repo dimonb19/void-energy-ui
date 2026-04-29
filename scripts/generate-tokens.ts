@@ -259,6 +259,13 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
   });
   scss += `);\n\n`;
 
+  // Aura tokens map (consumed by base/_themes.scss → :root vars).
+  scss += `$aura-tokens: (\n`;
+  Object.entries(tokens.aura).forEach(([key, val]) => {
+    scss += `  '${key}': ${val},\n`;
+  });
+  scss += `);\n\n`;
+
   // Themes map.
   scss += `$themes: (\n`;
   Object.entries(tokens.themes).forEach(([themeName, config]) => {

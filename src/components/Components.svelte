@@ -30,6 +30,7 @@
   import KineticText from './ui-library/KineticText.svelte';
   import DragAndDrop from './ui-library/DragAndDrop.svelte';
   import PortalRingShowcase from './ui-library/PortalRing.svelte';
+  import Aura from './ui-library/Aura.svelte';
   // Data Visualization
   import Charts from './ui-library/Charts.svelte';
 
@@ -81,6 +82,7 @@
         { id: 'kinetic-text', label: 'Kinetic Text' },
         { id: 'drag-and-drop', label: 'Drag & Drop' },
         { id: 'portal-ring', label: 'Portal Ring' },
+        { id: 'aura', label: 'Aura' },
       ],
     },
     {
@@ -290,6 +292,7 @@
           <KineticText />
           <DragAndDrop />
           <PortalRingShowcase />
+          <Aura />
 
           <hr />
 

@@ -206,7 +206,12 @@ Void Energy is **native-first**. Components are thin wrappers around native HTML
 | Navigation                        | `Sidebar`, `Breadcrumbs`, `Tabs`, `Pagination`, `LoadMore`, `use:navlink`                       |
 | Data display                      | `StatCard`, `LineChart`, `BarChart`, `DonutChart`, `Sparkline`                                   |
 | Motion                            | `use:tooltip`, `use:morph`, `use:kinetic`, `use:narrative`                                      |
+| Ambient light                     | `use:aura`, `extractAura`                                                                       |
 | Drag & reorder                    | `use:draggable`, `use:dropTarget`, `reorderByDrop`                                              |
+
+### Ambient light constraint (`use:aura`)
+
+Use `use:aura` **only** on image-backed or atmosphere-primary surfaces — story scenes, hero panels, album-cover-style cards. Do not attach Aura to dashboard tiles, form fields, navigation chrome, or generic cards. Multiple Auras in a single visible region produce rainbow-disco output; prefer one focal Aura per region. The `color` prop is optional — omit it for an atmosphere-driven glow (falls back to `--energy-primary`). Pair with `extractAura()` from `@lib/aura` only when the color must come from an image.
 
 ### When to build new
 
@@ -300,6 +305,8 @@ import { navlink } from '@actions/navlink';
 import { kinetic } from '@actions/kinetic';
 import { narrative, isOneShotEffect } from '@actions/narrative';
 import { draggable, dropTarget, reorderByDrop } from '@actions/drag';
+import { aura } from '@actions/aura';
+import { extractAura } from '@lib/aura';
 
 // Transitions
 import { emerge, dissolve, materialize, dematerialize, implode, live } from '@lib/transitions.svelte';

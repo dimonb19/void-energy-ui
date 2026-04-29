@@ -1,0 +1,55 @@
+/* Ambient Light (Aura) — atmosphere-reactive colored glow primitive.
+ *
+ * Paired with the `use:aura` action which sets data-aura='on' and optionally
+ * --aura-color inline. When --aura-color is unset, the glow falls back to
+ * --energy-primary so it tracks the active atmosphere natively.
+ *
+ * Rendered via ::after so we don't clobber surface-raised's box-shadow lift
+ * contract. Active on dark glass and dark flat only — light mode and retro
+ * disable the pseudo-element. */
+
+@use '../abstracts' as *;
+
+[data-aura='on'] {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    border-radius: inherit;
+    box-shadow:
+      0 0 var(--aura-spread-near) 0
+        rgb(
+          from var(--aura-color, var(--energy-primary)) r g b /
+            var(--aura-opacity-near)
+        ),
+      0 0 var(--aura-spread-far) 0
+        rgb(
+          from var(--aura-color, var(--energy-primary)) r g b /
+            var(--aura-opacity-far)
+        );
+    transition: box-shadow var(--aura-transition-duration) var(--ease-flow);
+  }
+
+  // Light mode and retro: no glow.
+  @include when-light {
+    &::after {
+      display: none;
+    }
+  }
+
+  @include when-retro {
+    &::after {
+      display: none;
+    }
+  }
+
+  // Reduced-motion: collapse the color crossfade to an instant swap.
+  @media (prefers-reduced-motion: reduce) {
+    &::after {
+      transition-duration: 0s;
+    }
+  }
+}

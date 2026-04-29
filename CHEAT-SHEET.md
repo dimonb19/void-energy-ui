@@ -6610,6 +6610,79 @@ engine.destroy(); // alias for stop()
 
 ---
 
+### G. Aura (`use:aura`)
+
+**Purpose:** Ambient colored glow that surrounds a surface, turning the container into a soft light source
+**Location:** [src/actions/aura.ts](src/actions/aura.ts)
+**CSS:** [src/styles/components/_aura.scss](src/styles/components/_aura.scss)
+**Showcase:** [/components#aura](src/components/ui-library/Aura.svelte)
+
+Toggles `data-aura` on the host. When a `color` is passed, writes `--aura-color` inline; otherwise SCSS falls back to `var(--energy-primary)` so the glow tracks the active atmosphere. Rendered on a `::after` pseudo-element so it doesn't clobber `surface-raised`'s lift shadow.
+
+#### Config
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `color` | `string` | `var(--energy-primary)` | Optional CSS color (hex, hsl, rgb). Omit to track the atmosphere. |
+| `enabled` | `boolean` | `true` | Master gate. When `false`, sets `data-aura="off"` and SCSS suppresses the glow. |
+
+#### Physics Profiles
+
+| Physics / Mode | Treatment |
+| --- | --- |
+| **Glass / dark** | Layered glow, color crossfade transition |
+| **Flat / dark** | Same geometry on a flat surface |
+| **Light / Retro** | No glow — `::after` pseudo-element disabled |
+
+#### Caveats
+
+- The host gets `position: relative`. If you need `position: absolute` or `fixed` on the host, wrap aura on a child element.
+- `prefers-reduced-motion: reduce` → color crossfade collapses to an instant swap.
+- Aura renders via `::after`. On a surface that also has `use:navlink`, the navlink loading shimmer (also `::after`) temporarily replaces the aura glow during navigation. The loading signal wins by design.
+
+#### Color Extraction (`extractAura`)
+
+`extractAura(source, options?)` is exported from [src/lib/aura.ts](src/lib/aura.ts) for image-driven flows. Accepts an `HTMLImageElement` or a URL string. Always returns a CSS-ready, HSL-clamped color — never throws. On failure, returns the fallback (default `var(--energy-primary)`) with a dev-only warning.
+
+```ts
+import { extractAura } from '@lib/aura';
+const color = await extractAura(imgEl); // or: await extractAura(url)
+```
+
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `clampSaturation` | `number` | `0.65` | Caps saturation to prevent neon glare |
+| `clampLightness` | `[number, number]` | `[0.35, 0.75]` | Lightness range — prevents muddy or washed |
+| `fallback` | `string` | `'var(--energy-primary)'` | Returned on extraction failure |
+
+#### Usage
+
+```svelte
+<script lang="ts">
+  import { aura } from '@actions/aura';
+  import { extractAura } from '@lib/aura';
+
+  let img: HTMLImageElement | undefined = $state();
+  let color = $state<string | undefined>();
+
+  $effect(() => {
+    if (img) extractAura(img).then((c) => (color = c));
+  });
+</script>
+
+<!-- Atmosphere-driven (no color prop): -->
+<div use:aura>...</div>
+
+<!-- Image-driven: -->
+<div use:aura={{ color }}>
+  <img bind:this={img} src={url} crossorigin="anonymous" alt="" />
+</div>
+```
+
+**When to use:** image-backed or atmosphere-primary surfaces (story scenes, hero panels, album-cover-style cards). Do not attach to dashboard tiles, form fields, navigation chrome, or generic cards. Multiple Auras visible simultaneously create rainbow-disco pages — prefer one focal Aura per visible region. See [COMPOSITION-RECIPES.md › Ambient light from an image](COMPOSITION-RECIPES.md#ambient-light-from-an-image).
+
+---
+
 ## 8. Timing Utilities
 
 **Location:** [src/lib/timing.ts](src/lib/timing.ts)

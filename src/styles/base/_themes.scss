@@ -34,6 +34,12 @@
   @each $key, $val in config.$ambient-tokens {
     --#{$key}: #{$val};
   }
+
+  // Aura tokens — geometry + timing for the use:aura primitive. Single set
+  // of values; light/retro disable the effect at the SCSS layer.
+  @each $key, $val in config.$aura-tokens {
+    --#{$key}: #{$val};
+  }
 }
 
 // Emit [data-physics="..."] layer.

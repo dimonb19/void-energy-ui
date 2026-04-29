@@ -34,6 +34,7 @@
     "@floating-ui/dom": "^1.7.4",
     "@lucide/svelte": "^0.564.0",
     "astro": "^5.16.0",
+    "fast-average-color": "^9.5.2",
     "svelte": "^5.43.14",
     "zod": "^3.25.76"
   },

@@ -333,10 +333,13 @@ function parseInterfacePropertyTypes(source: string, interfaceName: string) {
 }
 
 function extractFunctionParamNames(source: string, symbol: string): string[] | null {
-  const exportIndex = source.indexOf(`export function ${symbol}`);
-  if (exportIndex === -1) return null;
+  const escaped = escapeRegExp(stripGenericSuffix(symbol));
+  const match = new RegExp(
+    `\\bexport\\s+(?:async\\s+)?function\\s+${escaped}\\b`,
+  ).exec(source);
+  if (!match) return null;
 
-  const openParenIndex = source.indexOf('(', exportIndex);
+  const openParenIndex = source.indexOf('(', match.index);
   if (openParenIndex === -1) return null;
 
   const block = extractParenBlock(source, openParenIndex);
@@ -578,9 +581,9 @@ function stripContractName(source: string): string {
 
 function hasExportedSymbol(source: string, symbol: string): boolean {
   const escaped = escapeRegExp(stripGenericSuffix(symbol));
-  return new RegExp(`\\bexport\\s+(?:function|const|class)\\s+${escaped}\\b`).test(
-    source,
-  );
+  return new RegExp(
+    `\\bexport\\s+(?:async\\s+)?(?:function|const|class)\\s+${escaped}\\b`,
+  ).test(source);
 }
 
 function hasTypeDeclaration(source: string, typeName: string): boolean {
@@ -731,6 +734,7 @@ const EXPECTED_UTILITY_SYMBOLS = [
   'typewrite',
   'reorderByDrop',
   'resolveReorderByDrop',
+  'extractAura',
 ];
 const EXPECTED_ACTION_SYMBOLS = [
   'tooltip',
@@ -739,6 +743,7 @@ const EXPECTED_ACTION_SYMBOLS = [
   'navlink',
   'draggable',
   'dropTarget',
+  'aura',
 ];
 const EXPECTED_CONTROLLER_COMPONENTS = [
   'modal',

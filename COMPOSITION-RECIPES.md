@@ -191,6 +191,69 @@ Avoid:
 - Multi-panel complexity unless the flow truly requires it
 - Tiny spacing inside the primary card
 
+## Ambient light from an image
+
+Use when an image-backed or atmosphere-primary surface should bleed soft colored light into its surroundings — story scenes, hero panels, album-cover-style cards, scene tiles in a narrative reader. The container becomes a light source, not just a frame.
+
+Two pieces collaborate:
+
+- `use:aura` ([src/actions/aura.ts](src/actions/aura.ts)) — toggles `data-aura` on the host. When a color is passed, writes `--aura-color` inline; otherwise the SCSS falls back to `var(--energy-primary)` so the glow tracks the active atmosphere. Rendered on a `::after` pseudo-element.
+- `extractAura()` ([src/lib/aura.ts](src/lib/aura.ts)) — samples a single dominant color from an image and clamps it into a glow-friendly HSL range. Always returns a valid CSS color, never throws.
+
+### Atmosphere-driven (no image, color tracks the active theme)
+
+The simplest path. Drop `use:aura` on a surface and the glow follows whichever atmosphere is active.
+
+```svelte
+<script lang="ts">
+  import { aura } from '@actions/aura';
+</script>
+
+<div class="surface-raised p-lg flex flex-col gap-lg" use:aura>
+  <h3>Scene title</h3>
+  <p class="text-dim">The glow recolors when the user switches atmospheres.</p>
+</div>
+```
+
+### Image-driven (extract color from the image itself)
+
+```svelte
+<script lang="ts">
+  import { aura } from '@actions/aura';
+  import { extractAura } from '@lib/aura';
+
+  let { src, alt }: { src: string; alt: string } = $props();
+  let img = $state<HTMLImageElement>();
+  let color = $state<string | undefined>();
+
+  $effect(() => {
+    if (img) extractAura(img).then((c) => (color = c));
+  });
+</script>
+
+<div class="surface-raised p-lg flex flex-col gap-lg" use:aura={{ color }}>
+  <img bind:this={img} {src} {alt} crossorigin="anonymous" />
+  <div class="flex flex-col gap-xs">
+    <h3>Scene title</h3>
+    <p class="text-dim">Short narrative beat.</p>
+  </div>
+</div>
+```
+
+Notes:
+
+- Aura is active on dark glass and dark flat only. Light mode and retro disable the `::after` pseudo-element automatically — the same consumer markup works everywhere.
+- `prefers-reduced-motion: reduce` collapses the color crossfade to an instant swap.
+- The host gets `position: relative`. If you need `position: absolute` or `fixed` on the host itself, wrap aura on a child instead.
+- See [CHEAT-SHEET › Aura](CHEAT-SHEET.md#g-aura-useaura) for the full prop and option reference.
+
+Avoid:
+
+- Attaching `use:aura` to dashboard tiles, form fields, navigation chrome, or generic cards. Aura is for image-backed or atmosphere-primary surfaces only.
+- Stacking multiple Auras inside one visible region — pages with several glows fight each other and read as visual noise. Prefer one focal Aura per region.
+- Hand-writing `box-shadow`, `radial-gradient`, or `filter: blur()` to recreate ambient color spill — that is what `use:aura` exists for.
+- Calling `extractAura` on every render — drive it from a `$effect` keyed off the image element or src.
+
 ## Foreign / User-Generated Content
 
 Use when rendering HTML the application **does not author**: rich-text-editor output, embedded third-party blocks, markdown rendered from user input, paste-to-publish flows.

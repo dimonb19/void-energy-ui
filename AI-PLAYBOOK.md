@@ -51,7 +51,8 @@ If the request sounds like this, use the shipped system first:
 - Feedback: `toast`, `modal`, `portal-loader`, `skeleton`, `progress-ring`
 - Media: `image`, `avatar`, `video`, `adaptive-image` (physics/mode-aware decorative imagery — never branch on atmosphere name in app code)
 - Data display: `tile`, `stat-card`, `line-chart`, `bar-chart`, `donut-chart`
-- Motion: `tooltip`, `morph`, `kinetic`, `narrative`
+- Motion: `tooltip`, `morph`, `kinetic`, `narrative`, `aura`
+- Ambient color glow / color spill from image / scene tinting: `use:aura` (color optional — omit for atmosphere-driven glow) + `extractAura` (only when color must come from an image). Do NOT hand-write `box-shadow`, `radial-gradient`, `filter: blur()`, or sibling overlay divs to recreate the effect.
 - Drag and reorder: `draggable`, `dropTarget`, `reorderByDrop`, `resolveReorderByDrop`
 - TTS-synced narrative reveal: `TtsKineticBlock` (kinetic-text package) — wires `<audio>`, reveal timing, and timed action dispatch together. See `COMPOSITION-RECIPES.md › Narrative UI`.
 

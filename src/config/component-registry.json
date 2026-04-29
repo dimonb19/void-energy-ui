@@ -1299,6 +1299,21 @@
       "related": ["draggable", "drop-target", "reorder-by-drop"],
       "compose": "Use when a sortable drop must also produce a backend-ready payload describing the move.",
       "example": "const change = resolveReorderByDrop(items, detail); if (change) save(change.request);"
+    },
+    "extract-aura": {
+      "description": "Sample a single dominant color from an image and clamp it into a glow-friendly HSL range. Returns a CSS-ready color string for the aura action. Always returns a valid color — never throws on extraction failure (CORS, decode error, missing image).",
+      "category": "motion",
+      "symbol": "extractAura",
+      "import": "@lib/aura",
+      "signature": "extractAura(source, options?)",
+      "args": [
+        "source: HTMLImageElement | string",
+        "options?: { clampSaturation?: number; clampLightness?: [number, number]; fallback?: string }"
+      ],
+      "returns": ["Promise<string>"],
+      "related": ["aura"],
+      "compose": "Pair with use:aura on image-backed surfaces. Call from a $effect when the image element or src changes; pass the resolved color to aura. Consumers whose upstream already emits a validated hex (e.g. a story engine) can pass that directly to use:aura and skip extraction entirely.",
+      "example": "$effect(() => { if (img) extractAura(img).then((c) => (color = c)); });"
     }
   },
   "actions": {
@@ -1373,6 +1388,18 @@
       "related": ["draggable", "resolve-reorder-by-drop"],
       "compose": "Use mode='between' for sortable lists and mode='inside' for zone drops. between-mode pairs naturally with reorderByDrop/resolveReorderByDrop.",
       "example": "<div use:dropTarget={{ id: item.id, group: 'stories', mode: 'between', onDrop: handleDrop }}>...</div>"
+    },
+    "aura": {
+      "description": "Svelte action that attaches an ambient colored glow to a host element via a ::after pseudo-element. Toggles data-aura on the host; writes --aura-color inline only when a color is provided. When color is omitted, SCSS falls back to var(--energy-primary) so the glow tracks the active atmosphere. Active on dark glass and dark flat only — light mode and retro disable the effect. Hosts that need position: absolute|fixed must wrap aura on a child.",
+      "category": "motion",
+      "symbol": "aura",
+      "import": "@actions/aura",
+      "signature": "aura(node, options?)",
+      "args": ["options?: { color?: string; enabled?: boolean }"],
+      "returns": ["{ update(newOptions), destroy() }"],
+      "related": ["extract-aura", "adaptive-image"],
+      "compose": "Attach to image-backed or atmosphere-primary surfaces (story scenes, hero panels, album-cover-style cards). Omit color for atmosphere-driven glow; pass an explicit hex when the upstream already emits one. Pair with extractAura when the color must come from an image. Do not use on dashboard tiles, form fields, navigation chrome, or generic cards — multiple Auras in one region create rainbow-disco pages.",
+      "example": "<div use:aura>...</div> // atmosphere-driven, or use:aura={{ color: '#33e2e6' }}"
     }
   },
   "controllers": {
