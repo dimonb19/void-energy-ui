@@ -25,8 +25,8 @@
  *
  * PHYSICS BEHAVIOR:
  * - Glass: Glowing hover states, blur effects, gradient CTA
- * - Flat:  Tint and border-color hover, no elevation shadow, no gradient animation
- * - Retro: Hard borders, instant transitions, pixel shadows
+ * - Flat:  Tint and border-color hover, no elevation shadow. Gradient CTA retained — rotating color is identity, not elevation
+ * - Retro: Hard borders, instant transitions, pixel shadows. Gradient CTA disabled — terminal UIs can't render rotating gradients
  *
  * DESIGN NOTES:
  * - Resting state carries potential energy through glass/border treatments
@@ -73,14 +73,18 @@
     height: 1250%;
     border-radius: 50%;
 
-    // Tail gradient.
+    // Soft halo with directional notch: ~270° visible arc, ~50° transparent gap.
+    // Keeps the premium glow of a near-full ring but introduces a clear
+    // moving notch so the rotation reads as directional, not just pulsing.
     background: conic-gradient(
       from 0deg,
       transparent 0deg,
-      var(--energy-secondary) 100deg,
-      var(--energy-primary) 160deg,
-      var(--energy-primary) 200deg,
-      var(--energy-secondary) 260deg,
+      transparent 50deg,
+      var(--energy-secondary) 110deg,
+      var(--energy-primary) 170deg,
+      var(--energy-primary) 210deg,
+      var(--energy-secondary) 270deg,
+      transparent 320deg,
       transparent 360deg
     );
 
@@ -377,7 +381,7 @@ button:not(.btn-void, .btn-icon, .tabs-trigger),
   // 2. THE GEMINI LASER (CTA)
   // Nested to override Base Styles properly
   // ========================================================================
-  &.btn-cta:not(:disabled) {
+  &.btn-cta:not(:disabled, [aria-disabled='true']) {
     @include _gemini-laser;
 
     color: var(--energy-primary);
@@ -388,7 +392,7 @@ button:not(.btn-void, .btn-icon, .tabs-trigger),
     border-radius: var(--radius-full);
 
     @media (hover: hover) {
-      &:hover:not(:disabled) {
+      &:hover:not(:disabled, [aria-disabled='true']) {
         // Reset base button hover effects that clash
         background: transparent;
         border: none;
