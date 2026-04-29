@@ -295,6 +295,29 @@ describe('L0 runtime — DOM behavior (jsdom)', () => {
     expect(localStorage.getItem('ve-mode')).toBe('auto');
   });
 
+  it('setMode("light") under physics="glass" forces data-mode="dark" (CONSTRAINTS)', () => {
+    // Without this guard setMode could land an invalid combo (glass/light)
+    // that AdaptiveImage's "4 valid combinations" resolver assumes never
+    // happens. Mirrors the symmetric guard in setPhysics.
+    runtime.setPhysics('glass');
+    runtime.setMode('light');
+    expect(document.documentElement.getAttribute('data-mode')).toBe('dark');
+  });
+
+  it('setMode("auto") under physics="retro" forces data-mode="dark" (CONSTRAINTS)', () => {
+    runtime.setPhysics('retro');
+    runtime.setMode('auto'); // would resolve to 'light' via mocked matchMedia
+    expect(document.documentElement.getAttribute('data-mode')).toBe('dark');
+    // localStorage retains the user's 'auto' preference for the next page load
+    expect(localStorage.getItem('ve-mode')).toBe('auto');
+  });
+
+  it('setMode("light") under physics="flat" stays light (no CONSTRAINTS entry)', () => {
+    runtime.setPhysics('flat');
+    runtime.setMode('light');
+    expect(document.documentElement.getAttribute('data-mode')).toBe('light');
+  });
+
   it('init() restores persisted state from localStorage', () => {
     localStorage.setItem('ve-atmosphere', 'slate');
     localStorage.setItem('ve-density', 'compact');

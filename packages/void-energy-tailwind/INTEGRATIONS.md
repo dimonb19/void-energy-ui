@@ -514,6 +514,8 @@ export default defineNuxtPlugin(() => {
 
 ## SvelteKit
 
+SvelteKit's `app.html` is a static template — it can't `import { FOUC_SCRIPT }` directly. Instead, leave a `%ve-fouc%` placeholder and have `hooks.server.ts` substitute the real `FOUC_SCRIPT` string per render. This keeps a single source of truth for the FOUC contract (matching the Astro and Nuxt recipes above) and avoids the silent drift that catches consumers using runtime atmospheres, custom mode resolution, or the physics→mode constraints.
+
 ### `src/app.html`
 
 ```html
@@ -521,17 +523,7 @@ export default defineNuxtPlugin(() => {
 <html lang="en">
   <head>
     %sveltekit.head%
-    <script>
-      (function () {
-        try {
-          var s = localStorage, r = document.documentElement;
-          r.setAttribute('data-atmosphere', s.getItem('ve-atmosphere') || 'frost');
-          r.setAttribute('data-physics',    s.getItem('ve-physics')    || 'glass');
-          r.setAttribute('data-mode',       s.getItem('ve-mode')       || 'dark');
-          r.setAttribute('data-density',    s.getItem('ve-density')    || 'default');
-        } catch (e) {}
-      })();
-    </script>
+    <script>%ve-fouc%</script>
   </head>
   <body data-sveltekit-preload-data="hover">
     <div style="display: contents">%sveltekit.body%</div>
@@ -539,7 +531,20 @@ export default defineNuxtPlugin(() => {
 </html>
 ```
 
-SvelteKit's `app.html` is a static template, so the FOUC script has to be inline-literal here (not imported). Keep it in sync with `@void-energy/tailwind/head#FOUC_SCRIPT` on upgrades.
+### `src/hooks.server.ts` — inject the real FOUC script
+
+```ts
+import type { Handle } from '@sveltejs/kit';
+import { FOUC_SCRIPT } from '@void-energy/tailwind/head';
+
+export const handle: Handle = async ({ event, resolve }) => {
+  return resolve(event, {
+    transformPageChunk: ({ html }) => html.replace('%ve-fouc%', FOUC_SCRIPT),
+  });
+};
+```
+
+This recipe scales: the SSR cookie-bridge section below extends the same hook to also inject `<html>` `data-*` attributes alongside the FOUC script.
 
 ### CSS + runtime
 
@@ -560,12 +565,13 @@ SvelteKit's `app.html` is a static template, so the FOUC script has to be inline
 
 ### SSR — render with the user's persisted atmosphere baked in
 
-The FOUC inline script above paints the right atmosphere before stylesheets load, but the HTML SvelteKit emits still has no `data-*` attributes — search-engine crawlers, social-card scrapers, and slow first paints all see the default. The SSR cookie bridge fixes this: the `handle` hook reads the user's atmosphere from a cookie and rewrites `<html>` during server render so the client hydrates into the right state with no flash.
+The FOUC script above paints the right atmosphere before stylesheets load, but the HTML SvelteKit emits still has no `data-*` attributes — search-engine crawlers, social-card scrapers, and slow first paints all see the default. The SSR cookie bridge fixes this: the same `handle` hook reads the user's atmosphere from a cookie and rewrites `<html>` during server render so the client hydrates into the right state with no flash.
 
-`src/hooks.server.ts` — read the cookie on every request and inject the attributes into the rendered HTML:
+`src/hooks.server.ts` — extend the hook from above to also read the cookie and inject the `<html>` attributes:
 
 ```ts
 import type { Handle } from '@sveltejs/kit';
+import { FOUC_SCRIPT } from '@void-energy/tailwind/head';
 import {
   readAtmosphereCookie,
   renderRootAttributes,
@@ -577,7 +583,8 @@ export const handle: Handle = async ({ event, resolve }) => {
   );
   const attrs = renderRootAttributes(event.locals.atmosphere);
   return resolve(event, {
-    transformPageChunk: ({ html }) => html.replace('%ve-attrs%', attrs),
+    transformPageChunk: ({ html }) =>
+      html.replace('%ve-attrs%', attrs).replace('%ve-fouc%', FOUC_SCRIPT),
   });
 };
 ```
@@ -598,24 +605,14 @@ declare global {
 export {};
 ```
 
-`src/app.html` — add the `%ve-attrs%` placeholder to the existing `<html>` tag. Keep the FOUC inline script alongside (see callout below):
+`src/app.html` — add the `%ve-attrs%` placeholder to the existing `<html>` tag. The `%ve-fouc%` placeholder from the basic recipe stays exactly as it was:
 
 ```html
 <!doctype html>
 <html lang="en" %ve-attrs%>
   <head>
     %sveltekit.head%
-    <script>
-      (function () {
-        try {
-          var s = localStorage, r = document.documentElement;
-          r.setAttribute('data-atmosphere', s.getItem('ve-atmosphere') || 'frost');
-          r.setAttribute('data-physics',    s.getItem('ve-physics')    || 'glass');
-          r.setAttribute('data-mode',       s.getItem('ve-mode')       || 'dark');
-          r.setAttribute('data-density',    s.getItem('ve-density')    || 'default');
-        } catch (e) {}
-      })();
-    </script>
+    <script>%ve-fouc%</script>
   </head>
   <body data-sveltekit-preload-data="hover">
     <div style="display: contents">%sveltekit.body%</div>
@@ -625,7 +622,7 @@ export {};
 
 When no cookie is set, `renderRootAttributes` returns `''`, so the `<html lang="en" >` SvelteKit emits has only an extra space before `>` — valid HTML, and the FOUC script fills the four `data-*` attributes before paint. When the cookie is set, the server-rendered HTML carries the right `data-*` attrs from the start, and the FOUC script's `localStorage.getItem(...) || 'frost'` fallback never triggers because the `<html>` tag is already painted correctly by then.
 
-**Keep the FOUC inline script alongside SSR.** Three cases the cookie bridge alone does not cover:
+**Why the FOUC script still ships alongside SSR.** Three cases the cookie bridge alone does not cover:
 
 1. **First-time visitors.** No cookie exists yet. The server emits `<html lang="en">` with no atmosphere attrs; the FOUC script paints the default `frost`/`glass`/`dark`/`default` before stylesheets load.
 2. **Legacy users with localStorage but no cookie.** Anyone who used the app before the cookie bridge shipped has only `localStorage` state. Server emits no `data-*`; FOUC restores from localStorage; the next setter call writes both cookie and localStorage, and subsequent SSR renders see the user's state.

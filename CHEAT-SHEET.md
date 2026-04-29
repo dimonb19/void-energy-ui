@@ -1561,7 +1561,7 @@ Use Astro's `<Image>` when responsive srcset / build-time optimization is the pr
 
 #### `<AdaptiveImage>` — Physics/mode-aware decorative image
 
-**Description:** Selects which pre-existing source URL to display based on the active atmosphere's **physics × mode** — the two finite axes (4 valid combinations: `glass-dark`, `flat-dark`, `flat-light`, `retro-dark`). Composes `<Image>`, inheriting skeleton fallback, error state, lazy loading, and aspect-ratio behavior. Per **D33**: never transforms pixels — only selects between consumer-provided URLs. Re-resolution on atmosphere change preloads the next variant before swapping, so the previous image stays painted until the new one is decoded.
+**Description:** Selects which pre-existing source URL to display based on the active atmosphere's **physics × mode** — the two finite axes (4 valid combinations: `glass-dark`, `flat-dark`, `flat-light`, `retro-dark`). Reuses `<Image>`'s `.image` SCSS surface (skeleton fallback, error state, opacity fade, aspect-ratio) but reimplements its template instead of composing it — composition would defeat swap-without-flash because `<Image>`'s effect resets `loaded` on every src change. Per **D33**: never transforms pixels — only selects between consumer-provided URLs. On atmosphere change the next variant is decoded off-DOM via `Image().decode()`; only after decode resolves does the visible `<img>` src advance, so the previous frame stays painted until the new one is ready.
 **Location:** [src/components/ui/AdaptiveImage.svelte](src/components/ui/AdaptiveImage.svelte)
 **CSS:** Inherits `.image` ([src/styles/components/\_image.scss](src/styles/components/_image.scss))
 

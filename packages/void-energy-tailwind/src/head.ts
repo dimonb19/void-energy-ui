@@ -28,6 +28,14 @@ import { STORAGE_KEYS } from './runtime';
  * attribute eliminates a cascade ambiguity when any element further down the
  * tree carries a more specific density attribute.
  *
+ * Mode resolution: localStorage retains 'auto' as the user's preference, but
+ * the data-mode attribute must be a concrete 'light' or 'dark'. The script
+ * resolves 'auto' against matchMedia and then applies physics→mode
+ * constraints (glass + retro require dark) so the painted state always
+ * matches one of the four valid physics × mode combinations the system
+ * assumes. Without this, a stored 'auto' would land as data-mode="auto" and
+ * decorative resolvers like AdaptiveImage would mis-key.
+ *
  * Custom atmosphere re-injection: if the consumer has registered any custom
  * atmospheres via runtime.registerAtmosphere, their definitions live in the
  * `ve-custom-atmospheres` storage key as JSON. The script re-emits the
@@ -41,10 +49,18 @@ export const FOUC_SCRIPT = `
   try {
     var s = localStorage;
     var r = document.documentElement;
+    var physics = s.getItem('${STORAGE_KEYS.physics}') || 'glass';
+    var modeRaw = s.getItem('${STORAGE_KEYS.mode}') || 'dark';
+    var mode = modeRaw;
+    if (mode === 'auto') {
+      mode = (typeof matchMedia !== 'undefined' && matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+    }
+    if (mode !== 'light' && mode !== 'dark') mode = 'dark';
+    if (physics === 'glass' || physics === 'retro') mode = 'dark';
     r.setAttribute('data-atmosphere', s.getItem('${STORAGE_KEYS.atmosphere}') || 'frost');
-    r.setAttribute('data-physics',    s.getItem('${STORAGE_KEYS.physics}')    || 'glass');
-    r.setAttribute('data-mode',       s.getItem('${STORAGE_KEYS.mode}')       || 'dark');
-    r.setAttribute('data-density',    s.getItem('${STORAGE_KEYS.density}')    || 'default');
+    r.setAttribute('data-physics',    physics);
+    r.setAttribute('data-mode',       mode);
+    r.setAttribute('data-density',    s.getItem('${STORAGE_KEYS.density}') || 'default');
     var raw = s.getItem('${STORAGE_KEYS.customAtmospheres}');
     if (raw) {
       var defs = JSON.parse(raw);

@@ -225,4 +225,36 @@ describe('L0 head — script execution (jsdom)', () => {
     await runScript();
     expect(document.getElementById('ve-custom-atmospheres')).toBeNull();
   });
+
+  it('resolves stored ve-mode="auto" to a concrete light/dark attribute', async () => {
+    // jsdom matchMedia is mocked to matches:false → resolves to 'light'.
+    // Without this resolution the FOUC script would write data-mode="auto",
+    // an invalid value the SSR cookie bridge correctly rejects.
+    localStorage.setItem('ve-mode', 'auto');
+    localStorage.setItem('ve-physics', 'flat');
+    await runScript();
+    expect(document.documentElement.getAttribute('data-mode')).toBe('light');
+  });
+
+  it('forces data-mode="dark" when stored physics="glass" (CONSTRAINTS)', async () => {
+    localStorage.setItem('ve-physics', 'glass');
+    localStorage.setItem('ve-mode', 'auto'); // would resolve to 'light' otherwise
+    await runScript();
+    expect(document.documentElement.getAttribute('data-physics')).toBe('glass');
+    expect(document.documentElement.getAttribute('data-mode')).toBe('dark');
+  });
+
+  it('forces data-mode="dark" when stored physics="retro" + mode="light"', async () => {
+    localStorage.setItem('ve-physics', 'retro');
+    localStorage.setItem('ve-mode', 'light');
+    await runScript();
+    expect(document.documentElement.getAttribute('data-mode')).toBe('dark');
+  });
+
+  it('sanitizes garbage stored mode values to "dark"', async () => {
+    localStorage.setItem('ve-mode', 'banana');
+    localStorage.setItem('ve-physics', 'flat');
+    await runScript();
+    expect(document.documentElement.getAttribute('data-mode')).toBe('dark');
+  });
 });

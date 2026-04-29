@@ -345,6 +345,16 @@ export function setMode(mode: Mode): void {
   } else {
     resolved = mode;
   }
+  // Physics constraint enforcement. Glass and retro require dark; if the
+  // active physics has a CONSTRAINTS entry the resolved mode is overridden
+  // to match. Without this guard, setMode could land an invalid combo
+  // (glass/light, retro/light) that AdaptiveImage's "4 valid combinations"
+  // resolution table assumes never happens.
+  const activePhysics = root.getAttribute('data-physics') as Physics | null;
+  if (activePhysics) {
+    const required = CONSTRAINTS[activePhysics];
+    if (required) resolved = required;
+  }
   root.setAttribute('data-mode', resolved);
   persist(STORAGE_KEYS.mode, mode);
   // Cookie carries the *resolved* light/dark value — 'auto' means nothing

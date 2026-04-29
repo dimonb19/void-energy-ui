@@ -450,13 +450,18 @@
             ever visible on initial mount, before any variant has loaded.
           </p>
           <p>
-            <strong>First-paint trade-off.</strong> The initial
-            <code>displayedSrc</code>
-            is the plain <code>src</code> prop (not the resolved variant) so SSR
-            HTML and first-client-render HTML stay identical regardless of the visitor's
-            persisted atmosphere. If their atmosphere matches a variant, the first
-            effect run after mount swaps to it via the same decode-then-swap path
-            &mdash; a one-time crossfade rather than a flash.
+            <strong>First-paint trade-off.</strong> The visible
+            <code>&lt;img&gt;</code> is gated on a client-only
+            <code>mounted</code> flag, so SSR emits skeleton-only HTML &mdash;
+            no stale <code>&lt;img src&gt;</code> for hydration to reconcile. On
+            the first client effect <code>displayedSrc</code> snaps to the
+            resolved variant for the visitor's persisted atmosphere and the
+            <code>&lt;img&gt;</code> mounts already pointing at the right URL,
+            so the browser's first fetch is the right one. The trade-off is
+            visibility: search engines that don't execute JS, and visitors with
+            JS disabled, see only the skeleton. For SEO-critical hero imagery
+            without atmosphere variants, prefer plain
+            <code>&lt;Image&gt;</code>.
           </p>
           <p>
             <strong>What it does <em>not</em> do.</strong> Never keys on

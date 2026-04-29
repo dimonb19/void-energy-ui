@@ -69,6 +69,7 @@
 
   let loaded = $state(false);
   let errored = $state(false);
+  let imgEl = $state<HTMLImageElement>();
 
   let imageState = $derived(errored ? 'error' : loaded ? 'loaded' : 'loading');
 
@@ -76,6 +77,23 @@
     src;
     loaded = false;
     errored = false;
+  });
+
+  // Post-hydration backstop. Browsers may finish (or fail) the image fetch
+  // before Svelte attaches onload/onerror — that event fires once and is
+  // lost, leaving the wrapper stuck in the loading state with the SCSS
+  // opacity:0 hiding the image. The element's `complete` flag is
+  // persistent: true once the fetch settles either way. naturalWidth tells
+  // us which way it settled (>0 = decoded successfully, 0 with complete =
+  // network/decode error). Same shape as Video.svelte's element.error
+  // backstop.
+  $effect(() => {
+    if (!imgEl?.complete) return;
+    if (imgEl.naturalWidth > 0) {
+      loaded = true;
+    } else {
+      errored = true;
+    }
   });
 
   function handleLoad() {
@@ -110,6 +128,7 @@
     -->
     <img
       {...rest}
+      bind:this={imgEl}
       {src}
       {alt}
       loading={lazy ? 'lazy' : 'eager'}
