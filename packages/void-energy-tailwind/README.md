@@ -156,6 +156,7 @@ setDensity('comfortable');   // 0.75 | 1 | 1.25 spacing multiplier
 | **Tailwind utilities** | `bg-surface`, `p-lg`, `rounded`, `border`, `min-h-control`, `font-heading`, … |
 | **Footgun fixes** | physics-aware `.border`, adaptive `.rounded`, VE-scaled `.container`, `.backdrop-blur-physics` |
 | **SSR-safe runtime** | ~1 KB gzipped, zero side effects on import |
+| **SSR cookie bridge** | per-user atmosphere baked into server-rendered HTML; cookie + localStorage dual-write |
 | **FOUC prevention** | inline-script string export, framework-agnostic |
 
 ---
@@ -251,6 +252,28 @@ import { FOUC_SCRIPT, STORAGE_KEYS } from '@void-energy/tailwind/head';
 `FOUC_SCRIPT` is a string-literal IIFE for inline injection in `<head>`. `STORAGE_KEYS` is re-exported from the runtime so the two surfaces can't drift.
 
 See [INTEGRATIONS.md](./INTEGRATIONS.md) for Next.js / Nuxt / Astro / SvelteKit / Vite injection recipes.
+
+### `@void-energy/tailwind/ssr`
+
+```ts
+import {
+  readAtmosphereCookie,
+  serializeAtmosphereCookie,
+  renderRootAttributes,
+} from '@void-energy/tailwind/ssr';
+```
+
+Three pure framework-agnostic primitives so an SSR framework can render a page with the user's persisted atmosphere baked into the initial HTML.
+
+| Function | Signature | Notes |
+|---|---|---|
+| `readAtmosphereCookie` | `(cookieHeader: string \| null \| undefined) => AtmosphereCookieState` | Parses a Cookie request header, validates against the FOUC value vocabulary, drops malformed values silently. Returns `{ atmosphere?, physics?, mode?, density? }`. |
+| `serializeAtmosphereCookie` | `(state, opts?: { secure?, maxAge?, sameSite? }) => string[]` | Emits one `name=value; Path=/; Max-Age=...; SameSite=Lax[; Secure]` line per set key. Usable as `Set-Cookie` response headers or `document.cookie` assignments. |
+| `renderRootAttributes` | `(state) => string` | Returns `data-atmosphere="..." data-physics="..." data-mode="..." data-density="..."` (unset keys omitted, no leading/trailing space) for `<html>` injection. HTML-safe by construction. |
+
+Cookie key names are exactly `STORAGE_KEYS.atmosphere/physics/mode/density` — shared from the runtime so the two surfaces can't drift. The `customAtmospheres` registry is intentionally out of scope; runtime atmospheres remain client-only and the FOUC script's rehydration restores them before paint.
+
+The runtime dual-writes cookie + localStorage on every state change, so once a user has interacted with the app the cookie is current and the next SSR render sees the right state. See [INTEGRATIONS.md](./INTEGRATIONS.md) for Astro / SvelteKit / Next.js recipes.
 
 ### `@void-energy/tailwind/config`
 

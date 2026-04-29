@@ -394,6 +394,35 @@ describe('L0 SSR — runtime round-trip (R5 cookie-key format drift guard)', () 
       atmosphere: 'frost',
     });
   });
+
+  it('full SSR pipeline: live <html> attrs match what the server would render from the cookie', () => {
+    // Closes the W5 verification loop end-to-end. The runtime sets state and
+    // writes the cookie (the wire format that lands at the server on the next
+    // request). The server-side parser + renderer read that cookie back and
+    // produce the data-* string the layout would inject. The string must
+    // contain the same atmosphere/physics/mode the runtime applied to the
+    // live <html>, proving server-render + client-hydrate observe the same
+    // state with no drift.
+    runtime.setAtmosphere('meridian'); // cascades flat + light
+    runtime.setDensity('comfortable');
+
+    const liveAttrs = {
+      atmosphere: document.documentElement.getAttribute('data-atmosphere'),
+      physics: document.documentElement.getAttribute('data-physics'),
+      mode: document.documentElement.getAttribute('data-mode'),
+      density: document.documentElement.getAttribute('data-density'),
+    };
+
+    // What the server would do with the cookie this browser session emitted:
+    const fromServer = ssr.renderRootAttributes(
+      ssr.readAtmosphereCookie(document.cookie),
+    );
+
+    expect(fromServer).toContain(`data-atmosphere="${liveAttrs.atmosphere}"`);
+    expect(fromServer).toContain(`data-physics="${liveAttrs.physics}"`);
+    expect(fromServer).toContain(`data-mode="${liveAttrs.mode}"`);
+    expect(fromServer).toContain(`data-density="${liveAttrs.density}"`);
+  });
 });
 
 describe('L0 SSR — runtime SSR no-op safety (Node, no document)', () => {
