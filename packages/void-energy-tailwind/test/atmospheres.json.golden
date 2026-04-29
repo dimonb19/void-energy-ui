@@ -1,4 +1,9 @@
 {
+  "frost": {
+    "physics": "glass",
+    "mode": "dark",
+    "tagline": "Arctic / Glass"
+  },
   "graphite": {
     "physics": "flat",
     "mode": "dark",
@@ -13,10 +18,5 @@
     "physics": "flat",
     "mode": "light",
     "tagline": "Fintech / Brand"
-  },
-  "frost": {
-    "physics": "glass",
-    "mode": "dark",
-    "tagline": "Arctic / Glass"
   }
 }

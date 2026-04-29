@@ -44,12 +44,34 @@ See [CONFIG.md](./CONFIG.md) for config-layer schema + the flagship "replace 4 w
 
 | Atmosphere | Physics | Mode | Vibe |
 |---|---|---|---|
+| [`frost`](#frost) | `glass` | `dark` | Arctic / Glass *(default)* |
 | [`graphite`](#graphite) | `flat` | `dark` | Editor / Neutral |
 | [`terminal`](#terminal) | `retro` | `dark` | Hacker / Retro |
 | [`meridian`](#meridian) | `flat` | `light` | Fintech / Brand |
-| [`frost`](#frost) | `glass` | `dark` | Arctic / Glass |
 
 All four atmospheres override the same set of semantic tokens. The table below covers the major palette axes; see [TOKENS.md](./TOKENS.md) for the complete list.
+
+---
+
+## `frost`
+
+Arctic glass. Deep blue canvas, translucent lift, ice blue energy.
+
+| Token | Value |
+|---|---|
+| `--bg-canvas` | `#080c14` |
+| `--bg-surface` | `rgba(20, 30, 50, 0.45)` |
+| `--bg-sunk` | `rgba(0, 5, 15, 0.5)` |
+| `--energy-primary` | `#7ec8e3` |
+| `--energy-secondary` | `#4a6fa5` |
+| `--text-main` | `#edf2f7` |
+| `--text-dim` | `#a0b0c0` |
+| `--color-premium` | `#ff8c00` |
+| `--color-success` | `#00e055` |
+| `--color-error` | `#ff3c40` |
+| `--color-system` | `#a078ff` |
+
+Locks `glass` physics: 20px backdrop blur, -3px lift on hover, 1.02 scale transforms, atmospheric shadows. The default atmosphere shipped by `theme.css`. Best fit for creative tools, landing pages, anywhere density + depth sell.
 
 ---
 
@@ -116,28 +138,6 @@ Light fintech. White canvas, deep teal energy, slate-navy text.
 | `--color-system` | `#6d28d9` |
 
 The only built-in light atmosphere. Pairs with `flat` physics. Best fit for finance, insurance, regulated B2B, anywhere a dark UI would undercut trust.
-
----
-
-## `frost`
-
-Arctic glass. Deep blue canvas, translucent lift, ice blue energy.
-
-| Token | Value |
-|---|---|
-| `--bg-canvas` | `#080c14` |
-| `--bg-surface` | `rgba(20, 30, 50, 0.45)` |
-| `--bg-sunk` | `rgba(0, 5, 15, 0.5)` |
-| `--energy-primary` | `#7ec8e3` |
-| `--energy-secondary` | `#4a6fa5` |
-| `--text-main` | `#edf2f7` |
-| `--text-dim` | `#a0b0c0` |
-| `--color-premium` | `#ff8c00` |
-| `--color-success` | `#00e055` |
-| `--color-error` | `#ff3c40` |
-| `--color-system` | `#a078ff` |
-
-Locks `glass` physics: 20px backdrop blur, -3px lift on hover, 1.02 scale transforms, atmospheric shadows. The default atmosphere shipped by `theme.css`. Best fit for creative tools, landing pages, anywhere density + depth sell.
 
 ---
 

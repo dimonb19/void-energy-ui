@@ -19,10 +19,10 @@
 
   // ── Live Proof: atmosphere previewer ──────────────────────────────────
   const proofAtmospheres = [
+    { value: 'frost', label: 'Frost' },
     { value: 'graphite', label: 'Graphite' },
     { value: 'terminal', label: 'Terminal' },
     { value: 'meridian', label: 'Meridian' },
-    { value: 'frost', label: 'Frost' },
   ];
 
   // Derived: only highlights if current atmosphere is one of the curated set

@@ -96,10 +96,10 @@ const BUILTIN_DIRECTORY: Record<
   string,
   { physics: Physics; mode: 'light' | 'dark'; label: string }
 > = {
+  frost: { physics: 'glass', mode: 'dark', label: 'Frost' },
   graphite: { physics: 'flat', mode: 'dark', label: 'Graphite' },
   terminal: { physics: 'retro', mode: 'dark', label: 'Terminal' },
   meridian: { physics: 'flat', mode: 'light', label: 'Meridian' },
-  frost: { physics: 'glass', mode: 'dark', label: 'Frost' },
 };
 
 const ATMOSPHERES_META: Record<string, AtmosphereMeta> = Object.fromEntries(

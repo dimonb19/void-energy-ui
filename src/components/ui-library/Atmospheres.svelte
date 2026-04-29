@@ -12,6 +12,13 @@
   // ── Built-in atmospheres table data ────────────────────────────────────
   const builtInAtmospheres = [
     {
+      id: 'frost',
+      physics: 'glass',
+      mode: 'dark',
+      tagline: 'Arctic / Glass',
+      concept: 'Ice station observatory — clean and cold',
+    },
+    {
       id: 'graphite',
       physics: 'flat',
       mode: 'dark',
@@ -20,11 +27,11 @@
         'OS-native editor workspace — neutral charcoal surfaces, no chromatic accent',
     },
     {
-      id: 'frost',
-      physics: 'glass',
+      id: 'terminal',
+      physics: 'retro',
       mode: 'dark',
-      tagline: 'Arctic / Glass',
-      concept: 'Ice station observatory — clean and cold',
+      tagline: 'Hacker / Retro',
+      concept: '1980s amber phosphor CRT monitor',
     },
     {
       id: 'meridian',
@@ -32,13 +39,6 @@
       mode: 'light',
       tagline: 'Fintech / Brand',
       concept: 'Quiet light interface — teal authority, indigo accent',
-    },
-    {
-      id: 'terminal',
-      physics: 'retro',
-      mode: 'dark',
-      tagline: 'Hacker / Retro',
-      concept: '1980s amber phosphor CRT monitor',
     },
   ];
 

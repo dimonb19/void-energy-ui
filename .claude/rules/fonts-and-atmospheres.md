@@ -52,9 +52,9 @@ If these drift, users see a flash of wrong theme on first paint.
 
 | Theme | Physics | Mode | Font |
 |-------|---------|------|------|
+| frost | glass | dark | Space Grotesk (sharp) + Inter (clean) — default |
 | graphite | flat | dark | Inter (clean) |
 | terminal | retro | dark | Courier Prime (code) |
-| meridian | flat | light | Open Sans (lab) + Inter (clean) |
-| frost | glass | dark | Space Grotesk (sharp) + Inter (clean) |
+| meridian | flat | light | Poppins (geometric) + Inter (clean) |
 
 These cover all 3 physics presets and both color modes.

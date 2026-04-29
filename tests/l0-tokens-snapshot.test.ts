@@ -52,7 +52,7 @@ describe('L0 — physics presets', () => {
 });
 
 describe('L0 — atmosphere palettes', () => {
-  for (const name of ['graphite', 'terminal', 'meridian', 'frost']) {
+  for (const name of ['frost', 'graphite', 'terminal', 'meridian']) {
     it(`atmospheres/${name}.css matches golden`, () =>
       compare(
         `dist/atmospheres/${name}.css`,

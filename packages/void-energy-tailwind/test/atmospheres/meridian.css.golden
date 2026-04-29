@@ -24,7 +24,7 @@
   --color-error-light: oklch(from #dc2626 calc(l * 1.25) c h);
   --color-error-dark: oklch(from #dc2626 calc(l * 0.75) c h);
   --color-error-subtle: oklch(from #dc2626 l c h / 0.15);
-  --font-heading: 'Open Sans', sans-serif;
+  --font-heading: 'Poppins', sans-serif;
   --font-body: 'Inter', sans-serif;
   --bg-canvas: #f4f6f9;
   --bg-spotlight: #ffffff;

@@ -148,7 +148,7 @@ setDensity('comfortable');   // 0.75 | 1 | 1.25 spacing multiplier
 
 | | |
 |---|---|
-| **4 atmospheres** | `graphite`, `terminal`, `meridian`, `frost` — see [ATMOSPHERES.md](./ATMOSPHERES.md) |
+| **4 atmospheres** | `frost`, `graphite`, `terminal`, `meridian` — see [ATMOSPHERES.md](./ATMOSPHERES.md) |
 | **3 physics presets** | `glass` (atmospheric blur + lift), `flat` (modern minimal), `retro` (hard edges, no motion) |
 | **2 color modes** | `dark`, `light` (glass + retro force dark; flat supports both). Of the four built-ins, **only `meridian` ships in light mode** — the others are dark-first because their physics demands it. |
 | **3 density levels** | `compact` (0.75×), `default` (1×), `comfortable` (1.25×) |
@@ -316,10 +316,10 @@ The atmosphere manifest, usable at build time:
 
 ```json
 {
+  "frost":    { "physics": "glass", "mode": "dark",  "tagline": "Arctic / Glass" },
   "graphite": { "physics": "flat",  "mode": "dark",  "tagline": "Editor / Neutral" },
   "terminal": { "physics": "retro", "mode": "dark",  "tagline": "Hacker / Retro" },
-  "meridian": { "physics": "flat",  "mode": "light", "tagline": "Fintech / Brand" },
-  "frost":    { "physics": "glass", "mode": "dark",  "tagline": "Arctic / Glass" }
+  "meridian": { "physics": "flat",  "mode": "light", "tagline": "Fintech / Brand" }
 }
 ```
 

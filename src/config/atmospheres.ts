@@ -122,7 +122,30 @@ export interface AtmosphereDefinition {
 // ---------------------------------------------------------------------------
 
 export const ATMOSPHERES: Record<string, AtmosphereDefinition> = {
-  // 1. GRAPHITE — Editor / Neutral (dark flat)
+  // 1. FROST — Arctic / Glass (glass dark) — DEFAULT
+  frost: {
+    mode: 'dark',
+    physics: 'glass',
+    tagline: 'Arctic / Glass',
+
+    palette: {
+      ...SEMANTIC_DARK,
+      'font-atmos-heading': FONTS.sharp.family,
+      'font-atmos-body': FONTS.clean.family,
+      'bg-canvas': '#080c14',
+      'bg-spotlight': '#141c2e',
+      'bg-surface': 'rgba(20, 30, 50, 0.45)',
+      'bg-sunk': 'rgba(0, 5, 15, 0.5)',
+      'energy-primary': '#7ec8e3',
+      'energy-secondary': '#4a6fa5',
+      'border-color': 'rgba(126, 200, 227, 0.2)',
+      'text-main': '#edf2f7',
+      'text-dim': '#a0b0c0',
+      'text-mute': '#607080',
+    },
+  },
+
+  // 2. GRAPHITE — Editor / Neutral (dark flat)
   // Neutral-charcoal archetype (ChatGPT / VS Code Dark Modern / Vercel Geist family).
   // Canvas + spotlight match — no gradient. Surface floats up in luminance for elevation
   // (Apple/VS Code pattern). Energy is in the gray ramp by design — accent IS contrast,
@@ -149,7 +172,7 @@ export const ATMOSPHERES: Record<string, AtmosphereDefinition> = {
     },
   },
 
-  // 2. TERMINAL — Hacker / Retro (retro dark)
+  // 3. TERMINAL — Hacker / Retro (retro dark)
   terminal: {
     mode: 'dark',
     physics: 'retro',
@@ -173,7 +196,7 @@ export const ATMOSPHERES: Record<string, AtmosphereDefinition> = {
     },
   },
 
-  // 3. MERIDIAN — Fintech / Brand (light flat)
+  // 4. MERIDIAN — Fintech / Brand (light flat)
   meridian: {
     mode: 'light',
     physics: 'flat',
@@ -181,7 +204,7 @@ export const ATMOSPHERES: Record<string, AtmosphereDefinition> = {
 
     palette: {
       ...SEMANTIC_LIGHT,
-      'font-atmos-heading': FONTS.lab.family,
+      'font-atmos-heading': FONTS.geometric.family,
       'font-atmos-body': FONTS.clean.family,
       'bg-canvas': '#f4f6f9',
       'bg-spotlight': '#ffffff',
@@ -193,29 +216,6 @@ export const ATMOSPHERES: Record<string, AtmosphereDefinition> = {
       'text-main': '#0f1729',
       'text-dim': '#3d4a5c',
       'text-mute': '#7c8797',
-    },
-  },
-
-  // 4. FROST — Arctic / Glass (glass dark)
-  frost: {
-    mode: 'dark',
-    physics: 'glass',
-    tagline: 'Arctic / Glass',
-
-    palette: {
-      ...SEMANTIC_DARK,
-      'font-atmos-heading': FONTS.sharp.family,
-      'font-atmos-body': FONTS.clean.family,
-      'bg-canvas': '#080c14',
-      'bg-spotlight': '#141c2e',
-      'bg-surface': 'rgba(20, 30, 50, 0.45)',
-      'bg-sunk': 'rgba(0, 5, 15, 0.5)',
-      'energy-primary': '#7ec8e3',
-      'energy-secondary': '#4a6fa5',
-      'border-color': 'rgba(126, 200, 227, 0.2)',
-      'text-main': '#edf2f7',
-      'text-dim': '#a0b0c0',
-      'text-mute': '#607080',
     },
   },
 };
