@@ -20,23 +20,18 @@ import Layout from '../layouts/Layout.astro';
 <Layout title="Participation Contract">
   <div class="container flex flex-col gap-2xl py-2xl">
     <!-- Page intro -->
-    <section class="flex flex-col gap-xl">
-      <div class="surface-raised p-lg flex flex-col gap-lg">
-        <div class="flex flex-col gap-xs">
-          <p class="text-caption text-mute">Reference</p>
-          <h1>Physics Participation Contract</h1>
-          <p class="text-dim max-w-2xl">
-            Attribute-driven opt-in API. Use the nav controls to flip
-            atmosphere, physics, and color mode and verify each surface
-            renders correctly across the full matrix: 4 surfaces × 4
-            valid <code>(physics, mode)</code> combinations
-            (<code>glass-dark</code>, <code>flat-dark</code>,
-            <code>flat-light</code>, <code>retro-dark</code>) = 16 cells.
-            Glass and retro require dark mode; flat works in either.
-          </p>
-        </div>
-      </div>
-    </section>
+    <header class="flex flex-col gap-lg items-center text-center">
+      <h1 class="text-primary">Physics Participation Contract</h1>
+      <p class="text-body text-dim max-w-3xl">
+        Attribute-driven opt-in API. Use the nav controls to flip atmosphere,
+        physics, and color mode and verify each surface renders correctly
+        across the full matrix: 4 surfaces × 4 valid
+        <code>(physics, mode)</code> combinations
+        (<code>glass-dark</code>, <code>flat-dark</code>,
+        <code>flat-light</code>, <code>retro-dark</code>) = 16 cells.
+        Glass and retro require dark mode; flat works in either.
+      </p>
+    </header>
 
     <!-- 1. data-ve-surface — all four values -->
     <section class="flex flex-col gap-xl">
