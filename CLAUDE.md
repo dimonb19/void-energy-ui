@@ -413,6 +413,14 @@ Auth visibility utilities (FOUC-safe, set before first paint):
 - `.auth-only` — visible when any authenticated user (including Guest role) sets `data-auth`
 - `.public-only` — visible only when unauthenticated (`data-auth` absent)
 
+Physics participation contract (CSS-only, attribute-driven opt-in to VE physics):
+```
+data-ve-surface   raised | sunk | floating | flat     Apply VE surface physics to this element
+data-ve-content   primary | secondary | muted          Set color (cascades to descendants)
+data-ve-emphasis  strong | subtle | none               Modulate surface border/shadow (requires data-ve-surface)
+```
+Wrapper-only contract: each rule styles only the element it is set on. Color and typography propagate into descendants via the CSS cascade; surface treatment does **not** propagate. Wrapping a foreign component (MUI Card, shadcn Card) in `data-ve-surface` produces visible card-in-card — use this on your own divs, not as a foreign-component wrapper. Source of truth: [src/styles/components/_participation.scss](src/styles/components/_participation.scss). Shipped to L0 consumers via `@void-energy/tailwind/participation.css`. Acceptance fixtures: [src/pages/participation.astro](src/pages/participation.astro) (in-repo reference + QA) and [packages/void-energy-tailwind/test/participation.html](packages/void-energy-tailwind/test/participation.html) (L0).
+
 ---
 
 ## 8. MIGRATION PROTOCOL

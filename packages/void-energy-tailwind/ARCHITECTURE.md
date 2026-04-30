@@ -68,6 +68,7 @@ node_modules/@void-energy/tailwind/
 - `./theme.css` — default Tailwind v4 bridge (imports tokens + frost + glass + density).
 - `./theme-no-container.css` — variant without `.container` override.
 - `./tokens.css`, `./density.css` — granular imports.
+- `./participation.css` — wrapper-style attribute API (`data-ve-surface`, `data-ve-content`, `data-ve-emphasis`).
 - `./atmospheres/*`, `./physics/*` — granular imports.
 - `./atmospheres.json` — build-time manifest of the four built-ins.
 - `./builtins.json` — resolved token/base data consumed internally by the generator (exposed for custom build integrations).

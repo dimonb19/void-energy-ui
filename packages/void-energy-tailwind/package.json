@@ -44,6 +44,7 @@
     "./tokens.css": "./dist/tokens.css",
     "./density.css": "./dist/density.css",
     "./components.css": "./dist/components.css",
+    "./participation.css": "./dist/participation.css",
     "./atmospheres/*": "./dist/atmospheres/*",
     "./physics/*": "./dist/physics/*",
     "./bridges/*": "./dist/bridges/*",

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en" data-atmosphere="frost" data-physics="glass" data-mode="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@void-energy/tailwind — participation contract fixture</title>
+
+    <!--
+      L0 acceptance proof for the Physics Participation Contract.
+
+      What this fixture verifies:
+        - data-ve-* attribute API renders correctly against the L0 dist
+          output, with no L1 compiled CSS in scope.
+        - The contract works as a standalone `participation.css` export,
+          so ecosystem-bridge consumers (shadcn / Radix / Mantine) who
+          skip components.css still get the surface API.
+
+      What is loaded:
+        - ../dist/theme.css       (transitively pulls tokens, frost
+                                    atmosphere, glass physics, density)
+        - ../dist/participation.css
+
+      Nothing else. No components.css. No Tailwind. No JS.
+
+      How to open:
+        Open this file directly in a browser via file://, or serve it
+        with any static server, e.g.
+          npx serve packages/void-energy-tailwind/test
+        and visit http://localhost:3000/participation.html.
+
+        Same convention as test/index.html — both use `../dist/*`
+        relative URLs and require no build step.
+
+      data-atmosphere / data-physics / data-mode are set on <html> above
+      because theme.css's atmosphere + physics rules are scoped to those
+      attribute selectors. Without them, --surface-bg / --shadow-lift /
+      --border-color resolve to nothing and the contract has no tokens
+      to read.
+    -->
+    <link rel="stylesheet" href="../dist/theme.css" />
+    <link rel="stylesheet" href="../dist/participation.css" />
+
+    <style>
+      body {
+        background: var(--bg-canvas);
+        color: var(--text-main);
+        font-family: var(--font-body);
+        min-height: 100dvh;
+        margin: 0;
+        padding: var(--space-xl);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-xl);
+      }
+
+      h1,
+      h2 {
+        font-family: var(--font-heading);
+        margin: 0;
+      }
+
+      section {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+
+      .demo {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--space-lg);
+      }
+
+      .demo > * {
+        padding: var(--space-lg);
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>Participation contract — L0 fixture</h1>
+      <p>
+        Loaded from <code>dist/theme.css</code> and
+        <code>dist/participation.css</code> only. If the three blocks below
+        render with VE physics (raised surface, muted text, energy-primary
+        border on the strong block) the L0 export is wired correctly.
+      </p>
+    </header>
+
+    <section>
+      <h2>data-ve-surface="raised"</h2>
+      <p>
+        Plain div with the attribute. Token-driven background, border, shadow.
+      </p>
+      <div class="demo">
+        <div data-ve-surface="raised">
+          <strong>Raised surface</strong>
+          <p>Renders with --surface-bg + --shadow-float + --border-color.</p>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>data-ve-content="muted"</h2>
+      <p>Sets color from <code>--text-mute</code>.</p>
+      <div class="demo">
+        <p data-ve-content="muted">
+          This paragraph should render in the muted text color. If it looks
+          identical to body text, the content rule is not applying.
+        </p>
+      </div>
+    </section>
+
+    <section>
+      <h2>data-ve-surface="raised" + data-ve-emphasis="strong"</h2>
+      <p>Combination test: surface + emphasis layered on a single element.</p>
+      <div class="demo">
+        <div data-ve-surface="raised" data-ve-emphasis="strong">
+          <strong>Strong-emphasis raised surface</strong>
+          <p>
+            Border should be --energy-primary. Shadow should be --shadow-lift
+            (deeper than the plain raised block above).
+          </p>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

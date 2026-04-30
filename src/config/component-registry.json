@@ -1839,5 +1839,22 @@
       "usage": "<SettingsRow label='Density'>...</SettingsRow>",
       "note": "Prefer the SettingsRow component instead of hand-rolling label and control alignment."
     }
+  },
+  "participation": {
+    "data-ve-surface": {
+      "usage": "<div data-ve-surface='raised' class='p-lg'>...</div>",
+      "values": ["raised", "sunk", "floating", "flat"],
+      "note": "Wrapper-only attribute API for VE surface physics (background, border, radius, shadow). Styles only the element it is set on; surface treatment does not propagate to descendants. Wrapping a foreign design-system component (MUI Card, Chakra Card) produces visible card-in-card — use on your own divs, not as a foreign-component wrapper. Source of truth: src/styles/components/_participation.scss. Full decision tree: packages/void-energy-tailwind/INTEGRATIONS.md (Physics participation contract)."
+    },
+    "data-ve-content": {
+      "usage": "<div data-ve-content='primary'>...</div>",
+      "values": ["primary", "secondary", "muted"],
+      "note": "Sets color to --text-main / --text-dim / --text-mute. Cascades into descendants that don't override their own color. Independent of data-ve-surface — use either or both. Source of truth: src/styles/components/_participation.scss."
+    },
+    "data-ve-emphasis": {
+      "usage": "<div data-ve-surface='raised' data-ve-emphasis='strong'>...</div>",
+      "values": ["strong", "subtle", "none"],
+      "note": "Modulates a surface's border + shadow. Requires data-ve-surface on the same element to take effect — without a base surface, there is nothing to modulate. Source of truth: src/styles/components/_participation.scss."
+    }
   }
 }

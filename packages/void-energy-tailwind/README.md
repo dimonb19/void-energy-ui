@@ -155,6 +155,7 @@ setDensity('comfortable');   // 0.75 | 1 | 1.25 spacing multiplier
 | **Semantic tokens** | `--bg-canvas`, `--energy-primary`, `--color-premium`, `--control-height`, … — see [TOKENS.md](./TOKENS.md) |
 | **Tailwind utilities** | `bg-surface`, `p-lg`, `rounded`, `border`, `min-h-control`, `font-heading`, … |
 | **Footgun fixes** | physics-aware `.border`, adaptive `.rounded`, VE-scaled `.container`, `.backdrop-blur-physics` |
+| **Participation contract** | opt any DOM element into VE physics via `data-ve-surface` / `data-ve-content` / `data-ve-emphasis` (wrapper-only — see [INTEGRATIONS.md](./INTEGRATIONS.md#physics-participation-contract)) |
 | **SSR-safe runtime** | ~1 KB gzipped, zero side effects on import |
 | **SSR cookie bridge** | per-user atmosphere baked into server-rendered HTML; cookie + localStorage dual-write |
 | **FOUC prevention** | inline-script string export, framework-agnostic |
@@ -190,6 +191,12 @@ Also ships `@void-energy/tailwind/theme-no-container.css` — identical but with
 Optional precompiled component styles (~18 KB gzipped). Import after `theme.css` to style native HTML elements — `<button class="btn">`, `<input>`, `<dialog>`, toasts, dropdowns, chips, badges, pagination, tabs, and ~70 other classes — with VE physics already applied. Pure CSS, no JS. Generated from L1's `src/styles/components/**` sources; shipped with L0 for convenience.
 
 Consumers using an ecosystem bridge (shadcn, Radix, Mantine) typically don't need this — the bridge already styles the library's components. See [Components bundle](./INTEGRATIONS.md#components-bundle-optional) for the full list.
+
+### `@void-energy/tailwind/participation.css`
+
+Optional attribute-driven surface contract. Import after `theme.css` and any element gains VE physics by setting `data-ve-surface`, `data-ve-content`, or `data-ve-emphasis`. Useful when you want atmosphere-aware sections inside an existing layout without rewriting against L1 components — wrap your own div, drop your own `background` / `shadow` / `radius`, and the wrapper repaints with every `setAtmosphere` call.
+
+Wrapper-only by design: color and typography propagate into descendants via the CSS cascade, but surface treatment (background, border, shadow) does not. Don't use it as a wrapper around third-party component-library cards (MUI, Chakra, Antd) — you'll get card-in-card. See [Physics participation contract](./INTEGRATIONS.md#physics-participation-contract) for the full attribute table, decision tree, and pitch copy.
 
 ### `@void-energy/tailwind/bridges/*`
 

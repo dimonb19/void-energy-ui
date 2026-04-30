@@ -1,0 +1,79 @@
+@use '../abstracts' as *;
+
+// ==========================================================================
+// PHYSICS PARTICIPATION CONTRACT
+// ==========================================================================
+// Attribute-based opt-in API. Lets any element become a VE-styled surface
+// with content color or emphasis — without authoring a wrapper class.
+//
+// Wrapper-only: each rule styles only the element it is set on. Descendants
+// inherit `color` via natural CSS cascade and inherit nothing else. Foreign
+// components keep their own backgrounds, borders, and shadows; wrapping them
+// in `data-ve-surface` will produce visible card-in-card.
+//
+// Attributes (all independent — use one, some, or all):
+//   data-ve-surface   raised | sunk | floating | flat
+//   data-ve-content   primary | secondary | muted
+//   data-ve-emphasis  strong | subtle | none           (modifies a surface)
+
+// --------------------------------------------------------------------------
+// Surface
+// --------------------------------------------------------------------------
+
+[data-ve-surface='raised'] {
+  @include surface-raised;
+}
+
+[data-ve-surface='sunk'] {
+  @include surface-sunk;
+}
+
+// More-elevated companion to raised. Same physics, deeper shadow.
+[data-ve-surface='floating'] {
+  @include surface-raised;
+  box-shadow: var(--shadow-lift);
+}
+
+// Minimal: token border + background, no shadow, no transition behavior.
+[data-ve-surface='flat'] {
+  background: var(--surface-bg);
+  border: var(--physics-border-width) solid var(--border-color);
+  border-radius: var(--radius-base);
+}
+
+// --------------------------------------------------------------------------
+// Content (cascading text color)
+// --------------------------------------------------------------------------
+
+[data-ve-content='primary'] {
+  color: var(--text-main);
+}
+
+[data-ve-content='secondary'] {
+  color: var(--text-dim);
+}
+
+[data-ve-content='muted'] {
+  color: var(--text-mute);
+}
+
+// --------------------------------------------------------------------------
+// Emphasis (modulates surface intensity)
+// --------------------------------------------------------------------------
+// Scoped to elements that also opt into a surface — without a base, there
+// is nothing to modulate.
+
+[data-ve-surface][data-ve-emphasis='strong'] {
+  border-color: var(--energy-primary);
+  box-shadow: var(--shadow-lift);
+}
+
+[data-ve-surface][data-ve-emphasis='subtle'] {
+  border-color: alpha(var(--border-color), 50%);
+  box-shadow: none;
+}
+
+[data-ve-surface][data-ve-emphasis='none'] {
+  border-color: transparent;
+  box-shadow: none;
+}

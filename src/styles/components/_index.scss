@@ -66,3 +66,4 @@
 @forward 'avatar'; // Avatar: circular user representation, image or initials fallback
 @forward 'video'; // Video: native <video> wrapper with skeleton fallback and error state
 @forward 'aura'; // Aura: ambient colored glow primitive (paired with use:aura action)
+@forward 'participation'; // Physics Participation Contract (data-ve-* attribute API)

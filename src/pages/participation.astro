@@ -1,0 +1,204 @@
+---
+// Reference + QA page for the Physics Participation Contract.
+//
+// TOKEN LAW EXCEPTION
+// The "foreign-card" demo block at the bottom of this page hardcodes raw
+// hex / px / rgba values inline. This is intentional: the block simulates
+// a third-party component (e.g. MUI, Chakra) whose styles VE has no
+// contract over. The whole point of the final foreign-card section is
+// to show that the participation contract does NOT reach into
+// descendants and does NOT neutralize foreign styling. Replacing those
+// literals with VE tokens would defeat the demonstration.
+//
+// Note: the conventional `// void-ignore` annotation does NOT apply here —
+// `npm run scan` only walks `.scss` and `.svelte`, so `.astro` files are
+// already outside its scope. This comment serves as the human-readable
+// justification.
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Participation Contract">
+  <div class="container flex flex-col gap-2xl py-2xl">
+    <!-- Page intro -->
+    <section class="flex flex-col gap-xl">
+      <div class="surface-raised p-lg flex flex-col gap-lg">
+        <div class="flex flex-col gap-xs">
+          <p class="text-caption text-mute">Reference</p>
+          <h1>Physics Participation Contract</h1>
+          <p class="text-dim max-w-2xl">
+            Attribute-driven opt-in API. Use the nav controls to flip
+            atmosphere, physics, and color mode and verify each surface
+            renders correctly across the full matrix: 4 surfaces × 4
+            valid <code>(physics, mode)</code> combinations
+            (<code>glass-dark</code>, <code>flat-dark</code>,
+            <code>flat-light</code>, <code>retro-dark</code>) = 16 cells.
+            Glass and retro require dark mode; flat works in either.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. data-ve-surface — all four values -->
+    <section class="flex flex-col gap-xl">
+      <div class="surface-raised p-lg flex flex-col gap-lg">
+        <div class="flex flex-col gap-xs">
+          <h2>data-ve-surface</h2>
+          <p class="text-dim">
+            Each surface is a plain <code>div</code> with one attribute. Heading,
+            paragraph, and button inherit through natural cascade.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 tablet:grid-cols-2 gap-lg">
+          <div data-ve-surface="raised" class="p-lg flex flex-col gap-md">
+            <h3>raised</h3>
+            <p class="text-dim">
+              Floating card surface. Default shadow.
+            </p>
+            <div>
+              <button class="btn-cta">Action</button>
+            </div>
+          </div>
+
+          <div data-ve-surface="sunk" class="p-lg flex flex-col gap-md">
+            <h3>sunk</h3>
+            <p class="text-dim">
+              Recessed well. Inset depth.
+            </p>
+            <div>
+              <button class="btn-cta">Action</button>
+            </div>
+          </div>
+
+          <div data-ve-surface="floating" class="p-lg flex flex-col gap-md">
+            <h3>floating</h3>
+            <p class="text-dim">
+              Higher elevation than raised. Stronger shadow.
+            </p>
+            <div>
+              <button class="btn-cta">Action</button>
+            </div>
+          </div>
+
+          <div data-ve-surface="flat" class="p-lg flex flex-col gap-md">
+            <h3>flat</h3>
+            <p class="text-dim">
+              Minimal: background + border. No shadow.
+            </p>
+            <div>
+              <button class="btn-cta">Action</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. data-ve-content — cascading text color -->
+    <section class="flex flex-col gap-xl">
+      <div class="surface-raised p-lg flex flex-col gap-lg">
+        <div class="flex flex-col gap-xs">
+          <h2>data-ve-content</h2>
+          <p class="text-dim">
+            Sets <code>color</code>. Cascades to descendants that don't
+            override their own color.
+          </p>
+        </div>
+
+        <div class="surface-sunk p-md flex flex-col gap-md">
+          <p data-ve-content="primary">
+            Primary content — uses <code>--text-main</code>. Highest
+            contrast for body copy.
+          </p>
+          <p data-ve-content="secondary">
+            Secondary content — uses <code>--text-dim</code>. Mid contrast
+            for supporting text.
+          </p>
+          <p data-ve-content="muted">
+            Muted content — uses <code>--text-mute</code>. Lowest contrast
+            for ambient or de-emphasized text.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. data-ve-emphasis — modulates surface intensity -->
+    <section class="flex flex-col gap-xl">
+      <div class="surface-raised p-lg flex flex-col gap-lg">
+        <div class="flex flex-col gap-xs">
+          <h2>data-ve-emphasis</h2>
+          <p class="text-dim">
+            Modifies a surface's border + shadow. All three rows share
+            <code>data-ve-surface="raised"</code>.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 tablet:grid-cols-3 gap-lg">
+          <div
+            data-ve-surface="raised"
+            data-ve-emphasis="strong"
+            class="p-lg flex flex-col gap-md"
+          >
+            <h3>strong</h3>
+            <p class="text-dim">
+              Energy-primary border. Lift shadow.
+            </p>
+          </div>
+
+          <div
+            data-ve-surface="raised"
+            data-ve-emphasis="subtle"
+            class="p-lg flex flex-col gap-md"
+          >
+            <h3>subtle</h3>
+            <p class="text-dim">
+              Half-alpha border. No shadow.
+            </p>
+          </div>
+
+          <div
+            data-ve-surface="raised"
+            data-ve-emphasis="none"
+            class="p-lg flex flex-col gap-md"
+          >
+            <h3>none</h3>
+            <p class="text-dim">
+              Background only. Border + shadow stripped.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Foreign-style opaque card — documented limitation -->
+    <section class="flex flex-col gap-xl">
+      <div class="surface-raised p-lg flex flex-col gap-lg">
+        <div class="flex flex-col gap-xs">
+          <h2>Demonstrates card-in-card limitation</h2>
+          <p class="text-dim max-w-2xl">
+            The contract styles the wrapper element. It does not reach into
+            descendants. A foreign component with its own opaque
+            background, shadow, and radius will visibly nest inside any VE
+            surface — this is the documented v1 behavior. Visible on glass
+            most strikingly; still present on flat and retro.
+          </p>
+        </div>
+
+        <div data-ve-surface="raised" class="p-lg">
+          <!-- Simulated third-party component: hardcoded values are
+               intentional — they represent a foreign library's own
+               styling that VE has no contract over. -->
+          <div
+            style="background: white; color: #111; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); border-radius: 8px; padding: 20px;"
+          >
+            <strong>Imported MUI-style Card</strong>
+            <p style="margin-top: 8px;">
+              This element brings its own background, shadow, and radius.
+              It does not participate in VE physics — and the contract
+              does not try to neutralize it.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</Layout>

@@ -822,6 +822,65 @@ Now bare HTML picks up Void Energy physics:
 
 ---
 
+## Physics participation contract
+
+Lets any DOM element opt into VE's current physics as a wrapper surface, so consumers can build atmosphere-aware layouts without rewriting against L1 Svelte components. Pure CSS, attribute-driven, no runtime.
+
+```css
+@import 'tailwindcss';
+@import '@void-energy/tailwind/theme.css';
+@import '@void-energy/tailwind/participation.css';
+```
+
+The bundle ships three independent attributes — use one, some, or all on the same element:
+
+| Attribute | Values | Effect |
+|---|---|---|
+| `data-ve-surface` | `raised` \| `sunk` \| `floating` \| `flat` | Applies VE surface physics (background, border, radius, shadow) on the element. |
+| `data-ve-content` | `primary` \| `secondary` \| `muted` | Sets `color` to `--text-main` / `--text-dim` / `--text-mute`. Cascades into descendants. |
+| `data-ve-emphasis` | `strong` \| `subtle` \| `none` | Modulates an existing surface's border + shadow. Requires `data-ve-surface` on the same element to take effect. |
+
+### Example
+
+```html
+<section data-ve-surface="raised" data-ve-content="primary">
+  <h2>Atmosphere-aware section</h2>
+  <p data-ve-content="secondary">Heading and paragraph inherit VE color via the cascade.</p>
+</section>
+```
+
+The `<section>` becomes a VE-styled surface; the `<h2>` inherits `--text-main` from the section's `color`; the `<p>` overrides to `--text-dim`. Switching atmospheres at runtime repaints all three in one cascade.
+
+### Scope — when the contract fits, and when it doesn't
+
+- **Your own divs/CSS** — wrap them in `data-ve-surface` and remove your own background/shadow/radius. They become VE atmospheric surfaces.
+- **Plain text/controls inside a foreign layout div** — wrapping the container in `data-ve-content` gives you VE color and typography automatically (cascade), even if the wrapper itself stays foreign.
+- **Third-party design-system components (MUI Card, Chakra Card, Antd Card)** — the contract gives you VE tokens *inside* those components, but the components keep their own surface treatment. Wrapping a foreign Card in `data-ve-surface` produces visible card-in-card, especially on glass. Replace those components with VE primitives or your own divs to get full participation.
+
+VE styles only the wrapper element. Color and typography propagate into descendants through the CSS cascade. Surface treatment (background, border, shadow) does **not** propagate — descendants keep whatever they already had.
+
+The L0 fixture at [test/participation.html](./test/participation.html) is the acceptance proof — it exercises every attribute combination across atmospheres and physics presets and is what the contract is verified against.
+
+### Pitch copy (for marketing materials, READMEs, social posts)
+
+```
+The physics participation contract lets any DOM element opt into Void Energy's
+current physics by adding a data-ve-* attribute. VE styles the wrapper element.
+Color and typography propagate into descendants via the CSS cascade. Surface
+treatment (background, border, shadow) does NOT propagate — descendants keep
+their own.
+
+Use it when your surfaces are your own divs (wrap them and drop your own
+background/shadow). Use it for plain text/controls inside a foreign layout div
+(the wrapper inherits VE color/typography). Don't use it as a wrapper around
+third-party design-system components (MUI/Chakra/Antd Card): you'll get VE
+tokens inside, but the component's own surface treatment stays — producing
+card-in-card. Replace those with VE primitives or your own divs for full
+participation.
+```
+
+---
+
 ## Tailwind v4 `@source` directive
 
 Tailwind v4 auto-scans `node_modules` imports, so you don't normally need to tell it where to find class references. But if you opt into explicit source declarations (for performance or clarity), add the L0 package to your scan list:
