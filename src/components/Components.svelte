@@ -311,10 +311,19 @@
 
           <hr />
 
-          <p class="text-small text-mute text-center">
-            Related: L0 attribute API &mdash;
-            <a href="/participation" class="link">Participation Contract</a>
-          </p>
+          <div class="flex flex-col gap-md items-center text-center">
+            <p class="text-small text-mute max-w-3xl">
+              <strong>Participation contract</strong> &mdash; an attribute-based
+              opt-in API (<code>data-ve-surface</code>,
+              <code>data-ve-content</code>, <code>data-ve-emphasis</code>) that
+              turns any plain element into a VE surface. Wrapper-only by design
+              &mdash; useful for your own divs, not as a wrapper around
+              third-party cards.
+            </p>
+            <a href="/participation" class="link"
+              >See the reference page &rarr;</a
+            >
+          </div>
         </div>
       </div>
     </PullRefresh>
