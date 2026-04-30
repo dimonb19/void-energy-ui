@@ -193,16 +193,6 @@
                 <code>&lt;table&gt;</code>), and documented recipes for
                 app-specific compositions like nav menus.
               </p>
-              <p>
-                <strong>Participation contract</strong> &mdash; an
-                attribute-based opt-in API (<code>data-ve-surface</code>,
-                <code>data-ve-content</code>, <code>data-ve-emphasis</code>)
-                that turns any plain element into a VE surface. Wrapper-only by
-                design &mdash; useful for your own divs, not as a wrapper around
-                third-party cards.
-                <a href="/participation" class="link">See the reference page.</a
-                >
-              </p>
             </div>
           </details>
 
@@ -318,6 +308,13 @@
             </p>
           </div>
           <Charts />
+
+          <hr />
+
+          <p class="text-small text-mute text-center">
+            Related: L0 attribute API &mdash;
+            <a href="/participation" class="link">Participation Contract</a>
+          </p>
         </div>
       </div>
     </PullRefresh>
