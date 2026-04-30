@@ -64,6 +64,13 @@ export default defineConfig({
         },
       },
     },
+    // The /components showcase page statically imports 24 demo sections
+    // (incl. Markdown, which pulls in marked + isomorphic-dompurify), so the
+    // dev-facing docs chunk runs ~550 kB. Lift the warning ceiling rather
+    // than chase a number that's expected to be large for this one route.
+    build: {
+      chunkSizeWarningLimit: 700,
+    },
   },
   devToolbar: {
     enabled: false,

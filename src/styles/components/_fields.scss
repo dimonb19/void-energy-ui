@@ -268,7 +268,7 @@ $_slot-width: var(--control-padding-x);
     }
   }
 
-  &.disabled {
+  &[data-disabled] {
     opacity: 0.5;
     pointer-events: none;
     cursor: not-allowed;

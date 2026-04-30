@@ -64,7 +64,10 @@
   }
 </script>
 
-<div class="field color-field {className}" class:disabled>
+<div
+  class="field color-field {className}"
+  data-disabled={disabled || undefined}
+>
   <!-- Native color input — visually hidden but focusable and form-participating -->
   <input
     id={inputId}

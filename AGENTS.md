@@ -10,7 +10,7 @@ Repo-wide instructions for coding agents working in `void-energy-ui`.
 
 ## Project Snapshot
 
-- Stack: Astro 5, Svelte 5 runes, TypeScript, Tailwind CSS 3, SCSS, Vitest.
+- Stack: Astro 5, Svelte 5 runes, TypeScript, Tailwind CSS v4 (`@tailwindcss/vite`, no `tailwind.config.mjs` — bridge lives in `src/styles/tailwind-theme.css`), SCSS, Vitest.
 - Design system: Void Energy UI for CoNexus.
 - Dev server: `npm run dev` regenerates tokens and starts Astro.
 - Key docs:

@@ -322,6 +322,7 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
   line-height: var(--line-height-small);
   text-decoration: none;
   color: var(--text-dim);
+  border-radius: var(--radius-base);
 
   transition:
     color var(--speed-base) var(--ease-spring-snappy),
@@ -336,9 +337,6 @@ $sidebar-width: 15rem; // void-ignore (Sidebar Width) 240px
     box-shadow: var(--focus-ring);
   }
 
-  // Active state — inset left accent rail + primary color + subtle tint.
-  // Inset box-shadow (not border) so the accent can't interact with
-  // border-radius and can't leak to other sides via border shorthand.
   @include when-state('active') {
     color: var(--energy-primary);
     font-weight: var(--font-weight-semibold);
