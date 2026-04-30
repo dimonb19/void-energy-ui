@@ -2,15 +2,15 @@
   import type { HTMLAttributes } from 'svelte/elements';
   let { class: className, ...rest }: HTMLAttributes<SVGElement> = $props();
 
-  // 6 curved shutter blades arranged radially around (128, 128).
-  // Outer arc R=110 (40° span), inner arc R=48 (40° span, twisted +28°).
-  // Outer blades cover 240° / 360°, leaving 120° of canvas visible between them
-  // — the spiral channels that read as a vortex rather than a solid disc.
+  // 7 curved shutter blades arranged radially around (128, 128).
+  // Outer arc R=118, inner arc R=38 — longer reach into the core tightens the
+  // spiral channels and reads as a sharper vortex than the 6-blade version.
   // Trailing edge curves toward center, leading edge curves outward —
   // gives each blade a comma-like swirl character.
   const BLADE =
-    'M 231.37 90.38 A 110 110 0 0 1 231.37 165.62 Q 190.46 161.80 160.12 163.67 A 48 48 0 0 0 175.53 134.68 Q 209.33 111.32 231.37 90.38 Z';
-  const ANGLES = [0, 60, 120, 180, 240, 300];
+    'M 239.57 89.58 A 118 118 0 0 1 239.57 166.42 Q 192 173 140.37 163.93 A 38 38 0 0 0 157.53 151.91 Q 208 113 239.57 89.58 Z';
+  const COUNT = 7;
+  const ANGLES = Array.from({ length: COUNT }, (_, i) => (360 / COUNT) * i);
 </script>
 
 <svg
