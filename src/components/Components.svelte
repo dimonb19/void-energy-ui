@@ -200,7 +200,8 @@
                 that turns any plain element into a VE surface. Wrapper-only by
                 design &mdash; useful for your own divs, not as a wrapper around
                 third-party cards.
-                <a href="/participation">See the reference page.</a>
+                <a href="/participation" class="link">See the reference page.</a
+                >
               </p>
             </div>
           </details>
