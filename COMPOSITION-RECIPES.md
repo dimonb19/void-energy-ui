@@ -259,7 +259,7 @@ Avoid:
 Use when rendering HTML the application **does not author**: rich-text-editor output, embedded third-party blocks, markdown rendered from user input, paste-to-publish flows.
 
 - Wrap the foreign HTML in `<div class="prose-untrusted">…</div>` — the scope caps runaway media, wraps wide tables, re-anchors inheritable typography, and isolates layout/stacking context.
-- Sanitize the HTML **separately** before rendering (DOMPurify, trusted-types). `.prose-untrusted` is the visual quarantine layer, not a security layer — it does not strip `<script>`, event handlers, or dangerous URL schemes.
+- Sanitize the HTML **separately** before rendering (`sanitize-html`, DOMPurify, or a trusted-types policy). `.prose-untrusted` is the visual quarantine layer, not a security layer — it does not strip `<script>`, event handlers, or dangerous URL schemes.
 - For **trusted** rich text the app controls (markdown blogs, legal documents, in-house articles) use `.prose` or `.legal-content` instead — `.prose-untrusted` is heavier and constrains layout in ways that matter only for foreign content.
 - Inline `style="…"` on foreign elements still wins locally — that is by design. The scope defends against block-level leakage, not against attributes the sanitizer left in place.
 

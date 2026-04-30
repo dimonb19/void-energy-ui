@@ -17,7 +17,8 @@
  *                     wide tables, and re-anchors inheritable typography
  *                     so foreign styles cannot escape the scope. NOT a
  *                     sanitization layer — caller must sanitize HTML
- *                     separately (DOMPurify, trusted-types).
+ *                     separately (e.g. sanitize-html, DOMPurify, or a
+ *                     trusted-types policy).
  *
  * List markers are globally stripped in _reset.scss (list-style: none) to
  * protect navigation menus and component lists. The .prose class safely
@@ -276,8 +277,9 @@ address {
 //      not a CSS one.
 //
 // NOT a sanitization layer. Caller must strip <script>, <style>, event
-// handlers, and dangerous URL schemes via DOMPurify or trusted-types
-// before rendering inside this scope.
+// handlers, and dangerous URL schemes via an HTML sanitizer (e.g.
+// sanitize-html, DOMPurify, or a trusted-types policy) before rendering
+// inside this scope.
 //
 // Pairs with .prose for trusted rich text. Use .prose for content the
 // application controls; use .prose-untrusted for content it does not.

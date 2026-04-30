@@ -1006,7 +1006,7 @@
       "example": "<Video src='/clip.mp4' poster='/poster.jpg' />"
     },
     "markdown": {
-      "description": "Renders a markdown string as styled, sanitized HTML inside a .prose wrapper. Bundles parser (marked + GFM) and sanitizer (isomorphic-dompurify) so consumers don't choose per-call. Safe by default; trusted bypasses sanitization for system-authored strings committed in source. External links auto-receive target='_blank' rel='noopener noreferrer'. Inline mode wraps in <span> (no leading <p>) for tooltip / label phrasing.",
+      "description": "Renders a markdown string as styled, sanitized HTML inside a .prose wrapper. Bundles parser (marked + GFM) and sanitizer (sanitize-html) so consumers don't choose per-call. Safe by default; trusted bypasses sanitization for system-authored strings committed in source. External links auto-receive target='_blank' rel='noopener noreferrer'. Inline mode wraps in <span> (no leading <p>) for tooltip / label phrasing.",
       "category": "feedback",
       "component": "Markdown",
       "import": "@components/ui/Markdown.svelte",

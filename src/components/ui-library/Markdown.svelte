@@ -55,9 +55,9 @@
         app."</em
       >
       Bundles parser (<code>marked</code>
-      + GFM) and sanitizer (<code>isomorphic-dompurify</code>) so consumers
-      don't pick per-call. Safe by default; the <code>trusted</code> flag bypasses
-      the sanitizer for system-authored strings committed in source.
+      + GFM) and sanitizer (<code>sanitize-html</code>) so consumers don't pick
+      per-call. Safe by default; the <code>trusted</code> flag bypasses the sanitizer
+      for system-authored strings committed in source.
     </p>
 
     <details>
@@ -75,7 +75,7 @@
         throwing — pre-first-chunk AI streaming is safe. Inline mode uses
         <code>marked.parseInline</code> in a <code>&lt;span&gt;</code> for
         tooltip / label phrasing. Decisions log: <code>plans/decisions.md</code>
-        D34.
+        D34 (parser, naming, streaming, trusted-flag) and D35 (sanitizer choice).
       </p>
     </details>
 

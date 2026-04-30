@@ -5,9 +5,10 @@
   it to look like the rest of the app" — covers AI-generated narrative copy,
   help text, toast bodies, changelog entries, and similar authored content.
 
-  See plans/decisions.md D34 for the locked five decisions that shape this
-  primitive: parser (`marked` + GFM, exact pin), sanitizer (`isomorphic-
-  dompurify`, exact pin), no syntax highlighting in v1, no streaming in v1,
+  See plans/decisions.md D34 (parser, naming, streaming, trusted-flag) and
+  D35 (sanitizer swap rationale) for the locked decisions that shape this
+  primitive: parser (`marked` + GFM, exact pin), sanitizer (`sanitize-html`,
+  exact pin), no syntax highlighting in v1, no streaming in v1,
   `trusted?: boolean` default `false` (safe-by-default).
 
   USAGE
@@ -41,7 +42,7 @@
 
 <script lang="ts" module>
   import { Marked, type Tokens } from 'marked';
-  import DOMPurify from 'isomorphic-dompurify';
+  import sanitizeHtml from 'sanitize-html';
 
   // Module-scoped: parser instance and renderer hook are configured once
   // per module load. Doing this in the instance script would re-register
@@ -70,9 +71,9 @@
 
   // Sanitizer allowlist. Covers every tag styled in `_prose.scss` plus the
   // inline semantics from `_typography.scss`, GFM tables, and details/summary
-  // (which DOMPurify excludes from its default allowlist). When a new tag is
-  // added to either stylesheet, this list must be updated in lock-step or
-  // the parser will produce HTML the sanitizer silently strips.
+  // (which `sanitize-html` excludes from its default allowlist). When a new
+  // tag is added to either stylesheet, this list must be updated in lock-step
+  // or the parser will produce HTML the sanitizer silently strips.
   const ALLOWED_TAGS = [
     'h1',
     'h2',
@@ -145,8 +146,17 @@
     'checked',
   ];
 
+  // sanitize-html shape: `allowedAttributes` is per-tag. Apply the flat
+  // allowlist to every tag via the `*` wildcard — equivalent to DOMPurify's
+  // global `ALLOWED_ATTR` semantics. The library's default `allowedSchemes`
+  // (http, https, ftp, mailto) handles unsafe-URL filtering for us.
+  const SANITIZE_OPTIONS: sanitizeHtml.IOptions = {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: { '*': ALLOWED_ATTR },
+  };
+
   function sanitize(html: string): string {
-    return DOMPurify.sanitize(html, { ALLOWED_TAGS, ALLOWED_ATTR });
+    return sanitizeHtml(html, SANITIZE_OPTIONS);
   }
 </script>
 

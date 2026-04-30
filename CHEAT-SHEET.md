@@ -705,20 +705,20 @@ Defensive scope for foreign HTML the application does not author: rich-text-edit
 
 **What it does NOT do:**
 
-- **No HTML sanitization.** Strip `<script>`, `<style>`, event handlers, and dangerous URL schemes via DOMPurify or trusted-types **before** rendering inside this scope.
+- **No HTML sanitization.** Strip `<script>`, `<style>`, event handlers, and dangerous URL schemes via an HTML sanitizer (e.g. `sanitize-html`, DOMPurify, or a trusted-types policy) **before** rendering inside this scope.
 - **No defense against inline `style="…"`** on foreign elements. The CSS specificity hierarchy explicitly grants inline styles priority — that is by design. Sanitize attributes the application does not need.
 - **No content transformation.** No filtering, tinting, desaturation, or pixel modification. The scope wraps and selects; it never touches pixels.
 
 **Usage:**
 
 ```svelte
-<script>
-  import DOMPurify from 'isomorphic-dompurify';
+<script lang="ts">
+  import sanitizeHtml from 'sanitize-html';
   let { userHtml }: { userHtml: string } = $props();
 </script>
 
 <div class="prose-untrusted">
-  {@html DOMPurify.sanitize(userHtml)}
+  {@html sanitizeHtml(userHtml)}
 </div>
 ```
 
@@ -2482,7 +2482,7 @@ const pv = createPasswordValidation(() => password);
 
 #### `<Markdown>`
 
-**Description:** Renders a markdown string as styled, sanitized HTML inside a `.prose` wrapper. Bundles parser (`marked` + GFM) and sanitizer (`isomorphic-dompurify`) so consumers don't pick per-call. Safe by default; `trusted` bypasses sanitization for system-authored strings committed in source. External links auto-receive `target="_blank" rel="noopener noreferrer"`. Inline mode wraps in `<span>` (no leading `<p>`) for tooltip / label phrasing.
+**Description:** Renders a markdown string as styled, sanitized HTML inside a `.prose` wrapper. Bundles parser (`marked` + GFM) and sanitizer (`sanitize-html`) so consumers don't pick per-call. Safe by default; `trusted` bypasses sanitization for system-authored strings committed in source. External links auto-receive `target="_blank" rel="noopener noreferrer"`. Inline mode wraps in `<span>` (no leading `<p>`) for tooltip / label phrasing.
 **Location:** [src/components/ui/Markdown.svelte](src/components/ui/Markdown.svelte)
 **CSS Class:** `.prose` ([src/styles/base/\_prose.scss](src/styles/base/_prose.scss)) — primitive does not own its own SCSS surface; styling adapts via the `.prose` scope across all physics and modes.
 
