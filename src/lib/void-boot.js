@@ -296,10 +296,17 @@ export function applyTheme(root, theme, constants) {
   }
 
   // Update <meta name="theme-color"> to match atmosphere canvas.
-  var meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) {
+  // Replace the element rather than mutating its content attribute —
+  // iOS Safari otherwise won't repaint the chrome region until a full reload.
+  var oldMeta = document.querySelector('meta[name="theme-color"]');
+  if (oldMeta) {
     var color = resolveThemeColor(theme);
-    if (color) meta.setAttribute('content', color);
+    if (color) {
+      var newMeta = document.createElement('meta');
+      newMeta.setAttribute('name', 'theme-color');
+      newMeta.setAttribute('content', color);
+      oldMeta.replaceWith(newMeta);
+    }
   }
 }
 

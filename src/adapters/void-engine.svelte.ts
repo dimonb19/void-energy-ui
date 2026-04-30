@@ -405,10 +405,13 @@ export class VoidEngine {
   /**
    * Update <meta name="theme-color"> eagerly (before View Transition snapshot).
    * Mirrors the resolution logic in void-boot.js applyTheme().
+   *
+   * Replaces the element rather than mutating its content attribute — iOS
+   * Safari otherwise won't repaint the chrome region until a full reload.
    */
   private updateThemeColorMeta(name: string) {
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (!meta) return;
+    const oldMeta = document.querySelector('meta[name="theme-color"]');
+    if (!oldMeta) return;
     const entry = this.registry[name];
     if (!entry) return;
     const color = resolveThemeColor(
@@ -416,7 +419,11 @@ export class VoidEngine {
         canvas?: string;
       },
     );
-    if (color) meta.setAttribute('content', color);
+    if (!color) return;
+    const newMeta = document.createElement('meta');
+    newMeta.setAttribute('name', 'theme-color');
+    newMeta.setAttribute('content', color);
+    oldMeta.replaceWith(newMeta);
   }
 
   private syncDOM() {
