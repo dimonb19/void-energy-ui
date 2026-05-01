@@ -2,7 +2,7 @@
 
 Void Energy's design system brain as a **framework-agnostic Tailwind CSS v4 preset**. Four built-in atmospheres, three physics presets, two color modes, three density levels — plus a consumer config layer that lets you replace VE's themes with your own and ship them as first-class defaults. Works with any framework. Zero runtime unless you want it.
 
-**See it live:** [void.dgrslabs.ink](https://void.dgrslabs.ink) — every atmosphere, physics preset, and density level, switchable in the browser.
+**See it live:** [voidenergy.dev](https://voidenergy.dev) — every atmosphere, physics preset, and density level, switchable in the browser.
 
 > **Status:** Phase 1 complete (Sessions 1–9). Not yet published to npm.
 

@@ -1,7 +1,7 @@
 ---
 name: Void Energy
 version: alpha
-description: Void Energy — Frost atmosphere. A dark, glass-morphism design system built on translucent surfaces over an indigo ambient backdrop. Space Grotesk for headings, Inter for body. Generous whitespace, sentence-case controls, semantic color tokens. This snapshot describes one of several atmospheres; the live system is physics-reactive (glass / flat / retro) and mode-aware (light / dark). See https://void.dgrslabs.ink for the full runtime.
+description: Void Energy — Frost atmosphere. A dark, glass-morphism design system built on translucent surfaces over an indigo ambient backdrop. Space Grotesk for headings, Inter for body. Generous whitespace, sentence-case controls, semantic color tokens. This snapshot describes one of several atmospheres; the live system is physics-reactive (glass / flat / retro) and mode-aware (light / dark). See https://voidenergy.dev for the full runtime.
 
 colors:
   primary: "#7ec8e3"
