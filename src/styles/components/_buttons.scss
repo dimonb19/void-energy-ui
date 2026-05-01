@@ -116,6 +116,10 @@
     z-index: -1;
     border-radius: var(--radius-full);
 
+    // Match ::before so the fill eases in alongside the beam color shift.
+    // Pseudo-element transitions don't inherit from the host element.
+    transition: background-color var(--speed-base) var(--ease-spring-gentle);
+
     // Retro override: disable inner mask (not needed without gradient)
     @include when-retro($low-specificity: true) {
       display: none;
@@ -131,6 +135,12 @@
 
     &:hover::after {
       background: blend(var(--bg-canvas), var(--energy-primary), 6%);
+
+      // Light mode needs a stronger tint — 6% primary on near-white canvas
+      // sits below the perception floor and the button face dissolves into the page.
+      @include when-light {
+        background: blend(var(--bg-canvas), var(--energy-primary), 18%);
+      }
     }
 
     // Cursor-aim (auto-attached by ActionBtn / ThemesBtn when class includes
@@ -147,7 +157,10 @@
       animation: none;
       background-color: transparent;
       transform: translate(-50%, -50%) rotate(var(--cta-aim, 0deg));
-      transition: transform var(--speed-base) var(--ease-flow);
+      // Cursor tracking re-targets transform every frame; needs uniform
+      // interpolation. --ease-flow is `linear` in glass but `ease-in-out` in
+      // flat, which makes every frame restart an S-curve and the comet stutter.
+      transition: transform var(--speed-base) linear;
     }
   }
 }

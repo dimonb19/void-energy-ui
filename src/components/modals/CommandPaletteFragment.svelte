@@ -43,6 +43,20 @@
       hint: '/conexus',
       action: () => navigate('/conexus'),
     },
+    {
+      id: 'page-participation',
+      label: 'Physics Participation',
+      group: 'Pages',
+      hint: '/participation',
+      action: () => navigate('/participation'),
+    },
+    {
+      id: 'page-ambient-layers',
+      label: 'Ambient Layers',
+      group: 'Pages',
+      hint: '/ambient-layers',
+      action: () => navigate('/ambient-layers'),
+    },
   ];
 
   function navigate(path: string) {
