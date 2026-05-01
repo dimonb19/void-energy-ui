@@ -7,8 +7,8 @@
   fade) but holds the previous frame across atmosphere-driven src swaps
   instead of resetting to the loading state.
 
-  Per D33: never transforms pixels — only selects between consumer-provided
-  source URLs. Resolution keys on the finite axes (physics × mode), never on
+  Never transforms pixels — only selects between consumer-provided source
+  URLs. Resolution keys on the finite axes (physics × mode), never on
   unbounded atmosphere names.
 
   USAGE

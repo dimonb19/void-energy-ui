@@ -5,11 +5,9 @@
   it to look like the rest of the app" — covers AI-generated narrative copy,
   help text, toast bodies, changelog entries, and similar authored content.
 
-  See plans/decisions.md D34 (parser, naming, streaming, trusted-flag) and
-  D35 (sanitizer swap rationale) for the locked decisions that shape this
-  primitive: parser (`marked` + GFM, exact pin), sanitizer (`sanitize-html`,
-  exact pin), no syntax highlighting in v1, no streaming in v1,
-  `trusted?: boolean` default `false` (safe-by-default).
+  Parser: `marked` + GFM (exact pin). Sanitizer: `sanitize-html` (exact pin).
+  No syntax highlighting. No streaming. `trusted?: boolean` defaults to
+  `false` — safe-by-default.
 
   USAGE
   -------------------------------------------------------------------------
@@ -33,11 +31,6 @@
   parser renderer hook. Internal links (relative, anchor-only) pass through
   unchanged.
 
-  PHASE 0c W1 FALLBACK: this component emits `.prose` only on the sanitized
-  path. The plan calls for `.prose-untrusted` (Phase 0c W1) to also be
-  applied — but `.prose-untrusted` does not yet exist in `_prose.scss`. When
-  Phase 0c W1 lands, change the sanitized-path class to
-  `prose prose-untrusted {className}` in one line. See COMPOSITION-RECIPES.md.
 -->
 
 <script lang="ts" module>

@@ -73,9 +73,8 @@
         <code>&lt;details&gt;/&lt;summary&gt;</code>. Empty / <code>null</code>
         / <code>undefined</code> source renders an empty wrapper without
         throwing — pre-first-chunk AI streaming is safe. Inline mode uses
-        <code>marked.parseInline</code> in a <code>&lt;span&gt;</code> for
-        tooltip / label phrasing. Decisions log: <code>plans/decisions.md</code>
-        D34 (parser, naming, streaming, trusted-flag) and D35 (sanitizer choice).
+        <code>marked.parseInline</code> in a <code>&lt;span&gt;</code> for tooltip
+        / label phrasing.
       </p>
     </details>
 

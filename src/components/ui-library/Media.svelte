@@ -72,10 +72,9 @@
       <summary>Technical Details</summary>
       <div class="p-md flex flex-col gap-md">
         <p>
-          Per <strong>D33</strong>: Void Energy <em>wraps</em> and
-          <em>selects</em> content, never modifies pixels. No filters, tints, desaturation,
-          or mode-adaptive processing. The skeleton adapts to physics; the underlying
-          image/video is never transformed.
+          Void Energy <em>wraps</em> and <em>selects</em> content, never modifies
+          pixels. No filters, tints, desaturation, or mode-adaptive processing. The
+          skeleton adapts to physics; the underlying image/video is never transformed.
         </p>
         <p>
           State is exposed via <code>data-state</code> on the wrapper:
@@ -387,8 +386,8 @@
         surface as <code>&lt;Image&gt;</code> (skeleton, error, aspect-ratio,
         opacity fade) but holds the previous frame across atmosphere-driven
         swaps via <code>Image().decode()</code> &mdash; no skeleton flash, no
-        opacity reset. Per <strong>D33</strong>: never modifies pixels &mdash;
-        selects only between URLs the consumer provides. The demo below binds
+        opacity reset. Never modifies pixels &mdash; selects only between URLs
+        the consumer provides. The demo below binds
         <code>glass</code>, <code>retro</code>, <code>dark</code>, and
         <code>light</code> to distinct <code>picsum</code> seeds; the
         <code>flat</code> physics-prop is intentionally omitted so flat atmospheres
