@@ -29,6 +29,7 @@
   import Effects from './ui-library/Effects.svelte';
   import MotionPrimitives from './ui-library/MotionPrimitives.svelte';
   import KineticText from './ui-library/KineticText.svelte';
+  import FontShift from './ui-library/FontShift.svelte';
   import DragAndDrop from './ui-library/DragAndDrop.svelte';
   import PortalRingShowcase from './ui-library/PortalRing.svelte';
   import Aura from './ui-library/Aura.svelte';
@@ -82,6 +83,7 @@
         { id: 'loading-states', label: 'Loading States' },
         { id: 'motion-primitives', label: 'Motion Primitives' },
         { id: 'kinetic-text', label: 'Kinetic Text' },
+        { id: 'font-shift', label: 'Font Shift' },
         { id: 'drag-and-drop', label: 'Drag & Drop' },
         { id: 'portal-ring', label: 'Portal Ring' },
         { id: 'aura', label: 'Aura' },
@@ -293,6 +295,7 @@
           <Effects />
           <MotionPrimitives />
           <KineticText />
+          <FontShift />
           <DragAndDrop />
           <PortalRingShowcase />
           <Aura />

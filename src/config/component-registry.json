@@ -1444,6 +1444,20 @@
       "related": [],
       "compose": "Already auto-bound by ActionBtn and ThemesBtn when their class prop includes btn-cta — consumers using those wrappers don't need to import or apply this action. For raw <button class=\"btn-cta\"> usages in Svelte runes files, bind it explicitly. Astro pages can't use Svelte directives and will fall back to the default paused-on-hover behavior. Apply to primary CTAs only — the magnetic feel is most striking when scarce.",
       "example": "<button class=\"btn btn-cta\" use:laserAim>Continue</button>"
+    },
+    "font-shift": {
+      "description": "Svelte action that ties a variable font's wght axis to scroll position via animation-timeline: view(). Per-instance keyframes are injected into a per-instance <style> tag. The animated custom property --void-font-shift-wght is registered once via CSS.registerProperty with syntax: '<number>' so all browsers interpolate it smoothly (without registration, custom properties flip discretely at 50%). All three physics presets default to a 100 → 900 sweep — only the timing function differs (glass linear, flat linear, retro steps(4, end)). The action queries the resolved font's actual wght axis via document.fonts and auto-clamps the defaults to that axis, so a font like Space Grotesk (300–700) uses its full visible range without dead zones. Explicit from/to values bypass clamping. Physics resolves from the nearest [data-physics] ancestor (closest() lookup), so AtmosphereScope-pinned subtrees and local data-physics regions render correctly. State surfacing via data-font-shift: active, reduced (motion preference), or static (font has no wght axis — dev builds also log a console warning). Reduced motion and static-font elements render at the natural cascade weight. Browsers without view-timeline (Firefox stable) fall back via @supports. Animates wght only — wdth/opsz and scroll() timelines are non-goals for v1.",
+      "category": "motion",
+      "symbol": "fontShift",
+      "import": "@actions/font-shift",
+      "signature": "fontShift(node, options?)",
+      "args": [
+        "options?: { from?: number; to?: number; range?: string; enabled?: boolean }"
+      ],
+      "returns": ["{ update(newOptions), destroy() }"],
+      "related": ["kinetic"],
+      "compose": "Apply to headings or short phrases on tall, scrollable pages — the effect needs viewport runway to be visible. Omit from/to to inherit atmosphere defaults. Use only on variable fonts whose @font-face declares a wght range (Inter, Hanken Grotesk, Raleway, Exo 2, Cinzel, etc.). Avoid stacking on every heading on a page — the effect is most striking when scarce.",
+      "example": "<h1 use:fontShift={{ from: 100, to: 900 }}>Type that breathes</h1>"
     }
   },
   "controllers": {

@@ -309,21 +309,37 @@ function generateFontsScss(): string {
     const displayName = fontDef.family.match(/^'([^']+)'/)?.[1] || fontKey;
     scss += `/* FAMILY: ${displayName} */\n`;
 
-    // Sort weights for consistent output
-    const weights = Object.keys(fontDef.files)
-      .map(Number)
-      .sort((a, b) => a - b);
-
-    for (const weight of weights) {
-      const filename = fontDef.files[weight];
+    if (fontDef.variable) {
+      // Variable font: emit one block with the full fvar weight range so
+      // CSS can reach any weight via font-variation-settings or font-weight
+      // interpolation. All weight keys point at the same WOFF2 file.
+      const filename = Object.values(fontDef.files)[0];
+      const { min, max } = fontDef.variable;
 
       scss += `@font-face {\n`;
       scss += `  font-family: '${displayName}';\n`;
       scss += `  src: url('/fonts/${filename}') format('woff2');\n`;
-      scss += `  font-weight: ${weight};\n`;
+      scss += `  font-weight: ${min} ${max};\n`;
       scss += `  font-style: normal;\n`;
       scss += `  font-display: swap;\n`;
       scss += `}\n`;
+    } else {
+      // Static font: one @font-face per discrete weight, distinct files.
+      const weights = Object.keys(fontDef.files)
+        .map(Number)
+        .sort((a, b) => a - b);
+
+      for (const weight of weights) {
+        const filename = fontDef.files[weight];
+
+        scss += `@font-face {\n`;
+        scss += `  font-family: '${displayName}';\n`;
+        scss += `  src: url('/fonts/${filename}') format('woff2');\n`;
+        scss += `  font-weight: ${weight};\n`;
+        scss += `  font-style: normal;\n`;
+        scss += `  font-display: swap;\n`;
+        scss += `}\n`;
+      }
     }
     scss += `\n`;
   }
@@ -375,7 +391,16 @@ function generateFontRegistry(): string {
   for (const [fontKey, fontDef] of Object.entries(FONTS)) {
     const displayName = fontDef.family.match(/^'([^']+)'/)?.[1] || fontKey;
     const preloadWeights = fontDef.preloadWeights ?? [...DEFAULT_PRELOAD_WEIGHTS];
-    const files = preloadWeights.map((weight) => `/fonts/${fontDef.files[weight]}`);
+    const seen = new Set<string>();
+    const files: string[] = [];
+    for (const weight of preloadWeights) {
+      const file = fontDef.files[weight];
+      // Variable fonts collapse all preload weights to one file; static fonts
+      // may not have entries for every default weight (e.g. only 400+700).
+      if (!file || seen.has(file)) continue;
+      seen.add(file);
+      files.push(`/fonts/${file}`);
+    }
     userFontMap[displayName] = files;
   }
 

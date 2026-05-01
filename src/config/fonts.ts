@@ -43,6 +43,8 @@
  *  (covers ~90% of initial viewport text). Non-critical weights load
  *  on-demand via @font-face with font-display: swap.
  *  Override per-font with the optional preloadWeights array.
+ *  Variable fonts collapse to a single preload tag — the same .woff2
+ *  file serves every weight, so duplicate preloads are deduped.
  *
  * =====================================================================
  */
@@ -56,6 +58,14 @@ export interface FontDefinition {
   files: Record<number, string>;
   /** Override DEFAULT_PRELOAD_WEIGHTS if this font needs different preload behavior */
   preloadWeights?: number[];
+  /**
+   * If set, the file is a variable font with a `wght` axis. The generator emits
+   * a single `@font-face` block with `font-weight: <min> <max>` range syntax,
+   * making the full fvar range reachable from CSS (font-variation-settings,
+   * fluid weight transitions). Use the file's actual fvar range — not the
+   * subset declared in `files`.
+   */
+  variable?: { min: number; max: number };
 }
 
 // ---------------------------------------------------------------------------
@@ -77,22 +87,13 @@ export const DEFAULT_PRELOAD_WEIGHTS = [400, 700] as const;
 export const FONTS: Record<string, FontDefinition> = {
   tech: {
     family: "'Hanken Grotesk', sans-serif",
-    files: {
-      300: 'HankenGrotesk.woff2',
-      400: 'HankenGrotesk.woff2',
-      500: 'HankenGrotesk.woff2',
-      600: 'HankenGrotesk.woff2',
-      700: 'HankenGrotesk.woff2',
-    },
+    files: { 400: 'HankenGrotesk.woff2' },
+    variable: { min: 100, max: 900 },
   },
   clean: {
     family: "'Inter', sans-serif",
-    files: {
-      400: 'Inter.woff2',
-      500: 'Inter.woff2',
-      600: 'Inter.woff2',
-      700: 'Inter.woff2',
-    },
+    files: { 400: 'Inter.woff2' },
+    variable: { min: 100, max: 900 },
   },
   code: {
     family: "'Courier Prime', monospace",
@@ -103,28 +104,18 @@ export const FONTS: Record<string, FontDefinition> = {
   },
   horror: {
     family: "'Merriweather', serif",
-    files: {
-      400: 'Merriweather.woff2',
-      500: 'Merriweather.woff2',
-      600: 'Merriweather.woff2',
-      700: 'Merriweather.woff2',
-    },
+    files: { 400: 'Merriweather.woff2' },
+    variable: { min: 300, max: 900 },
   },
   nature: {
     family: "'Lora', serif",
-    files: {
-      400: 'Lora.woff2',
-      500: 'Lora.woff2',
-      600: 'Lora.woff2',
-      700: 'Lora.woff2',
-    },
+    files: { 400: 'Lora.woff2' },
+    variable: { min: 400, max: 700 },
   },
   hand: {
     family: "'Caveat', cursive",
-    files: {
-      400: 'Caveat.woff2',
-      700: 'Caveat.woff2',
-    },
+    files: { 400: 'Caveat.woff2' },
+    variable: { min: 400, max: 700 },
   },
   book: {
     family: "'PT Serif Caption', serif",
@@ -135,30 +126,18 @@ export const FONTS: Record<string, FontDefinition> = {
   },
   arcane: {
     family: "'Cinzel', serif",
-    files: {
-      400: 'Cinzel.woff2',
-      500: 'Cinzel.woff2',
-      600: 'Cinzel.woff2',
-      700: 'Cinzel.woff2',
-    },
+    files: { 400: 'Cinzel.woff2' },
+    variable: { min: 400, max: 900 },
   },
   mystic: {
     family: "'Exo 2', sans-serif",
-    files: {
-      400: 'Exo2.woff2',
-      500: 'Exo2.woff2',
-      600: 'Exo2.woff2',
-      700: 'Exo2.woff2',
-    },
+    files: { 400: 'Exo2.woff2' },
+    variable: { min: 100, max: 900 },
   },
   lab: {
     family: "'Open Sans', sans-serif",
-    files: {
-      400: 'OpenSans.woff2',
-      500: 'OpenSans.woff2',
-      600: 'OpenSans.woff2',
-      700: 'OpenSans.woff2',
-    },
+    files: { 400: 'OpenSans.woff2' },
+    variable: { min: 300, max: 800 },
   },
   fun: {
     family: "'Comic Neue', sans-serif",
@@ -178,40 +157,23 @@ export const FONTS: Record<string, FontDefinition> = {
   },
   display: {
     family: "'Playfair Display', serif",
-    files: {
-      400: 'PlayfairDisplay.woff2',
-      500: 'PlayfairDisplay.woff2',
-      600: 'PlayfairDisplay.woff2',
-      700: 'PlayfairDisplay.woff2',
-    },
+    files: { 400: 'PlayfairDisplay.woff2' },
+    variable: { min: 400, max: 900 },
   },
   sharp: {
     family: "'Space Grotesk', sans-serif",
-    files: {
-      400: 'SpaceGrotesk.woff2',
-      500: 'SpaceGrotesk.woff2',
-      600: 'SpaceGrotesk.woff2',
-      700: 'SpaceGrotesk.woff2',
-    },
+    files: { 400: 'SpaceGrotesk.woff2' },
+    variable: { min: 300, max: 700 },
   },
   devmono: {
     family: "'JetBrains Mono', monospace",
-    files: {
-      400: 'JetBrainsMono.woff2',
-      500: 'JetBrainsMono.woff2',
-      600: 'JetBrainsMono.woff2',
-      700: 'JetBrainsMono.woff2',
-    },
+    files: { 400: 'JetBrainsMono.woff2' },
+    variable: { min: 400, max: 800 },
   },
   elegant: {
     family: "'Raleway', sans-serif",
-    files: {
-      300: 'Raleway.woff2',
-      400: 'Raleway.woff2',
-      500: 'Raleway.woff2',
-      600: 'Raleway.woff2',
-      700: 'Raleway.woff2',
-    },
+    files: { 400: 'Raleway.woff2' },
+    variable: { min: 100, max: 900 },
   },
 };
 

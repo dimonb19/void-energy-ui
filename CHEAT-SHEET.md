@@ -6827,6 +6827,84 @@ Sets `--cta-aim` from `pointermove` and toggles `data-aim="on"` on the host. Coa
 
 ---
 
+### I. Font Shift (`use:fontShift`)
+
+**Purpose:** Scroll-driven `wght` modulation. Ties a variable font's weight axis to viewport position via `animation-timeline: view()`, so type breathes thicker or thinner as it crosses the viewport.
+**Location:** [src/actions/font-shift.ts](src/actions/font-shift.ts)
+**Demo:** [/components#font-shift](src/pages/components.astro)
+
+Each instance injects its own `<style>` tag containing a `@keyframes` rule + an `@supports (animation-timeline: view())` block scoped by `data-font-shift-id`. The animated custom property `--void-font-shift-wght` is registered once via `CSS.registerProperty` with `syntax: '<number>'` — every browser otherwise treats custom properties as opaque token streams and flips them discretely at 50%, so registration is what lets the value interpolate smoothly each frame. The action then reads it via `font-variation-settings: 'wght' var(--void-font-shift-wght)` so the wght axis tracks the interpolated number. Toggles `data-font-shift="active" | "reduced"` for state surfacing per Law 4.
+
+Atmosphere physics is resolved per-instance via the nearest `[data-physics]` ancestor (`closest()` lookup), so AtmosphereScope-pinned subtrees and locally-scoped `data-physics` regions behave correctly. Falls back to `<html data-physics>` and finally `glass`.
+
+**Scope.** Animates `wght` only via `view()` timeline. `wdth` / `opsz` axes and `scroll()`-timeline modes are deliberate non-goals for v1.
+
+#### Config
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `from` | `number` | atmosphere preset | Start weight. Browser clamps to the font's declared `wght` range. |
+| `to` | `number` | atmosphere preset | End weight. Same clamp behavior. |
+| `range` | `string` | `'cover'` | CSS `animation-range` value (e.g. `'entry'`, `'cover 0% cover 50%'`). |
+| `enabled` | `boolean` | `true` | Master gate. When `false`, the action attaches nothing — cascade weight wins. |
+
+#### Atmosphere Defaults
+
+All three physics presets default to a generous **100 → 900** sweep — only the timing function differs, so physics defines *cadence* and the range adapts to the font.
+
+| Physics | from | to | Timing | Notes |
+| --- | --- | --- | --- | --- |
+| **Glass** | 100 | 900 | `linear` | Smooth interpolation. |
+| **Flat** | 100 | 900 | `linear` | Smooth interpolation. |
+| **Retro** | 100 | 900 | `steps(4, end)` | Quantized weight shift — reads as deliberate digital stepping rather than smooth interpolation. |
+
+**Range auto-clamping.** The 100 → 900 defaults are intentionally generous. The action queries the resolved font's actual `wght` axis via `document.fonts` and clamps the defaults to that axis, so a font like Space Grotesk (300–700) animates over its full visible range without dead zones at the extremes. Explicit `from`/`to` values bypass clamping — pass them when you want literal numbers.
+
+Document-level atmosphere swaps and `prefers-reduced-motion` toggles are picked up live: a shared `MutationObserver` on `<html data-physics>` and a `matchMedia('(prefers-reduced-motion: reduce)')` listener re-run the apply path across all mounted instances. Nested scope swaps are intentionally not tracked — those scopes pin physics for their lifetime.
+
+State surfacing via `data-font-shift`: `active` (animating), `reduced` (motion preference, cascade weight), `static` (font has no wght axis, cascade weight). In dev builds the action also logs a console warning when applied to a static-font element.
+
+#### Browser support
+
+| Browser | Behavior |
+| --- | --- |
+| Chrome 115+, Edge 115+ | Animates. |
+| Safari 26+ (macOS Tahoe / iOS 26, Oct 2025) | Animates. |
+| Firefox stable | Cascade-weight fallback via `@supports`. |
+| Firefox with `layout.css.scroll-driven-animations.enabled` flag | Animates. The action emits `animation-duration: 1ms` to work around a Firefox quirk where 0s scroll-driven animations silently no-op. |
+
+#### Caveats
+
+- **View-timeline only.** No `scroll()` timeline, no JS scroll listener, no Firefox polyfill.
+- **Variable fonts only.** Apply to elements whose font's `@font-face` declares a `font-weight: <min> <max>` range — see [src/config/fonts.ts](src/config/fonts.ts) for the canonical list (entries with a `variable` block). Static fonts hold their cascade weight — the action becomes a no-op.
+- **`prefers-reduced-motion: reduce`** renders at the natural cascade weight (no animation, no inline override). Surfaces `data-font-shift="reduced"` for state-driven styling.
+- **Use sparingly.** The effect is most striking on hero / display copy and short emphasized phrases. Stacking it on every heading dilutes it.
+- **Tall pages only.** View-timeline needs viewport runway. Elements that start in view on first paint won't animate until the user scrolls past and back.
+
+#### Usage
+
+```svelte
+<script lang="ts">
+  import { fontShift } from '@actions/font-shift';
+</script>
+
+<!-- Explicit full range -->
+<h1 use:fontShift={{ from: 100, to: 900 }}>Type that breathes</h1>
+
+<!-- Atmosphere defaults -->
+<h2 use:fontShift>Section heading</h2>
+
+<!-- Custom animation-range -->
+<p use:fontShift={{ range: 'entry' }}>...</p>
+
+<!-- Disabled -->
+<p use:fontShift={{ enabled: false }}>...</p>
+```
+
+**When to use:** hero display copy, section headings, and short emphasized phrases on tall scrollable pages. **When to skip:** dense paragraphs, navigation chrome, form labels, table cells — the effect is decorative and reads as noise on functional UI.
+
+---
+
 ## 8. Timing Utilities
 
 **Location:** [src/lib/timing.ts](src/lib/timing.ts)

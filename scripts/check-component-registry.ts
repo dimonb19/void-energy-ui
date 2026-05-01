@@ -745,6 +745,7 @@ const EXPECTED_ACTION_SYMBOLS = [
   'dropTarget',
   'aura',
   'laserAim',
+  'fontShift',
 ];
 const EXPECTED_CONTROLLER_COMPONENTS = [
   'modal',
