@@ -1446,7 +1446,7 @@ Use Astro's `<Image>` when responsive srcset / build-time optimization is the pr
 
 #### `<Video>` — Embedded video with skeleton fallback
 
-**Description:** Thin wrapper around native `<video>` that adds a skeleton during metadata load, a muted icon on error, and an `aspect-ratio` container so the skeleton has a height before the video reports its dimensions. Native browser controls are on by default. Custom playback chrome is deferred to `<MediaSlider>` bound to a consumer-owned video ref. `<source>` and `<track>` elements pass through as children.
+**Description:** Thin wrapper around native `<video>` that adds a skeleton during metadata load, a muted icon on error, and an `aspect-ratio` container so the skeleton has a height before the video reports its dimensions. Native browser controls are on by default. Custom playback chrome is deferred to `<MediaScrubber>` (timeline) and `<MediaSlider>` (transport + volume) bound to a consumer-owned video ref. `<source>` and `<track>` elements pass through as children.
 **Location:** [src/components/ui/Video.svelte](src/components/ui/Video.svelte)
 **CSS:** `.video` ([src/styles/components/\_video.scss](src/styles/components/_video.scss))
 
@@ -1460,6 +1460,8 @@ Use Astro's `<Image>` when responsive srcset / build-time optimization is the pr
 | `preload` | `'none' \| 'metadata' \| 'auto'` | `'metadata'` | How aggressively the browser preloads |
 | `aspectRatio` | `string` | `'16 / 9'` | CSS aspect-ratio applied to the wrapper |
 | `element` | `HTMLVideoElement \| undefined` | `undefined` | Bindable ref to the inner `<video>` element (for custom controls) |
+| `paused` | `boolean` | `$bindable(true)` | Bindable paused state — auto-syncs with the native element via `bind:paused` (autoplay, click, keyboard, `ended` all reflected back). |
+| `clickToPlay` | `boolean` | `false` | When true and `controls={false}`, clicking the video pixels toggles `paused`. Matches Plyr / Vidstack / Video.js convention. Ignored when `controls={true}` (browser owns clicks). |
 | `class` | `string` | `''` | Consumer classes on outer `.video` div |
 | `children` | `Snippet` | — | `<source>` / `<track>` elements rendered inside `<video>` |
 | `...rest` | `HTMLVideoAttributes` | — | Forwarded to `<video>` |
@@ -1500,11 +1502,12 @@ Use Astro's `<Image>` when responsive srcset / build-time optimization is the pr
 </Video>
 ```
 
-**Custom controls** — pair with [`<MediaSlider>`](#mediaslider). Capture the inner `<video>` via `bind:element`, and sync MediaSlider state to it through `$effect` blocks:
+**Custom controls** — pair with [`<MediaScrubber>`](#mediascrubber) (timeline, top row) and [`<MediaSlider>`](#mediaslider) (transport + volume, bottom row). The two-row layout mirrors Plyr / Vidstack / Video.js / Netflix. MediaScrubber takes the element ref directly and owns its own `timeupdate` / `durationchange` / `loadedmetadata` listeners — no consumer wiring for the timeline. Bind `paused` on Video so the same state drives MediaSlider's play button and reflects autoplay / click-to-play / `ended` back. Pass `clickToPlay` so the video pixels themselves toggle pause/play. Volume and mute still flow through `$effect` blocks (those are direct property writes, not bindable on the element):
 
 ```svelte
 <script lang="ts">
   import Video from '@components/ui/Video.svelte';
+  import MediaScrubber from '@components/ui/MediaScrubber.svelte';
   import MediaSlider from '@components/ui/MediaSlider.svelte';
 
   let videoEl: HTMLVideoElement | undefined = $state();
@@ -1520,11 +1523,6 @@ Use Astro's `<Image>` when responsive srcset / build-time optimization is the pr
     if (!videoEl) return;
     videoEl.muted = muted;
   });
-  $effect(() => {
-    if (!videoEl) return;
-    if (paused) videoEl.pause();
-    else void videoEl.play().catch(() => (paused = true));
-  });
 
   function replay() {
     if (!videoEl) return;
@@ -1533,7 +1531,14 @@ Use Astro's `<Image>` when responsive srcset / build-time optimization is the pr
   }
 </script>
 
-<Video src="/clip.mp4" controls={false} bind:element={videoEl} />
+<Video
+  src="/clip.mp4"
+  controls={false}
+  clickToPlay
+  bind:element={videoEl}
+  bind:paused
+/>
+<MediaScrubber element={videoEl} />
 <MediaSlider
   bind:volume={displayVolume}
   bind:muted
@@ -1552,7 +1557,7 @@ Use Astro's `<Image>` when responsive srcset / build-time optimization is the pr
 | **Default `controls={true}`** | A `<video>` without `controls` and without autoplay is essentially invisible to users. Consumers explicitly opt out for hero videos and background loops. |
 | **Default `aspectRatio="16 / 9"`** | The wrapper needs a height for the skeleton before metadata arrives. 16:9 is the dominant video ratio; consumers override per use case. |
 | **`data-state="ready"` (not `"loaded"`)** | The full file isn't loaded after `loadedmetadata` — only enough for the first frame. `ready` is more accurate. |
-| **Custom controls deferred to MediaSlider** | A custom playback UI is a separate primitive (already shipped). Video stays a wrapper, not a player. |
+| **Custom controls deferred to MediaScrubber + MediaSlider** | Custom playback chrome is split across two shipped primitives: timeline above, transport + volume below. Video stays a wrapper, not a player. |
 | **No filters / tints / pixel processing** | Per D33: VE wraps and selects content, never modifies pixels. |
 
 **Physics:** Inherits `--radius-base` (8px glass/flat, 0 retro), `--bg-sunk` placeholder, and `--ease-flow` opacity fade. Skeleton physics come from the composed `<Skeleton>`.
@@ -2518,9 +2523,49 @@ const pv = createPasswordValidation(() => password);
 
 ---
 
+#### `<MediaScrubber>`
+
+**Description:** Timeline scrubber for `<video>` / `<audio>`. Pass an `HTMLMediaElement` ref via `element={...}` and the scrubber owns its own `timeupdate` / `durationchange` / `loadedmetadata` listeners and seeks on user input — no consumer `$effect` wiring for time. Includes a tabular monospace time label (`00:42 / 03:15`) on the right by default. Pair above a `<MediaSlider>` to build a two-row custom control bar (Plyr / Vidstack / Video.js convention).
+**Location:** [src/components/ui/MediaScrubber.svelte](src/components/ui/MediaScrubber.svelte)
+**CSS Class:** `.media-scrubber` ([src/styles/components/\_fields.scss](src/styles/components/_fields.scss))
+
+**Props:**
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `element` | `HTMLMediaElement \| undefined` | `undefined` | Media ref. When provided, scrubber auto-syncs `currentTime` / `duration` via media events and seeks on user input. |
+| `currentTime` | `number` | `$bindable(0)` | Current position in seconds (bindable; mirrors element when `element` is bound) |
+| `duration` | `number` | `$bindable(0)` | Total duration in seconds (bindable; mirrors element when `element` is bound) |
+| `showTime` | `boolean` | `true` | Show `"00:42 / 03:15"` label to the right of the seek bar |
+| `disabled` | `boolean` | `false` | Disables seeking |
+| `class` | `string` | `''` | Consumer classes on the wrapper |
+
+**States** (`data-state` on the wrapper):
+
+| State | Trigger |
+| --- | --- |
+| `seeking` | User is dragging the scrubber (set on `input`, cleared on `change`) |
+
+**Usage:**
+
+```svelte
+<Video src="/clip.mp4" controls={false} bind:element={videoEl} />
+<MediaScrubber element={videoEl} />
+<MediaSlider bind:volume bind:muted bind:paused playback replay onreplay={replay} />
+```
+
+**Behavior notes:**
+
+- `seeking` flag prevents `timeupdate` from clobbering `currentTime` mid-drag — the scrubber only writes back on `input` and clears `seeking` on `change` (pointer release / keyboard commit).
+- Reactive `$effect` re-binds listeners cleanly when the `element` prop changes.
+- `aria-valuetext` reads as `"0:42 of 3:15"` (humanized timecodes) — screen readers don't get raw seconds.
+- Time format auto-promotes to `H:MM:SS` for clips ≥ 1 hour.
+
+---
+
 #### `<MediaSlider>`
 
-**Description:** Horizontal control bar with mute toggle, volume slider, optional playback (pause/play) toggle, and optional replay button.
+**Description:** Horizontal control bar following the standard video-player layout: a transport cluster (play/pause + replay) on the left and a compact volume cluster (volume slider + mute icon) on the right, separated by `justify-between`. Mirrors Plyr / Vidstack / Video.js / Netflix. Volume slider width (~96px via `--space-3xl`) is intentionally compact so it doesn't compete with the wider timeline scrubber above — width disparity is what reads as "volume vs. timeline."
 **Location:** [src/components/ui/MediaSlider.svelte](src/components/ui/MediaSlider.svelte)
 **CSS Class:** `.media-slider` ([src/styles/components/\_fields.scss](src/styles/components/_fields.scss))
 
@@ -2531,9 +2576,9 @@ const pv = createPasswordValidation(() => password);
 | `volume` | `number` | `$bindable(50)` | Volume level 0–100 (bindable) |
 | `muted` | `boolean` | `$bindable(false)` | Mute state (bindable) |
 | `icon` | `'voice' \| 'music'` | `'voice'` | Mute toggle icon |
-| `playback` | `boolean` | `false` | Show pause/play toggle |
+| `playback` | `boolean` | `false` | Show pause/play toggle (left cluster) |
 | `paused` | `boolean` | `$bindable(false)` | Pause state (bindable) |
-| `replay` | `boolean` | `false` | Show replay button |
+| `replay` | `boolean` | `false` | Show replay button (left cluster) |
 | `onchange` | `(volume: number) => void` | — | Callback on volume change |
 | `onmute` | `(muted: boolean) => void` | — | Callback on mute toggle |
 | `onpause` | `(paused: boolean) => void` | — | Callback on pause toggle |
@@ -2543,8 +2588,11 @@ const pv = createPasswordValidation(() => password);
 **Usage:**
 
 ```svelte
+<!-- Video chrome (bottom row of a two-row layout, paired with <MediaScrubber> above) -->
 <MediaSlider bind:volume bind:muted bind:paused icon="voice" playback replay onreplay={replay} />
-<MediaSlider bind:volume bind:muted bind:paused icon="music" playback />
+
+<!-- Audio context (no transport) — left cluster collapses, volume cluster lands on the right -->
+<MediaSlider bind:volume bind:muted icon="music" />
 ```
 
 ---

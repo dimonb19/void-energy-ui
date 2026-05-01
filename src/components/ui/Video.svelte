@@ -19,6 +19,11 @@
   - preload:     'none' | 'metadata' | 'auto' (default: 'metadata')
   - aspectRatio: CSS aspect-ratio value (default: '16 / 9')
   - element:     Bindable ref to the inner HTMLVideoElement
+  - paused:      Bindable paused state — auto-syncs with the native element
+                 via bind:paused. Starts true; flips to false on autoplay/play.
+  - clickToPlay: When true and controls={false}, clicking the video pixels
+                 toggles paused. Matches Plyr / Vidstack / Video.js convention.
+                 Ignored when controls={true} (browser owns clicks). Default: false.
   - class:       Consumer classes on outer .video div
   - children:    <source> / <track> elements rendered inside <video>
   - ...rest:     Forwarded to <video> (autoplay, muted, loop, playsinline, etc.)
@@ -37,8 +42,13 @@
   provided (true blank loading state).
 
   CUSTOM CONTROLS
-  Set controls={false}, capture the <video> ref via bind:element, and render
-  a <MediaSlider> wired to it through $effect blocks for custom playback chrome.
+  Set controls={false}, capture the <video> ref via bind:element, stack a
+  <MediaScrubber> on top for the timeline and a <MediaSlider> below for
+  transport + volume. bind:paused on Video keeps state in sync bidirectionally
+  with MediaSlider's bind:paused — autoplay, click-to-play, keyboard space on
+  MediaSlider's play button, and 'ended' all flow back. Pass clickToPlay so
+  the video pixels themselves toggle pause/play on click — matches the universal
+  web-player convention (YouTube, Vimeo, Netflix, Plyr, Vidstack, Video.js).
 
   DEFAULT preload="metadata" RATIONALE
   'auto' is too aggressive for mobile data. With a poster, the browser
@@ -64,6 +74,8 @@
     preload?: 'none' | 'metadata' | 'auto';
     aspectRatio?: string;
     element?: HTMLVideoElement;
+    paused?: boolean;
+    clickToPlay?: boolean;
     class?: string;
     children?: Snippet;
   }
@@ -75,10 +87,21 @@
     preload = 'metadata',
     aspectRatio = '16 / 9',
     element = $bindable(),
+    paused = $bindable(true),
+    clickToPlay = false,
     class: className = '',
     children,
     ...rest
   }: VideoProps = $props();
+
+  // Click-to-play only kicks in when native controls are off — otherwise the
+  // browser already handles clicks on the controls layer.
+  const clickEnabled = $derived(clickToPlay && !controls);
+
+  function handleClick() {
+    if (!clickEnabled) return;
+    paused = !paused;
+  }
 
   let ready = $state(false);
   let errored = $state(false);
@@ -131,6 +154,7 @@
 <div
   class="video {className}"
   data-state={videoState}
+  data-click-to-play={clickEnabled || undefined}
   style:aspect-ratio={aspectRatio}
 >
   {#if !ready && !errored && !poster}
@@ -162,10 +186,12 @@
       bind:this={element}
       bind:duration={videoDuration}
       bind:readyState={videoReadyState}
+      bind:paused
       {src}
       {poster}
       {controls}
       {preload}
+      onclick={clickEnabled ? handleClick : undefined}
       onloadedmetadata={handleReady}
       onloadeddata={handleReady}
       onerror={handleError}

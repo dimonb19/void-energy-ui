@@ -1,7 +1,8 @@
 <!--
   MEDIA SLIDER COMPONENT
-  A horizontal control bar with mute toggle, volume slider, optional
-  playback (pause/play) toggle, and optional replay button.
+  A horizontal control bar following the standard video-player layout:
+  transport (play/pause + replay) on the left, volume slider in the
+  middle, mute toggle on the right.
 
   USAGE
   -------------------------------------------------------------------------
@@ -25,11 +26,18 @@
   - disabled: Disables all controls
   - class: Additional CSS classes on the wrapper
 
-  BEHAVIOR:
-  - Voice/Music icon toggles mute state
-  - Slider controls volume (dimmed when muted)
-  - Pause/Play icon toggles paused state
-  - Restart button triggers replay callback with animation
+  LAYOUT:
+  ┌─ .media-slider (flex justify-between gap-md) ──────────────────────────┐
+  │  Left cluster (transport)         Right cluster (volume)               │
+  │  [Pause/Play] [Replay]            [—— volume slider ——] [Mute]         │
+  └────────────────────────────────────────────────────────────────────────┘
+
+  Mirrors Plyr / Vidstack / Video.js / Netflix: transport on the left, a
+  compact volume cluster (slider + mute icon) on the right. The slider is
+  intentionally compact (~96px) so the timeline scrubber above dominates
+  the visual hierarchy — width disparity is what reads as "timeline vs.
+  volume" without further visual cues. For video, stack a <MediaScrubber>
+  above this component.
 
   @see /_fields.scss for .media-slider styles
 -->
@@ -88,45 +96,49 @@
 </script>
 
 <div
-  class="media-slider flex items-center gap-xs {className}"
+  class="media-slider flex items-center justify-between gap-md {className}"
   data-muted={muted}
 >
-  <IconBtn
-    icon={icon === 'music' ? Music : Voice}
-    iconProps={{ 'data-muted': muted }}
-    onclick={toggleMute}
-    {disabled}
-    aria-label={muted ? 'Unmute' : 'Mute'}
-    aria-pressed={muted}
-  />
+  <div class="flex items-center gap-xs">
+    {#if playback}
+      <IconBtn
+        icon={PlayPause}
+        iconProps={{ 'data-paused': paused }}
+        onclick={togglePause}
+        {disabled}
+        aria-label={paused ? 'Resume' : 'Pause'}
+        aria-pressed={paused}
+      />
+    {/if}
 
-  <input
-    type="range"
-    min="0"
-    max="100"
-    aria-label="Volume"
-    bind:value={volume}
-    oninput={() => onchange?.(volume)}
-    disabled={disabled || muted}
-  />
+    {#if replay}
+      <IconBtn
+        icon={Restart}
+        {disabled}
+        onclick={handleReplay}
+        aria-label="Replay"
+      />
+    {/if}
+  </div>
 
-  {#if playback}
-    <IconBtn
-      icon={PlayPause}
-      iconProps={{ 'data-paused': paused }}
-      onclick={togglePause}
-      {disabled}
-      aria-label={paused ? 'Resume' : 'Pause'}
-      aria-pressed={paused}
+  <div class="flex items-center gap-xs">
+    <input
+      type="range"
+      min="0"
+      max="100"
+      aria-label="Volume"
+      bind:value={volume}
+      oninput={() => onchange?.(volume)}
+      disabled={disabled || muted}
     />
-  {/if}
 
-  {#if replay}
     <IconBtn
-      icon={Restart}
+      icon={icon === 'music' ? Music : Voice}
+      iconProps={{ 'data-muted': muted }}
+      onclick={toggleMute}
       {disabled}
-      onclick={handleReplay}
-      aria-label="Replay"
+      aria-label={muted ? 'Unmute' : 'Mute'}
+      aria-pressed={muted}
     />
-  {/if}
+  </div>
 </div>

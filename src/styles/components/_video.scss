@@ -27,6 +27,13 @@
     object-fit: cover;
   }
 
+  // Click-to-play affordance: only when controls are off and clickToPlay is on
+  // (data-click-to-play set by Video.svelte). Pointer cursor signals the video
+  // pixels are interactive — without it, click-to-pause would be a hidden gesture.
+  &[data-click-to-play] > video {
+    cursor: pointer;
+  }
+
   // Skeleton fills the aspect-ratio wrapper instead of using its default 128px.
   .video-skeleton {
     position: absolute;

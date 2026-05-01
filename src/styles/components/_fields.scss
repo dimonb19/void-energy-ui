@@ -300,8 +300,11 @@ $_slot-width: var(--control-padding-x);
 // ==========================================================================
 
 .media-slider {
-  // Dim slider when muted
+  // Volume slider sits in the right cluster at a compact width — matches Plyr /
+  // Vidstack / Netflix (~96px). Width disparity vs. the wide timeline scrubber
+  // above is what reads as "volume vs. timeline" without further visual cues.
   input[type='range'] {
+    width: var(--space-3xl);
     transition: opacity var(--speed-fast) var(--ease-spring-snappy);
   }
 
@@ -309,6 +312,39 @@ $_slot-width: var(--control-padding-x);
     opacity: 0.5;
     pointer-events: none;
   }
+}
+
+// ==========================================================================
+// 5b. MEDIA SCRUBBER (non-field composite)
+// ==========================================================================
+//
+// ANATOMY:
+// ┌─ .media-scrubber (flex items-center gap-sm) ──────────────────────────┐
+// │  <input type="range">         flex:1 — wide seek bar                   │
+// │  .media-scrubber-time         tabular monospace, fixed character box   │
+// └────────────────────────────────────────────────────────────────────────┘
+//
+// The seek bar takes the full available row (flex:1) so it visibly dominates
+// the compact volume slider in the MediaSlider row below. That width
+// disparity is what reads as "timeline vs. volume" without extra labeling.
+
+.media-scrubber {
+  input[type='range'] {
+    flex: 1;
+    transition: opacity var(--speed-fast) var(--ease-spring-snappy);
+  }
+
+  &[data-disabled] {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+.media-scrubber-time {
+  font-family: var(--font-code);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 // ==========================================================================

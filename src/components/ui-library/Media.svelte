@@ -3,6 +3,7 @@
   import AdaptiveImage from '@components/ui/AdaptiveImage.svelte';
   import Avatar from '@components/ui/Avatar.svelte';
   import Video from '@components/ui/Video.svelte';
+  import MediaScrubber from '@components/ui/MediaScrubber.svelte';
   import MediaSlider from '@components/ui/MediaSlider.svelte';
 
   // Custom-controls demo — wire MediaSlider to <video> via the element ref
@@ -19,12 +20,6 @@
   $effect(() => {
     if (!videoEl) return;
     videoEl.muted = videoMuted;
-  });
-
-  $effect(() => {
-    if (!videoEl) return;
-    if (videoPaused) videoEl.pause();
-    else void videoEl.play().catch(() => (videoPaused = true));
   });
 
   function handleReplay() {
@@ -265,8 +260,9 @@
         playback chrome, set
         <code>controls=&#123;false&#125;</code>, capture the inner element via
         <code>bind:element</code>, and pair with
-        <code>&lt;MediaSlider&gt;</code> wired through
-        <code>$effect</code> blocks (demo at the bottom).
+        <code>&lt;MediaScrubber&gt;</code> on top (timeline) and
+        <code>&lt;MediaSlider&gt;</code> below (transport + volume) &mdash; demo
+        at the bottom.
       </p>
 
       <h6 class="text-mute">Standard playback &amp; error state</h6>
@@ -312,28 +308,39 @@
         playsinline
       />
 
-      <h6 class="text-mute">Custom controls (MediaSlider)</h6>
+      <h6 class="text-mute">Custom controls (MediaScrubber + MediaSlider)</h6>
       <p class="text-small text-mute">
         Capture the inner <code>&lt;video&gt;</code> via
-        <code>bind:element</code>. <code>&lt;MediaSlider&gt;</code> emits volume
-        / mute / pause / replay; <code>$effect</code> blocks sync the MediaSlider
-        state back to the video element.
+        <code>bind:element</code> and bind <code>paused</code> on
+        <code>&lt;Video&gt;</code> &mdash; the binding is bidirectional, so the
+        same state drives MediaSlider's play button and reflects autoplay,
+        click, and end-of-clip back. <code>&lt;MediaScrubber&gt;</code> takes
+        the element ref and owns its own <code>timeupdate</code> /
+        <code>durationchange</code> listeners. <code>clickToPlay</code> on Video
+        makes the pixels themselves toggle pause/play &mdash; the universal web-player
+        convention. The two-row layout (timeline above, transport &amp; volume below)
+        mirrors Plyr / Vidstack / Video.js.
       </p>
       <div class="flex flex-col gap-md">
         <Video
           src={SAMPLE_VIDEO}
           poster={SAMPLE_POSTER}
           controls={false}
+          clickToPlay
           bind:element={videoEl}
-        />
-        <MediaSlider
-          bind:volume={displayVolume}
-          bind:muted={videoMuted}
           bind:paused={videoPaused}
-          playback
-          replay
-          onreplay={handleReplay}
         />
+        <div class="flex flex-col gap-xs">
+          <MediaScrubber element={videoEl} />
+          <MediaSlider
+            bind:volume={displayVolume}
+            bind:muted={videoMuted}
+            bind:paused={videoPaused}
+            playback
+            replay
+            onreplay={handleReplay}
+          />
+        </div>
       </div>
 
       <details>
@@ -363,8 +370,15 @@
   /&gt;
 &lt;/Video&gt;
 
-&lt;!-- Custom controls --&gt;
-&lt;Video src="/clip.mp4" controls=&#123;false&#125; bind:element=&#123;videoEl&#125; /&gt;
+&lt;!-- Custom controls (two-row: scrubber + transport/volume) --&gt;
+&lt;Video
+  src="/clip.mp4"
+  controls=&#123;false&#125;
+  clickToPlay
+  bind:element=&#123;videoEl&#125;
+  bind:paused
+/&gt;
+&lt;MediaScrubber element=&#123;videoEl&#125; /&gt;
 &lt;MediaSlider
   bind:volume bind:muted bind:paused playback replay onreplay=&#123;replay&#125;
 /&gt;</code

@@ -32,6 +32,7 @@
         "drop-zone",
         "edit-textarea",
         "generate-textarea",
+        "media-scrubber",
         "media-slider"
       ],
       "form": ["form-field", "password-meter", "password-checklist"],
@@ -997,12 +998,14 @@
         "preload",
         "aspectRatio",
         "element:bindable",
+        "paused:bindable",
+        "clickToPlay",
         "class",
         "...rest:HTMLVideoAttributes"
       ],
       "slots": ["children()"],
-      "related": ["image", "media-slider", "skeleton"],
-      "compose": "Use for embedded clips and hero videos. Default aspectRatio='16 / 9' and preload='metadata' (mobile-data-friendly). For custom playback chrome, set controls={false} and pair with <MediaSlider> bound to your own video ref. For accessibility, pass <track kind='captions'> as children.",
+      "related": ["image", "media-scrubber", "media-slider", "skeleton"],
+      "compose": "Use for embedded clips and hero videos. Default aspectRatio='16 / 9' and preload='metadata' (mobile-data-friendly). For custom playback chrome: set controls={false}, capture the element via bind:element, bind paused (bidirectional sync — autoplay / click-to-play / ended all reflect back), pass clickToPlay so the pixels themselves toggle pause/play (universal web-player convention), and pair with <MediaScrubber element={videoEl} /> on top + <MediaSlider> below. For accessibility, pass <track kind='captions'> as children.",
       "example": "<Video src='/clip.mp4' poster='/poster.jpg' />"
     },
     "markdown": {
@@ -1016,8 +1019,26 @@
       "compose": "Use whenever content arrives as a markdown string (AI-generated narrative, help text, changelog, CMS field, toast detail body). Default <Markdown source={x} /> for AI/untrusted content. Pass trusted only for strings committed in source — treat the word 'trusted' in a diff as a sanitizer-bypass review surface. Pass inline for phrasing contexts (tooltip body, label text). Empty/null/undefined source renders an empty wrapper without throwing. Complete strings only in v1 — no streaming. Do not hand-roll marked() + {@html}.",
       "example": "<Markdown source={aiOutput} />"
     },
+    "media-scrubber": {
+      "description": "Timeline scrubber for <video>/<audio>. Pass an HTMLMediaElement ref via element={...} and the scrubber owns its own timeupdate / durationchange / loadedmetadata listeners and seeks on user input. Tabular monospace time label (00:42 / 03:15) on the right by default.",
+      "category": "field",
+      "component": "MediaScrubber",
+      "import": "@components/ui/MediaScrubber.svelte",
+      "props": [
+        "element",
+        "currentTime:bindable",
+        "duration:bindable",
+        "showTime",
+        "disabled",
+        "class"
+      ],
+      "slots": [],
+      "related": ["media-slider", "video", "slider-field"],
+      "compose": "Stack above a <MediaSlider> to build a two-row custom control bar (timeline on top, transport + volume below) — mirrors Plyr / Vidstack / Video.js. Pass element={videoEl} from <Video bind:element>. Scrubber wires its own listeners; consumer doesn't need $effect blocks for time. Time label is on by default — set showTime={false} to hide.",
+      "example": "<MediaScrubber element={videoEl} />"
+    },
     "media-slider": {
-      "description": "Horizontal volume/playback control bar with mute toggle, play/pause, and optional replay button. Icons animate between states.",
+      "description": "Horizontal control bar following the standard video-player layout: transport (play/pause + replay) on the left, volume slider in the middle, mute toggle on the right. Icons animate between states.",
       "category": "field",
       "component": "MediaSlider",
       "import": "@components/ui/MediaSlider.svelte",
@@ -1036,8 +1057,8 @@
         "class"
       ],
       "slots": [],
-      "related": ["slider-field", "toggle", "icon-button"],
-      "compose": "Use for audio controls. Mute, play/pause, and replay buttons are already wired to animated icons.",
+      "related": ["media-scrubber", "slider-field", "toggle", "icon-button"],
+      "compose": "Use for audio controls or as the bottom row of custom video chrome. Mute, play/pause, and replay buttons are already wired to animated icons. For video, stack a <MediaScrubber> on top for the timeline.",
       "example": "<MediaSlider bind:volume bind:muted playback bind:paused icon='music' />"
     },
     "progress-ring": {
