@@ -4,6 +4,7 @@
   import { tooltip } from '@actions/tooltip';
   import { live, implode } from '@lib/transitions.svelte';
   import { morph } from '@actions/morph';
+  import { laserAim } from '@actions/laser-aim';
   import Selector from '../ui/Selector.svelte';
 
   // Chip demo state
@@ -88,6 +89,7 @@
           </button>
           <button
             class="btn-cta"
+            use:laserAim
             onclick={() => toast.show('CTA activated', 'success')}
           >
             Call to Action
@@ -124,7 +126,7 @@
         <summary>View Code</summary>
         <pre><code
             >&lt;button&gt;Default&lt;/button&gt;
-&lt;button class="btn-cta"&gt;Call to Action&lt;/button&gt;
+&lt;button class="btn-cta" use:laserAim&gt;Call to Action&lt;/button&gt;
 &lt;button class="btn-premium"&gt;Premium&lt;/button&gt;
 &lt;button class="btn-system"&gt;System&lt;/button&gt;
 &lt;button class="btn-success"&gt;Success&lt;/button&gt;

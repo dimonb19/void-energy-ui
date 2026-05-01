@@ -261,7 +261,7 @@
     &lt;button class="btn-ghost btn-error" onclick=&#123;() =&gt; modal.close()&#125;&gt;
       Cancel
     &lt;/button&gt;
-    &lt;button class="btn-cta" onclick=&#123;() =&gt; onInvite(email)&#125;&gt;
+    &lt;button class="btn-cta" use:laserAim onclick=&#123;() =&gt; onInvite(email)&#125;&gt;
       Send Invite
     &lt;/button&gt;
   &lt;/div&gt;

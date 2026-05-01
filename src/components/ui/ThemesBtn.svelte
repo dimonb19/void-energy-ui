@@ -1,6 +1,7 @@
 <script lang="ts">
   import { voidEngine } from '@adapters/void-engine.svelte';
   import { modal } from '@lib/modal-manager.svelte';
+  import { laserAim } from '@actions/laser-aim';
   import { Sun, Moon } from '@lucide/svelte';
 
   interface ThemesBtnProps {
@@ -23,6 +24,7 @@
   aria-label={icon
     ? `Theme: ${voidEngine.currentTheme.label || voidEngine.atmosphere}`
     : undefined}
+  use:laserAim={{ enabled: className.split(/\s+/).includes('btn-cta') }}
   onclick={() => modal.themes()}
 >
   {#if voidEngine.currentTheme.mode === 'dark'}

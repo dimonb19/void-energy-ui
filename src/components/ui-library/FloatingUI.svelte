@@ -1,6 +1,7 @@
 <script lang="ts">
   import { toast } from '@stores/toast.svelte';
   import { tooltip } from '@actions/tooltip';
+  import { laserAim } from '@actions/laser-aim';
   import Dropdown from '../ui/Dropdown.svelte';
   import { ChevronDown, Settings, Bell, Filter } from '@lucide/svelte';
 
@@ -415,7 +416,11 @@
       <div
         class="surface-sunk p-md flex flex-row flex-wrap gap-md justify-center items-center"
       >
-        <button class="btn-cta" use:tooltip={'Tooltip on a CTA button'}>
+        <button
+          class="btn-cta"
+          use:laserAim
+          use:tooltip={'Tooltip on a CTA button'}
+        >
           CTA Button
         </button>
         <!-- svelte-ignore a11y_no_noninteractive_tabindex -->

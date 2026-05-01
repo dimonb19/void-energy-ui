@@ -1151,7 +1151,7 @@ Preset components with built-in layout and physics.
 | Class | Description | Use Case |
 | --- | --- | --- |
 | `.btn` | Standard surface button (auto-applied to `<button>`) | Default actions |
-| `.btn-cta` | Rotating gradient border (Gemini Laser), pill shape | Primary CTA |
+| `.btn-cta` | Rotating gradient border (Gemini Laser), pill shape. Comet head tracks the cursor on hover when `use:laserAim` is bound. | Primary CTA |
 | `.btn-premium` | Gold/orange semantic | Premium features, upgrades, warnings/caution |
 | `.btn-system` | Purple semantic | System/diagnostic actions |
 | `.btn-success` | Green/success semantic | Confirmations, positive actions |
@@ -1164,9 +1164,17 @@ Preset components with built-in layout and physics.
 **Usage:**
 
 ```svelte
+<script>
+  import { laserAim } from '@actions/laser-aim';
+</script>
+
 <!-- Standard -->
 <button>Default Button</button>
-<button class="btn-cta">Call to Action</button>
+
+<!-- Primary CTA — bind use:laserAim so the comet head tracks the cursor.
+     ActionBtn / ThemesBtn auto-attach when their class includes btn-cta;
+     for raw <button class="btn-cta"> elements, bind it explicitly. -->
+<button class="btn-cta" use:laserAim>Call to Action</button>
 
 <!-- Semantic -->
 <button class="btn-success">Confirm</button>
@@ -5337,7 +5345,11 @@ All accept optional `$low-specificity: true`.
 ### E. CTA Button with Laser Border
 
 ```svelte
-<button class="btn-cta px-lg py-md">
+<script>
+  import { laserAim } from '@actions/laser-aim';
+</script>
+
+<button class="btn-cta px-lg py-md" use:laserAim>
   <span>Take Action</span>
 </button>
 ```
@@ -6766,6 +6778,52 @@ const color = await extractAura(imgEl); // or: await extractAura(url)
 ```
 
 **When to use:** image-backed or atmosphere-primary surfaces (story scenes, hero panels, album-cover-style cards). Do not attach to dashboard tiles, form fields, navigation chrome, or generic cards. Multiple Auras visible simultaneously create rainbow-disco pages — prefer one focal Aura per visible region. See [COMPOSITION-RECIPES.md › Ambient light from an image](COMPOSITION-RECIPES.md#ambient-light-from-an-image).
+
+---
+
+### H. Laser Aim (`use:laserAim`)
+
+**Purpose:** Cursor-tracking comet head for `.btn-cta`. On hover, the rotating gradient ring's bright spot snaps to point at the pointer instead of pausing at a random animation frame.
+**Location:** [src/actions/laser-aim.ts](src/actions/laser-aim.ts)
+**CSS hook:** the `_gemini-laser` mixin in [src/styles/components/\_buttons.scss](src/styles/components/_buttons.scss) gates the override on `[data-aim='on']`.
+
+Sets `--cta-aim` from `pointermove` and toggles `data-aim="on"` on the host. Coarse-pointer devices (touch) skip the binding — there is no cursor to follow.
+
+#### Config
+
+| Prop | Type | Default | Description |
+| --- | --- | --- | --- |
+| `enabled` | `boolean` | `true` | Master gate. When `false`, the listener is unbound and `data-aim` is removed. Used by `ActionBtn` / `ThemesBtn` to auto-attach only when their class includes `btn-cta`. |
+
+#### Physics Profiles
+
+| Physics | Treatment |
+| --- | --- |
+| **Glass / Flat** | Comet tracks cursor on hover (the rotating ring is identity, the cursor magnetism is identity-plus). |
+| **Retro** | No effect — the rotating ring is already disabled in retro and the static double border doesn't have a comet to aim. |
+
+#### Caveats
+
+- **Already auto-attached** by `ActionBtn` and `ThemesBtn` when their class includes `btn-cta`. Bind manually only on raw `<button class="btn-cta">` elements (Svelte runes files only — Astro pages can't use Svelte directives and will fall back to the default paused-on-hover behavior).
+- The default hover (no action) fills the conic gradient's transparent gap with `--energy-primary`; the SCSS override resets `background-color: transparent` when `data-aim='on'` so the comet stays visible during tracking.
+- The transform handoff from running animation to static cursor-aimed rotation is interpolated via the mixin's `transition` rule — no manual reset needed.
+
+#### Usage
+
+```svelte
+<script lang="ts">
+  import { laserAim } from '@actions/laser-aim';
+</script>
+
+<!-- Raw button (manual): -->
+<button class="btn-cta" use:laserAim>Continue</button>
+
+<!-- ActionBtn / ThemesBtn (automatic): -->
+<ActionBtn icon={Sparkle} text="Generate" class="btn-cta" />
+<ThemesBtn class="btn-cta" />
+```
+
+**When to use:** apply only on primary CTA surfaces. The magnetic-comet feel is most striking when scarce — stacking it on every button on a page dilutes the effect.
 
 ---
 

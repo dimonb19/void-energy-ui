@@ -744,6 +744,7 @@ const EXPECTED_ACTION_SYMBOLS = [
   'draggable',
   'dropTarget',
   'aura',
+  'laserAim',
 ];
 const EXPECTED_CONTROLLER_COMPONENTS = [
   'modal',

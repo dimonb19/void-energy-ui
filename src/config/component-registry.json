@@ -1432,6 +1432,18 @@
       "related": ["extract-aura", "adaptive-image"],
       "compose": "Attach to image-backed or atmosphere-primary surfaces (story scenes, hero panels, album-cover-style cards). Omit color for atmosphere-driven glow; pass an explicit hex when the upstream already emits one. Pair with extractAura when the color must come from an image. Do not use on dashboard tiles, form fields, navigation chrome, or generic cards — multiple Auras in one region create rainbow-disco pages.",
       "example": "<div use:aura>...</div> // atmosphere-driven, or use:aura={{ color: '#33e2e6' }}"
+    },
+    "laser-aim": {
+      "description": "Svelte action for .btn-cta. On hover, the rotating gradient ring's comet head tracks the cursor instead of pausing at a random animation frame. Sets --cta-aim from pointermove and toggles data-aim='on' so SCSS can gate the override. Skipped on coarse-pointer devices (touch). Auto-attached inside ActionBtn and ThemesBtn when their class includes btn-cta — bind manually only on raw <button class=\"btn-cta\"> elements.",
+      "category": "motion",
+      "symbol": "laserAim",
+      "import": "@actions/laser-aim",
+      "signature": "laserAim(node, options?)",
+      "args": ["options?: { enabled?: boolean }"],
+      "returns": ["{ update(newOptions), destroy() }"],
+      "related": [],
+      "compose": "Already auto-bound by ActionBtn and ThemesBtn when their class prop includes btn-cta — consumers using those wrappers don't need to import or apply this action. For raw <button class=\"btn-cta\"> usages in Svelte runes files, bind it explicitly. Astro pages can't use Svelte directives and will fall back to the default paused-on-hover behavior. Apply to primary CTAs only — the magnetic feel is most striking when scarce.",
+      "example": "<button class=\"btn btn-cta\" use:laserAim>Continue</button>"
     }
   },
   "controllers": {

@@ -27,6 +27,7 @@
 <script lang="ts">
   import type { Component } from 'svelte';
   import type { HTMLButtonAttributes } from 'svelte/elements';
+  import { laserAim } from '@actions/laser-aim';
 
   interface ActionBtnProps extends HTMLButtonAttributes {
     icon: Component;
@@ -58,6 +59,7 @@
   class={className}
   type="button"
   {disabled}
+  use:laserAim={{ enabled: className.split(/\s+/).includes('btn-cta') }}
   onpointerenter={() => {
     if (disabled) return;
     hovered = true;

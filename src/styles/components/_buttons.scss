@@ -73,18 +73,21 @@
     height: 1250%;
     border-radius: 50%;
 
-    // Soft halo with directional notch: ~270° visible arc, ~50° transparent gap.
-    // Keeps the premium glow of a near-full ring but introduces a clear
-    // moving notch so the rotation reads as directional, not just pulsing.
+    // Comet trail: ~120° lit arc, ~240° transparent. Short enough to read as a
+    // directional comet head following the cursor (with use:laserAim) rather
+    // than a near-full ring with a notch. Bright primary band sits at
+    // 185°-195° (peak 190°). If you retune these stops, update COMET_PEAK_DEG
+    // in src/actions/laser-aim.ts so the cursor tracking still aligns with the
+    // comet.
     background: conic-gradient(
       from 0deg,
       transparent 0deg,
-      transparent 50deg,
-      var(--energy-secondary) 110deg,
-      var(--energy-primary) 170deg,
-      var(--energy-primary) 210deg,
-      var(--energy-secondary) 270deg,
-      transparent 320deg,
+      transparent 130deg,
+      var(--energy-secondary) 165deg,
+      var(--energy-primary) 185deg,
+      var(--energy-primary) 195deg,
+      var(--energy-secondary) 215deg,
+      transparent 250deg,
       transparent 360deg
     );
 
@@ -128,6 +131,23 @@
 
     &:hover::after {
       background: blend(var(--bg-canvas), var(--energy-primary), 6%);
+    }
+
+    // Cursor-aim (auto-attached by ActionBtn / ThemesBtn when class includes
+    // btn-cta; see actions/laser-aim.ts). When the action is bound, the comet
+    // head tracks the cursor on hover instead of freezing at a random frame.
+    // Without the action this selector never matches and the default
+    // pause-on-hover above stands.
+    //
+    // The default hover fills the conic gradient's transparent gap with
+    // --energy-primary, which would hide the comet during tracking. Reset
+    // background-color to transparent so the gap stays visible and the comet
+    // remains the only bright zone.
+    &[data-aim='on']:hover::before {
+      animation: none;
+      background-color: transparent;
+      transform: translate(-50%, -50%) rotate(var(--cta-aim, 0deg));
+      transition: transform var(--speed-base) var(--ease-flow);
     }
   }
 }
