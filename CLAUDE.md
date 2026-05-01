@@ -340,6 +340,11 @@ Registry: src/config/modal-registry.ts (add new fragments here)
 Escape pops the topmost layer (LIFO). Registered layers: Modal, Dropdown, Sidebar.
 Element-scoped handlers (EditField, EditTextarea, GenerateField) use `e.preventDefault()`
 which the stack respects via `defaultPrevented` check — no double-dismissal.
+On Chromium/Firefox each layer additionally registers a `CloseWatcher` so the
+Android system Back gesture dismisses the topmost layer. Esc remains owned by
+the document keydown listener — `keydown.preventDefault` suppresses the watcher's
+`close`, so element-handler coordination still works. Safari falls back to
+keydown-only (no Back-button handling) until it ships CloseWatcher.
 
 ### Shortcut Registry (`import { shortcutRegistry } from '@lib/shortcut-registry.svelte'`)
 ```
