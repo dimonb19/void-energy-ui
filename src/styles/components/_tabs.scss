@@ -55,6 +55,10 @@
   padding: var(--space-sm) var(--space-md);
   min-height: var(--control-height);
 
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none; // Prevents iOS long-press context menu
+
   // --- C. Typography ---
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-body);

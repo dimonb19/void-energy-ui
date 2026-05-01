@@ -212,6 +212,10 @@
   border: none;
   cursor: pointer;
 
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-user-drag: none; // Prevents macOS link-drag suppressing the click
+
   // --- D. Transitions ---
   transition:
     color var(--speed-fast) var(--ease-spring-snappy),
