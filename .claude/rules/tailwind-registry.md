@@ -9,6 +9,8 @@ paths:
 
 # Tailwind Registry
 
+> **Sibling reference:** the same vocabulary as CSS variables (for SCSS) is in `.claude/rules/tokens-reference.md`. This file documents the **utility-class** API for Svelte/Astro markup; `tokens-reference.md` documents the **CSS variable** API for SCSS authors.
+
 Quick-reference of every Tailwind utility available in this system. Standard Tailwind numeric scales and color palettes are **fully replaced** — only the classes listed here resolve to real values. If a class isn't here and isn't a standard layout/display utility, it won't work.
 
 **Tailwind v4 setup.** The system runs on Tailwind CSS v4 via `@tailwindcss/vite`. There is no `tailwind.config.mjs`. All theme registration, namespace resets, `@utility` declarations, and the `void-overrides` cascade layer live in [src/styles/tailwind-theme.css](../../src/styles/tailwind-theme.css). Cascade layer order is `void-scss, properties, theme, base, components, utilities, void-overrides` (declared identically in `tailwind-theme.css` and `global.scss`).

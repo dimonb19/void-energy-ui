@@ -77,7 +77,18 @@ These are non-negotiable. Every component, every page, every generated output ho
 ❌ color: #ffffff;
 ```
 
-Exceptions carry `// void-ignore` with a written justification (shimmer highlights, readability floors, browser-mandated constants). They are audited; do not add new ones casually.
+Exceptions carry `// void-ignore` with a written justification (shimmer highlights, readability floors, browser-mandated constants, scan-line / dotted pattern stripe widths that have no token equivalent). They are audited; do not add new ones casually.
+
+```scss
+// Retro physics scan-line — 1px stripes are the visual primitive; no token applies.
+background: repeating-linear-gradient(
+  0deg,
+  transparent 0,
+  transparent 1px,                                  // void-ignore: scan-line stripe primitive
+  var(--text-mute) 1px,                             // void-ignore: scan-line stripe primitive
+  var(--text-mute) 2px                              // void-ignore: scan-line stripe primitive
+);
+```
 
 ### Law 3 — Runes Doctrine (Svelte 5)
 
@@ -92,6 +103,15 @@ Runes only. No legacy patterns.
 ❌ $: reactive = value * 2;
 ❌ onMount / onDestroy / createEventDispatcher
 ❌ writable / readable / derived from 'svelte/store'
+```
+
+**Data loading on mount uses `$effect`, NOT `onMount`.** This is the most common regression — write the rune.
+
+```
+✅ $effect(() => { void loadData(); });
+✅ $effect(() => { const id = setInterval(tick, 1000); return () => clearInterval(id); });
+❌ import { onMount } from 'svelte'; onMount(async () => { await loadData(); });
+❌ import { onDestroy } from 'svelte'; onDestroy(() => cleanup());
 ```
 
 ### Law 4 — State Protocol
@@ -164,6 +184,26 @@ Radius:    --radius-base (default)   --radius-full (pills)
            --radius-sm/md/lg/xl (explicit sizes; all zeroed under retro)
 ```
 
+**Map raw concepts to tokens — these are the most-invented raw values:**
+
+| Raw concept                                | Use this token instead                                              |
+| ------------------------------------------ | ------------------------------------------------------------------- |
+| Backdrop blur (`filter: blur(Npx)`)        | `filter: var(--physics-blur);` — physics-correct per preset         |
+| Primitive border width (`border: Npx ...`) | `border-width: var(--physics-border-width);` — 1px glass/flat, 2px retro |
+| Outline / gradient stop color              | `var(--border-color)`, `var(--energy-primary)`, `var(--text-mute)`   |
+| Drop shadow                                | `var(--shadow-float | --shadow-lift | --shadow-sunk)`                |
+| Overlay positioning offsets (`inset: ±Npx`) | Drop the offset, or carry `// void-ignore` with justification — physics layer is owned by `surface-*` mixins |
+| Scan-line / dotted overlay raw px stops    | `var(--physics-border-width)`, or `// void-ignore` if the pattern needs literal-px stripes |
+
+### Typography (semantic, density-scaled)
+
+```
+--text-caption    --text-small    --text-base    --text-h6    --text-h5    --text-h4    --text-h3    --text-h2    --text-h1
+--font-weight-regular (400)    --font-weight-medium (500)    --font-weight-semibold (600)    --font-weight-bold (700)
+```
+
+For type sizes use these tokens — never `font-size: 0.75rem`, `font-size: 12px`, or any raw rem/px. `--text-caption` covers what `0.75rem` is reaching for; `--text-small` covers `0.875rem`; `--text-base` is body text. Body buttons and form controls use `--font-weight-medium` (500) by default.
+
 ### Z-Index (semantic layers)
 
 ```
@@ -178,6 +218,16 @@ mobile (0)   tablet (768)   small-desktop (1024)   large-desktop (1440)   full-h
 
 > Custom names. Do not assume Tailwind's defaults (`sm`, `md`, `lg`) — they are replaced.
 
+### Max-width T-shirt scale (preserved from standard Tailwind)
+
+```
+max-w-3xs  (16rem)   max-w-2xs (18rem)   max-w-xs  (20rem)   max-w-sm  (24rem)
+max-w-md   (28rem)   max-w-lg  (32rem)   max-w-xl  (36rem)   max-w-2xl (42rem)
+max-w-3xl  (48rem)   max-w-4xl (56rem)   max-w-5xl (64rem)   max-w-6xl (72rem)   max-w-7xl (80rem)
+```
+
+For width constraints (search fields in toolbars, prose containers, narrow forms) use this scale — never `max-w-[NNNpx]` brackets. `max-w-md` ≈ 448px; `max-w-sm` ≈ 384px; `max-w-lg` ≈ 512px.
+
 ---
 
 ## 5. Component Contract
@@ -190,25 +240,35 @@ Void Energy is **native-first**. Components are thin wrappers around native HTML
 
 ### Shipped Primitives (use before inventing)
 
-| Need                              | Primitive(s)                                                                                     |
-| --------------------------------- | ------------------------------------------------------------------------------------------------ |
-| Single-choice picker              | `Selector`, `Switcher`, `Tabs`, `Combobox`                                                      |
-| Boolean                           | `Toggle`                                                                                        |
-| Text input                        | `EditField`, `EditTextarea`, `SearchField`, `GenerateField`, `GenerateTextarea`, `PasswordField` |
-| Numeric / range                   | `SliderField`                                                                                   |
-| Color                             | `ColorField`                                                                                    |
-| Field composition                 | `FormField` (label + slot + hint + error)                                                       |
-| Buttons                           | `<button class="btn-*">`, `ActionBtn`, `IconBtn`, `ProfileBtn`, `ThemesBtn`                     |
-| Overlays                          | `Modal`, `Dropdown`, `Sidebar`                                                                  |
-| Media                             | `Image`, `Avatar`, `Video`, `AdaptiveImage`                                                      |
-| Authored / formatted string content | `Markdown`                                                                                     |
-| Theme creation (AI + manual)      | `ThemeBuilder`                                                                                  |
-| Feedback                          | `toast`, `modal.alert`, `modal.confirm`, `Skeleton`, `ProgressRing`                             |
-| Navigation                        | `Sidebar`, `Breadcrumbs`, `Tabs`, `Pagination`, `LoadMore`, `use:navlink`                       |
-| Data display                      | `StatCard`, `LineChart`, `BarChart`, `DonutChart`, `Sparkline`                                   |
-| Motion                            | `use:tooltip`, `use:morph`, `use:kinetic`, `use:narrative`                                      |
-| Ambient light                     | `use:aura`, `extractAura`                                                                       |
-| Drag & reorder                    | `use:draggable`, `use:dropTarget`, `reorderByDrop`                                              |
+| Need                                | Primitive(s)                                                                                       |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Single-choice picker                | `Selector`, `Switcher`, `Tabs`, `Combobox`                                                         |
+| Boolean                             | `Toggle`                                                                                           |
+| Text input                          | `EditField`, `EditTextarea`, `SearchField`, `GenerateField`, `GenerateTextarea`, `PasswordField`   |
+| Numeric / range                     | `SliderField`                                                                                      |
+| Color                               | `ColorField`                                                                                       |
+| Copy-to-clipboard                   | `CopyField`                                                                                        |
+| File upload                         | `DropZone`                                                                                         |
+| Password feedback                   | `PasswordMeter`, `PasswordChecklist` (both consume `createPasswordValidation()`)                   |
+| Media transport                     | `MediaScrubber`, `MediaSlider`                                                                     |
+| Field composition                   | `FormField` (label + slot + hint + error)                                                          |
+| Settings row                        | `SettingsRow` (label + control alignment for settings dialogs)                                     |
+| Buttons                             | `<button class="btn-*">`, `ActionBtn`, `IconBtn`, `ProfileBtn`, `ThemesBtn`                        |
+| Overlays                            | `Modal`, `Dropdown`, `Sidebar`                                                                     |
+| Pull-to-refresh                     | `PullRefresh`                                                                                      |
+| Media                               | `Image`, `Avatar`, `Video`, `AdaptiveImage`                                                        |
+| Authored / formatted string content | `Markdown`                                                                                         |
+| Theme creation (AI + manual)        | `ThemeBuilder`                                                                                     |
+| Theme scoping (lifecycle-bound)     | `AtmosphereScope`                                                                                  |
+| Glass refraction filter (mount once) | `LiquidGlassFilter`                                                                               |
+| Feedback                            | `toast`, `modal.alert`, `modal.confirm`, `Skeleton`, `ProgressRing`                                |
+| Navigation                          | `Sidebar`, `Breadcrumbs`, `Tabs`, `Pagination`, `LoadMore`, `use:navlink`                          |
+| Data display                        | `StatCard`, `LineChart`, `BarChart`, `DonutChart`, `Sparkline`                                     |
+| Motion                              | `use:tooltip`, `use:morph`, `use:kinetic`, `use:narrative`, `use:fontShift`, `use:laserAim`        |
+| Ambient light                       | `use:aura`, `extractAura`                                                                          |
+| Drag & reorder                      | `use:draggable`, `use:dropTarget`, `reorderByDrop`, `resolveReorderByDrop`                         |
+| Imperative typing                   | `typewrite`                                                                                        |
+| Singletons                          | `voidEngine`, `modal`, `toast`, `user`, `layerStack`, `shortcutRegistry`                           |
 
 ### Ambient light constraint (`use:aura`)
 
@@ -217,6 +277,26 @@ Use `use:aura` **only** on image-backed or atmosphere-primary surfaces — story
 ### Markdown rendering constraint (`<Markdown>`)
 
 If the source string may contain markdown syntax (`**bold**`, `#`, `-`, fenced code, links), render it through `<Markdown source={...}>`. If it is guaranteed plain text, render directly into a `<p>` or other native element. Do not hand-roll `marked()` + `{@html}` or wrap output in your own sanitizer — the primitive already runs `marked` + `sanitize-html` and applies `.prose` styling. Default usage is **safe** (sanitizer runs on every call). The `trusted` flag bypasses the sanitizer and **must only be used for strings committed in source** (changelog, help copy, settings descriptions); when `trusted` appears in a diff, treat it as a sanitizer-bypass review surface and verify the source is system-authored, not AI / CMS / user input. For phrasing contexts (tooltip body, label text), pass `inline` so the wrapper is `<span>` and there is no leading `<p>`.
+
+### Premium Packages (sit on top of the L1 contract)
+
+Two add-on packages consume the atmosphere × physics × mode contract and add narrative-grade motion. Both are usable standalone and have a canonical `AI-REFERENCE.md` for their effect vocabularies.
+
+| Package                          | Surface                                                              | Use For                                                                  |
+| -------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `@void-energy/ambient-layers`    | `<AmbientHost />` + `ambient.push(category, variant, intensity)` / `ambient.fire(variant, intensity)`; raw `AtmosphereLayer` / `PsychologyLayer` / `ActionLayer` / `EnvironmentLayer` | Backdrop weather, mood, environment color grading, one-shot scene beats |
+| `@void-energy/kinetic-text`      | `KineticText` (engine), `TtsKineticBlock` (TTS-synced), `KineticSkeleton` (placeholder); style snapshot via `createVoidEnergyTextStyleSnapshot` | Character-level reveals, 21 continuous mood effects, 16 one-shot punctuation effects, TTS-synced narrative |
+
+The free `use:kinetic` action covers basic typewriter / cycle / decode reveals; the paid engine adds character-level pretext layout and the 37-effect narrative library. Do not mix the two — pick the level of fidelity the task demands.
+
+### Prop API conventions (the ones AI agents most often invent)
+
+- **Button variants are class names, not `variant=` props.** Valid variant classes: `btn-cta`, `btn-premium`, `btn-system`, `btn-success`, `btn-error`, `btn-ghost`, `btn-loud`, `btn-icon`, `btn-void`. Apply via the `class` prop. There is no `variant="danger"` / `variant="primary"` / `variant="..."` prop on `ActionBtn`, `IconBtn`, `ProfileBtn`, or `ThemesBtn`. Modal-dismiss / cancel buttons use `class="btn-ghost btn-error"` (red ghost), not plain `btn-ghost`.
+- **`ActionBtn` takes `text` as a prop, not children.** Correct: `<ActionBtn icon={Sparkle} text="Generate" class="btn-cta" onclick={...} />`. Incorrect: `<ActionBtn>...</ActionBtn>`.
+- **`IconBtn` is icon-only.** Pass `icon` + accessibility-relevant `...rest` (`aria-label`, `title`). Use `ActionBtn` when an action benefits from a label.
+- **Modal / Dropdown / Sidebar take Svelte 5 snippets via slot props.** Do not call them with positional children for content the registry calls a `panel`, `trigger`, or `children` snippet.
+- **`Toggle` exposes a native `<input type="checkbox" role="switch">`** — use `bind:checked` and `...rest` for native attributes (`name`, `disabled`, `aria-*`).
+- **State drives via `data-state` / `aria-*`, never `variant=` or `mode=` props.** A control that's "active" carries `data-state="active"` or `aria-pressed="true"`, not `variant="active"`.
 
 ### When to build new
 
@@ -233,6 +313,25 @@ Otherwise, compose with what already ships.
 ## 6. Import Paths
 
 All UI primitives import from a single alias root. Pattern: `@components/ui/<ComponentName>.svelte`.
+
+**Valid alias roots (do not invent new ones):**
+
+| Alias                 | Maps to                | Use For                                                              |
+| --------------------- | ---------------------- | -------------------------------------------------------------------- |
+| `@components/ui/`     | `src/components/ui/`   | Shipped UI primitives                                                |
+| `@components/core/`   | `src/components/core/` | Astro scaffolding (`AtmosphereScope`, `LiquidGlassFilter`)           |
+| `@components/icons/`  | `src/components/icons/` | Custom interactive icon components                                   |
+| `@components/app/`    | `src/components/app/`  | App-level / consumer-side components                                 |
+| `@adapters/`          | `src/adapters/`        | `voidEngine` and adapter modules                                     |
+| `@actions/`           | `src/actions/`         | Svelte actions (`tooltip`, `morph`, `kinetic`, …)                    |
+| `@lib/`               | `src/lib/`             | Singletons + utilities (`modal-manager`, `aura`, `password-validation`) |
+| `@stores/`            | `src/stores/`          | Reactive state singletons (`toast`, `user`)                          |
+| `@config/`            | `src/config/`          | Token + atmosphere + font configuration                              |
+| `@service/` `@styles/` | `src/service/` `src/styles/` | Service shims and SCSS entrypoints                              |
+
+There is no `@components/dashboard/`, `@components/terminal/`, `@components/forms/`, or any other invented subroot. Compose pages from the four valid `@components/*` subroots above.
+
+**New components the consumer authors live in `@components/app/`, not `@components/ui/`.** `@components/ui/` is reserved for the shipped primitive library — it is read-only outside system-level tasks. When you write a new consumer-side component (a custom card, a feature-specific widget, a domain-specific composite), place it in `@components/app/`. Do not author into `@components/ui/`. Better still: see if a `surface-*` class on a native `<div>` plus the registered primitives covers the need without a new component file at all.
 
 ```ts
 // Fields
@@ -275,6 +374,8 @@ import Breadcrumbs from '@components/ui/Breadcrumbs.svelte';
 import SettingsRow from '@components/ui/SettingsRow.svelte';
 import PullRefresh from '@components/ui/PullRefresh.svelte';
 import Skeleton from '@components/ui/Skeleton.svelte';
+import Markdown from '@components/ui/Markdown.svelte';
+import MediaScrubber from '@components/ui/MediaScrubber.svelte';
 
 // Media
 import Image from '@components/ui/Image.svelte';
@@ -307,17 +408,27 @@ import { user } from '@stores/user.svelte';
 import { morph } from '@actions/morph';
 import { tooltip } from '@actions/tooltip';
 import { navlink } from '@actions/navlink';
-import { kinetic } from '@actions/kinetic';
+import { kinetic, typewrite } from '@actions/kinetic';
 import { narrative, isOneShotEffect } from '@actions/narrative';
-import { draggable, dropTarget, reorderByDrop } from '@actions/drag';
+import { draggable, dropTarget, reorderByDrop, resolveReorderByDrop } from '@actions/drag';
 import { aura } from '@actions/aura';
 import { extractAura } from '@lib/aura';
+import { laserAim } from '@actions/laser-aim';
+import { fontShift } from '@actions/font-shift';
+
+// Validation factory
+import { createPasswordValidation } from '@lib/password-validation.svelte';
 
 // Transitions
 import { emerge, dissolve, materialize, dematerialize, implode, live } from '@lib/transitions.svelte';
+
+// Premium packages (separate npm scopes; consume the L1 contract)
+import { ambient, AmbientHost } from '@void-energy/ambient-layers';
+import { KineticText, TtsKineticBlock, KineticSkeleton } from '@void-energy/kinetic-text';
+import { createVoidEnergyTextStyleSnapshot } from '@void-energy/kinetic-text/adapters/void-energy-host';
 ```
 
-The complete machine-readable inventory (props, slots, compose guidance, examples) lives in [src/config/component-registry.json](src/config/component-registry.json). Read that file when you need exact prop shapes.
+The complete machine-readable inventory (props, slots, compose guidance, examples) lives in [src/config/component-registry.json](src/config/component-registry.json). Read that file when you need exact prop shapes. Premium-package vocabularies live in [packages/ambient-layers/AI-REFERENCE.md](packages/ambient-layers/AI-REFERENCE.md) and [packages/kinetic-text/AI-REFERENCE.md](packages/kinetic-text/AI-REFERENCE.md).
 
 ---
 
@@ -383,10 +494,21 @@ When asked for a page, screen, or feature:
 
 These break the system. Do not ship them.
 
-- **Raw values.** Hardcoded px, rem, %, hex, rgb, hsl in application code.
+- **Raw values.** Hardcoded px, rem, %, hex, rgb, rgba, hsl, hsla in application code. Specific failure modes:
+  - `filter: blur(Npx)` → `filter: var(--physics-blur);`
+  - `inset: ±Npx` for overlays → drop the offset, or carry a `// void-ignore` with justification.
+  - `rgba(0, 0, 0, N)` for shadows / gradient stops → use `var(--shadow-*)` or `var(--border-color)`.
+  - `border: Npx solid #...` → `border: var(--physics-border-width) solid var(--border-color);`
+  - `text-shadow: 0 0 Npx ...` / `box-shadow: 0 0 Npx ...` → use a shadow token (`var(--shadow-float | --shadow-lift)`) or `--physics-blur` for the blur radius. Never spell out raw px shadow blur radii (`8px`, `16px`).
+  - `width: Npx; height: Npx;` for tiny ornaments (cursor caret, dot indicator) → use `var(--space-xs)` (8px) or carry `// void-ignore`.
+  - `min-width: Nrem` / `min-height: Nrem` → use a `--space-*` token (`--space-xs` 8 / `sm` 16 / `md` 24 / `lg` 32 / `xl` 48 / `2xl` 64).
+- **Arbitrary Tailwind brackets for layout values.** `gap-[20px]`, `p-[32px]`, `w-[400px]`, `max-w-[600px]`, `min-h-[200px]`, `h-[80vh]`, `max-w-[400px]`. **All bracket-syntax utilities are banned** — including responsive variants like `tablet:max-w-[400px]`. Compose from the semantic token scale (`gap-md`, `p-lg`, `w-full`, container queries, container `max-w-prose`-style classes) — if no token covers the case, use SCSS with a token, not an arbitrary bracket utility.
+- **Hallucinated import aliases.** `@components/dashboard/`, `@components/terminal/`, `@components/forms/`, etc. The valid alias subroots are listed in §6 — only `@components/{ui,core,icons,app}` plus the top-level `@adapters` / `@actions` / `@lib` / `@stores` / `@config` / `@service` / `@styles`.
 - **Physics in Tailwind.** `shadow-lg`, `backdrop-blur-md`, arbitrary `bg-*` utilities for material.
 - **Composition in SCSS.** One-off page sections, grid layouts, margin-based positioning.
-- **Classes for state.** `.active`, `.open`, `.selected`, `.is-*`, `.has-*`.
+- **Classes for state.** `.active`, `.open`, `.selected`, `.is-*`, `.has-*`. State lives on `data-state="..."` or `aria-*` attributes.
+- **`variant=` props on shipped buttons.** `ActionBtn`, `IconBtn`, `ProfileBtn`, and `ThemesBtn` consume variants via `class="btn-..."` — there is no `variant=` prop. Modal-dismiss / cancel uses `class="btn-ghost btn-error"`, not `variant="danger"`.
+- **Children content on `ActionBtn`.** It takes `text` as a prop, not a slot.
 - **Legacy Svelte.** `export let`, `$:`, `onMount`, `onDestroy`, `createEventDispatcher`, stores from `svelte/store` (use runes).
 - **New primitives when one ships.** Rebuilding `<select>`, `<dialog>`, or any shipped UI component from scratch.
 - **Editing generated files.** `src/styles/config/_generated-themes.scss`, `src/styles/config/_fonts.scss`, `src/config/void-registry.json`, `src/config/void-physics.json`, `src/config/font-registry.ts`. Edit `src/config/design-tokens.ts` instead.
@@ -467,8 +589,9 @@ For depth beyond this contract — available to agents with file-system access:
 
 - [CHEAT-SHEET.md](CHEAT-SHEET.md) — complete developer reference: mixins, patterns, actions, transitions.
 - [COMPOSITION-RECIPES.md](COMPOSITION-RECIPES.md) — page archetypes composed from shipped primitives.
-- [AI-PLAYBOOK.md](AI-PLAYBOOK.md) — compact operating guide for agents building consumer pages.
 - [THEME-GUIDE.md](THEME-GUIDE.md) — building and validating custom themes (palette contract, WCAG, collisions).
 - [src/config/component-registry.json](src/config/component-registry.json) — machine-readable inventory of shipped primitives.
 - [src/config/design-tokens.ts](src/config/design-tokens.ts) — single source of truth for every token value.
+- [packages/ambient-layers/AI-REFERENCE.md](packages/ambient-layers/AI-REFERENCE.md) — canonical ambient-layer vocabulary (variants, intensity, lifetime semantics, scene recipes).
+- [packages/kinetic-text/AI-REFERENCE.md](packages/kinetic-text/AI-REFERENCE.md) — canonical kinetic-text vocabulary (reveal styles, continuous effects, one-shot punctuation, style spans, TTS sync).
 - [DESIGN.md](DESIGN.md) — aesthetic snapshot (Frost) for agents building VE-inspired UI without installing VE. Tool-agnostic. Not the AI-build contract — that's this file.

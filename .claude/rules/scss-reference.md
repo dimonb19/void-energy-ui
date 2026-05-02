@@ -1,22 +1,35 @@
 ---
 paths:
-  - "src/styles/**/*.scss"
+  - "src/**/*.scss"
   - "src/components/**/*.svelte"
 ---
 
-# SCSS Toolkit Reference
+# SCSS Authoring & Toolkit Reference
 
-All available via `@use '../abstracts' as *;`
+All toolkit primitives are available via `@use '../abstracts' as *;`. Never import individual partial files.
 
-## Protocol Note
+## Hybrid Protocol
+
 Use SCSS for:
-- visuals, physics, state styling
+- visuals, physics, materials, complex state styling
 - token-driven primitive-internal geometry that ships with the component out of the box
 
 Do not use SCSS for:
-- arbitrary page/layout composition
+- arbitrary page/layout composition (that belongs in Tailwind)
 - one-off consumer layout wrappers
 - raw geometry values that bypass tokens
+
+## Token Law
+
+- No raw px, hex, rgb, or hsl values
+- Use semantic CSS variables and shipped utility tokens only
+- See `.claude/rules/tokens-reference.md` for the CSS variable catalog
+
+## Starter Bias
+
+- Prefer no new SCSS when page composition can solve the task
+- Never move shadows, blur, glow, or border materials into Tailwind utilities
+- Never move page layout into SCSS
 
 ## Surfaces
 ```
@@ -77,3 +90,7 @@ alpha($color, $opacity)       Set transparency. Accepts 0-1 or 0%-100%.
 blend($color, $other, $pct)   Mix two colors.
 z($layer)                     Semantic z-index lookup from layer map.
 ```
+
+## Warning
+
+If the file you are editing is under `src/styles/`, read `.claude/rules/read-only-system.md` first.

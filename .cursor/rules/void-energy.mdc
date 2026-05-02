@@ -1,0 +1,95 @@
+---
+description: Builds atmosphere-aware, physics-driven Void Energy interfaces — glass, flat, or retro surfaces with density-scaled tokens, theme switching, and Svelte 5 runes. Use this skill for VE design system, theming, or component-composition tasks.
+---
+
+
+
+# Void Energy — Cursor Rules
+
+Always-loaded backstop for Cursor 2.4 in any Void Energy consumer project. Cursor's official position is *"Skills don't replace Rules. They're meant to coexist."* This file is the always-on surface; the SKILL.md at `.cursor/skills/void-skill/` is the relevance-ranked supplement.
+
+## Identity
+
+Void Energy is a **physics-based, theme-reactive design system**. Every surface is the intersection of three environmental variables — an **atmosphere** (palette + font), a **physics** preset (texture, motion, borders), and a **mode** (light or dark polarity) — composed from a token dictionary, never raw values. A runtime engine enforces constraints at the DOM level.
+
+> Do not paint pixels. Declare materials.
+
+## The Five Laws (non-negotiable)
+
+1. **Hybrid Protocol** — Tailwind owns composition; SCSS owns material.
+   - ✅ `class="flex flex-col gap-md p-lg"` ❌ `.section { display: grid; gap: 24px; }`
+   - ✅ `.card { @include surface-raised; }` ❌ `class="shadow-lg bg-blue-500"`
+
+2. **Token Law** — No raw px, hex, rgb, hsl, or rem in app code. Semantic tokens only.
+   - ✅ `padding: var(--space-lg);` `class="gap-md p-lg"`
+   - ❌ `padding: 32px;` `class="gap-[20px] max-w-[400px]"` (bracket-syntax utilities are banned, including responsive variants)
+
+3. **Runes Doctrine** — Svelte 5 runes only. No `export let`, `$:`, `onMount`, `onDestroy`, `createEventDispatcher`, or stores from `svelte/store`.
+   - Use `$props`, `$state`, `$derived`, `$effect`, `$bindable`. Data loading on mount uses `$effect`.
+
+4. **State Protocol** — State lives in the DOM via `data-*` and ARIA, never modifier classes.
+   - ✅ `data-state="open"` `aria-pressed="true"` ❌ `class="is-active"` `class="selected"`
+
+5. **Spacing Gravity** — Default generous; when uncertain, go ONE size up.
+   - Floating surface → `p-lg gap-lg`. Sunk surface → `p-md gap-md`. `gap-xs`/`gap-sm` only between items that are semantically one unit.
+
+## The Triad
+
+The `<html>` element carries `data-atmosphere`, `data-physics`, and `data-mode`. Only four of six combinations are valid; the engine auto-corrects the rest:
+
+- `glass` + `dark` ✅ — backdrop blur, organic motion, glow borders
+- `flat` + `dark` ✅, `flat` + `light` ✅ — clean ease-out, solid borders
+- `retro` + `dark` ✅ — instant steps, hard borders, CRT phosphor
+- `glass` + `light` → runtime downgrades to `flat` (glass needs darkness)
+- `retro` + `light` → runtime forces `dark` (CRT requires a black canvas)
+
+Drive the triad through `voidEngine.setAtmosphere()` or DOM attributes — never patch invalid combinations manually.
+
+## Opinionated defaults
+
+One recommended path per task. Reach into the registry only when genuinely outside this list.
+
+- **Icon + text action** → `<ActionBtn icon={X} text="..." class="btn-cta" />` (the label is the `text` prop, not children).
+- **Icon-only action** → `<IconBtn icon={X} aria-label="..." />`.
+- **Button variants** → class names: `btn-cta | btn-premium | btn-system | btn-success | btn-error | btn-ghost`. Modal-dismiss / cancel uses `class="btn-ghost btn-error"`. There is no `variant=` prop.
+- **Single-choice picker** → `Selector`. Tab-style → `Switcher` or `Tabs`. Type-to-filter → `Combobox`.
+- **Boolean** → `Toggle` (renders `<input type="checkbox" role="switch">`).
+- **Text input** → `EditField`, `SearchField`, `PasswordField`, `CopyField`, `ColorField`, `SliderField`, `GenerateField`/`GenerateTextarea`. Field composition → `FormField`.
+- **Modal / dialog** → `import { modal } from '@lib/modal-manager.svelte'`; `modal.confirm({ ... })` for destructive actions.
+- **Transient feedback** → `import { toast } from '@stores/toast.svelte'`; `toast.success | error | info | warning | loading | promise`.
+- **Floating panel** → `Dropdown`. Slide-out → `Sidebar`.
+- **Avatar / image / video** → `Avatar`, `Image`, `AdaptiveImage`, `Video`. Do not author raw `<img>` for content media.
+- **Authored markdown** → `<Markdown source={...} />` (or `inline` for phrasing). Never hand-roll `marked()` + `{@html}`.
+- **Glass refraction** → mount `<LiquidGlassFilter />` once at app root.
+- **Theme creation UI** → `ThemeBuilder`. Lifecycle-bound theming → `AtmosphereScope`.
+- **Narrative motion** (character reveals, mood-driven typography, TTS sync) → `KineticText` from `@void-energy/kinetic-text`.
+- **Backdrop weather, mood, environmental color grading** → `ambient.push(category, variant, intensity)` from `@void-energy/ambient-layers`. Mount `<AmbientHost />` once at app root.
+- **Page scaffold** → `<div class="container flex flex-col gap-2xl py-2xl"><section class="flex flex-col gap-xl"><div class="surface-raised p-lg flex flex-col gap-lg">...</div></section></div>`.
+
+New consumer-side components belong in `@components/app/`. `@components/ui/` is the shipped primitive library — read-only.
+
+## Native-First
+
+Always native: `<button>`, `<input>`, `<select>`, `<textarea>`, `<dialog>`, `<details>`, `<fieldset>`, `<label>`, `<a>`, `<form>`. Custom only when no native element covers the interaction (combobox, multi-thumb slider, virtualized table, command palette, floating panels). Reference: `Selector.svelte` wraps a native `<select>` with label association and SCSS physics — zero custom dropdown JS.
+
+## Hard prohibitions
+
+- Bracket-syntax Tailwind utilities (`gap-[20px]`, `max-w-[400px]`, `tablet:max-w-[400px]`).
+- Hallucinated alias roots. Valid: `@components/{ui,core,icons,app}`, `@adapters`, `@actions`, `@lib`, `@stores`, `@config`, `@service`, `@styles`.
+- Physics utilities in Tailwind (`shadow-lg`, `backdrop-blur-md`).
+- Composition in SCSS (one-off page grids, margin-based positioning).
+- Modifier classes for state (`.is-active`, `.open`, `.selected`).
+- `variant=` props on shipped buttons.
+- Children content on `ActionBtn`.
+- Inline visual styles. Inline styles are reserved for runtime positioning.
+- Editing generated files (`_generated-themes.scss`, `_fonts.scss`, `void-registry.json`, `void-physics.json`, `font-registry.ts`). Edit `src/config/design-tokens.ts` and run `npm run build:tokens`.
+
+## Runtime contracts
+
+Import singletons; never re-instantiate: `voidEngine`, `modal`, `toast`, `layerStack`, `shortcutRegistry`, `user`. Transitions in `@lib/transitions.svelte`. Actions in `@actions/*`. Reusable types live in `src/types/` as ambient globals (do not import). Keep file-local types unexported.
+
+## Acceptance
+
+Output is complete when types check, the registry aligns with every component use, no raw values appear in touched files (exceptions carry `// void-ignore` with justification), and the result renders correctly across all three physics presets and both modes where the active physics permits. `glass` and `retro` are dark-only.
+
+For depth, read `SYSTEM-PROMPT.md`, `CHEAT-SHEET.md`, `COMPOSITION-RECIPES.md`, `THEME-GUIDE.md`, `src/config/component-registry.json`, `src/config/design-tokens.ts`, and the package `AI-REFERENCE.md` files.

@@ -1,5 +1,20 @@
 # Composition Recipes
 
+> Generated from `COMPOSITION-RECIPES.md`. Do not hand-edit. Edit the source file and run `npm run build:skill`.
+
+## Build Procedure
+
+Follow this procedure for any page-composition or component-composition task. The recipes below are the *patterns*; this is the *order of operations* that uses them.
+
+1. **Parse the brief.** Identify the page archetype (dashboard, marketing, settings, story hub, analytics, narrative, auth) — match it to one of the recipes below.
+2. **Check the registry.** `src/config/component-registry.json` is the inventory; `references/component-catalog.md` is the AI-readable view. If a primitive covers the need, use it. Do not invent a parallel.
+3. **Find the analog.** Identify the nearest existing page that does what you are building. Match its layout primitives, surface depth, and spacing rhythm.
+4. **Pick tokens.** From `references/token-vocabulary.md`. Spacing, color, motion, typography — never hardcode.
+5. **Compose.** Tailwind for layout (`flex`, `grid`, `gap-*`, `p-*`); SCSS only for material (surface mixins, when-state, when-physics). State via `data-*`.
+6. **Verify.** Result must render correctly under all three physics presets (`glass`, `flat`, `retro`) and both modes where the active physics permits. Run `npm run check` before reporting done.
+
+---
+
 Compact page archetypes for AI page-building. Start here after checking `src/config/component-registry.json`.
 
 For premium-package work, the **package `AI-REFERENCE.md` is canonical** before the recipes below:
@@ -324,3 +339,67 @@ Ask these in order:
 2. Is this already a registry action or controller?
 3. Is this a documented recipe built from native HTML and shipped classes?
 4. Is the missing need real, or am I failing to compose the existing system correctly?
+
+---
+
+## When Extending the System (Component Skeleton)
+
+For consumer-side components in `@components/app/` only. `@components/ui/` is read-only. New library primitives go through `/new-component`.
+
+```svelte
+<script lang="ts">
+  interface MyComponentProps {
+    value: string;
+    checked?: boolean;
+    onchange?: (value: string) => void;
+    class?: string;
+  }
+
+  let {
+    value,
+    checked = $bindable(false),
+    onchange,
+    class: className = '',
+  }: MyComponentProps = $props();
+</script>
+
+<div
+  class="my-component flex gap-md {className}"
+  data-state={checked ? 'active' : ''}
+>
+  <!-- Layout = Tailwind. State = data attributes. Visual physics = SCSS class. -->
+</div>
+
+<style lang="scss">
+  @use '../abstracts' as *;
+
+  .my-component {
+    @include surface-raised;
+    @include when-state('active') { border-color: var(--energy-primary); }
+    @include when-retro           { border-width: var(--physics-border-width); }
+    @include when-light           { background: var(--bg-surface); }
+  }
+</style>
+```
+
+---
+
+## Page Scaffold (default)
+
+When in doubt, start here. Container → section → raised card → header → sunk well → content. Every gap and padding is a Spacing-Gravity floor; never go down a size without justification.
+
+```svelte
+<div class="container flex flex-col gap-2xl py-2xl">
+  <section class="flex flex-col gap-xl">
+    <div class="surface-raised p-lg flex flex-col gap-lg">
+      <div class="flex flex-col gap-xs">
+        <h2>Section title</h2>
+        <p class="text-dim">Short explanation.</p>
+      </div>
+      <div class="surface-sunk p-md flex flex-col gap-md">
+        <!-- content -->
+      </div>
+    </div>
+  </section>
+</div>
+```

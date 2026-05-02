@@ -25,6 +25,7 @@
    - [Icons](#e-icons)
    - [Effects](#f-effects)
    - [Narrative Effects](#narrative-effects-post-reveal-text-animations)
+   - [Premium Packages — Ambient Layers + Kinetic Text Engine](#premium-packages--ambient-layers--kinetic-text-engine)
    - [State Patterns](#g-state-patterns)
    - [Charts & Data Visualization](#h-charts--data-visualization)
 5. [Mixin Reference](#5-mixin-reference)
@@ -4048,9 +4049,51 @@ Physics-aware visual effects for loading states and skeleton loaders.
 
 ---
 
-#### `<KineticText>` — REMOVED
+#### `<KineticText>` — Premium Package (`@void-energy/kinetic-text`)
 
-**Status:** Removed. Replaced by `@void-energy/kinetic-text` (premium package with character-level DOM, scoped effects, cue system). For simple loading cyclers, use `<LoadingTextCycler>`. The `use:kinetic` action remains available for direct usage.
+**Status:** Lives in the [packages/kinetic-text/](packages/kinetic-text/) premium package. The free `use:kinetic` action remains in the public repo for basic typewriter / cycle / decode reveals (covered above); the premium engine adds character-level pretext layout, the 37-effect narrative library (16 one-shot + 21 continuous), TTS sync, and the cue system.
+
+**Surface:** `KineticText` (engine), `TtsKineticBlock` (TTS-synced narrative block), `KineticSkeleton` (loading placeholder).
+
+**Canonical reference:** [packages/kinetic-text/AI-REFERENCE.md](packages/kinetic-text/AI-REFERENCE.md) — full vocabulary for `revealStyle`, `speedPreset`, `activeEffect`, `punctuation`, and `styleSpans`. Pre-text per-character DOM is a paid moat per [decisions.md §D11](plans/decisions.md#d11) — do not back-port the engine into the free package.
+
+**Reveal styles (7):** `pop` (default), `drop`, `rise`, `blur`, `scale`, `scramble`, `instant`.
+
+**Continuous effects (21, sustained mood):** `tremble`, `flicker`, `static`, `burn`, `vibrate`, `distort`, `sway`, `wobble`, `stretch`, `drip`, `haunt`, `whisper`, `fade`, `sparkle`, `glow`, `breathe`, `drift`, `float`, `wave`, `pulse`, `freeze`.
+
+**One-shot punctuation (16, fires when reveal completes):** `shake`, `quake`, `slam`, `jolt`, `bounce`, `explode`, `shatter`, `collapse`, `scatter`, `surge`, `flash`, `ripple`, `spin`, `glitch`, `warp`, `vortex`.
+
+**Inline style spans (5 kinds):** `weight`, `style`, `decoration`, `color`, `transform` — applied to a word range without breaking the character-level reveal.
+
+**Style-snapshot bridge:** `createVoidEnergyTextStyleSnapshot(el)` from `@void-energy/kinetic-text/adapters/void-energy-host` reads `data-physics` / `data-mode` and the host element's computed styles to feed `styleSnapshot`. Non-VE hosts construct `TextStyleSnapshot` manually.
+
+**Usage (engine, story step):**
+
+```svelte
+<script lang="ts">
+  import { KineticText } from '@void-energy/kinetic-text';
+  import { createVoidEnergyTextStyleSnapshot } from '@void-energy/kinetic-text/adapters/void-energy-host';
+  import '@void-energy/kinetic-text/styles';
+
+  let el = $state<HTMLElement>();
+  const snapshot = $derived(el ? createVoidEnergyTextStyleSnapshot(el) : null);
+</script>
+
+<div bind:this={el} class="surface-sunk p-lg">
+  {#if snapshot}
+    <KineticText
+      text="The reactor hums awake, then roars."
+      revealStyle="rise"
+      speedPreset="slow"
+      activeEffect="breathe"
+      punctuation="slam"
+      styleSnapshot={snapshot}
+    />
+  {/if}
+</div>
+```
+
+For TTS-synced reveal with timed action dispatch see [`<TtsKineticBlock>`](#tts-kinetic-block) and the [Narrative UI recipe](COMPOSITION-RECIPES.md#narrative-ui-tts--kinetic--ambient).
 
 **Showcase:** [/kinetic-text](src/pages/kinetic-text.astro)
 
@@ -4199,6 +4242,90 @@ Use `isOneShotEffect()` to branch. The effect can also arrive late (from API, ga
 **User Preference:** Persisted `narrativeEffects` boolean in `UserConfig`. Consumer passes `enabled` derived from `voidEngine.userConfig.narrativeEffects`. Toggle lives in the Themes modal Preferences section.
 
 **Showcase:** [/conexus → Narrative Effects](packages/dgrs/src/components/CoNexus.svelte)
+
+---
+
+#### Premium Packages — Ambient Layers + Kinetic Text Engine
+
+VE ships two premium packages that consume the L1 contract (atmosphere × physics × mode) and add narrative-grade motion. Both are usable standalone, both are designed for AI-driven story pipelines, and both have a canonical `AI-REFERENCE.md` that is the source of truth for their effect vocabularies.
+
+##### `@void-energy/ambient-layers` — Backdrop Layer Engine
+
+**Canonical reference:** [packages/ambient-layers/AI-REFERENCE.md](packages/ambient-layers/AI-REFERENCE.md) — full variant catalog (39 variants across four categories), intensity scale, lifetime semantics, and scene recipes.
+
+**What it does:** Mounts a fixed-position backdrop host that composes up to four layer categories simultaneously. Each category has its own lifetime semantics — they are intentional and load-bearing.
+
+| Category | Lifetime | Variants | Use For |
+|----------|----------|----------|---------|
+| `atmosphere` | Sticky + auto-decay | `rain`, `snow`, `ash`, `storm`, `wind`, `fog`, `spores`, `fireflies`, `underwater`, `heat` | Weather + sensory overlays |
+| `psychology` | Sticky + auto-decay | `danger`, `tension`, `fail`, `dizzy`, `haze`, `filmGrain`, `focus`, `calm`, `serenity`, `success`, `awe`, `melancholy` | Emotional / mental state |
+| `environment` | Sticky, no decay | `dawn`, `dusk`, `night`, `overcast`, `candlelit`, `neon`, `sickly`, `toxic`, `underground` | Color grading (LUT / hour / place) |
+| `action` | One-shot, auto-removes | `impact`, `shake`, `zoomBurst`, `flash`, `reveal`, `dissolve`, `speed`, `glitch` | Single dramatic beats |
+
+**Intensity scale:** `low` / `medium` / `high` (default `medium`).
+
+**APIs (two surfaces ship side-by-side):**
+
+- **Singleton API (recommended):** mount `<AmbientHost />` once at the layout level, then drive layers imperatively from anywhere via `ambient.push(category, variant, intensity)` / `ambient.release(handle)` / `ambient.fire(actionVariant, intensity)`. Push/release manages a handle stack — nested scopes compose cleanly (page pushes `rain`, modal pushes `calm`, modal closes → `rain` returns).
+- **Raw layer components:** `AtmosphereLayer`, `PsychologyLayer`, `ActionLayer`, `EnvironmentLayer` exported for showcases and consumers that need direct control over decay, `onChange`, or per-instance props.
+
+**Physics adaptation:** layers read the global `<html data-physics data-mode>` contract via CSS only — no host adapter. Every effect renders correctly across `glass`, `flat`, `retro` and across `light` / `dark` (within the engine's auto-corrected combos: glass and retro require dark). Reduced-motion-safe by construction.
+
+**Usage (AI scene-step driver):**
+
+```svelte
+<script lang="ts">
+  import { ambient } from '@void-energy/ambient-layers';
+
+  // Each story step from the AI returns a sticky-state object.
+  function applyScene(step: {
+    environment?: { variant: string; intensity: 'low' | 'medium' | 'high' } | null;
+    atmosphere?: { variant: string; intensity: 'low' | 'medium' | 'high' } | null;
+    psychology?: { variant: string; intensity: 'low' | 'medium' | 'high' } | null;
+    action?: { variant: string; intensity: 'low' | 'medium' | 'high' };
+  }) {
+    if (step.environment !== undefined) {
+      step.environment === null
+        ? ambient.release('environment')
+        : ambient.push('environment', step.environment.variant, step.environment.intensity);
+    }
+    if (step.atmosphere !== undefined) {
+      step.atmosphere === null
+        ? ambient.release('atmosphere')
+        : ambient.push('atmosphere', step.atmosphere.variant, step.atmosphere.intensity);
+    }
+    if (step.action) ambient.fire(step.action.variant, step.action.intensity);
+  }
+</script>
+```
+
+**Combination guidance (from AI-REFERENCE):** environment + atmosphere + psychology compose freely; action fires on top. At most one variant per category at a time. Environment is the LUT (hour-of-day, place); atmosphere is weather/sensory; psychology is emotional state; action is a single beat.
+
+**Avoid:**
+- Pushing a category before `<AmbientHost />` mounts — push calls early in the boot sequence drop on the floor.
+- Inventing variants in code without updating the `AI-REFERENCE.md` source of truth — drift breaks the AI contract.
+- Using `ambient.fire` in a `setInterval` to "beat" an effect — push a persistent layer instead and let physics own the loop.
+
+**Showcase:** [/ambient-layers](src/pages/ambient-layers.astro)
+
+##### `@void-energy/kinetic-text` — Premium Engine + TTS Sync
+
+Engine surface is documented above under [`<KineticText>`](#kinetictext--premium-package-void-energykinetic-text). The TTS-synced narrative block is the second public component:
+
+###### `<TtsKineticBlock>` — TTS-Synced Reveal {#tts-kinetic-block}
+
+**What it does:** Wires `<audio>`, kinetic reveal timing, and timed action dispatch together. Owns blob-URL lifecycle, drift correction, pause/resume, rate changes, scrub, and autoplay errors. The text reveals at the cadence of spoken audio; `actions` fire at word offsets and dispatch payloads to `onaction`.
+
+**Provider-agnostic TTS:** built-in adapters in `@void-energy/kinetic-text/tts/providers` — `inworldSynthesize`, `elevenLabsSynthesize`, `openaiSynthesize`. Adding a new provider (Deepgram, Cartesia, your backend) is a single file — see the kinetic-text README's "TTS providers" section.
+
+**Composition with ambient layers:** dispatch `ambient.fire(payload.variant, payload.intensity)` from `onaction` — the action category in ambient-layers exists specifically to receive these one-shot beats. The minimum viable end-to-end recipe is in [COMPOSITION-RECIPES.md › Narrative UI](COMPOSITION-RECIPES.md#narrative-ui-tts--kinetic--ambient).
+
+**Reference:** [packages/kinetic-text/AI-REFERENCE.md](packages/kinetic-text/AI-REFERENCE.md) and the `TtsKineticBlock` README in the package.
+
+**Avoid:**
+- Wiring `syncAudioToKT` and `attachAudioActions` by hand — they are private; `<TtsKineticBlock>` is the public composition.
+- Passing TTS timestamps as raw ms offsets — use `WordTimestamp[]` so reveal marks stay character-accurate.
+- Replaying without keying — re-mount via `{#key replay}<TtsKineticBlock …/>{/key}` so the engine restarts cleanly.
 
 ---
 
@@ -7055,7 +7182,12 @@ FLIP animation for keyed `{#each}` blocks. Smoothly repositions siblings when li
 
 ## 📚 Related Documentation
 
+- **[SYSTEM-PROMPT.md](./SYSTEM-PROMPT.md)** — Tool-agnostic AI portable spec (the contract)
+- **[AI-PLAYBOOK.md](./AI-PLAYBOOK.md)** — Compact operating guide for AI agents in this repo
+- **[COMPOSITION-RECIPES.md](./COMPOSITION-RECIPES.md)** — Page archetypes built from shipped primitives
 - **[THEME-GUIDE.md](./THEME-GUIDE.md)** — How to create custom themes
+- **[packages/ambient-layers/AI-REFERENCE.md](./packages/ambient-layers/AI-REFERENCE.md)** — Canonical ambient-layer vocabulary (variants, intensity, lifetimes, scene recipes)
+- **[packages/kinetic-text/AI-REFERENCE.md](./packages/kinetic-text/AI-REFERENCE.md)** — Canonical kinetic-text vocabulary (reveal styles, continuous effects, one-shot punctuation, style spans)
 - **[CONTRIBUTING.md](./CONTRIBUTING.md)** — Contribution guidelines
 - **[README.md](./README.md)** — Project overview and architecture
 

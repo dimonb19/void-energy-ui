@@ -10,6 +10,8 @@ paths:
 
 Source of truth: `src/config/design-tokens.ts` (orchestrator), `src/config/fonts.ts` (fonts), `src/config/atmospheres.ts` (themes). Regenerate with `npm run build:tokens`.
 
+> **Sibling reference:** the same vocabulary as utility classes (Tailwind) is in `.claude/rules/tailwind-registry.md`. This file documents the **CSS variable** API for SCSS authors; `tailwind-registry.md` documents the **utility-class** API for Svelte/Astro markup.
+
 ## Spacing (4px base unit, density-scaled)
 ```
 --space-xs (8px)   --space-sm (16px)   --space-md (24px)   --space-lg (32px)

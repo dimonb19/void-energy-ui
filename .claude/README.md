@@ -6,12 +6,9 @@
 .claude/
   commands/                  On-demand skills (invoke with /name)
     document.md              Document recent changes
-    build-page.md            Compose a page with shipped primitives
-    new-page.md              Scaffold a new route + page-level screen
-    new-component.md         Scaffold a new component
-    migrate.md               Migrate legacy → Void Energy
+    build-page.md            Compose a page with shipped primitives (handles new pages too)
+    new-component.md         Match-first scaffold for new components
     review.md                Check design system compliance
-    showcase.md              Generate ui-library demo page
 
   hooks/                     Automatic (runs on every edit, no action needed)
     auto-format.sh           Prettier after file saves
@@ -54,20 +51,6 @@ How it works:
 3. Implements the page in consumer files without inventing new design-system primitives
 4. Reports any real system gaps that remain
 
-### `/new-page`
-
-Creates a new route using the standard starter pattern: thin `.astro` shell plus page-level `.svelte` screen.
-
-```
-/new-page "account settings page"
-```
-
-How it works:
-1. Reads the registry, playbook, recipes, and page scaffold rules
-2. Creates a route file that imports `Layout` and a page-level Svelte screen
-3. Builds the page screen from shipped primitives instead of inventing new ones
-4. Leaves the system files untouched
-
 ### `/new-component ComponentName`
 
 Scaffolds a new component with the correct Void Energy patterns.
@@ -80,23 +63,6 @@ Creates:
 - `src/components/ui/DataGrid.svelte` — Svelte 5 runes, props interface, data-attributes
 - `src/styles/components/_datagrid.scss` — surface-raised, physics blocks, token-only values
 
-### `/migrate ComponentName`
-
-Migrates all **consumers** of a `-legacy` component to use its Void Energy replacement.
-
-```
-/migrate Modal
-/migrate Toggle
-```
-
-How it works:
-1. Reads both `Modal.svelte` (new) and `Modal-legacy.svelte` (old) to build an API transformation map
-2. Finds all files importing the `-legacy` version
-3. Updates each consumer: imports, prop names, `on:event` → callback props, slots → snippets
-4. Reports which `-legacy` files are safe to delete (zero remaining consumers)
-
-**Never modifies the components themselves** — only their consumers.
-
 ### `/review`
 
 Checks code for design system violations (the 5 Laws).
@@ -107,16 +73,6 @@ Checks code for design system violations (the 5 Laws).
 ```
 
 Outputs: `file:line [Law N] violation → fix` for each issue found.
-
-### `/showcase ComponentName`
-
-Generates an interactive demo page in the ui-library.
-
-```
-/showcase DataGrid
-```
-
-Creates: `src/components/ui-library/SectionName.svelte` with live demos, props annotations, and explanations.
 
 ### `/document`
 
@@ -183,28 +139,11 @@ These load automatically when Claude edits matching file types. No action needed
 ### Building a new component
 
 ```
-/new-component RangeSlider        1. Scaffold files
+/new-component RangeSlider        1. Match-first scaffold (refuses if existing component covers the need)
   ... implement the component ...
 /review src/components/ui/RangeSlider.svelte   2. Check compliance
-/showcase RangeSlider             3. Create demo page
-/document RangeSlider             4. Update CHEAT-SHEET.md
+/document RangeSlider             3. Update CHEAT-SHEET.md
 ```
-
-### Migrating a legacy component (strangler fig pattern)
-
-```
-                                         Setup (one-time per component):
-                                         - New Void Energy component → Modal.svelte
-                                         - Old component renamed   → Modal-legacy.svelte
-
-/migrate Modal                    1. Migrate all consumers from -legacy → new
-/review                           2. Verify compliance
-  ... test in browser across glass/flat/retro ...
-/document Modal                   3. Document the result
-  ... delete Modal-legacy.svelte when zero consumers remain ...
-```
-
-Track progress: `grep -r "legacy" src/ | wc -l` — when it hits zero, migration is complete.
 
 ### Reviewing recent work
 
@@ -213,27 +152,3 @@ Track progress: `grep -r "legacy" src/ | wc -l` — when it hits zero, migration
 ```
 
 Or ask directly: "Review my latest changes for design system violations and accessibility."
-
----
-
-## Production Migration Tips
-
-For migrating a large codebase using the strangler fig pattern:
-
-1. **Import the foundation first.** Copy Void Energy's `styles/abstracts/`, `styles/tailwind-theme.css`, `config/design-tokens.ts`, VoidEngine, and the `.claude/` directory into the big repo. Rename the template to `CLAUDE.md` and fill in Section 0 (Legacy Patterns). Note: Void Energy uses Tailwind v4 via `@tailwindcss/vite` — there is no `tailwind.config.mjs` file to copy. Consumers must also be on v4 (or willing to migrate).
-
-2. **Rename old files with `-legacy` suffix.** `Modal.svelte` → `Modal-legacy.svelte`, `/styles/` → `/styles-legacy/`. The Void Energy versions take the clean names.
-
-3. **Start small.** Pick a component with few consumers first (`/migrate Toggle`) to build confidence.
-
-4. **One component per session.** Run `/migrate ComponentName` → `/review` → test → `/document`. Keep changes reviewable and reversible.
-
-5. **Test all 3 physics presets.** Every migrated consumer must work in glass, flat, and retro modes. Switch `data-physics` on `<html>` in dev tools.
-
-6. **Track progress.** `grep -r "legacy" src/ | wc -l` — this number should decrease every session.
-
-7. **Delete `-legacy` files** only when `/migrate` reports zero remaining consumers. Never before.
-
-8. **Use agents for audits.** Ask "Run the design reviewer on src/components/" to scan an entire directory at once.
-
-9. **The hooks are your safety net.** Auto-format keeps code clean. Protect-generated prevents accidents. Token-scan can flag common raw-value misses early, but it is advisory.

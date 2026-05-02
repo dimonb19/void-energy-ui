@@ -46,7 +46,14 @@
       "nav": ["tabs", "pagination", "load-more", "breadcrumbs", "sidebar"],
       "layout": ["settings-row"],
       "interaction": ["pull-refresh"],
-      "feedback": ["skeleton", "image", "avatar", "video", "markdown"],
+      "feedback": [
+        "skeleton",
+        "image",
+        "adaptive-image",
+        "avatar",
+        "video",
+        "markdown"
+      ],
       "chart": [
         "progress-ring",
         "sparkline",
@@ -55,7 +62,7 @@
         "line-chart",
         "bar-chart"
       ],
-      "theme": ["atmosphere-scope", "theme-builder"]
+      "theme": ["atmosphere-scope", "theme-builder", "liquid-glass-filter"]
     }
   },
   "types": {

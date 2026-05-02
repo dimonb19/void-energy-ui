@@ -1,0 +1,60 @@
+{
+  "name": "@void-energy/mcp",
+  "version": "0.1.0",
+  "description": "Void Energy MCP server — atmosphere registry as Resources, Safety-Merge validation as a Tool. Stdio transport, read-only, zero side effects.",
+  "type": "module",
+  "license": "BUSL-1.1",
+  "author": "DGRS Labs Pte. Ltd. <biz@dgrslabs.com>",
+  "homepage": "https://github.com/void-energy/void-energy#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/void-energy/void-energy.git",
+    "directory": "packages/void-energy-mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/void-energy/void-energy/issues"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "design-system",
+    "design-tokens",
+    "atmosphere",
+    "void-energy"
+  ],
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE.md"
+  ],
+  "bin": {
+    "void-energy-mcp": "./dist/index.js"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build:data": "npm --prefix ../.. run build:mcp:data",
+    "build:ts": "tsc -p tsconfig.json",
+    "build": "npm run build:data && npm run build:ts",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "test": "npm --prefix ../.. run test:mcp"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org",
+    "access": "public"
+  }
+}
