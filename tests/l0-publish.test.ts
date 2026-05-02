@@ -8,7 +8,7 @@
  * version, required fields, etc.) that pack alone does not perform.
  *
  * This is the Session 6 publish-readiness gate. The actual `npm publish`
- * (without --dry-run) is deferred to the Phase 3 monorepo restructure.
+ * (without --dry-run) is deferred to the monorepo restructure.
  */
 
 import path from 'node:path';

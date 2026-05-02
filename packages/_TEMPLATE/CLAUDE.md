@@ -13,7 +13,7 @@ This package depends on `void-energy` (the L1 core library) as a **peer**, exact
 - **Never reach into `src/` via relative paths** (`../../src/...`, `../../../src/...`). Use the published exports.
 - **All imports from the core library go through public exports.** Path aliases (`@adapters/*`, `@lib/*`, `@components/*`) are L1-internal and not available here.
 - **Do not import from other `packages/*`.** Premium packages are independent of each other; if two packages need to share something, the shared piece belongs in `void-energy` core or in a new shared package proposed to the user.
-- **No backdoor imports.** When this package goes private (Phase 3b), the consumer-style discipline is what makes the cutover mechanical.
+- **No backdoor imports.** When this package goes private (premium-packages cutover), the consumer-style discipline is what makes the cutover mechanical.
 
 Enforcement is by convention right now — there is no lint rule blocking it. The discipline is the deliverable.
 

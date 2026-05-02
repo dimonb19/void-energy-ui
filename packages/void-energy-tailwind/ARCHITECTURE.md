@@ -216,7 +216,7 @@ L0 and L1 share a single source of truth: `src/config/design-tokens.ts` and `src
 - `npm run build:tokens -- --target=l1` → L1's `_generated-themes.scss` (SCSS-aware, consumed by Svelte components).
 - `npm run build:tokens -- --target=l0` → L0's `dist/*.css` (flat CSS, consumed by any framework).
 
-A parity snapshot test (Session 1) catches drift between the two outputs. Full L1↔L0 unification — L1 importing L0 as a workspace package — is deferred to Phase 3 (monorepo restructure).
+A parity snapshot test (Session 1) catches drift between the two outputs. Full L1↔L0 unification — L1 importing L0 as a workspace package — is deferred to the monorepo restructure.
 
 The practical consequence: when the design team changes a token value in `design-tokens.ts`, both L0 consumers and L1 consumers get the update in lockstep. No double-maintenance.
 
