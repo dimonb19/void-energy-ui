@@ -5,6 +5,69 @@
 The Void Energy UI is a framework-agnostic, physics-based design system for the **CoNexus** storytelling platform.
 It combines the performance of **Tailwind CSS** (for Layout) with a bespoke **SCSS Physics Engine** (for Materials).
 
+## 🚀 Getting Started
+
+Requires Node.js 18+ and npm 9+.
+
+```bash
+git clone https://github.com/dimonb19/void-energy-ui.git
+cd void-energy-ui
+npm install
+npm run dev
+```
+
+Open [http://localhost:4321/components](http://localhost:4321/components) — the showcase of every shipped primitive in context. Use the theme button in the nav to swap **atmosphere** (Frost, Meridian, Terminal…) and **physics** (Glass, Flat, Retro). Watch the entire page reskin: colors, depth, motion, blur, even border style. That swap is the system. Your code never declares any of those values — you compose primitives, and the engine renders them under whichever triad is active.
+
+### Build a page
+
+Pages are two files: a thin `.astro` route shell and a Svelte screen that owns markup and state.
+
+`src/pages/hello.astro`:
+
+```astro
+---
+import Layout from '../layouts/Layout.astro';
+import HelloPage from '@components/app/HelloPage.svelte';
+---
+
+<Layout title="Hello">
+  <HelloPage client:load />
+</Layout>
+```
+
+`src/components/app/HelloPage.svelte`:
+
+```svelte
+<script lang="ts">
+  import FormField from '@components/ui/FormField.svelte';
+
+  let name = $state('');
+</script>
+
+<div class="container flex flex-col gap-2xl py-2xl">
+  <section class="surface-raised p-lg flex flex-col gap-lg">
+    <h1>Hello, {name || 'world'}</h1>
+
+    <FormField label="Your name">
+      {#snippet children({ fieldId })}
+        <input id={fieldId} type="text" bind:value={name} />
+      {/snippet}
+    </FormField>
+
+    <div class="flex gap-md">
+      <button class="btn-cta">Save</button>
+      <button class="btn-ghost">Cancel</button>
+    </div>
+  </section>
+</div>
+```
+
+Visit [http://localhost:4321/hello](http://localhost:4321/hello). Layout came from Tailwind utilities, material from SCSS classes (`surface-raised`, `btn-cta`), state from Svelte 5 runes — no hex colors, no raw pixels, no shadow or motion rules anywhere. Switch atmosphere again; your new page reskins alongside the showcase.
+
+The **Triad Architecture** section below explains why that works. The **Documentation** index points to the rest: the full primitive catalog, composition recipes, theme authoring, and the 5 Laws that govern every component.
+
+---
+
 ## 📚 Documentation
 
 - **[CHEAT-SHEET.md](./CHEAT-SHEET.md)** — Quick reference for developers (components, mixins, tokens)
