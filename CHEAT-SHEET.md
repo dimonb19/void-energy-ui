@@ -1368,7 +1368,7 @@ Use Astro's `<Image>` when responsive srcset / build-time optimization is the pr
 | **Aspect-ratio on wrapper, not img** | Setting `aspect-ratio` on the outer div makes the skeleton match the eventual image dimensions, preventing layout shift on load. |
 | **`alt` required** | TypeScript enforces it — there is no opt-out for screen readers, including in error state (`role="img" aria-label={alt}`). |
 | **`...rest` spread to `<img>`** | Native attributes like `srcset`, `sizes`, `decoding`, `crossorigin`, `referrerpolicy` work without VE knowing about them. |
-| **No filters / tints / processing** | Per D33: VE wraps and selects content, never modifies pixels. For physics/mode-aware decorative imagery, see `<AdaptiveImage>` (Phase 0c W3). |
+| **No filters / tints / processing** | VE wraps and selects content, never modifies pixels. For physics/mode-aware decorative imagery, see `<AdaptiveImage>`. |
 
 **Physics:** No physics-specific rules — the wrapper inherits `--radius-base` (8px glass/flat, 0 retro), `--bg-sunk` placeholder, and `--ease-flow` fade. Skeleton physics come from the composed `<Skeleton>`.
 
@@ -1447,7 +1447,7 @@ Use Astro's `<Image>` when responsive srcset / build-time optimization is the pr
 | **`name` required** | Single source of truth for initials and accessible name. Eliminates the "alt vs name vs aria-label" footgun. |
 | **Initials surface mirrors `.profile-avatar`** | Energy-primary tint + retro/light overrides reuse the proven pattern from ProfileBtn instead of inventing a new fallback look. |
 | **`overflow: visible`** | Presence dot intentionally spills past the circle boundary, so the wrapper does not clip it. The image itself is clipped via `border-radius: inherit` on the inner `<img>`. |
-| **No filters / tints / pixel processing** | Per D33: VE wraps and selects content, never modifies pixels. |
+| **No filters / tints / pixel processing** | VE wraps and selects content, never modifies pixels. |
 
 **Physics:** Initials surface follows `.profile-avatar` per-physics behavior — `alpha(--energy-primary, 15%)` glass/flat dark, `var(--bg-canvas)` retro with solid energy border, `alpha(--energy-primary, 10%)` light. The presence dot uses `--bg-canvas` for its border so it cleanly reads against any backdrop.
 
@@ -1567,7 +1567,7 @@ Use Astro's `<Image>` when responsive srcset / build-time optimization is the pr
 | **Default `aspectRatio="16 / 9"`** | The wrapper needs a height for the skeleton before metadata arrives. 16:9 is the dominant video ratio; consumers override per use case. |
 | **`data-state="ready"` (not `"loaded"`)** | The full file isn't loaded after `loadedmetadata` — only enough for the first frame. `ready` is more accurate. |
 | **Custom controls deferred to MediaScrubber + MediaSlider** | Custom playback chrome is split across two shipped primitives: timeline above, transport + volume below. Video stays a wrapper, not a player. |
-| **No filters / tints / pixel processing** | Per D33: VE wraps and selects content, never modifies pixels. |
+| **No filters / tints / pixel processing** | VE wraps and selects content, never modifies pixels. |
 
 **Physics:** Inherits `--radius-base` (8px glass/flat, 0 retro), `--bg-sunk` placeholder, and `--ease-flow` opacity fade. Skeleton physics come from the composed `<Skeleton>`.
 
@@ -1575,7 +1575,7 @@ Use Astro's `<Image>` when responsive srcset / build-time optimization is the pr
 
 #### `<AdaptiveImage>` — Physics/mode-aware decorative image
 
-**Description:** Selects which pre-existing source URL to display based on the active atmosphere's **physics × mode** — the two finite axes (4 valid combinations: `glass-dark`, `flat-dark`, `flat-light`, `retro-dark`). Reuses `<Image>`'s `.image` SCSS surface (skeleton fallback, error state, opacity fade, aspect-ratio) but reimplements its template instead of composing it — composition would defeat swap-without-flash because `<Image>`'s effect resets `loaded` on every src change. Per **D33**: never transforms pixels — only selects between consumer-provided URLs. On atmosphere change the next variant is decoded off-DOM via `Image().decode()`; only after decode resolves does the visible `<img>` src advance, so the previous frame stays painted until the new one is ready.
+**Description:** Selects which pre-existing source URL to display based on the active atmosphere's **physics × mode** — the two finite axes (4 valid combinations: `glass-dark`, `flat-dark`, `flat-light`, `retro-dark`). Reuses `<Image>`'s `.image` SCSS surface (skeleton fallback, error state, opacity fade, aspect-ratio) but reimplements its template instead of composing it — composition would defeat swap-without-flash because `<Image>`'s effect resets `loaded` on every src change. Never transforms pixels — only selects between consumer-provided URLs. On atmosphere change the next variant is decoded off-DOM via `Image().decode()`; only after decode resolves does the visible `<img>` src advance, so the previous frame stays painted until the new one is ready.
 **Location:** [src/components/ui/AdaptiveImage.svelte](src/components/ui/AdaptiveImage.svelte)
 **CSS:** Inherits `.image` ([src/styles/components/\_image.scss](src/styles/components/_image.scss))
 
@@ -1643,7 +1643,7 @@ Use Astro's `<Image>` when responsive srcset / build-time optimization is the pr
 | **Decode-then-swap (true crossfade)** | On atmosphere change the next variant is fetched and decoded off-DOM via `Image().decode()`; only after decode resolves does `displayedSrc` advance. The browser holds the previous frame on the `<img>` element across the src change, and the wrapper does not return to the loading state — no skeleton flash, no opacity reset, no missing-image gap. The skeleton is therefore only ever visible on initial mount, before any variant has loaded. |
 | **`<img>` is client-only (SSR / SEO trade-off)** | Pre-rendered HTML contains the skeleton wrapper but no `<img>` element — the `<img>` is gated on a client-only `mounted` flag. Search engines that don't execute JS, and visitors with JS disabled, see only the skeleton. Required because voidEngine has no localStorage knowledge on the server, so any SSR-emitted `<img>` would lock in the default-atmosphere variant and Svelte hydration would not update it (hydration trusts SSR HTML for static-equality bindings). For decorative atmosphere-aware imagery this is the right trade-off; for SEO-critical hero imagery without atmosphere variants, use plain `<Image>` instead. Revisit once the W5 SSR cookie bridge ships and the server can emit the correct variant. |
 | **Mode props only fire under flat physics for `light`** | Glass and retro both force dark mode (auto-corrected by the engine). The `light` prop only resolves under flat-light. The `dark` prop fires under flat-dark, retro-dark, and any glass atmosphere that doesn't have a physics-prop bound. |
-| **No pixel modification** | Per D33. No filters, tints, desaturation, blending, or runtime processing. |
+| **No pixel modification** | No filters, tints, desaturation, blending, or runtime processing. VE wraps and selects content, never modifies pixels. |
 | **No atmosphere-name props** | `frost="..."` / `terminal="..."` rejected by design. Consumers who need this branch on `voidEngine.atmosphere` themselves. |
 | **No AI-generated fallback** | Missing variants fall through to `src`, never to a generated image. AI generation is a separate premium concern. |
 | **No automatic dark/light inversion** | If only `src` is provided and the user switches modes, the image does not change. Variants are explicit. |
@@ -2528,7 +2528,7 @@ const pv = createPasswordValidation(() => password);
 <Markdown source={tooltipBody} inline />
 ```
 
-**Decisions:** `plans/decisions.md` D34 — parser + sanitizer pinned to exact versions; no syntax highlighting, no streaming in v1; `trusted` flag is safe-by-default. **Phase 0c W1 transition:** wrapper currently emits `.prose` only on the sanitized path; when `.prose-untrusted` lands in `_prose.scss`, the class becomes `prose prose-untrusted` — sanitization runs identically in both states.
+**Locked choices:** parser + sanitizer pinned to exact versions; no syntax highlighting, no streaming in v1; `trusted` flag is safe-by-default. **Prose-untrusted transition:** wrapper currently emits `.prose` only on the sanitized path; when `.prose-untrusted` lands in `_prose.scss`, the class becomes `prose prose-untrusted` — sanitization runs identically in both states.
 
 ---
 

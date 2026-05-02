@@ -2,7 +2,7 @@
 
 > Template. Copy to `packages/<name>/CLAUDE.md` and replace the package-specific section. Per-package files stay ≤30 lines (L0 has its own ceiling — see [void-energy-tailwind/CLAUDE.md](../void-energy-tailwind/CLAUDE.md)).
 
-You are editing the **`@void-energy/<name>`** package (DGRS carve-out per [decisions.md §D30](../../plans/decisions.md#d30--dgrs-atmospheres--shared-ui-carve-out) is the one exception — see [dgrs/CLAUDE.md](../dgrs/CLAUDE.md)). The 5 Laws (root [CLAUDE.md](../../CLAUDE.md)) apply unchanged. The strict library audit in [src/CLAUDE.md](../../src/CLAUDE.md) does **not** — packages have different boundaries.
+You are editing the **`@void-energy/<name>`** package. The 5 Laws (root [CLAUDE.md](../../CLAUDE.md)) apply unchanged. The strict library audit in [src/CLAUDE.md](../../src/CLAUDE.md) does **not** — packages have different boundaries.
 
 ---
 

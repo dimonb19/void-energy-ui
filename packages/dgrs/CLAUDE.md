@@ -7,7 +7,7 @@ You are editing the **DGRS atmospheres + shared DGRS UI** package. This is the o
 ## Staging vs. final (read this first)
 
 - **Staging name** (today, this monorepo): `packages/dgrs/`. No `package.json` yet — code stages here while the VE roadmap runs.
-- **Final name** (after the premium-packages extraction): **`@dgrslabs/dgrs-ui`** in the new private repo `github.com/dgrslabs/dgrs-ui`, published to GitHub Packages under the `@dgrslabs` scope. Per [decisions.md §D30](../../plans/decisions.md#d30--dgrs-atmospheres--shared-ui-carve-out), this package is **not** part of the VE premium repo or the VE sale — it is DGRS Labs proprietary, used by CoNexus and future DGRS apps.
+- **Final name** (after the premium-packages extraction): **`@dgrslabs/dgrs-ui`** in the new private repo `github.com/dgrslabs/dgrs-ui`, published to GitHub Packages under the `@dgrslabs` scope. This package is **not** part of the VE premium repo or the VE sale — it is DGRS Labs proprietary, used by CoNexus and future DGRS apps.
 
 The carve-out exists so a future VE acquirer cannot accidentally inherit DGRS's private UI kit. Keep the boundary clean from day one — write this code as if it already lived in the DGRS repo.
 
