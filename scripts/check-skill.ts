@@ -1,11 +1,11 @@
 // scripts/check-skill.ts — regenerability + line-count + determinism gates for the
 // seven L2 distribution artifacts emitted by scripts/build-skill.ts.
 //
-// Per plans/phase-1-decisions.md#d11:
+// Build-pipeline determinism contract:
 //   Rule 1 — build-skill.ts must be deterministic (no LLM calls). Verified by
 //            grepping for the determinism comment as the file's first two lines.
 //   Rule 2 — SKILL.md body cliff: wc -l ≤ 200 (target ~100). Same cliff applies
-//            to .cursor/rules/void-energy.mdc per D10.
+//            to .cursor/rules/void-energy.mdc.
 //
 // Process:
 //   1. Run build-skill.ts in-memory; compare each emitted string to the file on
@@ -25,7 +25,7 @@ const ROOT = path.resolve(__dirname, '..');
 const SKILL_LINE_CAP = 200;
 const CURSOR_LINE_CAP = 200;
 const DETERMINISM_COMMENT_LINE_1 = '// DETERMINISTIC TEMPLATING ONLY. NO LLM CALLS.';
-const DETERMINISM_COMMENT_LINE_2 = '// See plans/phase-1-decisions.md#d11.';
+const DETERMINISM_COMMENT_LINE_2 = '// Hand-authored templates only — no LLM in the build pipeline.';
 
 const errors: string[] = [];
 

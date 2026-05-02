@@ -2,7 +2,7 @@
 
 MCP server for the [Void Energy](https://github.com/void-energy/void-energy) design system. Stdio transport, read-only, zero side effects.
 
-Exposes **3 Resources + 1 Tool** per [phase-1-decisions D9](https://github.com/void-energy/void-energy/blob/main/plans/phase-1-decisions.md#d9):
+Exposes **3 Resources + 1 Tool**. The split follows 2026 MCP doctrine: static metadata that exists before the conversation and doesn't change per model action is a Resource (URI-addressable, client-cached, subscribe-on-change); only computation, mutation, or external API calls are Tools. Three of the four surfaces here are static reads of the design system; only `void_validate_atmosphere` runs code.
 
 | Surface | Type | URI / Name | Returns |
 |---|---|---|---|

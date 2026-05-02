@@ -429,7 +429,7 @@ function generateFontRegistry(): string {
 //
 // L0 ships pure CSS. This generator emits the foundation tokens into
 // `packages/void-energy-tailwind/dist/tokens.css`. Atmospheres, physics,
-// density, and theme.css land in later sessions (see plans/phase-1-*).
+// density, and theme.css land in later sessions.
 
 function rawFontStack(family: string): string {
   // Atmosphere palette `font-atmos-*` entries are CSS font-family strings

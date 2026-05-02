@@ -2,9 +2,8 @@
  * L0 theme.css compile + grep verification.
  *
  * Uses @tailwindcss/node to compile theme.css against a fixed candidate set,
- * then grep-asserts the built CSS. These are the Session 3 built-CSS checks
- * from phase-1-l0-tailwind-preset.md → Verification Checklist → "Built CSS
- * spot-checks."
+ * then grep-asserts the built CSS — built-CSS spot-checks for the L0 verification
+ * checklist.
  *
  * Why grep-based instead of snapshot: v4's compiled output includes
  * preflight + theme layer + candidate-generated utilities, which changes

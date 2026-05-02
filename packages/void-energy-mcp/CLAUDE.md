@@ -12,9 +12,9 @@ This package needs L1 atmosphere data, but its **runtime must not** reach into `
 - **Runtime** — only reads `dist/data/*.json` / `*.md` via `node:fs`. No L1 imports, no path aliases.
 - `dist/data/` is gitignored; regenerated each build.
 
-## 2. Surface scope (per [D6](../../plans/phase-1-decisions.md#d6) + [D9](../../plans/phase-1-decisions.md#d9))
+## 2. Surface scope
 
-3 Resources + 1 Tool. Read-only. No filesystem writes, no rendering, no hosted dependencies. Do **not** add `void_preview_atmosphere`, `void_apply_atmosphere`, or `void_generate_from_url` — explicitly excluded.
+3 Resources + 1 Tool. Read-only. No filesystem writes, no rendering, no hosted dependencies. Do **not** add `void_preview_atmosphere`, `void_apply_atmosphere`, or `void_generate_from_url` — explicitly excluded from v1. Preview requires either lossy pre-rendered screenshots or a hosted endpoint (different trust model). Apply mutates consumer disk (the agent's job, not the server's). Generate-from-URL depends on the not-yet-shipped `loadExternalTheme` runtime capability.
 
 ## 3. Stdio hygiene
 

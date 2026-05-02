@@ -1,5 +1,10 @@
 // DETERMINISTIC TEMPLATING ONLY. NO LLM CALLS.
-// See plans/phase-1-decisions.md#d11.
+// Hand-authored templates only — no LLM in the build pipeline.
+//
+// Rationale: LLM-generated context files reduce task success rates 0.5-2%
+// while increasing inference cost 20%+ (Augment Code data). The four-surface
+// distribution architecture's regenerability gates (npm run check:skill)
+// only have value if the build is deterministic.
 //
 // Inputs: scripts/skill-templates/*.template.md (hand-curated bodies,
 // co-canonical with SYSTEM-PROMPT.md) + component-registry.json +

@@ -12,9 +12,6 @@
  *      consumers who want Tailwind v4's stock breakpoint container.
  *   3. Does NOT import `tailwindcss` — consumer owns that import per D-L0.4.
  *
- * Source of truth for the namespace strategy:
- *   plans/phase-1-l0-tailwind-preset.md → "v4 Namespace Strategy"
- *
  * Decision tree for new tokens:
  *   1. Already defined on :root by tokens.css/atmospheres/physics?  → @theme reference
  *   2. Literal value, no underlying var?                            → plain @theme
@@ -30,7 +27,7 @@
  * hardcoded and can't be overridden via @utility (which only APPENDS to
  * existing utilities — Tailwind's original declaration still wins source-
  * order ties within the same rule). Used sparingly: bare `border` family,
- * `.container`. See footgun inventory in the phase-1 plan.
+ * `.container`.
  *
  * `void-scss` (lowest) is included even though L0 ships zero SCSS — it lets
  * L1 (and any consumer that mirrors L1's pattern) append SCSS into this

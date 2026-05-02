@@ -2,7 +2,7 @@
 /*
  * @void-energy/mcp — stdio MCP server.
  *
- * Surfaces (per plans/phase-1-decisions.md D6/D9):
+ * Surfaces:
  *   - 3 Resources (read-only metadata, URI scheme `void://`):
  *       void://atmospheres                       — list of atmospheres
  *       void://atmospheres/{id}                  — full token JSON

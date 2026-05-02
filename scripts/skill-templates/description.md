@@ -6,7 +6,7 @@ This file documents the `description:` field that `scripts/build-skill.ts` (M6b)
 - `.agents/skills/void-skill/SKILL.md` frontmatter (Codex copy — byte-identical)
 - `.cursor/rules/void-energy.mdc` frontmatter (Cursor Rules — same trigger string per D10)
 
-Per [D11 Rule 3](../../plans/phase-1-decisions.md#d11), the description is the load-bearing trigger surface. Vercel's [April 2026 evals](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals) measured 56% non-invocation in default config — the description is what closes that gap.
+The description is the load-bearing trigger surface — it's what every skill-aware agent matches against to decide whether to load this skill. Vercel's [April 2026 evals](https://vercel.com/blog/agents-md-outperforms-skills-in-our-agent-evals) measured 56% non-invocation in default config; description tuning is what closes that gap. Iteration target: ≥80% invocation rate across ≥10 representative prompts, floor 70%.
 
 ## Final pick (v5b)
 
