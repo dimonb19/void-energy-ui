@@ -182,25 +182,19 @@ graph TD
 
 Defines: **Color Palettes** and **Font Families**
 
-| Atmosphere   | Mood                | Fonts          | Primary Color     |
-| ------------ | ------------------- | -------------- | ----------------- |
-| `void`       | Tech / Sci-Fi       | Hanken Grotesk | Cyan (#33e2e6)    |
-| `onyx`       | Stealth / Cinema    | Inter          | White (#ffffff)   |
-| `terminal`   | Retro / Hacker      | Courier Prime  | Amber (#f5c518)   |
-| `crimson`    | Horror / Aggressive | Merriweather   | Red (#ff6b6b)     |
-| `overgrowth` | Nature / Organic    | Lora           | Green (#39ff14)   |
-| `velvet`     | Romance / Soft      | Caveat         | Pink (#ff80a0)    |
-| `solar`      | Royal / Gold        | Cinzel         | Gold (#ffaa00)    |
-| `nebula`     | Synthwave / Mystery | Exo 2          | Magenta (#d946ef) |
-| `paper`      | Light / Print       | PT Serif       | Navy (#2c3e50)    |
-| `laboratory` | Clinical / Science  | Open Sans      | Blue (#005bb5)    |
-| `playground` | Fun / Kids          | Comic Neue     | Pink (#ff4081)    |
-| `focus`      | Distraction Free    | Inter          | Black (#000000)   |
+| Atmosphere | Mode  | Physics | Fonts                          | Primary Color                |
+| ---------- | ----- | ------- | ------------------------------ | ---------------------------- |
+| `frost`    | dark  | glass   | Space Grotesk + Inter          | Arctic blue (#7ec8e3)        |
+| `graphite` | dark  | flat    | Inter                          | White (#ffffff)              |
+| `terminal` | dark  | retro   | Courier Prime                  | Amber (#f5c518)              |
+| `meridian` | light | flat    | Poppins + Inter                | Teal (#0d6e6e)               |
+
+These four cover every valid physics × mode combination. Add or replace entries in `src/config/atmospheres.ts` and run `npm run build:tokens`.
 
 **Usage:**
 
 ```html
-<html data-atmosphere="void"></html>
+<html data-atmosphere="frost"></html>
 ```
 
 ---
@@ -258,7 +252,7 @@ See [THEME-GUIDE.md](./THEME-GUIDE.md) for details.
 The browser's address bar and system chrome automatically tint to match the active atmosphere. The color is resolved via `resolveThemeColor()` in `void-boot.js`: it checks `palette['bg-canvas']` first (runtime themes with full palettes), then falls back to the `canvas` field (built-in static registry entries in [void-registry.json](src/config/void-registry.json)).
 
 **How it works:**
-1. **SSR** — `Layout.astro` renders a static `<meta name="theme-color" content="#010020">` (the `void` default)
+1. **SSR** — `Layout.astro` renders a static `<meta name="theme-color" content="#080c14">` (the `frost` default)
 2. **Hydration** — The bootloader (`void-boot.js`) immediately updates the meta tag to match the resolved theme
 3. **Runtime** — `VoidEngine._applyAtmosphere()` updates reactive state synchronously, then paints the DOM via View Transitions (or immediately if unsupported)
 
@@ -4435,7 +4429,7 @@ Temporary themes override the user's selected atmosphere without persisting. The
 **Scoped (lifecycle-bound)** — `AtmosphereScope` wraps content in a temporary atmosphere and restores the previous one on unmount. Handles nested scopes correctly via the stack. Object themes are registered as ephemeral (no localStorage).
 
 ```svelte
-<AtmosphereScope theme="crimson" label="Horror story">
+<AtmosphereScope theme="terminal" label="Hacker scene">
   <StoryContent />
 </AtmosphereScope>
 
@@ -4458,11 +4452,11 @@ Temporary themes override the user's selected atmosphere without persisting. The
 
   function previewTheme() {
     voidEngine.restoreUserTheme();  // clear any active preview first
-    voidEngine.applyTemporaryTheme('crimson', 'Blood Moon');
+    voidEngine.applyTemporaryTheme('terminal', 'Hacker Scene');
   }
 </script>
 
-<button onclick={previewTheme}>Preview Crimson</button>
+<button onclick={previewTheme}>Preview Terminal</button>
 <button onclick={() => voidEngine.restoreUserTheme()}>Disable Preview</button>
 ```
 

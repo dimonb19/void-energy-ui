@@ -134,7 +134,7 @@ Path aliases (`tsconfig.json`): `@actions/*  @adapters/*  @components/*  @config
 
 The `<html>` element carries the runtime state:
 ```
-data-atmosphere="void"      Active theme ID
+data-atmosphere="frost"     Active theme ID
 data-physics="glass"        glass | flat | retro
 data-mode="dark"            light | dark
 data-auth                   Present when any user is authenticated (Guest role included)

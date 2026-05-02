@@ -46,7 +46,7 @@ type VoidDensity = 'high' | 'standard' | 'low';
  */
 interface VoidPalette {
   // CANVAS: Background layers defining depth
-  /** Deepest background layer (e.g., #010020 for void, #000000 for onyx) */
+  /** Deepest background layer (e.g., #080c14 for frost, #1f1f1f for graphite) */
   'bg-canvas': string;
 
   /** Elevated surface layer for cards/modals (semi-transparent for glass physics) */
@@ -181,7 +181,7 @@ type PartialThemeDefinition = Partial<Omit<VoidThemeDefinition, 'palette'>> & {
 
 /**
  * Runtime theme registry mapping atmosphere names to theme definitions.
- * Keys are atmosphere identifiers (e.g., 'void', 'onyx', 'terminal').
+ * Keys are atmosphere identifiers (e.g., 'frost', 'graphite', 'terminal').
  */
 type ThemeRegistry = Record<string, VoidThemeDefinition>;
 

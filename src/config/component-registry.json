@@ -1240,7 +1240,7 @@
       "slots": ["children()"],
       "related": [],
       "compose": "Wrap any section that needs its own atmosphere. Uses pushTemporaryTheme/releaseTemporaryTheme under the hood so nested scopes restore correctly. Pass a string for registered themes or an object for inline/brand themes.",
-      "example": "<AtmosphereScope theme=\"crimson\" label=\"Horror story\"><StoryContent /></AtmosphereScope>"
+      "example": "<AtmosphereScope theme=\"terminal\" label=\"Hacker scene\"><StoryContent /></AtmosphereScope>"
     },
     "theme-builder": {
       "description": "Full theme creation surface: AI-generated atmospheres from a vibe description or brand URL, plus an inline palette editor for manual color, opacity, font, and semantic-color tweaking. Drives the ephemeral preview lifecycle (registerEphemeralTheme + pushTemporaryTheme) so the user previews a candidate atmosphere before keeping it. On Keep, the candidate is promoted via registerTheme + setAtmosphere — saved themes show up in voidEngine.customAtmospheres (not builtInAtmospheres). Respects voidEngine.userConfig.adaptAtmosphere: when overrides are disabled, generated atmospheres save and apply immediately with no preview step.",

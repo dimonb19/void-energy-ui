@@ -51,7 +51,7 @@ Every pixel on screen is calculated by the intersection of three layers:
 In the Void Energy system, **Atmospheres are strict presets.**
 The `VoidEngine` includes an active guardrail system that prevents "broken" physics combinations.
 
-* **User Choice:** Users select an **Atmosphere** (e.g., "Void", "Paper", "Terminal").
+* **User Choice:** Users select an **Atmosphere** (e.g., "Frost", "Meridian", "Terminal").
 * **System Correction:** If an invalid combination is registered (e.g., via API), the Engine auto-corrects it to preserve legibility.
 
 | Violation Detected | System Correction | Reason |
@@ -67,7 +67,7 @@ The `<html>` element carries the runtime state:
 
 | Attribute | Values | Set by |
 | :--- | :--- | :--- |
-| `data-atmosphere` | Theme ID (e.g., `void`, `paper`) | VoidEngine |
+| `data-atmosphere` | Theme ID (e.g., `frost`, `meridian`) | VoidEngine |
 | `data-physics` | `glass` \| `flat` \| `retro` | VoidEngine |
 | `data-mode` | `light` \| `dark` | VoidEngine |
 | `data-auth` | Present (no value) when any user is authenticated, including Guest | UserScript.astro |
@@ -113,7 +113,7 @@ We separate **Composition Layout** from **Material + Shipped Primitive Geometry*
 | :--- | :--- |
 | **Material is Truth** | **Glass:** Blur, Shadows, Glows (0.3s cubic-bezier).<br>**Flat:** Borders, Drop Shadows, No Glows (0.2s ease-out).<br>**Retro:** Pixel Borders, No Shadows (0s steps). |
 | **Depth is Tiered** | **Sunk (-Z):** Inputs/Wells (`shadow-sunk`).<br>**Float (+Z):** Cards/Surfaces (`shadow-float`).<br>**Lift (++Z):** Interactive/Modals (`shadow-lift`). |
-| **Atmosphere is Context** | The UI adapts to the story. Switching from `void` to `paper` changes physics instantly. |
+| **Atmosphere is Context** | The UI adapts to the story. Switching from `frost` to `meridian` changes physics instantly. |
 
 ### 4. The Single Source of Truth
 * **DO NOT** edit `_generated-themes.scss`, `void-registry.json`, or `void-physics.json`.

@@ -6,8 +6,8 @@
 
   @example Basic Usage - Story Page
   ```svelte
-  <AtmosphereScope theme="crimson" label="Horror story">
-    <h1>The Haunted Manor</h1>
+  <AtmosphereScope theme="terminal" label="Hacker scene">
+    <h1>Console Log</h1>
     <StoryContent />
   </AtmosphereScope>
   ```

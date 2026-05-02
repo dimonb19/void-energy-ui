@@ -27,7 +27,7 @@ The UI reads three attributes on the `<html>` element and reacts instantly when 
 
 | Attribute         | Values                                                                                                                       | Meaning                          |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
-| `data-atmosphere` | `void`, `paper`, `terminal`, `crimson`, `nebula`, `overgrowth`, `velvet`, `solar`, `onyx`, `laboratory`, `playground`, `focus`, or a registered custom theme | Color palette and font family |
+| `data-atmosphere` | `frost`, `graphite`, `terminal`, `meridian`, or a registered custom theme | Color palette and font family |
 | `data-physics`    | `glass`, `flat`, `retro`                                                                                                     | Texture, blur, motion, borders   |
 | `data-mode`       | `light`, `dark`                                                                                                              | Polarity of the canvas           |
 

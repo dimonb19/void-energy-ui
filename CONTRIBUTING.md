@@ -144,7 +144,7 @@ Follow the [Architecture & Discipline](#6-architecture--discipline) rules strict
 
 #### 3. Test Thoroughly
 
-- Test across **all themes**: void, onyx, terminal, nebula, solar, overgrowth, velvet, crimson (dark) and paper, focus, laboratory, playground (light)
+- Test across **all built-in themes**: frost, graphite, terminal (dark) and meridian (light)
 - Test across **all density settings** (high, standard, low)
 - Test across **all physics modes** (glass, flat, retro)
 - Test on mobile, tablet, and desktop viewports

@@ -174,8 +174,8 @@
             <div class="p-lg flex flex-col gap-md">
               <p>
                 <strong>Atmosphere</strong> &mdash; the active color palette,
-                typography, and mood. 4 built-in presets (Void, Onyx, Terminal,
-                Nebula, and more).
+                typography, and mood. 4 built-in presets: Frost, Graphite,
+                Terminal, and Meridian.
                 <a href="/">Learn more on the intro page.</a>
               </p>
               <p>

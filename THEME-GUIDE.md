@@ -21,48 +21,45 @@
 
 Navigate to [src/config/design-tokens.ts](src/config/design-tokens.ts), and find the `VOID_TOKENS.themes` object (search for `themes:`).
 
-Copy an existing theme block (e.g., `void`) and rename it:
+Copy an existing theme block (e.g., `frost`) and rename it:
 
 ```typescript
-export const VOID_TOKENS = {
-  // ... other config (density, layers, responsive, etc.)
+export const ATMOSPHERES: Record<string, AtmosphereDefinition> = {
+  frost: { ... },      // Existing theme
+  graphite: { ... },   // Existing theme
+  terminal: { ... },   // Existing theme
+  meridian: { ... },   // Existing theme
 
-  themes: {
-    void: { ... },      // Existing theme
-    onyx: { ... },      // Existing theme
-    terminal: { ... },  // Existing theme
+  // 👇 Your new theme here
+  'my-theme': {
+    mode: 'dark',           // 'light' or 'dark'
+    physics: 'glass',       // 'glass', 'flat', or 'retro'
+    tagline: 'My Theme / Custom',  // Short description for UI display
+    palette: {
+      // Semantic colors (auto-generated variants)
+      ...SEMANTIC_DARK,  // or SEMANTIC_LIGHT for light mode
 
-    // 👇 Your new theme here
-    'my-theme': {
-      mode: 'dark',           // 'light' or 'dark'
-      physics: 'glass',       // 'glass', 'flat', or 'retro'
-      tagline: 'My Theme / Custom',  // Short description for UI display
-      palette: {
-        // Semantic colors (auto-generated variants)
-        ...SEMANTIC_DARK,  // or SEMANTIC_LIGHT for light mode
+      // Fonts (use .family to get the CSS font-family string)
+      'font-atmos-heading': FONTS.sharp.family,
+      'font-atmos-body': FONTS.clean.family,
 
-        // Fonts (use .family to get the CSS font-family string)
-        'font-atmos-heading': FONTS.tech.family,
-        'font-atmos-body': FONTS.tech.family,
+      // Layer 1: Canvas
+      'bg-canvas': '#080c14',
+      'bg-spotlight': '#141c2e',
+      'bg-surface': 'rgba(20, 30, 50, 0.45)',
+      'bg-sunk': 'rgba(0, 5, 15, 0.5)',
 
-        // Layer 1: Canvas
-        'bg-canvas': '#010020',
-        'bg-spotlight': '#0a0c2b',
-        'bg-surface': 'rgba(22, 30, 95, 0.4)',
-        'bg-sunk': 'rgba(0, 2, 41, 0.6)',
+      // Layer 3: Energy
+      'energy-primary': '#7ec8e3',
+      'energy-secondary': '#4a6fa5',
 
-        // Layer 3: Energy
-        'energy-primary': '#33e2e6',
-        'energy-secondary': '#3875fa',
+      // Layer 4: Structure
+      'border-color': 'rgba(126, 200, 227, 0.2)',
 
-        // Layer 4: Structure
-        'border-color': 'rgba(56, 117, 250, 0.2)',
-
-        // Layer 5: Signal
-        'text-main': '#ffffff',
-        'text-dim': 'rgba(255, 255, 255, 0.85)',
-        'text-mute': 'rgba(255, 255, 255, 0.6)',
-      },
+      // Layer 5: Signal
+      'text-main': '#edf2f7',
+      'text-dim': '#a0b0c0',
+      'text-mute': '#607080',
     },
   },
 };
@@ -168,7 +165,7 @@ The absolute foundation of your theme. Everything renders on top of this.
 
 - **Role:** The absolute floor (Page Background)
 - **Context:** The deepest layer, like the paper in a painting
-- **Example:** `#010020` (Deep blue-black for "void" theme)
+- **Example:** `#080c14` (Deep blue-black for "frost" theme)
 - **Rule:** Must be the **darkest** tone in dark mode, **lightest** in light mode
 
 #### `bg-sunk`
@@ -211,14 +208,14 @@ Your brand colors and interactive states.
 
 - **Role:** The Brand Color
 - **Context:** Buttons, Links, Focus states, Glows, CTA elements
-- **Example:** `#33e2e6` (Cyan for "void"), `#ff00ff` (Magenta for "cyberpunk")
+- **Example:** `#7ec8e3` (Arctic blue for "frost"), `#ff00ff` (Magenta for "cyberpunk")
 - **Rule:** Must have **sufficient contrast** with `bg-surface` (WCAG AA: 3:1 minimum)
 
 #### `energy-secondary`
 
 - **Role:** Supporting accent
 - **Context:** Borders, Scrollbars, Subtle indicators, Secondary buttons
-- **Example:** `#3875fa` (Blue for "void")
+- **Example:** `#4a6fa5` (Muted blue for "frost")
 - **Rule:** Should complement `energy-primary` (analogous or triadic color harmony)
 
 ---
@@ -252,7 +249,7 @@ This collision is easy to introduce when darkening `text-mute` for accessibility
 'energy-primary': '#f5c518',
 'color-premium':  '#33e2e6',
 
-// Solar — gold energy, sapphire premium override
+// Any gold-energy theme — sapphire premium override
 'energy-primary': '#ffaa00',
 'color-premium':  '#0284c7',
 ```
@@ -264,7 +261,7 @@ The override must avoid purple (`color-system`), red (`color-error`), and green 
 `SEMANTIC_DARK` sets `color-system: '#a078ff'` (purple). If your energy tokens are in the **purple/violet family**, add a per-theme `color-system` override. Without it, system notifications and AI feature indicators are indistinguishable from primary interactive elements.
 
 ```typescript
-// Nebula — purple secondary, sky blue system override
+// Any purple-energy theme — sky blue system override
 'energy-secondary': '#8b5cf6',
 'color-system':     '#38bdf8',
 ```
@@ -273,7 +270,7 @@ The override must avoid gold/orange (`color-premium`), red (`color-error`), and 
 
 #### Why `color-success` and `color-error` are never overridden
 
-Overgrowth's green energy overlaps with `color-success`, and Crimson's red energy overlaps with `color-error`. These are accepted tradeoffs — green must mean success and red must mean error. Unlike premium/system (arbitrary semantic assignments), these carry universal meaning that no alternative color can replace. The overlap is tolerable because success/error states appear momentarily with explicit text labels (toasts, validation), not persistently alongside energy colors in the same UI region.
+A green-energy theme will overlap with `color-success`, and a red-energy theme will overlap with `color-error`. These are accepted tradeoffs — green must mean success and red must mean error. Unlike premium/system (arbitrary semantic assignments), these carry universal meaning that no alternative color can replace. The overlap is tolerable because success/error states appear momentarily with explicit text labels (toasts, validation), not persistently alongside energy colors in the same UI region.
 
 ---
 
@@ -501,8 +498,8 @@ flowchart TD
 | ------------------------------------ | ------------------------ | -------------------------------------------------------------------------------------------------- |
 | `physics: 'glass'` + `mode: 'light'` | Forces `physics: 'flat'` | **Glass glows require darkness to be visible.** Light backgrounds wash out blur effects and glows. |
 | `physics: 'retro'` + `mode: 'light'` | Forces `mode: 'dark'`    | **CRT phosphor effects require a black canvas.** Retro terminals are historically dark.            |
-| `physics: 'flat'` + `mode: 'light'`  | ✅ Allowed               | Flat physics work beautifully in light mode (e.g., "paper" theme).                                 |
-| `physics: 'flat'` + `mode: 'dark'`   | ✅ Allowed               | Flat physics also work in dark mode (e.g., "laboratory" theme in dark variant).                    |
+| `physics: 'flat'` + `mode: 'light'`  | ✅ Allowed               | Flat physics work beautifully in light mode (e.g., "meridian" theme).                              |
+| `physics: 'flat'` + `mode: 'dark'`   | ✅ Allowed               | Flat physics also work in dark mode (e.g., "graphite" theme).                                      |
 
 ---
 
@@ -512,7 +509,7 @@ flowchart TD
 
 Examples:
 
-- A "void" theme with `physics: 'glass'` in light mode would lose its sci-fi glowing aesthetic
+- A "frost" theme with `physics: 'glass'` in light mode would lose its arctic glowing aesthetic
 - A "terminal" theme with `physics: 'retro'` in light mode would lose its CRT monitor authenticity
 
 **The guardrail system protects your users from broken experiences.**
@@ -849,44 +846,36 @@ Increase opacity or adjust base color:
 
 ## 🎨 Built-in Atmospheres Reference
 
-The 4 built-in themes demonstrate every valid physics/mode combination and cover the full range of design intents. Study them before creating a new theme — the patterns and decisions made here are intentional.
+The 4 built-in themes cover every valid physics/mode combination. Study them before creating a new theme — the patterns and decisions made here are intentional.
 
-| Theme | Mode | Physics | Concept |
-|---|---|---|---|
-| `void` | dark | glass | Default / Cyber |
-| `onyx` | dark | flat | Stealth / Cinema |
-| `terminal` | dark | retro | Hacker / Retro |
-| `nebula` | dark | glass | Synthwave / Cosmic |
-| `solar` | dark | glass | Royal / Gold |
-| `overgrowth` | dark | glass | Nature / Organic |
-| `velvet` | dark | glass | Romance / Soft |
-| `crimson` | dark | glass | Horror / Intense |
-| `paper` | light | flat | Light / Print |
-| `focus` | light | flat | Distraction Free |
-| `laboratory` | light | flat | Science / Clinical |
-| `playground` | light | flat | Playful / Vibrant |
+| Theme       | Mode  | Physics | Concept           |
+|-------------|-------|---------|-------------------|
+| `frost`     | dark  | glass   | Arctic / Glass    |
+| `graphite`  | dark  | flat    | Editor / Neutral  |
+| `terminal`  | dark  | retro   | Hacker / Retro    |
+| `meridian`  | light | flat    | Fintech / Brand   |
 
 ---
 
-### VOID — Default / Cyber
+### FROST — Arctic / Glass *(default)*
 **Physics:** glass · dark
 
-**Concept:** The system baseline — a sci-fi control interface scanning deep space. Every other atmosphere is measured as a departure from this one.
+**Concept:** Indigo-and-ice — translucent surfaces over a deep navy ambient backdrop. Frost is the system baseline and the canonical example of glass physics done correctly.
 
-**Palette rationale:** Deep blue-black canvas (`#010020`) pushes the environment into near-void darkness. Cyan primary (`#33e2e6`) and blue secondary (`#3875fa`) are analogous cool colors — close on the color wheel but clearly distinct. In glass physics, analogous pairs create harmonic ambient bloom: the cyan and blue glows breathe together rather than competing. Text uses a pure white hierarchy (`#ffffff → #d9d9de → #9999a6`) with no color tint — keeping the interface clinical and the content front.
+**Palette rationale:** Deep blue-black canvas (`#080c14`) with a slightly warmer spotlight (`#141c2e`) creates the "lit-from-above" depth glass physics depends on. Arctic blue primary (`#7ec8e3`) and a muted slate-blue secondary (`#4a6fa5`) are analogous cool colors — close on the color wheel, distinct in brightness. Surface uses `rgba(20, 30, 50, 0.45)` — within the 0.3–0.6 opacity range glass requires for blur compositing. Border at 20% primary opacity gives the soft glow halo that defines the theme.
 
-**Key decisions:** The cool analogous pairing is the canonical example of glass physics done correctly. If you're building a dark glass theme and unsure whether your primary/secondary work together, check them against this model.
+**Key decisions:** Pairing Space Grotesk (heading) with Inter (body) is the system's default — sharp display typography over a workhorse text face. Use Frost as the reference when building any other dark glass theme.
 
 ---
 
-### ONYX — Stealth / Cinema
-**Physics:** flat · dark *(the only dark-flat built-in)*
+### GRAPHITE — Editor / Neutral
+**Physics:** flat · dark
 
-**Concept:** Film noir editorial minimalism — a high-end cinema dashboard where the content is the only color. Restraint as a design philosophy.
+**Concept:** Neutral-charcoal — the ChatGPT / VS Code Dark Modern / Vercel Geist family. Energy is in the gray ramp by design; accent IS contrast, not hue.
 
-**Palette rationale:** Pure black canvas, white primary (`#ffffff`), gray secondary (`#a3a3a3`). The deliberate monochrome is a "no personality" statement — the palette says nothing about itself, letting content lead. Glass physics was rejected because white and gray glows on black produce undefined halos that add visual noise rather than atmosphere. Flat physics gives sharp, precise edges matching the "editorial precision" concept. The border at 15% white opacity is the only visual softening in an otherwise hard-edged system.
+**Palette rationale:** Canvas and spotlight match (`#1f1f1f`) — no gradient, no ambient lift. Surface floats up in luminance (`#2a2a2c`) instead of color (Apple/VS Code pattern). White primary (`#ffffff`) and gray secondary (`#6e7178`) are differentiated only by brightness. Border at 10% white opacity is the only visual softening in an otherwise hard-edged system. `bg-surface` is solid opaque hex — never rgba — because flat-dark has no blur compositing.
 
-**Key decisions:** This is the reference implementation for `physics: 'flat'` + `mode: 'dark'`. Note that `bg-surface: '#1e1e1e'` is a solid opaque hex — not rgba — because without blur compositing, semi-transparent dark surfaces render ambiguously. Also: `energy-secondary (#a3a3a3)` shares the value of `text-dim` — a known collision accepted here because the entire theme concept is "everything is gray."
+**Key decisions:** This is the reference implementation for `physics: 'flat'` + `mode: 'dark'`. Inter is the only typeface — clean, neutral, content-forward. If you need a dark-flat theme with personality, branch from here and shift the energy tokens; the surface architecture should stay.
 
 ---
 
@@ -895,112 +884,24 @@ The 4 built-in themes demonstrate every valid physics/mode combination and cover
 
 **Concept:** A 1980s amber phosphor CRT monitor — monochromatic, mechanical, historically faithful.
 
-**Palette rationale:** Near-black canvas with a green-tinted `bg-surface` (`rgba(0,20,0,0.9)`) — the subtle green contamination simulates early green-screen phosphor bleeding behind the amber display. All three text tokens use amber (`#f5c518, #ad8b12, #7d650f`) because a real CRT has one phosphor color with no hue variation, only brightness. `text-main` equals `energy-primary` for the same reason — the text color *is* the energy color. The secondary was differentiated (`#c9a820`) from the primary specifically for chart series separation, while staying amber-family.
+**Palette rationale:** Near-black canvas with a green-tinted `bg-surface` (`rgba(0,20,0,0.9)`) — the subtle green contamination simulates early green-screen phosphor bleeding behind the amber display. All three text tokens use amber (`#f5c518, #ad8b12, #7d650f`) because a real CRT has one phosphor color with no hue variation, only brightness. `text-main` equals `energy-primary` for the same reason — the text color *is* the energy color. The secondary was differentiated (`#c9a820`) for chart series separation while staying amber-family.
 
-**Key decisions:** `color-premium` overridden to cyan (`#33e2e6`) — the only non-amber signal in the entire theme. This is necessary because the base `color-premium` (`#ff8c00`) is amber, which would be invisible in this amber environment. Retro physics means zero animation timing, step-based easing, 0px border-radius, and 2px borders — the complete CRT mechanical aesthetic is enforced by the physics preset, not by the palette.
-
----
-
-### NEBULA — Synthwave / Cosmic
-**Physics:** glass · dark
-
-**Concept:** Looking up at a nebula from a synth-lit observation deck — cosmic, dreamy, drenched in electric color.
-
-**Palette rationale:** Deep purple canvas (`#0a0014`) saturates every surface with cosmic hue. Even the text tokens carry color: `#fdf4ff` (near-white with purple), `#d0bde8` (lavender), `#8e7ea1` (muted violet) — nothing in this theme is truly neutral. Magenta primary (`#d946ef`) and purple secondary (`#8b5cf6`) sit approximately 45° apart on the color wheel — close enough for harmonic glass bloom, different enough for clear visual distinction. The secondary is deliberately darker than the primary, providing clear brightness hierarchy within the narrow hue range.
-
-**Key decisions:** The "contaminated text" approach (tinting neutral text with the theme hue) creates the most atmospherically immersive effect of any dark theme. Use this technique when the concept requires the user to feel *inside* the environment, not just *looking at* it. `color-system` overridden to sky blue (`#38bdf8`). The base `color-system` (`#a078ff`) is purple — nearly indistinguishable from `energy-secondary` (`#8b5cf6`) in this purple-saturated palette. Sky blue provides clear separation from both the magenta primary and purple secondary while remaining cool-toned enough to feel at home in the cosmic palette.
+**Key decisions:** `color-premium` overridden to cyan (`#33e2e6`) — the only non-amber signal in the entire theme. The base `color-premium` (`#ff8c00`) is amber, which would be invisible here. Retro physics means zero animation timing, step-based easing, 0px border-radius, and 2px borders — the complete CRT mechanical aesthetic is enforced by the physics preset, not by the palette.
 
 ---
 
-### SOLAR — Royal / Gold
-**Physics:** glass · dark
-
-**Concept:** A royal archive chamber at midnight — ancient authority, ceremony, and gold as material rather than accent.
-
-**Palette rationale:** Deep warm brown canvas (`#120a00`) — nearly black but with an amber undertone that makes the darkness feel warm rather than cold. Gold primary (`#ffaa00`) and dark gold secondary (`#b8860b`) are both in the gold family, differentiated by ~40% brightness rather than hue. This single-hue-family pairing creates a sense of material consistency — everything in Solar is made of the same stuff, just more or less refined. Cinzel (heading) paired with PT Serif (body) is the only theme using two serif typefaces — reinforcing the "ancient document" concept.
-
-**Key decisions:** `color-premium` overridden to sapphire (`#0284c7`). The base `color-premium` (`#ff8c00`) is gold/orange — indistinguishable from the energy tokens in this theme. The sapphire override follows the Crown Jewels metaphor: gold is the ambient material of the throne room, the sapphire is what marks something as truly exceptional.
-
----
-
-### OVERGROWTH — Nature / Organic
-**Physics:** glass · dark
-
-**Concept:** A bioluminescent forest at night — alive, growing, something ancient and electric beneath the canopy.
-
-**Palette rationale:** Deep forest green canvas (`#051a0a`) with glass surface tint `rgba(0,40,10,0.5)` — the tint creates a pervasive atmospheric green wash. Everything rendered in this theme exists *inside* the forest, not in front of it. Neon green primary (`#39ff14`) is deliberately intense because bioluminescence is the only light source in the dark — it's not subtle, it's life asserting itself. The secondary was changed from acid yellow (`#ffd700`) to wheat gold (`#c8a84b`): the original felt like a neon arcade sign; the replacement feels like afternoon sunlight filtering through a leaf canopy.
-
-**Key decisions:** The glass surface tint interacts visually with `energy-secondary` — the wheat gold picks up a slight green cast when rendered through the surface tint, which reinforces the organic feel. This is an intentional property of the tinting system, not a bug.
-
----
-
-### VELVET — Romance / Soft
-**Physics:** glass · dark
-
-**Concept:** A candlelit rose garden at midnight — delicate, intimate, soft beauty with intensity underneath.
-
-**Palette rationale:** Deep rose canvas (`#1a0510`) sets a warm, enclosed atmosphere. Primary (`#ff80a0`) is deliberately pastel — the "bloom" color, the ambient romance of the theme. Secondary (`#e91e8c`) is vivid magenta — more saturated and slightly darker than the primary. This is an intentional hierarchy inversion: the secondary is more visually intense than the primary. It serves the concept: the soft pink invites you in; the magenta reveals intensity when something demands real attention. Text hierarchy uses rose-tinted neutrals from near-white through soft rose, so even metadata carries warmth.
-
-**Key decisions:** The secondary-more-vivid-than-primary inversion is unusual in the system. In button contexts the button variant styling (filled vs outlined) compensates for the raw color weight difference. The Caveat (handwritten) heading + PT Serif body pairing is the most typographically expressive combination in the set — intentional for a theme about personal intimacy.
-
----
-
-### CRIMSON — Horror / Intense
-**Physics:** glass · dark
-
-**Concept:** A blood moon at its zenith — beauty through dread, intensity as aesthetic.
-
-**Palette rationale:** Deep blood-red canvas (`#180808`) with glass surfaces tinted `rgba(60,0,0,0.6)` — the saturated red tint means the entire interface is bathed in red light. Coral-red primary (`#ff6b6b`) is bright enough for functional visibility. The secondary was changed from near-invisible dark red (`#8a0000`, ~1.1:1 contrast against the composited surface) to oxblood (`#c0392b`, ~3:1 contrast) — the original secondary was functionally invisible on glass surfaces. Merriweather is the only theme with a heavy gothic serif, adding physical weight that matches the thematic weight. Even "white" text (`#ffe5e5`) is blood-warm.
-
-**Key decisions:** The red glass tint is the most aggressive surface tint in the built-in set — it leaves no neutral ground. Any element rendered in this theme is visually participating in the horror aesthetic, whether the designer intends it or not. Plan accordingly when building UI in Crimson.
-
----
-
-### PAPER — Light / Print
+### MERIDIAN — Fintech / Brand
 **Physics:** flat · light
 
-**Concept:** A quality broadsheet or well-worn paperback — warm, editorial, the quiet authority of print media.
+**Concept:** A modern fintech dashboard — confident, restrained, brand-forward. Pure white surfaces over a soft cool canvas, with a single decisive brand teal as the only saturated color.
 
-**Palette rationale:** Three warm cream tones form the canvas family (`#faeed1 → #fff8e1 → #fdf6e3`) — natural variation like different paper stocks in the same publication. Dark blue-gray primary (`#2c3e50`) is "ink on parchment" — the authoritative editorial color. Warm brown secondary (`#8d6e63`) is "aged leather binding" — supporting structure without competing with ink. Border at 70% opacity (`rgba(141,110,99,0.7)`) is the boldest in the collection: intentional, simulating the defined margins of a printed page. PT Serif Caption for both heading and body is the only theme where both typefaces are identical — reinforcing total typographic unity.
+**Palette rationale:** Cool off-white canvas (`#f4f6f9`) with pure white surfaces (`#ffffff`) creates clinical clarity — the surface lifts off the canvas through value, not shadow. Teal primary (`#0d6e6e`) is deep enough to read as authoritative on white (3:1+ contrast) without the saturation of a typical brand blue. Indigo secondary (`#4a3df7`) is reserved for accent moments where the teal would feel monotonous. Border at 25% teal opacity ties the structure to the brand. Poppins (heading) plus Inter (body) is geometric display over neutral workhorse — confident without ornament.
 
-**Key decisions:** The warm canvas trio (three distinct but close values) creates subtle depth without shadows or blur. This is flat physics used at its most sophisticated — visual hierarchy achieved entirely through color temperature and opacity.
-
----
-
-### FOCUS — Distraction Free
-**Physics:** flat · light
-
-**Concept:** A blank page with a pen. Nothing should exist except what the user puts there.
-
-**Palette rationale:** Pure white canvas, pure black for all accent tokens (primary, secondary, text-main). The total collapse of all color differentiation into black and white is a deliberate design statement — this theme is not trying to be a good design, it is trying to be *invisible*. Inter is correct: maximum legibility, zero personality. The border-color was softened from solid black to `rgba(0,0,0,0.15)` as the single concession to visual comfort — sharp black borders on white felt more like a spreadsheet than a writing environment.
-
-**Key decisions:** `energy-primary === energy-secondary === #000000`. Chart series are indistinguishable. This is an accepted tradeoff — a distraction-free tool shouldn't need competing visual data layers. If you need chart functionality in a minimal light theme, use Laboratory instead.
+**Key decisions:** This is the reference implementation for `physics: 'flat'` + `mode: 'light'`. The narrow color vocabulary (one canvas family, two energy tokens, no warm accents) is the discipline that keeps light-flat themes from looking generic. Branch from here for any brand-driven light theme; preserve the canvas/surface contrast and shift only the energy tokens.
 
 ---
 
-### LABORATORY — Science / Clinical
-**Physics:** flat · light
-
-**Concept:** A clean research environment — precision instruments, sterile surfaces, confident scientific authority.
-
-**Palette rationale:** Cool slate-gray canvas (`#f1f5f9`) establishes a clinical environment slightly cooler than pure white — the difference between a hospital corridor and a blank page. Medical blue primary (`#005bb5`) and medium blue secondary (`#3d7ab5`) form a brightness-differentiated pair within the same hue family: deep blue for primary authority, lighter blue for supporting data. The entire palette is cool/neutral — no warm tones by design. Open Sans was chosen specifically for readability at small sizes: lab interfaces render dense data in tight spaces. `text-mute` was darkened from `#94a3b8` to `#64748b` for accessibility — a clinical environment must have legible fine print.
-
-**Key decisions:** When fixing `text-mute` for accessibility, the darkened value matched the existing `energy-secondary`. This would create a collision — chart series 2 looking like muted body text. `energy-secondary` was shifted to `#3d7ab5` (medium blue) to maintain distinctness. Always check both tokens after changing either.
-
----
-
-### PLAYGROUND — Playful / Vibrant
-**Physics:** flat · light
-
-**Concept:** A children's art studio where every color is welcome and energy is the goal.
-
-**Palette rationale:** Light cyan canvas (`#e0f7fa`) — the only non-white, non-neutral canvas in the light theme set, signaling immediately that this is a different kind of light theme. Hot pink primary (`#ff4081`) and deep cyan secondary (`#0088a8`) are near-complementary — positioned on opposite sides of the color wheel — intentionally creating maximum visual tension and energy. The secondary was deepened from the original cyan (`#00bcd4`) to ensure genuine separation from the border color in chart contexts. The text hierarchy (`#003040 → #1a4a55 → #4a7a85`) corrects an original inversion where `text-mute` was brighter than `text-dim` — all three now properly descend in contrast.
-
-**Key decisions:** Comic Neue is the only font choice that could mean only one thing. The near-complementary energy pair is the most visually aggressive combination in the light theme set — appropriate for the concept, but potentially tiring in long-use interfaces. Consider this a showcase theme rather than a primary productivity environment.
-
----
-
-Explore the full definitions in [design-tokens.ts](src/config/design-tokens.ts) (search for `themes:`).
+Explore the full definitions in [src/config/atmospheres.ts](src/config/atmospheres.ts).
 
 ---
 

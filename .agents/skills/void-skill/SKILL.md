@@ -44,7 +44,7 @@ The `<html>` element carries three attributes. The runtime reacts when any chang
 
 | Attribute | Values | Meaning |
 | --- | --- | --- |
-| `data-atmosphere` | `void`, `paper`, `terminal`, `crimson`, `nebula`, `overgrowth`, `velvet`, `solar`, `onyx`, `laboratory`, `playground`, `focus`, plus registered custom themes | Palette + font |
+| `data-atmosphere` | `frost`, `graphite`, `terminal`, `meridian`, plus registered custom themes | Palette + font |
 | `data-physics` | `glass`, `flat`, `retro` | Texture, blur, motion, borders |
 | `data-mode` | `light`, `dark` | Canvas polarity |
 

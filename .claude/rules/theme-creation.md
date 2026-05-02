@@ -18,7 +18,7 @@ When adding or modifying a theme in `src/config/atmospheres.ts`, run this checkl
 | glass   | light | ❌     | Engine auto-corrects to `flat` — never set intentionally |
 | retro   | dark  | ✅     | CRT aesthetic only |
 | retro   | light | ❌     | Engine forces `dark` — never set intentionally |
-| flat    | dark  | ✅     | Valid — Onyx is the only built-in example |
+| flat    | dark  | ✅     | Valid — Graphite is the built-in example |
 | flat    | light | ✅     | All light themes use this |
 
 ---
@@ -91,7 +91,7 @@ If `energy-primary` or `energy-secondary` is in the **gold/orange/amber family**
 'energy-primary': '#f5c518',   // Bright amber
 'color-premium':  '#33e2e6',   // Cyan override ← required
 
-// Solar — gold energy requires a non-gold premium
+// Any gold-energy theme — non-gold premium
 'energy-primary': '#ffaa00',   // Gold
 'color-premium':  '#0284c7',   // Sapphire override ← required
 ```
@@ -112,7 +112,7 @@ The override color must avoid:
 If `energy-primary` or `energy-secondary` is in the **purple/violet family**, add a per-theme `color-system` override. Without it, system notifications and AI feature indicators are visually indistinguishable from primary interactive elements.
 
 ```typescript
-// Nebula — purple secondary requires a non-purple system
+// Any purple-energy theme — non-purple system
 'energy-secondary': '#8b5cf6',   // Purple
 'color-system':     '#38bdf8',   // Sky blue override ← required
 ```
@@ -127,7 +127,7 @@ The override color must avoid:
 
 ## Accepted Overlap — `color-success` and `color-error`
 
-Overgrowth's neon green (`#39ff14`) overlaps with `color-success` (`#00e055`), and Crimson's coral (`#ff6b6b`) overlaps with `color-error` (`#ff3c40`). Unlike `color-premium` and `color-system`, these are **not overridden** — green must mean success and red must mean error. These are universal signals; replacing them with an arbitrary hue would cause more confusion than the overlap.
+A neon-green energy will overlap with `color-success` (`#00e055`), and a coral-red energy will overlap with `color-error` (`#ff3c40`). Unlike `color-premium` and `color-system`, these are **not overridden** — green must mean success and red must mean error. These are universal signals; replacing them with an arbitrary hue would cause more confusion than the overlap.
 
 The overlap is tolerable because success/error appear in **momentary, contextual states** (toasts, validation, form borders) with explicit text labels that disambiguate meaning. `color-premium` and `color-system` appear persistently alongside energy colors in the same UI regions, making their collisions far more disruptive.
 
@@ -161,15 +161,7 @@ Every theme must explicitly set all of the following (spread `...SEMANTIC_DARK` 
 
 | Theme | Mode | Physics | Primary | Secondary | Overrides |
 |-------|------|---------|---------|-----------|-----------|
-| void | dark | glass | #33e2e6 cyan | #3875fa blue | — |
-| onyx | dark | flat | #ffffff white | #a3a3a3 gray | — |
+| frost | dark | glass | #7ec8e3 arctic blue | #4a6fa5 muted blue | — |
+| graphite | dark | flat | #ffffff white | #6e7178 gray | — |
 | terminal | dark | retro | #f5c518 amber | #c9a820 dim amber | color-premium: #33e2e6 |
-| nebula | dark | glass | #d946ef magenta | #8b5cf6 purple | color-system: #38bdf8 |
-| solar | dark | glass | #ffaa00 gold | #b8860b dark gold | color-premium: #0284c7 |
-| overgrowth | dark | glass | #39ff14 neon green | #c8a84b wheat gold | — |
-| velvet | dark | glass | #ff80a0 soft pink | #e91e8c vivid magenta | — |
-| crimson | dark | glass | #ff6b6b coral red | #c0392b oxblood | — |
-| paper | light | flat | #2c3e50 slate | #8d6e63 warm brown | — |
-| focus | light | flat | #000000 black | #000000 black | intentional collapse |
-| laboratory | light | flat | #005bb5 blue | #3d7ab5 medium blue | — |
-| playground | light | flat | #ff4081 hot pink | #0088a8 deep cyan | — |
+| meridian | light | flat | #0d6e6e teal | #4a3df7 indigo | — |
