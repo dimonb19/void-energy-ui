@@ -163,7 +163,7 @@ Wrapper-only contract — surface treatment does **not** propagate. Source of tr
 npm run dev            Start dev server (auto-generates tokens, watches changes)
 npm run build          Production build (runs build:tokens → astro build)
 npm run build:tokens   Regenerate _generated-themes.scss from design-tokens.ts
-npm run check          Full check chain: check:registry + svelte-check + lint:design-md + check:design-md
+npm run check          Full check chain: check:registry + svelte-check + lint:design-md + check:design-md + check:skill + check:mcp + test:mcp
 npm run scan           Advisory raw-pixel scan (helper, not a complete Token Law gate)
 npm run atmosphere-md  Atmosphere markdown CLI (export / import / spec-export / spec-verify)
 npm run check:registry Verify component-registry.json is in sync with source files

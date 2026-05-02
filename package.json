@@ -30,8 +30,8 @@
     "check:ambient-layers": "npm --workspace @void-energy/ambient-layers run check",
     "check:mcp": "npm --workspace @void-energy/mcp run check",
     "test:mcp": "vitest run tests/mcp-safety-merge-equivalence.test.ts",
-    "smoke:mcp": "tsx packages/void-energy-mcp/scripts/smoke-test.ts",
-    "check": "npm run check:registry && svelte-check --tsconfig ./tsconfig.json && npm run lint:design-md && npm run check:design-md && npm run check:skill && npm run check:mcp",
+    "smoke:mcp": "npm run build:mcp && tsx packages/void-energy-mcp/scripts/smoke-test.ts",
+    "check": "npm run check:registry && svelte-check --tsconfig ./tsconfig.json && npm run lint:design-md && npm run check:design-md && npm run check:skill && npm run check:mcp && npm run test:mcp",
     "test": "vitest run",
     "format": "prettier --write ."
   },

@@ -93,6 +93,8 @@ describe('safety-merge equivalence: VoidEngine ↔ MCP port', () => {
     expect(fromPort.normalized!.palette['energy-primary']).toBe(
       fromEngine.palette['energy-primary'],
     );
+    expect(fromPort.normalized!.palette).toEqual(fromEngine.palette);
+    expect(fromPort.normalized!.fonts).toEqual(fromEngine.fonts ?? []);
   });
 
   it('auto-corrects retro+light identically through both surfaces', () => {
@@ -118,6 +120,8 @@ describe('safety-merge equivalence: VoidEngine ↔ MCP port', () => {
     expect(fromEngine.physics).toBe('retro');
     expect(fromPort.normalized!.mode).toBe('dark');
     expect(fromPort.normalized!.physics).toBe('retro');
+    expect(fromPort.normalized!.palette).toEqual(fromEngine.palette);
+    expect(fromPort.normalized!.fonts).toEqual(fromEngine.fonts ?? []);
   });
 
   it('rejects non-object input', () => {

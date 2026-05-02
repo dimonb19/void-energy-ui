@@ -4,7 +4,7 @@
  * SOURCE OF TRUTH: src/adapters/void-engine.svelte.ts → normalizeThemeDefinition()
  *
  * Drift contract — when the engine's Safety Merge changes, this port must
- * change with it. Drift is caught by tests in test/safety-merge-equivalence.test.ts,
+ * change with it. Drift is caught by tests in tests/mcp-safety-merge-equivalence.test.ts,
  * which round-trips Frost through both surfaces and asserts structural
  * equality on the normalized output.
  *

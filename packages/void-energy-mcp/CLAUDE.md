@@ -22,4 +22,4 @@ stdout is owned by JSON-RPC. **Never `console.log` or `process.stdout.write` fro
 
 ## 4. Safety-Merge drift
 
-[src/safety-merge.ts](src/safety-merge.ts) is a pure port of `normalizeThemeDefinition` in [src/adapters/void-engine.svelte.ts](../../src/adapters/void-engine.svelte.ts). When the engine version changes, this port must change with it. The drift contract is enforced by [test/safety-merge-equivalence.test.ts](test/safety-merge-equivalence.test.ts) — keep it green.
+[src/safety-merge.ts](src/safety-merge.ts) is a pure port of `normalizeThemeDefinition` in [src/adapters/void-engine.svelte.ts](../../src/adapters/void-engine.svelte.ts). When the engine version changes, this port must change with it. The drift contract is enforced by [tests/mcp-safety-merge-equivalence.test.ts](../../tests/mcp-safety-merge-equivalence.test.ts) — keep it green.

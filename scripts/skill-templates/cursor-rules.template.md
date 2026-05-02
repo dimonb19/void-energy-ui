@@ -13,7 +13,7 @@
 
 # Void Energy — Cursor Rules
 
-Always-loaded backstop for Cursor 2.4 in any Void Energy consumer project. Cursor's official position is *"Skills don't replace Rules. They're meant to coexist."* This file is the always-on surface; the SKILL.md at `.cursor/skills/void-skill/` is the relevance-ranked supplement.
+Always-loaded backstop for Cursor 2.4 in any Void Energy consumer project. Cursor's official position is *"Skills don't replace Rules. They're meant to coexist."* This `.mdc` file (frontmatter `alwaysApply: true`) is the only Cursor surface Phase 1 ships, so every Cursor session loads it unconditionally.
 
 ## Identity
 

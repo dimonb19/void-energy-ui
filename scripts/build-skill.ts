@@ -1,6 +1,10 @@
 // DETERMINISTIC TEMPLATING ONLY. NO LLM CALLS.
 // See plans/phase-1-decisions.md#d11.
 //
+// Inputs: scripts/skill-templates/*.template.md (hand-curated bodies,
+// co-canonical with SYSTEM-PROMPT.md) + component-registry.json +
+// design-tokens.ts + COMPOSITION-RECIPES.md. Re-runs are byte-stable.
+//
 // scripts/build-skill.ts — emits the seven L2 distribution artifacts (D10):
 //   1. skills/void-skill/SKILL.md                              (canonical)
 //   2. skills/void-skill/references/component-catalog.md       (from component-registry.json)
@@ -86,7 +90,7 @@ function emitSkillMd(description: string): string {
 
 function emitCursorMdc(description: string): string {
   const body = stripBuildComments(fs.readFileSync(PATHS.cursorRulesBody, 'utf8'));
-  const frontmatter = `---\ndescription: ${description}\n---\n\n`;
+  const frontmatter = `---\ndescription: ${description}\nalwaysApply: true\n---\n\n`;
   return frontmatter + body;
 }
 
