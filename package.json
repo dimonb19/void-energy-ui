@@ -39,7 +39,7 @@
     "@astrojs/svelte": "^7.2.2",
     "@astrojs/vercel": "^9.0.5",
     "@floating-ui/dom": "^1.7.4",
-    "@lucide/svelte": "^0.564.0",
+    "@lucide/svelte": "^1.14.0",
     "astro": "^5.16.0",
     "fast-average-color": "^9.5.2",
     "marked": "18.0.2",

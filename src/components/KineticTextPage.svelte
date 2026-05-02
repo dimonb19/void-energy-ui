@@ -1239,7 +1239,11 @@
         <div class="flex flex-col gap-xs min-w-0">
           <div class="flex items-center justify-between">
             <h6>Pop <span class="text-caption text-mute">— default</span></h6>
-            <button class="btn-icon" onclick={() => replayRevealPop++}>
+            <button
+              class="btn-icon"
+              aria-label="Replay"
+              onclick={() => replayRevealPop++}
+            >
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
@@ -1265,7 +1269,11 @@
         <div class="flex flex-col gap-xs min-w-0">
           <div class="flex items-center justify-between">
             <h6>Scramble</h6>
-            <button class="btn-icon" onclick={() => replayRevealScramble++}>
+            <button
+              class="btn-icon"
+              aria-label="Replay"
+              onclick={() => replayRevealScramble++}
+            >
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
@@ -1290,7 +1298,11 @@
         <div class="flex flex-col gap-xs min-w-0">
           <div class="flex items-center justify-between">
             <h6>Rise</h6>
-            <button class="btn-icon" onclick={() => replayRevealRise++}>
+            <button
+              class="btn-icon"
+              aria-label="Replay"
+              onclick={() => replayRevealRise++}
+            >
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
@@ -1315,7 +1327,11 @@
         <div class="flex flex-col gap-xs min-w-0">
           <div class="flex items-center justify-between">
             <h6>Drop</h6>
-            <button class="btn-icon" onclick={() => replayRevealDrop++}>
+            <button
+              class="btn-icon"
+              aria-label="Replay"
+              onclick={() => replayRevealDrop++}
+            >
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
@@ -1340,7 +1356,11 @@
         <div class="flex flex-col gap-xs min-w-0">
           <div class="flex items-center justify-between">
             <h6>Scale</h6>
-            <button class="btn-icon" onclick={() => replayRevealScale++}>
+            <button
+              class="btn-icon"
+              aria-label="Replay"
+              onclick={() => replayRevealScale++}
+            >
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
@@ -1365,7 +1385,11 @@
         <div class="flex flex-col gap-xs min-w-0">
           <div class="flex items-center justify-between">
             <h6>Blur</h6>
-            <button class="btn-icon" onclick={() => replayRevealBlur++}>
+            <button
+              class="btn-icon"
+              aria-label="Replay"
+              onclick={() => replayRevealBlur++}
+            >
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
@@ -1447,7 +1471,11 @@
         <div class="flex flex-col gap-xs min-w-0">
           <div class="flex items-center justify-between">
             <h5>Word <span class="text-caption text-mute">— default</span></h5>
-            <button class="btn-icon" onclick={() => replayWord++}>
+            <button
+              class="btn-icon"
+              aria-label="Replay"
+              onclick={() => replayWord++}
+            >
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
@@ -1473,7 +1501,11 @@
         <div class="flex flex-col gap-xs min-w-0">
           <div class="flex items-center justify-between">
             <h5>Character</h5>
-            <button class="btn-icon" onclick={() => replayChar++}>
+            <button
+              class="btn-icon"
+              aria-label="Replay"
+              onclick={() => replayChar++}
+            >
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
@@ -1502,7 +1534,11 @@
               Decode
               <span class="text-caption text-mute">— character variant</span>
             </h6>
-            <button class="btn-icon" onclick={() => replayDecode++}>
+            <button
+              class="btn-icon"
+              aria-label="Replay"
+              onclick={() => replayDecode++}
+            >
               <RotateCcw class="icon" data-size="sm" />
             </button>
           </div>
