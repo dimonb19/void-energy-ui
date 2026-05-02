@@ -6,8 +6,8 @@
  * adapter that returns `TTSResult`) to drive character-accurate reveal
  * from spoken audio.
  *
- * See the parent package README and `plans/phase-2-tts-kinetic-sync.md`
- * for architecture and consumer wiring examples.
+ * See the parent package README for architecture and consumer wiring
+ * examples.
  */
 
 export type { TTSResult, WordTimestamp, TTSProvider } from './types';
