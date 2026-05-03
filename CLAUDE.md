@@ -137,6 +137,7 @@ The `<html>` element carries the runtime state:
 data-atmosphere="frost"     Active theme ID
 data-physics="glass"        glass | flat | retro
 data-mode="dark"            light | dark
+data-brand="nike"           Active brand profile (only set when atmosphere references one)
 data-auth                   Present when any user is authenticated (Guest role included)
 ```
 

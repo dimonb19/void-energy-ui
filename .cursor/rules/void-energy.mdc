@@ -11,7 +11,7 @@ Always-loaded backstop for Cursor 2.4 in any Void Energy consumer project. Curso
 
 ## Identity
 
-Void Energy is a **physics-based, theme-reactive design system**. Every surface is the intersection of three environmental variables — an **atmosphere** (palette + font), a **physics** preset (texture, motion, borders), and a **mode** (light or dark polarity) — composed from a token dictionary, never raw values. A runtime engine enforces constraints at the DOM level.
+Void Energy is a **physics-based, theme-reactive design system**. Every surface is the intersection of three environmental variables — an **atmosphere** (palette + font), a **physics** preset (texture, motion, borders), and a **mode** (light or dark polarity) — composed from a token dictionary, never raw values. An optional **brand** overlay (`data-brand`) can sit between physics and atmosphere to carry identity (radii / motion / type-treatment / per-role weights) without touching color or composition. A runtime engine enforces constraints at the DOM level.
 
 > Do not paint pixels. Declare materials.
 
@@ -36,7 +36,7 @@ Void Energy is a **physics-based, theme-reactive design system**. Every surface 
 
 ## The Triad
 
-The `<html>` element carries `data-atmosphere`, `data-physics`, and `data-mode`. Only four of six combinations are valid; the engine auto-corrects the rest:
+The `<html>` element carries `data-atmosphere`, `data-physics`, `data-mode`, and (when the active atmosphere references one) `data-brand`. Only four of six triad combinations are valid; the engine auto-corrects the rest:
 
 - `glass` + `dark` ✅ — backdrop blur, organic motion, glow borders
 - `flat` + `dark` ✅, `flat` + `light` ✅ — clean ease-out, solid borders

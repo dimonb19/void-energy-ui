@@ -164,18 +164,20 @@ State lives in **attributes**, not classes. This ensures CSS transitions trigger
 
 ---
 
-## 2. The Triad (Context Engine)
+## 2. The Triad + Brand Overlay (Context Engine)
 
-The UI is a material that reacts to three environmental variables set on `<html>`.
+The UI is a material that reacts to three environmental variables set on `<html>` — atmosphere, physics, mode. An optional fourth axis (`data-brand`) sits between physics and atmosphere as an identity overlay.
 
 ```mermaid
 graph TD
     A[Void Energy UI] --> B[Atmosphere]
     A --> C[Physics]
     A --> D[Mode]
+    A --> H[Brand &#40;optional&#41;]
     B --> E[Colors + Fonts]
     C --> F[Texture + Motion + Blur]
     D --> G[Light / Dark]
+    H --> I[Radii + Motion + Type + Per-Role Weights]
 ```
 
 ### 1. Atmosphere (The Soul) — `data-atmosphere`
@@ -233,6 +235,79 @@ Defines: **Luminosity** and **Contrast** handling
 ```
 
 ---
+
+### 4. Brand (Identity Overlay) — `data-brand`
+
+Defines: **Radii**, **Motion**, **Type-treatment**, **Per-role weights**
+
+An optional identity overlay. Atmospheres opt in via `brand: '<id>'`; runtime sets `<html data-brand="<id>">` alongside `data-atmosphere`. Brand-less atmospheres clear the attribute and fall through to physics defaults — output is byte-identical to pre-overlay builds.
+
+| Brand          | Shape          | Fields | Signature                                         |
+| -------------- | -------------- | ------ | ------------------------------------------------- |
+| `stripe`       | calm           | 3      | Gentle outer-scale radii, mechanical ease, body tracking 0 |
+| `nike`         | ceiling        | 8      | 4-radii + uppercase tight-tracked headings/buttons + heavy weights |
+| `lamborghini`  | motion-forward | 8      | Zero radii (incl. `full`), snappier speeds, sharper ease, heavy display |
+
+**Usage:**
+
+```html
+<html data-atmosphere="nike-volt-light" data-brand="nike" data-physics="flat" data-mode="dark"></html>
+```
+
+**Authoring discipline (sparse-by-default):** most profiles override 2-3 fields; Nike (8) is the ceiling. Empty fields are inheritance, not omission. Color, fonts, and spacing stay on the atmosphere / global axes — never set them in a brand profile. See [.claude/rules/theme-creation.md](.claude/rules/theme-creation.md) "Brand Profile Overlay" for the full rule and [THEME-GUIDE.md](THEME-GUIDE.md) §7 for authoring walkthroughs.
+
+**`BrandProfile` interface** (source: [src/config/brands/index.ts](src/config/brands/index.ts)):
+
+```ts
+export interface BrandProfile {
+  id: string;
+  name: string;
+
+  radii?: {
+    sm?: string;
+    md?: string;
+    lg?: string;
+    xl?: string;
+    full?: string;
+  };
+
+  motion?: {
+    speedFast?: number;
+    speedBase?: number;
+    speedSlow?: number;
+    easeSpringGentle?: string;
+    easeSpringSnappy?: string;
+    easeSpringBounce?: string;
+    easeFlow?: string;
+  };
+
+  typography?: {
+    trackingDisplay?: string;
+    trackingHeading?: string;
+    trackingBody?: string;
+    trackingButton?: string;
+    transformButton?: 'none' | 'uppercase' | 'lowercase';
+    transformHeading?: 'none' | 'uppercase' | 'lowercase';
+    weightButton?: number;
+    weightHeading?: number;
+    weightDisplay?: number;
+  };
+}
+```
+
+### Cascade Order (Locked)
+
+| Layer            | Selector                  | Owns                                            | Wins over                |
+| ---------------- | ------------------------- | ----------------------------------------------- | ------------------------ |
+| Global tokens    | `:root`                   | Spacing, typography scale, z-index, semantics   | nothing (foundation)     |
+| Physics          | `[data-physics='<x>']`    | Motion, blur, borders, radii floor, shadows    | Global tokens            |
+| Brand overlay    | `[data-brand='<id>']`     | Radii, motion, type-treatment, per-role weights | Physics defaults*        |
+| Atmosphere       | `[data-atmosphere='<x>']` | Color palette, font families                    | Brand and physics for color |
+| Retro floor      | `[data-physics='retro']` (re-asserted) | Radii: 0, `steps()` motion           | Brand overrides          |
+
+\* Except retro physics, which re-asserts its zero-radii / `steps()`-motion floor in a final block via `emit-physics-retro-floor` ([src/styles/abstracts/_engine.scss](src/styles/abstracts/_engine.scss)). A brand setting `radii.full: '9999px'` will not round retro pills.
+
+**Runtime plumbing.** `voidEngine.setAtmosphere('<id>')` triggers `applyTheme()` (in [src/lib/void-boot.js](src/lib/void-boot.js)) which writes/clears `data-brand` based on the atmosphere's `brand` field — same write site that owns `data-atmosphere`/`data-physics`/`data-mode`. There is no separate `voidEngine.setBrand()` API; brand is atmosphere-bound by design (one source of truth per switch).
 
 ### ⚠️ The Law of Immutability (Physics Constraints)
 

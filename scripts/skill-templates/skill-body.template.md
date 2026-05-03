@@ -2,7 +2,7 @@
 
 Models default to design slop without specific guidance. Per Anthropic's [frontend-design blog post](https://claude.com/blog/improving-frontend-design-through-skills), *"models predict tokens based on statistical patterns in training data. Safe design choices — those that work universally and offend no one — dominate web training data."* The visible markers are Inter, Roboto, Arial, system fonts, purple gradients on white, predictable layouts, and cookie-cutter patterns lacking context-specific character.
 
-**Void Energy is the concrete answer to that convergence.** Every surface is the intersection of three environmental variables — an **atmosphere** (palette + font), a **physics** preset (texture, motion, borders), and a **mode** (light or dark polarity) — composed from a token dictionary, never raw values. A runtime engine enforces constraints at the DOM level. Output produced through this skill diverges from the convergent center because the system itself is opinionated.
+**Void Energy is the concrete answer to that convergence.** Every surface is the intersection of three environmental variables — an **atmosphere** (palette + font), a **physics** preset (texture, motion, borders), and a **mode** (light or dark polarity) — composed from a token dictionary, never raw values. An optional **brand** overlay can sit between physics and atmosphere to carry identity (radii / motion / type-treatment / per-role weights) without touching color or composition. A runtime engine enforces constraints at the DOM level. Output produced through this skill diverges from the convergent center because the system itself is opinionated.
 
 > Do not paint pixels. Declare materials.
 
@@ -41,6 +41,7 @@ The `<html>` element carries three attributes. The runtime reacts when any chang
 | `data-atmosphere` | `frost`, `graphite`, `terminal`, `meridian`, plus registered custom themes | Palette + font |
 | `data-physics` | `glass`, `flat`, `retro` | Texture, blur, motion, borders |
 | `data-mode` | `light`, `dark` | Canvas polarity |
+| `data-brand` | `nike`, `stripe`, `lamborghini`, plus registered profiles (optional) | Identity overlay (radii / motion / type / per-role weights) |
 
 **Engine-enforced invariants — only four of six combinations are valid:**
 

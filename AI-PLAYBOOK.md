@@ -84,6 +84,18 @@ If the request still appears uncovered, prove it by checking the registry first 
 - Sunk wells: `surface-sunk p-md flex flex-col gap-md`
 - Tight coupling only: `gap-xs` for label → input, icon + text, title + subtitle
 
+## Atmosphere & Brand Axes
+
+The runtime contract is `atmosphere × physics × mode`. **Brand is an optional fourth axis** — an identity overlay that overrides radii, motion, type-treatment, and per-role weights without touching color, fonts, spacing, or composition. Cascade order: `global → physics → brand → atmosphere`.
+
+- Brand profiles live in `src/config/brands/<brand>.ts`. Atmospheres opt in via `brand: '<id>'`; without that, the atmosphere inherits physics defaults like the 4 free atmospheres do.
+- Author a brand profile **only** for catalog work where a real brand has identity worth preserving (radii policy, motion signature, type-treatment that survives a port). Skip it for ad-hoc or exploratory atmospheres.
+- **Sparse-by-default.** Most profiles override 2-3 fields. Stripe (3 fields: 2 radii + 1 ease + 1 tracking) is typical; Nike (8 fields: 4 radii + 4 typography) is the ceiling. Empty fields are inheritance, not omission — never pre-populate every field "for completeness."
+- **Retro physics floor wins.** A brand setting `radii.full: '9999px'` does not round retro pills; the retro block re-asserts zero radii and `steps()` motion above any brand override.
+- Spacing (Law 5) and fonts stay on the universal/atmosphere axes — not brand-overridable.
+
+Read [.claude/rules/theme-creation.md](.claude/rules/theme-creation.md) "Brand Profile Overlay" for the full discipline. Pattern-match against `src/config/brands/{stripe,nike,lamborghini}.ts` for the three reference shapes (calm / ceiling / motion-forward).
+
 ## Verification
 
 Run the narrowest set that matches the change:

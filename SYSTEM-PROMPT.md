@@ -8,7 +8,7 @@
 
 ## 1. Identity
 
-Void Energy is a **physics-based, theme-reactive design system** built for narrative software. It separates **composition** (what goes where) from **material** (how it looks, moves, and feels). Every pixel on screen is the intersection of three environmental variables: an **Atmosphere** (color + font), a **Physics** preset (texture + motion), and a **Mode** (light/dark polarity).
+Void Energy is a **physics-based, theme-reactive design system** built for narrative software. It separates **composition** (what goes where) from **material** (how it looks, moves, and feels). Every pixel on screen is the intersection of three environmental variables: an **Atmosphere** (color + font), a **Physics** preset (texture + motion), and a **Mode** (light/dark polarity). An optional **Brand** overlay can sit between physics and atmosphere to carry identity (radii / motion / type-treatment / per-role weights) without changing color or composition.
 
 The system ships as:
 
@@ -21,15 +21,16 @@ The system ships as:
 
 ---
 
-## 2. The Triad
+## 2. The Triad + Brand Overlay
 
-The UI reads three attributes on the `<html>` element and reacts instantly when any of them change.
+The UI reads four attributes on the `<html>` element and reacts instantly when any of them change. The first three are the triad; the fourth is the optional brand-overlay axis.
 
 | Attribute         | Values                                                                                                                       | Meaning                          |
 | ----------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
 | `data-atmosphere` | `frost`, `graphite`, `terminal`, `meridian`, or a registered custom theme | Color palette and font family |
 | `data-physics`    | `glass`, `flat`, `retro`                                                                                                     | Texture, blur, motion, borders   |
 | `data-mode`       | `light`, `dark`                                                                                                              | Polarity of the canvas           |
+| `data-brand`      | `nike`, `stripe`, `lamborghini`, or any registered brand id (optional — only set when atmosphere references one) | Identity overlay (radii / motion / type / per-role weights) |
 
 ### Physics Contract
 
@@ -44,6 +45,20 @@ The UI reads three attributes on the `<html>` element and reacts instantly when 
 - `glass` + `light` → runtime downgrades physics to `flat`. Glass needs darkness to glow.
 - `retro` + `light` → runtime forces mode to `dark`. CRT phosphor requires a black canvas.
 - Never set an invalid combination manually — use `voidEngine.setAtmosphere()` or DOM attributes; the runtime guards itself.
+
+### Cascade Order
+
+| Layer            | Selector                  | Owns                                            | Wins over                |
+| ---------------- | ------------------------- | ----------------------------------------------- | ------------------------ |
+| Global tokens    | `:root`                   | Spacing, typography scale, z-index, semantics   | nothing (foundation)     |
+| Physics          | `[data-physics='<x>']`    | Motion, blur, borders, radii floor, shadows    | Global tokens            |
+| Brand overlay    | `[data-brand='<id>']`     | Radii, motion, type-treatment, per-role weights | Physics defaults*        |
+| Atmosphere       | `[data-atmosphere='<x>']` | Color palette, font families                    | Brand and physics for color |
+| Retro floor      | `[data-physics='retro']` (re-asserted) | Radii: 0, `steps()` motion           | Brand overrides          |
+
+\* Except retro, which re-asserts its zero-radii / `steps()`-motion floor in a final block — no brand override beats it.
+
+Atmospheres without a `brand:` reference fall through unchanged: brand-less output is byte-identical to pre-overlay builds.
 
 ---
 
@@ -558,6 +573,21 @@ voidEngine.registerTheme('brand-v1', {
   },
 });
 ```
+
+### Reference a brand profile
+
+```ts
+// src/config/atmospheres.ts — atmosphere opts in via `brand: '<id>'`
+'nike-volt-light': {
+  mode: 'dark',
+  physics: 'flat',
+  brand: 'nike',           // sets <html data-brand="nike"> when active
+  tier: 'catalog',
+  palette: { /* color/font tokens — independent of brand */ },
+}
+```
+
+Brand profiles live in `src/config/brands/<brand>.ts` (sparse, identity-only — no color, no fonts, no spacing). The runtime applies `data-brand` synchronously alongside `data-atmosphere`; brand-less atmospheres clear the attribute on switch. See [THEME-GUIDE.md](THEME-GUIDE.md) §7 for the full authoring workflow.
 
 ### Load a remote theme
 

@@ -172,15 +172,22 @@ Every theme must explicitly set all of the following (spread `...SEMANTIC_DARK` 
 
 The 8 rules above govern the **palette axis** — color correctness, contrast, hierarchy, semantic collisions. Brand profiles are an **orthogonal axis**: identity overrides for radii / motion / type-treatment / per-role weights. They live separately and are sparse-by-default.
 
-> Phase 1.2 ships the directory + `BrandProfile` interface only. Reference profiles (Nike, Stripe, Lamborghini) land in Phase 1.5; runtime cascade plumbing (`data-brand`, `:root[data-brand]` blocks) lands in Phase 1.3.
+> Status (post-1.5): directory + `BrandProfile` interface (1.2), cascade plumbing — `data-brand` + `:root[data-brand]` blocks + retro-floor reassertion — (1.3), heading-mixin + button-base port to role tokens (1.4), and three reference profiles (1.5) all shipped. The brand axis is end-to-end live.
 
 ### Cascade order (locked, Option B)
 
 ```
-global tokens  →  physics  →  brand overlay  →  atmosphere palette
+global tokens  →  physics  →  brand overlay  →  atmosphere palette  →  retro floor (re-asserted)
 ```
 
-Brand sits **between physics and atmosphere**. Physics still has the floor — retro zeroes radii, retro keeps `steps()` motion, no brand override beats it. Atmosphere still owns color. Atmospheres without a `brand:` reference fall through unchanged.
+Brand sits **between physics and atmosphere**. Physics still has the floor — retro zeroes radii, retro keeps `steps()` motion, and `emit-physics-retro-floor` ([../../src/styles/abstracts/_engine.scss](../../src/styles/abstracts/_engine.scss)) re-asserts both above any brand override. Atmosphere still owns color. Atmospheres without a `brand:` reference fall through unchanged (byte-identical compile output to pre-overlay builds).
+
+### Cascade plumbing (1.3-1.5)
+
+- **DOM:** `applyTheme()` in [../../src/lib/void-boot.js](../../src/lib/void-boot.js) sets/clears `<html data-brand="<id>">` based on the active atmosphere's `brand` field — same write site that owns `data-atmosphere`/`data-physics`/`data-mode`. No separate `voidEngine.setBrand()` API; brand is atmosphere-bound.
+- **Generator:** [../../scripts/generate-tokens.ts](../../scripts/generate-tokens.ts) reads `BRANDS` and emits one `:root[data-brand='<id>']` block per profile in `_generated-themes.scss`, plus per-axis CSS files at `dist/brands/<id>.css` and a `dist/brands.json` registry mirror.
+- **SCSS source order** in [../../src/styles/base/_themes.scss](../../src/styles/base/_themes.scss): `:root → emit-physics → brands → atmospheres → emit-physics-retro-floor`. The retro floor wins because it emits last.
+- **Role tokens reach `<h1>`-`<h4>` and buttons.** The 1.4 typography port rewrote the heading mixin to read `--weight-display`/`--weight-heading` and `--text-transform-display`/`--text-transform-heading`; `_buttons.scss` reads `--weight-button`/`--tracking-button`/`--text-transform-button`. `<h5>`/`<h6>` stay on `--font-weight-medium` (deferred from the brand axis).
 
 ### When to author a brand profile
 
@@ -191,14 +198,15 @@ Author one **only** when a real brand has identity worth preserving — radii po
 Most profiles override 2-3 fields. The Stripe shape (a couple radii + one transform) is the norm. The Nike shape (radii + 4 typography fields) is the ceiling. Do **not** pre-populate every field "for completeness" — empty fields are inheritance, not omission.
 
 ```ts
-// Stripe-shape (typical) — calm, sentence-case, default-ish radii
+// Stripe — calm shape (3 fields). Outer radii nudged, one ease, body tracking neutralized.
 stripe: {
   id: 'stripe', name: 'Stripe',
   radii: { lg: '6px', xl: '8px' },
-  typography: { trackingBody: '0', transformButton: 'none', weightButton: 500 },
+  motion: { easeSpringGentle: 'cubic-bezier(0.4, 0, 0.2, 1)' },
+  typography: { trackingBody: '0' },
 }
 
-// Nike-shape (ceiling) — uppercase, tight tracking, heavy weights, gentle radii
+// Nike — ceiling shape (8 fields). Uppercase, tight tracking, heavy weights, gentle radii.
 nike: {
   id: 'nike', name: 'Nike',
   radii: { sm: '2px', md: '4px', lg: '6px', xl: '8px' },
@@ -207,6 +215,17 @@ nike: {
     transformButton: 'uppercase', transformHeading: 'uppercase',
     weightButton: 700, weightHeading: 900, weightDisplay: 900,
   },
+}
+
+// Lamborghini — motion-forward shape (8 fields). Zero radii incl. `full`, snappier speeds, sharper ease.
+lamborghini: {
+  id: 'lamborghini', name: 'Lamborghini',
+  radii: { sm: '0', md: '0', lg: '0', xl: '0', full: '0' },
+  motion: {
+    speedFast: 120, speedBase: 240,
+    easeSpringSnappy: 'cubic-bezier(0.22, 1, 0.36, 1)',
+  },
+  typography: { trackingDisplay: '0.06em', weightDisplay: 900 },
 }
 ```
 

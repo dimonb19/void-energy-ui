@@ -49,10 +49,22 @@ sunk(-1)  floor(0)  base(1)  decorate(2)  float(10)  sticky(20)  header(40)  dro
 
 ## Typography
 ```
-Scales:   text-caption  text-small  text-body  text-h6  text-h5  text-h4  text-h3  text-h2  text-h1
-Weights:  --font-weight-regular(400)  --font-weight-medium(500)  --font-weight-semibold(600)  --font-weight-bold(700)
-Families: --font-heading  --font-body  --font-code
+Scales:        text-caption  text-small  text-body  text-h6  text-h5  text-h4  text-h3  text-h2  text-h1
+Weights:       --font-weight-regular(400)  --font-weight-medium(500)
+               --font-weight-semibold(600) --font-weight-bold(700)
+Families:      --font-heading  --font-body  --font-code
+
+Tracking (role, brand-axis):  --tracking-display(h1/h2)   --tracking-heading(h3/h4)
+                              --tracking-body             --tracking-button
+Tracking (scale, Tailwind):   --tracking-h1...h4   --tracking-title  --tracking-subtitle
+                              --tracking-body  --tracking-small  --tracking-caption
+Transform (role, brand-axis): --text-transform-display    --text-transform-heading
+                              --text-transform-button     (none | uppercase | lowercase)
+Weights (role, brand-axis):   --weight-display(h1/h2)     --weight-heading(h3/h4)
+                              --weight-body               --weight-button
 ```
+
+**Role vs. scale tokens.** The `--tracking-h1`...`--tracking-caption` family is the per-level scale read by Tailwind utilities (`tracking-h1` etc.). The `--tracking-display`/`--tracking-heading`/`--tracking-body`/`--tracking-button` family is the brand-axis role tokens consumed by `_typography.scss` and `_buttons.scss` — they default to scale-token values via `var()` so brand-less atmospheres compile byte-identically. `--text-transform-*` and `--weight-*` (role) live only in SCSS — there is no Tailwind utility for them. Brand profiles override the role tokens; never override the scale tokens.
 
 ## Runtime Variables (set by reset/global, not design-tokens)
 ```

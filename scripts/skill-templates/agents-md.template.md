@@ -15,7 +15,7 @@ Repo-wide instructions for any AGENTS.md-aware coding agent (Aider, goose, openc
 
 ## Mission
 
-Void Energy UI is a **physics-based, theme-reactive design system** for narrative software. It separates **composition** (what goes where) from **material** (how it looks, moves, and feels). Every surface is the intersection of three environmental variables — an **atmosphere** (palette + font), a **physics** preset (texture, motion, borders), and a **mode** (light or dark polarity) — composed from a token dictionary, never raw values. A runtime engine enforces constraints at the DOM level.
+Void Energy UI is a **physics-based, theme-reactive design system** for narrative software. It separates **composition** (what goes where) from **material** (how it looks, moves, and feels). Every surface is the intersection of three environmental variables — an **atmosphere** (palette + font), a **physics** preset (texture, motion, borders), and a **mode** (light or dark polarity) — composed from a token dictionary, never raw values. An optional **brand** overlay can sit between physics and atmosphere to carry identity (radii / motion / type-treatment / per-role weights) without touching color or composition. A runtime engine enforces constraints at the DOM level.
 
 > Do not paint pixels. Declare materials.
 
@@ -174,6 +174,7 @@ The `<html>` element carries the runtime state:
 - `data-atmosphere` — active theme ID
 - `data-physics` — `glass` | `flat` | `retro`
 - `data-mode` — `light` | `dark`
+- `data-brand` — active brand profile id (only set when atmosphere references one — e.g. `nike`, `stripe`, `lamborghini`)
 - `data-auth` — present when any user is authenticated (Guest role included)
 
 Engine-enforced physics invariants (only four of six combinations valid):

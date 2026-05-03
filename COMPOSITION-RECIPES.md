@@ -26,6 +26,10 @@ For premium-package work, the **package `AI-REFERENCE.md` is canonical** before 
 </div>
 ```
 
+## Brand Overlay (Runtime, Not Composition)
+
+Page archetypes do not change when an atmosphere references a brand profile (`brand: 'nike'`). Brand is a runtime axis — it reskins radii, motion, type-treatment, and per-role weights through the cascade, not through markup. Compose the page as below; the active `<html data-brand>` does the rest.
+
 ## Dashboard / App Home
 
 Use when the page has summary metrics, quick actions, and recent activity.

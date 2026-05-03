@@ -12,6 +12,7 @@
 4. [Complete Theme Example](#4-complete-theme-example)
 5. [Testing Your Theme](#5-testing-your-theme)
 6. [Troubleshooting](#6-troubleshooting)
+7. [Brand Profiles (Identity Overlay)](#7-brand-profiles-identity-overlay)
 
 ---
 
@@ -822,6 +823,292 @@ Increase opacity or adjust base color:
 // ✅ GOOD: Readable
 'text-dim': 'rgba(255, 255, 255, 0.85)',  // 85% opacity
 ```
+
+---
+
+## 7. Brand Profiles (Identity Overlay)
+
+The first 6 sections cover the **palette axis** — the color-and-font contract that defines an atmosphere. **Brand profiles are an orthogonal axis**: identity overrides for radii, motion, type-treatment, and per-role weights that sit between physics and atmosphere in the cascade. Authoring them is optional — most atmospheres don't need one. When a brand has identity worth preserving (radii policy, motion signature, type-treatment that survives a port across a real product surface), a sparse profile captures it once and any atmosphere can reference it.
+
+> **Brand vs. Atmosphere — the axis split.** Atmosphere = color + font. Brand = radii + motion + type-treatment + per-role weights. **Color and fonts never go in a brand profile** — they belong on the atmosphere so the same brand can render in dark glass, light flat, or any palette without re-authoring.
+
+---
+
+### Cascade Order
+
+| Layer            | Selector                  | Owns                                            | Wins over                |
+| ---------------- | ------------------------- | ----------------------------------------------- | ------------------------ |
+| Global tokens    | `:root`                   | Spacing, typography scale, z-index, semantics   | nothing (foundation)     |
+| Physics          | `[data-physics='<x>']`    | Motion, blur, borders, radii floor, shadows    | Global tokens            |
+| Brand overlay    | `[data-brand='<id>']`     | Radii, motion, type-treatment, per-role weights | Physics defaults*        |
+| Atmosphere       | `[data-atmosphere='<x>']` | Color palette, font families                    | Brand and physics for color |
+| Retro floor      | `[data-physics='retro']` (re-asserted) | Radii: 0, `steps()` motion           | Brand overrides          |
+
+\* Except retro physics, which re-asserts its zero-radii / `steps()`-motion floor in a final block via `emit-physics-retro-floor` ([src/styles/abstracts/_engine.scss](src/styles/abstracts/_engine.scss)). A brand profile setting `radii.full: '9999px'` will not round retro pills — that contract is non-negotiable.
+
+Atmospheres without a `brand:` reference fall through unchanged. Brand-less compile output is byte-identical to pre-overlay builds.
+
+---
+
+### Sparse-by-Default Discipline
+
+Most profiles override 2-3 fields. **Stripe (3 fields) is typical, Nike (8 fields) is the ceiling.** Empty fields are inheritance, not omission — never pre-populate every field "for completeness."
+
+| Shape          | Reference     | Field count | What it overrides                                       |
+| -------------- | ------------- | ----------- | ------------------------------------------------------- |
+| Calm           | `stripe`      | 3           | A couple radii + one ease + one tracking adjustment     |
+| Motion-forward | `lamborghini` | 8           | Full radii zero-out + 3 motion fields + 2 typography    |
+| Ceiling        | `nike`        | 8           | 4 radii + 4 typography (uppercase + tight + heavy)      |
+
+If your profile is approaching ~10 fields, ask whether you're encoding *brand identity* or replicating *the brand's entire visual system*. The system rule is identity, not replication.
+
+---
+
+### The `BrandProfile` Interface
+
+Source of truth: [src/config/brands/index.ts](src/config/brands/index.ts).
+
+```ts
+export interface BrandProfile {
+  id: string;
+  name: string;
+
+  radii?: {
+    sm?: string;
+    md?: string;
+    lg?: string;
+    xl?: string;
+    full?: string;
+  };
+
+  motion?: {
+    speedFast?: number;
+    speedBase?: number;
+    speedSlow?: number;
+    easeSpringGentle?: string;
+    easeSpringSnappy?: string;
+    easeSpringBounce?: string;
+    easeFlow?: string;
+  };
+
+  typography?: {
+    trackingDisplay?: string;
+    trackingHeading?: string;
+    trackingBody?: string;
+    trackingButton?: string;
+    transformButton?: 'none' | 'uppercase' | 'lowercase';
+    transformHeading?: 'none' | 'uppercase' | 'lowercase';
+    weightButton?: number;
+    weightHeading?: number;
+    weightDisplay?: number;
+  };
+}
+```
+
+- `id` and `name` are the only required fields.
+- Every other axis is optional and sparse — sub-objects only need to declare the fields you want to override.
+- `radii.*` accept any CSS length string (`'0'`, `'2px'`, `'6px'`, `'9999px'`).
+- `motion.speed*` are numeric milliseconds; `motion.ease*` are CSS timing-function strings (`cubic-bezier(...)` or named easings).
+- `typography.tracking*` are CSS length strings (`'0'`, `'0.04em'`, `'0.08em'`); `transform*` accept `'none' | 'uppercase' | 'lowercase'`; `weight*` are numeric (100-900).
+
+`weightHeading` reaches `<h3>` and `<h4>`; `weightDisplay` reaches `<h1>` and `<h2>`. `<h5>` and `<h6>` stay on `--font-weight-medium` (the heading-mixin port stops at h3/h4 reading the brand axis — see [src/styles/base/_typography.scss](src/styles/base/_typography.scss)).
+
+---
+
+### Authoring Steps
+
+**Step 1: Create the profile file.** Add `src/config/brands/<brand-id>.ts`:
+
+```ts
+import type { BrandProfile } from './index';
+
+export const myBrand: BrandProfile = {
+  id: 'my-brand',
+  name: 'My Brand',
+
+  // Add only the fields that carry identity. Skip every axis you don't need.
+  radii: { lg: '6px' },
+  typography: { trackingButton: '0.04em' },
+};
+```
+
+**Step 2: Wire into the `BRANDS` registry.** Edit [src/config/brands/index.ts](src/config/brands/index.ts):
+
+```ts
+import { myBrand } from './my-brand';
+
+export { stripe, nike, lamborghini, myBrand };
+
+export const BRANDS: Record<string, BrandProfile> = {
+  stripe,
+  nike,
+  lamborghini,
+  myBrand,
+};
+```
+
+**Step 3: Reference from an atmosphere.** Edit `src/config/atmospheres.ts`:
+
+```ts
+'my-brand-flagship': {
+  mode: 'dark',
+  physics: 'flat',
+  brand: 'my-brand',     // ← opts in to the brand overlay
+  tier: 'catalog',
+  palette: { /* color/font tokens — independent of brand */ },
+}
+```
+
+**Step 4: Regenerate.** Run:
+
+```bash
+npm run build:tokens
+```
+
+The generator emits a `:root[data-brand='my-brand']` block in `_generated-themes.scss` and a per-axis CSS file at `dist/brands/my-brand.css`. The runtime sets `<html data-brand="my-brand">` automatically when the atmosphere becomes active.
+
+---
+
+### Reference Profiles
+
+Three profiles ship in `src/config/brands/` to anchor the shape envelope.
+
+#### `stripe` — Calm Shape (the "did we accidentally do too much?" reference)
+
+```ts
+export const stripe: BrandProfile = {
+  id: 'stripe',
+  name: 'Stripe',
+
+  radii: {
+    lg: '6px',
+    xl: '8px',
+  },
+
+  motion: {
+    easeSpringGentle: 'cubic-bezier(0.4, 0, 0.2, 1)',
+  },
+
+  typography: {
+    trackingBody: '0',
+  },
+};
+```
+
+| Field | Why |
+| --- | --- |
+| `radii.lg` / `radii.xl` | Outer-scale radii nudged to Stripe's gentle 6/8px instead of system 16/24. Inner radii (`sm`, `md`) inherit. |
+| `motion.easeSpringGentle` | One mechanical cubic-bezier override — Stripe motion reads as engineered, not springy. |
+| `typography.trackingBody` | Body tracking set to neutral `0`. The system default is slightly positive; Stripe is calmer. |
+
+#### `nike` — Ceiling Shape (the heaviest reasonable brand still expressed sparsely)
+
+```ts
+export const nike: BrandProfile = {
+  id: 'nike',
+  name: 'Nike',
+
+  radii: {
+    sm: '2px',
+    md: '4px',
+    lg: '6px',
+    xl: '8px',
+  },
+
+  typography: {
+    trackingButton: '0.08em',
+    trackingHeading: '0.04em',
+    transformButton: 'uppercase',
+    transformHeading: 'uppercase',
+    weightButton: 700,
+    weightHeading: 900,
+    weightDisplay: 900,
+  },
+};
+```
+
+| Field | Why |
+| --- | --- |
+| `radii` (full set) | Tight 2/4/6/8 progression — Nike chrome is rectilinear but not zero. |
+| `transformButton` / `transformHeading` | Uppercase across both — Nike's signature on bold surfaces. |
+| `trackingButton` / `trackingHeading` | Wider tracking on uppercase characters for legibility. |
+| `weightButton` / `weightHeading` / `weightDisplay` | Heavy 700/900/900 weights — the Nike voice is loud. |
+
+`weightHeading: 900` reaches `<h3>` and `<h4>`; `weightDisplay: 900` reaches `<h1>` and `<h2>`. `<h5>` and `<h6>` stay on `--font-weight-medium` per the typography port.
+
+#### `lamborghini` — Motion-Forward Shape (exercises the motion axis)
+
+```ts
+export const lamborghini: BrandProfile = {
+  id: 'lamborghini',
+  name: 'Lamborghini',
+
+  radii: {
+    sm: '0',
+    md: '0',
+    lg: '0',
+    xl: '0',
+    full: '0',
+  },
+
+  motion: {
+    speedFast: 120,
+    speedBase: 240,
+    easeSpringSnappy: 'cubic-bezier(0.22, 1, 0.36, 1)',
+  },
+
+  typography: {
+    trackingDisplay: '0.06em',
+    weightDisplay: 900,
+  },
+};
+```
+
+| Field | Why |
+| --- | --- |
+| `radii.*` (all 0, including `full`) | Hard angular geometry — pills square off, cards have crisp corners. |
+| `motion.speedFast` / `speedBase` | Snappier 120/240ms versus system 200/280 — Lamborghini transitions feel mechanical. |
+| `motion.easeSpringSnappy` | Sharper exit curve for a more aggressive feel. |
+| `typography.trackingDisplay` / `weightDisplay` | Heavy + tracked-out display headings. |
+
+Glass blur survives — physics floor still wins on blur compositing. Retro re-asserts `--radius-full: 0` and `steps()` motion above any of these overrides.
+
+---
+
+### Out of Scope for v1
+
+| Not yet | Why |
+| --- | --- |
+| **Component-level brand conventions** ("Nike buttons always have a swoosh treatment") | Wait until ~30 brands exist and patterns recur enough to abstract. v1 covers tokens; tokens carry 80%+ of brand identity. |
+| **Spacing-scale brand overrides** | Spacing Gravity (Law 5) stays universal. Brand identity is in the radii/motion/type axes, not in `--space-*`. |
+| **Brand-level fonts** | Fonts already live on the atmosphere (`font-atmos-heading`, `font-atmos-body`). Same brand, different atmospheres = different fonts on purpose. |
+| **Per-mode brand profiles** | A profile is mode-agnostic; mode-specific treatments live on separate atmospheres referencing the same brand. |
+| **`voidEngine.setBrand()` API** | Brand is atmosphere-bound by design — switching atmospheres switches brand. One source of truth per switch. |
+
+See [.claude/rules/theme-creation.md](.claude/rules/theme-creation.md) "Brand Profile Overlay" for the canonical authoring discipline (file layout, tier mapping, retro-floor non-negotiable).
+
+---
+
+### System Defaults (Reference)
+
+Brand overrides are deltas from these baselines. Knowing the baseline helps you decide whether your override is "subtly slower" or "noticeably faster."
+
+| Token         | Glass default | Flat default | Retro default |
+| ------------- | ------------- | ------------ | ------------- |
+| `speedFast`   | 200ms         | 133ms        | 0 (instant)   |
+| `speedBase`   | 300ms         | 280ms        | 0 (instant)   |
+| `speedSlow`   | 500ms         | 350ms        | 0 (instant)   |
+
+| Typography role     | System default                                                                |
+| ------------------- | ----------------------------------------------------------------------------- |
+| `--tracking-body`   | `var(--letter-spacing-body)` — atmosphere/font-driven, slightly positive       |
+| `--tracking-button` | `0.02em` (modern-chrome floor)                                                |
+| `--text-transform-*` | `none` across display/heading/button (sentence-case is the system voice)     |
+| `--weight-display`  | `var(--font-weight-bold)` (700)                                               |
+| `--weight-heading`  | `var(--font-weight-semibold)` (600)                                           |
+| `--weight-button`   | `var(--font-weight-medium)` (500)                                             |
+
+Motion speeds are physics-keyed; brand overrides apply across all physics presets. Retro physics zeroes motion regardless. See [src/config/design-tokens.ts](src/config/design-tokens.ts) for the full physics table.
 
 ---
 
