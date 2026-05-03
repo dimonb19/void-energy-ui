@@ -873,7 +873,7 @@ Wraps content in a temporary atmosphere that auto-restores on unmount. Accepts a
 **Example:**
 
 ```svelte
-<AtmosphereScope theme="crimson" label="Horror story"><StoryContent /></AtmosphereScope>
+<AtmosphereScope theme="terminal" label="Hacker scene"><StoryContent /></AtmosphereScope>
 ```
 
 #### LiquidGlassFilter `liquid-glass-filter`
