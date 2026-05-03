@@ -32,10 +32,18 @@
   // Default tab to current theme's mode
   let activeMode = $state<'dark' | 'light'>(voidEngine.currentTheme.mode);
 
-  // Unified theme list: built-in first, then custom — all filtered by active mode
+  // Unified theme list: built-in first, then custom — all filtered by active mode.
+  // Built-in stream is gated to tier='core' so the modal stays at ~6-8 entries even
+  // after Phase 3 ships the catalog atmospheres (tier='catalog' lives only on the
+  // public /atmospheres gallery). Custom stream is implicitly tier='custom' by
+  // construction (customAtmospheres excludes built-in + ephemeral).
   let allAtmospheres = $derived([
     ...voidEngine.builtInAtmospheres
-      .filter((id: string) => voidEngine.registry[id]?.mode === activeMode)
+      .filter(
+        (id: string) =>
+          voidEngine.registry[id]?.mode === activeMode &&
+          (ATMOSPHERES[id]?.tier ?? 'core') === 'core',
+      )
       .map((id: string) => {
         const meta = voidEngine.registry[id];
         return {

@@ -111,6 +111,20 @@ export const SEMANTIC_LIGHT = {
 export interface AtmosphereDefinition {
   mode: 'dark' | 'light';
   physics: 'glass' | 'flat' | 'retro';
+  /**
+   * Distribution tier — drives surface filtering:
+   *   - 'core'    Free atmospheres shipped with void-energy. Visible in the in-product Themes modal.
+   *   - 'catalog' Brand-themed atmospheres for the public /atmospheres gallery only. Hidden from the modal.
+   *   - 'custom'  User-imported / runtime-registered atmospheres. Visible in the modal.
+   * Absent = treated as 'core' at consumer use-sites.
+   */
+  tier?: 'core' | 'catalog' | 'custom';
+  /**
+   * Optional brand profile reference (BRANDS[brand] in src/config/brands/index.ts).
+   * Layers radii / motion / type-treatment / per-role weights on top of physics.
+   * Atmospheres without a brand reference fall through to physics defaults unchanged.
+   */
+  brand?: string;
   tagline: string;
   palette: VoidPalette & Record<string, string>;
 }
@@ -126,6 +140,7 @@ export const ATMOSPHERES: Record<string, AtmosphereDefinition> = {
   frost: {
     mode: 'dark',
     physics: 'glass',
+    tier: 'core',
     tagline: 'Arctic / Glass',
 
     palette: {
@@ -153,6 +168,7 @@ export const ATMOSPHERES: Record<string, AtmosphereDefinition> = {
   graphite: {
     mode: 'dark',
     physics: 'flat',
+    tier: 'core',
     tagline: 'Editor / Neutral',
 
     palette: {
@@ -176,6 +192,7 @@ export const ATMOSPHERES: Record<string, AtmosphereDefinition> = {
   terminal: {
     mode: 'dark',
     physics: 'retro',
+    tier: 'core',
     tagline: 'Hacker / Retro',
 
     palette: {
@@ -200,6 +217,7 @@ export const ATMOSPHERES: Record<string, AtmosphereDefinition> = {
   meridian: {
     mode: 'light',
     physics: 'flat',
+    tier: 'core',
     tagline: 'Fintech / Brand',
 
     palette: {

@@ -165,3 +165,78 @@ Every theme must explicitly set all of the following (spread `...SEMANTIC_DARK` 
 | graphite | dark | flat | #ffffff white | #6e7178 gray | — |
 | terminal | dark | retro | #f5c518 amber | #c9a820 dim amber | color-premium: #33e2e6 |
 | meridian | light | flat | #0d6e6e teal | #4a3df7 indigo | — |
+
+---
+
+## Brand Profile Overlay (v1)
+
+The 8 rules above govern the **palette axis** — color correctness, contrast, hierarchy, semantic collisions. Brand profiles are an **orthogonal axis**: identity overrides for radii / motion / type-treatment / per-role weights. They live separately and are sparse-by-default.
+
+> Phase 1.2 ships the directory + `BrandProfile` interface only. Reference profiles (Nike, Stripe, Lamborghini) land in Phase 1.5; runtime cascade plumbing (`data-brand`, `:root[data-brand]` blocks) lands in Phase 1.3.
+
+### Cascade order (locked, Option B)
+
+```
+global tokens  →  physics  →  brand overlay  →  atmosphere palette
+```
+
+Brand sits **between physics and atmosphere**. Physics still has the floor — retro zeroes radii, retro keeps `steps()` motion, no brand override beats it. Atmosphere still owns color. Atmospheres without a `brand:` reference fall through unchanged.
+
+### When to author a brand profile
+
+Author one **only** when a real brand has identity worth preserving — radii policy, motion signature, type-treatment that survives a port. Catalog work (Phase 3). For ad-hoc or exploratory atmospheres, leave `brand:` unset; the atmosphere inherits physics defaults like the 4 free atmospheres do today.
+
+### Sparse-by-default discipline
+
+Most profiles override 2-3 fields. The Stripe shape (a couple radii + one transform) is the norm. The Nike shape (radii + 4 typography fields) is the ceiling. Do **not** pre-populate every field "for completeness" — empty fields are inheritance, not omission.
+
+```ts
+// Stripe-shape (typical) — calm, sentence-case, default-ish radii
+stripe: {
+  id: 'stripe', name: 'Stripe',
+  radii: { lg: '6px', xl: '8px' },
+  typography: { trackingBody: '0', transformButton: 'none', weightButton: 500 },
+}
+
+// Nike-shape (ceiling) — uppercase, tight tracking, heavy weights, gentle radii
+nike: {
+  id: 'nike', name: 'Nike',
+  radii: { sm: '2px', md: '4px', lg: '6px', xl: '8px' },
+  typography: {
+    trackingButton: '0.08em', trackingHeading: '0.04em',
+    transformButton: 'uppercase', transformHeading: 'uppercase',
+    weightButton: 700, weightHeading: 900, weightDisplay: 900,
+  },
+}
+```
+
+### File layout
+
+| File | Role |
+|------|------|
+| `src/config/brands/index.ts` | `BrandProfile` interface + `BRANDS` registry barrel |
+| `src/config/brands/<brand>.ts` | One file per brand profile (Phase 1.5+); re-exported from the barrel |
+| `src/config/atmospheres.ts` | Atmospheres reference the brand by id: `brand: 'nike'` |
+
+### Tier discipline (`AtmosphereDefinition.tier`)
+
+Tier drives surface filtering — without it, the in-product Themes modal would balloon to 75+ entries when the catalog ships. The field is optional; **absent = treated as `'core'`**.
+
+| Tier | Used for | Visible in Themes modal | Visible in /atmospheres gallery |
+|------|----------|------------------------|--------------------------------|
+| `core` (default) | The 4 free atmospheres + premium-adjacent sets that should appear in-product | ✅ | — |
+| `catalog` | Brand-themed atmospheres in the public gallery (Phase 3) | ❌ | ✅ |
+| `custom` | User-imported / runtime-registered atmospheres | ✅ | — |
+
+The Themes modal filters built-in atmospheres to `tier === 'core'` (treating absence as core) and shows custom atmospheres unconditionally. Catalog atmospheres must declare `tier: 'catalog'` explicitly — they only surface in the public gallery.
+
+### Out of scope for v1
+
+- **Component-level brand conventions** ("Nike buttons always have a swoosh treatment"). Wait until ~30 brands exist and patterns recur enough to abstract. v1 covers tokens; tokens carry 80%+ of brand identity.
+- **Spacing scale brand overrides.** Spacing Gravity (Law 5) stays universal.
+- **Brand-level fonts.** Fonts already live on the atmosphere (`font-atmos-heading`, `font-atmos-body`).
+- **Per-mode brand profiles.** A profile is mode-agnostic; mode-specific treatments live on separate atmospheres referencing the same brand.
+
+### Retro physics floor — non-negotiable
+
+A brand profile setting `radii.full: '9999px'` does **not** un-zero retro radii. The retro physics block reasserts the floor above any brand override (Phase 1.3). Same for `steps()` motion. "No rounding under CRT phosphor" is part of the contract; brand overlay does not break it.
