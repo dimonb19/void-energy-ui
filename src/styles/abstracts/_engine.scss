@@ -137,14 +137,12 @@ $physics-presets: (
       0 4px 16px rgba(0, 0, 0, 0.4), 0 8px 24px -4px rgba(0, 0, 0, 0.3); // void-ignore
   }
 
-  // Force square borders in retro physics.
-  // Override radius scale tokens (defined in :root) so any usage is square.
+  // Retro utility-class neutralization. Independent of the radius variable
+  // cascade — these win directly via class-name specificity and don't
+  // intersect with brand overrides on the `--radius-*` custom properties.
+  // The `--radius-*: 0` reassertions live in `emit-physics-retro-floor` so
+  // they can sit AFTER the brand layer in source order.
   [data-physics='retro'] {
-    --radius-sm: 0;
-    --radius-md: 0;
-    --radius-lg: 0;
-    --radius-xl: 0;
-
     .rounded,
     .rounded-xs,
     .rounded-sm,
@@ -155,6 +153,84 @@ $physics-presets: (
     .rounded-3xl,
     .rounded-full {
       border-radius: 0;
+    }
+  }
+}
+
+// ==========================================================================
+// 2b. RETRO PHYSICS FLOOR (reassertion above brand overlay)
+// ==========================================================================
+//
+// Brand profiles can override radii (`--radius-md: 4px`) and motion eases
+// (`--ease-spring-gentle: cubic-bezier(...)`) — but retro must keep zero
+// radii and `steps()` motion ("no rounding under CRT phosphor"). Source
+// order resolves precedence between equal-specificity attribute selectors,
+// so this block must emit AFTER the brand overlay layer in `_themes.scss`.
+//
+// Reassertion surface mirrors what `BrandProfile.radii` and
+// `BrandProfile.motion` can touch — anything else stays as the brand left it.
+// ==========================================================================
+
+@mixin emit-physics-retro-floor {
+  [data-physics='retro'] {
+    // Radii — including --radius-full, which today's emit-physics block
+    // doesn't zero (only sm/md/lg/xl). A brand profile emitting
+    // `radii.full: '9999px'` would re-round any element reading the
+    // variable directly without this reassertion.
+    --radius-sm: 0;
+    --radius-md: 0;
+    --radius-lg: 0;
+    --radius-xl: 0;
+    --radius-full: 0;
+
+    // Motion — speeds collapse to instantaneous, eases collapse to steps().
+    // Mirrors VOID_TOKENS.physics.retro from design-tokens.ts.
+    --speed-instant: 0s;
+    --speed-fast: 0s;
+    --speed-base: 0s;
+    --speed-slow: 0s;
+    --ease-spring-gentle: steps(2);
+    --ease-spring-snappy: steps(2);
+    --ease-spring-bounce: steps(4);
+    --ease-flow: steps(4);
+  }
+}
+
+// ==========================================================================
+// 2c. BRAND OVERLAY GENERATOR
+// ==========================================================================
+//
+// Emits one `[data-brand='<id>']` block per profile with axis-grouped
+// overrides. Sub-maps may be absent — sparse-by-default brand profiles
+// override 2-3 fields each. Map keys arrive pre-kebab-cased from the
+// generator (see scripts/generate-tokens.ts compileBrand) so this mixin
+// can interpolate without per-axis branching.
+//
+// Cascade position: between physics and atmosphere (see base/_themes.scss).
+// Atmosphere palette has the last word over color; retro physics floor
+// (above) has the last word over radii + motion.
+// ==========================================================================
+
+@mixin generate-brand($name, $config) {
+  $radii: map.get($config, 'radii');
+  $motion: map.get($config, 'motion');
+  $typography: map.get($config, 'typography');
+
+  [data-brand='#{$name}'] {
+    @if $radii != null {
+      @each $key, $value in $radii {
+        --radius-#{$key}: #{$value};
+      }
+    }
+    @if $motion != null {
+      @each $key, $value in $motion {
+        --#{$key}: #{$value};
+      }
+    }
+    @if $typography != null {
+      @each $key, $value in $typography {
+        --#{$key}: #{$value};
+      }
     }
   }
 }

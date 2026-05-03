@@ -108,11 +108,15 @@ function sanitizeThemeDefinition(input) {
   var palette = sanitizePalette(input.palette, true);
   if (!palette) return null;
 
-  return {
+  var sanitized = {
     mode: input.mode,
     physics: input.physics,
     palette: palette,
   };
+
+  if (hasText(input.brand)) sanitized.brand = input.brand;
+
+  return sanitized;
 }
 
 export function resolveThemeColor(theme) {
@@ -285,6 +289,14 @@ export function applyTheme(root, theme, constants) {
   root.setAttribute(constants.ATMOSPHERE, theme.id);
   root.setAttribute(constants.PHYSICS, theme.physics);
   root.setAttribute(constants.MODE, theme.mode);
+
+  // Brand-overlay axis: present only when the atmosphere references a brand
+  // profile. Cleared on switch to a brand-less atmosphere so cascade is clean.
+  if (theme.brand) {
+    root.setAttribute(constants.BRAND, theme.brand);
+  } else {
+    root.removeAttribute(constants.BRAND);
+  }
 
   // Inject palette overrides for runtime themes.
   if (theme.palette) {

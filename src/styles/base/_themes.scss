@@ -49,10 +49,25 @@
   }
 }
 
+// Cascade order (low → high precedence, source-order resolves equal-specificity
+// attribute selectors): :root defaults → physics → brand overlay → atmosphere
+// palette → retro physics floor (last word over radii + motion).
+
 // Emit [data-physics="..."] layer.
 @include engine.emit-physics;
+
+// Emit [data-brand="..."] layer — sits between physics and atmosphere.
+// Empty when BRANDS is {} (the @each is a no-op).
+@each $name, $brand-config in config.$brands {
+  @include engine.generate-brand($name, $brand-config);
+}
 
 // Emit [data-atmosphere="..."] layer.
 @each $name, $theme-config in config.$themes {
   @include engine.generate-atmosphere($name, $theme-config);
 }
+
+// Retro physics floor — reasserts zero radii (incl. --radius-full) and steps()
+// motion above any brand override. Must come after the brand block; same
+// specificity, source order wins.
+@include engine.emit-physics-retro-floor;

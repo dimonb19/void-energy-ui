@@ -160,6 +160,9 @@ interface VoidThemeDefinition extends VoidThemeConfig {
   /** Short mood descriptor (e.g., "Stealth / Cinema") */
   tagline?: string;
 
+  /** Optional brand profile reference — overlays radii / motion / type-treatment */
+  brand?: string;
+
   /** Required color and typography tokens (see VoidPalette interface) */
   palette: VoidPalette;
 
@@ -197,6 +200,8 @@ type ThemeRegistryJSON = Record<
     tagline?: string;
     /** Static built-in canvas color used for meta theme-color updates */
     canvas?: string;
+    /** Optional brand profile reference (sets data-brand on initial paint) */
+    brand?: string;
   }
 >;
 

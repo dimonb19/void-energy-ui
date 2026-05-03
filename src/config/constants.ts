@@ -9,6 +9,7 @@ export const DOM_ATTRS = {
   ATMOSPHERE: 'data-atmosphere',
   PHYSICS: 'data-physics',
   MODE: 'data-mode',
+  BRAND: 'data-brand',
 } as const;
 
 /**

@@ -18,6 +18,7 @@ import {
   FONT_FAMILY_TO_KEY,
   DEFAULT_PRELOAD_WEIGHTS,
 } from '../src/config/design-tokens';
+import { BRANDS, type BrandProfile } from '../src/config/brands';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -149,6 +150,79 @@ function hasTabletOverride(
   config: TypographyScale,
 ): config is TypographyScale & { tabletOverride: string } {
   return 'tabletOverride' in config && typeof config.tabletOverride === 'string';
+}
+
+// ---------------------------------------------------------------------------
+// Brand profile → CSS variable map (per-axis, kebab-cased)
+// ---------------------------------------------------------------------------
+// Brand profiles (src/config/brands/index.ts) carry overrides as camelCase
+// fields grouped by axis (radii / motion / typography). The SCSS mixin that
+// emits `[data-brand='<id>']` blocks expects pre-kebab-cased CSS variable
+// names so it can interpolate without per-axis branching. Some camelCase
+// fields don't map directly to their CSS-var name (e.g. `transformButton` →
+// `text-transform-button`), so the mapping is explicit per field.
+// ---------------------------------------------------------------------------
+
+const BRAND_MOTION_KEYS: Record<string, string> = {
+  speedFast: 'speed-fast',
+  speedBase: 'speed-base',
+  speedSlow: 'speed-slow',
+  easeSpringGentle: 'ease-spring-gentle',
+  easeSpringSnappy: 'ease-spring-snappy',
+  easeSpringBounce: 'ease-spring-bounce',
+  easeFlow: 'ease-flow',
+};
+
+const BRAND_TYPOGRAPHY_KEYS: Record<string, string> = {
+  trackingDisplay: 'tracking-display',
+  trackingHeading: 'tracking-heading',
+  trackingBody: 'tracking-body',
+  trackingButton: 'tracking-button',
+  transformButton: 'text-transform-button',
+  transformHeading: 'text-transform-heading',
+  weightButton: 'weight-button',
+  weightHeading: 'weight-heading',
+  weightDisplay: 'weight-display',
+};
+
+interface BrandSubmaps {
+  radii: Record<string, string>;
+  motion: Record<string, string>;
+  typography: Record<string, string | number>;
+}
+
+function compileBrand(profile: BrandProfile): BrandSubmaps {
+  const radii: Record<string, string> = {};
+  const motion: Record<string, string> = {};
+  const typography: Record<string, string | number> = {};
+
+  if (profile.radii) {
+    for (const [k, v] of Object.entries(profile.radii)) {
+      if (v !== undefined) radii[k] = v;
+    }
+  }
+
+  if (profile.motion) {
+    for (const [k, v] of Object.entries(profile.motion)) {
+      if (v === undefined) continue;
+      const cssKey = BRAND_MOTION_KEYS[k];
+      if (!cssKey) continue;
+      // Speeds arrive as ms numbers (matching VOID_TOKENS.physics shape) →
+      // emit as seconds. Easings are CSS strings; pass through.
+      motion[cssKey] = typeof v === 'number' ? `${v / 1000}s` : v;
+    }
+  }
+
+  if (profile.typography) {
+    for (const [k, v] of Object.entries(profile.typography)) {
+      if (v === undefined) continue;
+      const cssKey = BRAND_TYPOGRAPHY_KEYS[k];
+      if (!cssKey) continue;
+      typography[cssKey] = v;
+    }
+  }
+
+  return { radii, motion, typography };
 }
 
 // Convert raw token numbers to CSS units.
@@ -296,6 +370,41 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
       scss += `      '${key}': "${value}",\n`;
     });
     scss += `    ),\n`;
+    scss += `  ),\n`;
+  });
+  scss += `);\n\n`;
+
+  // Brands map (consumed by base/_themes.scss → [data-brand='<id>'] blocks).
+  // Brand profiles override radii / motion / type-treatment / per-role weights;
+  // sit between physics and atmosphere in the cascade. Empty when BRANDS is {}.
+  scss += `$brands: (\n`;
+  Object.entries(BRANDS).forEach(([brandId, profile]) => {
+    const compiled = compileBrand(profile);
+    scss += `  '${brandId}': (\n`;
+    if (Object.keys(compiled.radii).length > 0) {
+      scss += `    'radii': (\n`;
+      Object.entries(compiled.radii).forEach(([key, value]) => {
+        scss += `      '${key}': "${value}",\n`;
+      });
+      scss += `    ),\n`;
+    }
+    if (Object.keys(compiled.motion).length > 0) {
+      scss += `    'motion': (\n`;
+      Object.entries(compiled.motion).forEach(([key, value]) => {
+        scss += `      '${key}': "${value}",\n`;
+      });
+      scss += `    ),\n`;
+    }
+    if (Object.keys(compiled.typography).length > 0) {
+      scss += `    'typography': (\n`;
+      Object.entries(compiled.typography).forEach(([key, value]) => {
+        // Numbers (per-role weights) emit unquoted; strings get quoted to
+        // survive Sass parsing of arbitrary CSS values.
+        const formatted = typeof value === 'number' ? value : `"${value}"`;
+        scss += `      '${key}': ${formatted},\n`;
+      });
+      scss += `    ),\n`;
+    }
     scss += `  ),\n`;
   });
   scss += `);\n`;
@@ -969,15 +1078,32 @@ async function main() {
       // Generate theme registry JSON.
       const registry: Record<
         string,
-        { physics: string; mode: string; tagline?: string; canvas: string }
+        {
+          physics: string;
+          mode: string;
+          tagline?: string;
+          canvas: string;
+          brand?: string;
+        }
       > = {};
       Object.entries(VOID_TOKENS.themes).forEach(([key, config]) => {
-        registry[key] = {
+        const entry: {
+          physics: string;
+          mode: string;
+          tagline?: string;
+          canvas: string;
+          brand?: string;
+        } = {
           physics: config.physics,
           mode: config.mode,
           tagline: config.tagline,
           canvas: config.palette['bg-canvas'],
         };
+        // Brand reference flows into the bootloader via the registry — single
+        // source of truth, no parallel atmosphere → brand map to maintain.
+        // Omit the field entirely when absent so JSON stays minimal.
+        if (config.brand) entry.brand = config.brand;
+        registry[key] = entry;
       });
       fs.writeFileSync(PATHS.registryJson, JSON.stringify(registry, null, 2));
       console.log(`   └─ ⚙️  [L1] Registry: src/config/void-registry.json`);
