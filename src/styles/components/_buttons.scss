@@ -314,10 +314,10 @@ button:not(.btn-void, .btn-icon, .tabs-trigger),
 
   // --- B. Typography ---
   font-family: var(--font-body);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--weight-button);
   font-size: var(--font-size-small);
-  letter-spacing: 0.02em;
-  text-transform: none;
+  letter-spacing: var(--tracking-button);
+  text-transform: var(--text-transform-button);
   color: var(--text-main);
   text-decoration: none;
   line-height: 1;

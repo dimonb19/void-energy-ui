@@ -61,30 +61,30 @@ $letter-spacings: generated.$letter-spacings;
 /* Typography mixin. */
 @mixin typography($level: 'body', $is-input: false) {
   @if map.has-key($font-scale, $level) {
-    // Headings use heading font; body uses body font with optional input weight.
-    @if (
-      $level ==
-        'h1' or
-        $level ==
-        'h2' or
-        $level ==
-        'h3' or
-        $level ==
-        'h4' or
-        $level ==
-        'h5' or
-        $level ==
-        'h6'
-    ) {
+    // Headings use heading font + brand-overlay role tokens (display | heading axis).
+    // h5/h6 stay on the global medium weight token — their per-level 500 weight does
+    // not map cleanly onto --weight-heading (semibold/600), so brand-axis weight
+    // reach is deferred for them. Per-level letter-spacing stays on scale tokens to
+    // preserve byte-identity across h2/h4/h6 (role-axis tracking is single-valued).
+    @if $level == 'h1' or $level == 'h2' {
       font-family: var(--font-heading);
-      font-weight: map.get($font-weights, $level);
+      font-weight: var(--weight-display);
+      text-transform: var(--text-transform-display);
+    } @else if $level == 'h3' or $level == 'h4' {
+      font-family: var(--font-heading);
+      font-weight: var(--weight-heading);
+      text-transform: var(--text-transform-heading);
+    } @else if $level == 'h5' or $level == 'h6' {
+      font-family: var(--font-heading);
+      font-weight: var(--font-weight-medium);
+      text-transform: var(--text-transform-heading);
     } @else {
       font-family: var(--font-body);
 
       @if $is-input {
-        font-weight: map.get($font-weights, 'input');
+        font-weight: var(--font-weight-regular);
       } @else {
-        font-weight: map.get($font-weights, 'body');
+        font-weight: var(--weight-body);
       }
     }
 
