@@ -586,6 +586,10 @@ export class VoidEngine {
       label: nextDefinition.label,
       mode: targetMode,
       physics: nextDefinition.physics || baseTheme.physics,
+      // Brand reference rides through normalize so ephemeral object-themes
+      // (e.g. AtmosphereScope previews) emit data-brand in syncDOM. ID-based
+      // atmospheres carry brand via void-registry.json directly.
+      brand: nextDefinition.brand,
       palette: {
         ...fallbackPalette,
         ...baseTheme.palette,

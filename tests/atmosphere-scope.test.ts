@@ -144,4 +144,22 @@ describe('AtmosphereScope', () => {
     expect(voidEngine.atmosphere).toBe('frost');
     expect(voidEngine.hasTemporaryTheme).toBe(false);
   });
+
+  it('emits and clears data-brand for object-theme scopes carrying a brand reference', () => {
+    const view = render(AtmosphereScopeFixture, {
+      label: 'Branded overlay',
+      theme: {
+        mode: 'dark',
+        physics: 'flat',
+        brand: 'nike',
+        palette: { 'energy-primary': '#fa5400' },
+      },
+    });
+
+    expect(document.documentElement.getAttribute(DOM_ATTRS.BRAND)).toBe('nike');
+
+    view.unmount();
+
+    expect(document.documentElement.hasAttribute(DOM_ATTRS.BRAND)).toBe(false);
+  });
 });
