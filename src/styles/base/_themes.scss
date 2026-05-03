@@ -40,6 +40,13 @@
   @each $key, $val in config.$aura-tokens {
     --#{$key}: #{$val};
   }
+
+  // Typography role tokens — brand-overlay axis defaults. Forward to the
+  // global vocabulary so brand-less atmospheres render identically; brand
+  // profiles override per `[data-brand="<id>"]` to express identity.
+  @each $key, $val in config.$typography-roles {
+    --#{$key}: #{$val};
+  }
 }
 
 // Emit [data-physics="..."] layer.

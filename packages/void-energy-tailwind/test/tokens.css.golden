@@ -91,6 +91,22 @@
   --font-weight-bold: 700;
   --font-weight-extrabold: 800;
 
+  /* Typography role tokens — addressed by brand identity (display,
+   * heading, body, button) rather than typographic scale. Defaults
+   * forward to the global vocabulary; brand profiles override per
+   * [data-brand] to express identity. */
+  --tracking-display: var(--letter-spacing-h1);
+  --tracking-heading: var(--letter-spacing-h3);
+  --tracking-body: var(--letter-spacing-body);
+  --tracking-button: 0.02em;
+  --text-transform-display: none;
+  --text-transform-heading: none;
+  --text-transform-button: none;
+  --weight-display: var(--font-weight-bold);
+  --weight-heading: var(--font-weight-semibold);
+  --weight-body: var(--font-weight-regular);
+  --weight-button: var(--font-weight-medium);
+
   /*
    * Font families — default stacks only. Consumers override via --font-heading/body/mono
    * or via atmosphere CSS (--font-atmos-heading / --font-atmos-body). Session 2 wires

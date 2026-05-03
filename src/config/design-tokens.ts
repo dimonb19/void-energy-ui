@@ -171,6 +171,42 @@ export const VOID_AURA = {
   'aura-transition-duration': '1.5s',
 } as const;
 
+/**
+ * TYPOGRAPHY ROLE TOKENS (brand-overlay axis)
+ *
+ * Letter-spacing / text-transform / per-role weight tokens addressed by
+ * brand-identity *role* (display, heading, body, button) rather than scale
+ * (h1, h3, body, caption). Sits between the global vocabulary and the brand
+ * profile cascade — defaults forward to the existing global tokens, so a
+ * brand-less atmosphere renders byte-identically. Brand profiles override
+ * these per `:root[data-brand="<id>"]` to express identity (Nike's tight-tracked
+ * uppercase buttons, Apple's regular-weight headings, etc.).
+ *
+ * The scale-level aliases (`--tracking-h1` … `--tracking-caption` in
+ * `tailwind-theme.css`, plus the `--letter-spacing-*` family in `_typography.scss`)
+ * stay as-is — two parallel vocabularies, one keyed by typographic scale, one
+ * by brand role. See plans/atmosphere-brand-overlay.md §3 (Naming Reconciliation).
+ */
+export const VOID_TYPOGRAPHY_ROLES = {
+  // Letter-spacing — defaults match the typographic scale they cover.
+  'tracking-display': 'var(--letter-spacing-h1)',
+  'tracking-heading': 'var(--letter-spacing-h3)',
+  'tracking-body': 'var(--letter-spacing-body)',
+  'tracking-button': '0.02em', // Modern-Chrome default (matches existing button base).
+
+  // Text-transform — sentence case by default; brands like Nike override to uppercase.
+  'text-transform-display': 'none',
+  'text-transform-heading': 'none',
+  'text-transform-button': 'none',
+
+  // Per-role weights — forward to the global weight family. Brands like Nike
+  // override (buttons 700, headings 900); brands like Apple cap at 600.
+  'weight-display': 'var(--font-weight-bold)',
+  'weight-heading': 'var(--font-weight-semibold)',
+  'weight-body': 'var(--font-weight-regular)',
+  'weight-button': 'var(--font-weight-medium)',
+} as const;
+
 // --------------------------------------------------------------------------
 // TYPOGRAPHY TOKENS (Font Scales, Weights, Line Heights)
 // --------------------------------------------------------------------------
@@ -356,6 +392,10 @@ export const VOID_TOKENS = {
 
   aura: {
     ...VOID_AURA,
+  },
+
+  typographyRoles: {
+    ...VOID_TYPOGRAPHY_ROLES,
   },
 
   // Theme registry: atmospheres defined in src/config/atmospheres.ts

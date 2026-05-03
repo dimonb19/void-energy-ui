@@ -273,6 +273,14 @@ function generateSCSS(tokens: typeof VOID_TOKENS) {
   });
   scss += `);\n\n`;
 
+  // Typography role tokens map (consumed by base/_themes.scss → :root vars).
+  // Brand-overlay axis defaults — sparse profiles override per `[data-brand]`.
+  scss += `$typography-roles: (\n`;
+  Object.entries(tokens.typographyRoles).forEach(([key, val]) => {
+    scss += `  '${key}': ${val},\n`;
+  });
+  scss += `);\n\n`;
+
   // Themes map.
   scss += `$themes: (\n`;
   Object.entries(tokens.themes).forEach(([themeName, config]) => {
@@ -530,6 +538,16 @@ function generateL0Tokens(): string {
   css += `  /* Font weights. */\n`;
   for (const [key, value] of Object.entries(VOID_TYPOGRAPHY.weights)) {
     css += `  --font-weight-${key}: ${value};\n`;
+  }
+  css += `\n`;
+
+  // ── Typography: role tokens (brand-overlay axis) ────────────────────────
+  css += `  /* Typography role tokens — addressed by brand identity (display,\n`;
+  css += `   * heading, body, button) rather than typographic scale. Defaults\n`;
+  css += `   * forward to the global vocabulary; brand profiles override per\n`;
+  css += `   * [data-brand] to express identity. */\n`;
+  for (const [key, value] of Object.entries(VOID_TOKENS.typographyRoles)) {
+    css += `  --${key}: ${value};\n`;
   }
   css += `\n`;
 
