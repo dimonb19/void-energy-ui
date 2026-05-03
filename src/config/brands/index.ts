@@ -55,4 +55,14 @@ export interface BrandProfile {
   };
 }
 
-export const BRANDS: Record<string, BrandProfile> = {};
+import { stripe } from './stripe';
+import { nike } from './nike';
+import { lamborghini } from './lamborghini';
+
+export { stripe, nike, lamborghini };
+
+export const BRANDS: Record<string, BrandProfile> = {
+  stripe,
+  nike,
+  lamborghini,
+};

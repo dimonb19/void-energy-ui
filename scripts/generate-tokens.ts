@@ -65,6 +65,14 @@ const PATHS = {
     __dirname,
     '../packages/void-energy-tailwind/dist/atmospheres.json',
   ),
+  l0Brands: path.resolve(
+    __dirname,
+    '../packages/void-energy-tailwind/dist/brands',
+  ),
+  l0BrandsJson: path.resolve(
+    __dirname,
+    '../packages/void-energy-tailwind/dist/brands.json',
+  ),
   l0ThemeSrc: path.resolve(
     __dirname,
     '../packages/void-energy-tailwind/src/theme.css',
@@ -886,6 +894,50 @@ function generateL0Atmospheres(): Record<string, string> {
   return files;
 }
 
+function generateL0Brands(): Record<string, string> {
+  const timestamp = new Date().toISOString();
+  const files: Record<string, string> = {};
+
+  for (const [id, profile] of Object.entries(BRANDS)) {
+    const compiled = compileBrand(profile);
+
+    let css = `/*\n`;
+    css += ` * 🤖 AUTO-GENERATED — DO NOT EDIT\n`;
+    css += ` * @void-energy/tailwind — brand: ${id}\n`;
+    css += ` * Source of truth: src/config/brands/${id}.ts\n`;
+    css += ` * Generated at: ${timestamp}\n`;
+    css += ` *\n`;
+    css += ` * Brand-overlay axis. Sits between physics and atmosphere in the\n`;
+    css += ` * cascade. Retro physics floor (radii: 0, steps() motion) reasserts\n`;
+    css += ` * above this block via physics/retro.css.\n`;
+    css += ` */\n\n`;
+
+    css += `[data-brand='${id}'] {\n`;
+    for (const [key, value] of Object.entries(compiled.radii)) {
+      css += `  --radius-${key}: ${value};\n`;
+    }
+    for (const [key, value] of Object.entries(compiled.motion)) {
+      css += `  --${key}: ${value};\n`;
+    }
+    for (const [key, value] of Object.entries(compiled.typography)) {
+      css += `  --${key}: ${value};\n`;
+    }
+    css += `}\n`;
+
+    files[id] = css;
+  }
+
+  return files;
+}
+
+function generateL0BrandsJson(): string {
+  const manifest: Record<string, { name: string }> = {};
+  for (const [id, profile] of Object.entries(BRANDS)) {
+    manifest[id] = { name: profile.name };
+  }
+  return JSON.stringify(manifest, null, 2) + '\n';
+}
+
 function generateL0Density(): string {
   const timestamp = new Date().toISOString();
   const f = VOID_TOKENS.density.factors;
@@ -1137,6 +1189,25 @@ async function main() {
       }
       console.log(
         `   └─ 🌌 [L0] Atmospheres: packages/void-energy-tailwind/dist/atmospheres/{${Object.keys(atmosphereFiles).join(',')}}.css`,
+      );
+
+      // Brand-overlay axis — one file per profile, parallel to atmospheres/.
+      // No-op when BRANDS is {}, in which case the directory still exists.
+      if (!fs.existsSync(PATHS.l0Brands))
+        fs.mkdirSync(PATHS.l0Brands, { recursive: true });
+      const brandFiles = generateL0Brands();
+      for (const [name, content] of Object.entries(brandFiles)) {
+        fs.writeFileSync(path.join(PATHS.l0Brands, `${name}.css`), content);
+      }
+      if (Object.keys(brandFiles).length > 0) {
+        console.log(
+          `   └─ 🏷️  [L0] Brands: packages/void-energy-tailwind/dist/brands/{${Object.keys(brandFiles).join(',')}}.css`,
+        );
+      }
+
+      fs.writeFileSync(PATHS.l0BrandsJson, generateL0BrandsJson());
+      console.log(
+        `   └─ 📒 [L0] Brand manifest: packages/void-energy-tailwind/dist/brands.json`,
       );
 
       fs.writeFileSync(PATHS.l0Density, generateL0Density());

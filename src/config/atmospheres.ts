@@ -236,4 +236,34 @@ export const ATMOSPHERES: Record<string, AtmosphereDefinition> = {
       'text-mute': '#7c8797',
     },
   },
+
+  // 5. NIKE-TEST — Brand axis end-to-end reach proof (Phase 1.5).
+  //
+  // Palette is a clone of graphite's so the only runtime difference between
+  // graphite and nike-test is the brand layer: switching between them in the
+  // Themes modal isolates the brand axis as a clean A/B. Real Nike-themed
+  // palettes (Nike orange, volt, etc.) land in Phase 3.1 catalog work.
+  'nike-test': {
+    mode: 'dark',
+    physics: 'flat',
+    tier: 'core',
+    brand: 'nike',
+    tagline: 'Brand axis test (Nike)',
+
+    palette: {
+      ...SEMANTIC_DARK,
+      'font-atmos-heading': FONTS.clean.family,
+      'font-atmos-body': FONTS.clean.family,
+      'bg-canvas': '#1f1f1f',
+      'bg-spotlight': '#1f1f1f',
+      'bg-surface': '#2a2a2c',
+      'bg-sunk': '#161617',
+      'energy-primary': '#ffffff',
+      'energy-secondary': '#6e7178',
+      'border-color': 'rgba(255, 255, 255, 0.10)',
+      'text-main': '#ececee',
+      'text-dim': '#b4b6bb',
+      'text-mute': '#94989e',
+    },
+  },
 };
