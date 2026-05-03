@@ -130,16 +130,17 @@ describe('theme runtime correctness', () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     document.head.innerHTML = '<meta name="theme-color" content="#111111">';
-    const meta = document.querySelector(
-      'meta[name="theme-color"]',
-    ) as HTMLMetaElement;
 
     const engine = new VoidEngine();
 
     engine.setAtmosphere('meridian');
-    expect(meta.getAttribute('content')).toBe(
-      VOID_TOKENS.themes.meridian.palette['bg-canvas'],
-    );
+    // Re-query: applyTheme() replaces the <meta> element on each switch
+    // (intentional, for iOS Safari chrome-region repaint — see void-boot.js).
+    expect(
+      document
+        .querySelector('meta[name="theme-color"]')
+        ?.getAttribute('content'),
+    ).toBe(VOID_TOKENS.themes.meridian.palette['bg-canvas']);
 
     engine.registerTheme('meta-runtime', {
       mode: 'dark',
@@ -149,7 +150,11 @@ describe('theme runtime correctness', () => {
     });
     engine.setAtmosphere('meta-runtime');
 
-    expect(meta.getAttribute('content')).toBe('#123123');
+    expect(
+      document
+        .querySelector('meta[name="theme-color"]')
+        ?.getAttribute('content'),
+    ).toBe('#123123');
   });
 
   it('does not throw when localStorage reads fail during runtime theme hydration', () => {

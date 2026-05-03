@@ -7,7 +7,7 @@ It combines the performance of **Tailwind CSS** (for Layout) with a bespoke **SC
 
 ## 🚀 Getting Started
 
-Requires Node.js 18+ and npm 9+.
+Requires Node.js 22.x and npm 9+ (per `package.json` engines).
 
 ```bash
 git clone https://github.com/dimonb19/void-energy-ui.git
@@ -49,8 +49,15 @@ import HelloPage from '@components/app/HelloPage.svelte';
     <h1>Hello, {name || 'world'}</h1>
 
     <FormField label="Your name">
-      {#snippet children({ fieldId })}
-        <input id={fieldId} type="text" bind:value={name} />
+      {#snippet children({ fieldId, descriptionId, invalid })}
+        <input
+          id={fieldId}
+          type="text"
+          bind:value={name}
+          aria-invalid={invalid}
+          aria-describedby={descriptionId}
+          class="input"
+        />
       {/snippet}
     </FormField>
 

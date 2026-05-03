@@ -198,7 +198,7 @@ export class VoidEngine {
 
     // If this theme is active, fall back to default
     if (this.atmosphere === id) {
-      this.setAtmosphere('void');
+      this.setAtmosphere(DEFAULTS.ATMOSPHERE);
     }
 
     const nextRegistry = { ...this.registry };
